@@ -11,18 +11,39 @@ from quivr_core.llm import LLMEndpoint
 from quivr_core.storage.local_storage import TransparentStorage
 
 
-def test_brain_empty_files():
+@pytest.mark.base
+def test_brain_empty_files_no_vectordb(fake_llm, embedder):
     # Testing no files
     with pytest.raises(ValueError):
-        Brain.from_files(name="test_brain", file_paths=[])
+        Brain.from_files(
+            name="test_brain",
+            file_paths=[],
+            llm=fake_llm,
+            embedder=embedder,
+        )
+
+
+def test_brain_empty_files(fake_llm, embedder, mem_vector_store):
+    brain = Brain.from_files(
+        name="test_brain",
+        file_paths=[],
+        llm=fake_llm,
+        embedder=embedder,
+        vector_db=mem_vector_store,
+    )
+    assert brain
 
 
 @pytest.mark.asyncio
 async def test_brain_from_files_success(
-    fake_llm: LLMEndpoint, embedder, temp_data_file
+    fake_llm: LLMEndpoint, embedder, temp_data_file, mem_vector_store
 ):
     brain = await Brain.afrom_files(
-        name="test_brain", file_paths=[temp_data_file], embedder=embedder, llm=fake_llm
+        name="test_brain",
+        file_paths=[temp_data_file],
+        embedder=embedder,
+        llm=fake_llm,
+        vector_db=mem_vector_store,
     )
     assert brain.name == "test_brain"
     assert len(brain.chat_history) == 0
@@ -37,16 +58,21 @@ async def test_brain_from_files_success(
 
 
 @pytest.mark.asyncio
-async def test_brain_from_langchain_docs(embedder):
+async def test_brain_from_langchain_docs(embedder, fake_llm, mem_vector_store):
     chunk = Document("content_1", metadata={"id": uuid4()})
     brain = await Brain.afrom_langchain_documents(
-        name="test", langchain_documents=[chunk], embedder=embedder
+        name="test",
+        llm=fake_llm,
+        langchain_documents=[chunk],
+        embedder=embedder,
+        vector_db=mem_vector_store,
     )
     # No appended files
     assert len(await brain.storage.get_files()) == 0
     assert len(brain.chat_history) == 0
 
 
+@pytest.mark.base
 @pytest.mark.asyncio
 async def test_brain_search(
     embedder: Embeddings,
@@ -69,10 +95,14 @@ async def test_brain_search(
 
 @pytest.mark.asyncio
 async def test_brain_get_history(
-    fake_llm: LLMEndpoint, embedder, temp_data_file, answers
+    fake_llm: LLMEndpoint, embedder, temp_data_file, mem_vector_store
 ):
     brain = await Brain.afrom_files(
-        name="test_brain", file_paths=[temp_data_file], embedder=embedder, llm=fake_llm
+        name="test_brain",
+        file_paths=[temp_data_file],
+        embedder=embedder,
+        llm=fake_llm,
+        vector_db=mem_vector_store,
     )
 
     brain.ask("question")
@@ -81,6 +111,7 @@ async def test_brain_get_history(
     assert len(brain.default_chat) == 4
 
 
+@pytest.mark.base
 @pytest.mark.asyncio
 async def test_brain_ask_streaming(
     fake_llm: LLMEndpoint, embedder, temp_data_file, answers

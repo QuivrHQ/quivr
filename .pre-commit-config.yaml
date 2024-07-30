@@ -3,6 +3,7 @@ repos:
     rev: v4.6.0
     hooks:
       - id: check-added-large-files
+        args: ["--maxkb=5000"]
       - id: check-toml
       - id: check-yaml
       - id: end-of-file-fixer
