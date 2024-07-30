@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.0.293 (2024-07-30)
+
+## What's Changed
+* feat(frontend): brain carousel by @Zewed in https://github.com/QuivrHQ/quivr/pull/2924
+* fix(frontend): feedback for brain carousel by @Zewed in https://github.com/QuivrHQ/quivr/pull/2926
+
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.292...v0.0.293
+
 ## 0.0.292 (2024-07-29)
 
 ## What's Changed
