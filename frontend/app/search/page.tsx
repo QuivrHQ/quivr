@@ -59,6 +59,22 @@ const Search = (): JSX.Element => {
     }, 750);
   };
 
+  const totalPages = Math.ceil(allBrains.length / brainsPerPage);
+
+  const handleNextPage = () => {
+    if (currentPage < totalPages - 1) {
+      setTransitionDirection("next");
+      setCurrentPage((prevPage) => prevPage + 1);
+    }
+  };
+
+  const handlePreviousPage = () => {
+    if (currentPage > 0) {
+      setTransitionDirection("prev");
+      setCurrentPage((prevPage) => prevPage - 1);
+    }
+  };
+
   useEffect(() => {
     if (userIdentityData) {
       setIsUserDataFetched(true);
@@ -88,21 +104,33 @@ const Search = (): JSX.Element => {
     }
   }, [pathname, session]);
 
-  const totalPages = Math.ceil(allBrains.length / brainsPerPage);
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (document.activeElement) {
+        const tagName = document.activeElement.tagName.toLowerCase();
+        if (tagName !== "body") {
+          return;
+        }
+      }
 
-  const handleNextPage = () => {
-    if (currentPage < totalPages - 1) {
-      setTransitionDirection("next");
-      setCurrentPage((prevPage) => prevPage + 1);
-    }
-  };
+      switch (event.key) {
+        case "ArrowLeft":
+          handlePreviousPage();
+          break;
+        case "ArrowRight":
+          handleNextPage();
+          break;
+        default:
+          break;
+      }
+    };
 
-  const handlePreviousPage = () => {
-    if (currentPage > 0) {
-      setTransitionDirection("prev");
-      setCurrentPage((prevPage) => prevPage - 1);
-    }
-  };
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [handlePreviousPage, handleNextPage]);
 
   const displayedBrains = allBrains.slice(
     currentPage * brainsPerPage,

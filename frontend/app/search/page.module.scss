@@ -36,7 +36,7 @@
 
       @media (max-width: ScreenSizes.$small) {
         width: 100%;
-        padding-inline: Spacings.$spacing09;
+        padding-inline: Spacings.$spacing10;
       }
 
       .quivr_logo_wrapper {
@@ -56,8 +56,7 @@
 
       .brains_list_container {
         display: flex;
-        margin-inline: -(Spacings.$spacing09);
-        align-items: center;
+        margin-inline: -(Spacings.$spacing10);
         gap: calc(Spacings.$spacing05 + Spacings.$spacing01);
 
         .brains_list_wrapper {
@@ -75,6 +74,14 @@
 
         .chevron {
           visibility: visible;
+          height: min-content;
+          padding: Spacings.$spacing03;
+          margin-top: calc(Variables.$brainButtonHeight / 2 - 20px);
+
+          &:hover {
+            background-color: var(--background-3);
+            border-radius: Radius.$circle;
+          }
 
           &.disabled {
             visibility: hidden;
