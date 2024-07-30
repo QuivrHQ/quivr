@@ -18,7 +18,7 @@ export const SearchBar = ({
   newBrain,
 }: {
   onSearch?: () => void;
-  newBrain: boolean;
+  newBrain?: boolean;
 }): JSX.Element => {
   const [searching, setSearching] = useState(false);
   const [isDisabled, setIsDisabled] = useState(true);
