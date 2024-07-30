@@ -48,16 +48,14 @@ async def sync_session(sync_engine):
         conn.begin_nested()
         sync_session = Session(conn, expire_on_commit=False)
 
-        @sqlalchemy.event.listens_for(
-            sync_session.sync_session, "after_transaction_end"
-        )
+        @sqlalchemy.event.listens_for(sync_session, "after_transaction_end")
         def end_savepoint(session, transaction):
             if conn.closed:
                 return
             if not conn.in_nested_transaction():
                 conn.sync_connection.begin_nested()
 
-        yield async_session
+        yield sync_session
 
 
 @pytest.mark.asyncio
@@ -82,6 +80,7 @@ async def test_notion_sync_insert(session):
         last_modified=datetime.now(),
         type="page",
         user=user_1,
+        user_id=user_1.id,
     )
     session.add(sync)
 
@@ -146,12 +145,11 @@ def search_result():
     ]
 
 
-def test_store_notion_pages(sync_engine, search_result):
-    # FIXME(@aminediro): get sync session fixture with rollback
-    with Session(sync_engine, expire_on_commit=False, autoflush=False) as session:
-        notion_repository = NotionRepository(session)
-        notion_service = SyncNotionService(notion_repository)
-        user_1 = (
-            session.exec(select(User).where(User.email == "admin@quivr.app"))
-        ).one()
-        store_notion_pages(search_result, notion_service, user_1.id)
+def test_store_notion_pages(sync_session, search_result):
+    user_1 = (
+        sync_session.exec(select(User).where(User.email == "admin@quivr.app"))
+    ).one()
+    notion_repository = NotionRepository(sync_session)
+    notion_service = SyncNotionService(notion_repository)
+    sync_files = store_notion_pages(search_result, notion_service, user_1.id)
+    assert len(sync_files) == 1

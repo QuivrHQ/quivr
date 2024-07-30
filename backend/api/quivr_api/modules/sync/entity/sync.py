@@ -74,12 +74,12 @@ class NotionSyncFile(SQLModel, table=True):
     type: Optional[str] = Field(
         default=None, description="The type/category of the file"
     )
-    user_id: UUID = Field(
+    user_id: UUID | None = Field(
+        default=None,  # Relationship with user
         foreign_key="users.id",
         description="The ID of the user who owns the file",
     )
     user: User = Relationship(back_populates="notion_syncs")
-    # Uncomment and define User class to establish relationship
 
 
 class SyncsActive(BaseModel):

@@ -20,6 +20,7 @@ def store_notion_pages(
     notion_service: SyncNotionService,
     user_id: UUID,
 ):
+    notion_sync_files = []
     for i, page in enumerate(all_search_result):
         logger.debug(f"Processing page: {i}")
         page = all_search_result[i]
@@ -30,7 +31,7 @@ def store_notion_pages(
             and page["archived"] == False
             and page["parent"]["type"] != "database_id"
         ):
-            notion_sync_input = NotionSyncFile(
+            file = NotionSyncFile(
                 notion_id=page["id"],
                 parent_id=page["parent"][parent_type],
                 name=f'{page["properties"]["title"]["title"][0]["text"]["content"]}.md',
@@ -44,12 +45,16 @@ def store_notion_pages(
                 type="page",
                 user_id=user_id,
             )
-            logger.debug(f"Notion sync input: {notion_sync_input}")
-            # TODO : service should create the NotionSyncFile object internally
-            notion_service.create_notion_file(notion_sync_input)
-            logger.debug(f"Created Notion file: {notion_sync_input}")
+            logger.debug(f"Notion sync input: {file}")
+            # FIXME(@chloedia): service should create the NotionSyncFile object internally
+            # The notion_service should insert ALL the pages in a single batch
+            # This loop should live in the notion_service
+            notion_service.create_notion_file(file)
+            logger.debug(f"Created Notion file: {file}")
+            notion_sync_files.append(file)
         else:
             logger.debug(f"Page did not pass filter: {page['id']}")
+    return notion_sync_files
 
 
 def fetch_notion_pages(notion_client: Client):
