@@ -88,6 +88,9 @@ msal = "*"
 sentry-sdk = { version = "^2.5.0", extras = ["fastapi"] }
 sqlmodel = "^0.0.19"
 megaparse = "0.0.19"
+notion-client = "^2.2.1"
+dropbox = "^12.0.2"
+markdownify = "^0.13.1"
 
 
 [tool.poetry.group.dev.dependencies]

@@ -1,9 +1,9 @@
 import os
-from typing import AsyncGenerator, Callable, Generic, Type, TypeVar
+from typing import AsyncGenerator, Callable, Generator, Generic, Type, TypeVar
 
 from fastapi import Depends
 from sqlalchemy.ext.asyncio import create_async_engine
-from sqlmodel import Session
+from sqlmodel import Session, create_engine
 from sqlmodel.ext.asyncio.session import AsyncSession
 
 from quivr_api.models.settings import settings
@@ -32,6 +32,15 @@ class BaseService(Generic[R]):
 S = TypeVar("S", bound=BaseService)
 
 # TODO: env variable debug sql_alchemy
+sync_engine = create_engine(
+    settings.pg_database_url,
+    echo=True if os.getenv("ORM_DEBUG") else False,
+    future=True,
+    # NOTE: pessimistic bound on
+    pool_pre_ping=True,
+    pool_size=10,  # NOTE: no bouncer for now, if 6 process workers => 6
+    pool_recycle=1800,
+)
 async_engine = create_async_engine(
     settings.pg_database_async_url,
     echo=True if os.getenv("ORM_DEBUG") else False,
@@ -41,6 +50,11 @@ async_engine = create_async_engine(
     pool_size=10,  # NOTE: no bouncer for now, if 6 process workers => 6
     pool_recycle=1800,
 )
+
+
+def get_sync_session() -> Generator[Session, None, None]:
+    with Session(sync_engine, expire_on_commit=False, autoflush=False) as session:
+        yield session
 
 
 async def get_async_session() -> AsyncGenerator[AsyncSession, None]:

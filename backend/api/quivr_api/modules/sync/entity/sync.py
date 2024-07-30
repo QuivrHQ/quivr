@@ -3,8 +3,10 @@ from typing import Optional
 from uuid import UUID
 
 from pydantic import BaseModel
-from sqlmodel import TIMESTAMP, Column, Field, SQLModel, text
+from sqlmodel import TIMESTAMP, Column, Field, Relationship, SQLModel, text
 from sqlmodel import UUID as PGUUID
+
+from quivr_api.modules.user.entity.user_identity import User
 
 
 class SyncsUser(BaseModel):
@@ -72,14 +74,12 @@ class NotionSyncFile(SQLModel, table=True):
     type: Optional[str] = Field(
         default=None, description="The type/category of the file"
     )
-    user_id: Optional[UUID] = Field(
-        default=None,
-        # foreign_key="users.id",
+    user_id: UUID = Field(
+        foreign_key="users.id",
         description="The ID of the user who owns the file",
     )
-
+    user: User = Relationship(back_populates="notion_syncs")
     # Uncomment and define User class to establish relationship
-    # user: Optional[User] = Relationship(back_populates="notion_sync")
 
 
 class SyncsActive(BaseModel):
