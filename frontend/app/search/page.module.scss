@@ -75,6 +75,13 @@
 
         .chevron {
           visibility: visible;
+          height: min-content;
+          padding: Spacings.$spacing03;
+
+          &:hover {
+            background-color: var(--background-3);
+            border-radius: Radius.$circle;
+          }
 
           &.disabled {
             visibility: hidden;
