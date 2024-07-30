@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 
 import { Checkbox } from "@/lib/components/ui/Checkbox/Checkbox";
-import Icon from "@/lib/components/ui/Icon/Icon";
-import QuivrButton from "@/lib/components/ui/QuivrButton/QuivrButton";
+import { Icon } from "@/lib/components/ui/Icon/Icon";
+import { QuivrButton } from "@/lib/components/ui/QuivrButton/QuivrButton";
 import { TextInput } from "@/lib/components/ui/TextInput/TextInput";
 import { useDevice } from "@/lib/hooks/useDevice";
 import { isUploadedKnowledge, Knowledge } from "@/lib/types/Knowledge";

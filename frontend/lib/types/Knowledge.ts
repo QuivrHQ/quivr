@@ -8,6 +8,8 @@ export interface UploadedKnowledge {
   fileName: string;
   extension: string;
   status: "UPLOADED" | "PROCESSING" | "ERROR";
+  integration: string;
+  integration_link: string;
 }
 
 export interface CrawledKnowledge {

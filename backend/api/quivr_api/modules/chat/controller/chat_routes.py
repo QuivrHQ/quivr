@@ -5,25 +5,26 @@ from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from fastapi.responses import StreamingResponse
 from quivr_api.logger import get_logger
 from quivr_api.middlewares.auth import AuthBearer, get_current_user
-from quivr_api.models.settings import get_embedding_client, get_supabase_client
+from quivr_api.modules.brain.entity.brain_entity import RoleEnum
+from quivr_api.modules.brain.service.brain_authorization_service import (
+    validate_brain_authorization,
+)
 from quivr_api.modules.brain.service.brain_service import BrainService
-from quivr_api.modules.chat.controller.chat.brainful_chat import (
-    BrainfulChat, validate_authorization)
 from quivr_api.modules.chat.dto.chats import ChatItem, ChatQuestion
-from quivr_api.modules.chat.dto.inputs import (ChatMessageProperties,
-                                               ChatUpdatableProperties,
-                                               CreateChatProperties,
-                                               QuestionAndAnswer)
+from quivr_api.modules.chat.dto.inputs import (
+    ChatMessageProperties,
+    ChatUpdatableProperties,
+    CreateChatProperties,
+    QuestionAndAnswer,
+)
 from quivr_api.modules.chat.entity.chat import Chat
 from quivr_api.modules.chat.service.chat_service import ChatService
 from quivr_api.modules.dependencies import get_service
-from quivr_api.modules.knowledge.repository.knowledges import \
-    KnowledgeRepository
+from quivr_api.modules.knowledge.repository.knowledges import KnowledgeRepository
 from quivr_api.modules.prompt.service.prompt_service import PromptService
 from quivr_api.modules.rag_service import RAGService
 from quivr_api.modules.user.entity.user_identity import UserIdentity
 from quivr_api.packages.utils.telemetry import maybe_send_telemetry
-from quivr_api.vectorstore.supabase import CustomSupabaseVectorStore
 
 logger = get_logger(__name__)
 
@@ -37,52 +38,13 @@ ChatServiceDep = Annotated[ChatService, Depends(get_service(ChatService))]
 UserIdentityDep = Annotated[UserIdentity, Depends(get_current_user)]
 
 
-def init_vector_store(user_id: UUID) -> CustomSupabaseVectorStore:
-    """
-    Initialize the vector store
-    """
-    supabase_client = get_supabase_client()
-    embedding_service = get_embedding_client()
-    vector_store = CustomSupabaseVectorStore(
-        supabase_client, embedding_service, table_name="vectors", user_id=user_id
-    )
-
-    return vector_store
-
-
-async def get_answer_generator(
-    chat_id: UUID,
-    chat_question: ChatQuestion,
-    chat_service: ChatService,
-    brain_id: UUID | None,
-    current_user: UserIdentity,
-):
-    chat_instance = BrainfulChat()
-    vector_store = init_vector_store(user_id=current_user.id)
-
-    # Get History only if needed
-    if not brain_id:
-        history = await chat_service.get_chat_history(chat_id)
-    else:
-        history = []
-
-    # TODO(@aminediro) : NOT USED anymore
-    brain, metadata_brain = brain_service.find_brain_from_question(
-        brain_id, chat_question.question, current_user, chat_id, history, vector_store
-    )
-    gpt_answer_generator = chat_instance.get_answer_generator(
-        brain=brain,
-        chat_id=str(chat_id),
-        chat_service=chat_service,
-        model=brain.model,
-        temperature=0.1,
-        streaming=True,
-        prompt_id=chat_question.prompt_id,
-        user_id=current_user.id,
-        user_email=current_user.email,
-    )
-
-    return gpt_answer_generator
+def validate_authorization(user_id, brain_id):
+    if brain_id:
+        validate_brain_authorization(
+            brain_id=brain_id,
+            user_id=user_id,
+            required_roles=[RoleEnum.Viewer, RoleEnum.Editor, RoleEnum.Owner],
+        )
 
 
 @chat_router.get("/chat/healthz", tags=["Health"])

@@ -22,7 +22,7 @@
     height: 100%;
     display: flex;
     align-items: center;
-    justify-content: center;
+    padding-top: Spacings.$spacing07;
     flex-direction: column;
 
     .main_wrapper {
@@ -32,10 +32,11 @@
       width: 50%;
       margin-inline: auto;
       transform: translateY(-#{Variables.$searchBarHeight});
+      margin-top: 25vh;
 
       @media (max-width: ScreenSizes.$small) {
         width: 100%;
-        padding-inline: Spacings.$spacing07;
+        padding-inline: Spacings.$spacing10;
       }
 
       .quivr_logo_wrapper {
@@ -49,6 +50,41 @@
 
           .quivr_text_primary {
             color: var(--primary-0);
+          }
+        }
+      }
+
+      .brains_list_container {
+        display: flex;
+        margin-inline: -(Spacings.$spacing10);
+        gap: calc(Spacings.$spacing05 + Spacings.$spacing01);
+
+        .brains_list_wrapper {
+          display: grid;
+          grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+          gap: Spacings.$spacing03;
+          overflow: hidden;
+          width: 100%;
+          overflow-y: scroll;
+
+          @media screen and (min-width: ScreenSizes.$large) {
+            grid-template-columns: repeat(3, minmax(200px, 1fr));
+          }
+        }
+
+        .chevron {
+          visibility: visible;
+          height: min-content;
+          padding: Spacings.$spacing03;
+          margin-top: calc(Variables.$brainButtonHeight / 2 - 20px);
+
+          &:hover {
+            background-color: var(--background-3);
+            border-radius: Radius.$circle;
+          }
+
+          &.disabled {
+            visibility: hidden;
           }
         }
       }

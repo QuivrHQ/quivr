@@ -7,7 +7,7 @@ from quivr_api.modules.sync.dto.inputs import (
     SyncsUserInput,
     SyncUserUpdateInput,
 )
-from quivr_api.modules.sync.entity.sync import SyncsActive
+from quivr_api.modules.sync.entity.sync import SyncsActive, SyncsUser
 from quivr_api.modules.sync.repository.sync import Sync, SyncInterface
 from quivr_api.modules.sync.repository.sync_interfaces import (
     SyncInterface,
@@ -37,7 +37,7 @@ class SyncUserService:
     def delete_sync_user(self, sync_id: str, user_id: str):
         return self.repository.delete_sync_user(sync_id, user_id)
 
-    def get_sync_user_by_state(self, state: dict):
+    def get_sync_user_by_state(self, state: dict) -> SyncsUser:
         return self.repository.get_sync_user_by_state(state)
 
     def get_sync_user_by_id(self, sync_id: int):

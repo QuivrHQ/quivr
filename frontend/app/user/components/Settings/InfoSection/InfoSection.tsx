@@ -1,4 +1,4 @@
-import Icon from "@/lib/components/ui/Icon/Icon";
+import { Icon } from "@/lib/components/ui/Icon/Icon";
 
 import styles from "./InfoSection.module.scss";
 

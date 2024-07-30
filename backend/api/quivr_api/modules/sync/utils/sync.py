@@ -3,7 +3,7 @@ import os
 import time
 from abc import ABC, abstractmethod
 from io import BytesIO
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Union
 
 import dropbox
 import msal
@@ -40,7 +40,9 @@ class BaseSync(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def download_file(self, credentials: Dict, file: SyncFile) -> BytesIO:
+    def download_file(
+        self, credentials: Dict, file: SyncFile
+    ) -> Dict[str, Union[str, BytesIO]]:
         raise NotImplementedError
 
 
@@ -58,7 +60,9 @@ class GoogleDriveSync(BaseSync):
             logger.info("Google Drive credentials refreshed")
         return json.loads(self.creds.to_json())
 
-    def download_file(self, credentials: Dict, file: SyncFile) -> BytesIO:
+    def download_file(
+        self, credentials: Dict, file: SyncFile
+    ) -> Dict[str, Union[str, BytesIO]]:
         file_id = file.id
         file_name = file.name
         mime_type = file.mime_type
@@ -120,7 +124,7 @@ class GoogleDriveSync(BaseSync):
             raise Exception("Unsupported file type")
 
         file_data = request.execute()
-        return BytesIO(file_data)
+        return {"file_name": file_name, "content": BytesIO(file_data)}
 
     def get_files_by_id(self, credentials: Dict, file_ids: List[str]) -> List[SyncFile]:
         """
@@ -236,13 +240,13 @@ class GoogleDriveSync(BaseSync):
                     # If recursive is True and the item is a folder, get files from the folder
                     if (
                         recursive
-                        and item.mimeType == "application/vnd.google-apps.folder"
+                        and item["mimeType"] == "application/vnd.google-apps.folder"
                     ):
                         logger.warning(
                             "Calling Recursive for folder: %s",
-                            item.name,
+                            item["name"],
                         )
-                        files.extend(self.get_files(credentials, item.id, recursive))
+                        files.extend(self.get_files(credentials, item["id"], recursive))
 
                 page_token = results.get("nextPageToken", None)
                 if page_token is None:
@@ -261,10 +265,11 @@ class GoogleDriveSync(BaseSync):
 
 
 class AzureDriveSync(BaseSync):
-    name = "Azure Drive"
+    name = "Share Point"
     lower_name = "azure"
     datetime_format: str = "%Y-%m-%dT%H:%M:%SZ"
     CLIENT_ID = os.getenv("SHAREPOINT_CLIENT_ID")
+    CLIENT_SECRET = os.getenv("SHAREPOINT_CLIENT_SECRET")
     AUTHORITY = "https://login.microsoftonline.com/common"
     BACKEND_URL = os.getenv("BACKEND_URL", "http://localhost:5050")
     REDIRECT_URI = f"{BACKEND_URL}/sync/azure/oauth2callback"
@@ -286,17 +291,24 @@ class AzureDriveSync(BaseSync):
             "Authorization": f"Bearer {token_data['access_token']}",
             "Accept": "application/json",
         }
+    
 
     def check_and_refresh_access_token(self, credentials) -> Dict:
         if "refresh_token" not in credentials:
             raise HTTPException(status_code=401, detail="No refresh token available")
 
-        client = msal.PublicClientApplication(self.CLIENT_ID, authority=self.AUTHORITY)
+        client = msal.ConfidentialClientApplication(
+            self.CLIENT_ID,
+            authority=self.AUTHORITY,
+            client_credential=self.CLIENT_SECRET,
+        )
         result = client.acquire_token_by_refresh_token(
             credentials["refresh_token"], scopes=self.SCOPE
         )
         if "access_token" not in result:
-            raise HTTPException(status_code=400, detail="Failed to refresh token")
+            raise HTTPException(
+                status_code=400, detail=f"Failed to refresh token: {result}"
+            )
 
         credentials.update(
             {
@@ -310,7 +322,9 @@ class AzureDriveSync(BaseSync):
 
         return credentials
 
-    def get_files(self, credentials, folder_id=None, recursive=False) -> List[SyncFile]:
+    def get_files(
+        self, credentials, site_folder_id=None, recursive=False
+    ) -> List[SyncFile]:
         def fetch_files(endpoint, headers, max_retries=1):
             logger.debug(f"fetching files from {endpoint}.")
 
@@ -342,24 +356,48 @@ class AzureDriveSync(BaseSync):
 
         token_data = self.get_azure_token_data(credentials)
         headers = self.get_azure_headers(token_data)
-        endpoint = "https://graph.microsoft.com/v1.0/me/drive/root/children"
-        if folder_id:
-            endpoint = (
-                f"https://graph.microsoft.com/v1.0/me/drive/items/{folder_id}/children"
-            )
+        if not site_folder_id:
+            folder_id = None
+            site_id = None
+        else:
+            site_id, folder_id = site_folder_id.split(":")
+            if folder_id == "":
+                folder_id = None
 
+        if not folder_id and not site_id:
+            # Fetch the sites
+            #endpoint = "https://graph.microsoft.com/v1.0/me/followedSites"
+            endpoint = "https://graph.microsoft.com/v1.0/sites?search=*"
+        elif site_id == "root":
+            if not folder_id:
+                endpoint = "https://graph.microsoft.com/v1.0/me/drive/root/children"
+            else:
+                endpoint = f"https://graph.microsoft.com/v1.0/me/drive/items/{folder_id}/children"
+        else:
+            if not folder_id:
+                endpoint = f"https://graph.microsoft.com/v1.0/sites/{site_id}/drive/root/children"
+            else:
+                endpoint = f"https://graph.microsoft.com/v1.0/sites/{site_id}/drive/items/{folder_id}/children"
         items = fetch_files(endpoint, headers)
+
+        if not folder_id and not site_id and len(items) == 0:
+            logger.debug("No sites found in Azure Drive, files : %s", items)
+            return self.get_files(credentials, "root:", recursive)
 
         if not items:
             logger.info("No files found in Azure Drive")
             return []
+        else:
+            logger.info("Azure Drive files found: %s", items)
 
         files = []
         for item in items:
             file_data = SyncFile(
-                name=item.get("name"),
-                id=item.get("id"),
-                is_folder="folder" in item,
+                name=item.get("name") if site_folder_id else item.get("displayName"),
+                id=f'{item.get("id", {}).split(",")[1]}:'
+                if not site_folder_id
+                else f'{site_id}:{item.get("id")}',
+                is_folder="folder" in item or not site_folder_id,
                 last_modified=item.get("lastModifiedDateTime"),
                 mime_type=item.get("file", {}).get("mimeType", "folder"),
                 web_view_link=item.get("webUrl"),
@@ -369,10 +407,21 @@ class AzureDriveSync(BaseSync):
             # If recursive option is enabled and the item is a folder, fetch files from it
             if recursive and file_data.is_folder:
                 folder_files = self.get_files(
-                    credentials, folder_id=file_data.id, recursive=True
+                    credentials, site_folder_id=file_data.id, recursive=True
                 )
 
                 files.extend(folder_files)
+        if not folder_id and not site_id:
+            files.append(
+                SyncFile(
+                    name="My Drive",
+                    id="root:",
+                    is_folder=True,
+                    last_modified="",
+                    mime_type="folder",
+                    web_view_link="https://onedrive.live.com",
+                )
+            )
         for file in files:
             file.name = remove_special_characters(file.name)
         logger.info("Azure Drive files retrieved successfully: %s", len(files))
@@ -397,7 +446,15 @@ class AzureDriveSync(BaseSync):
         files = []
 
         for file_id in file_ids:
-            endpoint = f"https://graph.microsoft.com/v1.0/me/drive/items/{file_id}"
+            site_id, folder_id = file_id.split(":")
+            if folder_id == "":
+                folder_id = None
+            if site_id == "root":
+                endpoint = (
+                    f"https://graph.microsoft.com/v1.0/me/drive/items/{folder_id}"
+                )
+            else:
+                endpoint = f"https://graph.microsoft.com/v1.0/sites/{site_id}/drive/items/{folder_id}"
             response = requests.get(endpoint, headers=headers)
             if response.status_code == 401:
                 token_data = self.check_and_refresh_access_token(credentials)
@@ -414,7 +471,7 @@ class AzureDriveSync(BaseSync):
             files.append(
                 SyncFile(
                     name=result.get("name"),
-                    id=result.get("id"),
+                    id=f'{site_id}:{result.get("id")}',
                     is_folder="folder" in result,
                     last_modified=result.get("lastModifiedDateTime"),
                     mime_type=result.get("file", {}).get("mimeType", "folder"),
@@ -427,20 +484,28 @@ class AzureDriveSync(BaseSync):
         logger.info("Azure Drive files retrieved successfully: %s", len(files))
         return files
 
-    def download_file(self, credentials: Dict, file: SyncFile) -> BytesIO:
+    def download_file(
+        self, credentials: Dict, file: SyncFile
+    ) -> Dict[str, Union[str, BytesIO]]:
         file_id = file.id
         file_name = file.name
         modified_time = file.last_modified
         headers = self.get_azure_headers(credentials)
 
-        download_endpoint = (
-            f"https://graph.microsoft.com/v1.0/me/drive/items/{file_id}/content"
-        )
+        site_id, folder_id = file_id.split(":")
+        if folder_id == "":
+            folder_id = None
+        if site_id == "root":
+            download_endpoint = (
+                f"https://graph.microsoft.com/v1.0/me/drive/items/{file_id}/content"
+            )
+        else:
+            download_endpoint = f"https://graph.microsoft.com/v1.0/sites/{site_id}/drive/items/{folder_id}/content"
         logger.info("Downloading file: %s", file_name)
         download_response = requests.get(
             download_endpoint, headers=headers, stream=True
         )
-        return BytesIO(download_response.content)
+        return {"file_name": file_name, "content": BytesIO(download_response.content)}
 
 
 class DropboxSync(BaseSync):
@@ -502,7 +567,6 @@ class DropboxSync(BaseSync):
             def fetch_files(metadata):
                 files = []
                 for file in metadata.entries:
-
                     shared_link = f"https://www.dropbox.com/preview{file.path_display}?context=content_suggestions&role=personal"
                     is_folder = isinstance(file, dropbox.files.FolderMetadata)
 
@@ -613,10 +677,13 @@ class DropboxSync(BaseSync):
             logger.error("Unexpected error: %s", e)
             raise Exception("Failed to retrieve files")
 
-    def download_file(self, credentials: Dict, file: SyncFile) -> BytesIO:
+    def download_file(
+        self, credentials: Dict, file: SyncFile
+    ) -> Dict[str, Union[str, BytesIO]]:
         file_id = str(file.id)
+        file_name = file.name
         if not self.dbx:
             self.dbx = self.link_dropbox(credentials)
 
         metadata, file_data = self.dbx.files_download(file_id)  # type: ignore
-        return BytesIO(file_data.content)
+        return {"file_name": file_name, "content": BytesIO(file_data.content)}

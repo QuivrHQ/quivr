@@ -13,16 +13,24 @@
   overflow: hidden;
   box-shadow: BoxShadow.$large;
 
+  &.new_brain {
+    border-color: var(--primary-0);
+  }
+
   .editor_wrapper {
     display: flex;
     align-items: center;
     justify-content: space-between;
     padding: Spacings.$spacing05;
-    padding-top: 0;
 
     &.disabled {
       pointer-events: none;
       opacity: 0.3;
+      padding-top: 0;
+    }
+
+    &.current {
+      padding-top: 0;
     }
 
     .search_icon {

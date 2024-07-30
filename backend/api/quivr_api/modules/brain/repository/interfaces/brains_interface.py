@@ -5,7 +5,7 @@ from quivr_api.modules.brain.dto.inputs import (
     BrainUpdatableProperties,
     CreateBrainProperties,
 )
-from quivr_api.modules.brain.entity.brain_entity import BrainEntity, PublicBrain
+from quivr_api.modules.brain.entity.brain_entity import BrainEntity
 
 
 class BrainsInterface(ABC):
@@ -13,13 +13,6 @@ class BrainsInterface(ABC):
     def create_brain(self, brain: CreateBrainProperties) -> BrainEntity:
         """
         Create a brain in the brains table
-        """
-        pass
-
-    @abstractmethod
-    def get_public_brains(self) -> list[PublicBrain]:
-        """
-        Get all public brains
         """
         pass
 

@@ -76,14 +76,18 @@ export const SingleSelector = <T extends string | number | UUID>({
               color="black"
             />
           </div>
-          <div
-            className={`
+          {(folded || selectedOption) && (
+            <div
+              className={`
             ${styles.label} 
             ${!selectedOption ? styles.not_set : ""}
             `}
-          >
-            {selectedOption?.label ?? placeholder}
-          </div>
+            >
+              <span className={styles.label_text}>
+                {selectedOption?.label ?? placeholder}
+              </span>
+            </div>
+          )}
         </div>
         {!folded && (
           <div className={styles.right}>
@@ -107,7 +111,7 @@ export const SingleSelector = <T extends string | number | UUID>({
               }}
             >
               <div className={styles.icon}>
-                <Icon name={iconName} size="normal" color="black" />
+                <Icon name={iconName} size="small" color="black" />
               </div>
               <span className={styles.option_name}>{option.label}</span>
             </div>

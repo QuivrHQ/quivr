@@ -3,7 +3,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 import { useBrainFetcher } from "@/app/studio/[brainId]/BrainManagementTabs/hooks/useBrainFetcher";
-import Icon from "@/lib/components/ui/Icon/Icon";
+import { Icon } from "@/lib/components/ui/Icon/Icon";
 import { LoaderIcon } from "@/lib/components/ui/LoaderIcon/LoaderIcon";
 import Tooltip from "@/lib/components/ui/Tooltip/Tooltip";
 import { Brain } from "@/lib/context/BrainProvider/types";
@@ -125,12 +125,11 @@ export const FeedingNotification = ({
   );
 
   const deleteNotification = async () => {
-    const deletePromises = bulkNotification.notifications.map(
-      async (notification) => {
-        await supabase.from("notifications").delete().eq("id", notification.id);
-      }
-    );
-    await Promise.all(deletePromises);
+    await supabase
+      .from("notifications")
+      .delete()
+      .match({ bulk_id: bulkNotification.bulk_id });
+
     await updateNotifications();
   };
 

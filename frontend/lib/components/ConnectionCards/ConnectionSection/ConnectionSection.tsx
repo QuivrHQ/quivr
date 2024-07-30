@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useFromConnectionsContext } from "@/app/chat/[chatId]/components/ActionsBar/components/KnowledgeToFeed/components/FromConnections/FromConnectionsProvider/hooks/useFromConnectionContext";
 import { OpenedConnection, Provider, Sync } from "@/lib/api/sync/types";
 import { useSync } from "@/lib/api/sync/useSync";
-import QuivrButton from "@/lib/components/ui/QuivrButton/QuivrButton";
+import { QuivrButton } from "@/lib/components/ui/QuivrButton/QuivrButton";
 
 import { ConnectionButton } from "./ConnectionButton/ConnectionButton";
 import { ConnectionLine } from "./ConnectionLine/ConnectionLine";
@@ -115,7 +115,7 @@ export const ConnectionSection = ({
   fromAddKnowledge,
   callback,
 }: ConnectionSectionProps): JSX.Element => {
-  const { iconUrls, getUserSyncs, getSyncFiles } = useSync();
+  const { providerIconUrls, getUserSyncs, getSyncFiles } = useSync();
   const {
     setCurrentSyncElements,
     setCurrentSyncId,
@@ -216,7 +216,7 @@ export const ConnectionSection = ({
         <div className={styles.connection_section_header}>
           <div className={styles.left}>
             <Image
-              src={iconUrls[provider]}
+              src={providerIconUrls[provider]}
               alt={label}
               width={24}
               height={24}

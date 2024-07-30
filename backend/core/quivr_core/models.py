@@ -17,12 +17,6 @@ class cited_answer(BaseModelV1):
         ...,
         description="The answer to the user question, which is based only on the given sources.",
     )
-    thoughts: str = FieldV1(
-        ...,
-        description="""Description of the thought process, based only on the given sources.
-        Cite the text as much as possible and give the document name it appears in. In the format : 'Doc_name states : cited_text'. Be the most
-        procedural as possible. Write all the steps needed to find the answer until you find it.""",
-    )
     citations: list[int] = FieldV1(
         ...,
         description="The integer IDs of the SPECIFIC sources which justify the answer.",
@@ -63,7 +57,6 @@ class RawRAGResponse(TypedDict):
 
 class RAGResponseMetadata(BaseModel):
     citations: list[int] | None = None
-    thoughts: str | list[str] | None = None
     followup_questions: list[str] | None = None
     sources: list[Any] | None = None
 
@@ -86,6 +79,8 @@ class QuivrKnowledge(BaseModel):
     url: str | None = None
     extension: str = "txt"
     status: str = "PROCESSING"
+    integration: str | None = None
+    integration_link: str | None = None
 
 
 # NOTE: for compatibility issues with langchain <-> PydanticV1

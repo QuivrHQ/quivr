@@ -2,7 +2,7 @@ import { formatDistanceToNow } from "date-fns";
 import { useRouter } from "next/navigation";
 
 import { useBrainFetcher } from "@/app/studio/[brainId]/BrainManagementTabs/hooks/useBrainFetcher";
-import Icon from "@/lib/components/ui/Icon/Icon";
+import { Icon } from "@/lib/components/ui/Icon/Icon";
 import { useNotificationsContext } from "@/lib/context/NotificationsProvider/hooks/useNotificationsContext";
 import { useSupabase } from "@/lib/context/SupabaseProvider";
 
@@ -27,12 +27,11 @@ export const GenericNotification = ({
   };
 
   const deleteNotification = async () => {
-    const deletePromises = bulkNotification.notifications.map(
-      async (notification) => {
-        await supabase.from("notifications").delete().eq("id", notification.id);
-      }
-    );
-    await Promise.all(deletePromises);
+    await supabase
+      .from("notifications")
+      .delete()
+      .match({ bulk_id: bulkNotification.bulk_id });
+
     await updateNotifications();
   };
 

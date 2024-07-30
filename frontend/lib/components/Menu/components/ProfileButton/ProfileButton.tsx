@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 
 import { useUserApi } from "@/lib/api/user/useUserApi";
 import { MenuButton } from "@/lib/components/Menu/components/MenuButton/MenuButton";
-import Icon from "@/lib/components/ui/Icon/Icon";
+import { Icon } from "@/lib/components/ui/Icon/Icon";
 import { useUserSettingsContext } from "@/lib/context/UserSettingsProvider/hooks/useUserSettingsContext";
 import { useUserData } from "@/lib/hooks/useUserData";
 

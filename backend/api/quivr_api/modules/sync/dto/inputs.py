@@ -20,6 +20,7 @@ class SyncsUserInput(BaseModel):
     provider: str
     credentials: dict
     state: dict
+    additional_data: dict = {}
 
 
 class SyncUserUpdateInput(BaseModel):
@@ -63,6 +64,7 @@ class SyncsActiveInput(BaseModel):
     syncs_user_id: int
     settings: SyncActiveSettings
     brain_id: str
+    notification_id: Optional[str] = None
 
 
 class SyncsActiveUpdateInput(BaseModel):
@@ -79,6 +81,7 @@ class SyncsActiveUpdateInput(BaseModel):
     settings: Optional[SyncActiveSettings] = None
     last_synced: Optional[str] = None
     force_sync: Optional[bool] = False
+    notification_id: Optional[str] = None
 
 
 class SyncFileInput(BaseModel):

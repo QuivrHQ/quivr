@@ -3,7 +3,8 @@ import { useEffect, useState } from "react";
 import { SyncElement } from "@/lib/api/sync/types";
 import { useSync } from "@/lib/api/sync/useSync";
 import { ConnectionCards } from "@/lib/components/ConnectionCards/ConnectionCards";
-import TextButton from "@/lib/components/ui/TextButton/TextButton";
+import { LoaderIcon } from "@/lib/components/ui/LoaderIcon/LoaderIcon";
+import { TextButton } from "@/lib/components/ui/TextButton/TextButton";
 import { useUserData } from "@/lib/hooks/useUserData";
 
 import { FileLine } from "./FileLine/FileLine";
@@ -19,6 +20,7 @@ export const FromConnections = (): JSX.Element => {
   const [currentFolders, setCurrentFolders] = useState<SyncElement[]>([]);
   const { getSyncFiles } = useSync();
   const { userData } = useUserData();
+  const [loading, setLoading] = useState(false);
 
   const isPremium = userData?.is_premium;
 
@@ -29,6 +31,7 @@ export const FromConnections = (): JSX.Element => {
     setCurrentFolders(
       currentSyncElements?.files.filter((file) => file.is_folder) ?? []
     );
+    setLoading(false);
   }, [currentSyncElements]);
 
   const handleGetSyncFiles = async (
@@ -36,6 +39,7 @@ export const FromConnections = (): JSX.Element => {
     folderId: string | null
   ) => {
     try {
+      setLoading(true);
       let res;
       if (folderId !== null) {
         res = await getSyncFiles(userSyncId, folderId);
@@ -84,29 +88,37 @@ export const FromConnections = (): JSX.Element => {
             />
           </div>
           <div className={styles.connection_content}>
-            {currentFolders.map((folder) => (
-              <div
-                key={folder.id}
-                onClick={() => {
-                  void handleFolderClick(currentSyncId, folder.id);
-                }}
-              >
-                <FolderLine
-                  name={folder.name ?? ""}
-                  selectable={!!isPremium}
-                  id={folder.id}
-                />
+            {loading ? (
+              <div className={styles.loader_icon}>
+                <LoaderIcon size="big" color="primary" />
               </div>
-            ))}
-            {currentFiles.map((file) => (
-              <div key={file.id}>
-                <FileLine
-                  name={file.name ?? ""}
-                  selectable={true}
-                  id={file.id}
-                />
-              </div>
-            ))}
+            ) : (
+              <>
+                {currentFolders.map((folder) => (
+                  <div
+                    key={folder.id}
+                    onClick={() => {
+                      void handleFolderClick(currentSyncId, folder.id);
+                    }}
+                  >
+                    <FolderLine
+                      name={folder.name ?? ""}
+                      selectable={!!isPremium}
+                      id={folder.id}
+                    />
+                  </div>
+                ))}
+                {currentFiles.map((file) => (
+                  <div key={file.id}>
+                    <FileLine
+                      name={file.name ?? ""}
+                      selectable={true}
+                      id={file.id}
+                    />
+                  </div>
+                ))}
+              </>
+            )}
             {!currentFiles.length && !currentFolders.length && (
               <span className={styles.empty_folder}>Empty folder</span>
             )}

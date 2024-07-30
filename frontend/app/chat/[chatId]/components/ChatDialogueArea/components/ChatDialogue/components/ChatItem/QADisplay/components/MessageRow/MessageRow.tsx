@@ -3,9 +3,9 @@ import React, { useEffect, useState } from "react";
 import { useChatInput } from "@/app/chat/[chatId]/components/ActionsBar/components/ChatInput/hooks/useChatInput";
 import { useChat } from "@/app/chat/[chatId]/hooks/useChat";
 import { useChatApi } from "@/lib/api/chat/useChatApi";
+import { Integration } from "@/lib/api/sync/types";
 import { CopyButton } from "@/lib/components/ui/CopyButton";
-import Icon from "@/lib/components/ui/Icon/Icon";
-import { ThoughtsButton } from "@/lib/components/ui/ThoughtsButton";
+import { Icon } from "@/lib/components/ui/Icon/Icon";
 import { Source } from "@/lib/types/MessageMetadata";
 
 import styles from "./MessageRow.module.scss";
@@ -67,6 +67,8 @@ export const MessageRow = ({
             file_url: source.source_url,
             citations: [source.citation],
             selected: false,
+            integration: source.integration as Integration,
+            integration_link: source.integration_link,
           });
         }
 
@@ -116,9 +118,6 @@ export const MessageRow = ({
               sourceFiles.length === 0 ? styles.with_border : ""
             }`}
           >
-            {metadata?.thoughts && metadata.thoughts.trim() !== "" && (
-              <ThoughtsButton text={metadata.thoughts} size="small" />
-            )}
             <CopyButton handleCopy={handleCopy} size="small" />
             <Icon
               name="thumbsUp"

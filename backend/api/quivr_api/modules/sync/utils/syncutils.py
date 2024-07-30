@@ -85,7 +85,9 @@ class SyncUtils(BaseModel):
                 mime_type = file.mime_type
                 modified_time = file.last_modified
 
-                file_data = self.sync_cloud.download_file(credentials, file)
+                file_response = self.sync_cloud.download_file(credentials, file)
+                file_name = file_response["file_name"]
+                file_data = file_response["content"]
                 # Check if the file already exists in the storage
                 if check_file_exists(brain_id, file_name):
                     logger.debug("%s already exists in the storage", file_name)

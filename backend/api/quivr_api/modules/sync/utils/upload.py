@@ -62,19 +62,27 @@ async def upload_file(
     except Exception as e:
         print(e)
 
-        notification_service.update_notification_by_id(
-            notification_id,
-            NotificationUpdatableProperties(
-                status=NotificationsStatusEnum.ERROR,
-                description=f"There was an error uploading the file: {e}",
-            ),
-        )
         if "The resource already exists" in str(e):
+            notification_service.update_notification_by_id(
+                notification_id,
+                NotificationUpdatableProperties(
+                    status=NotificationsStatusEnum.ERROR,
+                    description=f"File {upload_file.filename} already exists in storage.",
+                ),
+            )
             raise HTTPException(
                 status_code=403,
                 detail=f"File {upload_file.filename} already exists in storage.",
             )
+        
         else:
+            notification_service.update_notification_by_id(
+                notification_id,
+                NotificationUpdatableProperties(
+                    status=NotificationsStatusEnum.ERROR,
+                    description=f"There was an error uploading the file",
+                ),
+            )
             raise HTTPException(
                 status_code=500, detail=f"Failed to upload file to storage. {e}"
             )

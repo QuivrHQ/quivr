@@ -98,6 +98,7 @@ def authorize_google(
         provider="Google",
         credentials={},
         state={"state": state},
+        additional_data={},
     )
     sync_user_service.create_sync_user(sync_user_input)
     return {"authorization_url": authorization_url}
