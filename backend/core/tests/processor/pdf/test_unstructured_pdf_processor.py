@@ -5,11 +5,8 @@ import pytest
 
 from quivr_core.files.file import FileExtension, QuivrFile
 from quivr_core.processor.implementations.default import UnstructuredPDFProcessor
-from quivr_core.processor.registry import register_processor
 
 all_but_pdf = list(filter(lambda ext: ext != ".pdf", list(FileExtension)))
-
-register_processor(FileExtension.pdf, proc_cls=UnstructuredPDFProcessor)
 
 
 @pytest.mark.asyncio

@@ -117,14 +117,13 @@ def defaults_to_proc_entries(
 
     # TODO(@aminediro): Megaparse should register itself
     # Append Megaparse
-    for ext in [FileExtension.pdf]:
-        _append_proc_mapping(
-            mapping=base_processors,
-            file_ext=ext,
-            cls_mod="quivr_core.processor.implementations.megaparse_processor.MegaparseProcessor",
-            errtxt=f"can't import MegaparseProcessor. Please install quivr-core[{ext_str}] to access MegaparseProcessor",
-            priority=None,
-        )
+    _append_proc_mapping(
+        mapping=base_processors,
+        file_ext=FileExtension.pdf,
+        cls_mod="quivr_core.processor.implementations.megaparse_processor.MegaparseProcessor",
+        errtxt=f"can't import MegaparseProcessor. Please install quivr-core[{ext_str}] to access MegaparseProcessor",
+        priority=None,
+    )
     return base_processors
 
 

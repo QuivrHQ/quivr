@@ -10,15 +10,13 @@ from quivr_core.processor.registry import get_processor_class
 all_but_pdf = list(filter(lambda ext: ext != ".pdf", list(FileExtension)))
 
 
-@pytest.mark.base
 def test_get_default_processors_megaparse():
     cls = get_processor_class(FileExtension.pdf)
-    # FIXME: using this class will actually fail if you don't have the
     assert cls == MegaparseProcessor
 
 
 @pytest.mark.asyncio
-async def test_unstructured_pdf_processor():
+async def test_megaparse_pdf_processor():
     p = Path("./tests/processor/pdf/sample.pdf")
     f = QuivrFile(
         id=uuid4(),
@@ -30,12 +28,13 @@ async def test_unstructured_pdf_processor():
     )
     processor = MegaparseProcessor()
     result = await processor.process_file(f)
+
     assert len(result) > 0
 
 
 @pytest.mark.parametrize("ext", all_but_pdf)
 @pytest.mark.asyncio
-async def test_unstructured_pdf_processor_fail(ext):
+async def test_megaparse_fail(ext):
     p = Path("./tests/processor/pdf/sample.pdf")
     f = QuivrFile(
         id=uuid4(),

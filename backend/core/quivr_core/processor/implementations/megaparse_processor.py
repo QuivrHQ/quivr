@@ -3,7 +3,7 @@ import logging
 import tiktoken
 from langchain_core.documents import Document
 from langchain_text_splitters import RecursiveCharacterTextSplitter, TextSplitter
-from megaparse.Converter import MegaParse
+from megaparse import MegaParse
 
 from quivr_core.files.file import QuivrFile
 from quivr_core.processor.processor_base import ProcessorBase
@@ -20,10 +20,16 @@ class MegaparseProcessor(ProcessorBase):
         self,
         splitter: TextSplitter | None = None,
         splitter_config: SplitterConfig = SplitterConfig(),
+        llama_parse_api_key: str | None = None,
+        strategy: str = "fast",
     ) -> None:
-        self.loader_cls = MegaParse(file_path="./test.pdf")
+        self.loader_cls = MegaParse
         self.enc = tiktoken.get_encoding("cl100k_base")
         self.splitter_config = splitter_config
+        self.megaparse_kwargs = {
+            "llama_parse_api_key": llama_parse_api_key,
+            "strategy": strategy,
+        }
 
         if splitter:
             self.text_splitter = splitter
@@ -40,10 +46,11 @@ class MegaparseProcessor(ProcessorBase):
         }
 
     async def process_file_inner(self, file: QuivrFile) -> list[Document]:
-        loader = self.loader_cls(file_path=file.path, **self.loader_kwargs)  # type: ignore
-        documents = await loader.aload()
-        docs = self.text_splitter.split_documents(documents)
-
-        for doc in docs:
-            doc.metadata = {"chunk_size": len(self.enc.encode(doc.page_content))}
-        return docs
+        mega_parse = MegaParse(file_path=file.path, **self.megaparse_kwargs)  # type: ignore
+        document: Document = await mega_parse.aload()
+        if len(document.page_content) > self.splitter_config.chunk_size:
+            docs = self.text_splitter.split_documents([document])
+            for doc in docs:
+                doc.metadata = {"chunk_size": len(self.enc.encode(doc.page_content))}
+            return docs
+        return [document]
