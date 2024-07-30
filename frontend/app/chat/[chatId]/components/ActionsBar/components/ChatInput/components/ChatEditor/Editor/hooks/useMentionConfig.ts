@@ -5,6 +5,8 @@ import { SuggestionOptions } from "@tiptap/suggestion";
 import { RefAttributes, useMemo } from "react";
 import tippy, { Instance } from "tippy.js";
 
+import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
+
 import { MentionList, MentionListRef } from "../MentionsList/MentionsList";
 import { MentionListProps } from "../MentionsList/types";
 import { SuggestionData, SuggestionItem } from "../types";
@@ -19,6 +21,7 @@ export const useMentionConfig = ({
   char,
   suggestionData,
 }: UseMentionConfigProps) => {
+  const { currentBrainId } = useBrainContext();
   const mentionKey = `mention${char}`;
   const items = suggestionData.items;
 
@@ -88,6 +91,12 @@ export const useMentionConfig = ({
               return true;
             }
 
+            if (!currentBrainId && props.event.key === "Enter") {
+              alert("hey");
+
+              return true;
+            }
+
             return reactRenderer?.ref?.onKeyDown(props) ?? false;
           },
           onExit: () => {
@@ -97,7 +106,7 @@ export const useMentionConfig = ({
         };
       },
     }),
-    [char, items, mentionKey, suggestionData]
+    [char, items, mentionKey, suggestionData, currentBrainId]
   );
 
   const Mention = TiptapMention.extend({
