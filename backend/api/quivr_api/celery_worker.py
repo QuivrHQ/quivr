@@ -295,7 +295,9 @@ def check_if_is_premium_user():
 @celery.task(name="fetch_and_store_notion_files")
 def fetch_and_store_notion_files(access_token: str, user_id: UUID):
     logger.debug("Fetching and storing Notion files")
-    assert sync_engine
+    if sync_engine is None:
+        init_worker()
+
     with Session(sync_engine, expire_on_commit=False, autoflush=False) as session:
         notion_repository = NotionRepository(session)
         notion_service = SyncNotionService(notion_repository)
