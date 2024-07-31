@@ -1,6 +1,5 @@
 from langchain_core.language_models.chat_models import BaseChatModel
 from pydantic.v1 import SecretStr
-
 from quivr_core.brain.info import LLMInfo
 from quivr_core.config import LLMEndpointConfig
 from quivr_core.utils import model_supports_function_calling

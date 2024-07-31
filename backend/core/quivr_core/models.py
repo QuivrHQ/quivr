@@ -31,7 +31,7 @@ class cited_answer(BaseModelV1):
 class ChatMessage(BaseModelV1):
     chat_id: UUID
     message_id: UUID
-    brain_id: UUID
+    brain_id: UUID | None
     msg: AIMessage | HumanMessage
     message_time: datetime
     metadata: dict[str, Any]

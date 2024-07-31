@@ -31,6 +31,7 @@ def model_supports_function_calling(model_name: str):
         "gpt-3.5-turbo",
         "gpt-4-turbo",
         "gpt-4o",
+        "gpt-4o-mini",
     ]
     return model_name in models_supporting_function_calls
 
