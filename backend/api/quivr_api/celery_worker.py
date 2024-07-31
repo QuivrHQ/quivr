@@ -22,7 +22,8 @@ from quivr_api.modules.brain.service.brain_vector_service import \
 from quivr_api.modules.sync.repository.sync import NotionRepository
 from quivr_api.modules.sync.service.sync_notion import (SyncNotionService,
                                                         fetch_notion_pages,
-                                                        store_notion_pages)
+                                                        store_notion_pages,
+                                                        update_notion_pages)
 from quivr_api.packages.files.crawl.crawler import CrawlWebsite, slugify
 from quivr_api.packages.files.processors import filter_file
 from quivr_api.packages.utils.telemetry import maybe_send_telemetry
@@ -315,6 +316,26 @@ async def fetch_and_store_notion_files_async(access_token: str, user_id: UUID):
         notion_client = Client(auth=access_token)
         all_search_result = fetch_notion_pages(notion_client)
         await store_notion_pages(all_search_result, notion_service, user_id)
+
+@celery.task(name="sync_notion_files")
+def sync_notion_files(access_token: str, user_id: UUID):
+    if async_engine is None:
+        init_worker()
+    logger.debug("Syncing Notion files")
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(sync_notion_files_async(access_token, user_id))
+
+async def sync_notion_files_async(access_token: str, user_id: UUID):
+    global async_engine
+    assert async_engine
+    async with AsyncSession(
+        async_engine, expire_on_commit=False, autoflush=False
+    ) as session:
+        notion_repository = NotionRepository(session)
+        notion_service = SyncNotionService(notion_repository)
+        notion_client = Client(auth=access_token)
+        all_search_result= fetch_notion_pages(notion_client, sync = True)
+        await update_notion_pages(all_search_result, notion_service, user_id)
 
 
 celery.conf.beat_schedule = {

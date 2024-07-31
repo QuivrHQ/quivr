@@ -2,20 +2,20 @@ from datetime import datetime, timedelta
 from typing import List, Sequence
 from uuid import UUID
 
-from sqlalchemy.exc import IntegrityError
-from sqlmodel import select
-from sqlmodel.ext.asyncio.session import AsyncSession
-
 from quivr_api.logger import get_logger
 from quivr_api.models.settings import get_supabase_client
 from quivr_api.modules.dependencies import BaseRepository
-from quivr_api.modules.knowledge.service.knowledge_service import KnowledgeService
-from quivr_api.modules.notification.service.notification_service import (
-    NotificationService,
-)
-from quivr_api.modules.sync.dto.inputs import SyncsActiveInput, SyncsActiveUpdateInput
+from quivr_api.modules.knowledge.service.knowledge_service import \
+    KnowledgeService
+from quivr_api.modules.notification.service.notification_service import \
+    NotificationService
+from quivr_api.modules.sync.dto.inputs import (SyncsActiveInput,
+                                               SyncsActiveUpdateInput)
 from quivr_api.modules.sync.entity.sync import NotionSyncFile, SyncsActive
 from quivr_api.modules.sync.repository.sync_interfaces import SyncInterface
+from sqlalchemy.exc import IntegrityError
+from sqlmodel import select
+from sqlmodel.ext.asyncio.session import AsyncSession
 
 notification_service = NotificationService()
 knowledge_service = KnowledgeService()
@@ -236,6 +236,36 @@ class NotionRepository(BaseRepository):
         await self.session.refresh(new_notion_file)
         return new_notion_file
 
+    async def update_notion_file(
+        self, updated_notion_file: NotionSyncFile
+    ) -> NotionSyncFile:
+        try:
+            query = select(NotionSyncFile).where(NotionSyncFile.notion_id == updated_notion_file.notion_id)
+            results = await self.session.exec(query)
+            page = results.one()
+            if page:
+                page.name = updated_notion_file.name
+                page.last_modified = updated_notion_file.last_modified
+
+                self.session.add(page)
+                logger.info(f"Updating notion file in notion repo: {updated_notion_file}")
+                await self.session.commit()
+            else:
+                self.session.add(updated_notion_file)
+
+
+        except IntegrityError as ie:
+            logger.error(f"IntegrityError occurred: {ie}")
+            await self.session.rollback()
+            raise Exception("Integrity error while updating notion file.")
+        except Exception as e:
+            logger.error(f"Exception occurred: {e}")
+            await self.session.rollback()
+            raise e
+
+        await self.session.refresh(updated_notion_file)
+        return updated_notion_file
+
     async def get_notion_files_by_ids(self, ids: List[str]) -> Sequence[NotionSyncFile]:
         logger.debug("Hey there, i am in get_notion_files_by_ids")
         query = select(NotionSyncFile).where(NotionSyncFile.notion_id.in_(ids))  # type: ignore
@@ -256,3 +286,13 @@ class NotionRepository(BaseRepository):
         query = select(NotionSyncFile).where(NotionSyncFile.parent_id == page_id)
         response = await self.session.exec(query)
         return response.first() is not None
+    
+    async def delete_notion_file(self, notion_id: str):
+        query = select(NotionSyncFile).where(NotionSyncFile.notion_id == notion_id)
+        response = await self.session.exec(query)
+        notion_file = response.first()
+        if notion_file:
+            await self.session.delete(notion_file)
+            await self.session.commit()
+            return notion_file
+        return None
