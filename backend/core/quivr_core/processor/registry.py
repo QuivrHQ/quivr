@@ -6,20 +6,6 @@ from heapq import heappop, heappush
 from typing import Type, TypeAlias
 
 from quivr_core.files.file import FileExtension
-from quivr_core.processor.implementations.default import (
-    BibTexProcessor,
-    CSVProcessor,
-    DOCXProcessor,
-    EpubProcessor,
-    HTMLProcessor,
-    MarkdownProcessor,
-    NotebookProcessor,
-    ODTProcessor,
-    PPTProcessor,
-    PythonProcessor,
-    TikTokenTxtProcessor,
-    XLSXProcessor,
-)
 
 from .processor_base import ProcessorBase
 
@@ -69,15 +55,24 @@ def _append_proc_mapping(
     priority: int | None,
 ):
     if file_ext in mapping:
-        prev_proc = heappop(mapping[file_ext])
-        proc_entry = ProcEntry(
-            priority=priority if priority is not None else prev_proc.priority - 1,
-            cls_mod=cls_mod,
-            err=errtxt,
-        )
-        # Repush the previous processor
-        heappush(mapping[file_ext], prev_proc)
-        heappush(mapping[file_ext], proc_entry)
+        try:
+            prev_proc = heappop(mapping[file_ext])
+            proc_entry = ProcEntry(
+                priority=priority if priority is not None else prev_proc.priority - 1,
+                cls_mod=cls_mod,
+                err=errtxt,
+            )
+            # Push the previous processor back
+            heappush(mapping[file_ext], prev_proc)
+            heappush(mapping[file_ext], proc_entry)
+        except IndexError:
+            proc_entry = ProcEntry(
+                priority=priority if priority is not None else _LOWEST_PRIORITY,
+                cls_mod=cls_mod,
+                err=errtxt,
+            )
+            heappush(mapping[file_ext], proc_entry)
+
     else:
         proc_entry = ProcEntry(
             priority=priority if priority is not None else _LOWEST_PRIORITY,
@@ -92,30 +87,43 @@ def defaults_to_proc_entries(
 ) -> ProcMapping:
     # TODO(@aminediro) : how can a user change the order of the processor ?
     # NOTE: order of this list is important as resolution of `get_processor_class` depends on it
-    for processor in [
-        CSVProcessor,
-        TikTokenTxtProcessor,
-        DOCXProcessor,
-        XLSXProcessor,
-        PPTProcessor,
-        MarkdownProcessor,
-        EpubProcessor,
-        BibTexProcessor,
-        ODTProcessor,
-        HTMLProcessor,
-        PythonProcessor,
-        NotebookProcessor,
+    # We should have a way to automatically add these at 'import' time
+    for supported_extensions, processor_name in [
+        ([FileExtension.csv], "CSVProcessor"),
+        ([FileExtension.txt], "TikTokenTxtProcessor"),
+        ([FileExtension.docx, FileExtension.doc], "DOCXProcessor"),
+        ([FileExtension.xls, FileExtension.xlsx], "XLSXProcessor"),
+        ([FileExtension.pptx], "PPTProcessor"),
+        (
+            [FileExtension.markdown, FileExtension.md, FileExtension.mdx],
+            "MarkdownProcessor",
+        ),
+        ([FileExtension.epub], "EpubProcessor"),
+        ([FileExtension.bib], "BibTexProcessor"),
+        ([FileExtension.odt], "ODTProcessor"),
+        ([FileExtension.html], "HTMLProcessor"),
+        ([FileExtension.py], "PythonProcessor"),
+        ([FileExtension.ipynb], "NotebookProcessor"),
     ]:
-        for ext in processor.supported_extensions:
+        for ext in supported_extensions:
             ext_str = ext.value if isinstance(ext, FileExtension) else ext
             _append_proc_mapping(
                 mapping=base_processors,
                 file_ext=ext,
-                cls_mod=f"quivr_core.processor.implementations.default.{processor.__name__}",
-                errtxt=f"can't import {processor.__name__}. Please install quivr-core[{ext_str}] to access {processor.__name__}",
+                cls_mod=f"quivr_core.processor.implementations.default.{processor_name}",
+                errtxt=f"can't import {processor_name}. Please install quivr-core[{ext_str}] to access {processor_name}",
                 priority=None,
             )
 
+    # TODO(@aminediro): Megaparse should register itself
+    # Append Megaparse
+    _append_proc_mapping(
+        mapping=base_processors,
+        file_ext=FileExtension.pdf,
+        cls_mod="quivr_core.processor.implementations.megaparse_processor.MegaparseProcessor",
+        errtxt=f"can't import MegaparseProcessor. Please install quivr-core[{ext_str}] to access MegaparseProcessor",
+        priority=None,
+    )
     return base_processors
 
 
