@@ -19,7 +19,8 @@ export const useCreateEditorState = (placeholder?: string) => {
   const PreventNewline = Extension.create({
     addKeyboardShortcuts: () => {
       return {
-        Enter: () => true, // Prevent default newline behavior
+        Enter: () => true,
+        Escape: () => true,
       };
     },
   });

@@ -1,11 +1,9 @@
 import { default as TiptapMention } from "@tiptap/extension-mention";
 import { PluginKey } from "@tiptap/pm/state";
 import { ReactRenderer } from "@tiptap/react";
-import { SuggestionKeyDownProps, SuggestionOptions } from "@tiptap/suggestion";
+import { SuggestionOptions } from "@tiptap/suggestion";
 import { RefAttributes, useMemo } from "react";
 import tippy, { Instance } from "tippy.js";
-
-import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
 
 import { MentionList, MentionListRef } from "../MentionsList/MentionsList";
 import { MentionListProps } from "../MentionsList/types";
@@ -21,7 +19,6 @@ export const useMentionConfig = ({
   char,
   suggestionData,
 }: UseMentionConfigProps) => {
-  const { currentBrainId } = useBrainContext();
   const mentionKey = `mention${char}`;
   const items = suggestionData.items;
 
@@ -84,7 +81,7 @@ export const useMentionConfig = ({
               },
             });
           },
-          onKeyDown: (props: SuggestionKeyDownProps) => {
+          onKeyDown: (props) => {
             if (props.event.key === "Escape") {
               popup?.[0].hide();
 
@@ -100,7 +97,7 @@ export const useMentionConfig = ({
         };
       },
     }),
-    [char, items, mentionKey, suggestionData, currentBrainId]
+    [char, items, mentionKey, suggestionData]
   );
 
   const Mention = TiptapMention.extend({
