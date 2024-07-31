@@ -93,7 +93,7 @@ export const SyncElementLine = ({
           </div>
         )}
       {
-        icon ? 
+        icon ?
         <div>{icon}</div> :
 
         <Icon name={isFolder? "folder" : "file"} color="black" size="normal" />
