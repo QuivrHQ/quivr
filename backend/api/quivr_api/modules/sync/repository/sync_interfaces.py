@@ -2,14 +2,15 @@ from abc import ABC, abstractmethod
 from typing import Any, List, Literal
 from uuid import UUID
 
-from quivr_api.modules.sync.dto.inputs import (SyncFileInput,
-                                               SyncFileUpdateInput,
-                                               SyncsActiveInput,
-                                               SyncsActiveUpdateInput,
-                                               SyncsUserInput,
-                                               SyncUserUpdateInput)
-from quivr_api.modules.sync.entity.sync import (SyncFile, SyncsActive,
-                                                SyncsFiles)
+from quivr_api.modules.sync.dto.inputs import (
+    SyncFileInput,
+    SyncFileUpdateInput,
+    SyncsActiveInput,
+    SyncsActiveUpdateInput,
+    SyncsUserInput,
+    SyncUserUpdateInput,
+)
+from quivr_api.modules.sync.entity.sync import SyncFile, SyncsActive, SyncsFiles
 
 
 class SyncUserInterface(ABC):
