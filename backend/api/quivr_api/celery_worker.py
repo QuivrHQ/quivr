@@ -8,26 +8,26 @@ from celery.schedules import crontab
 from celery.signals import worker_process_init
 from notion_client import Client
 from pytz import timezone  # type: ignore
-from sqlalchemy.ext.asyncio import AsyncEngine, create_async_engine
-from sqlmodel.ext.asyncio.session import AsyncSession
-
 from quivr_api.celery_config import celery
 from quivr_api.logger import get_logger
 from quivr_api.middlewares.auth.auth_bearer import AuthBearer
 from quivr_api.models.files import File
-from quivr_api.models.settings import get_supabase_client, get_supabase_db, settings
-from quivr_api.modules.brain.integrations.Notion.Notion_connector import NotionConnector
+from quivr_api.models.settings import (get_supabase_client, get_supabase_db,
+                                       settings)
+from quivr_api.modules.brain.integrations.Notion.Notion_connector import \
+    NotionConnector
 from quivr_api.modules.brain.service.brain_service import BrainService
-from quivr_api.modules.brain.service.brain_vector_service import BrainVectorService
+from quivr_api.modules.brain.service.brain_vector_service import \
+    BrainVectorService
 from quivr_api.modules.sync.repository.sync import NotionRepository
-from quivr_api.modules.sync.service.sync_notion import (
-    SyncNotionService,
-    fetch_notion_pages,
-    store_notion_pages,
-)
+from quivr_api.modules.sync.service.sync_notion import (SyncNotionService,
+                                                        fetch_notion_pages,
+                                                        store_notion_pages)
 from quivr_api.packages.files.crawl.crawler import CrawlWebsite, slugify
 from quivr_api.packages.files.processors import filter_file
 from quivr_api.packages.utils.telemetry import maybe_send_telemetry
+from sqlalchemy.ext.asyncio import AsyncEngine, create_async_engine
+from sqlmodel.ext.asyncio.session import AsyncSession
 
 logger = get_logger(__name__)
 
@@ -297,6 +297,8 @@ def check_if_is_premium_user():
 
 @celery.task(name="fetch_and_store_notion_files")
 def fetch_and_store_notion_files(access_token: str, user_id: UUID):
+    if async_engine is None:
+        init_worker()
     logger.debug("Fetching and storing Notion files")
     loop = asyncio.get_event_loop()
     loop.run_until_complete(fetch_and_store_notion_files_async(access_token, user_id))

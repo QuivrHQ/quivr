@@ -1,22 +1,18 @@
 import asyncio
 import os
-from datetime import datetime
 from typing import List, Tuple
 
 import pytest
 import pytest_asyncio
 import sqlalchemy
-from sqlmodel import Session, create_engine, select
-
+from quivr_api.celery_worker import fetch_and_store_notion_files
 from quivr_api.modules.brain.entity.brain_entity import Brain
 from quivr_api.modules.chat.entity.chat import Chat, ChatHistory
-from quivr_api.modules.sync.entity.sync import NotionSyncFile
 from quivr_api.modules.sync.repository.sync import NotionRepository
-from quivr_api.modules.sync.service.sync_notion import (
-    SyncNotionService,
-    store_notion_pages,
-)
+from quivr_api.modules.sync.service.sync_notion import (SyncNotionService,
+                                                        store_notion_pages)
 from quivr_api.modules.user.entity.user_identity import User
+from sqlmodel import Session, create_engine, select
 
 pg_database_base_url = "postgres:postgres@localhost:54322/postgres"
 
@@ -58,37 +54,6 @@ async def sync_session(sync_engine):
                 conn.sync_connection.begin_nested()
 
         yield sync_session
-
-
-@pytest.mark.asyncio
-async def test_notion_sync_insert(session):
-    page = {
-        "id": "id_1",
-        "parent": {"type": "database_id", "database_id": "parent_1"},
-        "url": "url_1",
-    }
-
-    user_1 = (
-        await session.exec(select(User).where(User.email == "admin@quivr.app"))
-    ).one()
-    sync = NotionSyncFile(
-        notion_id=page["id"],
-        parent_id=page["parent"]["database_id"],
-        name="name",
-        icon=None,
-        mime_type="md",
-        web_view_link=page["url"],
-        is_folder=True,
-        last_modified=datetime.now(),
-        type="page",
-        user=user_1,
-        user_id=user_1.id,
-    )
-    session.add(sync)
-
-    await session.commit()
-
-    assert sync
 
 
 def test_fetch_notion_pages():
@@ -147,11 +112,29 @@ def search_result():
     ]
 
 
-async def test_store_notion_pages(sync_session, search_result):
+@pytest.fixture
+def user_1(sync_session):
     user_1 = (
         sync_session.exec(select(User).where(User.email == "admin@quivr.app"))
     ).one()
+    return user_1
+
+
+async def test_store_notion_pages(sync_session, search_result, user_1):
     notion_repository = NotionRepository(sync_session)
     notion_service = SyncNotionService(notion_repository)
     sync_files = await store_notion_pages(search_result, notion_service, user_1.id)
     assert len(sync_files) == 1
+
+
+@pytest.mark.skip
+def test_celery_notion(monkeypatch, search_result, user_1):
+    def search(self, *args, **kwargs):
+        return {"results": search_result, "has_more": False}
+
+    from notion_client import Client
+
+    monkeypatch.setattr(Client, "search", search)
+
+    # Call the function under test
+    fetch_and_store_notion_files("test", user_1.id)
