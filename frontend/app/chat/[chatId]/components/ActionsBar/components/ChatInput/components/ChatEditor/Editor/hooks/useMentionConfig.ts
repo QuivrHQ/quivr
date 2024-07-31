@@ -1,7 +1,7 @@
 import { default as TiptapMention } from "@tiptap/extension-mention";
 import { PluginKey } from "@tiptap/pm/state";
 import { ReactRenderer } from "@tiptap/react";
-import { SuggestionOptions } from "@tiptap/suggestion";
+import { SuggestionKeyDownProps, SuggestionOptions } from "@tiptap/suggestion";
 import { RefAttributes, useMemo } from "react";
 import tippy, { Instance } from "tippy.js";
 
@@ -84,15 +84,9 @@ export const useMentionConfig = ({
               },
             });
           },
-          onKeyDown: (props) => {
+          onKeyDown: (props: SuggestionKeyDownProps) => {
             if (props.event.key === "Escape") {
               popup?.[0].hide();
-
-              return true;
-            }
-
-            if (!currentBrainId && props.event.key === "Enter") {
-              alert("hey");
 
               return true;
             }

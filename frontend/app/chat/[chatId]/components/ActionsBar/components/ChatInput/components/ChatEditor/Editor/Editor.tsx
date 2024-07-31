@@ -65,7 +65,6 @@ export const Editor = ({
       className="w-full caret-accent"
       onKeyDown={(event) => {
         if (event.key === "Enter" && !currentBrain) {
-          // Prevent default behavior and let the mention extension handle it
           event.preventDefault();
           editor?.chain().insertContent("@").focus().run();
         } else {
