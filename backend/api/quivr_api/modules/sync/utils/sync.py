@@ -330,7 +330,6 @@ class AzureDriveSync(BaseSync):
             "Authorization": f"Bearer {token_data['access_token']}",
             "Accept": "application/json",
         }
-    
 
     def check_and_refresh_access_token(self, credentials) -> Dict:
         if "refresh_token" not in credentials:
@@ -405,7 +404,7 @@ class AzureDriveSync(BaseSync):
 
         if not folder_id and not site_id:
             # Fetch the sites
-            #endpoint = "https://graph.microsoft.com/v1.0/me/followedSites"
+            # endpoint = "https://graph.microsoft.com/v1.0/me/followedSites"
             endpoint = "https://graph.microsoft.com/v1.0/sites?search=*"
         elif site_id == "root":
             if not folder_id:

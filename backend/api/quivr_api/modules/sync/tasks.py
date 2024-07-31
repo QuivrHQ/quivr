@@ -2,22 +2,27 @@ import asyncio
 import os
 
 from celery.signals import worker_process_init
+from sqlalchemy.ext.asyncio import AsyncEngine, create_async_engine
+from sqlmodel.ext.asyncio.session import AsyncSession
+
 from quivr_api.celery_config import celery
 from quivr_api.logger import get_logger
 from quivr_api.models.settings import settings
 from quivr_api.modules.knowledge.repository.storage import Storage
-from quivr_api.modules.notification.service.notification_service import \
-    NotificationService
+from quivr_api.modules.notification.service.notification_service import (
+    NotificationService,
+)
 from quivr_api.modules.sync.repository.sync import NotionRepository
 from quivr_api.modules.sync.repository.sync_files import SyncFiles
 from quivr_api.modules.sync.service.sync_notion import SyncNotionService
-from quivr_api.modules.sync.service.sync_service import (SyncService,
-                                                         SyncUserService)
-from quivr_api.modules.sync.utils.sync import (AzureDriveSync, DropboxSync,
-                                               GoogleDriveSync, NotionSync)
+from quivr_api.modules.sync.service.sync_service import SyncService, SyncUserService
+from quivr_api.modules.sync.utils.sync import (
+    AzureDriveSync,
+    DropboxSync,
+    GoogleDriveSync,
+    NotionSync,
+)
 from quivr_api.modules.sync.utils.syncutils import SyncUtils
-from sqlalchemy.ext.asyncio import AsyncEngine, create_async_engine
-from sqlmodel.ext.asyncio.session import AsyncSession
 
 notification_service = NotificationService()
 
