@@ -17,7 +17,7 @@ from quivr_api.modules.chat.controller.chat.utils import update_user_usage
 from quivr_api.modules.upload.controller.upload_routes import upload_file
 from quivr_api.modules.user.entity.user_identity import UserIdentity
 from quivr_api.modules.user.service.user_usage import UserUsage
-from quivr_api.packages.emails.send_email import send_email
+from quivr_api.utils.send_email import send_email
 from unidecode import unidecode
 
 logger = get_logger(__name__)
@@ -184,7 +184,7 @@ class ITO(BaseModel):
         file_to_upload.file.seek(0)
         if self.input.outputs.brain.activated:
             await upload_file(
-                uploadFile=file_to_upload,
+                upload_file=file_to_upload,
                 brain_id=self.input.outputs.brain.value,
                 current_user=self.current_user,
                 chat_id=None,

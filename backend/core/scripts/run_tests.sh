@@ -8,7 +8,7 @@ IMAGE_NAME="quivr-core-test"
 IMAGE_TAG="latest"
 DOCKERFILE="Dockerfile.test"
 VOLUME_MAPPING="$PWD:/code"
-CMD="poetry run tox"
+CMD=" poetry run tox"
 
 # Functions
 build_image() {
@@ -18,7 +18,8 @@ build_image() {
 
 run_container() {
     echo "Running tests in Docker container..."
-    docker run -it --rm -v $VOLUME_MAPPING $IMAGE_NAME:$IMAGE_TAG $CMD
+export 
+    docker run -it --rm -e TOX_WORK_DIR=/code/.tox-docker -v $VOLUME_MAPPING $IMAGE_NAME:$IMAGE_TAG $CMD
 }
 
 # Main script execution

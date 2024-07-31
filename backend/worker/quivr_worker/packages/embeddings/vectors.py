@@ -1,6 +1,5 @@
 from concurrent.futures import ThreadPoolExecutor
 from typing import List
-from uuid import UUID
 
 from pydantic import BaseModel
 from quivr_api.logger import get_logger
@@ -39,10 +38,7 @@ def process_batch(batch_ids: List[str]):
     supabase_db = get_supabase_db()
 
     try:
-        if len(batch_ids) == 1:
-            return (supabase_db.get_vectors_by_batch(UUID(batch_ids[0]))).data
-        else:
-            return (supabase_db.get_vectors_in_batch(batch_ids)).data
+        return (supabase_db.get_vectors_in_batch(batch_ids)).data
     except Exception as e:
         logger.error("Error retrieving batched vectors", e)
 
@@ -53,10 +49,8 @@ def get_unique_files_from_vector_ids(vectors_ids):
     """
     Retrieve unique user data vectors.
     """
-
     # constants
     BATCH_SIZE = 5
-
     with ThreadPoolExecutor() as executor:
         futures = []
         for i in range(0, len(vectors_ids), BATCH_SIZE):

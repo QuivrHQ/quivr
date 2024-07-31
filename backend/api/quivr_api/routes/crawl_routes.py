@@ -2,7 +2,7 @@ from typing import Optional
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, Query, Request
-from quivr_api.celery_worker import process_crawl_and_notify
+from quivr_api.celery_config import celery
 from quivr_api.logger import get_logger
 from quivr_api.middlewares.auth import AuthBearer, get_current_user
 from quivr_api.modules.brain.entity.brain_entity import RoleEnum
@@ -84,11 +84,14 @@ async def crawl_endpoint(
         added_knowledge = knowledge_service.add_knowledge(knowledge_to_add)
         logger.info(f"Knowledge {added_knowledge} added successfully")
 
-        process_crawl_and_notify.delay(
-            crawl_website_url=crawl_website.url,
-            brain_id=brain_id,
-            knowledge_id=added_knowledge.id,
-            notification_id=upload_notification.id,
+        celery.send_task(
+            "process_crawl_and_notify",
+            kwargs={
+                "crawl_website_url": crawl_website.url,
+                "brain_id": brain_id,
+                "knowledge_id": added_knowledge.id,
+                "notification_id": upload_notification.id,
+            },
         )
 
         return {"message": "Crawl processing has started."}

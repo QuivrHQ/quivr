@@ -3,7 +3,7 @@ from typing import Optional
 from uuid import UUID
 
 from fastapi import HTTPException, UploadFile
-from quivr_api.celery_worker import process_file_and_notify
+from quivr_api.celery_config import celery
 from quivr_api.logger import get_logger
 from quivr_api.modules.brain.entity.brain_entity import RoleEnum
 from quivr_api.modules.brain.service.brain_authorization_service import (
@@ -19,7 +19,7 @@ from quivr_api.modules.notification.service.notification_service import (
 from quivr_api.modules.upload.service.upload_file import upload_file_storage
 from quivr_api.modules.user.service.user_usage import UserUsage
 from quivr_api.packages.files.file import convert_bytes, get_file_size
-from quivr_api.packages.utils.telemetry import maybe_send_telemetry
+from quivr_api.utils.telemetry import maybe_send_telemetry
 
 logger = get_logger("upload_file")
 
@@ -74,7 +74,7 @@ async def upload_file(
                 status_code=403,
                 detail=f"File {upload_file.filename} already exists in storage.",
             )
-        
+
         else:
             notification_service.update_notification_by_id(
                 notification_id,
@@ -99,13 +99,17 @@ async def upload_file(
 
     added_knowledge = knowledge_service.add_knowledge(knowledge_to_add)
 
-    process_file_and_notify.delay(
-        file_name=filename_with_brain_id,
-        file_original_name=upload_file.filename,
-        integration=integration,
-        integration_link=integration_link,
-        brain_id=brain_id,
-        notification_id=notification_id,
-        knowledge_id=added_knowledge.id,
+    celery.send_task(
+        "process_file_and_notify",
+        kwargs={
+            "file_name": filename_with_brain_id,
+            "file_original_name": upload_file.filename,
+            "integration": integration,
+            "integration_link": integration_link,
+            "brain_id": brain_id,
+            "notification_id": notification_id,
+            "knowledge_id": added_knowledge.id,
+        },
     )
+
     return {"message": "File processing has started."}

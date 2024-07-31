@@ -22,7 +22,6 @@ langchain-openai = { version = "^0.1.14", optional = true }
 # libmagic, poppler, libreoffice, pandoc, and tesseract.
 # NOTE: for now poetry doesn't support groups as extra:
 # see : https://github.com/pythofeat: async load  n-poetry/poetry/issues/4842
-
 torch = [
     { version = "2.3.1", source = "pypi", platform = "darwin", optional = true },
     { version = "2.3.1", source = "pypi", platform = "linux", markers = "platform_machine != 'x86_64'", optional = true },

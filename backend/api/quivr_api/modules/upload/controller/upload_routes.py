@@ -3,7 +3,7 @@ from typing import Optional
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Query, UploadFile
-from quivr_api.celery_worker import process_file_and_notify
+from quivr_api.celery_config import celery
 from quivr_api.logger import get_logger
 from quivr_api.middlewares.auth import AuthBearer, get_current_user
 from quivr_api.modules.brain.entity.brain_entity import RoleEnum
@@ -24,7 +24,7 @@ from quivr_api.modules.upload.service.upload_file import upload_file_storage
 from quivr_api.modules.user.entity.user_identity import UserIdentity
 from quivr_api.modules.user.service.user_usage import UserUsage
 from quivr_api.packages.files.file import convert_bytes, get_file_size
-from quivr_api.packages.utils.telemetry import maybe_send_telemetry
+from quivr_api.utils.telemetry import maybe_send_telemetry
 
 logger = get_logger(__name__)
 upload_router = APIRouter()
@@ -35,7 +35,7 @@ knowledge_service = KnowledgeService()
 
 @upload_router.post("/upload", dependencies=[Depends(AuthBearer())], tags=["Upload"])
 async def upload_file(
-    uploadFile: UploadFile,
+    upload_file: UploadFile,
     bulk_id: Optional[UUID] = Query(None, description="The ID of the bulk upload"),
     brain_id: UUID = Query(..., description="The ID of the brain"),
     chat_id: Optional[UUID] = Query(None, description="The ID of the chat"),
@@ -46,7 +46,7 @@ async def upload_file(
     validate_brain_authorization(
         brain_id, current_user.id, [RoleEnum.Editor, RoleEnum.Owner]
     )
-    uploadFile.file.seek(0)
+    upload_file.file.seek(0)
     user_daily_usage = UserUsage(
         id=current_user.id,
         email=current_user.email,
@@ -57,7 +57,7 @@ async def upload_file(
             user_id=current_user.id,
             bulk_id=bulk_id,
             status=NotificationsStatusEnum.INFO,
-            title=f"{uploadFile.filename}",
+            title=f"{upload_file.filename}",
             category="upload",
             brain_id=str(brain_id),
         )
@@ -66,15 +66,15 @@ async def upload_file(
     user_settings = user_daily_usage.get_user_settings()
 
     remaining_free_space = user_settings.get("max_brain_size", 1000000000)
-    maybe_send_telemetry("upload_file", {"file_name": uploadFile.filename})
-    file_size = get_file_size(uploadFile)
+    maybe_send_telemetry("upload_file", {"file_name": upload_file.filename})
+    file_size = get_file_size(upload_file)
     if remaining_free_space - file_size < 0:
         message = f"Brain will exceed maximum capacity. Maximum file allowed is : {convert_bytes(remaining_free_space)}"
         raise HTTPException(status_code=403, detail=message)
 
-    file_content = await uploadFile.read()
+    file_content = await upload_file.read()
 
-    filename_with_brain_id = str(brain_id) + "/" + str(uploadFile.filename)
+    filename_with_brain_id = str(brain_id) + "/" + str(upload_file.filename)
 
     try:
         upload_file_storage(file_content, filename_with_brain_id)
@@ -82,18 +82,17 @@ async def upload_file(
     except Exception as e:
         print(e)
 
-
         if "The resource already exists" in str(e):
             notification_service.update_notification_by_id(
                 upload_notification.id if upload_notification else None,
                 NotificationUpdatableProperties(
                     status=NotificationsStatusEnum.ERROR,
-                    description=f"File {uploadFile.filename} already exists in storage.",
+                    description=f"File {upload_file.filename} already exists in storage.",
                 ),
             )
             raise HTTPException(
                 status_code=403,
-                detail=f"File {uploadFile.filename} already exists in storage.",
+                detail=f"File {upload_file.filename} already exists in storage.",
             )
         else:
             notification_service.update_notification_by_id(
@@ -109,9 +108,9 @@ async def upload_file(
 
     knowledge_to_add = CreateKnowledgeProperties(
         brain_id=brain_id,
-        file_name=uploadFile.filename,
+        file_name=upload_file.filename,
         extension=os.path.splitext(
-            uploadFile.filename  # pyright: ignore reportPrivateUsage=none
+            upload_file.filename  # pyright: ignore reportPrivateUsage=none
         )[-1].lower(),
         integration=integration,
         integration_link=integration_link,
@@ -119,13 +118,16 @@ async def upload_file(
 
     knowledge = knowledge_service.add_knowledge(knowledge_to_add)
 
-    process_file_and_notify.delay(
-        file_name=filename_with_brain_id,
-        file_original_name=uploadFile.filename,
-        brain_id=brain_id,
-        notification_id=upload_notification.id,
-        knowledge_id=knowledge.id,
-        integration=integration,
-        integration_link=integration_link,
+    celery.send_task(
+        "process_file_and_notify",
+        kwargs={
+            "file_name": filename_with_brain_id,
+            "file_original_name": upload_file.filename,
+            "brain_id": brain_id,
+            "notification_id": upload_notification.id,
+            "knowledge_id": knowledge.id,
+            "integration": integration,
+            "integration_link": integration_link,
+        },
     )
     return {"message": "File processing has started."}

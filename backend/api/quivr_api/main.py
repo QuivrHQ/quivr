@@ -21,10 +21,10 @@ from quivr_api.modules.prompt.controller import prompt_router
 from quivr_api.modules.sync.controller import sync_router
 from quivr_api.modules.upload.controller import upload_router
 from quivr_api.modules.user.controller import user_router
-from quivr_api.packages.utils import handle_request_validation_error
-from quivr_api.packages.utils.telemetry import maybe_send_telemetry
 from quivr_api.routes.crawl_routes import crawl_router
 from quivr_api.routes.subscription_routes import subscription_router
+from quivr_api.utils import handle_request_validation_error
+from quivr_api.utils.telemetry import maybe_send_telemetry
 from sentry_sdk.integrations.fastapi import FastApiIntegration
 from sentry_sdk.integrations.starlette import StarletteIntegration
 

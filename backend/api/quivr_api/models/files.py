@@ -4,7 +4,6 @@ from typing import List, Optional
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_core.documents import Document
 from pydantic import BaseModel
-
 from quivr_api.logger import get_logger
 from quivr_api.models.databases.supabase.supabase import SupabaseDB
 from quivr_api.models.settings import get_supabase_db

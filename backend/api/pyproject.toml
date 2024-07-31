@@ -12,84 +12,55 @@ readme = "README.md"
 
 
 [tool.poetry.dependencies]
+python = "^3.11,<3.13"
 quivr-core = { path = "../core", extras = ["base"] }
-python = "^3.11"
-torch = [
-    { version = "2.3.1", source = "pypi", platform = "darwin" },
-    { version = "2.3.1", source = "pypi", platform = "linux", markers = "platform_machine != 'x86_64'" },
-    { version = "2.3.1+cpu", source = "pytorch-cpu-src", platform = "linux", markers = "platform_machine == 'x86_64'" },
-    { version = "2.3.1+cpu", source = "pytorch-cpu-src", platform = "win32" },
-]
-torchvision = [
-    { version = "0.18.1", source = "pypi", platform = "darwin" },
-    { version = "0.18.1", source = "pypi", platform = "linux", markers = "platform_machine != 'x86_64'" },
-    { version = "0.18.1+cpu", source = "pytorch-cpu-src", platform = "linux", markers = "platform_machine == 'x86_64'" },
-    { version = "0.18.1+cpu", source = "pytorch-cpu-src", platform = "win32" },
-]
-langchain = "*"
-litellm = "*"
-openai = "*"
-gitpython = "*"
-pdf2image = "*"
-nest-asyncio = "*"
-pypdf = "*"
 supabase = "*"
-tiktoken = "*"
 fastapi = "*"
+python-jose = "*"
 python-multipart = "*"
 uvicorn = "*"
-pypandoc = "*"
-docx2txt = "*"
-python-jose = "*"
-asyncpg = "*"
-pyright = "*"
-resend = "*"
-html5lib = "*"
-beautifulsoup4 = "*"
-newspaper3k = "*"
-xlrd = "*"
 redis = "*"
-flower = "*"
+asyncpg = "*"
+psycopg2-binary = "*"
+sqlmodel = "^0.0.19"
+celery = { extras = ["redis", "sqs"], version = "*" }
+pydantic-settings = "*"
 boto3 = "*"
 botocore = "*"
 python-dotenv = "*"
-pytesseract = "*"
-async-generator = "*"
-posthog = "*"
-jq = "*"
-pytest = "*"
-watchdog = "*"
-langchain-community = "*"
-langchain-openai = "*"
-pydantic-settings = "*"
-langfuse = "*"
-pandasai = "*"
+resend = "*"
 colorlog = "*"
-psycopg2-binary = "*"
-celery = { extras = ["redis", "sqs"], version = "*" }
-unstructured = { extras = ["all-docs"], version = "*" }
-llama-parse = "*"
-llama-index = "*"
-lxml = { extras = ["html_clean"], version = "*" }
-ragas = "*"
-datasets = "*"
-fpdf2 = "*"
 unidecode = "*"
-langchain-cohere = "*"
+
+# Monitoring 
+posthog = "*"
 pyinstrument = "*"
-playwright = "*"
-langgraph = "*"
-tavily-python = "*"
-duckduckgo-search = "*"
+sentry-sdk = { version = "^2.5.0", extras = ["fastapi"] }
+
+# OAuth Clients
 google-api-python-client = "*"
 google-auth-httplib2 = "*"
 google-auth-oauthlib = "*"
 msal = "*"
-sentry-sdk = { version = "^2.5.0", extras = ["fastapi"] }
-sqlmodel = "^0.0.19"
-megaparse = "0.0.19"
+
+# Maybe
+langchain = "*"
+litellm = "*"
+openai = "*"
+tiktoken = "*"
+langchain-community = "*"
+langchain-openai = "*"
+langchain-cohere = "*"
+# langfuse = "*"
+# langgraph = "*"
+
+# TO delete
+beautifulsoup4 = "*"
+playwright = "*"
 
 
+[tool.poetry.group.dev]
+optional = true
 [tool.poetry.group.dev.dependencies]
 mypy = "^1.10.0"
 pre-commit = "^3.7.1"
@@ -102,6 +73,7 @@ pytest = "*"
 pytest-dotenv = "*"
 pytest-mock = "*"
 pytest-celery = "*"
+pyright = "*"
 
 [[tool.poetry.source]]
 name = "pytorch-cpu-src"
