@@ -2,18 +2,15 @@ from typing import List, Sequence
 
 from quivr_api.logger import get_logger
 from quivr_api.modules.dependencies import BaseService
-from quivr_api.modules.sync.dto.inputs import (
-    SyncsActiveInput,
-    SyncsActiveUpdateInput,
-    SyncsUserInput,
-    SyncUserUpdateInput,
-)
-from quivr_api.modules.sync.entity.sync import NotionSyncFile, SyncsActive, SyncsUser
+from quivr_api.modules.sync.dto.inputs import (SyncsActiveInput,
+                                               SyncsActiveUpdateInput,
+                                               SyncsUserInput,
+                                               SyncUserUpdateInput)
+from quivr_api.modules.sync.entity.sync import (NotionSyncFile, SyncsActive,
+                                                SyncsUser)
 from quivr_api.modules.sync.repository.sync import NotionRepository, Sync
 from quivr_api.modules.sync.repository.sync_interfaces import (
-    SyncInterface,
-    SyncUserInterface,
-)
+    SyncInterface, SyncUserInterface)
 from quivr_api.modules.sync.repository.sync_user import SyncUser
 from quivr_api.modules.user.service.user_service import UserService
 
@@ -81,11 +78,11 @@ class SyncService:
         return self.repository.get_syncs_active(user_id)
 
     def update_sync_active(
-        self, sync_id: str, sync_active_input: SyncsActiveUpdateInput
+        self, sync_id: int, sync_active_input: SyncsActiveUpdateInput
     ):
         return self.repository.update_sync_active(sync_id, sync_active_input)
 
-    def delete_sync_active(self, sync_active_id: str, user_id: str):
+    def delete_sync_active(self, sync_active_id: int, user_id: str):
         return self.repository.delete_sync_active(int(sync_active_id), user_id)
 
     async def get_syncs_active_in_interval(self) -> List[SyncsActive]:

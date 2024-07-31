@@ -1,0 +1,31 @@
+[tool.poetry]
+name = "quivr-pdf"
+version = "0.1.0"
+description = ""
+authors = ["aminediro <amine@quir.app>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11,<3.13"
+unstructured = { version = "^0.15.0", extras = ["pdf"] }
+torch = [
+    { version = "2.3.1", source = "pypi", platform = "darwin" },
+    { version = "2.3.1", source = "pypi", platform = "linux", markers = "platform_machine != 'x86_64'" },
+    { version = "2.3.1+cpu", source = "pytorch-cpu-src", platform = "linux", markers = "platform_machine == 'x86_64'" },
+    { version = "2.3.1+cpu", source = "pytorch-cpu-src", platform = "win32" },
+]
+torchvision = [
+    { version = "0.18.1", source = "pypi", platform = "darwin" },
+    { version = "0.18.1", source = "pypi", platform = "linux", markers = "platform_machine != 'x86_64'" },
+    { version = "0.18.1+cpu", source = "pytorch-cpu-src", platform = "linux", markers = "platform_machine == 'x86_64'" },
+    { version = "0.18.1+cpu", source = "pytorch-cpu-src", platform = "win32" },
+]
+
+[[tool.poetry.source]]
+name = "pytorch-cpu-src"
+url = "https://download.pytorch.org/whl/cpu"
+priority = "explicit"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

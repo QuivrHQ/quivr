@@ -46,6 +46,19 @@
         .brain_name {
           @include textColor(text-3);
           @include Typography.EllipsisOverflow;
+
+          &.new {
+            color: var(--primary-0);
+          }
+        }
+
+        .warning {
+          color: var(--warning);
+          display: flex;
+          align-items: center;
+          gap: Spacings.$spacing02;
+          margin-left: Spacings.$spacing02;
+          font-size: Typography.$tiny;
         }
       }
     }
@@ -55,14 +68,6 @@
 .no_brain_selected,
 .no_credits_left {
   @extend %header_style;
-}
-
-.no_brain_selected {
-  @include textColor(warning);
-
-  .strong {
-    font-weight: 800;
-  }
 }
 
 .no_credits_left {

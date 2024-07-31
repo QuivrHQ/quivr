@@ -57,7 +57,6 @@ ENV PATH="/root/.cargo/bin:${PATH}" \
 
 WORKDIR /code
 
-
 # Copy monorepo dependencies
 # CORE
 COPY core/pyproject.toml core/README.md core/poetry.lock  /code/core/

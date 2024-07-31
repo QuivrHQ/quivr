@@ -1,5 +1,84 @@
 # Changelog
 
+## 0.0.293 (2024-07-30)
+
+## What's Changed
+* feat(frontend): brain carousel by @Zewed in https://github.com/QuivrHQ/quivr/pull/2924
+* fix(frontend): feedback for brain carousel by @Zewed in https://github.com/QuivrHQ/quivr/pull/2926
+
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.292...v0.0.293
+
+## 0.0.292 (2024-07-29)
+
+## What's Changed
+* Feat/handle_azure_sites by @chloedia in https://github.com/QuivrHQ/quivr/pull/2921
+* feat: update dev command in frontend README.md by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2922
+
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.291...v0.0.292
+
+## 0.0.291 (2024-07-29)
+
+## What's Changed
+* feat(integrations): Add Azure Drive Sites support by @chloedia in https://github.com/QuivrHQ/quivr/pull/2919
+* chore: update sync notification status to INFO by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2918
+
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.290...v0.0.291
+
+## 0.0.290 (2024-07-26)
+
+## What's Changed
+* fix(frontend): remove possibility to sync folder by @Zewed in https://github.com/QuivrHQ/quivr/pull/2913
+* fix(frontend): remove latence for delete notifications by @Zewed in https://github.com/QuivrHQ/quivr/pull/2916
+* fix(backend): fix error messages by @Zewed in https://github.com/QuivrHQ/quivr/pull/2917
+* feat(notifications): improved requirements by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2915
+
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.289...v0.0.290
+
+## 0.0.289 (2024-07-25)
+
+## What's Changed
+* chore(main): release core 0.0.12 by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2889
+* fix: error dict google drive by @chloedia in https://github.com/QuivrHQ/quivr/pull/2912
+
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.288...v0.0.289
+
+## 0.0.288 (2024-07-23)
+
+## What's Changed
+* fix(sync): folder upload to Google Drive by @chloedia in https://github.com/QuivrHQ/quivr/pull/2909
+
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.287...v0.0.288
+
+## 0.0.287 (2024-07-23)
+
+## What's Changed
+* feat: Update AzureDriveSync name to "Share Point" by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2907
+
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.286...v0.0.287
+
+## 0.0.286 (2024-07-23)
+
+## What's Changed
+* fix(frontend): remove warning in frontend by @Zewed in https://github.com/QuivrHQ/quivr/pull/2896
+* feat(frontend): add logo to source when integration by @Zewed in https://github.com/QuivrHQ/quivr/pull/2899
+* feat(premium): add trialing by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2900
+* feat: Remove unused onboarding code by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2901
+* feat(dead-code): removed composite & api by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2902
+* feat(frontend): add a loader when processing files by @Zewed in https://github.com/QuivrHQ/quivr/pull/2903
+* feat(frontend): icon chevron for folders by @Zewed in https://github.com/QuivrHQ/quivr/pull/2904
+* feat(frontend): loader icon for integrations by @Zewed in https://github.com/QuivrHQ/quivr/pull/2905
+* fix(frontend): remove current brain id when click on create brain by @Zewed in https://github.com/QuivrHQ/quivr/pull/2906
+
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.285...v0.0.286
+
 ## 0.0.285 (2024-07-22)
 
 ## What's Changed

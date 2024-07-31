@@ -32,3 +32,9 @@ class NotificationService:
             return self.repository.update_notification_by_id(
                 notification_id, notification
             )
+
+    def remove_notification_by_id(self, notification_id):
+        """
+        Remove a notification
+        """
+        return self.repository.remove_notification_by_id(notification_id)

@@ -1,0 +1,50 @@
+@use "styles/Radius.module.scss";
+@use "styles/Spacings.module.scss";
+@use "styles/Typography.module.scss";
+@use "styles/Variables.module.scss";
+
+.brain_button_container {
+  display: flex;
+  padding: Spacings.$spacing03;
+  border: 1px solid var(--border-0);
+  border-radius: Radius.$normal;
+  cursor: pointer;
+  gap: Spacings.$spacing03;
+  flex-direction: column;
+  align-items: center;
+  height: Variables.$brainButtonHeight;
+  overflow: hidden;
+
+  &:hover {
+    border-color: var(--primary-0);
+
+    .header {
+      color: var(--primary-0);
+    }
+  }
+
+  .header {
+    display: flex;
+    gap: Spacings.$spacing03;
+    width: 100%;
+    align-items: center;
+
+    .name {
+      @include Typography.EllipsisOverflow;
+      font-size: Typography.$small;
+      font-weight: 500;
+    }
+  }
+
+  .description {
+    font-size: Typography.$tiny;
+    color: var(--text-4);
+    width: 100%;
+    font-style: italic;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    text-overflow: ellipsis;
+  }
+}

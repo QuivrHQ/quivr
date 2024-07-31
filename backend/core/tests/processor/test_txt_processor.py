@@ -2,11 +2,7 @@ from uuid import uuid4
 
 import pytest
 
-from quivr_core.files.file import FileExtension, QuivrFile
-from quivr_core.processor.implementations.default import TikTokenTxtProcessor
-from quivr_core.processor.splitter import SplitterConfig
-
-# TODO: TIKA server should be set
+from quivr_core.storage.file import FileExtension, QuivrFile
 
 
 @pytest.fixture
@@ -24,8 +20,12 @@ def txt_qfile(temp_data_file):
 @pytest.mark.base
 @pytest.mark.asyncio
 async def test_process_txt(txt_qfile):
-    splitter_config = SplitterConfig(chunk_size=20, chunk_overlap=0)
-    tparser = TikTokenTxtProcessor(splitter_config=splitter_config)
+    from quivr_core.processor.implementations.default import TikTokenTxtProcessor
+    from quivr_core.processor.splitter import SplitterConfig
+
+    tparser = TikTokenTxtProcessor(
+        splitter_config=SplitterConfig(chunk_size=20, chunk_overlap=0)
+    )
     doc = await tparser.process_file(txt_qfile)
     assert len(doc) > 0
     assert doc[0].page_content == "This is some test data."

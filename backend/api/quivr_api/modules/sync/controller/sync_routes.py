@@ -3,25 +3,30 @@ import uuid
 from typing import Annotated, List
 
 from fastapi import APIRouter, Depends, status
-
 from quivr_api.logger import get_logger
 from quivr_api.middlewares.auth import AuthBearer, get_current_user
 from quivr_api.modules.dependencies import get_service
 from quivr_api.modules.notification.dto.inputs import CreateNotification
-from quivr_api.modules.notification.entity.notification import NotificationsStatusEnum
-from quivr_api.modules.notification.service.notification_service import (
-    NotificationService,
-)
-from quivr_api.modules.sync.controller.azure_sync_routes import azure_sync_router
-from quivr_api.modules.sync.controller.dropbox_sync_routes import dropbox_sync_router
-from quivr_api.modules.sync.controller.google_sync_routes import google_sync_router
-from quivr_api.modules.sync.controller.notion_sync_routes import notion_sync_router
+from quivr_api.modules.notification.entity.notification import \
+    NotificationsStatusEnum
+from quivr_api.modules.notification.service.notification_service import \
+    NotificationService
+from quivr_api.modules.sync.controller.azure_sync_routes import \
+    azure_sync_router
+from quivr_api.modules.sync.controller.dropbox_sync_routes import \
+    dropbox_sync_router
+from quivr_api.modules.sync.controller.google_sync_routes import \
+    google_sync_router
+from quivr_api.modules.sync.controller.notion_sync_routes import \
+    notion_sync_router
 from quivr_api.modules.sync.dto import SyncsDescription
-from quivr_api.modules.sync.dto.inputs import SyncsActiveInput, SyncsActiveUpdateInput
+from quivr_api.modules.sync.dto.inputs import (SyncsActiveInput,
+                                               SyncsActiveUpdateInput)
 from quivr_api.modules.sync.dto.outputs import AuthMethodEnum
 from quivr_api.modules.sync.entity.sync import SyncsActive
 from quivr_api.modules.sync.service.sync_notion import SyncNotionService
-from quivr_api.modules.sync.service.sync_service import SyncService, SyncUserService
+from quivr_api.modules.sync.service.sync_service import (SyncService,
+                                                         SyncUserService)
 from quivr_api.modules.user.entity.user_identity import UserIdentity
 
 notification_service = NotificationService()
@@ -162,23 +167,25 @@ async def create_sync_active(
     logger.debug(
         f"Creating active sync for user: {current_user.id} with data: {sync_active_input}"
     )
-    notification_service.add_notification(
+    bulk_id = uuid.uuid4()
+    notification = notification_service.add_notification(
         CreateNotification(
             user_id=current_user.id,
-            status=NotificationsStatusEnum.SUCCESS,
+            status=NotificationsStatusEnum.INFO,
             title="Synchronization created! ",
             description="Your brain is preparing to sync files. This may take a few minutes before proceeding.",
             category="generic",
-            bulk_id=uuid.uuid4(),
+            bulk_id=bulk_id,
             brain_id=sync_active_input.brain_id,
         )
     )
+    sync_active_input.notification_id = str(notification.id)
     return sync_service.create_sync_active(sync_active_input, str(current_user.id))
 
 
 @sync_router.put(
     "/sync/active/{sync_id}",
-    response_model=SyncsActive,
+    response_model=SyncsActive | None,
     dependencies=[Depends(AuthBearer())],
     tags=["Sync"],
 )
@@ -203,19 +210,31 @@ async def update_sync_active(
     )
 
     details_sync_active = sync_service.get_details_sync_active(sync_id)
-    notification_service.add_notification(
-        CreateNotification(
-            user_id=current_user.id,
-            status=NotificationsStatusEnum.SUCCESS,
-            title="Sync updated! Synchronization takes a few minutes to complete",
-            description="Syncing your files...",
-            category="generic",
-            bulk_id=uuid.uuid4(),
-            brain_id=details_sync_active["brain_id"],  # type: ignore
+    if (details_sync_active and sync_active_input.settings) and (
+        (details_sync_active["settings"]["files"] != sync_active_input.settings.files)
+        or (
+            details_sync_active["settings"]["folders"]
+            != sync_active_input.settings.folders
         )
-    )
-    sync_active_input.force_sync = True
-    return sync_service.update_sync_active(sync_id, sync_active_input)  # type: ignore #FIXME: force to int sync_id
+    ):
+        sync_active_input.force_sync = True
+        bulk_id = uuid.uuid4()
+        notification = notification_service.add_notification(
+            CreateNotification(
+                user_id=current_user.id,
+                status=NotificationsStatusEnum.INFO,
+                title="Sync updated! Synchronization takes a few minutes to complete",
+                description="Your brain is syncing files. This may take a few minutes before proceeding.",
+                category="generic",
+                bulk_id=bulk_id,
+                brain_id=details_sync_active["brain_id"],  # type: ignore
+            )
+        )
+        sync_active_input.force_sync = True
+        sync_active_input.notification_id = str(notification.id)
+        return sync_service.update_sync_active(sync_id, sync_active_input)
+    else:
+        return None
 
 
 @sync_router.delete(

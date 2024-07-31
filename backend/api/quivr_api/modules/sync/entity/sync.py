@@ -88,6 +88,7 @@ class SyncsActive(BaseModel):
     sync_interval_minutes: int
     brain_id: str
     syncs_user: Optional[SyncsUser] = None
+    notification_id: Optional[str] = None
 
 
 class SyncsFiles(BaseModel):
