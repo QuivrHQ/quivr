@@ -1,10 +1,12 @@
 import os
 import uuid
-from typing import List
+from typing import Annotated, List
 
 from fastapi import APIRouter, Depends, status
+
 from quivr_api.logger import get_logger
 from quivr_api.middlewares.auth import AuthBearer, get_current_user
+from quivr_api.modules.dependencies import get_service
 from quivr_api.modules.notification.dto.inputs import CreateNotification
 from quivr_api.modules.notification.entity.notification import NotificationsStatusEnum
 from quivr_api.modules.notification.service.notification_service import (
@@ -18,6 +20,7 @@ from quivr_api.modules.sync.dto import SyncsDescription
 from quivr_api.modules.sync.dto.inputs import SyncsActiveInput, SyncsActiveUpdateInput
 from quivr_api.modules.sync.dto.outputs import AuthMethodEnum
 from quivr_api.modules.sync.entity.sync import SyncsActive
+from quivr_api.modules.sync.service.sync_notion import SyncNotionService
 from quivr_api.modules.sync.service.sync_service import SyncService, SyncUserService
 from quivr_api.modules.user.entity.user_identity import UserIdentity
 
@@ -32,6 +35,8 @@ logger = get_logger(__name__)
 # Initialize sync service
 sync_service = SyncService()
 sync_user_service = SyncUserService()
+NotionServiceDep = Annotated[SyncNotionService, Depends(get_service(SyncNotionService))]
+
 
 # Initialize API router
 sync_router = APIRouter()
@@ -130,7 +135,7 @@ async def delete_user_sync(
     logger.debug(
         f"Deleting user sync for user: {current_user.id} with sync ID: {sync_id}"
     )
-    sync_user_service.delete_sync_user(sync_id, str(current_user.id))
+    sync_user_service.delete_sync_user(sync_id, str(current_user.id))  # type: ignore
     return None
 
 
@@ -210,7 +215,7 @@ async def update_sync_active(
         )
     )
     sync_active_input.force_sync = True
-    return sync_service.update_sync_active(sync_id, sync_active_input)
+    return sync_service.update_sync_active(sync_id, sync_active_input)  # type: ignore #FIXME: force to int sync_id
 
 
 @sync_router.delete(
@@ -248,7 +253,7 @@ async def delete_sync_active(
             brain_id=details_sync_active["brain_id"],  # type: ignore
         )
     )
-    sync_service.delete_sync_active(sync_id, str(current_user.id))
+    sync_service.delete_sync_active(sync_id, str(current_user.id))  # type: ignore
     return None
 
 
@@ -281,7 +286,8 @@ async def get_active_syncs_for_user(
 )
 async def get_files_folder_user_sync(
     user_sync_id: int,
-    folder_id: str = None,
+    notion_service: NotionServiceDep,
+    folder_id: str | None = None,
     current_user: UserIdentity = Depends(get_current_user),
 ):
     """
@@ -299,7 +305,7 @@ async def get_files_folder_user_sync(
         f"Fetching files for user sync: {user_sync_id} for user: {current_user.id}"
     )
     return await sync_user_service.get_files_folder_user_sync(
-        user_sync_id, str(current_user.id), folder_id
+        user_sync_id, str(current_user.id), folder_id, notion_service=notion_service
     )
 
 

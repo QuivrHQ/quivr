@@ -1,16 +1,15 @@
 from abc import ABC, abstractmethod
-from typing import List
+from typing import Any, List, Literal
 from uuid import UUID
 
-from quivr_api.modules.sync.dto.inputs import (
-    SyncFileInput,
-    SyncFileUpdateInput,
-    SyncsActiveInput,
-    SyncsActiveUpdateInput,
-    SyncsUserInput,
-    SyncUserUpdateInput,
-)
-from quivr_api.modules.sync.entity.sync import SyncsActive, SyncsFiles
+from quivr_api.modules.sync.dto.inputs import (SyncFileInput,
+                                               SyncFileUpdateInput,
+                                               SyncsActiveInput,
+                                               SyncsActiveUpdateInput,
+                                               SyncsUserInput,
+                                               SyncUserUpdateInput)
+from quivr_api.modules.sync.entity.sync import (SyncFile, SyncsActive,
+                                                SyncsFiles)
 
 
 class SyncUserInterface(ABC):
@@ -22,7 +21,7 @@ class SyncUserInterface(ABC):
         pass
 
     @abstractmethod
-    def get_syncs_user(self, user_id: str, sync_user_id: int = None):
+    def get_syncs_user(self, user_id: str, sync_user_id: int | None = None):
         pass
 
     @abstractmethod
@@ -30,7 +29,7 @@ class SyncUserInterface(ABC):
         pass
 
     @abstractmethod
-    def delete_sync_user(self, sync_user_id: UUID, user_id: UUID):
+    def delete_sync_user(self, sync_user_id: int, user_id: UUID | str):
         pass
 
     @abstractmethod
@@ -39,7 +38,7 @@ class SyncUserInterface(ABC):
 
     @abstractmethod
     def update_sync_user(
-        self, sync_user_id: str, state: dict, sync_user_input: SyncUserUpdateInput
+        self, sync_user_id: int, state: dict, sync_user_input: SyncUserUpdateInput
     ):
         pass
 
@@ -48,29 +47,29 @@ class SyncUserInterface(ABC):
         self,
         sync_active_id: int,
         user_id: str,
-        folder_id: int = None,
+        notion_service: Any = None,
+        folder_id: str | None = None,
         recursive: bool = False,
-    ):
+    ) -> None | dict[str, List[SyncFile]] | Literal["No sync found"]:
         pass
 
 
 class SyncInterface(ABC):
-
     @abstractmethod
     def create_sync_active(
         self,
         sync_active_input: SyncsActiveInput,
         user_id: str,
-    ) -> SyncsActive:
+    ) -> SyncsActive | None:
         pass
 
     @abstractmethod
-    def get_syncs_active(self, user_id: UUID) -> list[SyncsActive]:
+    def get_syncs_active(self, user_id: UUID | str) -> List[SyncsActive]:
         pass
 
     @abstractmethod
     def update_sync_active(
-        self, sync_id: UUID, sync_active_input: SyncsActiveUpdateInput
+        self, sync_id: UUID | str, sync_active_input: SyncsActiveUpdateInput
     ):
         pass
 

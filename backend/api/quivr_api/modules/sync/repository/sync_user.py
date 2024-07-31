@@ -1,19 +1,21 @@
 import json
+from typing import List, Literal
+from uuid import UUID
 
 from quivr_api.logger import get_logger
 from quivr_api.models.settings import get_supabase_client
-from quivr_api.modules.knowledge.service.knowledge_service import KnowledgeService
-from quivr_api.modules.notification.service.notification_service import (
-    NotificationService,
-)
-from quivr_api.modules.sync.dto.inputs import SyncsUserInput, SyncUserUpdateInput
+from quivr_api.modules.knowledge.service.knowledge_service import \
+    KnowledgeService
+from quivr_api.modules.notification.service.notification_service import \
+    NotificationService
+from quivr_api.modules.sync.dto.inputs import (SyncsUserInput,
+                                               SyncUserUpdateInput)
+from quivr_api.modules.sync.entity.sync import SyncFile
 from quivr_api.modules.sync.repository.sync_interfaces import SyncUserInterface
-from quivr_api.modules.sync.utils.sync import (
-    AzureDriveSync,
-    DropboxSync,
-    GoogleDriveSync,
-    NotionSync,
-)
+from quivr_api.modules.sync.service.sync_notion import SyncNotionService
+from quivr_api.modules.sync.utils.sync import (AzureDriveSync, BaseSync,
+                                               DropboxSync, GoogleDriveSync,
+                                               NotionSync)
 
 notification_service = NotificationService()
 knowledge_service = KnowledgeService()
@@ -65,7 +67,7 @@ class SyncUser(SyncUserInterface):
         logger.warning("No sync user found for sync_id: %s", sync_id)
         return None
 
-    def get_syncs_user(self, user_id: str, sync_user_id: int = None):
+    def get_syncs_user(self, user_id: str, sync_user_id: int | None = None):
         """
         Retrieve sync users from the database.
 
@@ -117,7 +119,7 @@ class SyncUser(SyncUserInterface):
         logger.warning("No sync user found for state: %s", state)
         return []
 
-    def delete_sync_user(self, sync_id: str, user_id: str):
+    def delete_sync_user(self, sync_id: int, user_id: UUID | str):
         """
         Delete a sync user from the database.
 
@@ -134,7 +136,7 @@ class SyncUser(SyncUserInterface):
         logger.info("Sync user deleted successfully")
 
     def update_sync_user(
-        self, sync_user_id: str, state: dict, sync_user_input: SyncUserUpdateInput
+        self, sync_user_id: int, state: dict, sync_user_input: SyncUserUpdateInput
     ):
         """
         Update a sync user in the database.
@@ -161,9 +163,11 @@ class SyncUser(SyncUserInterface):
         self,
         sync_active_id: int,
         user_id: str,
-        folder_id: str = None,
+        notion_service: SyncNotionService,
+        folder_id: str | None = None,
         recursive: bool = False,
-    ):
+        
+    ) -> None | dict[str, List[SyncFile]] | Literal["No sync found"]:
         """
         Retrieve files from a user's sync folder, either from Google Drive or Azure.
 
@@ -181,7 +185,6 @@ class SyncUser(SyncUserInterface):
             user_id,
             folder_id,
         )
-
         # Check whether the sync is Google or Azure
         sync_user = self.get_syncs_user(user_id=user_id, sync_user_id=sync_active_id)
         if not sync_user:
@@ -193,6 +196,7 @@ class SyncUser(SyncUserInterface):
             return None
 
         sync_user = sync_user[0]
+        sync: BaseSync
 
         provider = sync_user["provider"].lower()
         if provider == "google":
@@ -215,7 +219,7 @@ class SyncUser(SyncUserInterface):
             }
         elif provider == "notion":
             logger.info("Getting files for Notion sync")
-            sync = NotionSync()
+            sync = NotionSync(notion_service=notion_service)
             return {
                 "files": await sync.aget_files(
                     sync_user["credentials"], folder_id if folder_id else "", recursive

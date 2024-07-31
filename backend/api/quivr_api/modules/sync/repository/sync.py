@@ -2,9 +2,9 @@ from datetime import datetime, timedelta
 from typing import List, Sequence
 from uuid import UUID
 
-from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
-from sqlmodel import Session, select
+from sqlmodel import select
+from sqlmodel.ext.asyncio.session import AsyncSession
 
 from quivr_api.logger import get_logger
 from quivr_api.models.settings import get_supabase_client
@@ -33,7 +33,7 @@ class Sync(SyncInterface):
 
     def create_sync_active(
         self, sync_active_input: SyncsActiveInput, user_id: str
-    ) -> SyncsActive:
+    ) -> SyncsActive | None:
         """
         Create a new active sync in the database.
 
@@ -60,7 +60,7 @@ class Sync(SyncInterface):
         logger.warning("Failed to create active sync for user_id: %s", user_id)
         return None
 
-    def get_syncs_active(self, user_id: str) -> List[SyncsActive]:
+    def get_syncs_active(self, user_id: UUID | str) -> List[SyncsActive]:
         """
         Retrieve active syncs from the database.
 
@@ -84,7 +84,7 @@ class Sync(SyncInterface):
         return []
 
     def update_sync_active(
-        self, sync_id: int, sync_active_input: SyncsActiveUpdateInput
+        self, sync_id: UUID | str, sync_active_input: SyncsActiveUpdateInput
     ):
         """
         Update an active sync in the database.
@@ -207,38 +207,52 @@ class Sync(SyncInterface):
 
 
 class NotionRepository(BaseRepository):
-    def __init__(self, session: Session):
+    def __init__(self, session: AsyncSession):
         super().__init__(session)
+        self.session = session
         self.db = get_supabase_client()
 
-    def get_user_notion_files(self, user_id: UUID) -> Sequence[NotionSyncFile]:
+    async def get_user_notion_files(self, user_id: UUID) -> Sequence[NotionSyncFile]:
         query = select(NotionSyncFile).where(NotionSyncFile.user_id == user_id)
-        response = self.session.exec(query)
+        response = await self.session.exec(query)
         return response.all()
 
-    def create_notion_file(self, new_notion_file: NotionSyncFile) -> NotionSyncFile:
+    async def create_notion_file(
+        self, new_notion_file: NotionSyncFile
+    ) -> NotionSyncFile:
         try:
             self.session.add(new_notion_file)
             logger.info(f"Creating new notion file in notion repo: {new_notion_file}")
-            self.session.commit()
+            await self.session.commit()
         except IntegrityError as ie:
             logger.error(f"IntegrityError occurred: {ie}")
-            self.session.rollback()
+            await self.session.rollback()
             raise Exception("Integrity error while creating notion file.")
         except Exception as e:
             logger.error(f"Exception occurred: {e}")
-            self.session.rollback()
+            await self.session.rollback()
             raise e
 
-        self.session.refresh(new_notion_file)
+        await self.session.refresh(new_notion_file)
         return new_notion_file
 
-    def get_notion_files_by_ids(self, ids: List[str]) -> List[NotionSyncFile]:
-        query = select(NotionSyncFile).where(NotionSyncFile.id.in_(ids))
-        response = self.session.exec(query)
+    async def get_notion_files_by_ids(self, ids: List[str]) -> Sequence[NotionSyncFile]:
+        logger.debug("Hey there, i am in get_notion_files_by_ids")
+        query = select(NotionSyncFile).where(NotionSyncFile.notion_id.in_(ids))  # type: ignore
+        response = await self.session.exec(query)
+        logger.debug(
+            "Hey there, i just finished processing get_notion_files_by_ids hehe"
+        )
         return response.all()
 
-    def get_notion_files_by_parent_id(self, parent_id: str) -> List[NotionSyncFile]:
+    async def get_notion_files_by_parent_id(
+        self, parent_id: str
+    ) -> Sequence[NotionSyncFile]:
         query = select(NotionSyncFile).where(NotionSyncFile.parent_id == parent_id)
-        response = self.session.exec(query)
+        response = await self.session.exec(query)
         return response.all()
+
+    async def is_folder_page(self, page_id: str) -> bool:
+        query = select(NotionSyncFile).where(NotionSyncFile.parent_id == page_id)
+        response = await self.session.exec(query)
+        return response.first() is not None

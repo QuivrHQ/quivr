@@ -12,8 +12,10 @@ from quivr_api.modules.brain.entity.brain_entity import Brain
 from quivr_api.modules.chat.entity.chat import Chat, ChatHistory
 from quivr_api.modules.sync.entity.sync import NotionSyncFile
 from quivr_api.modules.sync.repository.sync import NotionRepository
-from quivr_api.modules.sync.service.sync_notion import store_notion_pages
-from quivr_api.modules.sync.service.sync_service import SyncNotionService
+from quivr_api.modules.sync.service.sync_notion import (
+    SyncNotionService,
+    store_notion_pages,
+)
 from quivr_api.modules.user.entity.user_identity import User
 
 pg_database_base_url = "postgres:postgres@localhost:54322/postgres"
@@ -145,11 +147,11 @@ def search_result():
     ]
 
 
-def test_store_notion_pages(sync_session, search_result):
+async def test_store_notion_pages(sync_session, search_result):
     user_1 = (
         sync_session.exec(select(User).where(User.email == "admin@quivr.app"))
     ).one()
     notion_repository = NotionRepository(sync_session)
     notion_service = SyncNotionService(notion_repository)
-    sync_files = store_notion_pages(search_result, notion_service, user_1.id)
+    sync_files = await store_notion_pages(search_result, notion_service, user_1.id)
     assert len(sync_files) == 1

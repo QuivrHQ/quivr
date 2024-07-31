@@ -1,12 +1,13 @@
 from datetime import datetime
-from typing import Any
+from typing import Any, List, Sequence
 from uuid import UUID
 
 from notion_client import Client
 
 from quivr_api.logger import get_logger
+from quivr_api.modules.dependencies import BaseService
 from quivr_api.modules.sync.entity.sync import NotionSyncFile
-from quivr_api.modules.sync.service.sync_service import SyncNotionService
+from quivr_api.modules.sync.repository.sync import NotionRepository
 
 logger = get_logger(__name__)
 
@@ -15,20 +16,66 @@ logger = get_logger(__name__)
 # class NotionPage(BaseModel): ...
 
 
-def store_notion_pages(
+class SyncNotionService(BaseService[NotionRepository]):
+    repository_cls = NotionRepository
+
+    def __init__(self, repository: NotionRepository):
+        self.repository = repository
+
+    async def create_notion_file(
+        self, notion_sync_file: NotionSyncFile
+    ) -> NotionSyncFile:
+        logger.info(
+            f"New notion entry on notion table for user {notion_sync_file.user_id}"
+        )
+
+        inserted_notion_file = await self.repository.create_notion_file(
+            notion_sync_file
+        )
+        logger.info(f"Insert response {inserted_notion_file}")
+
+        return inserted_notion_file
+
+    async def get_notion_files_by_ids(self, ids: List[str]) -> Sequence[NotionSyncFile]:
+        logger.info(f"Fetching notion files for IDs: {ids}")
+        notion_files = await self.repository.get_notion_files_by_ids(ids)
+        logger.info(f"Fetched {len(notion_files)} notion files")
+        return notion_files
+
+    async def get_notion_files_by_parent_id(
+        self, parent_id: str
+    ) -> Sequence[NotionSyncFile]:
+        logger.info(f"Fetching notion files with parent_id: {parent_id}")
+        notion_files = await self.repository.get_notion_files_by_parent_id(parent_id)
+        logger.info(
+            f"Fetched {len(notion_files)} notion files with parent_id {parent_id}"
+        )
+        return notion_files
+
+    async def get_root_notion_files(self) -> Sequence[NotionSyncFile]:
+        logger.info("Fetching root notion files")
+        notion_files = await self.repository.get_notion_files_by_parent_id("True")
+        logger.info(f"Fetched {len(notion_files)} root notion files")
+        return notion_files
+
+    async def is_folder_page(self, page_id: str) -> bool:
+        logger.info(f"Checking if page is a folder: {page_id}")
+        is_folder = await self.repository.is_folder_page(page_id)
+        return is_folder
+
+
+async def store_notion_pages(
     all_search_result: list[dict[str, Any]],
     notion_service: SyncNotionService,
     user_id: UUID,
 ):
     notion_sync_files = []
     for i, page in enumerate(all_search_result):
-        logger.debug(f"Processing page: {i}")
         page = all_search_result[i]
-        logger.debug(f"Page: {page}")
         parent_type = page["parent"]["type"]
         if (
-            page["in_trash"] == False
-            and page["archived"] == False
+            not page["in_trash"]
+            and not page["archived"]
             and page["parent"]["type"] != "database_id"
         ):
             file = NotionSyncFile(
@@ -45,12 +92,10 @@ def store_notion_pages(
                 type="page",
                 user_id=user_id,
             )
-            logger.debug(f"Notion sync input: {file}")
             # FIXME(@chloedia): service should create the NotionSyncFile object internally
             # The notion_service should insert ALL the pages in a single batch
             # This loop should live in the notion_service
-            notion_service.create_notion_file(file)
-            logger.debug(f"Created Notion file: {file}")
+            await notion_service.create_notion_file(file)
             notion_sync_files.append(file)
         else:
             logger.debug(f"Page did not pass filter: {page['id']}")

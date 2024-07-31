@@ -9,17 +9,18 @@ from typing import Any, Dict, List, Optional, Union
 import dropbox
 import markdownify
 import msal
-import redis
-import requests
+import redis  # type: ignore
+import requests  # type: ignore
 from fastapi import HTTPException
 from google.auth.transport.requests import Request as GoogleRequest
 from google.oauth2.credentials import Credentials
 from googleapiclient.discovery import build
-from notion_client import AsyncClient
+from notion_client import Client
 from requests import HTTPError
 
 from quivr_api.logger import get_logger
 from quivr_api.modules.sync.entity.sync import SyncFile
+from quivr_api.modules.sync.service.sync_notion import SyncNotionService
 from quivr_api.modules.sync.utils.normalize import remove_special_characters
 
 logger = get_logger(__name__)
@@ -90,7 +91,6 @@ class GoogleDriveSync(BaseSync):
         file_id = file.id
         file_name = file.name
         mime_type = file.mime_type
-        modified_time = file.last_modified
         if not self.creds:
             self.check_and_refresh_access_token(credentials)
         if not self.service:
@@ -433,9 +433,7 @@ class AzureDriveSync(BaseSync):
     ) -> List[SyncFile]:
         return []
 
-    def get_files_by_id(
-        self, credentials: dict, file_ids: List[str]
-    ) -> List[SyncFile] | dict:
+    def get_files_by_id(self, credentials: dict, file_ids: List[str]) -> List[SyncFile]:
         """
         Retrieve files from Azure Drive by their IDs.
 
@@ -492,7 +490,6 @@ class AzureDriveSync(BaseSync):
     ) -> Dict[str, Union[str, BytesIO]]:
         file_id = file.id
         file_name = file.name
-        modified_time = file.last_modified
         headers = self.get_azure_headers(credentials)
 
         download_endpoint = (
@@ -534,7 +531,7 @@ class DropboxSync(BaseSync):
         return credentials
 
     def get_files(
-        self, credentials: Dict, folder_id: str = "", recursive: bool = False
+        self, credentials: Dict, folder_id: str | None = "", recursive: bool = False
     ) -> List[SyncFile]:
         """
         Retrieve files from Dropbox.
@@ -709,11 +706,16 @@ class DropboxSync(BaseSync):
 class NotionSync(BaseSync):
     name = "Notion"
     lower_name = "notion"
-    notion: Optional[AsyncClient] = None
-    datetime_format: str = "%Y-%m-%dT%H:%M:%S.%fZ"
+    notion: Optional[Client] = None
+    datetime_format: str = "%Y-%m-%d %H:%M:%S%z"
+    notion_service: SyncNotionService
 
-    def link_notion(self, credentials) -> AsyncClient:
-        return AsyncClient(auth=credentials["access_token"])
+    def __init__(self, notion_service: SyncNotionService):
+        self.notion_service = notion_service
+        super().__init__()
+
+    def link_notion(self, credentials) -> Client:
+        return Client(auth=credentials["access_token"])
 
     def check_and_refresh_access_token(self, credentials: Dict) -> Dict:
         if not self.notion:
@@ -727,29 +729,34 @@ class NotionSync(BaseSync):
         t_0 = time.time()
         pages = []
 
-        children = notion_sync_service.get_children(folder_id)  # FIXME
+        if not self.notion:
+            self.link_notion(credentials)
 
-        logger.debug("Children: %s", children)
+        if not folder_id or folder_id == "":
+            folder_id = "true"  # ROOT FOLDER HAVE A TRUE PARENT ID
 
+        children = await self.notion_service.get_notion_files_by_parent_id(
+            folder_id
+        )  # FIXME
         for page in children:
             page_info = SyncFile(
-                name=page["name"],
-                id=page["id"],
-                is_folder=page["is_folder"],
-                last_modified=page["last_edited_time"],
-                mime_type=page["mime_type"],
-                web_view_link=page["url"],
-                icon=page["icon"],
+                name=page.name,
+                id=str(page.notion_id),
+                is_folder=await self.notion_service.is_folder_page(page.notion_id),
+                last_modified=str(page.last_modified),
+                mime_type=page.mime_type,
+                web_view_link=page.web_view_link,
+                icon=page.icon,
             )
-            redis_client.set(page["id"], json.dumps(page_info.model_dump_json()))
+            redis_client.set(str(page.id), json.dumps(page_info.model_dump_json()))
 
             pages.append(page_info)
 
             if recursive:
-                sub_pages = await self.fetch_pages(page["id"], recursive)
+                sub_pages = await self.aget_files(credentials, str(page.id), recursive)
                 pages.extend(sub_pages)
         print("TOTAL Time taken for fetching pages: ", time.time() - t_0)
-        return page
+        return pages
 
     def get_files(
         self, credentials: Dict, folder_id: str | None = None, recursive: bool = False
@@ -768,24 +775,23 @@ class NotionSync(BaseSync):
     ) -> List[SyncFile]:
         logger.info("Retrieving Notion files by file_ids: %s", file_ids)
         files = []
+        pages = await self.notion_service.get_notion_files_by_ids(file_ids)
 
-        for file_id in file_ids:
+        for page in pages:
             try:
-                page = await notion_sync_service.retrieve_id(file_id)
-
                 page_info = SyncFile(
-                    name=page["name"],
-                    id=page["id"],
-                    is_folder=page["is_folder"],
-                    last_modified=page["last_edited_time"],
-                    mime_type=page["mime_type"],
-                    web_view_link=page["url"],
-                    icon=page["icon"],
+                    name=page.name,
+                    id=str(page.notion_id),
+                    is_folder=await self.notion_service.is_folder_page(page.notion_id),
+                    last_modified=str(page.last_modified),
+                    mime_type=page.mime_type,
+                    web_view_link=page.web_view_link,
+                    icon=page.icon,
                 )
                 files.append(page_info)
 
             except Exception as e:
-                logger.error("Error retrieving Notion file with ID %s: %s", file_id, e)
+                logger.error("Error retrieving Notion file with ID %s: %s", page.id, e)
                 continue  # Skip this file and proceed with the next one
 
         logger.info("Notion files retrieved successfully by IDs: %d", len(files))
@@ -793,13 +799,19 @@ class NotionSync(BaseSync):
 
     def get_files_by_id(self, credentials: Dict, file_ids: List[str]) -> List[SyncFile]:
         loop = asyncio.get_event_loop()
-        return loop.run_until_complete(self.aget_files_by_id(credentials, file_ids))
+        result = loop.run_until_complete(self.aget_files_by_id(credentials, file_ids))
+        loop.close()
+        return result
 
     def get_block_content(self, block):
         block_type = block["type"]
         result = ""
 
+        if block_type == "image":
+            return "![Image](%s)" % block["image"]["file"]["url"]
         if "rich_text" not in block[block_type]:
+            if "title" not in block[block_type]:
+                return "--- ---"
             return f'{block[block_type]["title"]} {": database" if block_type == "child_database" else ": linked page"}'
 
         if len(block[block_type]["rich_text"]) == 0:
@@ -877,8 +889,9 @@ class NotionSync(BaseSync):
         try:
 
             async def retrieve_page_content(page_id) -> List[str]:
-                blocks = await self.notion.blocks.children.list(page_id)
-                blocks = blocks["results"]
+                blocks = self.notion.blocks.children.list(page_id)  # type: ignore
+
+                blocks = blocks["results"]  # type: ignore
                 if not blocks:
                     raise Exception("Page does not exist")
 
@@ -908,6 +921,8 @@ class NotionSync(BaseSync):
             )
             raise Exception("Failed to download file")
 
-    def download_file(self, credentials: Dict, file: SyncFile) -> BytesIO:
+    def download_file(
+        self, credentials: Dict, file: SyncFile
+    ) -> Dict[str, Union[str, BytesIO]]:
         loop = asyncio.get_event_loop()
         return loop.run_until_complete(self.adownload_file(credentials, file))
