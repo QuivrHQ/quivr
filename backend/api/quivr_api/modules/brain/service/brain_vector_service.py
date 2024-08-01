@@ -18,7 +18,7 @@ class BrainVectorService:
     def update_brain_with_file(self, file_sha1: str):
         # not  used
         vector_ids = self.repository.get_vector_ids_from_file_sha1(file_sha1)
-        if vector_ids == None or len(vector_ids) == 0:
+        if vector_ids is None or len(vector_ids) == 0:
             logger.info(f"No vector ids found for file {file_sha1}")
             return
 

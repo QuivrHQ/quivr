@@ -1,6 +1,3 @@
-import asyncio
-
-from quivr_api.celery_config import celery
 from quivr_api.logger import get_logger
 from quivr_api.modules.knowledge.repository.storage import Storage
 from quivr_api.modules.notification.service.notification_service import (
@@ -21,18 +18,12 @@ notification_service = NotificationService()
 logger = get_logger(__name__)
 
 
-@celery.task(name="process_sync_active")
-def process_sync_active():
-    loop = asyncio.get_event_loop()
-    loop.run_until_complete(_process_sync_active())
-
-
-async def _process_sync_active():
-    sync_active_service = SyncService()
-    sync_user_service = SyncUserService()
-    sync_files_repo_service = SyncFiles()
-    storage = Storage()
-
+async def process_all_syncs(
+    sync_active_service: SyncService,
+    sync_user_service: SyncUserService,
+    sync_files_repo_service: SyncFiles,
+    storage: Storage,
+):
     google_sync_utils = SyncUtils(
         sync_user_service=sync_user_service,
         sync_active_service=sync_active_service,

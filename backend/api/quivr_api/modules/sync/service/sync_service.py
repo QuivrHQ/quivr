@@ -8,11 +8,7 @@ from quivr_api.modules.sync.dto.inputs import (
     SyncUserUpdateInput,
 )
 from quivr_api.modules.sync.entity.sync import SyncsActive, SyncsUser
-from quivr_api.modules.sync.repository.sync import Sync, SyncInterface
-from quivr_api.modules.sync.repository.sync_interfaces import (
-    SyncInterface,
-    SyncUserInterface,
-)
+from quivr_api.modules.sync.repository.sync import Sync
 from quivr_api.modules.sync.repository.sync_user import SyncUser
 from quivr_api.modules.user.service.user_service import UserService
 
@@ -23,8 +19,6 @@ user_service = UserService()
 
 
 class SyncUserService:
-    repository: SyncUserInterface
-
     def __init__(self):
         self.repository = SyncUser()
 
@@ -61,8 +55,6 @@ class SyncUserService:
 
 
 class SyncService:
-    repository: SyncInterface
-
     def __init__(self):
         self.repository = Sync()
 

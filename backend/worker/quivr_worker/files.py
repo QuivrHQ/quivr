@@ -1,6 +1,7 @@
 import hashlib
 from pathlib import Path
 from typing import List, Optional
+from uuid import UUID
 
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_core.documents import Document
@@ -65,57 +66,61 @@ class File(BaseModel):
 
         self.documents = text_splitter.split_documents(documents)
 
-    def set_file_vectors_ids(self):
-        """
-        Set the vectors_ids property with the ids of the vectors
-        that are associated with the file in the vectors table
-        """
-        self.vectors_ids = self.supabase_db.get_vectors_by_file_sha1(
-            self.file_sha1
-        ).data
 
-    def file_already_exists(self):
-        """
-        Check if file already exists in vectors table
-        """
-        self.set_file_vectors_ids()
+def set_file_vectors_ids(self):
+    """
+    Set the vectors_ids property with the ids of the vectors
+    that are associated with the file in the vectors table
+    """
+    self.vectors_ids = self.supabase_db.get_vectors_by_file_sha1(self.file_sha1).data
 
-        # if the file does not exist in vectors then no need to go check in brains_vectors
-        if len(self.vectors_ids) == 0:  # pyright: ignore reportPrivateUsage=none
-            return False
 
-        return True
+def file_already_exists(self):
+    """
+    Check if file already exists in vectors table
+    """
+    self.set_file_vectors_ids()
 
-    def file_already_exists_in_brain(self, brain_id):
-        """
-        Check if file already exists in a brain
+    # if the file does not exist in vectors then no need to go check in brains_vectors
+    if len(self.vectors_ids) == 0:  # pyright: ignore reportPrivateUsage=none
+        return False
 
-        Args:
-            brain_id (str): Brain id
-        """
-        response = self.supabase_db.get_brain_vectors_by_brain_id_and_file_sha1(
-            brain_id,
-            self.file_sha1,  # type: ignore
-        )
+    return True
 
-        if len(response.data) == 0:
-            return False
 
-        return True
+# TODO: this is a crazy way to check if file exists
+def file_already_exists_in_brain(db: SupabaseDB, brain_id: UUID, file_sha1: bytes):
+    """
+    Check if file already exists in a brain
 
-    def file_is_empty(self):
-        """
-        Check if file is empty by checking if the file pointer is at the beginning of the file
-        """
-        return self.file_size < 1  # pyright: ignore reportPrivateUsage=none
+    Args:
+        brain_id (str): Brain id
+    """
+    response = db.get_brain_vectors_by_brain_id_and_file_sha1(
+        brain_id,
+        file_sha1,  # type: ignore
+    )
 
-    def link_file_to_brain(self, brain_id):
-        self.set_file_vectors_ids()
+    if len(response.data) == 0:
+        return False
 
-        if self.vectors_ids is None:
-            return
+    return True
 
-        brain_vector_service = BrainVectorService(brain_id)
 
-        for vector_id in self.vectors_ids:  # pyright: ignore reportPrivateUsage=none
-            brain_vector_service.create_brain_vector(vector_id["id"], self.file_sha1)
+def file_is_empty(self):
+    """
+    Check if file is empty by checking if the file pointer is at the beginning of the file
+    """
+    return self.file_size < 1  # pyright: ignore reportPrivateUsage=none
+
+
+def link_file_to_brain(self, brain_id):
+    self.set_file_vectors_ids()
+
+    if self.vectors_ids is None:
+        return
+
+    brain_vector_service = BrainVectorService(brain_id)
+
+    for vector_id in self.vectors_ids:  # pyright: ignore reportPrivateUsage=none
+        brain_vector_service.create_brain_vector(vector_id["id"], self.file_sha1)

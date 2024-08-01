@@ -1,3 +1,4 @@
+import asyncio
 import os
 from datetime import datetime, timedelta
 from tempfile import NamedTemporaryFile
@@ -11,19 +12,28 @@ from quivr_api.models.settings import get_supabase_client, get_supabase_db
 from quivr_api.modules.brain.integrations.Notion.Notion_connector import NotionConnector
 from quivr_api.modules.brain.service.brain_service import BrainService
 from quivr_api.modules.brain.service.brain_vector_service import BrainVectorService
+from quivr_api.modules.knowledge.repository.storage import Storage
 from quivr_api.modules.notification.service.notification_service import (
     NotificationService,
 )
+from quivr_api.modules.sync.repository.sync_files import SyncFiles
+from quivr_api.modules.sync.service.sync_service import SyncService, SyncUserService
 from quivr_api.utils.telemetry import maybe_send_telemetry
 
 from quivr_worker.crawl.crawler import CrawlWebsite, slugify
 from quivr_worker.files import File
 from quivr_worker.processors import process_file
+from quivr_worker.syncs.process_active_syncs import process_all_syncs
 
 logger = get_logger(__name__)
 
+supabase_client = get_supabase_client()
 notification_service = NotificationService()
 brain_service = BrainService()
+sync_active_service = SyncService()
+sync_user_service = SyncUserService()
+sync_files_repo_service = SyncFiles()
+storage = Storage()
 
 
 @celery.task(
@@ -35,24 +45,26 @@ brain_service = BrainService()
 def process_file_and_notify(
     file_name: str,
     file_original_name: str,
-    brain_id,
+    brain_id: UUID,
     notification_id: UUID,
     knowledge_id: UUID,
     integration=None,
     integration_link=None,
-    delete_file=False,
+    delete_file: bool = False,
 ):
     logger.debug(
-        f"process_file file_name={file_name}, knowledge_id={knowledge_id}, brain_id={brain_id}, notification_id={notification_id}"
+        f"process_file started for file_name={file_name}, knowledge_id={knowledge_id}, brain_id={brain_id}, notification_id={notification_id}"
     )
-    supabase_client = get_supabase_client()
     tmp_name = file_name.replace("/", "_")
     base_file_name = os.path.basename(file_name)
     _, file_extension = os.path.splitext(base_file_name)
 
+    brain_vector_service = BrainVectorService(brain_id)
+
     with NamedTemporaryFile(
         suffix="_" + tmp_name,  # pyright: ignore reportPrivateUsage=none
     ) as tmp_file:
+        # This reads the whole file to memory
         res = supabase_client.storage.from_("quivr").download(file_name)
         tmp_file.write(res)
         tmp_file.flush()
@@ -63,15 +75,22 @@ def process_file_and_notify(
             file_size=len(res),
             file_extension=file_extension,
         )
-        brain_vector_service = BrainVectorService(brain_id)
+
         if delete_file:  # TODO fix bug
             brain_vector_service.delete_file_from_brain(
                 file_original_name, only_vectors=True
             )
 
+        brain = brain_service.get_brain_by_id(brain_id)
+        if brain is None:
+            logger.exception(
+                "It seems like you're uploading knowledge to an unknown brain."
+            )
+            return
+
         process_file(
             file=file_instance,
-            brain_id=brain_id,
+            brain=brain,
             original_file_name=file_original_name,
             integration=integration,
             integration_link=integration_link,
@@ -267,6 +286,16 @@ def check_if_is_premium_user():
         f"Updated {len(settings_to_upsert)} premium users, deleted settings for {len(settings_to_delete)} non-premium users"
     )
     return True
+
+
+@celery.task(name="process_sync_active")
+def process_sync_active():
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(
+        process_all_syncs(
+            sync_active_service, sync_user_service, sync_files_repo_service, storage
+        )
+    )
 
 
 celery.conf.beat_schedule = {
