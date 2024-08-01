@@ -1,7 +1,7 @@
 from typing import Optional
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, Query, Request
+from fastapi import APIRouter, Depends, Query
 from quivr_api.celery_config import celery
 from quivr_api.logger import get_logger
 from quivr_api.middlewares.auth import AuthBearer, get_current_user
@@ -18,8 +18,7 @@ from quivr_api.modules.notification.service.notification_service import (
 )
 from quivr_api.modules.user.entity.user_identity import UserIdentity
 from quivr_api.modules.user.service.user_usage import UserUsage
-from quivr_api.packages.files.crawl.crawler import CrawlWebsite
-from quivr_api.packages.files.file import convert_bytes
+from quivr_api.utils.byte_size import convert_bytes
 
 logger = get_logger(__name__)
 crawl_router = APIRouter()
@@ -35,8 +34,7 @@ async def healthz():
 
 @crawl_router.post("/crawl", dependencies=[Depends(AuthBearer())], tags=["Crawl"])
 async def crawl_endpoint(
-    request: Request,
-    crawl_website: CrawlWebsite,
+    url: str,
     bulk_id: Optional[UUID] = Query(None, description="The ID of the bulk upload"),
     brain_id: UUID = Query(..., description="The ID of the brain"),
     chat_id: Optional[UUID] = Query(None, description="The ID of the chat"),
@@ -70,14 +68,14 @@ async def crawl_endpoint(
                 user_id=current_user.id,
                 bulk_id=bulk_id,
                 status=NotificationsStatusEnum.INFO,
-                title=f"{crawl_website.url}",
+                title=f"{url}",
                 category="crawl",
                 brain_id=str(brain_id),
             )
         )
         knowledge_to_add = CreateKnowledgeProperties(
             brain_id=brain_id,
-            url=crawl_website.url,
+            url=url,
             extension="html",
         )
 
@@ -87,7 +85,7 @@ async def crawl_endpoint(
         celery.send_task(
             "process_crawl_and_notify",
             kwargs={
-                "crawl_website_url": crawl_website.url,
+                "crawl_website_url": url,
                 "brain_id": brain_id,
                 "knowledge_id": added_knowledge.id,
                 "notification_id": upload_notification.id,

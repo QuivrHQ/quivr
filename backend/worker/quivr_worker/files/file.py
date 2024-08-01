@@ -4,19 +4,6 @@ from io import BytesIO
 from fastapi import UploadFile
 
 
-def convert_bytes(bytes, precision=2):
-    """Converts bytes into a human-friendly format."""
-    abbreviations = ["B", "KB", "MB"]
-    if bytes <= 0:
-        return "0 B"
-    size = bytes
-    index = 0
-    while size >= 1024 and index < len(abbreviations) - 1:
-        size /= 1024
-        index += 1
-    return f"{size:.{precision}f} {abbreviations[index]}"
-
-
 def get_file_size(file: UploadFile):
     if isinstance(file.file, BytesIO):
         # If the file object is a BytesIO object, get the size of the bytes data

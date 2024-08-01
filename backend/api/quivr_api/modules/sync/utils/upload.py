@@ -18,7 +18,6 @@ from quivr_api.modules.notification.service.notification_service import (
 )
 from quivr_api.modules.upload.service.upload_file import upload_file_storage
 from quivr_api.modules.user.service.user_usage import UserUsage
-from quivr_api.packages.files.file import convert_bytes, get_file_size
 from quivr_api.utils.telemetry import maybe_send_telemetry
 
 logger = get_logger("upload_file")
@@ -30,7 +29,7 @@ notification_service = NotificationService()
 async def upload_file(
     upload_file: UploadFile,
     brain_id: UUID,
-    current_user: str,
+    current_user: UUID,
     bulk_id: Optional[UUID] = None,
     integration: Optional[str] = None,
     integration_link: Optional[str] = None,
@@ -45,11 +44,14 @@ async def upload_file(
 
     user_settings = user_daily_usage.get_user_settings()
 
+    # TODO: FIX THIS in refacto
     remaining_free_space = user_settings.get("max_brain_size", 1000000000)
+
     maybe_send_telemetry("upload_file", {"file_name": upload_file.filename})
-    file_size = get_file_size(upload_file)
+
+    file_size = upload_file.size
     if remaining_free_space - file_size < 0:
-        message = f"Brain will exceed maximum capacity. Maximum file allowed is : {convert_bytes(remaining_free_space)}"
+        message = f"Brain will exceed maximum capacity. Maximum file allowed is : {remaining_free_space} MB"
         raise HTTPException(status_code=403, detail=message)
 
     file_content = await upload_file.read()

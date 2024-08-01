@@ -9,16 +9,15 @@ from quivr_api.celery_config import celery
 from quivr_api.logger import get_logger
 from quivr_api.models.files import File
 from quivr_api.models.settings import get_supabase_client, get_supabase_db
-from quivr_api.modules.brain.integrations.Notion.Notion_connector import \
-    NotionConnector
+from quivr_api.modules.brain.integrations.Notion.Notion_connector import NotionConnector
 from quivr_api.modules.brain.service.brain_service import BrainService
-from quivr_api.modules.brain.service.brain_vector_service import \
-    BrainVectorService
-from quivr_api.modules.notification.service.notification_service import \
-    NotificationService
-from quivr_api.packages.files.crawl.crawler import CrawlWebsite, slugify
-from quivr_api.packages.files.processors import filter_file
-from quivr_api.packages.utils.telemetry import maybe_send_telemetry
+from quivr_api.modules.brain.service.brain_vector_service import BrainVectorService
+from quivr_api.modules.notification.service.notification_service import (
+    NotificationService,
+)
+from quivr_api.utils.telemetry import maybe_send_telemetry
+from quivr_worker.files.crawl.crawler import CrawlWebsite, slugify
+from quivr_worker.files.processors import process_file
 
 logger = get_logger(__name__)
 
@@ -69,7 +68,7 @@ def process_file_and_notify(
                 file_original_name, only_vectors=True
             )
 
-        filter_file(
+        process_file(
             file=file_instance,
             brain_id=brain_id,
             original_file_name=file_original_name,
@@ -110,7 +109,7 @@ def process_crawl_and_notify(
             file_size=len(extracted_content),
             file_extension=".txt",
         )
-        filter_file(
+        process_file(
             file=file_instance,
             brain_id=brain_id,
             original_file_name=crawl_website_url,

@@ -1,4 +1,4 @@
-from quivr_api.packages.files.crawl.crawler import CrawlWebsite
+from quivr_worker.files.crawl.crawler import CrawlWebsite
 
 
 def test_crawl():

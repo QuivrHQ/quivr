@@ -49,7 +49,7 @@ brain_service = BrainService()
 
 
 # TODO: Move filter_file to a file service to avoid circular imports from quivr_api.models/files.py for File class
-def filter_file(
+def process_file(
     file,
     brain_id,
     original_file_name=None,

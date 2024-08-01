@@ -3,16 +3,33 @@ import tempfile
 import time
 
 import tiktoken
-from langchain.schema import Document
 from langchain.text_splitter import RecursiveCharacterTextSplitter
+from langchain_core.documents import Document
+from langchain_core.vectorstores import VectorStore
 from llama_parse import LlamaParse
 from quivr_api.logger import get_logger
 from quivr_api.models.files import File
-from quivr_api.modules.brain.service.brain_vector_service import BrainVectorService
+from quivr_api.models.settings import (get_documents_vector_store,
+                                       get_embedding_client)
+from quivr_api.modules.brain.service.brain_vector_service import \
+    BrainVectorService
 from quivr_api.modules.upload.service.upload_file import DocumentSerializable
-from quivr_api.packages.embeddings.vectors import Neurons
 
 logger = get_logger(__name__)
+
+
+def upload_vector_docs(docs: list[Document], vector_store: VectorStore):
+    try:
+        sids = vector_store.add_documents(docs)
+        if sids and len(sids) > 0:
+            return sids
+    except Exception as e:
+        logger.error(f"Error creating vector for document {e}")
+
+
+def create_embedding(content):
+    embeddings = get_embedding_client()
+    return embeddings.embed_query(content)
 
 
 def process_file(
@@ -22,9 +39,9 @@ def process_file(
     original_file_name,
     integration=None,
     integration_link=None,
+    supabase_vector_store=get_documents_vector_store(),
 ):
     dateshort = time.strftime("%Y%m%d")
-    neurons = Neurons()
 
     if os.getenv("LLAMA_CLOUD_API_KEY"):
         doc = file.file
@@ -73,7 +90,6 @@ def process_file(
     enc = tiktoken.get_encoding("cl100k_base")
 
     if file.documents is not None:
-        logger.info("Coming here?")
         for index, doc in enumerate(
             file.documents, start=1
         ):  # pyright: ignore reportPrivateUsage=none
@@ -98,7 +114,7 @@ def process_file(
             )
             docs.append(doc_with_metadata)
 
-    created_vector = neurons.create_vector(docs)
+    created_vector = upload_vector_docs(docs, vector_store=supabase_vector_store)
 
     brain_vector_service = BrainVectorService(brain_id)
 

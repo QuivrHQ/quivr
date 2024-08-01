@@ -5,13 +5,15 @@ from langchain.schema import Document
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_community.document_loaders import GitLoader
 from quivr_api.models.files import File
-from quivr_api.packages.embeddings.vectors import Neurons
+from quivr_api.models.settings import get_documents_vector_store
 from quivr_api.packages.files.file import compute_sha1_from_content
+from quivr_worker.files.parsers.common import upload_vector_docs
 
 
 def process_github(
     repo,
     brain_id,
+    supabase_vector_store=get_documents_vector_store(),
 ):
     random_dir_name = os.urandom(16).hex()
     dateshort = time.strftime("%Y%m%d")
@@ -29,8 +31,8 @@ def process_github(
     )
 
     documents = text_splitter.split_documents(documents)
-
     for doc in documents:
+        sha1 = compute_sha1_from_content(doc.page_content.encode("utf-8"))
         if doc.metadata["file_type"] in [
             ".pyc",
             ".png",
@@ -46,7 +48,7 @@ def process_github(
         ]:
             continue
         metadata = {
-            "file_sha1": compute_sha1_from_content(doc.page_content.encode("utf-8")),
+            "file_sha1": sha1,
             "file_size": len(doc.page_content) * 8,
             "file_name": doc.metadata["file_name"],
             "chunk_size": chunk_size,
@@ -58,15 +60,11 @@ def process_github(
 
         print(doc_with_metadata.metadata["file_name"])
 
-        file = File(
-            file_sha1=compute_sha1_from_content(doc.page_content.encode("utf-8"))
-        )
-
+        file = File(file_sha1=sha1)
         file_exists = file.file_already_exists()
 
         if not file_exists:
-            neurons = Neurons()
-            created_vector = neurons.create_vector(doc_with_metadata)
+            upload_vector_docs([doc_with_metadata], supabase_vector_store)
 
         file_exists_in_brain = file.file_already_exists_in_brain(brain_id)
 
