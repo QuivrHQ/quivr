@@ -2,20 +2,20 @@ from datetime import datetime, timedelta
 from typing import List, Sequence
 from uuid import UUID
 
-from quivr_api.logger import get_logger
-from quivr_api.models.settings import get_supabase_client
-from quivr_api.modules.dependencies import BaseRepository
-from quivr_api.modules.knowledge.service.knowledge_service import \
-    KnowledgeService
-from quivr_api.modules.notification.service.notification_service import \
-    NotificationService
-from quivr_api.modules.sync.dto.inputs import (SyncsActiveInput,
-                                               SyncsActiveUpdateInput)
-from quivr_api.modules.sync.entity.sync import NotionSyncFile, SyncsActive
-from quivr_api.modules.sync.repository.sync_interfaces import SyncInterface
 from sqlalchemy.exc import IntegrityError
 from sqlmodel import select
 from sqlmodel.ext.asyncio.session import AsyncSession
+
+from quivr_api.logger import get_logger
+from quivr_api.models.settings import get_supabase_client
+from quivr_api.modules.dependencies import BaseRepository
+from quivr_api.modules.knowledge.service.knowledge_service import KnowledgeService
+from quivr_api.modules.notification.service.notification_service import (
+    NotificationService,
+)
+from quivr_api.modules.sync.dto.inputs import SyncsActiveInput, SyncsActiveUpdateInput
+from quivr_api.modules.sync.entity.sync import NotionSyncFile, SyncsActive
+from quivr_api.modules.sync.repository.sync_interfaces import SyncInterface
 
 notification_service = NotificationService()
 knowledge_service = KnowledgeService()
@@ -240,19 +240,29 @@ class NotionRepository(BaseRepository):
         self, updated_notion_file: NotionSyncFile
     ) -> NotionSyncFile:
         try:
-            query = select(NotionSyncFile).where(NotionSyncFile.notion_id == updated_notion_file.notion_id)
-            results = await self.session.exec(query)
-            page = results.one()
-            if page:
-                page.name = updated_notion_file.name
-                page.last_modified = updated_notion_file.last_modified
+            query = select(NotionSyncFile).where(
+                NotionSyncFile.notion_id == updated_notion_file.notion_id
+            )
+            result = await self.session.exec(query)
+            existing_page = result.one_or_none()
 
-                self.session.add(page)
-                logger.info(f"Updating notion file in notion repo: {updated_notion_file}")
-                await self.session.commit()
+            if existing_page:
+                # Update existing page
+                existing_page.name = updated_notion_file.name
+                existing_page.last_modified = updated_notion_file.last_modified
+                self.session.add(existing_page)
             else:
+                # Add new page
                 self.session.add(updated_notion_file)
 
+            await self.session.commit()
+
+            # Refresh the object that's actually in the session
+            refreshed_file = existing_page if existing_page else updated_notion_file
+            await self.session.refresh(refreshed_file)
+
+            logger.info(f"Updated notion file in notion repo: {refreshed_file}")
+            return refreshed_file
 
         except IntegrityError as ie:
             logger.error(f"IntegrityError occurred: {ie}")
@@ -261,10 +271,7 @@ class NotionRepository(BaseRepository):
         except Exception as e:
             logger.error(f"Exception occurred: {e}")
             await self.session.rollback()
-            raise e
-
-        await self.session.refresh(updated_notion_file)
-        return updated_notion_file
+            raise
 
     async def get_notion_files_by_ids(self, ids: List[str]) -> Sequence[NotionSyncFile]:
         logger.debug("Hey there, i am in get_notion_files_by_ids")
@@ -276,7 +283,7 @@ class NotionRepository(BaseRepository):
         return response.all()
 
     async def get_notion_files_by_parent_id(
-        self, parent_id: str
+        self, parent_id: str | None
     ) -> Sequence[NotionSyncFile]:
         query = select(NotionSyncFile).where(NotionSyncFile.parent_id == parent_id)
         response = await self.session.exec(query)
@@ -286,7 +293,7 @@ class NotionRepository(BaseRepository):
         query = select(NotionSyncFile).where(NotionSyncFile.parent_id == page_id)
         response = await self.session.exec(query)
         return response.first() is not None
-    
+
     async def delete_notion_file(self, notion_id: str):
         query = select(NotionSyncFile).where(NotionSyncFile.notion_id == notion_id)
         response = await self.session.exec(query)

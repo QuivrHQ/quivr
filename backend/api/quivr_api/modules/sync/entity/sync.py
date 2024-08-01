@@ -47,31 +47,23 @@ class NotionSyncFile(SQLModel, table=True):
             primary_key=True,
         ),
     )
-    notion_id: str = Field(default=None, description="The ID of the file in Notion")
-    parent_id: str = Field(
+    notion_id: str = Field(unique=True, description="The ID of the file in Notion")
+    parent_id: str | None = Field(
         default=None, description="The ID of the parent file or directory"
     )
     name: str = Field(default=None, description="The name of the file")
-    icon: Optional[str] = Field(
-        default=None, description="The icon associated with the file"
-    )
+    icon: Optional[str] = Field(description="The icon associated with the file")
     mime_type: str = Field(default=None, description="The MIME type of the file")
-    web_view_link: str = Field(
-        default=None, description="The web view link for the file"
-    )
-    is_folder: bool = Field(
-        default=None, description="Indicates if the file is a folder"
-    )
+    web_view_link: str = Field(description="The web view link for the file")
+    is_folder: bool = Field(description="Indicates if the file is a folder")
     last_modified: datetime = Field(
-        default=None,
         sa_column=Column(TIMESTAMP(timezone=True)),
         description="The last modified timestamp of the file",
     )
     type: Optional[str] = Field(
         default=None, description="The type/category of the file"
     )
-    user_id: UUID | None = Field(
-        default=None,  # Relationship with user
+    user_id: UUID = Field(
         foreign_key="users.id",
         description="The ID of the user who owns the file",
     )

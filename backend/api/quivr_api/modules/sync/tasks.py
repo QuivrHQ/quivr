@@ -1,7 +1,9 @@
 import asyncio
 import os
+import uuid
 
 from celery.signals import worker_process_init
+from notion_client import Client
 from sqlalchemy.ext.asyncio import AsyncEngine, create_async_engine
 from sqlmodel.ext.asyncio.session import AsyncSession
 
@@ -14,7 +16,11 @@ from quivr_api.modules.notification.service.notification_service import (
 )
 from quivr_api.modules.sync.repository.sync import NotionRepository
 from quivr_api.modules.sync.repository.sync_files import SyncFiles
-from quivr_api.modules.sync.service.sync_notion import SyncNotionService
+from quivr_api.modules.sync.service.sync_notion import (
+    SyncNotionService,
+    fetch_notion_pages,
+    update_notion_pages,
+)
 from quivr_api.modules.sync.service.sync_service import SyncService, SyncUserService
 from quivr_api.modules.sync.utils.sync import (
     AzureDriveSync,
@@ -25,7 +31,7 @@ from quivr_api.modules.sync.utils.sync import (
 from quivr_api.modules.sync.utils.syncutils import SyncUtils
 
 notification_service = NotificationService()
-
+celery_inspector = celery.control.inspect()
 
 logger = get_logger(__name__)
 
@@ -98,6 +104,35 @@ async def _process_sync_active():
             sync_cloud=NotionSync(notion_service=notion_service),
         )
 
+        logger.debug("Syncing %s, let's see it there are some changes in notion")
+        has_notion_sync = False
+        notion_user_sync = None
+        user_id = "heu"  # FixMe: find user_id
+        user_syncs = sync_user_service.get_syncs_user(user_id)
+        for sync in user_syncs:
+            if sync["provider"].lower() == "notion":
+                has_notion_sync = True
+                notion_user_sync = sync
+                break
+
+        # Get active tasks for all workers
+        active_tasks = celery_inspector.active()
+        is_uploading_task_running = any(
+            "fetch_and_store_notion_files" in task
+            for worker_tasks in active_tasks.values()
+            for task in worker_tasks
+        )
+        logger.debug("Is uploading task running: %s", is_uploading_task_running)
+
+        # For Notion, sync first the db -- Check the time, fetching all the notion is supposed to be every 6 hours
+        if not is_uploading_task_running and has_notion_sync:
+            logger.debug(" !!! Syncing Notion")
+            notion_client = Client(auth=notion_user_sync["credentials"]["access_token"])
+            all_search_result = fetch_notion_pages(notion_client, sync=True)
+            await update_notion_pages(
+                all_search_result, notion_service, uuid.UUID(user_id)
+            )
+
         active = await sync_active_service.get_syncs_active_in_interval()
 
         for sync in active:
@@ -119,7 +154,9 @@ async def _process_sync_active():
                     )
                 elif details_user_sync["provider"].lower() == "notion":
                     await notion_sync_utils.sync(
-                        sync_active_id=sync.id, user_id=sync.user_id
+                        sync_active_id=sync.id,
+                        user_id=sync.user_id,
+                        notion_service=notion_service,
                     )
                 else:
                     logger.info(

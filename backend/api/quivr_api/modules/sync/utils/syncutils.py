@@ -4,6 +4,8 @@ from typing import List
 
 from fastapi import UploadFile
 from pydantic import BaseModel, ConfigDict
+
+from quivr_api.celery_config import celery
 from quivr_api.logger import get_logger
 from quivr_api.modules.brain.repository.brains_vectors import BrainsVectors
 from quivr_api.modules.knowledge.repository.storage import Storage
@@ -22,6 +24,7 @@ from quivr_api.modules.sync.dto.inputs import (
 )
 from quivr_api.modules.sync.entity.sync import SyncFile
 from quivr_api.modules.sync.repository.sync_files import SyncFiles
+from quivr_api.modules.sync.service.sync_notion import SyncNotionService
 from quivr_api.modules.sync.service.sync_service import SyncService, SyncUserService
 from quivr_api.modules.sync.utils.sync import BaseSync
 from quivr_api.modules.sync.utils.upload import upload_file
@@ -29,6 +32,8 @@ from quivr_api.modules.upload.service.upload_file import check_file_exists
 
 notification_service = NotificationService()
 logger = get_logger(__name__)
+
+celery_inspector = celery.control.inspect()
 
 
 class SyncUtils(BaseModel):
@@ -215,7 +220,12 @@ class SyncUtils(BaseModel):
 
         return {"downloaded_files": downloaded_files}
 
-    async def sync(self, sync_active_id: int, user_id: str):
+    async def sync(
+        self,
+        sync_active_id: int,
+        user_id: str,
+        notion_service: SyncNotionService = None,
+    ):
         """
         Check if the Specific sync has not been synced and download the folders and files based on the settings.
 

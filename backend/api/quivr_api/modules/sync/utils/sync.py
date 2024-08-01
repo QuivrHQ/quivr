@@ -784,7 +784,7 @@ class NotionSync(BaseSync):
             self.link_notion(credentials)
 
         if not folder_id or folder_id == "":
-            folder_id = "true"  # ROOT FOLDER HAVE A TRUE PARENT ID
+            folder_id = None  # ROOT FOLDER HAVE A TRUE PARENT ID
 
         children = await self.notion_service.get_notion_files_by_parent_id(
             folder_id
