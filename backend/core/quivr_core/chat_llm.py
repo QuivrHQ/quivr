@@ -1,10 +1,12 @@
 import logging
 from operator import itemgetter
+from typing import AsyncGenerator
 
 from langchain_core.messages import AIMessage, HumanMessage
 from langchain_core.messages.ai import AIMessageChunk
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain_core.runnables import RunnableLambda, RunnablePassthrough
+
 from quivr_core.chat import ChatHistory
 from quivr_core.llm import LLMEndpoint
 from quivr_core.models import (
@@ -90,10 +92,11 @@ class ChatLLM:
         response = parse_response(raw_llm_response, self.llm_endpoint._config.model)
         return response
 
-    async def answer_astream(self, question: str, history: ChatHistory | None = None):
+    async def answer_astream(
+        self, question: str, history: ChatHistory | None = None
+    ) -> AsyncGenerator[ParsedRAGChunkResponse, ParsedRAGChunkResponse]:
         chain = self.build_chain()
         rolling_message = AIMessageChunk(content="")
-        sources = []
         prev_answer = ""
         chunk_id = 0
 
@@ -134,9 +137,10 @@ class ChatLLM:
         # Last chunk provides metadata
         last_chunk = ParsedRAGChunkResponse(
             answer="",
-            metadata=get_chunk_metadata(rolling_message, sources),
+            metadata=get_chunk_metadata(rolling_message),
             last_chunk=True,
         )
+        last_chunk.metadata.model_name = self.llm_endpoint._config.model
         logger.debug(
             f"answer_astream last_chunk={last_chunk} question={question} rolling_msg={rolling_message} chunk_id={chunk_id}"
         )

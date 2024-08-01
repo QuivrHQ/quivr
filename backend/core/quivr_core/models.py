@@ -59,6 +59,7 @@ class RAGResponseMetadata(BaseModel):
     citations: list[int] | None = None
     followup_questions: list[str] | None = None
     sources: list[Any] | None = None
+    model_name: str | None = None
 
 
 class ParsedRAGResponse(BaseModel):

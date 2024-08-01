@@ -1,6 +1,12 @@
 import datetime
 from uuid import UUID, uuid4
 
+from quivr_core.chat import ChatHistory as ChatHistoryCore
+from quivr_core.chat_llm import ChatLLM
+from quivr_core.config import LLMEndpointConfig
+from quivr_core.llm.llm_endpoint import LLMEndpoint
+from quivr_core.models import ParsedRAGResponse, RAGResponseMetadata
+
 from quivr_api.logger import get_logger
 from quivr_api.models.settings import settings
 from quivr_api.modules.brain.service.utils.format_chat_history import (
@@ -16,11 +22,6 @@ from quivr_api.modules.chat.dto.outputs import GetChatHistoryOutput
 from quivr_api.modules.chat.service.chat_service import ChatService
 from quivr_api.modules.user.entity.user_identity import UserIdentity
 from quivr_api.modules.user.service.user_usage import UserUsage
-from quivr_core.chat import ChatHistory as ChatHistoryCore
-from quivr_core.chat_llm import ChatLLM
-from quivr_core.config import LLMEndpointConfig
-from quivr_core.llm.llm_endpoint import LLMEndpoint
-from quivr_core.models import ParsedRAGResponse, RAGResponseMetadata
 
 logger = get_logger(__name__)
 
@@ -197,7 +198,7 @@ class ChatLLMService:
             metadata=response.metadata.model_dump(),
             **message_metadata,
         )
-
+        logger.info("Last chunk before saving")
         self.save_answer(
             question,
             ParsedRAGResponse(
