@@ -49,4 +49,4 @@ jobs:
         sudo apt-get install -y libmagic-dev poppler-utils libreoffice tesseract-ocr  pandoc
         tesseract --version
         cd backend/core
-        poetry run tox -p auto
+        poetry run tox
