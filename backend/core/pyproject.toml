@@ -35,8 +35,6 @@ torchvision = [
     { version = "0.18.1+cpu", source = "pytorch-cpu-src", platform = "win32", optional = true },
 ]
 megaparse = { version = "0.0.24", optional = true, source = "pypi" }
-
-docx2txt = { version = "^0.8", optional = true }
 unstructured = { version = "^0.15.0", optional = true, extras = [
     "epub",
     "odt",
@@ -45,12 +43,15 @@ unstructured = { version = "^0.15.0", optional = true, extras = [
     "pptx",
     "ppt",
     "xlsx",
+    "md",
 ] }
+
+docx2txt = { version = "^0.8", optional = true }
 
 [tool.poetry.extras]
 base = ["langchain-community", "faiss-cpu", "langchain-openai"]
 csv = ["langchain-community"]
-md = ["langchain-community"]
+md = ["langchain-community", "unstructured"]
 ipynb = ["langchain-community"]
 epub = ["unstructured", "langchain-community"]
 odt = ["unstructured", "langchain-community", "docx2txt"]
@@ -87,7 +88,7 @@ pytest = "^8.2.2"
 pytest-xdist = "^3.6.1"
 pytest-cov = "^5.0.0"
 tox = "^4.16.0"
-
+pytest-benchmark = "^4.0.0"
 
 [tool.mypy]
 disallow_untyped_defs = true

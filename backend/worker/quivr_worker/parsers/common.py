@@ -9,10 +9,8 @@ from langchain_core.vectorstores import VectorStore
 from llama_parse import LlamaParse
 from quivr_api.logger import get_logger
 from quivr_api.models.files import File
-from quivr_api.models.settings import (get_documents_vector_store,
-                                       get_embedding_client)
-from quivr_api.modules.brain.service.brain_vector_service import \
-    BrainVectorService
+from quivr_api.models.settings import get_documents_vector_store, get_embedding_client
+from quivr_api.modules.brain.service.brain_vector_service import BrainVectorService
 from quivr_api.modules.upload.service.upload_file import DocumentSerializable
 
 logger = get_logger(__name__)
@@ -90,16 +88,12 @@ def process_file(
     enc = tiktoken.get_encoding("cl100k_base")
 
     if file.documents is not None:
-        for index, doc in enumerate(
-            file.documents, start=1
-        ):  # pyright: ignore reportPrivateUsage=none
+        for index, doc in enumerate(file.documents, start=1):  # pyright: ignore reportPrivateUsage=none
             new_metadata = metadata.copy()
             logger.info(f"Processing document {doc}")
             # Add filename at beginning of page content
             doc.page_content = f"Filename: {new_metadata['original_file_name']} Content: {doc.page_content}"
-
             doc.page_content = doc.page_content.replace("\u0000", "")
-
             len_chunk = len(enc.encode(doc.page_content))
 
             # Ensure the text is in UTF-8

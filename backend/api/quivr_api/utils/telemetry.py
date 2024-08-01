@@ -1,10 +1,10 @@
 import hashlib
 import json
 import os
-import threading
 
 import httpx
 from fastapi import Request
+
 from quivr_api.logger import get_logger
 
 logger = get_logger(__name__)
@@ -18,7 +18,7 @@ HEADERS = {
 
 def generate_machine_key():
     # Get the OpenAI API key from the environment variables
-    seed = os.getenv("OPENAI_API_KEY")
+    seed = os.getenv("OPENAI_API_KEY") or ""
 
     # Use SHA-256 hash to generate a unique key from the seed
     unique_key = hashlib.sha256(seed.encode()).hexdigest()
@@ -26,7 +26,7 @@ def generate_machine_key():
     return unique_key
 
 
-def send_telemetry(event_name: str, event_data: dict, request: Request = None):
+def send_telemetry(event_name: str, event_data: dict, request: Request | None = None):
     # Generate a unique machine key
     machine_key = generate_machine_key()
     domain = None
@@ -48,12 +48,13 @@ def send_telemetry(event_name: str, event_data: dict, request: Request = None):
         _ = client.post(TELEMETRY_URL, headers=HEADERS, data=payload)
 
 
-def maybe_send_telemetry(event_name: str, event_data: dict, request: Request = None):
+def maybe_send_telemetry(
+    event_name: str,
+    event_data: dict,
+    request: Request | None = None,
+):
     enable_telemetry = os.getenv("TELEMETRY_ENABLED", "false")
-
-    if enable_telemetry.lower() != "true":
+    if enable_telemetry.lower() == "false":
         return
 
-    threading.Thread(
-        target=send_telemetry, args=(event_name, event_data, request)
-    ).start()
+    send_telemetry(event_name, event_data, request)

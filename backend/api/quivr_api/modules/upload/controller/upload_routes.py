@@ -1,8 +1,17 @@
+import io
 import os
 from typing import Optional
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, HTTPException, Query, UploadFile
+from fastapi import (
+    APIRouter,
+    BackgroundTasks,
+    Depends,
+    HTTPException,
+    Query,
+    UploadFile,
+)
+
 from quivr_api.celery_config import celery
 from quivr_api.logger import get_logger
 from quivr_api.middlewares.auth import AuthBearer, get_current_user
@@ -35,7 +44,8 @@ knowledge_service = KnowledgeService()
 
 @upload_router.post("/upload", dependencies=[Depends(AuthBearer())], tags=["Upload"])
 async def upload_file(
-    upload_file: UploadFile,
+    uploadFile: UploadFile,
+    background_tasks: BackgroundTasks,
     bulk_id: Optional[UUID] = Query(None, description="The ID of the bulk upload"),
     brain_id: UUID = Query(..., description="The ID of the brain"),
     chat_id: Optional[UUID] = Query(None, description="The ID of the chat"),
@@ -46,7 +56,6 @@ async def upload_file(
     validate_brain_authorization(
         brain_id, current_user.id, [RoleEnum.Editor, RoleEnum.Owner]
     )
-    upload_file.file.seek(0)
     user_daily_usage = UserUsage(
         id=current_user.id,
         email=current_user.email,
@@ -57,7 +66,7 @@ async def upload_file(
             user_id=current_user.id,
             bulk_id=bulk_id,
             status=NotificationsStatusEnum.INFO,
-            title=f"{upload_file.filename}",
+            title=f"{uploadFile.filename}",
             category="upload",
             brain_id=str(brain_id),
         )
@@ -66,50 +75,55 @@ async def upload_file(
     user_settings = user_daily_usage.get_user_settings()
 
     remaining_free_space = user_settings.get("max_brain_size", 1000000000)
-    maybe_send_telemetry("upload_file", {"file_name": upload_file.filename})
-    if remaining_free_space - upload_file.size < 0:
+
+    background_tasks.add_task(
+        maybe_send_telemetry, "upload_file", {"file_name": uploadFile.filename}
+    )
+
+    if remaining_free_space - uploadFile.size < 0:
         message = f"Brain will exceed maximum capacity. Maximum file allowed is : {convert_bytes(remaining_free_space)}"
         raise HTTPException(status_code=403, detail=message)
 
-    file_content = await upload_file.read()
-
-    filename_with_brain_id = str(brain_id) + "/" + str(upload_file.filename)
+    filename_with_brain_id = str(brain_id) + "/" + str(uploadFile.filename)
 
     try:
-        upload_file_storage(file_content, filename_with_brain_id)
+        # NOTE(@aminediro) : This should redone. The supabase storage client interface is badly designed
+        # It specifically checks for BufferedReader | bytes before sending
+        # TODO: We bypass this to write to S3 Storage directly
+        buff_reader = io.BufferedReader(uploadFile.file)  # type: ignore
 
+        await upload_file_storage(buff_reader, filename_with_brain_id)
+
+    except FileExistsError:
+        notification_service.update_notification_by_id(
+            upload_notification.id if upload_notification else None,
+            NotificationUpdatableProperties(
+                status=NotificationsStatusEnum.ERROR,
+                description=f"File {uploadFile.filename} already exists in storage.",
+            ),
+        )
+        raise HTTPException(
+            status_code=403,
+            detail=f"File {uploadFile.filename} already exists in storage.",
+        )
     except Exception as e:
-        print(e)
-
-        if "The resource already exists" in str(e):
-            notification_service.update_notification_by_id(
-                upload_notification.id if upload_notification else None,
-                NotificationUpdatableProperties(
-                    status=NotificationsStatusEnum.ERROR,
-                    description=f"File {upload_file.filename} already exists in storage.",
-                ),
-            )
-            raise HTTPException(
-                status_code=403,
-                detail=f"File {upload_file.filename} already exists in storage.",
-            )
-        else:
-            notification_service.update_notification_by_id(
-                upload_notification.id if upload_notification else None,
-                NotificationUpdatableProperties(
-                    status=NotificationsStatusEnum.ERROR,
-                    description="There was an error uploading the file",
-                ),
-            )
-            raise HTTPException(
-                status_code=500, detail=f"Failed to upload file to storage. {e}"
-            )
+        logger.exception(f"Exception in upload_route {e}")
+        notification_service.update_notification_by_id(
+            upload_notification.id if upload_notification else None,
+            NotificationUpdatableProperties(
+                status=NotificationsStatusEnum.ERROR,
+                description="There was an error uploading the file",
+            ),
+        )
+        raise HTTPException(
+            status_code=500, detail=f"Failed to upload file to storage. {e}"
+        )
 
     knowledge_to_add = CreateKnowledgeProperties(
         brain_id=brain_id,
-        file_name=upload_file.filename,
+        file_name=uploadFile.filename,
         extension=os.path.splitext(
-            upload_file.filename  # pyright: ignore reportPrivateUsage=none
+            uploadFile.filename  # pyright: ignore reportPrivateUsage=none
         )[-1].lower(),
         integration=integration,
         integration_link=integration_link,
@@ -121,7 +135,7 @@ async def upload_file(
         "process_file_and_notify",
         kwargs={
             "file_name": filename_with_brain_id,
-            "file_original_name": upload_file.filename,
+            "file_original_name": uploadFile.filename,
             "brain_id": brain_id,
             "notification_id": upload_notification.id,
             "knowledge_id": knowledge.id,

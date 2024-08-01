@@ -3,6 +3,7 @@ from typing import Optional
 from uuid import UUID
 
 from fastapi import HTTPException, UploadFile
+
 from quivr_api.celery_config import celery
 from quivr_api.logger import get_logger
 from quivr_api.modules.brain.entity.brain_entity import RoleEnum
@@ -59,7 +60,7 @@ async def upload_file(
     filename_with_brain_id = str(brain_id) + "/" + str(upload_file.filename)
 
     try:
-        file_in_storage = upload_file_storage(file_content, filename_with_brain_id)
+        upload_file_storage(file_content, filename_with_brain_id)
 
     except Exception as e:
         print(e)
@@ -82,7 +83,7 @@ async def upload_file(
                 notification_id,
                 NotificationUpdatableProperties(
                     status=NotificationsStatusEnum.ERROR,
-                    description=f"There was an error uploading the file",
+                    description="There was an error uploading the file",
                 ),
             )
             raise HTTPException(

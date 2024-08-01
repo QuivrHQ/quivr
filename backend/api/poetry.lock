@@ -993,6 +993,23 @@ ssh = ["paramiko (>=2.4.3)"]
 websockets = ["websocket-client (>=1.3.0)"]
 
 [[package]]
+name = "dropbox"
+version = "12.0.2"
+description = "Official Dropbox API Client"
+optional = false
+python-versions = "*"
+files = [
+    {file = "dropbox-12.0.2-py2-none-any.whl", hash = "sha256:4b8207a9f4afd33726ec886c0d223f4bbc42fe649b87718690a24704f5e24c0c"},
+    {file = "dropbox-12.0.2-py3-none-any.whl", hash = "sha256:c5b7e9c2668adb6b12dcecd84342565dc50f7d35ab6a748d155cb79040979d1c"},
+    {file = "dropbox-12.0.2.tar.gz", hash = "sha256:50057fd5ad5fcf047f542dfc6747a896e7ef982f1b5f8500daf51f3abd609962"},
+]
+
+[package.dependencies]
+requests = ">=2.16.2"
+six = ">=1.12.0"
+stone = ">=2,<3.3.3"
+
+[[package]]
 name = "ecdsa"
 version = "0.19.0"
 description = "ECDSA cryptographic signature library (pure python)"
@@ -1215,6 +1232,16 @@ flake8 = ">=3"
 
 [package.extras]
 develop = ["build", "twine"]
+
+[[package]]
+name = "fpdf"
+version = "1.7.2"
+description = "Simple PDF generation for Python"
+optional = false
+python-versions = "*"
+files = [
+    {file = "fpdf-1.7.2.tar.gz", hash = "sha256:125840783289e7d12552b1e86ab692c37322e7a65b96a99e0ea86cca041b6779"},
+]
 
 [[package]]
 name = "frozenlist"
@@ -2927,6 +2954,17 @@ dev = ["pre-commit", "tox"]
 testing = ["pytest", "pytest-benchmark"]
 
 [[package]]
+name = "ply"
+version = "3.11"
+description = "Python Lex & Yacc"
+optional = false
+python-versions = "*"
+files = [
+    {file = "ply-3.11-py2.py3-none-any.whl", hash = "sha256:096f9b8350b65ebd2fd1346b12452efe5b9607f7482813ffca50c22722a807ce"},
+    {file = "ply-3.11.tar.gz", hash = "sha256:00c7c1aaa88358b9c765b6d3000c6eec0ba42abca5351b095321aef446081da3"},
+]
+
+[[package]]
 name = "postgrest"
 version = "0.16.9"
 description = "PostgREST client for Python. This library provides an ORM interface to PostgREST."
@@ -4605,6 +4643,22 @@ anyio = ">=3.4.0,<5"
 full = ["httpx (>=0.22.0)", "itsdangerous", "jinja2", "python-multipart (>=0.0.7)", "pyyaml"]
 
 [[package]]
+name = "stone"
+version = "3.3.1"
+description = "Stone is an interface description language (IDL) for APIs."
+optional = false
+python-versions = "*"
+files = [
+    {file = "stone-3.3.1-py2-none-any.whl", hash = "sha256:cd2f7f9056fc39b16c8fd46a26971dc5ccd30b5c2c246566cd2c0dd27ff96609"},
+    {file = "stone-3.3.1-py3-none-any.whl", hash = "sha256:e15866fad249c11a963cce3bdbed37758f2e88c8ff4898616bc0caeb1e216047"},
+    {file = "stone-3.3.1.tar.gz", hash = "sha256:4ef0397512f609757975f7ec09b35639d72ba7e3e17ce4ddf399578346b4cb50"},
+]
+
+[package.dependencies]
+ply = ">=3.4"
+six = ">=1.12.0"
+
+[[package]]
 name = "storage3"
 version = "0.7.7"
 description = "Supabase Storage client for Python."
@@ -5429,4 +5483,4 @@ test = ["big-O", "importlib-resources", "jaraco.functools", "jaraco.itertools", 
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11,<3.13"
-content-hash = "a3b101b6ef49504151471871b35677dcfb76a83a100a4f16df0478ef930c675d"
+content-hash = "c35b61f3bd044571484013d4061a190628808a40d7c8e987ee6d778df0a6c416"

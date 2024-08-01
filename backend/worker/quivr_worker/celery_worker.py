@@ -7,7 +7,6 @@ from celery.schedules import crontab
 from pytz import timezone
 from quivr_api.celery_config import celery
 from quivr_api.logger import get_logger
-from quivr_api.models.files import File
 from quivr_api.models.settings import get_supabase_client, get_supabase_db
 from quivr_api.modules.brain.integrations.Notion.Notion_connector import NotionConnector
 from quivr_api.modules.brain.service.brain_service import BrainService
@@ -16,8 +15,10 @@ from quivr_api.modules.notification.service.notification_service import (
     NotificationService,
 )
 from quivr_api.utils.telemetry import maybe_send_telemetry
-from quivr_worker.files.crawl.crawler import CrawlWebsite, slugify
-from quivr_worker.files.processors import process_file
+
+from quivr_worker.crawl.crawler import CrawlWebsite, slugify
+from quivr_worker.files import File
+from quivr_worker.processors import process_file
 
 logger = get_logger(__name__)
 

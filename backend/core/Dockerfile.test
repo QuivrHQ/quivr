@@ -29,6 +29,6 @@ ENV PATH="/root/.local/bin:$PATH"
 COPY ./pyproject.toml ./poetry.lock* /code/
 
 # Install project dependencies
-RUN poetry install --no-root --with test
+RUN poetry install  --with test
 
 ENV PYTHONPATH=/code

@@ -1,3 +1,4 @@
+import hashlib
 from pathlib import Path
 from typing import List, Optional
 
@@ -8,9 +9,20 @@ from quivr_api.logger import get_logger
 from quivr_api.models.databases.supabase.supabase import SupabaseDB
 from quivr_api.models.settings import get_supabase_db
 from quivr_api.modules.brain.service.brain_vector_service import BrainVectorService
-from quivr_api.packages.files.file import compute_sha1_from_content
 
 logger = get_logger(__name__)
+
+
+def compute_sha1_from_file(file_path: str | Path):
+    with open(file_path, "rb") as file:
+        bytes = file.read()
+        readable_hash = compute_sha1_from_content(bytes)
+    return readable_hash
+
+
+def compute_sha1_from_content(content: bytes):
+    readable_hash = hashlib.sha1(content).hexdigest()
+    return readable_hash
 
 
 class File(BaseModel):

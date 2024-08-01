@@ -36,11 +36,13 @@ flake8-black = "*"
 celery = { extras = ["redis", "sqs"], version = "*" }
 
 [tool.poetry.group.test.dependencies]
-pytest = "*"
-pytest-asyncio = "^0.23.7"
 pytest-dotenv = "*"
 pytest-mock = "*"
-pytest-celery = "*"
+pytest-asyncio = "^0.23.7"
+pytest = "^8.2.2"
+pytest-xdist = "^3.6.1"
+pytest-cov = "^5.0.0"
+tox = "^4.16.0"
 
 [build-system]
 requires = ["poetry-core"]

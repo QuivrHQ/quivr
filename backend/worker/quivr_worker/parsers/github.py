@@ -7,6 +7,7 @@ from langchain_community.document_loaders import GitLoader
 from quivr_api.models.files import File
 from quivr_api.models.settings import get_documents_vector_store
 from quivr_api.packages.files.file import compute_sha1_from_content
+
 from quivr_worker.files.parsers.common import upload_vector_docs
 
 
