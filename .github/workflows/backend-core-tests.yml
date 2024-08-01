@@ -37,7 +37,8 @@ jobs:
 
     - name: Run pre-commit checks
       run: |
-        poetry run pre-commit run --files backend/core/*
+        cd backend/core
+        poetry run pre-commit run --files .
 
     - name: Run tests
       env:
