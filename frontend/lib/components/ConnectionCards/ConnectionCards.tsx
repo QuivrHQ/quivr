@@ -35,12 +35,6 @@ export const ConnectionCards = ({
         callback={(name) => syncDropbox(name)}
         fromAddKnowledge={fromAddKnowledge}
       />
-      <ConnectionSection
-        label="GitHub"
-        provider="GitHub"
-        callback={(name) => syncGitHub(name)}
-        fromAddKnowledge={fromAddKnowledge}
-      />
     </div>
   );
 };
