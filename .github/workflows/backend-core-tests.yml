@@ -33,7 +33,11 @@ jobs:
         cd backend/core
         python -m pip install --upgrade pip
         pip install poetry
-        poetry install -E base --with test
+        poetry install -E base --with dev,test
+
+    - name: Run pre-commit checks
+      run: |
+        pre-commit run --files backend/core/*
 
     - name: Run tests
       env:
