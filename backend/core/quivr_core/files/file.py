@@ -85,6 +85,7 @@ class QuivrFile:
         "file_size",
         "file_extension",
         "file_sha1",
+        "additional_metadata",
     ]
 
     def __init__(
@@ -96,6 +97,7 @@ class QuivrFile:
         file_sha1: str,
         file_extension: FileExtension | str,
         file_size: int | None = None,
+        metadata: dict[str, Any] | None = None,
     ) -> None:
         self.id = id
         self.brain_id = brain_id
@@ -104,6 +106,7 @@ class QuivrFile:
         self.file_size = file_size
         self.file_extension = file_extension
         self.file_sha1 = file_sha1
+        self.additional_metadata = metadata if metadata else {}
 
     def __repr__(self) -> str:
         return f"QuivrFile-{self.id} original_filename:{self.original_filename}"
@@ -125,4 +128,5 @@ class QuivrFile:
             "original_file_name": self.original_filename,
             "file_sha1": self.file_sha1,
             "file_size": self.file_size,
+            **self.additional_metadata,
         }
