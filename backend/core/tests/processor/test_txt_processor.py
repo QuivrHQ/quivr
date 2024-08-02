@@ -13,7 +13,7 @@ def txt_qfile(temp_data_file):
         original_filename="data.txt",
         path=temp_data_file,
         file_extension=FileExtension.txt,
-        file_md5="hash",
+        file_sha1="hash",
     )
 
 

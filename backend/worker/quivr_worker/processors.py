@@ -27,8 +27,8 @@ file_processors = {
 async def process_file(
     file: File,
     brain: BrainEntity,
-    integration=None,
-    integration_link=None,
+    integration: str | None = None,
+    integration_link: str | None = None,
     **processor_kwargs: dict[str, Any],
 ) -> list[Document]:
     knowledge = []
@@ -43,6 +43,8 @@ async def process_file(
         file_size=file.file_size,
     )
 
+    # TODO:
+    # Check first if audio -> Send to different function
     try:
         if file.file_extension:
             processor_cls = get_processor_class(file.file_extension)

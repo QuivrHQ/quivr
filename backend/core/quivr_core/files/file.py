@@ -123,6 +123,6 @@ class QuivrFile:
             "qfile_id": self.id,
             "qfile_path": self.path,
             "original_file_name": self.original_filename,
-            "file_md4": self.file_sha1,
+            "file_sha1": self.file_sha1,
             "file_size": self.file_size,
         }
