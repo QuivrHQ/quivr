@@ -2,20 +2,20 @@ from datetime import datetime, timedelta
 from typing import List, Sequence
 from uuid import UUID
 
-from sqlalchemy.exc import IntegrityError
-from sqlmodel import select
-from sqlmodel.ext.asyncio.session import AsyncSession
-
 from quivr_api.logger import get_logger
 from quivr_api.models.settings import get_supabase_client
 from quivr_api.modules.dependencies import BaseRepository
-from quivr_api.modules.knowledge.service.knowledge_service import KnowledgeService
-from quivr_api.modules.notification.service.notification_service import (
-    NotificationService,
-)
-from quivr_api.modules.sync.dto.inputs import SyncsActiveInput, SyncsActiveUpdateInput
+from quivr_api.modules.knowledge.service.knowledge_service import \
+    KnowledgeService
+from quivr_api.modules.notification.service.notification_service import \
+    NotificationService
+from quivr_api.modules.sync.dto.inputs import (SyncsActiveInput,
+                                               SyncsActiveUpdateInput)
 from quivr_api.modules.sync.entity.sync import NotionSyncFile, SyncsActive
 from quivr_api.modules.sync.repository.sync_interfaces import SyncInterface
+from sqlalchemy.exc import IntegrityError
+from sqlmodel import select
+from sqlmodel.ext.asyncio.session import AsyncSession
 
 notification_service = NotificationService()
 knowledge_service = KnowledgeService()
@@ -216,25 +216,20 @@ class NotionRepository(BaseRepository):
         query = select(NotionSyncFile).where(NotionSyncFile.user_id == user_id)
         response = await self.session.exec(query)
         return response.all()
-
-    async def create_notion_file(
-        self, new_notion_file: NotionSyncFile
-    ) -> NotionSyncFile:
+    
+    async def create_notion_files(self, notion_files: List[NotionSyncFile]) -> List[NotionSyncFile]:
         try:
-            self.session.add(new_notion_file)
-            logger.info(f"Creating new notion file in notion repo: {new_notion_file}")
+            self.session.add_all(notion_files)
             await self.session.commit()
         except IntegrityError as ie:
-            logger.error(f"IntegrityError occurred: {ie}")
             await self.session.rollback()
-            raise Exception("Integrity error while creating notion file.")
+            raise Exception("Integrity error while creating notion files.")
         except Exception as e:
-            logger.error(f"Exception occurred: {e}")
             await self.session.rollback()
             raise e
 
-        await self.session.refresh(new_notion_file)
-        return new_notion_file
+        return notion_files
+    
 
     async def update_notion_file(
         self, updated_notion_file: NotionSyncFile
@@ -303,4 +298,15 @@ class NotionRepository(BaseRepository):
             await self.session.delete(notion_file)
             await self.session.commit()
             return notion_file
+        return None
+    
+    async def delete_notion_pages(self, notion_ids: List[str]):
+        query = select(NotionSyncFile).where(NotionSyncFile.notion_id.in_(notion_ids))
+        response = await self.session.exec(query)
+        notion_files = response.all()
+        if notion_files:
+            for notion_file in notion_files:
+                await self.session.delete(notion_file)
+            await self.session.commit()
+            return notion_files
         return None

@@ -3,7 +3,6 @@ from typing import Any, List, Sequence
 from uuid import UUID
 
 from notion_client import Client
-
 from quivr_api.logger import get_logger
 from quivr_api.modules.dependencies import BaseService
 from quivr_api.modules.sync.entity.sync import NotionSyncFile
@@ -11,42 +10,92 @@ from quivr_api.modules.sync.repository.sync import NotionRepository
 
 logger = get_logger(__name__)
 
-
-# FIXME (@chloedia)
-# class NotionPage(BaseModel): ...
-
-
 class SyncNotionService(BaseService[NotionRepository]):
     repository_cls = NotionRepository
 
     def __init__(self, repository: NotionRepository):
         self.repository = repository
 
-    async def create_notion_file(
-        self, notion_sync_file: NotionSyncFile
-    ) -> NotionSyncFile:
-        logger.info(
-            f"New notion entry on notion table for user {notion_sync_file.user_id}"
-        )
+    async def create_notion_files(self, notion_raw_files : List[dict[str, Any]], user_id: UUID):
+        pages_to_add: List[NotionSyncFile] = []
+        for page in notion_raw_files:
+            parent_type = page["parent"]["type"]
+            if (
+                not page["in_trash"]
+                and not page["archived"]
+                and page["parent"]["type"] != "database_id"
+            ):
+                file = NotionSyncFile(
+                    notion_id=page["id"],
+                    parent_id=page["parent"][parent_type]
+                    if not parent_type == "workspace"
+                    else None,
+                    name=f'{page["properties"]["title"]["title"][0]["text"]["content"]}.md',
+                    icon=page["icon"]["emoji"] if page["icon"] else None,
+                    mime_type="md",
+                    web_view_link=page["url"],
+                    is_folder=True,
+                    last_modified=datetime.strptime(
+                        page["last_edited_time"], "%Y-%m-%dT%H:%M:%S.%fZ"
+                    ),
+                    type="page",
+                    user_id=user_id,
+                )
+                pages_to_add.append(file)
+        inserted_notion_files = await self.repository.create_notion_files(pages_to_add)
+        logger.info(f"Insert response {inserted_notion_files}")
 
-        inserted_notion_file = await self.repository.create_notion_file(
-            notion_sync_file
-        )
-        logger.info(f"Insert response {inserted_notion_file}")
 
-        return inserted_notion_file
+    async def update_notion_files(
+        self, notion_raw_files: List[dict[str, Any]], user_id: UUID
+    ) -> bool:
+        try : 
+            current_pages = await self.repository.get_all_notion_files()
+            
+            for page in notion_raw_files:
+                parent_type = page["parent"]["type"]
+            if (
+                not page["in_trash"]
+                and not page["archived"]
+                and page["parent"]["type"] != "database_id"
+            ):
+                # Find notion_id in current_pages
+                current_page = next(
+                    (x for x in current_pages if x.notion_id == page["id"]), None
+                )
+                if not current_page or current_page.last_modified.replace(
+                    tzinfo=None
+                ) < datetime.strptime(
+                    page["last_edited_time"], "%Y-%m-%dT%H:%M:%S.%fZ"
+                ).replace(tzinfo=None):
+                    logger.info("Page %s was modified", page["id"])
 
-    async def update_notion_file(
-        self, notion_sync_file: NotionSyncFile
-    ) -> NotionSyncFile:
-        logger.info(
-            f"Updating notion entry on notion table for user {notion_sync_file.user_id}"
-        )
+                    file = NotionSyncFile(
+                        notion_id=page["id"],
+                        parent_id=page["parent"][parent_type],
+                        name=f'{page["properties"]["title"]["title"][0]["text"]["content"]}.md',
+                        icon=page["icon"]["emoji"] if page["icon"] else None,
+                        mime_type="md",
+                        web_view_link=page["url"],
+                        is_folder=True,
+                        last_modified=datetime.strptime(
+                            page["last_edited_time"], "%Y-%m-%dT%H:%M:%S.%fZ"
+                        ),
+                        type="page",
+                        user_id=user_id,
+                    )
+                    await self.repository.update_notion_file(file)
+                
+            # check for deleted pages
+            pages_to_delete = [page.notion_id for page in current_pages if not any(page.notion_id == x["id"] for x in notion_raw_files)]
+            
+            await self.repository.delete_notion_pages(pages_to_delete)
 
-        updated_notion_file = await self.repository.update_notion_file(notion_sync_file)
-        logger.info(f"Update response {updated_notion_file}")
 
-        return updated_notion_file
+            return True
+        except Exception as e:
+            logger.error(f"Error updating notion pages: {e}")
+            return False
 
     async def get_notion_files_by_ids(self, ids: List[str]) -> Sequence[NotionSyncFile]:
         logger.info(f"Fetching notion files for IDs: {ids}")
@@ -87,54 +136,11 @@ class SyncNotionService(BaseService[NotionRepository]):
 
 async def update_notion_pages(
     all_search_result: List[dict[str, Any]],
-    all_db_pages: Sequence[NotionSyncFile],
     notion_service: SyncNotionService,
     user_id: UUID,
 ):
-    for i, page in enumerate(all_search_result):
-        page = all_search_result[i]
-        parent_type = page["parent"]["type"]
-        if (
-            not page["in_trash"]
-            and not page["archived"]
-            and page["parent"]["type"] != "database_id"
-        ):
-            # Find notion_id in all_db_pages
-            current_page = next(
-                (x for x in all_db_pages if x.notion_id == page["id"]), None
-            )
-            if not current_page or current_page.last_modified.replace(
-                tzinfo=None
-            ) < datetime.strptime(
-                page["last_edited_time"], "%Y-%m-%dT%H:%M:%S.%fZ"
-            ).replace(tzinfo=None):
-                logger.info("Page %s was modified", page["id"])
+    return await notion_service.update_notion_files(all_search_result, user_id)
 
-                file = NotionSyncFile(
-                    notion_id=page["id"],
-                    parent_id=page["parent"][parent_type],
-                    name=f'{page["properties"]["title"]["title"][0]["text"]["content"]}.md',
-                    icon=page["icon"]["emoji"] if page["icon"] else None,
-                    mime_type="md",
-                    web_view_link=page["url"],
-                    is_folder=True,
-                    last_modified=datetime.strptime(
-                        page["last_edited_time"], "%Y-%m-%dT%H:%M:%S.%fZ"
-                    ),
-                    type="page",
-                    user_id=user_id,
-                )
-                # FIXME(@chloedia): service should create the NotionSyncFile object internally
-                # The notion_service should insert ALL the pages in a single batch
-                # This loop should live in the notion_service
-                await notion_service.update_notion_file(file)
-    # check for deleted pages
-    for page in all_db_pages:
-        if not any(page.notion_id == x["id"] for x in all_search_result):
-            logger.info("Deleting page: %s", page.notion_id)
-            await notion_service.delete_notion_pages(page.notion_id)
-
-    return True
 
 
 async def store_notion_pages(
@@ -142,37 +148,12 @@ async def store_notion_pages(
     notion_service: SyncNotionService,
     user_id: UUID,
 ):
-    notion_sync_files = []
-    for i, page in enumerate(all_search_result):
-        page = all_search_result[i]
-        parent_type = page["parent"]["type"]
-        if (
-            not page["in_trash"]
-            and not page["archived"]
-            and page["parent"]["type"] != "database_id"
-        ):
-            file = NotionSyncFile(
-                notion_id=page["id"],
-                parent_id=page["parent"][parent_type]
-                if not parent_type == "workspace"
-                else None,
-                name=f'{page["properties"]["title"]["title"][0]["text"]["content"]}.md',
-                icon=page["icon"]["emoji"] if page["icon"] else None,
-                mime_type="md",
-                web_view_link=page["url"],
-                is_folder=True,
-                last_modified=datetime.strptime(
-                    page["last_edited_time"], "%Y-%m-%dT%H:%M:%S.%fZ"
-                ),
-                type="page",
-                user_id=user_id,
-            )
-            # FIXME(@chloedia): service should create the NotionSyncFile object internally
-            # The notion_service should insert ALL the pages in a single batch
-            # This loop should live in the notion_service
-            await notion_service.create_notion_file(file)
-            notion_sync_files.append(file)
-    return notion_sync_files
+        try:
+            await notion_service.create_notion_files(all_search_result, user_id)
+            return True
+        except Exception as e:
+            logger.error(f"Error storing notion pages: {e}")
+            return False
 
 
 def fetch_notion_pages(notion_client: Client):

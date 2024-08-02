@@ -16,12 +16,11 @@ from google.auth.transport.requests import Request as GoogleRequest
 from google.oauth2.credentials import Credentials
 from googleapiclient.discovery import build
 from notion_client import Client
-from requests import HTTPError
-
 from quivr_api.logger import get_logger
 from quivr_api.modules.sync.entity.sync import SyncFile
 from quivr_api.modules.sync.service.sync_notion import SyncNotionService
 from quivr_api.modules.sync.utils.normalize import remove_special_characters
+from requests import HTTPError
 
 logger = get_logger(__name__)
 redis_client = redis.Redis(host="redis", port=os.getenv("REDIS_PORT"), db=0)
@@ -788,7 +787,7 @@ class NotionSync(BaseSync):
 
         children = await self.notion_service.get_notion_files_by_parent_id(
             folder_id
-        )  # FIXME
+        )
         for page in children:
             page_info = SyncFile(
                 name=page.name,
