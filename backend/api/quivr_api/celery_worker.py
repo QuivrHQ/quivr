@@ -68,7 +68,7 @@ def process_file_and_notify(
     integration_link=None,
     delete_file=False,
 ):
-    logger.debug(
+    logger.info(
         f"process_file file_name={file_name}, knowledge_id={knowledge_id}, brain_id={brain_id}, notification_id={notification_id}"
     )
     supabase_client = get_supabase_client()
@@ -176,8 +176,6 @@ def check_if_is_premium_user():
     paris_tz = timezone("Europe/Paris")
     current_time = datetime.now(paris_tz)
     current_time_str = current_time.strftime("%Y-%m-%d %H:%M:%S.%f")
-    logger.debug(f"Current time: {current_time_str}")
-
     # Define the memoization period (e.g., 1 hour)
     memoization_period = timedelta(hours=1)
     memoization_cutoff = current_time - memoization_period
@@ -326,8 +324,12 @@ celery.conf.beat_schedule = {
         "task": "process_sync_active",
         "schedule": crontab(minute="*/1", hour="*"),
     },
-    # "process_premium_users": {
-    #     "task": "check_if_is_premium_user",
-    #     "schedule": crontab(minute="*/1", hour="*"),
-    # },
+    "process_notion_sync": {
+        "task": "process_notion_sync",
+        "schedule": crontab(minute="0", hour="*/6"),
+    },
+    "process_premium_users": {
+        "task": "check_if_is_premium_user",
+        "schedule": crontab(minute="*/1", hour="*"),
+    },
 }

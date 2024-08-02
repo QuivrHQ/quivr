@@ -162,6 +162,23 @@ class SyncUser(SyncUserInterface):
         ).eq("state", state_str).execute()
         logger.info("Sync user updated successfully")
 
+    def get_all_notion_user_syncs(self):
+        """
+        Retrieve all Notion sync users from the database.
+
+        Returns:
+            list: A list of Notion sync users.
+        """
+        logger.info("Retrieving all Notion sync users")
+        response = (
+            self.db.from_("syncs_user").select("*").eq("provider", "Notion").execute()
+        )
+        if response.data:
+            logger.info("Notion sync users retrieved successfully")
+            return response.data
+        logger.warning("No Notion sync users found")
+        return []
+
     async def get_files_folder_user_sync(
         self,
         sync_active_id: int,

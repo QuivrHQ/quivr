@@ -54,6 +54,10 @@ class SyncUserInterface(ABC):
     ) -> None | dict[str, List[SyncFile]] | Literal["No sync found"]:
         pass
 
+    @abstractmethod
+    def get_all_notion_user_syncs(self):
+        pass
+
 
 class SyncInterface(ABC):
     @abstractmethod

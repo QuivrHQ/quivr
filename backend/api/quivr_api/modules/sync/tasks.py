@@ -104,35 +104,6 @@ async def _process_sync_active():
             sync_cloud=NotionSync(notion_service=notion_service),
         )
 
-        logger.debug("Syncing %s, let's see it there are some changes in notion")
-        has_notion_sync = False
-        notion_user_sync = None
-        user_id = "heu"  # FixMe: find user_id
-        user_syncs = sync_user_service.get_syncs_user(user_id)
-        for sync in user_syncs:
-            if sync["provider"].lower() == "notion":
-                has_notion_sync = True
-                notion_user_sync = sync
-                break
-
-        # Get active tasks for all workers
-        active_tasks = celery_inspector.active()
-        is_uploading_task_running = any(
-            "fetch_and_store_notion_files" in task
-            for worker_tasks in active_tasks.values()
-            for task in worker_tasks
-        )
-        logger.debug("Is uploading task running: %s", is_uploading_task_running)
-
-        # For Notion, sync first the db -- Check the time, fetching all the notion is supposed to be every 6 hours
-        if not is_uploading_task_running and has_notion_sync:
-            logger.debug(" !!! Syncing Notion")
-            notion_client = Client(auth=notion_user_sync["credentials"]["access_token"])
-            all_search_result = fetch_notion_pages(notion_client, sync=True)
-            await update_notion_pages(
-                all_search_result, notion_service, uuid.UUID(user_id)
-            )
-
         active = await sync_active_service.get_syncs_active_in_interval()
 
         for sync in active:
@@ -165,3 +136,42 @@ async def _process_sync_active():
             except Exception as e:
                 logger.error(f"Error syncing: {e}")
                 continue
+
+
+@celery.task(name="process_notion_sync")
+def process_notion_sync():
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(_process_notion_sync())
+
+
+async def _process_notion_sync():
+    assert async_engine
+    async with AsyncSession(
+        async_engine, expire_on_commit=False, autoflush=False
+    ) as session:
+        sync_user_service = SyncUserService()
+
+    notion_repository = NotionRepository(session)
+    notion_service = SyncNotionService(notion_repository)
+
+    # Get active tasks for all workers
+    active_tasks = celery_inspector.active()
+    is_uploading_task_running = any(
+        "fetch_and_store_notion_files" in task
+        for worker_tasks in active_tasks.values()
+        for task in worker_tasks
+    )
+    if is_uploading_task_running:
+        return None
+
+    # get all notion syncs
+    notion_syncs = sync_user_service.get_all_notion_user_syncs()
+    for notion_sync in notion_syncs:
+        user_id = notion_sync["user_id"]
+        notion_client = Client(auth=notion_sync["credentials"]["access_token"])
+
+        all_search_result = fetch_notion_pages(notion_client)
+        all_db_pages = await notion_service.get_all_notion_files()
+        await update_notion_pages(
+            all_search_result, all_db_pages, notion_service, uuid.UUID(user_id)
+        )

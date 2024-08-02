@@ -49,6 +49,9 @@ class SyncUserService:
     ):
         return self.repository.update_sync_user(sync_user_id, state, sync_user_input)
 
+    def get_all_notion_user_syncs(self):
+        return self.repository.get_all_notion_user_syncs()
+
     async def get_files_folder_user_sync(
         self,
         sync_active_id: int,

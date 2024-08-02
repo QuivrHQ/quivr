@@ -274,18 +274,19 @@ class NotionRepository(BaseRepository):
             raise
 
     async def get_notion_files_by_ids(self, ids: List[str]) -> Sequence[NotionSyncFile]:
-        logger.debug("Hey there, i am in get_notion_files_by_ids")
         query = select(NotionSyncFile).where(NotionSyncFile.notion_id.in_(ids))  # type: ignore
         response = await self.session.exec(query)
-        logger.debug(
-            "Hey there, i just finished processing get_notion_files_by_ids hehe"
-        )
         return response.all()
 
     async def get_notion_files_by_parent_id(
         self, parent_id: str | None
     ) -> Sequence[NotionSyncFile]:
         query = select(NotionSyncFile).where(NotionSyncFile.parent_id == parent_id)
+        response = await self.session.exec(query)
+        return response.all()
+
+    async def get_all_notion_files(self) -> Sequence[NotionSyncFile]:
+        query = select(NotionSyncFile)
         response = await self.session.exec(query)
         return response.all()
 
