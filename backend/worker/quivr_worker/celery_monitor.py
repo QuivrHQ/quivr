@@ -25,23 +25,23 @@ def notifier(app):
             task_name, task_kwargs = task_result.name, task_result.kwargs
 
             if (
-                task_name == "process_file_and_notify"
+                task_name == "process_file_task"
                 or task_name == "process_crawl_and_notify"
             ):
                 notification_id = task_kwargs["notification_id"]
                 knowledge_id = task_kwargs.get("knowledge_id", None)
                 if event["type"] == "task-failed":
                     logger.error(
-                        f"task {task.id} process_file_and_notify {task_kwargs} failed. Sending notifition {notification_id}"
+                        f"task {task.id} process_file_task {task_kwargs} failed. Sending notifition {notification_id}"
                     )
                     notification_service.update_notification_by_id(
                         notification_id,
                         NotificationUpdatableProperties(
                             status=NotificationsStatusEnum.ERROR,
                             description=(
-                                f"An error occurred while processing the file"
-                                if task_name == "process_file_and_notify"
-                                else f"An error occurred while processing the URL"
+                                "An error occurred while processing the file"
+                                if task_name == "process_file_task"
+                                else "An error occurred while processing the URL"
                             ),
                         ),
                     )
@@ -50,12 +50,12 @@ def notifier(app):
                             knowledge_id, KnowledgeStatus.ERROR
                         )
                     logger.error(
-                        f"task {task.id} process_file_and_notify {task_kwargs} failed. Updating knowledge {knowledge_id} to Error"
+                        f"task {task.id} process_file_task {task_kwargs} failed. Updating knowledge {knowledge_id} to Error"
                     )
 
                 if event["type"] == "task-succeeded":
                     logger.info(
-                        f"task {task.id} process_file_and_notify {task_kwargs} succeeded. Sending notification {notification_id}"
+                        f"task {task.id} process_file_task {task_kwargs} succeeded. Sending notification {notification_id}"
                     )
                     notification_service.update_notification_by_id(
                         notification_id,
@@ -63,7 +63,7 @@ def notifier(app):
                             status=NotificationsStatusEnum.SUCCESS,
                             description=(
                                 "Your file has been properly uploaded!"
-                                if task_name == "process_file_and_notify"
+                                if task_name == "process_file_task"
                                 else "Your URL has been properly crawled!"
                             ),
                         ),
@@ -74,7 +74,7 @@ def notifier(app):
                             knowledge_id, KnowledgeStatus.UPLOADED
                         )
                     logger.info(
-                        f"task {task.id} process_file_and_notify {task_kwargs} failed. Updating knowledge {knowledge_id} to UPLOADED"
+                        f"task {task.id} process_file_task {task_kwargs} failed. Updating knowledge {knowledge_id} to UPLOADED"
                     )
         except Exception as e:
             logger.exception(f"handling event {event} raised exception: {e}")

@@ -1,5 +1,4 @@
 import asyncio
-import os
 from pathlib import Path
 from tempfile import NamedTemporaryFile
 from uuid import UUID
@@ -8,7 +7,7 @@ from celery.schedules import crontab
 from dotenv import load_dotenv
 from quivr_api.celery_config import celery
 from quivr_api.logger import get_logger
-from quivr_api.models.settings import get_supabase_client
+from quivr_api.models.settings import get_documents_vector_store, get_supabase_client
 from quivr_api.modules.brain.integrations.Notion.Notion_connector import NotionConnector
 from quivr_api.modules.brain.service.brain_service import BrainService
 from quivr_api.modules.brain.service.brain_vector_service import BrainVectorService
@@ -19,11 +18,11 @@ from quivr_api.modules.notification.service.notification_service import (
 from quivr_api.modules.sync.repository.sync_files import SyncFiles
 from quivr_api.modules.sync.service.sync_service import SyncService, SyncUserService
 from quivr_api.utils.telemetry import maybe_send_telemetry
-from worker.quivr_worker.check_premium import check_is_premium
 
+from quivr_worker.check_premium import check_is_premium
 from quivr_worker.crawl.crawler import CrawlWebsite, slugify
 from quivr_worker.files import File
-from quivr_worker.processors import process_file
+from quivr_worker.process.process_file import parse_file, process_file_func
 from quivr_worker.syncs.process_active_syncs import process_all_syncs
 
 load_dotenv()
@@ -33,6 +32,7 @@ logger = get_logger("celery_worker")
 # FIXME: load at init time
 # Services
 supabase_client = get_supabase_client()
+document_vector_store = get_documents_vector_store()
 notification_service = NotificationService()
 brain_service = BrainService()
 sync_active_service = SyncService()
@@ -44,10 +44,10 @@ storage = Storage()
 @celery.task(
     retries=3,
     default_retry_delay=1,
-    name="process_file_and_notify",
+    name="process_file_task",
     autoretry_for=(Exception,),
 )
-async def process_file_and_notify(
+def process_file_task(
     file_name: str,
     file_original_name: str,
     brain_id: UUID,
@@ -57,57 +57,27 @@ async def process_file_and_notify(
     integration_link: str | None = None,
     delete_file: bool = False,
 ):
-
-    brain = brain_service.get_brain_by_id(brain_id)
-    if brain is None:
-        logger.exception(
-            "It seems like you're uploading knowledge to an unknown brain."
-        )
-        return
-    logger.debug(
-        f"process_file started for file_name={file_name}, knowledge_id={knowledge_id}, brain_id={brain_id}, notification_id={notification_id}"
+    logger.info(
+        f"Task process_file started for file_name={file_name}, knowledge_id={knowledge_id}, brain_id={brain_id}, notification_id={notification_id}"
     )
 
-    tmp_name = file_name.replace("/", "_")
-    base_file_name = os.path.basename(file_name)
-    _, file_extension = os.path.splitext(base_file_name)
-
     brain_vector_service = BrainVectorService(brain_id)
-
-    # FIXME: @chloedia @AmineDiro
-    # We should decide if these checks should happen at API level or Worker level
-    # These checks should use Knowledge table (where we should store knowledge sha1)
-    # file_exists = file_already_exists()
-    # file_exists_in_brain = file_already_exists_in_brain(brain.brain_id)
-
-    with NamedTemporaryFile(
-        suffix="_" + tmp_name,  # pyright: ignore reportPrivateUsage=none
-    ) as tmp_file:
-        # This reads the whole file to memory
-        file_data = supabase_client.storage.from_("quivr").download(file_name)
-        tmp_file.write(file_data)
-        tmp_file.flush()
-        file_instance = File(
-            file_name=base_file_name,
-            tmp_file_path=Path(tmp_file.name),
-            bytes_content=file_data,
-            file_size=len(file_data),
-            file_extension=file_extension,
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(
+        process_file_func(
+            brain_service,
+            brain_vector_service,
+            supabase_client,
+            document_vector_store,
+            file_name,
+            brain_id,
+            file_original_name,
+            knowledge_id,
+            integration,
+            integration_link,
+            delete_file,
         )
-
-        if delete_file:  # TODO fix bug
-            brain_vector_service.delete_file_from_brain(
-                file_original_name, only_vectors=True
-            )
-
-        await process_file(
-            file=file_instance,
-            brain=brain,
-            integration=integration,
-            integration_link=integration_link,
-        )
-
-        brain_service.update_brain_last_update_time(brain_id)
+    )
 
 
 @celery.task(
@@ -149,7 +119,7 @@ async def process_crawl_and_notify(
             file_extension=".txt",
         )
         # TODO(@aminediro): call process website function
-        await process_file(
+        await parse_file(
             file=file_instance,
             brain=brain,
         )

@@ -10,13 +10,6 @@ from quivr_core.files.file import FileExtension
 logger = get_logger(__name__)
 
 
-def compute_sha1_from_file(file_path: str | Path):
-    with open(file_path, "rb") as file:
-        bytes = file.read()
-        readable_hash = compute_sha1_from_content(bytes)
-    return readable_hash
-
-
 def compute_sha1_from_content(content: bytes):
     readable_hash = hashlib.sha1(content).hexdigest()
     return readable_hash
@@ -44,7 +37,10 @@ class File:
         self.tmp_file_path = tmp_file_path
         self.bytes_content = bytes_content
         self.file_size = file_size
-        self.file_extension = FileExtension[file_extension]
+        try:
+            self.file_extension = FileExtension(file_extension)
+        except KeyError:
+            raise KeyError("unknown file_extension")
         self.file_sha1 = compute_sha1_from_content(bytes_content)
 
     def is_empty(self):

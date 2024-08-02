@@ -10,7 +10,7 @@ repository = "https://github.com/QuivrHQ/quivr"
 python = "^3.11,<3.13"
 # API Services
 quivr-api = { path = "../api" }
-quivr-core = { path = "../core", extras = ["all"] }
+quivr-core = { path = "../core", extras = ["all"], develop = true }
 celery = { extras = ["redis", "sqs"], version = "*" }
 
 # Heavy deps
@@ -28,6 +28,7 @@ torchvision = [
 ]
 python-dotenv = "^1.0.1"
 
+playwright = "^1.45.1"
 [tool.poetry.group.dev]
 optional = true
 

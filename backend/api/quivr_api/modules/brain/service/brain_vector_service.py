@@ -13,7 +13,7 @@ class BrainVectorService:
         self.brain_id = brain_id
         self.storage = Storage()
 
-    def create_brain_vector(self, vector_id, file_sha1):
+    def create_brain_vector(self, vector_id: str, file_sha1: str):
         return self.repository.create_brain_vector(self.brain_id, vector_id, file_sha1)  # type: ignore
 
     def update_brain_with_file(self, file_sha1: str):

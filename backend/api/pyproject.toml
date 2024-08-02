@@ -31,6 +31,7 @@ python-dotenv = "*"
 resend = "*"
 colorlog = "*"
 unidecode = "*"
+fpdf = "^1.7.2"
 
 # Monitoring
 posthog = "*"
@@ -41,9 +42,10 @@ sentry-sdk = { version = "^2.5.0", extras = ["fastapi"] }
 google-api-python-client = "*"
 google-auth-httplib2 = "*"
 google-auth-oauthlib = "*"
+dropbox = "^12.0.2"
 msal = "*"
 
-# Maybe
+# To keep (Maybe)
 langchain = "*"
 litellm = "*"
 openai = "*"
@@ -51,14 +53,6 @@ tiktoken = "*"
 langchain-community = "*"
 langchain-openai = "*"
 langchain-cohere = "*"
-# langfuse = "*"
-# langgraph = "*"
-
-# TO delete
-beautifulsoup4 = "*"
-playwright = "*"
-fpdf = "^1.7.2"
-dropbox = "^12.0.2"
 
 
 [tool.poetry.group.dev]

@@ -103,15 +103,15 @@ async def upload_file(
     added_knowledge = knowledge_service.add_knowledge(knowledge_to_add)
 
     celery.send_task(
-        "process_file_and_notify",
+        "process_file_task",
         kwargs={
+            "brain_id": brain_id,
+            "knowledge_id": added_knowledge.id,
             "file_name": filename_with_brain_id,
             "file_original_name": upload_file.filename,
             "integration": integration,
             "integration_link": integration_link,
-            "brain_id": brain_id,
             "notification_id": notification_id,
-            "knowledge_id": added_knowledge.id,
         },
     )
 

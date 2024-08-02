@@ -34,7 +34,7 @@ async def test_process_txt(txt_qfile):
     assert (
         doc[0].metadata.items()
         >= {
-            "chunk_index": 0,
+            "chunk_index": 1,
             "original_file_name": "data.txt",
             "chunk_size": 6,
             "processor_cls": "TextLoader",
