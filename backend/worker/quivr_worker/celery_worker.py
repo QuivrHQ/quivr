@@ -1,6 +1,7 @@
 import asyncio
 import os
 from datetime import datetime, timedelta
+from pathlib import Path
 from tempfile import NamedTemporaryFile
 from uuid import UUID
 
@@ -42,37 +43,51 @@ storage = Storage()
     name="process_file_and_notify",
     autoretry_for=(Exception,),
 )
-def process_file_and_notify(
+async def process_file_and_notify(
     file_name: str,
     file_original_name: str,
     brain_id: UUID,
     notification_id: UUID,
     knowledge_id: UUID,
-    integration=None,
-    integration_link=None,
+    integration: str | None = None,
+    integration_link: str | None = None,
     delete_file: bool = False,
 ):
+
+    brain = brain_service.get_brain_by_id(brain_id)
+    if brain is None:
+        logger.exception(
+            "It seems like you're uploading knowledge to an unknown brain."
+        )
+        return
     logger.debug(
         f"process_file started for file_name={file_name}, knowledge_id={knowledge_id}, brain_id={brain_id}, notification_id={notification_id}"
     )
+
     tmp_name = file_name.replace("/", "_")
     base_file_name = os.path.basename(file_name)
     _, file_extension = os.path.splitext(base_file_name)
 
     brain_vector_service = BrainVectorService(brain_id)
 
+    # FIXME: @chloedia @AmineDiro
+    # We should decide if these checks should happen at API level or Worker level
+    # These checks should use Knowledge table (where we should store knowledge sha1)
+    # file_exists = file_already_exists()
+    # file_exists_in_brain = file_already_exists_in_brain(brain.brain_id)
+
     with NamedTemporaryFile(
         suffix="_" + tmp_name,  # pyright: ignore reportPrivateUsage=none
     ) as tmp_file:
         # This reads the whole file to memory
-        res = supabase_client.storage.from_("quivr").download(file_name)
-        tmp_file.write(res)
+        file_data = supabase_client.storage.from_("quivr").download(file_name)
+        tmp_file.write(file_data)
         tmp_file.flush()
         file_instance = File(
             file_name=base_file_name,
-            tmp_file_path=tmp_file.name,
-            bytes_content=res,
-            file_size=len(res),
+            tmp_file_path=Path(tmp_file.name),
+            bytes_content=file_data,
+            file_size=len(file_data),
             file_extension=file_extension,
         )
 
@@ -81,17 +96,9 @@ def process_file_and_notify(
                 file_original_name, only_vectors=True
             )
 
-        brain = brain_service.get_brain_by_id(brain_id)
-        if brain is None:
-            logger.exception(
-                "It seems like you're uploading knowledge to an unknown brain."
-            )
-            return
-
-        process_file(
+        await process_file(
             file=file_instance,
             brain=brain,
-            original_file_name=file_original_name,
             integration=integration,
             integration_link=integration_link,
         )
@@ -124,14 +131,14 @@ def process_crawl_and_notify(
         tmp_file.flush()
         file_instance = File(
             file_name=file_name,
-            tmp_file_path=tmp_file.name,
+            tmp_file_path=Path(tmp_file.name),
             bytes_content=extracted_content_bytes,
             file_size=len(extracted_content),
             file_extension=".txt",
         )
         process_file(
             file=file_instance,
-            brain_id=brain_id,
+            brain=brain,
             original_file_name=crawl_website_url,
         )
 

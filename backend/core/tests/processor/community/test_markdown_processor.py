@@ -17,7 +17,7 @@ async def test_markdown_processor():
         original_filename=p.stem,
         path=p,
         file_extension=FileExtension.md,
-        file_md5="123",
+        file_sha1="123",
     )
     processor = MarkdownProcessor()
     result = await processor.process_file(f)

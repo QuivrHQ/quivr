@@ -1,5 +1,11 @@
+from typing import Any
+from uuid import uuid4
+
+from langchain_core.documents import Document
 from quivr_api.logger import get_logger
 from quivr_api.modules.brain.entity.brain_entity import BrainEntity
+from quivr_core.files.file import FileExtension, QuivrFile
+from quivr_core.processor.registry import get_processor_class
 
 from quivr_worker.files import File
 
@@ -18,17 +24,47 @@ file_processors = {
 }
 
 
-def process_file(
+async def process_file(
+    file: File,
+    brain: BrainEntity,
+    integration=None,
+    integration_link=None,
+    **processor_kwargs: dict[str, Any],
+) -> list[Document]:
+    knowledge = []
+
+    qfile = QuivrFile(
+        id=uuid4(),  # TODO(@chloedia @aminediro) : should be the id for knowledge
+        original_filename=file.file_name,
+        path=file.tmp_file_path,
+        brain_id=brain.brain_id,
+        file_sha1=file.file_sha1,
+        file_extension=FileExtension[file.file_extension],
+        file_size=file.file_size,
+    )
+
+    try:
+        if file.file_extension:
+            processor_cls = get_processor_class(file.file_extension)
+            logger.debug(f"processing {file} using class {processor_cls.__name__}")
+            processor = processor_cls(**processor_kwargs)
+            docs = await processor.process_file(qfile)
+            knowledge.extend(docs)
+        else:
+            logger.error(f"can't find processor for {file}")
+            raise ValueError(f"can't parse {file}. can't find file extension")
+    except KeyError as e:
+        raise Exception(f"Can't parse {file}. No available processor") from e
+    return knowledge
+
+
+def process_audio_file(
     file: File,
     brain: BrainEntity,
     original_file_name=None,
     integration=None,
     integration_link=None,
 ):
-    # FIXME: @chloedia @AmineDiro
-    # TODO: These check should happen at API level in Knowledge table
-    # file_exists = file_already_exists()
-    # file_exists_in_brain = file_already_exists_in_brain(brain.brain_id)
 
     if file.file_extension in file_processors:
         try:
@@ -52,8 +88,3 @@ def process_file(
             # Add more specific exceptions as needed.
             print(f"Error processing file: {e}")
             raise e
-    else:
-        logger.error(
-            f"❌ {file.file_name} is not supported.",  # pyright: ignore reportPrivateUsage=none
-            "error",
-        )

@@ -11,6 +11,7 @@ class BrainVectorService:
     def __init__(self, brain_id: UUID):
         self.repository = BrainsVectors()
         self.brain_id = brain_id
+        self.storage = Storage()
 
     def create_brain_vector(self, vector_id, file_sha1):
         return self.repository.create_brain_vector(self.brain_id, vector_id, file_sha1)  # type: ignore
@@ -27,9 +28,8 @@ class BrainVectorService:
 
     def delete_file_from_brain(self, file_name: str, only_vectors: bool = False):
         file_name_with_brain_id = f"{self.brain_id}/{file_name}"
-        storage = Storage()
         if not only_vectors:
-            storage.remove_file(file_name_with_brain_id)
+            self.storage.remove_file(file_name_with_brain_id)
         return self.repository.delete_file_from_brain(self.brain_id, file_name)  # type: ignore
 
     def delete_file_url_from_brain(self, file_name: str):
