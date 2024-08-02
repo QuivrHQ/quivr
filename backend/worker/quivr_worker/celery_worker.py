@@ -21,7 +21,7 @@ from quivr_api.utils.telemetry import maybe_send_telemetry
 
 from quivr_worker.check_premium import check_is_premium
 from quivr_worker.crawl.crawler import CrawlWebsite, slugify
-from quivr_worker.files import File
+from quivr_worker.files import File, compute_sha1
 from quivr_worker.process.process_file import parse_file, process_file_func
 from quivr_worker.syncs.process_active_syncs import process_all_syncs
 
@@ -65,17 +65,17 @@ def process_file_task(
     loop = asyncio.get_event_loop()
     loop.run_until_complete(
         process_file_func(
-            brain_service,
-            brain_vector_service,
-            supabase_client,
-            document_vector_store,
-            file_name,
-            brain_id,
-            file_original_name,
-            knowledge_id,
-            integration,
-            integration_link,
-            delete_file,
+            supabase_client=supabase_client,
+            brain_service=brain_service,
+            brain_vector_service=brain_vector_service,
+            document_vector_store=document_vector_store,
+            file_name=file_name,
+            brain_id=brain_id,
+            file_original_name=file_original_name,
+            knowledge_id=knowledge_id,
+            integration=integration,
+            integration_link=integration_link,
+            delete_file=delete_file,
         )
     )
 
@@ -112,11 +112,12 @@ async def process_crawl_and_notify(
         tmp_file.write(extracted_content_bytes)
         tmp_file.flush()
         file_instance = File(
+            knowledge_id=knowledge_id,
             file_name=file_name,
             tmp_file_path=Path(tmp_file.name),
-            bytes_content=extracted_content_bytes,
             file_size=len(extracted_content),
             file_extension=".txt",
+            file_sha1=compute_sha1(extracted_content_bytes),
         )
         # TODO(@aminediro): call process website function
         await parse_file(

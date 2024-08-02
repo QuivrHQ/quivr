@@ -1,9 +1,8 @@
-import time
 from contextlib import contextmanager
 from pathlib import Path
 from tempfile import NamedTemporaryFile
 from typing import Any
-from uuid import UUID, uuid4
+from uuid import UUID
 
 from langchain_core.documents import Document
 from langchain_core.vectorstores import VectorStore
@@ -11,11 +10,10 @@ from quivr_api.logger import get_logger
 from quivr_api.modules.brain.entity.brain_entity import BrainEntity
 from quivr_api.modules.brain.service.brain_service import BrainService
 from quivr_api.modules.brain.service.brain_vector_service import BrainVectorService
-from quivr_core.files.file import FileExtension, QuivrFile
 from quivr_core.processor.registry import get_processor_class
 from supabase import Client
 
-from quivr_worker.files import File
+from quivr_worker.files import File, compute_sha1
 from quivr_worker.utils import get_tmp_name
 
 from ..parsers.audio import process_audio
@@ -35,7 +33,10 @@ file_processors = {
 
 @contextmanager
 def build_local_file(
-    supabase_client: Client, file_name: str, bucket_name: str = "quivr"
+    supabase_client: Client,
+    knowledge_id: UUID,
+    file_name: str,
+    bucket_name: str = "quivr",
 ):
     try:
         # FIXME: @chloedia @AmineDiro
@@ -51,14 +52,17 @@ def build_local_file(
         )
 
         file_data = supabase_client.storage.from_(bucket_name).download(file_name)
+        file_sha1 = compute_sha1(file_data)
         tmp_file.write(file_data)
         tmp_file.flush()
+
         file_instance = File(
+            knowledge_id=knowledge_id,
             file_name=base_file_name,
             tmp_file_path=Path(tmp_file.name),
-            bytes_content=file_data,
             file_size=len(file_data),
             file_extension=file_extension,
+            file_sha1=file_sha1,
         )
         yield file_instance
     finally:
@@ -67,9 +71,9 @@ def build_local_file(
 
 
 async def process_file_func(
+    supabase_client: Client,
     brain_service: BrainService,
     brain_vector_service: BrainVectorService,
-    supabase_client: Client,
     document_vector_store: VectorStore,
     file_name: str,
     brain_id: UUID,
@@ -86,7 +90,7 @@ async def process_file_func(
         )
         return True
 
-    with build_local_file(supabase_client, file_name) as file_instance:
+    with build_local_file(supabase_client, knowledge_id, file_name) as file_instance:
         # TODO(@StanGirard): fix bug
         # NOTE (@aminediro): I think this might be related to knowledge delete timeouts ?
         if delete_file:
@@ -95,7 +99,6 @@ async def process_file_func(
             )
         chunks = await parse_file(
             file=file_instance,
-            knowledge_id=knowledge_id,
             brain=brain,
             integration=integration,
             integration_link=integration_link,
@@ -138,23 +141,13 @@ def store_chunks(
 async def parse_file(
     file: File,
     brain: BrainEntity,
-    knowledge_id: UUID | None = None,
     integration: str | None = None,
     integration_link: str | None = None,
     **processor_kwargs: dict[str, Any],
 ) -> list[Document]:
-    qfile = QuivrFile(
-        id=uuid4(),  # TODO(@chloedia @aminediro) : should be the id for knowledge
-        original_filename=file.file_name,
-        path=file.tmp_file_path,
-        brain_id=brain.brain_id,
-        file_sha1=file.file_sha1,
-        file_extension=FileExtension[file.file_extension],
-        file_size=file.file_size,
-        metadata={
-            "date": time.strftime("%Y%m%d"),
-            "original_file_name": file.file_name,
-            "knowledge_id": knowledge_id,  # TODO(@chloedia): This knowledge_id should be a column in vectors table
+    qfile = file.to_qfile(
+        brain.brain_id,
+        {
             "integration": integration or "",
             "integration_link": integration_link or "",
         },

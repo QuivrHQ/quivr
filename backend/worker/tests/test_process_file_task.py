@@ -1,10 +1,15 @@
+import datetime
 import os
 from uuid import uuid4
 
+import pytest
+from quivr_api.modules.brain.entity.brain_entity import BrainEntity, BrainType
+from quivr_core.files.file import FileExtension
 from storage3._sync.client import SyncBucketProxy
 from supabase import Client
 
-from quivr_worker.process.process_file import build_local_file
+from quivr_worker.files import File
+from quivr_worker.process.process_file import build_local_file, parse_file
 
 
 def test_build_local_file(monkeypatch):
@@ -19,7 +24,42 @@ def test_build_local_file(monkeypatch):
     monkeypatch.setattr(SyncBucketProxy, "download", random_bytes)
     brain_id = uuid4()
     file_name = f"{brain_id}/test_file.txt"
+    knowledge_id = uuid4()
 
-    with build_local_file(client, file_name) as file:
-        assert len(file.bytes_content) == 1024
+    with build_local_file(client, knowledge_id, file_name) as file:
+        assert file.file_size == 1024
         assert file.file_name == "test_file.txt"
+        assert file.id == knowledge_id
+        assert file.file_extension == FileExtension.txt
+
+
+@pytest.fixture
+def file_instance(tmp_path) -> File:
+    data = "This is some test data."
+    temp_file = tmp_path / "data.txt"
+    temp_file.write_text(data)
+
+    knowledge_id = uuid4()
+    return File(
+        knowledge_id=knowledge_id,
+        file_sha1="124",
+        file_extension=".txt",
+        file_name=temp_file.name,
+        file_size=len(data),
+        tmp_file_path=temp_file.absolute(),
+    )
+
+
+@pytest.mark.asyncio
+async def test_parse_file(file_instance):
+    brain = BrainEntity(
+        brain_id=uuid4(),
+        name="test",
+        brain_type=BrainType.doc,
+        last_update=datetime.datetime.now(),
+    )
+    chunks = await parse_file(
+        file=file_instance,
+        brain=brain,
+    )
+    assert len(chunks) > 0

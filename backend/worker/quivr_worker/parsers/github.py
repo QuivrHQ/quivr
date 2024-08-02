@@ -4,11 +4,23 @@ import time
 from langchain.schema import Document
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_community.document_loaders import GitLoader
-from quivr_api.models.files import File
 from quivr_api.models.settings import get_documents_vector_store
-from quivr_api.packages.files.file import compute_sha1_from_content
+from quivr_api.modules.brain.service.brain_vector_service import BrainVectorService
 
-from quivr_worker.files.parsers.common import upload_vector_docs
+from quivr_worker.files import File
+from quivr_worker.parsers.common import upload_vector_docs
+
+
+def link_file_to_brain(self, brain_id):
+    self.set_file_vectors_ids()
+
+    if self.vectors_ids is None:
+        return
+
+    brain_vector_service = BrainVectorService(brain_id)
+
+    for vector_id in self.vectors_ids:  # pyright: ignore reportPrivateUsage=none
+        brain_vector_service.create_brain_vector(vector_id["id"], self.file_sha1)
 
 
 def process_github(

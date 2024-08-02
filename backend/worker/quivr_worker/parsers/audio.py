@@ -5,7 +5,7 @@ from langchain.schema import Document
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from quivr_api.models.settings import get_documents_vector_store
 
-from quivr_worker.files import File, compute_sha1_from_content
+from quivr_worker.files import File, compute_sha1
 
 
 def process_audio(file: File, **kwargs):
@@ -16,7 +16,7 @@ def process_audio(file: File, **kwargs):
     with open(file.tmp_file_path, "rb") as audio_file:
         transcript = openai.Audio.transcribe("whisper-1", audio_file)
 
-        file_sha = compute_sha1_from_content(
+        file_sha = compute_sha1(
             transcript.text.encode("utf-8")  # pyright: ignore reportPrivateUsage=none
         )
         file_size = len(
