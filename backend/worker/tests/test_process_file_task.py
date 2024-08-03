@@ -5,28 +5,19 @@ from uuid import uuid4
 import pytest
 from quivr_api.modules.brain.entity.brain_entity import BrainEntity, BrainType
 from quivr_core.files.file import FileExtension
-from storage3._sync.client import SyncBucketProxy
-from supabase import Client
 
-from quivr_worker.process.process_file import build_local_file, parse_file
+from quivr_worker.files import build_file
+from quivr_worker.process.process_file import parse_file
 
 
-def test_build_local_file(monkeypatch):
-    def random_bytes(*args, **kwargs):
-        return os.urandom(1024)
-
-    client = Client(
-        supabase_url="http://localhost:1111",
-        # TODO: pytest load from dotenv
-        supabase_key="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImV4cCI6MTk4MzgxMjk5Nn0.EGIM96RAZx35lJzdJsyH-qQwv8Hdp7fsn3W0YpN81IU",
-    )
-    monkeypatch.setattr(SyncBucketProxy, "download", random_bytes)
+def test_build_file():
+    random_bytes = os.urandom(128)
     brain_id = uuid4()
     file_name = f"{brain_id}/test_file.txt"
     knowledge_id = uuid4()
 
-    with build_local_file(client, knowledge_id, file_name) as file:
-        assert file.file_size == 1024
+    with build_file(random_bytes, knowledge_id, file_name) as file:
+        assert file.file_size == 128
         assert file.file_name == "test_file.txt"
         assert file.id == knowledge_id
         assert file.file_extension == FileExtension.txt

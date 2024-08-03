@@ -2,6 +2,7 @@ from typing import Optional
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, Query
+
 from quivr_api.celery_config import celery
 from quivr_api.logger import get_logger
 from quivr_api.middlewares.auth import AuthBearer, get_current_user
@@ -83,7 +84,7 @@ async def crawl_endpoint(
         logger.info(f"Knowledge {added_knowledge} added successfully")
 
         celery.send_task(
-            "process_crawl_and_notify",
+            "process_crawl_task",
             kwargs={
                 "crawl_website_url": url,
                 "brain_id": brain_id,

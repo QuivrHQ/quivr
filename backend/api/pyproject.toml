@@ -25,15 +25,13 @@ psycopg2-binary = "*"
 sqlmodel = "^0.0.19"
 celery = { extras = ["redis", "sqs"], version = "*" }
 pydantic-settings = "*"
-boto3 = "*"
-botocore = "*"
 python-dotenv = "*"
 resend = "*"
-colorlog = "*"
 unidecode = "*"
 fpdf = "^1.7.2"
 
 # Monitoring
+colorlog = "*"
 posthog = "*"
 pyinstrument = "*"
 sentry-sdk = { version = "^2.5.0", extras = ["fastapi"] }

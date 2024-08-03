@@ -1,6 +1,4 @@
 import asyncio
-from pathlib import Path
-from tempfile import NamedTemporaryFile
 from uuid import UUID
 
 from celery.schedules import crontab
@@ -20,9 +18,8 @@ from quivr_api.modules.sync.service.sync_service import SyncService, SyncUserSer
 from quivr_api.utils.telemetry import maybe_send_telemetry
 
 from quivr_worker.check_premium import check_is_premium
-from quivr_worker.crawl.crawler import CrawlWebsite, slugify
-from quivr_worker.files import File, compute_sha1
-from quivr_worker.process.process_file import parse_file, process_file_func
+from quivr_worker.process.process_s3_file import process_uploaded_file
+from quivr_worker.process.process_url import process_url_func
 from quivr_worker.syncs.process_active_syncs import process_all_syncs
 
 load_dotenv()
@@ -64,7 +61,7 @@ def process_file_task(
     brain_vector_service = BrainVectorService(brain_id)
     loop = asyncio.get_event_loop()
     loop.run_until_complete(
-        process_file_func(
+        process_uploaded_file(
             supabase_client=supabase_client,
             brain_service=brain_service,
             brain_vector_service=brain_vector_service,
@@ -86,44 +83,28 @@ def process_file_task(
     name="process_crawl_and_notify",
     autoretry_for=(Exception,),
 )
-async def process_crawl_and_notify(
+async def process_crawl_task(
     crawl_website_url: str,
     brain_id: UUID,
     knowledge_id: UUID,
     notification_id: UUID | None = None,
 ):
-    crawl_website = CrawlWebsite(url=crawl_website_url)
+    logger.info(
+        f"Task process_crawl_task started for url={crawl_website_url}, knowledge_id={knowledge_id}, brain_id={brain_id}, notification_id={notification_id}"
+    )
 
-    # Build file data
-    extracted_content = crawl_website.process()
-    extracted_content_bytes = extracted_content.encode("utf-8")
-    file_name = slugify(crawl_website.url) + ".txt"
-
-    brain = brain_service.get_brain_by_id(brain_id)
-    if brain is None:
-        logger.exception(
-            "It seems like you're uploading knowledge to an unknown brain."
-        )
-        return
-
-    with NamedTemporaryFile(
-        suffix="_" + file_name,  # pyright: ignore reportPrivateUsage=none
-    ) as tmp_file:
-        tmp_file.write(extracted_content_bytes)
-        tmp_file.flush()
-        file_instance = File(
+    brain_vector_service = BrainVectorService(brain_id)
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(
+        process_url_func(
+            url=crawl_website_url,
+            brain_id=brain_id,
             knowledge_id=knowledge_id,
-            file_name=file_name,
-            tmp_file_path=Path(tmp_file.name),
-            file_size=len(extracted_content),
-            file_extension=".txt",
-            file_sha1=compute_sha1(extracted_content_bytes),
+            brain_service=brain_service,
+            brain_vector_service=brain_vector_service,
+            document_vector_store=document_vector_store,
         )
-        # TODO(@aminediro): call process website function
-        await parse_file(
-            file=file_instance,
-            brain=brain,
-        )
+    )
 
 
 @celery.task(name="NotionConnectorLoad")
