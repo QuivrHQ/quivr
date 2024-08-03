@@ -28,7 +28,7 @@ services:
     env_file:
       - .env
     build:
-      context: backend
+      context: backend/api
       dockerfile: Dockerfile
     container_name: backend-core
     extra_hosts:

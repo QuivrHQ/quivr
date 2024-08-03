@@ -4,12 +4,12 @@ from langchain_core.vectorstores import VectorStore
 from quivr_api.logger import get_logger
 from quivr_api.modules.brain.service.brain_service import BrainService
 from quivr_api.modules.brain.service.brain_vector_service import BrainVectorService
-from worker.quivr_worker.parsers.crawler import URL, extract_from_url, slugify
-from worker.quivr_worker.process.process_file import (
-    process_file,
-)
 
 from quivr_worker.files import build_file
+from quivr_worker.parsers.crawler import URL, extract_from_url, slugify
+from quivr_worker.process.process_file import (
+    process_file,
+)
 
 logger = get_logger("celery_worker")
 
