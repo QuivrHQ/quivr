@@ -14,20 +14,19 @@ from quivr_core.processor.registry import get_processor_class
 from supabase import Client
 
 from quivr_worker.files import File, compute_sha1
+from quivr_worker.parsers.audio import process_audio
 from quivr_worker.utils import get_tmp_name
-
-from ..parsers.audio import process_audio
 
 logger = get_logger("celery_worker")
 
-file_processors = {
-    ".m4a": process_audio,
-    ".mp3": process_audio,
-    ".webm": process_audio,
-    ".mp4": process_audio,
-    ".mpga": process_audio,
-    ".wav": process_audio,
-    ".mpeg": process_audio,
+audio_extensions = {
+    ".m4a",
+    ".mp3",
+    ".webm",
+    ".mp4",
+    ".mpga",
+    ".wav",
+    ".mpeg",
 }
 
 
@@ -145,25 +144,25 @@ async def parse_file(
     integration_link: str | None = None,
     **processor_kwargs: dict[str, Any],
 ) -> list[Document]:
-    qfile = file.to_qfile(
-        brain.brain_id,
-        {
-            "integration": integration or "",
-            "integration_link": integration_link or "",
-        },
-    )
+
     try:
-        # TODO(@aminediro):
-        # Check first if audio -> Send to different function
-        if file.file_extension:
+        # TODO(@aminediro): add audio procesors to quivr-core
+        if file.file_extension in audio_extensions:
+            audio_docs = process_audio_file(file, brain)
+            return audio_docs
+        else:
+            qfile = file.to_qfile(
+                brain.brain_id,
+                {
+                    "integration": integration or "",
+                    "integration_link": integration_link or "",
+                },
+            )
             processor_cls = get_processor_class(file.file_extension)
             logger.debug(f"processing {file} using class {processor_cls.__name__}")
             processor = processor_cls(**processor_kwargs)
-            docs = await processor.process_file(qfile)
-            return docs
-        else:
-            logger.error(f"can't find processor for {file}")
-            raise ValueError(f"can't parse {file}. can't find file extension")
+            audio_docs = await processor.process_file(qfile)
+            return audio_docs
     except KeyError as e:
         raise ValueError(f"Can't parse {file}. No available processor") from e
 
@@ -171,29 +170,18 @@ async def parse_file(
 def process_audio_file(
     file: File,
     brain: BrainEntity,
-    original_file_name=None,
-    integration=None,
-    integration_link=None,
 ):
-    if file.file_extension in file_processors:
-        try:
-            result = file_processors[file.file_extension](
-                file=file,
-                brain_id=brain.brain_id,
-                original_file_name=original_file_name,
-                integration=integration,
-                integration_link=integration_link,
+    try:
+        result = process_audio(file=file)
+        if result is None or result == 0:
+            logger.info(
+                f"{file.file_name} has been uploaded to brain. There might have been an error while reading it, please make sure the file is not illformed or just an image",  # pyright: ignore reportPrivateUsage=none
             )
-            if result is None or result == 0:
-                return logger.info(
-                    f"{file.file_name} has been uploaded to brain. There might have been an error while reading it, please make sure the file is not illformed or just an image",  # pyright: ignore reportPrivateUsage=none
-                    "warning",
-                )
-            return logger.info(
-                f"{file.file_name} has been uploaded to brain {brain.name} in {result} chunks",  # pyright: ignore reportPrivateUsage=none
-                "success",
-            )
-        except Exception as e:
-            # Add more specific exceptions as needed.
-            print(f"Error processing file: {e}")
-            raise e
+            return []
+        logger.info(
+            f"{file.file_name} has been uploaded to brain {brain.name} in {result} chunks",  # pyright: ignore reportPrivateUsage=none
+        )
+        return result
+    except Exception as e:
+        logger.exception(f"Error processing audio file {file}: {e}")
+        raise e

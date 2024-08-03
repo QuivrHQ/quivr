@@ -39,10 +39,7 @@ class File:
         self.tmp_file_path = tmp_file_path
         self.file_size = file_size
         self.file_sha1 = file_sha1
-        try:
-            self.file_extension = FileExtension(file_extension)
-        except KeyError:
-            raise KeyError("unknown file_extension")
+        self.file_extension = FileExtension(file_extension)
 
     def is_empty(self):
         return self.file_size < 1  # pyright: ignore reportPrivateUsage=none

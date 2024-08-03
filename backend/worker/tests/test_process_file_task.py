@@ -8,7 +8,6 @@ from quivr_core.files.file import FileExtension
 from storage3._sync.client import SyncBucketProxy
 from supabase import Client
 
-from quivr_worker.files import File
 from quivr_worker.process.process_file import build_local_file, parse_file
 
 
@@ -33,23 +32,6 @@ def test_build_local_file(monkeypatch):
         assert file.file_extension == FileExtension.txt
 
 
-@pytest.fixture
-def file_instance(tmp_path) -> File:
-    data = "This is some test data."
-    temp_file = tmp_path / "data.txt"
-    temp_file.write_text(data)
-
-    knowledge_id = uuid4()
-    return File(
-        knowledge_id=knowledge_id,
-        file_sha1="124",
-        file_extension=".txt",
-        file_name=temp_file.name,
-        file_size=len(data),
-        tmp_file_path=temp_file.absolute(),
-    )
-
-
 @pytest.mark.asyncio
 async def test_parse_file(file_instance):
     brain = BrainEntity(
@@ -63,3 +45,26 @@ async def test_parse_file(file_instance):
         brain=brain,
     )
     assert len(chunks) > 0
+
+
+@pytest.mark.asyncio
+async def test_parse_audio(monkeypatch, audio_file):
+    from openai.resources.audio.transcriptions import Transcriptions
+    from openai.types.audio.transcription import Transcription
+
+    def transcribe(*args, **kwargs):
+        return Transcription(text="audio data")
+
+    monkeypatch.setattr(Transcriptions, "create", transcribe)
+    brain = BrainEntity(
+        brain_id=uuid4(),
+        name="test",
+        brain_type=BrainType.doc,
+        last_update=datetime.datetime.now(),
+    )
+    chunks = await parse_file(
+        file=audio_file,
+        brain=brain,
+    )
+    assert len(chunks) > 0
+    assert chunks[0].page_content == "audio data"

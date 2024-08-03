@@ -29,6 +29,7 @@ torchvision = [
 python-dotenv = "^1.0.1"
 
 playwright = "^1.45.1"
+openai = "^1.38.0"
 [tool.poetry.group.dev]
 optional = true
 

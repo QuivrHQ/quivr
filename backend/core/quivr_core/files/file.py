@@ -29,6 +29,13 @@ class FileExtension(str, Enum):
     odt = ".odt"
     py = ".py"
     ipynb = ".ipynb"
+    m4a = ".m4a"
+    mp3 = ".mp3"
+    webm = ".webm"
+    mp4 = ".mp4"
+    mpga = ".mpga"
+    wav = ".wav"
+    mpeg = ".mpeg"
 
 
 def get_file_extension(file_path: Path) -> FileExtension | str:
