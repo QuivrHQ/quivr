@@ -4,9 +4,7 @@ FROM python:3.11.6-slim-bullseye
 ARG DEV_MODE
 ENV DEV_MODE=$DEV_MODE
 
-
-RUN apt-get clean && apt-get update && apt-get install -y curl 
-
+RUN apt-get clean && apt-get update && apt-get install -y wget curl
 
 RUN ARCHITECTURE=$(uname -m) && \
     if [ "$ARCHITECTURE" = "x86_64" ]; then \
@@ -36,15 +34,16 @@ WORKDIR /code/api
 
 # Copy monorepo dependencies
 # CORE
-COPY core/pyproject.toml core/README.md core/poetry.lock  /code/core/
-COPY core/quivr_core /code/core/quivr_core
+# COPY core/pyproject.toml core/README.md core/poetry.lock  /code/core/
+# COPY core/quivr_core /code/core/quivr_core
 
 # API
 COPY api/pyproject.toml  api/poetry.lock api/README.md /code/api/
 COPY api/quivr_api /code/api/quivr_api
 
 # Run install
-RUN poetry install --no-root --with dev &&  rm -rf $POETRY_CACHE_DIR
+# Run install
+RUN poetry install --no-directory --no-root --with dev && rm -rf $POETRY_CACHE_DIR
 
 ENV PYTHONPATH=/code/api
 

@@ -18,16 +18,8 @@ services:
     container_name: backend-api
     volumes:
       - ./backend/:/code/
-    command:
-      - "uvicorn"
-      - "quivr_api.main:app"
-      - "--reload"
-      - "--host"
-      - "0.0.0.0"
-      - "--port"
-      - "5050"
-      - "--log-level"
-      - "info"
+    command: >
+      /bin/bash -c "poetry install -q && poetry run uvicorn quivr_api.main:app --host 0.0.0.0 --log-level info --reload --port 5050"
     restart: always
     ports:
       - 5050:5050
@@ -45,7 +37,7 @@ services:
       - ./backend/:/code/
     command:
       - "python"
-      - "/code/api/quivr_api/celery_monitor.py"
+      - "/code/worker/quivr_worker/celery_monitor.py"
     restart: always
     depends_on:
       - redis
@@ -68,7 +60,9 @@ services:
     container_name: worker
     volumes:
       - ./backend/:/code/
-    command: "celery -A quivr_worker.celery_worker worker -l info"
+    # command: "poetry install -q && celery -A quivr_worker.celery_worker worker -l info"
+    command: >
+      /bin/bash -c "poetry install -q && poetry run celery -A quivr_worker.celery_worker worker -l info"
     restart: always
     depends_on:
       - redis
@@ -83,14 +77,15 @@ services:
       - 6379:6379
 
   beat:
-    image: backend-api:latest
+    image: backend-worker:latest
     pull_policy: never
     extra_hosts:
       - "host.docker.internal:host-gateway"
     env_file:
       - .env
     container_name: beat
-    command: celery -A quivr_api.celery_worker beat -l info
+    command: >
+      /bin/bash -c  "poetry install -q && poetry run celery -A quivr_worker.celery_worker beat -l info"
     volumes:
       - ./backend/:/code/
     restart: always
@@ -98,14 +93,15 @@ services:
       - redis
 
   flower:
-    image: backend-api:latest
+    image: backend-worker:latest
     pull_policy: never
     extra_hosts:
       - "host.docker.internal:host-gateway"
     env_file:
       - .env
     container_name: flower
-    command: celery -A quivr_api.celery_worker flower -l info --port=5555
+    command: >
+      /bin/bash -c "poetry install -q && poetry run celery -A quivr_worker.celery_worker flower -l info --port=5555"
     volumes:
       - ./backend/:/code/
     restart: always

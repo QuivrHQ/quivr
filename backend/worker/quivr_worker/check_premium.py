@@ -1,11 +1,12 @@
 import os
 from datetime import datetime, timedelta
 
+from postgrest.exceptions import APIError
 from pytz import timezone
 from quivr_api.logger import get_logger
 from supabase import Client
 
-logger = get_logger(__name__)
+logger = get_logger("celery_worker")
 
 
 # TODO: Remove all this code and use Stripe Webhooks
@@ -24,12 +25,16 @@ def check_is_premium(supabase_client: Client):
     memoization_cutoff = current_time - memoization_period
 
     # Fetch all necessary data in bulk
-    subscriptions = (
-        supabase_client.table("subscriptions")
-        .select("*")
-        .filter("current_period_end", "gt", current_time_str)
-        .execute()
-    ).data
+    try:
+        subscriptions = (
+            supabase_client.table("subscriptions")
+            .select("*")
+            .filter("current_period_end", "gt", current_time_str)
+            .execute()
+        ).data
+    except APIError as e:
+        logger.error(f"Error fetching subscribtions : {e}")
+        return
 
     customers = (supabase_client.table("customers").select("*").execute()).data
 

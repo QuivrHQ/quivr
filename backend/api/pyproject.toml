@@ -29,7 +29,6 @@ python-dotenv = "*"
 resend = "*"
 unidecode = "*"
 fpdf = "^1.7.2"
-flower = "^2.0.1"
 
 # Monitoring
 colorlog = "*"

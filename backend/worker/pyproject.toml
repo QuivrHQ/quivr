@@ -9,7 +9,7 @@ repository = "https://github.com/QuivrHQ/quivr"
 [tool.poetry.dependencies]
 python = "^3.11,<3.13"
 # API Services
-quivr-api = { path = "../api" }
+quivr-api = { path = "../api", develop = true }
 quivr-core = { path = "../core", extras = ["all"], develop = true }
 celery = { extras = ["redis", "sqs"], version = "*" }
 
@@ -30,6 +30,7 @@ python-dotenv = "^1.0.1"
 
 playwright = "^1.45.1"
 openai = "^1.38.0"
+flower = "^2.0.1"
 [tool.poetry.group.dev]
 optional = true
 
