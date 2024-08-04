@@ -21,6 +21,7 @@ from quivr_worker.check_premium import check_is_premium
 from quivr_worker.process.process_s3_file import process_uploaded_file
 from quivr_worker.process.process_url import process_url_func
 from quivr_worker.syncs.process_active_syncs import process_all_syncs
+from quivr_worker.utils import _patch_json
 
 load_dotenv()
 
@@ -36,6 +37,8 @@ sync_active_service = SyncService()
 sync_user_service = SyncUserService()
 sync_files_repo_service = SyncFiles()
 storage = Storage()
+
+_patch_json()
 
 
 @celery.task(

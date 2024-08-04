@@ -35,7 +35,6 @@ async def process_file(
     integration: str | None,
     integration_link: str | None,
 ):
-
     chunks = await parse_file(
         file=file_instance,
         brain=brain,
@@ -63,9 +62,8 @@ def store_chunks(
 ):
     vector_ids = document_vector_store.add_documents(chunks)
     logger.debug(f"Inserted {len(chunks)} chunks in vectors table for {file}")
-    assert (
-        vector_ids and len(vector_ids) > 0
-    ), f"Error inserting chunks for file {file.file_name}"
+    if vector_ids and len(vector_ids) > 0:
+        raise Exception(f"Error inserting chunks for file {file.file_name}")
 
     # TODO(@chloedia) : Brains should be associated with knowledge NOT vectors...
     for created_vector_id in vector_ids:
@@ -84,7 +82,6 @@ async def parse_file(
     integration_link: str | None = None,
     **processor_kwargs: dict[str, Any],
 ) -> list[Document]:
-
     try:
         # TODO(@aminediro): add audio procesors to quivr-core
         if file.file_extension in audio_extensions:
