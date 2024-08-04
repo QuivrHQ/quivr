@@ -84,9 +84,7 @@ class SyncUtils(BaseModel):
         for file in files:
             logger.info("Processing file: %s", file.name)
             try:
-                file_id = file.id
                 file_name = file.name
-                mime_type = file.mime_type
                 modified_time = file.last_modified
 
                 if self.sync_cloud.lower_name == "notion":

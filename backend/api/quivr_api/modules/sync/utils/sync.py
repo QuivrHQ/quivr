@@ -16,11 +16,12 @@ from google.auth.transport.requests import Request as GoogleRequest
 from google.oauth2.credentials import Credentials
 from googleapiclient.discovery import build
 from notion_client import Client
+from requests import HTTPError
+
 from quivr_api.logger import get_logger
 from quivr_api.modules.sync.entity.sync import SyncFile
 from quivr_api.modules.sync.service.sync_notion import SyncNotionService
 from quivr_api.modules.sync.utils.normalize import remove_special_characters
-from requests import HTTPError
 
 logger = get_logger(__name__)
 redis_client = redis.Redis(host="redis", port=os.getenv("REDIS_PORT"), db=0)
@@ -785,9 +786,7 @@ class NotionSync(BaseSync):
         if not folder_id or folder_id == "":
             folder_id = None  # ROOT FOLDER HAVE A TRUE PARENT ID
 
-        children = await self.notion_service.get_notion_files_by_parent_id(
-            folder_id
-        )
+        children = await self.notion_service.get_notion_files_by_parent_id(folder_id)
         for page in children:
             page_info = SyncFile(
                 name=page.name,
@@ -963,7 +962,7 @@ class NotionSync(BaseSync):
 
             markdown_bytes = BytesIO(markdown_text.encode("utf-8"))
 
-            return {"file_name": f"{file.name}.md", "content": markdown_bytes}
+            return {"file_name": f"{file.name}", "content": markdown_bytes}
 
         except Exception as e:
             logger.error(
