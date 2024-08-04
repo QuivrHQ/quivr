@@ -16,12 +16,11 @@ from google.auth.transport.requests import Request as GoogleRequest
 from google.oauth2.credentials import Credentials
 from googleapiclient.discovery import build
 from notion_client import Client
-from requests import HTTPError
-
 from quivr_api.logger import get_logger
 from quivr_api.modules.sync.entity.sync import SyncFile
 from quivr_api.modules.sync.service.sync_notion import SyncNotionService
 from quivr_api.modules.sync.utils.normalize import remove_special_characters
+from requests import HTTPError
 
 logger = get_logger(__name__)
 redis_client = redis.Redis(host="redis", port=os.getenv("REDIS_PORT"), db=0)
@@ -804,7 +803,6 @@ class NotionSync(BaseSync):
             if recursive:
                 sub_pages = await self.aget_files(credentials, str(page.id), recursive)
                 pages.extend(sub_pages)
-        print("TOTAL Time taken for fetching pages: ", time.time() - t_0)
         return pages
 
     def get_files(
@@ -957,8 +955,6 @@ class NotionSync(BaseSync):
 
             markdown_content = await retrieve_page_content(file.id)
             markdown_text = "\n\n".join(markdown_content)
-
-            print(markdown_text)
 
             markdown_bytes = BytesIO(markdown_text.encode("utf-8"))
 
