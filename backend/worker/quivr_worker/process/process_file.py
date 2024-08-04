@@ -62,7 +62,8 @@ def store_chunks(
 ):
     vector_ids = document_vector_store.add_documents(chunks)
     logger.debug(f"Inserted {len(chunks)} chunks in vectors table for {file}")
-    if vector_ids and len(vector_ids) > 0:
+
+    if vector_ids is None or len(vector_ids) == 0:
         raise Exception(f"Error inserting chunks for file {file.file_name}")
 
     # TODO(@chloedia) : Brains should be associated with knowledge NOT vectors...
@@ -72,7 +73,6 @@ def store_chunks(
         )
         logger.debug(f"Inserted : {len(result)} in brain_vectors for {file}")
     brain_service.update_brain_last_update_time(brain_id)
-    pass
 
 
 async def parse_file(
@@ -85,6 +85,7 @@ async def parse_file(
     try:
         # TODO(@aminediro): add audio procesors to quivr-core
         if file.file_extension in audio_extensions:
+            logger.debug(f"processing audio file {file}")
             audio_docs = process_audio_file(file, brain)
             return audio_docs
         else:
@@ -98,8 +99,9 @@ async def parse_file(
             processor_cls = get_processor_class(file.file_extension)
             logger.debug(f"processing {file} using class {processor_cls.__name__}")
             processor = processor_cls(**processor_kwargs)
-            audio_docs = await processor.process_file(qfile)
-            return audio_docs
+            docs = await processor.process_file(qfile)
+            logger.debug(f"parsed {file} to : {docs}")
+            return docs
     except KeyError as e:
         raise ValueError(f"Can't parse {file}. No available processor") from e
 
