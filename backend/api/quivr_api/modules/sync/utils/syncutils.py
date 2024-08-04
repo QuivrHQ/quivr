@@ -87,14 +87,7 @@ class SyncUtils(BaseModel):
                 file_name = file.name
                 modified_time = file.last_modified
 
-                if self.sync_cloud.lower_name == "notion":
-                    file_response = await self.sync_cloud.adownload_file(
-                        credentials, file
-                    )
-                else:
-                    file_response = self.sync_cloud.download_file(
-                        credentials, file
-                    )  # Check if the file already exists in the storage
+                file_response = await self.sync_cloud.adownload_file(credentials, file)
                 if check_file_exists(brain_id, file_name):
                     logger.info("%s already exists in the storage", file_name)
 

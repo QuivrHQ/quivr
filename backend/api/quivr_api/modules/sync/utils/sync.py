@@ -153,7 +153,7 @@ class GoogleDriveSync(BaseSync):
     async def adownload_file(
         self, credentials: Dict, file: SyncFile
     ) -> Dict[str, Union[str, BytesIO]]:
-        return {}
+        return self.download_file(credentials, file)
 
     def get_files_by_id(self, credentials: Dict, file_ids: List[str]) -> List[SyncFile]:
         """
@@ -210,7 +210,7 @@ class GoogleDriveSync(BaseSync):
     async def aget_files_by_id(
         self, credentials: Dict, file_ids: List[str]
     ) -> List[SyncFile]:
-        return []
+        return self.get_files_by_id(credentials, file_ids)
 
     def get_files(
         self, credentials: dict, folder_id: str | None = None, recursive: bool = False
@@ -300,7 +300,7 @@ class GoogleDriveSync(BaseSync):
     async def aget_files(
         self, credentials: Dict, folder_id: str | None = None, recursive: bool = False
     ) -> List[SyncFile]:
-        return []
+        return self.get_files(credentials, folder_id, recursive)
 
 
 class AzureDriveSync(BaseSync):
@@ -468,7 +468,7 @@ class AzureDriveSync(BaseSync):
     async def aget_files(
         self, credentials: Dict, folder_id: str | None = None, recursive: bool = False
     ) -> List[SyncFile]:
-        return []
+        return self.get_files(credentials, folder_id, recursive)
 
     def get_files_by_id(self, credentials: dict, file_ids: List[str]) -> List[SyncFile]:
         """
@@ -528,7 +528,7 @@ class AzureDriveSync(BaseSync):
     async def aget_files_by_id(
         self, credentials: Dict, file_ids: List[str]
     ) -> List[SyncFile]:
-        return []
+        return self.get_files_by_id(credentials, file_ids)
 
     def download_file(
         self, credentials: Dict, file: SyncFile
@@ -555,7 +555,7 @@ class AzureDriveSync(BaseSync):
     async def adownload_file(
         self, credentials: Dict, file: SyncFile
     ) -> Dict[str, Union[str, BytesIO]]:
-        return {}
+        return self.download_file(credentials, file)
 
 
 class DropboxSync(BaseSync):
@@ -662,7 +662,7 @@ class DropboxSync(BaseSync):
     async def aget_files(
         self, credentials: Dict, folder_id: str | None = None, recursive: bool = False
     ) -> List[SyncFile]:
-        return []
+        return self.get_files(credentials, folder_id, recursive)
 
     def get_files_by_id(
         self, credentials: Dict[str, str], file_ids: List[str]
@@ -735,7 +735,7 @@ class DropboxSync(BaseSync):
     async def aget_files_by_id(
         self, credentials: Dict, file_ids: List[str]
     ) -> List[SyncFile]:
-        return []
+        return self.get_files_by_id(credentials, file_ids)
 
     def download_file(
         self, credentials: Dict, file: SyncFile
@@ -751,7 +751,7 @@ class DropboxSync(BaseSync):
     async def adownload_file(
         self, credentials: Dict, file: SyncFile
     ) -> Dict[str, Union[str, BytesIO]]:
-        return {"file_name": file.name, "content": BytesIO()}
+        return self.download_file(credentials, file)
 
 
 class NotionSync(BaseSync):
