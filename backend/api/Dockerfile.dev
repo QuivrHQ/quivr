@@ -5,9 +5,20 @@ ARG DEV_MODE
 ENV DEV_MODE=$DEV_MODE
 
 
-RUN apt-get clean && apt-get update && apt-get install -y \
-    curl \
-    git 
+RUN apt-get clean && apt-get update && apt-get install -y curl 
+
+
+RUN ARCHITECTURE=$(uname -m) && \
+    if [ "$ARCHITECTURE" = "x86_64" ]; then \
+    wget https://github.com/supabase/cli/releases/download/v1.163.6/supabase_1.163.6_linux_amd64.deb && \
+    dpkg -i supabase_1.163.6_linux_amd64.deb && \
+    rm supabase_1.163.6_linux_amd64.deb; \
+    elif [ "$ARCHITECTURE" = "aarch64" ]; then \
+    wget https://github.com/supabase/cli/releases/download/v1.163.6/supabase_1.163.6_linux_arm64.deb && \
+    dpkg -i supabase_1.163.6_linux_arm64.deb && \
+    rm supabase_1.163.6_linux_arm64.deb; \
+    fi && \
+    rm -rf /var/lib/apt/lists/*
 
 # TODO(@aminediro) : multistage build. Probably dont neet poetry once its built
 # Install Poetry

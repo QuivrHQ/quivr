@@ -29,6 +29,7 @@ python-dotenv = "*"
 resend = "*"
 unidecode = "*"
 fpdf = "^1.7.2"
+flower = "^2.0.1"
 
 # Monitoring
 colorlog = "*"
@@ -53,7 +54,6 @@ langchain-openai = "*"
 langchain-cohere = "*"
 # This is needed for ITO assistant
 llama-parse = "^0.4.9"
-flower = "^2.0.1"
 
 
 [tool.poetry.group.dev]

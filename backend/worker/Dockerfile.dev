@@ -30,18 +30,6 @@ RUN apt-get clean && apt-get update && apt-get install -y \
     rm -rf /var/lib/apt/lists/*
 
 
-RUN ARCHITECTURE=$(uname -m) && \
-    if [ "$ARCHITECTURE" = "x86_64" ]; then \
-    wget https://github.com/supabase/cli/releases/download/v1.163.6/supabase_1.163.6_linux_amd64.deb && \
-    dpkg -i supabase_1.163.6_linux_amd64.deb && \
-    rm supabase_1.163.6_linux_amd64.deb; \
-    elif [ "$ARCHITECTURE" = "aarch64" ]; then \
-    wget https://github.com/supabase/cli/releases/download/v1.163.6/supabase_1.163.6_linux_arm64.deb && \
-    dpkg -i supabase_1.163.6_linux_arm64.deb && \
-    rm supabase_1.163.6_linux_arm64.deb; \
-    fi && \
-    rm -rf /var/lib/apt/lists/*
-
 RUN curl -sSL https://install.python-poetry.org | POETRY_HOME=/opt/poetry python && \
     cd /usr/local/bin && \
     ln -s /opt/poetry/bin/poetry && \
