@@ -11,7 +11,7 @@ python = "^3.11,<3.13"
 # API Services
 quivr-api = { path = "../api", develop = true }
 quivr-core = { path = "../core", extras = ["all"], develop = true }
-celery = { extras = ["redis", "sqs"], version = "*" }
+celery = { extras = ["redis"], version = "*" }
 
 # Heavy deps
 torch = [
@@ -27,10 +27,10 @@ torchvision = [
     { version = "0.18.1+cpu", source = "pytorch-cpu-src", platform = "win32" },
 ]
 python-dotenv = "^1.0.1"
-
 playwright = "^1.45.1"
 openai = "^1.38.0"
 flower = "^2.0.1"
+
 [tool.poetry.group.dev]
 optional = true
 

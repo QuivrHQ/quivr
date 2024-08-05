@@ -27,7 +27,7 @@ services:
 
   notifier:
     pull_policy: never
-    image: backend-api:latest
+    image: backend-worker:latest
     extra_hosts:
       - "host.docker.internal:host-gateway"
     env_file:
@@ -35,9 +35,8 @@ services:
     container_name: notifier
     volumes:
       - ./backend/:/code/
-    command:
-      - "python"
-      - "/code/worker/quivr_worker/celery_monitor.py"
+    command: >
+      /bin/bash -c "poetry install -q && poetry run python /code/worker/quivr_worker/celery_monitor.py"
     restart: always
     depends_on:
       - redis

@@ -28,7 +28,8 @@ RUN curl -sSL https://install.python-poetry.org | POETRY_HOME=/opt/poetry python
 # Add Rust binaries to the PATH
 ENV PATH="/root/.cargo/bin:${PATH}" \
     POETRY_CACHE_DIR=/tmp/poetry_cache \
-    PYTHONDONTWRITEBYTECODE=1
+    PYTHONDONTWRITEBYTECODE=1 \
+    POETRY_VIRTUALENVS_PATH=/code/api/.venv-docker
 
 WORKDIR /code/api
 
