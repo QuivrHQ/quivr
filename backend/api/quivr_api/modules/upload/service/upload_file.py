@@ -1,10 +1,10 @@
 import os
 from io import BufferedReader, FileIO
 
-from supabase.client import Client
+from supabase.client import AsyncClient, Client
 
 from quivr_api.logger import get_logger
-from quivr_api.models.settings import get_supabase_async_client, get_supabase_client
+from quivr_api.models.settings import get_supabase_client
 
 logger = get_logger(__name__)
 
@@ -42,7 +42,6 @@ def check_file_exists(brain_id: str, file_identifier: str) -> bool:
         # Check if the file exists
         logger.info(f"Checking if file {file_identifier} exists.")
         # This needs to be converted into a file_identifier that is safe for a URL
-
         response = supabase_client.storage.from_("quivr").list(brain_id)
 
         # Check if the file_identifier is in the response
@@ -64,13 +63,11 @@ def check_file_exists(brain_id: str, file_identifier: str) -> bool:
 
 
 async def upload_file_storage(
+    supabase_client: AsyncClient,
     file: FileIO | BufferedReader | bytes,
     file_identifier: str,
     upsert: bool = False,
 ):
-    supabase_client = await get_supabase_async_client()
-    response = None
-
     _, file_extension = os.path.splitext(file_identifier)
     mime_type = mime_types.get(file_extension, "text/html")
 
@@ -95,10 +92,9 @@ async def upload_file_storage(
                     "cache-control": "3600",
                 },
             )
+            return response
         except Exception as e:
             # TODO: Supabase client should return the correct erro
             if "The resource already exists" in str(e) and not upsert:
                 raise FileExistsError("The resource already exists")
             raise e
-
-    return response

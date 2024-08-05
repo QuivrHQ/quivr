@@ -6,6 +6,7 @@ from fastapi import HTTPException, UploadFile
 
 from quivr_api.celery_config import celery
 from quivr_api.logger import get_logger
+from quivr_api.models.settings import get_supabase_async_client
 from quivr_api.modules.brain.entity.brain_entity import RoleEnum
 from quivr_api.modules.brain.service.brain_authorization_service import (
     validate_brain_authorization,
@@ -31,11 +32,12 @@ async def upload_file(
     upload_file: UploadFile,
     brain_id: UUID,
     current_user: UUID,
-    bulk_id: Optional[UUID] = None,
     integration: Optional[str] = None,
     integration_link: Optional[str] = None,
-    notification_id: Optional[UUID] = None,
+    notification_id: Optional[UUID | str] = None,
 ):
+    # TODO(@aminediro): inject from route
+    client = await get_supabase_async_client()
     validate_brain_authorization(
         brain_id, current_user, [RoleEnum.Editor, RoleEnum.Owner]
     )
@@ -47,7 +49,6 @@ async def upload_file(
 
     # TODO: FIX THIS in refacto
     remaining_free_space = user_settings.get("max_brain_size", 1000000000)
-
     maybe_send_telemetry("upload_file", {"file_name": upload_file.filename})
 
     file_size = upload_file.size
@@ -56,15 +57,12 @@ async def upload_file(
         raise HTTPException(status_code=403, detail=message)
 
     file_content = await upload_file.read()
-
     filename_with_brain_id = str(brain_id) + "/" + str(upload_file.filename)
 
     try:
-        upload_file_storage(file_content, filename_with_brain_id)
-
+        await upload_file_storage(client, file_content, filename_with_brain_id)
     except Exception as e:
-        print(e)
-
+        logger.error(e)
         if "The resource already exists" in str(e):
             notification_service.update_notification_by_id(
                 notification_id,

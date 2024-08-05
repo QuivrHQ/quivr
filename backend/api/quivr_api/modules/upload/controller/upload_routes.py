@@ -1,6 +1,6 @@
 import io
 import os
-from typing import Optional
+from typing import Annotated, Optional
 from uuid import UUID
 
 from fastapi import (
@@ -11,10 +11,12 @@ from fastapi import (
     Query,
     UploadFile,
 )
+from supabase.client import AsyncClient
 
 from quivr_api.celery_config import celery
 from quivr_api.logger import get_logger
 from quivr_api.middlewares.auth import AuthBearer, get_current_user
+from quivr_api.models.settings import get_supabase_async_client
 from quivr_api.modules.brain.entity.brain_entity import RoleEnum
 from quivr_api.modules.brain.service.brain_authorization_service import (
     validate_brain_authorization,
@@ -41,10 +43,13 @@ upload_router = APIRouter()
 notification_service = NotificationService()
 knowledge_service = KnowledgeService()
 
+AsyncClientDep = Annotated[AsyncClient, Depends(get_supabase_async_client)]
+
 
 @upload_router.post("/upload", dependencies=[Depends(AuthBearer())], tags=["Upload"])
 async def upload_file(
     uploadFile: UploadFile,
+    client: AsyncClientDep,
     background_tasks: BackgroundTasks,
     bulk_id: Optional[UUID] = Query(None, description="The ID of the bulk upload"),
     brain_id: UUID = Query(..., description="The ID of the brain"),
@@ -91,8 +96,7 @@ async def upload_file(
         # It specifically checks for BufferedReader | bytes before sending
         # TODO: We bypass this to write to S3 Storage directly
         buff_reader = io.BufferedReader(uploadFile.file)  # type: ignore
-
-        await upload_file_storage(buff_reader, filename_with_brain_id)
+        await upload_file_storage(client, buff_reader, filename_with_brain_id)
 
     except FileExistsError:
         notification_service.update_notification_by_id(

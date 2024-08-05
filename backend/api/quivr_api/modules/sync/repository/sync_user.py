@@ -1,4 +1,5 @@
 import json
+from uuid import UUID
 
 from quivr_api.logger import get_logger
 from quivr_api.models.settings import get_supabase_client
@@ -64,7 +65,7 @@ class SyncUser(SyncUserInterface):
         logger.warning("No sync user found for sync_id: %s", sync_id)
         return None
 
-    def get_syncs_user(self, user_id: str, sync_user_id: int = None):
+    def get_syncs_user(self, user_id: UUID, sync_user_id: int | None = None):
         """
         Retrieve sync users from the database.
 
@@ -82,7 +83,7 @@ class SyncUser(SyncUserInterface):
         )
         query = self.db.from_("syncs_user").select("*").eq("user_id", user_id)
         if sync_user_id:
-            query = query.eq("id", sync_user_id)
+            query = query.eq("id", str(sync_user_id))
         response = query.execute()
         if response.data:
             logger.info("Sync users retrieved successfully: %s", response.data)

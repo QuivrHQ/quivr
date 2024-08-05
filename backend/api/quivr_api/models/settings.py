@@ -30,9 +30,9 @@ class SendEmailSettings(BaseSettings):
 # The `PostHogSettings` class is used to initialize and interact with the PostHog analytics service.
 class PostHogSettings(BaseSettings):
     model_config = SettingsConfigDict(validate_default=False)
-    posthog_api_key: str = None
-    posthog_api_url: str = None
-    posthog: Posthog = None
+    posthog_api_key: str | None = None
+    posthog_api_url: str = | None None
+    posthog: Posthog  | None= None
 
     def __init__(self, *args, **kwargs):
         """

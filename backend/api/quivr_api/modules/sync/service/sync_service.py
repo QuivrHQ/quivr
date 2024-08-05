@@ -1,4 +1,5 @@
 from typing import List
+from uuid import UUID
 
 from quivr_api.logger import get_logger
 from quivr_api.modules.sync.dto.inputs import (
@@ -22,7 +23,7 @@ class SyncUserService:
     def __init__(self):
         self.repository = SyncUser()
 
-    def get_syncs_user(self, user_id: str, sync_user_id: int = None):
+    def get_syncs_user(self, user_id: UUID, sync_user_id: int | None = None):
         return self.repository.get_syncs_user(user_id, sync_user_id)
 
     def create_sync_user(self, sync_user_input: SyncsUserInput):
@@ -67,11 +68,11 @@ class SyncService:
         return self.repository.get_syncs_active(user_id)
 
     def update_sync_active(
-        self, sync_id: str, sync_active_input: SyncsActiveUpdateInput
+        self, sync_id: int, sync_active_input: SyncsActiveUpdateInput
     ):
         return self.repository.update_sync_active(sync_id, sync_active_input)
 
-    def delete_sync_active(self, sync_active_id: str, user_id: str):
+    def delete_sync_active(self, sync_active_id: int, user_id: UUID):
         return self.repository.delete_sync_active(sync_active_id, user_id)
 
     async def get_syncs_active_in_interval(self) -> List[SyncsActive]:

@@ -10,7 +10,7 @@ from quivr_api.modules.sync.dto.inputs import (
     SyncsUserInput,
     SyncUserUpdateInput,
 )
-from quivr_api.modules.sync.entity.sync import SyncsActive, SyncsFiles
+from quivr_api.modules.sync.entity.sync import DBSyncFile, SyncsActive
 
 
 class SyncUserInterface(ABC):
@@ -55,7 +55,6 @@ class SyncUserInterface(ABC):
 
 
 class SyncInterface(ABC):
-
     @abstractmethod
     def create_sync_active(
         self,
@@ -89,11 +88,11 @@ class SyncInterface(ABC):
 
 class SyncFileInterface(ABC):
     @abstractmethod
-    def create_sync_file(self, sync_file_input: SyncFileInput) -> SyncsFiles:
+    def create_sync_file(self, sync_file_input: SyncFileInput) -> DBSyncFile:
         pass
 
     @abstractmethod
-    def get_sync_files(self, sync_active_id: int) -> list[SyncsFiles]:
+    def get_sync_files(self, sync_active_id: int) -> list[DBSyncFile]:
         pass
 
     @abstractmethod

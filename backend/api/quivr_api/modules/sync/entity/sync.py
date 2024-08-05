@@ -1,5 +1,6 @@
 from datetime import datetime
 from typing import Optional
+from uuid import UUID
 
 from pydantic import BaseModel
 
@@ -15,8 +16,8 @@ class SyncsUser(BaseModel):
 
 
 class SyncFile(BaseModel):
-    name: str
     id: str
+    name: str
     is_folder: bool
     last_modified: str
     mime_type: str
@@ -28,7 +29,7 @@ class SyncsActive(BaseModel):
     id: int
     name: str
     syncs_user_id: int
-    user_id: str
+    user_id: UUID
     settings: dict
     last_synced: datetime
     sync_interval_minutes: int
@@ -37,7 +38,7 @@ class SyncsActive(BaseModel):
     notification_id: Optional[str] = None
 
 
-class SyncsFiles(BaseModel):
+class DBSyncFile(BaseModel):
     id: int
     path: str
     syncs_active_id: int

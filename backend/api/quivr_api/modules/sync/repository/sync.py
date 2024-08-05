@@ -1,5 +1,6 @@
 from datetime import datetime, timedelta
 from typing import List
+from uuid import UUID
 
 from quivr_api.logger import get_logger
 from quivr_api.models.settings import get_supabase_client
@@ -108,7 +109,7 @@ class Sync(SyncInterface):
         logger.warning("Failed to update active sync with sync_id: %s", sync_id)
         return None
 
-    def delete_sync_active(self, sync_active_id: int, user_id: str):
+    def delete_sync_active(self, sync_active_id: int, user_id: UUID):
         """
         Delete an active sync from the database.
 
@@ -128,7 +129,7 @@ class Sync(SyncInterface):
             self.db.from_("syncs_active")
             .delete()
             .eq("id", sync_active_id)
-            .eq("user_id", user_id)
+            .eq("user_id", str(user_id))
             .execute()
         )
         if response.data:
