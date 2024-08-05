@@ -2,14 +2,16 @@ import os
 
 import pytest
 from langchain_core.language_models import FakeListChatModel
-from langchain_openai import ChatOpenAI
 from pydantic.v1.error_wrappers import ValidationError
 
 from quivr_core.config import LLMEndpointConfig
 from quivr_core.llm import LLMEndpoint
 
 
+@pytest.mark.base
 def test_llm_endpoint_from_config_default():
+    from langchain_openai import ChatOpenAI
+
     del os.environ["OPENAI_API_KEY"]
 
     with pytest.raises(ValidationError):
@@ -24,7 +26,10 @@ def test_llm_endpoint_from_config_default():
     assert llm._llm.model_name in llm.get_config().model
 
 
+@pytest.mark.base
 def test_llm_endpoint_from_config():
+    from langchain_openai import ChatOpenAI
+
     config = LLMEndpointConfig(
         model="llama2", llm_api_key="test", llm_base_url="http://localhost:8441"
     )

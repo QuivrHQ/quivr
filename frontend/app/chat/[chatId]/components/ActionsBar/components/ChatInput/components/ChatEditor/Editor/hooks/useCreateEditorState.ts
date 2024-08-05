@@ -16,7 +16,7 @@ export const useCreateEditorState = (placeholder?: string) => {
   const { BrainMention, items } = useBrainMention();
   const { remainingCredits } = useUserSettingsContext();
 
-  const PreventEnter = Extension.create({
+  const PreventNewline = Extension.create({
     addKeyboardShortcuts: () => {
       return {
         Enter: () => true,
@@ -35,7 +35,7 @@ export const useCreateEditorState = (placeholder?: string) => {
         preserveWhitespace: "full",
       },
       extensions: [
-        PreventEnter,
+        PreventNewline,
         Placeholder.configure({
           showOnlyWhenEditable: true,
           placeholder: placeholder ?? t("actions_bar_placeholder"),

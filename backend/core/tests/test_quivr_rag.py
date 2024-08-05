@@ -21,6 +21,7 @@ def mock_chain_qa_stream(monkeypatch, chunks_stream_answer):
     monkeypatch.setattr(QuivrQARAG, "build_chain", mock_qa_chain)
 
 
+@pytest.mark.base
 @pytest.mark.asyncio
 async def test_quivrqarag(
     mem_vector_store, full_response, mock_chain_qa_stream, openai_api_key
