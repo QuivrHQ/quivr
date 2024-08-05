@@ -136,7 +136,7 @@ class ChatLLM:
                     chunk_id += 1
         # Last chunk provides metadata
         last_chunk = ParsedRAGChunkResponse(
-            answer="",
+            answer=rolling_message.content,
             metadata=get_chunk_metadata(rolling_message),
             last_chunk=True,
         )

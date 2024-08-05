@@ -104,6 +104,10 @@ class ChatLLMService:
         return model_to_use
 
     def save_answer(self, question: str, answer: ParsedRAGResponse):
+        logger.info(
+            f"Saving answer for chat {self.chat_id} with model {self.model_to_use.name}"
+        )
+        logger.info(answer)
         return self.chat_service.update_chat_history(
             CreateChatHistory(
                 **{
@@ -111,7 +115,6 @@ class ChatLLMService:
                     "user_message": question,
                     "assistant": answer.answer,
                     "brain_id": None,
-                    # TODO: prompt_id should always be not None
                     "prompt_id": None,
                     "metadata": answer.metadata.model_dump() if answer.metadata else {},
                 }
@@ -191,10 +194,12 @@ class ChatLLMService:
                 )
                 full_answer += response.answer
                 yield f"data: {streamed_chat_history.model_dump_json()}"
+            if response.last_chunk and full_answer == "":
+                full_answer += response.answer
 
         # For last chunk  parse the sources, and the full answer
         streamed_chat_history = GetChatHistoryOutput(
-            assistant=response.answer,
+            assistant=full_answer,
             metadata=response.metadata.model_dump(),
             **message_metadata,
         )
