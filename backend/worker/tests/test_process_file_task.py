@@ -7,6 +7,7 @@ from quivr_api.modules.brain.entity.brain_entity import BrainEntity, BrainType
 from quivr_core.files.file import FileExtension
 
 from quivr_worker.files import build_file
+from quivr_worker.parsers.crawler import URL, slugify
 from quivr_worker.process.process_file import parse_file
 
 
@@ -21,6 +22,23 @@ def test_build_file():
         assert file.file_name == "test_file.txt"
         assert file.id == knowledge_id
         assert file.file_extension == FileExtension.txt
+
+
+def test_build_url():
+    random_bytes = os.urandom(128)
+    crawl_website = URL(url="http://url.url")
+    file_name = slugify(crawl_website.url) + ".txt"
+    knowledge_id = uuid4()
+
+    with build_file(
+        random_bytes,
+        knowledge_id,
+        file_name=file_name,
+        original_file_name=crawl_website.url,
+    ) as file:
+        qfile = file.to_qfile(brain_id=uuid4())
+        assert qfile.metadata["original_file_name"] == crawl_website.url
+        assert qfile.metadata["file_name"] == file_name
 
 
 @pytest.mark.asyncio

@@ -17,6 +17,7 @@ def file_instance(tmp_path) -> File:
         file_sha1="124",
         file_extension=".txt",
         file_name=temp_file.name,
+        original_file_name=temp_file.name,
         file_size=len(data),
         tmp_file_path=temp_file.absolute(),
     )
@@ -33,6 +34,7 @@ def audio_file(tmp_path) -> File:
         file_sha1="124",
         file_extension=".mp4",
         file_name=temp_file.name,
+        original_file_name="data.mp4",
         file_size=len(data),
         tmp_file_path=temp_file.absolute(),
     )

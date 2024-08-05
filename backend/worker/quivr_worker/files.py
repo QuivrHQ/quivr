@@ -24,6 +24,7 @@ def build_file(
     file_data: bytes,
     knowledge_id: UUID,
     file_name: str,
+    original_file_name: str | None = None,
 ):
     try:
         # FIXME: @chloedia @AmineDiro
@@ -45,6 +46,9 @@ def build_file(
         file_instance = File(
             knowledge_id=knowledge_id,
             file_name=base_file_name,
+            original_file_name=(
+                original_file_name if original_file_name else base_file_name
+            ),
             tmp_file_path=Path(tmp_file.name),
             file_size=len(file_data),
             file_extension=file_extension,
@@ -64,6 +68,7 @@ class File:
         "file_size",
         "file_extension",
         "file_sha1",
+        "original_file_name",
     ]
 
     def __init__(
@@ -74,6 +79,7 @@ class File:
         file_size: int,
         file_extension: str,
         file_sha1: str,
+        original_file_name: str,
     ):
         self.id = knowledge_id
         self.file_name = file_name
@@ -81,11 +87,12 @@ class File:
         self.file_size = file_size
         self.file_sha1 = file_sha1
         self.file_extension = FileExtension(file_extension)
+        self.original_file_name = original_file_name
 
     def is_empty(self):
         return self.file_size < 1  # pyright: ignore reportPrivateUsage=none
 
-    def to_qfile(self, brain_id: UUID, metadata: dict[str, Any]) -> QuivrFile:
+    def to_qfile(self, brain_id: UUID, metadata: dict[str, Any] = {}) -> QuivrFile:
         return QuivrFile(
             id=self.id,
             original_filename=self.file_name,
@@ -96,7 +103,8 @@ class File:
             file_size=self.file_size,
             metadata={
                 "date": time.strftime("%Y%m%d"),
-                "original_file_name": self.file_name,
+                "file_name": self.file_name,
+                "original_file_name": self.original_file_name,
                 "knowledge_id": self.id,
                 **metadata,
             },

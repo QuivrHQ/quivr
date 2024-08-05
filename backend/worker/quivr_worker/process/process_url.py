@@ -7,9 +7,7 @@ from quivr_api.modules.brain.service.brain_vector_service import BrainVectorServ
 
 from quivr_worker.files import build_file
 from quivr_worker.parsers.crawler import URL, extract_from_url, slugify
-from quivr_worker.process.process_file import (
-    process_file,
-)
+from quivr_worker.process.process_file import process_file
 
 logger = get_logger("celery_worker")
 
@@ -23,7 +21,6 @@ async def process_url_func(
     document_vector_store: VectorStore,
 ):
     crawl_website = URL(url=url)
-
     extracted_content = extract_from_url(crawl_website)
     extracted_content_bytes = extracted_content.encode("utf-8")
     file_name = slugify(crawl_website.url) + ".txt"
