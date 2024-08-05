@@ -30,7 +30,6 @@ class ChatLLM:
         """
         Filter out the chat history to only include the messages that are relevant to the current question
 
-        Takes in a chat_history= [HumanMessage(content='Qui est Chloé ? '), AIMessage(content="Chloé est une salariée travaillant pour l'entreprise Quivr en tant qu'AI Engineer, sous la direction de son supérieur hiérarchique, Stanislas Girard."), HumanMessage(content='Dis moi en plus sur elle'), AIMessage(content=''), HumanMessage(content='Dis moi en plus sur elle'), AIMessage(content="Désolé, je n'ai pas d'autres informations sur Chloé à partir des fichiers fournis.")]
         Returns a filtered chat_history with in priority: first max_tokens, then max_history where a Human message and an AI message count as one pair
         a token is 4 characters
         """
