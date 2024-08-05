@@ -33,12 +33,9 @@ ENV PATH="/root/.cargo/bin:${PATH}" \
     POETRY_VIRTUALENVS_PATH=/code/api/.venv-docker
 
 WORKDIR /code/api
-COPY api/pyproject.toml  api/poetry.lock api/README.md /code/api/
-COPY api/quivr_api /code/api/quivr_api
+COPY . /code/
 
-# Run install
-# Run install
-RUN poetry install --no-directory --no-root --with dev && rm -rf $POETRY_CACHE_DIR
+RUN poetry install  && rm -rf $POETRY_CACHE_DIR
 
 ENV PYTHONPATH=/code/api
 

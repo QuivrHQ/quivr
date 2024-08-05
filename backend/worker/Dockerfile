@@ -3,6 +3,7 @@ FROM python:3.11.6-slim-bullseye AS BUILDER
 ARG DEV_MODE
 ENV DEV_MODE=$DEV_MODE
 
+# Install GEOS library, Rust, and other dependencies, then clean up
 RUN apt-get clean && apt-get update && apt-get install -y \
     libgeos-dev \
     libcurl4-openssl-dev \
@@ -39,22 +40,12 @@ ENV PATH="/root/.cargo/bin:${PATH}" \
     PYTHONDONTWRITEBYTECODE=1 \
     POETRY_VIRTUALENVS_PATH=/code/worker/.venv-docker
 
-ENV PYTHONPATH=/code/worker
-
-# Copy monorepo dependencies
-# CORE
-# COPY core/pyproject.toml core/README.md core/poetry.lock  /code/core/
-# COPY core/quivr_core /code/core/quivr_core
-# # API
-# COPY api/pyproject.toml  api/poetry.lock api/README.md /code/api/
-# COPY api/quivr_api /code/api/quivr_api
-
-# WORKER
-COPY worker/pyproject.toml worker/poetry.lock* /code/worker/
+COPY . /code/
 
 # Cache playwright dependency
 RUN poetry run pip install playwright && playwright install --with-deps
 
 # Run install
-RUN poetry install --no-directory --no-root --with dev,test && \
-    rm -rf $POETRY_CACHE_DIR
+RUN poetry install  && rm -rf $POETRY_CACHE_DIR
+
+ENV PYTHONPATH=/code/worker
