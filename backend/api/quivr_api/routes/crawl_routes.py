@@ -6,6 +6,7 @@ from fastapi import APIRouter, Depends, Query
 from quivr_api.celery_config import celery
 from quivr_api.logger import get_logger
 from quivr_api.middlewares.auth import AuthBearer, get_current_user
+from quivr_api.models.crawler import CrawlWebsite
 from quivr_api.modules.brain.entity.brain_entity import RoleEnum
 from quivr_api.modules.brain.service.brain_authorization_service import (
     validate_brain_authorization,
@@ -35,7 +36,7 @@ async def healthz():
 
 @crawl_router.post("/crawl", dependencies=[Depends(AuthBearer())], tags=["Crawl"])
 async def crawl_endpoint(
-    url: str,
+    crawl_website: CrawlWebsite,
     bulk_id: Optional[UUID] = Query(None, description="The ID of the bulk upload"),
     brain_id: UUID = Query(..., description="The ID of the brain"),
     chat_id: Optional[UUID] = Query(None, description="The ID of the chat"),
@@ -69,14 +70,14 @@ async def crawl_endpoint(
                 user_id=current_user.id,
                 bulk_id=bulk_id,
                 status=NotificationsStatusEnum.INFO,
-                title=f"{url}",
+                title=f"{crawl_website.url}",
                 category="crawl",
                 brain_id=str(brain_id),
             )
         )
         knowledge_to_add = CreateKnowledgeProperties(
             brain_id=brain_id,
-            url=url,
+            url=crawl_website.url,
             extension="html",
         )
 
@@ -86,7 +87,7 @@ async def crawl_endpoint(
         celery.send_task(
             "process_crawl_task",
             kwargs={
-                "crawl_website_url": url,
+                "crawl_website_url": crawl_website.url,
                 "brain_id": brain_id,
                 "knowledge_id": added_knowledge.id,
                 "notification_id": upload_notification.id,
