@@ -38,7 +38,7 @@ WORKDIR /code/worker
 ENV PATH="/root/.cargo/bin:${PATH}" \
     POETRY_CACHE_DIR=/tmp/poetry_cache \
     PYTHONDONTWRITEBYTECODE=1 \
-    POETRY_VIRTUALENVS_PATH=/code/api/.venv-docker
+    POETRY_VIRTUALENVS_PATH=/code/worker/.venv-docker
 
 ENV PYTHONPATH=/code/worker
 
