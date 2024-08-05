@@ -13,6 +13,7 @@ from quivr_api.modules.sync.dto.inputs import (SyncsActiveInput,
                                                SyncsActiveUpdateInput)
 from quivr_api.modules.sync.entity.sync import NotionSyncFile, SyncsActive
 from quivr_api.modules.sync.repository.sync_interfaces import SyncInterface
+from sqlalchemy import or_
 from sqlalchemy.exc import IntegrityError
 from sqlmodel import select
 from sqlmodel.ext.asyncio.session import AsyncSession
@@ -233,8 +234,9 @@ class NotionRepository(BaseRepository):
 
     async def update_notion_file(
         self, updated_notion_file: NotionSyncFile
-    ) -> NotionSyncFile:
+    ) -> bool:
         try:
+            is_update = False
             query = select(NotionSyncFile).where(
                 NotionSyncFile.notion_id == updated_notion_file.notion_id
             )
@@ -246,6 +248,7 @@ class NotionRepository(BaseRepository):
                 existing_page.name = updated_notion_file.name
                 existing_page.last_modified = updated_notion_file.last_modified
                 self.session.add(existing_page)
+                is_update = True
             else:
                 # Add new page
                 self.session.add(updated_notion_file)
@@ -257,7 +260,7 @@ class NotionRepository(BaseRepository):
             await self.session.refresh(refreshed_file)
 
             logger.info(f"Updated notion file in notion repo: {refreshed_file}")
-            return refreshed_file
+            return is_update
 
         except IntegrityError as ie:
             logger.error(f"IntegrityError occurred: {ie}")
@@ -290,7 +293,7 @@ class NotionRepository(BaseRepository):
         response = await self.session.exec(query)
         return response.first() is not None
 
-    async def delete_notion_file(self, notion_id: str):
+    async def delete_notion_page(self, notion_id: str):
         query = select(NotionSyncFile).where(NotionSyncFile.notion_id == notion_id)
         response = await self.session.exec(query)
         notion_file = response.first()
@@ -301,7 +304,12 @@ class NotionRepository(BaseRepository):
         return None
     
     async def delete_notion_pages(self, notion_ids: List[str]):
-        query = select(NotionSyncFile).where(NotionSyncFile.notion_id.in_(notion_ids))
+        query = select(NotionSyncFile).where(
+            or_(
+                NotionSyncFile.notion_id.in_(notion_ids),
+                NotionSyncFile.parent_id.in_(notion_ids)
+            )
+        )
         response = await self.session.exec(query)
         notion_files = response.all()
         if notion_files:

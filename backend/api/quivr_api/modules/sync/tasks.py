@@ -1,34 +1,27 @@
 import asyncio
 import os
-import uuid
+from uuid import UUID
 
 from celery.signals import worker_process_init
 from notion_client import Client
-from sqlalchemy.ext.asyncio import AsyncEngine, create_async_engine
-from sqlmodel.ext.asyncio.session import AsyncSession
-
 from quivr_api.celery_config import celery
 from quivr_api.logger import get_logger
 from quivr_api.models.settings import settings
 from quivr_api.modules.knowledge.repository.storage import Storage
-from quivr_api.modules.notification.service.notification_service import (
-    NotificationService,
-)
+from quivr_api.modules.notification.service.notification_service import \
+    NotificationService
 from quivr_api.modules.sync.repository.sync import NotionRepository
 from quivr_api.modules.sync.repository.sync_files import SyncFiles
-from quivr_api.modules.sync.service.sync_notion import (
-    SyncNotionService,
-    fetch_notion_pages,
-    update_notion_pages,
-)
-from quivr_api.modules.sync.service.sync_service import SyncService, SyncUserService
-from quivr_api.modules.sync.utils.sync import (
-    AzureDriveSync,
-    DropboxSync,
-    GoogleDriveSync,
-    NotionSync,
-)
+from quivr_api.modules.sync.service.sync_notion import (SyncNotionService,
+                                                        fetch_notion_pages,
+                                                        update_notion_pages)
+from quivr_api.modules.sync.service.sync_service import (SyncService,
+                                                         SyncUserService)
+from quivr_api.modules.sync.utils.sync import (AzureDriveSync, DropboxSync,
+                                               GoogleDriveSync, NotionSync)
 from quivr_api.modules.sync.utils.syncutils import SyncUtils
+from sqlalchemy.ext.asyncio import AsyncEngine, create_async_engine
+from sqlmodel.ext.asyncio.session import AsyncSession
 
 notification_service = NotificationService()
 celery_inspector = celery.control.inspect()
@@ -170,8 +163,12 @@ async def _process_notion_sync():
         user_id = notion_sync["user_id"]
         notion_client = Client(auth=notion_sync["credentials"]["access_token"])
 
-        all_search_result = fetch_notion_pages(notion_client)
-        all_db_pages = await notion_service.get_all_notion_files()
+        pages_to_update = fetch_notion_pages(notion_client, notion_sync = notion_sync)
+        logger.debug(f"Number of pages to update: %s", len(pages_to_update))
+        if not pages_to_update:
+            logger.info("No pages to update")
+            continue
+
         await update_notion_pages(
-            all_search_result, all_db_pages, notion_service, uuid.UUID(user_id)
+            notion_service, pages_to_update, UUID(user_id), notion_client #type: ignore
         )
