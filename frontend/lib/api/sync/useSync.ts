@@ -10,7 +10,6 @@ import {
   getUserSyncs,
   syncDropbox,
   syncFiles,
-  syncGitHub,
   syncGoogleDrive,
   syncSharepoint,
   updateActiveSync
@@ -54,7 +53,6 @@ export const useSync = () => {
       syncGoogleDrive(name, axiosInstance),
     syncSharepoint: async (name: string) => syncSharepoint(name, axiosInstance),
     syncDropbox: async (name: string) => syncDropbox(name, axiosInstance),
-    syncGitHub: async (name: string) => syncGitHub(name, axiosInstance),
     getUserSyncs: async () => getUserSyncs(axiosInstance),
     getSyncFiles: async (userSyncId: number, folderId?: string) =>
       getSyncFiles(axiosInstance, userSyncId, folderId),
