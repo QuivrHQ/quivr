@@ -2,15 +2,14 @@ from abc import ABC, abstractmethod
 from typing import Any, List, Literal
 from uuid import UUID
 
-from quivr_api.modules.sync.dto.inputs import (
-    SyncFileInput,
-    SyncFileUpdateInput,
-    SyncsActiveInput,
-    SyncsActiveUpdateInput,
-    SyncsUserInput,
-    SyncUserUpdateInput,
-)
-from quivr_api.modules.sync.entity.sync import SyncFile, SyncsActive, SyncsFiles
+from quivr_api.modules.sync.dto.inputs import (SyncFileInput,
+                                               SyncFileUpdateInput,
+                                               SyncsActiveInput,
+                                               SyncsActiveUpdateInput,
+                                               SyncsUserInput,
+                                               SyncUserUpdateInput)
+from quivr_api.modules.sync.entity.sync import (SyncFile, SyncsActive,
+                                                SyncsFiles)
 
 
 class SyncUserInterface(ABC):
@@ -49,7 +48,7 @@ class SyncUserInterface(ABC):
         sync_active_id: int,
         user_id: str,
         notion_service: Any = None,
-        folder_id: str | None = None,
+        folder_id: int | str | None = None,
         recursive: bool = False,
     ) -> None | dict[str, List[SyncFile]] | Literal["No sync found"]:
         pass

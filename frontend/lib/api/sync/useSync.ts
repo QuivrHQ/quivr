@@ -13,7 +13,7 @@ import {
   syncGoogleDrive,
   syncNotion,
   syncSharepoint,
-  updateActiveSync,
+  updateActiveSync
 } from "./sync";
 import { Integration, OpenedConnection, Provider } from "./types";
 
@@ -30,6 +30,8 @@ export const useSync = () => {
       "https://quivr-cms.s3.eu-west-3.amazonaws.com/dropbox_dce4f3d753.png",
     Notion:
       "https://quivr-cms.s3.eu-west-3.amazonaws.com/Notion_app_logo_004168672c.png",
+    GitHub:
+      "https://quivr-cms.s3.eu-west-3.amazonaws.com/dropbox_dce4f3d753.png",
   };
 
   const integrationIconUrls: Record<Integration, string> = {
@@ -41,6 +43,8 @@ export const useSync = () => {
       "https://quivr-cms.s3.eu-west-3.amazonaws.com/dropbox_dce4f3d753.png",
     Notion:
       "https://quivr-cms.s3.eu-west-3.amazonaws.com/Notion_app_logo_004168672c.png",
+    GitHub:
+      "https://quivr-cms.s3.eu-west-3.amazonaws.com/dropbox_dce4f3d753.png",
   };
 
   const getActiveSyncsForBrain = async (brainId: string) => {

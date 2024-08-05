@@ -18,7 +18,8 @@ from quivr_api.modules.sync.service.sync_notion import (SyncNotionService,
 from quivr_api.modules.sync.service.sync_service import (SyncService,
                                                          SyncUserService)
 from quivr_api.modules.sync.utils.sync import (AzureDriveSync, DropboxSync,
-                                               GoogleDriveSync, NotionSync)
+                                               GitHubSync, GoogleDriveSync,
+                                               NotionSync)
 from quivr_api.modules.sync.utils.syncutils import SyncUtils
 from sqlalchemy.ext.asyncio import AsyncEngine, create_async_engine
 from sqlmodel.ext.asyncio.session import AsyncSession
@@ -86,9 +87,19 @@ async def _process_sync_active():
             storage=storage,
             sync_cloud=DropboxSync(),
         )
+        github_sync_utils = SyncUtils(
+            sync_user_service=sync_user_service,
+            sync_active_service=sync_active_service,
+            sync_files_repo=sync_files_repo_service,
+            storage=storage,
+            sync_cloud=GitHubSync(),
+        )
+
+        active = await sync_active_service.get_syncs_active_in_interval()
 
         notion_repository = NotionRepository(session)
         notion_service = SyncNotionService(notion_repository)
+        
         notion_sync_utils = SyncUtils(
             sync_user_service=sync_user_service,
             sync_active_service=sync_active_service,
@@ -121,6 +132,10 @@ async def _process_sync_active():
                         sync_active_id=sync.id,
                         user_id=sync.user_id,
                         notion_service=notion_service,
+                    )
+                elif details_user_sync["provider"].lower() == "github":
+                    await github_sync_utils.sync(
+                        sync_active_id=sync.id, user_id=sync.user_id
                     )
                 else:
                     logger.info(
