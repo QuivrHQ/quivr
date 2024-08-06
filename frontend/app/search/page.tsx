@@ -110,7 +110,6 @@ const Search = (): JSX.Element => {
   useEffect(() => {
     void (async () => {
       try {
-        console.info("prout");
         const res = await getModels();
         console.info(res);
       } catch (error) {
