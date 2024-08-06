@@ -47,7 +47,11 @@
     display: flex;
     position: relative;
     gap: Spacings.$spacing02;
-    font-size: Typography.$small;
+
+    .label {
+      font-size: Typography.$tiny;
+      font-weight: 500;
+    }
 
     .label_badge {
       border-radius: Radius.$circle;
