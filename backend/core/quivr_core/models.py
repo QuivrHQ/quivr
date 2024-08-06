@@ -31,7 +31,7 @@ class cited_answer(BaseModelV1):
 class ChatMessage(BaseModelV1):
     chat_id: UUID
     message_id: UUID
-    brain_id: UUID
+    brain_id: UUID | None
     msg: AIMessage | HumanMessage
     message_time: datetime
     metadata: dict[str, Any]
@@ -55,10 +55,18 @@ class RawRAGResponse(TypedDict):
     docs: dict[str, Any]
 
 
+class ChatLLMMetadata(BaseModel):
+    name: str
+    display_name: str | None = None
+    description: str | None = None
+    image_url: str | None = None
+
+
 class RAGResponseMetadata(BaseModel):
     citations: list[int] | None = None
     followup_questions: list[str] | None = None
     sources: list[Any] | None = None
+    metadata_model: ChatLLMMetadata | None = None
 
 
 class ParsedRAGResponse(BaseModel):
