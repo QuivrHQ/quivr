@@ -4,6 +4,7 @@ from typing import Any, List, Tuple, no_type_check
 from langchain_core.messages import AIMessage, BaseMessage, HumanMessage, SystemMessage
 from langchain_core.messages.ai import AIMessageChunk
 from langchain_core.prompts import format_document
+
 from quivr_core.models import (
     ParsedRAGResponse,
     QuivrKnowledge,
@@ -31,6 +32,7 @@ def model_supports_function_calling(model_name: str):
         "gpt-3.5-turbo",
         "gpt-4-turbo",
         "gpt-4o",
+        "gpt-4o-mini",
     ]
     return model_name in models_supporting_function_calls
 
@@ -113,7 +115,8 @@ def parse_response(raw_response: RawRAGResponse, model_name: str) -> ParsedRAGRe
     answer = raw_response["answer"].content
     sources = raw_response["docs"] or []
 
-    metadata = {"sources": sources}
+    metadata = {"sources": sources, "model_name":model_name}
+    metadata["model_name"] = model_name
 
     if model_supports_function_calling(model_name):
         if raw_response["answer"].tool_calls:
