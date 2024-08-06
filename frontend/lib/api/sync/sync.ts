@@ -48,6 +48,7 @@ export const syncDropbox = async (
   ).data;
 };
 
+
 export const getUserSyncs = async (
   axiosInstance: AxiosInstance
 ): Promise<Sync[]> => {

@@ -5,6 +5,9 @@ FROM python:3.11.6-slim-bullseye
 RUN apt-get clean && apt-get update && apt-get install -y \
     curl \
     gcc \
+    autoconf \
+    automake \
+    build-essential \
     # Additional dependencies for document handling
     libmagic-dev \
     tesseract-ocr \
@@ -28,7 +31,10 @@ ENV PATH="/root/.local/bin:$PATH"
 # Copy the current directory contents into the container at /app
 COPY ./pyproject.toml ./poetry.lock* /code/
 
+RUN python3 -m pip install nltk && python3 -c "import nltk; nltk.download('punkt')" \
+    && python3 -c "import nltk; nltk.download('averaged_perceptron_tagger')"
+
 # Install project dependencies
-RUN poetry install --no-root --with test
+RUN poetry install  --with test
 
 ENV PYTHONPATH=/code
