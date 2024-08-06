@@ -115,7 +115,7 @@ def parse_response(raw_response: RawRAGResponse, model_name: str) -> ParsedRAGRe
     answer = raw_response["answer"].content
     sources = raw_response["docs"] or []
 
-    metadata = {"sources": sources}
+    metadata = {"sources": sources, "model_name":model_name}
     metadata["model_name"] = model_name
 
     if model_supports_function_calling(model_name):
