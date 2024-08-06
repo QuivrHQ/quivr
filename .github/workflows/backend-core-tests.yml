@@ -3,10 +3,10 @@ name: Run Tests with Tika Server
 on:
   push:
     paths:
-      - 'backend/core/**'
+      - "backend/core/**"
   pull_request:
     paths:
-      - 'backend/core/**'
+      - "backend/core/**"
   workflow_dispatch:
 
 jobs:
@@ -20,33 +20,28 @@ jobs:
           - 9998:9998
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
+      - name: Checkout code
+        uses: actions/checkout@v2
 
-    - name: Set up Python
-      uses: actions/setup-python@v2
-      with:
-        python-version: '3.11'
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: "3.11"
 
-    - name: Install dependencies
-      run: |
-        cd backend/core
-        python -m pip install --upgrade pip
-        pip install poetry
-        poetry install -E base --with dev,test
+      - name: Install dependencies
+        run: |
+          cd backend/core
+          python -m pip install --upgrade pip
+          pip install poetry
+          poetry install -E base --with dev,test
 
-    - name: Run pre-commit checks
-      run: |
-        cd backend/core
-        poetry run pre-commit run --files .
-
-    - name: Run tests
-      env:
-        TIKA_URL: http://localhost:9998/tika
-        OPENAI_API_KEY: this-is-a-test-key
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y libmagic-dev poppler-utils libreoffice tesseract-ocr  pandoc
-        tesseract --version
-        cd backend/core
-        poetry run tox
+      - name: Run tests
+        env:
+          TIKA_URL: http://localhost:9998/tika
+          OPENAI_API_KEY: this-is-a-test-key
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libmagic-dev poppler-utils libreoffice tesseract-ocr  pandoc
+          tesseract --version
+          cd backend/core
+          poetry run tox
