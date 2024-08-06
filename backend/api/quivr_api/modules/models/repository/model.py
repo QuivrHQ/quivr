@@ -1,10 +1,11 @@
 from typing import Sequence
 
+from sqlmodel import select
+from sqlmodel.ext.asyncio.session import AsyncSession
+
 from quivr_api.models.settings import get_supabase_client
 from quivr_api.modules.dependencies import BaseRepository
 from quivr_api.modules.models.entity.model import Model
-from sqlmodel import select
-from sqlmodel.ext.asyncio.session import AsyncSession
 
 
 class ModelRepository(BaseRepository):
@@ -17,3 +18,8 @@ class ModelRepository(BaseRepository):
         query = select(Model)
         response = await self.session.exec(query)
         return response.all()
+
+    async def get_model(self, model_name: str) -> Model:
+        query = select(Model).where(Model.name == model_name)
+        response = await self.session.exec(query)
+        return response.first()

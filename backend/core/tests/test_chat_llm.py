@@ -1,6 +1,6 @@
 import pytest
+
 from quivr_core import ChatLLM
-from quivr_core.chat_llm import ChatLLM
 
 
 @pytest.mark.base
@@ -15,3 +15,5 @@ def test_chat_llm(fake_llm):
     assert answer.metadata.citations is None
     assert answer.metadata.followup_questions is None
     assert answer.metadata.sources == []
+    assert answer.metadata.metadata_model is not None
+    assert answer.metadata.metadata_model.name is not None

@@ -10,3 +10,10 @@ class ModelsInterface(ABC):
         Get all models
         """
         pass
+
+    @abstractmethod
+    def get_model(self, model_name: str) -> Model:
+        """
+        Get a model by name
+        """
+        pass

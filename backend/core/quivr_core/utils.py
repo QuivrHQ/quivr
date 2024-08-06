@@ -6,6 +6,7 @@ from langchain_core.messages.ai import AIMessageChunk
 from langchain_core.prompts import format_document
 
 from quivr_core.models import (
+    ChatLLMMetadata,
     ParsedRAGResponse,
     QuivrKnowledge,
     RAGResponseMetadata,
@@ -115,22 +116,21 @@ def parse_response(raw_response: RawRAGResponse, model_name: str) -> ParsedRAGRe
     answer = raw_response["answer"].content
     sources = raw_response["docs"] or []
 
-    metadata = {"sources": sources, "model_name":model_name}
-    metadata["model_name"] = model_name
+    metadata = RAGResponseMetadata(
+        sources=sources, metadata_model=ChatLLMMetadata(name=model_name)
+    )
 
     if model_supports_function_calling(model_name):
         if raw_response["answer"].tool_calls:
             citations = raw_response["answer"].tool_calls[-1]["args"]["citations"]
-            metadata["citations"] = citations
+            metadata.citations = citations
             followup_questions = raw_response["answer"].tool_calls[-1]["args"][
                 "followup_questions"
             ]
             if followup_questions:
-                metadata["followup_questions"] = followup_questions
+                metadata.followup_questions = followup_questions
 
-    parsed_response = ParsedRAGResponse(
-        answer=answer, metadata=RAGResponseMetadata(**metadata)
-    )
+    parsed_response = ParsedRAGResponse(answer=answer, metadata=metadata)
     return parsed_response
 
 
