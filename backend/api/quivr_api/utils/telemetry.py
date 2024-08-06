@@ -43,6 +43,7 @@ def send_telemetry(event_name: str, event_data: dict, request: Request | None = 
         }
     )
 
+    # TODO: client should only live once
     # Send the telemetry data
     with httpx.Client() as client:
         _ = client.post(TELEMETRY_URL, headers=HEADERS, data=payload)

@@ -42,7 +42,6 @@ upload_router = APIRouter()
 
 notification_service = NotificationService()
 knowledge_service = KnowledgeService()
-
 AsyncClientDep = Annotated[AsyncClient, Depends(get_supabase_async_client)]
 
 
@@ -65,6 +64,11 @@ async def upload_file(
         id=current_user.id,
         email=current_user.email,
     )
+    user_settings = user_daily_usage.get_user_settings()
+    remaining_free_space = user_settings.get("max_brain_size", 1 << 30)  # 1GB
+    if remaining_free_space - uploadFile.size < 0:
+        message = f"Brain will exceed maximum capacity. Maximum file allowed is : {convert_bytes(remaining_free_space)}"
+        raise HTTPException(status_code=403, detail=message)
 
     upload_notification = notification_service.add_notification(
         CreateNotification(
@@ -77,27 +81,17 @@ async def upload_file(
         )
     )
 
-    user_settings = user_daily_usage.get_user_settings()
-
-    remaining_free_space = user_settings.get("max_brain_size", 1000000000)
-
     background_tasks.add_task(
         maybe_send_telemetry, "upload_file", {"file_name": uploadFile.filename}
     )
 
-    if remaining_free_space - uploadFile.size < 0:
-        message = f"Brain will exceed maximum capacity. Maximum file allowed is : {convert_bytes(remaining_free_space)}"
-        raise HTTPException(status_code=403, detail=message)
-
     filename_with_brain_id = str(brain_id) + "/" + str(uploadFile.filename)
-
     try:
         # NOTE(@aminediro) : This should redone. The supabase storage client interface is badly designed
         # It specifically checks for BufferedReader | bytes before sending
         # TODO: We bypass this to write to S3 Storage directly
         buff_reader = io.BufferedReader(uploadFile.file)  # type: ignore
         await upload_file_storage(client, buff_reader, filename_with_brain_id)
-
     except FileExistsError:
         notification_service.update_notification_by_id(
             upload_notification.id if upload_notification else None,

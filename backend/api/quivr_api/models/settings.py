@@ -31,8 +31,8 @@ class SendEmailSettings(BaseSettings):
 class PostHogSettings(BaseSettings):
     model_config = SettingsConfigDict(validate_default=False)
     posthog_api_key: str | None = None
-    posthog_api_url: str = | None None
-    posthog: Posthog  | None= None
+    posthog_api_url: str | None = None
+    posthog: Posthog | None = None
 
     def __init__(self, *args, **kwargs):
         """

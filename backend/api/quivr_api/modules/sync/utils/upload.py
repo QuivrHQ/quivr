@@ -28,7 +28,7 @@ knowledge_service = KnowledgeService()
 notification_service = NotificationService()
 
 
-async def upload_file(
+async def upload_file_sync(
     upload_file: UploadFile,
     brain_id: UUID,
     current_user: UUID,
@@ -41,22 +41,23 @@ async def upload_file(
     validate_brain_authorization(
         brain_id, current_user, [RoleEnum.Editor, RoleEnum.Owner]
     )
+
+    # TODO: FIX THIS in refacto, use middleware
     user_daily_usage = UserUsage(
         id=current_user,
     )
-
     user_settings = user_daily_usage.get_user_settings()
+    remaining_free_space = user_settings.get("max_brain_size", 1 << 30)  # 1GB
 
-    # TODO: FIX THIS in refacto
-    remaining_free_space = user_settings.get("max_brain_size", 1000000000)
-    maybe_send_telemetry("upload_file", {"file_name": upload_file.filename})
+    file_content = await upload_file.read()
 
-    file_size = upload_file.size
-    if remaining_free_space - file_size < 0:
+    if remaining_free_space - len(file_content) < 0:
         message = f"Brain will exceed maximum capacity. Maximum file allowed is : {remaining_free_space} MB"
         raise HTTPException(status_code=403, detail=message)
 
-    file_content = await upload_file.read()
+    # TODO: use background tasks?
+    maybe_send_telemetry("upload_file", {"file_name": upload_file.filename})
+
     filename_with_brain_id = str(brain_id) + "/" + str(upload_file.filename)
 
     try:

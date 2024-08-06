@@ -76,7 +76,7 @@ class SyncUtils(BaseModel):
     storage: Storage
     sync_cloud: BaseSync
 
-    def _update_sync_file(
+    def _upsert_sync_file(
         self,
         file_name: str,
         brain_id: UUID,
@@ -137,7 +137,9 @@ class SyncUtils(BaseModel):
 
         # TODO: function
         # TODO: Encode response in some Type for type checking
+        logger.debug(f"Downloading {file} using {self.sync_cloud}")
         file_response = self.sync_cloud.download_file(credentials, file)
+        logger.debug(f"Fetch sync file : {file_response}")
         file_name = str(file_response["file_name"])
         raw_data = file_response["content"]
         file_data = (
@@ -146,17 +148,22 @@ class SyncUtils(BaseModel):
             else io.BufferedReader(raw_data.encode("utf-8"))  # type: ignore
         )
 
-        # TODO: Maybe redo this logic
-        # Upload File to S3 Storage
+        # TODO:
         # check_user_limits()
-        logger.debug(
-            f"Uploading {file.name} to supabase storage s3//quivr/{brain_id}/{file.name}"
-        )
+        # Upload File to S3 Storage
         storage_path = str(brain_id) + "/" + str(file_name)
         await upload_file_storage(client, file_data, storage_path, upsert=True)
 
-        self._update_sync_file(
+        # TODO
+        # Add knowledge and send_task
+        # Send file for processing
+
+        self._upsert_sync_file(
             file_name=file_name,
+            brain_id=brain_id,
+            modified_time=modified_time,
+            previous_file=previous_file,
+            sync_active_id=sync_active_id,
         )
 
         notification_service.update_notification_by_id(
@@ -202,7 +209,7 @@ class SyncUtils(BaseModel):
 
         for file, prev_file in supported_files:
             try:
-                result = self._process_sync_file(
+                result = await self._process_sync_file(
                     file=file,
                     previous_file=prev_file,
                     brain_id=brain_id,
