@@ -12,6 +12,7 @@ import Icon from "@/lib/components/ui/Icon/Icon";
 import { MessageInfoBox } from "@/lib/components/ui/MessageInfoBox/MessageInfoBox";
 import { QuivrButton } from "@/lib/components/ui/QuivrButton/QuivrButton";
 import { SearchBar } from "@/lib/components/ui/SearchBar/SearchBar";
+import { SmallTabs } from "@/lib/components/ui/SmallTabs/SmallTabs";
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
 import { useOnboardingContext } from "@/lib/context/OnboardingProvider/hooks/useOnboardingContext";
 import { useSupabase } from "@/lib/context/SupabaseProvider";
@@ -19,11 +20,13 @@ import { useUserSettingsContext } from "@/lib/context/UserSettingsProvider/hooks
 import { useUserData } from "@/lib/hooks/useUserData";
 import { redirectToLogin } from "@/lib/router/redirectToLogin";
 import { ButtonType } from "@/lib/types/QuivrButton";
+import { Tab } from "@/lib/types/Tab";
 
 import BrainButton from "./BrainButton/BrainButton";
 import styles from "./page.module.scss";
 
 const Search = (): JSX.Element => {
+  const [selectedTab, setSelectedTab] = useState("Models");
   const [isUserDataFetched, setIsUserDataFetched] = useState(false);
   const [isNewBrain, setIsNewBrain] = useState(false);
   const [currentPage, setCurrentPage] = useState(0);
@@ -51,6 +54,27 @@ const Search = (): JSX.Element => {
         "You have reached the maximum number of brains allowed. Please upgrade your plan or delete some brains to create a new one.",
     },
   ]);
+
+  const assistantsTabs: Tab[] = [
+    {
+      label: "Models",
+      isSelected: selectedTab === "Knowledge",
+      onClick: () => setSelectedTab("Knowledge"),
+      iconName: "file",
+    },
+    {
+      label: "Brains",
+      isSelected: selectedTab === "Models",
+      onClick: () => setSelectedTab("Models"),
+      iconName: "settings",
+    },
+    {
+      label: "All",
+      isSelected: selectedTab === "all",
+      onClick: () => setSelectedTab("All"),
+      iconName: "settings",
+    },
+  ];
 
   const newBrain = () => {
     setIsNewBrain(true);
@@ -155,43 +179,50 @@ const Search = (): JSX.Element => {
             <div className={styles.search_bar_wrapper}>
               <SearchBar newBrain={isNewBrain} />
             </div>
-            <div className={styles.brains_list_container}>
-              <div
-                className={`${styles.chevron} ${
-                  currentPage === 0 ? styles.disabled : ""
-                }`}
-                onClick={handlePreviousPage}
-              >
-                <Icon
-                  name="chevronLeft"
-                  size="big"
-                  color="black"
-                  handleHover={true}
-                />
-              </div>
-              <div
-                className={`${styles.brains_list_wrapper} ${
-                  transitionDirection === "next"
-                    ? styles.slide_next
-                    : styles.slide_prev
-                }`}
-              >
-                {displayedBrains.map((brain, index) => (
-                  <BrainButton key={index} brain={brain} newBrain={newBrain} />
-                ))}
-              </div>
-              <div
-                className={`${styles.chevron} ${
-                  currentPage >= totalPages - 1 ? styles.disabled : ""
-                }`}
-                onClick={handleNextPage}
-              >
-                <Icon
-                  name="chevronRight"
-                  size="big"
-                  color="black"
-                  handleHover={true}
-                />
+            <div className={styles.assistant_container}>
+              <SmallTabs tabList={assistantsTabs} />
+              <div className={styles.brains_list_container}>
+                <div
+                  className={`${styles.chevron} ${
+                    currentPage === 0 ? styles.disabled : ""
+                  }`}
+                  onClick={handlePreviousPage}
+                >
+                  <Icon
+                    name="chevronLeft"
+                    size="big"
+                    color="black"
+                    handleHover={true}
+                  />
+                </div>
+                <div
+                  className={`${styles.brains_list_wrapper} ${
+                    transitionDirection === "next"
+                      ? styles.slide_next
+                      : styles.slide_prev
+                  }`}
+                >
+                  {displayedBrains.map((brain, index) => (
+                    <BrainButton
+                      key={index}
+                      brain={brain}
+                      newBrain={newBrain}
+                    />
+                  ))}
+                </div>
+                <div
+                  className={`${styles.chevron} ${
+                    currentPage >= totalPages - 1 ? styles.disabled : ""
+                  }`}
+                  onClick={handleNextPage}
+                >
+                  <Icon
+                    name="chevronRight"
+                    size="big"
+                    color="black"
+                    handleHover={true}
+                  />
+                </div>
               </div>
             </div>
           </div>
