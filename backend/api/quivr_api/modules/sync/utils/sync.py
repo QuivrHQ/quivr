@@ -2,6 +2,7 @@ import json
 import os
 import time
 from abc import ABC, abstractmethod
+from datetime import datetime
 from io import BytesIO
 from typing import Any, Dict, List, Union
 
@@ -12,10 +13,11 @@ from fastapi import HTTPException
 from google.auth.transport.requests import Request as GoogleRequest
 from google.oauth2.credentials import Credentials
 from googleapiclient.discovery import build
+from requests import HTTPError
+
 from quivr_api.logger import get_logger
 from quivr_api.modules.sync.entity.sync import SyncFile
 from quivr_api.modules.sync.utils.normalize import remove_special_characters
-from requests import HTTPError
 
 logger = get_logger(__name__)
 
@@ -66,7 +68,6 @@ class GoogleDriveSync(BaseSync):
         file_id = file.id
         file_name = file.name
         mime_type = file.mime_type
-        modified_time = file.last_modified
         if not self.creds:
             self.check_and_refresh_access_token(credentials)
         if not self.service:
@@ -291,7 +292,6 @@ class AzureDriveSync(BaseSync):
             "Authorization": f"Bearer {token_data['access_token']}",
             "Accept": "application/json",
         }
-    
 
     def check_and_refresh_access_token(self, credentials) -> Dict:
         if "refresh_token" not in credentials:
@@ -366,7 +366,7 @@ class AzureDriveSync(BaseSync):
 
         if not folder_id and not site_id:
             # Fetch the sites
-            #endpoint = "https://graph.microsoft.com/v1.0/me/followedSites"
+            # endpoint = "https://graph.microsoft.com/v1.0/me/followedSites"
             endpoint = "https://graph.microsoft.com/v1.0/sites?search=*"
         elif site_id == "root":
             if not folder_id:
@@ -427,9 +427,7 @@ class AzureDriveSync(BaseSync):
         logger.info("Azure Drive files retrieved successfully: %s", len(files))
         return files
 
-    def get_files_by_id(
-        self, credentials: dict, file_ids: List[str]
-    ) -> List[SyncFile] | dict:
+    def get_files_by_id(self, credentials: dict, file_ids: List[str]) -> List[SyncFile]:
         """
         Retrieve files from Azure Drive by their IDs.
 
@@ -489,9 +487,7 @@ class AzureDriveSync(BaseSync):
     ) -> Dict[str, Union[str, BytesIO]]:
         file_id = file.id
         file_name = file.name
-        modified_time = file.last_modified
         headers = self.get_azure_headers(credentials)
-
         site_id, folder_id = file_id.split(":")
         if folder_id == "":
             folder_id = None
@@ -687,3 +683,194 @@ class DropboxSync(BaseSync):
 
         metadata, file_data = self.dbx.files_download(file_id)  # type: ignore
         return {"file_name": file_name, "content": BytesIO(file_data.content)}
+
+
+class GitHubSync(BaseSync):
+    name = "GitHub"
+    lower_name = "github"
+    datetime_format = "%Y-%m-%dT%H:%M:%SZ"
+
+    def __init__(self):
+        self.CLIENT_ID = os.getenv("GITHUB_CLIENT_ID")
+        self.CLIENT_SECRET = os.getenv("GITHUB_CLIENT_SECRET")
+        self.BACKEND_URL = os.getenv("BACKEND_URL", "http://localhost:5050")
+        self.REDIRECT_URI = f"{self.BACKEND_URL}/sync/github/oauth2callback"
+        self.SCOPE = "repo user"
+
+    def get_github_token_data(self, credentials):
+        if "access_token" not in credentials:
+            raise HTTPException(status_code=401, detail="Invalid token data")
+        return credentials
+
+    def get_github_headers(self, token_data):
+        return {
+            "Authorization": f"Bearer {token_data['access_token']}",
+            "Accept": "application/json",
+        }
+
+    def check_and_refresh_access_token(self, credentials: dict) -> Dict:
+        # GitHub tokens do not support refresh token, usually need to re-authenticate
+        raise HTTPException(
+            status_code=400, detail="GitHub does not support token refresh"
+        )
+
+    def get_files(
+        self, credentials: Dict, folder_id: str | None = None, recursive: bool = False
+    ) -> List[SyncFile]:
+        logger.info("Retrieving GitHub files with folder_id: %s", folder_id)
+        if folder_id:
+            return self.list_github_files_in_repo(
+                credentials, folder_id, recursive=recursive
+            )
+        else:
+            return self.list_github_repos(credentials, recursive=recursive)
+
+    def get_files_by_id(self, credentials: Dict, file_ids: List[str]) -> List[SyncFile]:
+        token_data = self.get_github_token_data(credentials)
+        headers = self.get_github_headers(token_data)
+        files = []
+
+        for file_id in file_ids:
+            repo_name, file_path = file_id.split(":")
+            endpoint = f" https://api.github.com/repos/{repo_name}/contents/{file_path}"
+            response = requests.get(endpoint, headers=headers)
+            if response.status_code == 401:
+                raise HTTPException(status_code=401, detail="Unauthorized")
+            if response.status_code != 200:
+                logger.error(
+                    "An error occurred while retrieving GitHub files: %s", response.text
+                )
+                raise Exception("Failed to retrieve files")
+
+            result = response.json()
+            logger.debug("GitHub file result: %s", result)
+            files.append(
+                SyncFile(
+                    name=remove_special_characters(result.get("name")),
+                    id=f"{repo_name}:{result.get('path')}",
+                    is_folder=False,
+                    last_modified=datetime.now().strftime(self.datetime_format),
+                    mime_type=result.get("type"),
+                    web_view_link=result.get("html_url"),
+                )
+            )
+
+        logger.info("GitHub files retrieved successfully: %s", len(files))
+        return files
+
+    def download_file(
+        self, credentials: Dict, file: SyncFile
+    ) -> Dict[str, Union[str, BytesIO]]:
+        token_data = self.get_github_token_data(credentials)
+        headers = self.get_github_headers(token_data)
+        project_name, file_path = file.id.split(":")
+
+        # Construct the API endpoint for the file content
+        endpoint = f"https://api.github.com/repos/{project_name}/contents/{file_path}"
+
+        response = requests.get(endpoint, headers=headers)
+        if response.status_code != 200:
+            raise HTTPException(
+                status_code=response.status_code, detail="Failed to download file"
+            )
+
+        content = response.json().get("content")
+        if not content:
+            raise HTTPException(status_code=404, detail="File content not found")
+
+        # GitHub API returns content as base64 encoded string
+        import base64
+
+        file_content = base64.b64decode(content)
+
+        return {"file_name": file.name, "content": BytesIO(file_content)}
+
+    def list_github_repos(self, credentials, recursive=False):
+        def fetch_repos(endpoint, headers):
+            response = requests.get(endpoint, headers=headers)
+            if response.status_code == 401:
+                raise HTTPException(status_code=401, detail="Unauthorized")
+            if response.status_code != 200:
+                logger.error(
+                    "An error occurred while retrieving GitHub repositories: %s",
+                    response.text,
+                )
+                return []
+            return response.json()
+
+        token_data = self.get_github_token_data(credentials)
+        headers = self.get_github_headers(token_data)
+        endpoint = "https://api.github.com/user/repos"
+
+        items = fetch_repos(endpoint, headers)
+
+        if not items:
+            logger.info("No repositories found in GitHub")
+            return []
+
+        repos = []
+        for item in items:
+            repo_data = SyncFile(
+                name=remove_special_characters(item.get("name")),
+                id=f"{item.get('full_name')}:",
+                is_folder=True,
+                last_modified=str(item.get("updated_at")),
+                mime_type="repository",
+                web_view_link=item.get("html_url"),
+            )
+            repos.append(repo_data)
+
+            if recursive:
+                submodule_files = self.list_github_files_in_repo(
+                    credentials, repo_data.id
+                )
+                repos.extend(submodule_files)
+
+        logger.info("GitHub repositories retrieved successfully: %s", len(repos))
+        return repos
+
+    def list_github_files_in_repo(self, credentials, repo_folder, recursive=False):
+        def fetch_files(endpoint, headers):
+            response = requests.get(endpoint, headers=headers)
+            if response.status_code == 401:
+                raise HTTPException(status_code=401, detail="Unauthorized")
+            if response.status_code != 200:
+                logger.error(
+                    "An error occurred while retrieving GitHub repository files: %s",
+                    response.text,
+                )
+                return []
+            return response.json()
+
+        repo_name, folder_path = repo_folder.split(":")
+        token_data = self.get_github_token_data(credentials)
+        headers = self.get_github_headers(token_data)
+        endpoint = f"https://api.github.com/repos/{repo_name}/contents/{folder_path}"
+        logger.debug(f"Fetching files from GitHub with link: {endpoint}")
+
+        items = fetch_files(endpoint, headers)
+
+        if not items:
+            logger.info(f"No files found in GitHub repository {repo_name}")
+            return []
+
+        files = []
+        for item in items:
+            file_data = SyncFile(
+                name=remove_special_characters(item.get("name")),
+                id=f"{repo_name}:{item.get('path')}",
+                is_folder=item.get("type") == "dir",
+                last_modified=str(item.get("updated_at")),
+                mime_type=item.get("type"),
+                web_view_link=item.get("html_url"),
+            )
+            files.append(file_data)
+
+            if recursive and file_data.is_folder:
+                folder_files = self.list_github_files_in_repo(
+                    credentials, repo_folder=file_data.id, recursive=True
+                )
+                files.extend(folder_files)
+
+        logger.info(f"GitHub repository files retrieved successfully: {len(files)}")
+        return files

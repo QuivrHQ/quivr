@@ -48,14 +48,13 @@ class SyncUserInterface(ABC):
         self,
         sync_active_id: int,
         user_id: str,
-        folder_id: int = None,
+        folder_id: int | str | None = None,
         recursive: bool = False,
     ):
         pass
 
 
 class SyncInterface(ABC):
-
     @abstractmethod
     def create_sync_active(
         self,
