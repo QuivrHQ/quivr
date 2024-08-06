@@ -15,10 +15,10 @@
       "matchManagers": [
         "poetry"
       ],
-      "matchPackagePatterns": [
+      "rangeStrategy": "widen",
+      "matchPackageNames": [
         "*"
-      ],
-      "rangeStrategy": "widen"
+      ]
     },
     {
       "matchFileNames": [
