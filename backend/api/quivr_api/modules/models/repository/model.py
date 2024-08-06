@@ -1,0 +1,19 @@
+from typing import Sequence
+
+from quivr_api.models.settings import get_supabase_client
+from quivr_api.modules.dependencies import BaseRepository
+from quivr_api.modules.models.entity.model import Model
+from sqlmodel import select
+from sqlmodel.ext.asyncio.session import AsyncSession
+
+
+class ModelRepository(BaseRepository):
+    def __init__(self, session: AsyncSession):
+        super().__init__(session)
+        # TODO: for now use it instead of session
+        self.db = get_supabase_client()
+
+    async def get_models(self) -> Sequence[Model]:
+        query = select(Model)
+        response = await self.session.exec(query)
+        return response.all()

@@ -19,6 +19,7 @@ from quivr_api.modules.chat.dto.inputs import (
 )
 from quivr_api.modules.chat.entity.chat import Chat
 from quivr_api.modules.chat.service.chat_service import ChatService
+from quivr_api.modules.chat_llm_service.chat_llm_service import ChatLLMService
 from quivr_api.modules.dependencies import get_service
 from quivr_api.modules.knowledge.repository.knowledges import KnowledgeRepository
 from quivr_api.modules.prompt.service.prompt_service import PromptService
@@ -166,16 +167,25 @@ async def create_question_handler(
     # TODO: check logic into middleware
     validate_authorization(user_id=current_user.id, brain_id=brain_id)
     try:
-        rag_service = RAGService(
-            current_user,
-            brain_id,
-            chat_id,
-            brain_service,
-            prompt_service,
-            chat_service,
-            knowledge_service,
-        )
-        chat_answer = await rag_service.generate_answer(chat_question.question)
+        service = None
+        if brain_id:
+            service = RAGService(
+                current_user,
+                brain_id,
+                chat_id,
+                brain_service,
+                prompt_service,
+                chat_service,
+                knowledge_service,
+            )
+        else:
+            service = ChatLLMService(
+                current_user,
+                chat_question.model,
+                chat_id,
+                chat_service,
+            )
+        chat_answer = await service.generate_answer(chat_question.question)
 
         maybe_send_telemetry("question_asked", {"streaming": False}, request)
         return chat_answer
@@ -214,19 +224,28 @@ async def create_stream_question_handler(
     )
 
     try:
-        rag_service = RAGService(
-            current_user,
-            brain_id,
-            chat_id,
-            brain_service,
-            prompt_service,
-            chat_service,
-            knowledge_service,
-        )
+        service = None
+        if brain_id:
+            service = RAGService(
+                current_user,
+                brain_id,
+                chat_id,
+                brain_service,
+                prompt_service,
+                chat_service,
+                knowledge_service,
+            )
+        else:
+            service = ChatLLMService(
+                current_user,
+                chat_question.model,
+                chat_id,
+                chat_service,
+            )
         maybe_send_telemetry("question_asked", {"streaming": True}, request)
 
         return StreamingResponse(
-            rag_service.generate_answer_stream(chat_question.question),
+            service.generate_answer_stream(chat_question.question),
             media_type="text/event-stream",
         )
 

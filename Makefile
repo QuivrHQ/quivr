@@ -33,3 +33,6 @@ test-type:
 
 front:
 	cd frontend  && yarn build && yarn start
+
+test:
+	cd backend/core && ./scripts/run_tests.sh
