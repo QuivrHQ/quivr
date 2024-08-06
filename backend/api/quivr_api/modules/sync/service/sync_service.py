@@ -40,7 +40,7 @@ class SyncUserService:
         return self.repository.get_sync_user_by_id(sync_id)
 
     def update_sync_user(
-        self, sync_user_id: int, state: dict, sync_user_input: SyncUserUpdateInput
+        self, sync_user_id: UUID, state: dict, sync_user_input: SyncUserUpdateInput
     ):
         return self.repository.update_sync_user(sync_user_id, state, sync_user_input)
 
