@@ -10,6 +10,7 @@ from langchain_core.runnables import RunnableLambda, RunnablePassthrough
 from quivr_core.chat import ChatHistory
 from quivr_core.llm import LLMEndpoint
 from quivr_core.models import (
+    ChatLLMMetadata,
     ParsedRAGChunkResponse,
     ParsedRAGResponse,
     RAGResponseMetadata,
@@ -139,7 +140,9 @@ class ChatLLM:
             metadata=get_chunk_metadata(rolling_message),
             last_chunk=True,
         )
-        last_chunk.metadata.model_name = self.llm_endpoint._config.model
+        last_chunk.metadata.metadata_model = ChatLLMMetadata(
+            name=self.llm_endpoint._config.model,
+        )
         logger.debug(
             f"answer_astream last_chunk={last_chunk} question={question} rolling_msg={rolling_message} chunk_id={chunk_id}"
         )

@@ -5,7 +5,7 @@ from quivr_core.chat import ChatHistory as ChatHistoryCore
 from quivr_core.chat_llm import ChatLLM
 from quivr_core.config import LLMEndpointConfig
 from quivr_core.llm.llm_endpoint import LLMEndpoint
-from quivr_core.models import ParsedRAGResponse, RAGResponseMetadata
+from quivr_core.models import ChatLLMMetadata, ParsedRAGResponse, RAGResponseMetadata
 
 from quivr_api.logger import get_logger
 from quivr_api.models.settings import settings
@@ -20,6 +20,7 @@ from quivr_api.modules.chat.controller.chat.utils import (
 from quivr_api.modules.chat.dto.inputs import CreateChatHistory
 from quivr_api.modules.chat.dto.outputs import GetChatHistoryOutput
 from quivr_api.modules.chat.service.chat_service import ChatService
+from quivr_api.modules.models.service.model_service import ModelService
 from quivr_api.modules.user.entity.user_identity import UserIdentity
 from quivr_api.modules.user.service.user_usage import UserUsage
 
@@ -33,9 +34,11 @@ class ChatLLMService:
         model_name: str,
         chat_id: UUID,
         chat_service: ChatService,
+        model_service: ModelService,
     ):
         # Services
         self.chat_service = chat_service
+        self.model_service = model_service
 
         # Base models
         self.current_user = current_user
@@ -130,11 +133,19 @@ class ChatLLMService:
         )
         chat_llm = self.build_llm()
         history = await self.chat_service.get_chat_history(self.chat_id)
-
+        model_metadata = await self.model_service.get_model(self.model_to_use.name)
         #  Format the history, sanitize the input
         chat_history = self._build_chat_history(history)
 
         parsed_response = chat_llm.answer(question, chat_history)
+
+        if parsed_response.metadata:
+            parsed_response.metadata.metadata_model = ChatLLMMetadata(
+                name=self.model_to_use.name,
+                description=model_metadata.description,
+                image_url=model_metadata.image_url,
+                display_name=model_metadata.display_name,
+            )
 
         # Save the answer to db
         new_chat_entry = self.save_answer(question, parsed_response)
@@ -167,6 +178,9 @@ class ChatLLMService:
         )
         # Build the rag config
         chat_llm = self.build_llm()
+
+        # Get model metadata
+        model_metadata = await self.model_service.get_model(self.model_to_use.name)
         # Get chat history
         history = await self.chat_service.get_chat_history(self.chat_id)
         #  Format the history, sanitize the input
@@ -203,12 +217,22 @@ class ChatLLMService:
             metadata=response.metadata.model_dump(),
             **message_metadata,
         )
+
+        metadata = RAGResponseMetadata(**streamed_chat_history.metadata)  # type: ignore
+        metadata.metadata_model = ChatLLMMetadata(
+            name=self.model_to_use.name,
+            description=model_metadata.description,
+            image_url=model_metadata.image_url,
+            display_name=model_metadata.display_name,
+        )
+        streamed_chat_history.metadata = metadata.model_dump()
+
         logger.info("Last chunk before saving")
         self.save_answer(
             question,
             ParsedRAGResponse(
                 answer=full_answer,
-                metadata=RAGResponseMetadata(**streamed_chat_history.metadata),
+                metadata=metadata,
             ),
         )
         yield f"data: {streamed_chat_history.model_dump_json()}"

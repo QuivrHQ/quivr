@@ -16,6 +16,12 @@ class ModelService(BaseService[ModelRepository]):
         logger.info("Getting models")
 
         models = await self.repository.get_models()
-        logger.info(f"Insert response {models}")
 
-        return models
+        return models  # type: ignore
+
+    async def get_model(self, model_name: str) -> Model:
+        logger.info(f"Getting model {model_name}")
+
+        model = await self.repository.get_model(model_name)
+
+        return model
