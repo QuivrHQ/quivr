@@ -2,6 +2,7 @@
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 
+import { useModels } from "@/lib/api/models/useModels";
 import { QuivrLogo } from "@/lib/assets/QuivrLogo";
 import { AddBrainModal } from "@/lib/components/AddBrainModal";
 import { useBrainCreationContext } from "@/lib/components/AddBrainModal/brainCreation-provider";
@@ -41,6 +42,7 @@ const Search = (): JSX.Element => {
   const { isDarkMode } = useUserSettingsContext();
   const { isBrainCreated } = useOnboardingContext();
   const { allBrains } = useBrainContext();
+  const { getModels } = useModels();
 
   const [buttons, setButtons] = useState<ButtonType[]>([
     {
@@ -104,6 +106,18 @@ const Search = (): JSX.Element => {
       setIsUserDataFetched(true);
     }
   }, [userIdentityData]);
+
+  useEffect(() => {
+    void (async () => {
+      try {
+        console.info("prout");
+        const res = await getModels();
+        console.info(res);
+      } catch (error) {
+        console.error(error);
+      }
+    })();
+  }, [getModels]);
 
   useEffect(() => {
     if (userData) {
