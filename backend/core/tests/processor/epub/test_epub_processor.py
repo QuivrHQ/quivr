@@ -17,7 +17,7 @@ async def test_epub_page_blanche():
         original_filename=p.stem,
         path=p,
         file_extension=FileExtension.epub,
-        file_md5="123",
+        file_sha1="123",
     )
     processor = EpubProcessor()
     result = await processor.process_file(f)
@@ -34,7 +34,7 @@ async def test_epub_processor():
         original_filename=p.stem,
         path=p,
         file_extension=FileExtension.epub,
-        file_md5="123",
+        file_sha1="123",
     )
 
     processor = EpubProcessor()

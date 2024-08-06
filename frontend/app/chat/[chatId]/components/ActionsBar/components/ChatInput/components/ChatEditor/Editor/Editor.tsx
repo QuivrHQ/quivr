@@ -63,7 +63,24 @@ export const Editor = ({
   return (
     <EditorContent
       className="w-full caret-accent"
-      onKeyDown={(event) => void submitOnEnter(event)}
+      onKeyDown={(event) => {
+        if (event.key === "Enter" && !event.shiftKey && !currentBrain) {
+          event.preventDefault();
+          const lastChar = editor?.state.doc.textBetween(
+            editor.state.selection.$from.pos - 1,
+            editor.state.selection.$from.pos,
+            undefined,
+            "\ufffc"
+          );
+          if (lastChar === " ") {
+            editor?.chain().insertContent("@").focus().run();
+          } else {
+            editor?.chain().insertContent(" @").focus().run();
+          }
+        } else {
+          submitOnEnter(event);
+        }
+      }}
       editor={editor}
     />
   );

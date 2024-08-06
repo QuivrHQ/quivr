@@ -29,6 +29,13 @@ class FileExtension(str, Enum):
     odt = ".odt"
     py = ".py"
     ipynb = ".ipynb"
+    m4a = ".m4a"
+    mp3 = ".mp3"
+    webm = ".webm"
+    mp4 = ".mp4"
+    mpga = ".mpga"
+    wav = ".wav"
+    mpeg = ".mpeg"
 
 
 def get_file_extension(file_path: Path) -> FileExtension | str:
@@ -57,7 +64,7 @@ async def load_qfile(brain_id: UUID, path: str | Path):
     file_size = os.stat(path).st_size
 
     async with aiofiles.open(path, mode="rb") as f:
-        file_md5 = hashlib.md5(await f.read()).hexdigest()
+        file_sha1 = hashlib.sha1(await f.read()).hexdigest()
 
     try:
         # NOTE: when loading from existing storage, file name will be uuid
@@ -72,7 +79,7 @@ async def load_qfile(brain_id: UUID, path: str | Path):
         original_filename=path.name,
         file_extension=get_file_extension(path),
         file_size=file_size,
-        file_md5=file_md5,
+        file_sha1=file_sha1,
     )
 
 
@@ -84,7 +91,8 @@ class QuivrFile:
         "original_filename",
         "file_size",
         "file_extension",
-        "file_md5",
+        "file_sha1",
+        "additional_metadata",
     ]
 
     def __init__(
@@ -93,9 +101,10 @@ class QuivrFile:
         original_filename: str,
         path: Path,
         brain_id: UUID,
-        file_md5: str,
+        file_sha1: str,
         file_extension: FileExtension | str,
         file_size: int | None = None,
+        metadata: dict[str, Any] | None = None,
     ) -> None:
         self.id = id
         self.brain_id = brain_id
@@ -103,7 +112,8 @@ class QuivrFile:
         self.original_filename = original_filename
         self.file_size = file_size
         self.file_extension = file_extension
-        self.file_md5 = file_md5
+        self.file_sha1 = file_sha1
+        self.additional_metadata = metadata if metadata else {}
 
     def __repr__(self) -> str:
         return f"QuivrFile-{self.id} original_filename:{self.original_filename}"
@@ -123,6 +133,7 @@ class QuivrFile:
             "qfile_id": self.id,
             "qfile_path": self.path,
             "original_file_name": self.original_filename,
-            "file_md4": self.file_md5,
+            "file_sha1": self.file_sha1,
             "file_size": self.file_size,
+            **self.additional_metadata,
         }

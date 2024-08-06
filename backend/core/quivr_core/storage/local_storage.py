@@ -39,7 +39,7 @@ class LocalStorage(StorageBase):
             self.dir_path, str(file.brain_id), f"{file.id}{file.file_extension}"
         )
 
-        if file.file_md5 in self.hashes and not exists_ok:
+        if file.file_sha1 in self.hashes and not exists_ok:
             raise FileExistsError(f"file {file.original_filename} already uploaded")
 
         if self.copy_flag:
@@ -49,7 +49,7 @@ class LocalStorage(StorageBase):
 
         file.path = Path(dst_path)
         self.files.append(file)
-        self.hashes.add(file.file_md5)
+        self.hashes.add(file.file_sha1)
 
     async def get_files(self) -> list[QuivrFile]:
         return self.files

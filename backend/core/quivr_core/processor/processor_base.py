@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from importlib.metadata import version
+from importlib.metadata import PackageNotFoundError, version
 from typing import Any
 from uuid import uuid4
 
@@ -26,11 +26,22 @@ class ProcessorBase(ABC):
     async def process_file(self, file: QuivrFile) -> list[Document]:
         self.check_supported(file)
         docs = await self.process_file_inner(file)
-        for idx, doc in enumerate(docs):
+        try:
+            qvr_version = version("quivr-core")
+        except PackageNotFoundError:
+            qvr_version = "dev"
+
+        for idx, doc in enumerate(docs, start=1):
+            if "original_file_name" in doc.metadata:
+                doc.page_content = f"Filename: {doc.metadata['original_file_name']} Content: {doc.page_content}"
+            doc.page_content = doc.page_content.replace("\u0000", "")
+            doc.page_content = doc.page_content.encode("utf-8", "replace").decode(
+                "utf-8"
+            )
             doc.metadata = {
                 "id": uuid4(),
                 "chunk_index": idx,
-                "quivr_core_version": version("quivr-core"),
+                "quivr_core_version": qvr_version,
                 **file.metadata,
                 **doc.metadata,
                 **self.processor_metadata,

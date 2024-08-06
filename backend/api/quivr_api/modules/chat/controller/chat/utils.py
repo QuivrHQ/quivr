@@ -1,28 +1,12 @@
 import time
-from uuid import UUID
 
 from fastapi import HTTPException
+
 from quivr_api.logger import get_logger
 from quivr_api.models.databases.llm_models import LLMModel
 from quivr_api.modules.user.service.user_usage import UserUsage
 
 logger = get_logger(__name__)
-
-
-class NullableUUID(UUID):
-    @classmethod
-    def __get_validators__(cls):
-        yield cls.validate
-
-    @classmethod
-    def validate(v, values, **kwargs):
-        logger.info(f"Validating UUID: {v}")
-        if v == "":
-            return None
-        try:
-            return UUID(v)
-        except ValueError:
-            return None
 
 
 # TODO: rewrite
@@ -43,7 +27,8 @@ def find_model_and_generate_metadata(
 ):
     # Default model is gpt-3.5-turbo-0125
     default_model = "gpt-3.5-turbo-0125"
-    model_to_use = LLMModel(  # TODO Implement default models in database
+    # TODO Implement default models in database
+    model_to_use = LLMModel(
         name=default_model, price=1, max_input=4000, max_output=1000
     )
 

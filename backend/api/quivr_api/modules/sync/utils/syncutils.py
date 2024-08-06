@@ -1,10 +1,14 @@
-import uuid
+import io
 from datetime import datetime, timedelta, timezone
-from typing import List
+from typing import List, Tuple
+from uuid import UUID, uuid4
 
-from fastapi import UploadFile
 from pydantic import BaseModel, ConfigDict
+from supabase.client import AsyncClient
+
+from quivr_api.celery_config import celery
 from quivr_api.logger import get_logger
+from quivr_api.models.settings import get_supabase_async_client
 from quivr_api.modules.brain.repository.brains_vectors import BrainsVectors
 from quivr_api.modules.knowledge.repository.storage import Storage
 from quivr_api.modules.notification.dto.inputs import (
@@ -20,15 +24,51 @@ from quivr_api.modules.sync.dto.inputs import (
     SyncFileUpdateInput,
     SyncsActiveUpdateInput,
 )
-from quivr_api.modules.sync.entity.sync import SyncFile
+from quivr_api.modules.sync.entity.sync import DBSyncFile, SyncFile
 from quivr_api.modules.sync.repository.sync_files import SyncFiles
+from quivr_api.modules.sync.service.sync_notion import SyncNotionService
 from quivr_api.modules.sync.service.sync_service import SyncService, SyncUserService
 from quivr_api.modules.sync.utils.sync import BaseSync
-from quivr_api.modules.sync.utils.upload import upload_file
-from quivr_api.modules.upload.service.upload_file import check_file_exists
+from quivr_api.modules.upload.service.upload_file import (
+    check_file_exists,
+    upload_file_storage,
+)
 
 notification_service = NotificationService()
+brain_vectors = BrainsVectors()
 logger = get_logger(__name__)
+
+celery_inspector = celery.control.inspect()
+
+
+def filter_supported_files(
+    files: list[SyncFile], existing_files: dict[str, DBSyncFile]
+) -> list[Tuple[SyncFile, DBSyncFile | None]]:
+    res = []
+    for new_file in files:
+        prev_file = existing_files.get(new_file.name, None)
+        if (prev_file and prev_file.supported) or prev_file is None:
+            res.append((new_file, prev_file))
+
+    return res
+
+
+def create_sync_bulk_notification(
+    files: list[SyncFile], current_user: UUID, brain_id: UUID, bulk_id: UUID
+):
+    # TODO(@chloedia): redo this, we don't UploadFile as an additional abstraction
+    for file in files:
+        upload_notification = notification_service.add_notification(
+            CreateNotification(
+                user_id=current_user,
+                bulk_id=bulk_id,
+                status=NotificationsStatusEnum.INFO,
+                title=file.name,
+                category="sync",
+                brain_id=str(brain_id),
+            )
+        )
+        file.notification_id = str(upload_notification.id)
 
 
 class SyncUtils(BaseModel):
@@ -40,12 +80,110 @@ class SyncUtils(BaseModel):
     storage: Storage
     sync_cloud: BaseSync
 
-    async def _upload_files(
+    def _upsert_sync_file(
+        self,
+        file_name: str,
+        brain_id: UUID,
+        modified_time: str,
+        previous_file: DBSyncFile | None,
+        sync_active_id: int,
+    ):
+        if previous_file:
+            logger.debug(f"Updating file {previous_file} in database.")
+            self.sync_files_repo.update_sync_file(
+                previous_file.id,
+                SyncFileUpdateInput(
+                    last_modified=modified_time,
+                    supported=previous_file.supported,
+                ),
+            )
+        else:
+            # Create a new file record
+            self.sync_files_repo.create_sync_file(
+                SyncFileInput(
+                    path=file_name,
+                    syncs_active_id=sync_active_id,
+                    last_modified=modified_time,
+                    brain_id=str(brain_id),
+                    supported=True,
+                )
+            )
+
+    async def _process_sync_file(
+        self,
+        client: AsyncClient,
+        file: SyncFile,
+        previous_file: DBSyncFile | None,
+        credentials: dict,
+        current_user: UUID,
+        brain_id: UUID,
+        sync_active_id: int,
+    ):
+        logger.info("Processing file: %s", file.name)
+        file_name, modified_time = file.name, file.last_modified
+
+        if file_name.split(".")[-1] not in [
+            "pdf",
+            "txt",
+            "md",
+            "csv",
+            "docx",
+            "xlsx",
+            "pptx",
+            "doc",
+        ]:
+            logger.info("File is not compatible: %s. Skipping processing", file_name)
+            return None
+
+        # FIXME(@aminediro, @chloedia): Checks should use file_sha1 in database
+        if check_file_exists(str(brain_id), str(file_name)):
+            brain_vectors.delete_file_from_brain(brain_id, file_name)
+
+        # TODO: function
+        # TODO: Encode response in some Type for type checking
+        logger.debug(f"Downloading {file} using {self.sync_cloud}")
+        file_response = self.sync_cloud.download_file(credentials, file)
+        logger.debug(f"Fetch sync file : {file_response}")
+        file_name = str(file_response["file_name"])
+        raw_data = file_response["content"]
+        file_data = (
+            io.BufferedReader(raw_data)  # type: ignore
+            if isinstance(raw_data, io.BytesIO)
+            else io.BufferedReader(raw_data.encode("utf-8"))  # type: ignore
+        )
+
+        # TODO:
+        # check_user_limits()
+        # Upload File to S3 Storage
+        storage_path = str(brain_id) + "/" + str(file_name)
+        await upload_file_storage(client, file_data, storage_path, upsert=True)
+
+        # TODO
+        # Add knowledge and send_task
+        # Send file for processing
+
+        self._upsert_sync_file(
+            file_name=file_name,
+            brain_id=brain_id,
+            modified_time=modified_time,
+            previous_file=previous_file,
+            sync_active_id=sync_active_id,
+        )
+
+        notification_service.update_notification_by_id(
+            file.notification_id,
+            NotificationUpdatableProperties(
+                status=NotificationsStatusEnum.SUCCESS,
+                description="File downloaded successfully",
+            ),
+        )
+
+    async def _process_sync_diff(
         self,
         credentials: dict,
         files: List[SyncFile],
-        current_user: str,
-        brain_id: str,
+        current_user: UUID,
+        brain_id: UUID,
         sync_active_id: int,
     ):
         """
@@ -59,109 +197,34 @@ class SyncUtils(BaseModel):
             dict: A dictionary containing the status of the download or an error message.
         """
 
+        client = await get_supabase_async_client()
         credentials = self.sync_cloud.check_and_refresh_access_token(credentials)
 
         downloaded_files = []
-        bulk_id = uuid.uuid4()
+        bulk_id = uuid4()
 
-        for file in files:
-            upload_notification = notification_service.add_notification(
-                CreateNotification(
-                    user_id=current_user,
-                    bulk_id=bulk_id,
-                    status=NotificationsStatusEnum.INFO,
-                    title=file.name,
-                    category="sync",
-                    brain_id=str(brain_id),
-                )
-            )
-            file.notification_id = str(upload_notification.id)
+        list_existing_files = self.sync_files_repo.get_sync_files(sync_active_id)
+        existing_files = {f.path: f for f in list_existing_files}
 
-        for file in files:
-            logger.info("Processing file: %s", file.name)
+        supported_files = filter_supported_files(files, existing_files)
+
+        # TODO: bulk insert in batch
+        create_sync_bulk_notification(files, current_user, brain_id, bulk_id)
+
+        for file, prev_file in supported_files:
             try:
-                file_id = file.id
-                file_name = file.name
-                mime_type = file.mime_type
-                modified_time = file.last_modified
-
-                file_response = self.sync_cloud.download_file(credentials, file)
-                file_name = file_response["file_name"]
-                file_data = file_response["content"]
-                # Check if the file already exists in the storage
-                if check_file_exists(brain_id, file_name):
-                    logger.debug("%s already exists in the storage", file_name)
-
-                    self.storage.remove_file(brain_id + "/" + file_name)
-                    BrainsVectors().delete_file_from_brain(brain_id, file_name)
-
-                # Check if the file extension is compatible
-                if file_name.split(".")[-1] not in [
-                    "pdf",
-                    "txt",
-                    "md",
-                    "csv",
-                    "docx",
-                    "xlsx",
-                    "pptx",
-                    "doc",
-                ]:
-                    logger.info("File is not compatible: %s", file_name)
-                    continue
-
-                to_upload_file = UploadFile(
-                    file=file_data,
-                    filename=file_name,
+                result = await self._process_sync_file(
+                    file=file,
+                    previous_file=prev_file,
+                    brain_id=brain_id,
+                    client=client,
+                    credentials=credentials,
+                    current_user=current_user,
+                    sync_active_id=sync_active_id,
                 )
+                if result is not None:
+                    downloaded_files.append(result)
 
-                # Check if the file already exists in the database
-                existing_files = self.sync_files_repo.get_sync_files(sync_active_id)
-                existing_file = next(
-                    (f for f in existing_files if f.path == file_name), None
-                )
-
-                supported = False
-                if (existing_file and existing_file.supported) or not existing_file:
-                    supported = True
-                    await upload_file(
-                        to_upload_file,
-                        brain_id,
-                        current_user,
-                        bulk_id,
-                        self.sync_cloud.name,
-                        file.web_view_link,
-                        notification_id=file.notification_id,
-                    )
-
-                if existing_file:
-                    # Update the existing file record
-                    self.sync_files_repo.update_sync_file(
-                        existing_file.id,
-                        SyncFileUpdateInput(
-                            last_modified=modified_time,
-                            supported=supported,
-                        ),
-                    )
-                else:
-                    # Create a new file record
-                    self.sync_files_repo.create_sync_file(
-                        SyncFileInput(
-                            path=file_name,
-                            syncs_active_id=sync_active_id,
-                            last_modified=modified_time,
-                            brain_id=brain_id,
-                            supported=supported,
-                        )
-                    )
-
-                    downloaded_files.append(file_name)
-                notification_service.update_notification_by_id(
-                    file.notification_id,
-                    NotificationUpdatableProperties(
-                        status=NotificationsStatusEnum.SUCCESS,
-                        description="File downloaded successfully",
-                    ),
-                )
             except Exception as error:
                 logger.error(
                     "An error occurred while downloading %s files: %s",
@@ -169,10 +232,8 @@ class SyncUtils(BaseModel):
                     error,
                 )
                 # Check if the file already exists in the database
-                existing_files = self.sync_files_repo.get_sync_files(sync_active_id)
-                existing_file = next(
-                    (f for f in existing_files if f.path == file.name), None
-                )
+                existing_file = existing_files.get(file.name, None)
+
                 # Update the existing file record
                 if existing_file:
                     self.sync_files_repo.update_sync_file(
@@ -188,7 +249,8 @@ class SyncUtils(BaseModel):
                             path=file.name,
                             syncs_active_id=sync_active_id,
                             last_modified=file.last_modified,
-                            brain_id=brain_id,
+                            # TODO(@chlo)
+                            brain_id=str(brain_id),
                             supported=False,
                         )
                     )
@@ -202,7 +264,12 @@ class SyncUtils(BaseModel):
 
         return {"downloaded_files": downloaded_files}
 
-    async def sync(self, sync_active_id: int, user_id: str):
+    async def sync(
+        self,
+        sync_active_id: int,
+        user_id: UUID,
+        notion_service: SyncNotionService | None = None,
+    ):
         """
         Check if the Specific sync has not been synced and download the folders and files based on the settings.
 
@@ -280,24 +347,51 @@ class SyncUtils(BaseModel):
         files: List[SyncFile] = []
         files_metadata = []
         if len(folders) > 0:
-            for folder in folders:
+            if self.sync_cloud.lower_name == "notion":
                 files.extend(
-                    self.sync_cloud.get_files(
+                    await self.sync_cloud.aget_files_by_id(
                         sync_user["credentials"],
-                        folder_id=folder,
-                        recursive=True,
+                        folders,
                     )
                 )
+
+            for folder in folders:
+                # FIXME: should just put everything asynchrounous
+
+                if self.sync_cloud.lower_name == "notion":
+                    files.extend(
+                        await self.sync_cloud.aget_files(
+                            sync_user["credentials"],
+                            folder_id=folder,
+                            recursive=True,
+                        )
+                    )
+                else:
+                    files.extend(
+                        self.sync_cloud.get_files(
+                            sync_user["credentials"],
+                            folder_id=folder,
+                            recursive=True,
+                        )
+                    )
+        # FIXME: should just put everything asynchrounous
         if len(files_to_download) > 0:
-            files_metadata = self.sync_cloud.get_files_by_id(
-                sync_user["credentials"],
-                files_to_download,
-            )
+            if self.sync_cloud.lower_name == "notion":
+                files_metadata = await self.sync_cloud.aget_files_by_id(
+                    sync_user["credentials"],
+                    files_to_download,
+                )
+            else:
+                files_metadata = self.sync_cloud.get_files_by_id(
+                    sync_user["credentials"],
+                    files_to_download,
+                )
         files = files + files_metadata  # type: ignore
 
         if "error" in files:
             logger.error(
-                "Failed to download files from Azure for sync_active_id: %s",
+                "Failed to download files from %s for sync_active_id: %s",
+                self.sync_cloud.name,
                 sync_active_id,
             )
             return None
@@ -309,25 +403,42 @@ class SyncUtils(BaseModel):
             else None
         )
         logger.info("Files retrieved from %s: %s", self.sync_cloud.lower_name, files)
-
-        files_to_download = [
-            file
-            for file in files
-            if not file.is_folder
-            and (
-                (
-                    not last_synced_time
-                    or datetime.strptime(
-                        file.last_modified,
-                        (self.sync_cloud.datetime_format),
-                    ).replace(tzinfo=timezone.utc)
-                    > last_synced_time
+        if self.sync_cloud == "notion":
+            files_to_download = [
+                file
+                for file in files
+                if (
+                    (
+                        not last_synced_time
+                        or datetime.strptime(
+                            file.last_modified,
+                            (self.sync_cloud.datetime_format),
+                        ).replace(tzinfo=timezone.utc)
+                        > last_synced_time
+                    )
+                    or not check_file_exists(sync_active["brain_id"], file.name)
+                    or not file.mime_type == "db"
                 )
-                or not check_file_exists(sync_active["brain_id"], file.name)
-            )
-        ]
+            ]
+        else:
+            files_to_download = [
+                file
+                for file in files
+                if not file.is_folder
+                and (
+                    (
+                        not last_synced_time
+                        or datetime.strptime(
+                            file.last_modified,
+                            (self.sync_cloud.datetime_format),
+                        ).replace(tzinfo=timezone.utc)
+                        > last_synced_time
+                    )
+                    or not check_file_exists(sync_active["brain_id"], file.name)
+                )
+            ]
 
-        downloaded_files = await self._upload_files(
+        downloaded_files = await self._process_sync_diff(
             sync_user["credentials"],
             files_to_download,
             user_id,

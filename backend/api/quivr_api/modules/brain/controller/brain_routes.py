@@ -26,7 +26,7 @@ from quivr_api.modules.brain.service.integration_brain_service import (
 from quivr_api.modules.prompt.service.prompt_service import PromptService
 from quivr_api.modules.user.entity.user_identity import UserIdentity
 from quivr_api.modules.user.service.user_usage import UserUsage
-from quivr_api.packages.utils.telemetry import maybe_send_telemetry
+from quivr_api.utils.telemetry import maybe_send_telemetry
 
 logger = get_logger(__name__)
 brain_router = APIRouter()

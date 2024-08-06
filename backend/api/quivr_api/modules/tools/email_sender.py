@@ -10,9 +10,10 @@ from langchain.pydantic_v1 import Field as FieldV1
 from langchain_community.document_loaders import PlaywrightURLLoader
 from langchain_core.tools import BaseTool
 from pydantic import BaseModel
+
 from quivr_api.logger import get_logger
 from quivr_api.models.settings import BrainSettings, SendEmailSettings
-from quivr_api.packages.emails.send_email import send_email
+from quivr_api.utils.send_email import send_email
 
 logger = get_logger(__name__)
 
