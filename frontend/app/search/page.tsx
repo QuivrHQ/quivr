@@ -70,7 +70,7 @@ const Search = (): JSX.Element => {
     },
     {
       label: "All",
-      isSelected: selectedTab === "all",
+      isSelected: selectedTab === "All",
       onClick: () => setSelectedTab("All"),
       iconName: "settings",
     },
@@ -179,8 +179,10 @@ const Search = (): JSX.Element => {
             <div className={styles.search_bar_wrapper}>
               <SearchBar newBrain={isNewBrain} />
             </div>
-            <div className={styles.assistant_container}>
-              <SmallTabs tabList={assistantsTabs} />
+            <div className={styles.assistants_container}>
+              <div className={styles.tabs}>
+                <SmallTabs tabList={assistantsTabs} />
+              </div>
               <div className={styles.brains_list_container}>
                 <div
                   className={`${styles.chevron} ${
