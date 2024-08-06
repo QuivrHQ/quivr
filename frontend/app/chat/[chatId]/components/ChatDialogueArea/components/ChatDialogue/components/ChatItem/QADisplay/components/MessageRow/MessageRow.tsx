@@ -200,7 +200,7 @@ export const MessageRow = ({
   return (
     <div
       className={`
-      ${styles.message_row_container} 
+      ${styles.message_row_container}
       ${isUserSpeaker ? styles.user : styles.brain}
       ${messageContent.length > 100 && isUserSpeaker ? styles.smaller : ""}
       ${lastMessage ? styles.last : ""}

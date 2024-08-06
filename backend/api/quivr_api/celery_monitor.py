@@ -1,4 +1,5 @@
 from celery.result import AsyncResult
+
 from quivr_api.celery_config import celery
 from quivr_api.logger import get_logger
 from quivr_api.modules.knowledge.dto.inputs import KnowledgeStatus
@@ -39,9 +40,9 @@ def notifier(app):
                         NotificationUpdatableProperties(
                             status=NotificationsStatusEnum.ERROR,
                             description=(
-                                f"An error occurred while processing the file"
+                                "An error occurred while processing the file"
                                 if task_name == "process_file_and_notify"
-                                else f"An error occurred while processing the URL"
+                                else "An error occurred while processing the URL"
                             ),
                         ),
                     )

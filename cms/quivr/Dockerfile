@@ -4,7 +4,7 @@ RUN apk add --update --no-cache python3 make g++ git && ln -sf python3 /usr/bin/
 RUN python3 -m ensurepip
 RUN pip3 install --no-cache --upgrade pip setuptools
 
-# Create the directory on the node image 
+# Create the directory on the node image
 # where our Next.js app will live
 RUN mkdir -p /app
 
@@ -27,5 +27,5 @@ RUN yarn build
 # Ensure port 3000 is accessible to our system
 EXPOSE 1337
 
-# Run yarn start, as we would via the command line 
+# Run yarn start, as we would via the command line
 CMD ["yarn", "start"]

@@ -3,6 +3,7 @@ from typing import Optional
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Query, UploadFile
+
 from quivr_api.celery_worker import process_file_and_notify
 from quivr_api.logger import get_logger
 from quivr_api.middlewares.auth import AuthBearer, get_current_user
@@ -82,7 +83,6 @@ async def upload_file(
     except Exception as e:
         print(e)
 
-
         if "The resource already exists" in str(e):
             notification_service.update_notification_by_id(
                 upload_notification.id if upload_notification else None,
@@ -100,7 +100,7 @@ async def upload_file(
                 upload_notification.id if upload_notification else None,
                 NotificationUpdatableProperties(
                     status=NotificationsStatusEnum.ERROR,
-                    description=f"There was an error uploading the file",
+                    description="There was an error uploading the file",
                 ),
             )
             raise HTTPException(

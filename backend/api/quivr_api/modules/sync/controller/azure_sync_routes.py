@@ -4,6 +4,7 @@ import requests
 from fastapi import APIRouter, Depends, HTTPException, Request
 from fastapi.responses import HTMLResponse
 from msal import ConfidentialClientApplication
+
 from quivr_api.logger import get_logger
 from quivr_api.middlewares.auth import AuthBearer, get_current_user
 from quivr_api.modules.sync.dto.inputs import SyncsUserInput, SyncUserUpdateInput

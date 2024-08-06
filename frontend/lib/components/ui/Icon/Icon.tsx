@@ -40,8 +40,8 @@ export const Icon = ({
   return (
     <IconComponent
       className={`
-      ${classname} 
-      ${styles[size]} 
+      ${classname}
+      ${styles[size]}
       ${styles[color]}
       ${disabled ? styles.disabled : ""}
       ${iconHovered || hovered ? styles.hovered : ""}

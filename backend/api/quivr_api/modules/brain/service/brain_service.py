@@ -2,6 +2,7 @@ from typing import Optional
 from uuid import UUID
 
 from fastapi import HTTPException
+
 from quivr_api.celery_config import celery
 from quivr_api.logger import get_logger
 from quivr_api.modules.brain.dto.inputs import (

@@ -18,7 +18,7 @@ export const FromDocuments = (): JSX.Element => {
   return (
     <div
       className={`
-      ${styles.from_document_wrapper} 
+      ${styles.from_document_wrapper}
       ${dragging ? styles.dragging : ""}
       `}
       {...getRootProps()}

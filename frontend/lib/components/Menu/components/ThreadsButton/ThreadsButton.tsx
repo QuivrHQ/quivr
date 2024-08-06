@@ -56,7 +56,7 @@ export const ThreadsButton = (): JSX.Element => {
     >
       <div
         className={`
-        ${styles.history_content_wrapper} 
+        ${styles.history_content_wrapper}
         ${canScrollDown ? styles.fade_out : ""}
         `}
       >

@@ -79,7 +79,7 @@ export const SingleSelector = <T extends string | number | UUID>({
           {(folded || selectedOption) && (
             <div
               className={`
-            ${styles.label} 
+            ${styles.label}
             ${!selectedOption ? styles.not_set : ""}
             `}
             >

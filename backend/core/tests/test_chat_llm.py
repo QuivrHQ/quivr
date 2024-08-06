@@ -1,4 +1,5 @@
 import pytest
+
 from quivr_core import ChatLLM
 from quivr_core.chat_llm import ChatLLM
 

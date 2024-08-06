@@ -18,6 +18,8 @@ from langchain_core.runnables import RunnableLambda, RunnablePassthrough
 from langchain_openai import ChatOpenAI
 from pydantic import BaseModel, ConfigDict
 from pydantic_settings import BaseSettings
+from supabase.client import Client
+
 from quivr_api.logger import get_logger
 
 # Importing settings related to the 'brain'
@@ -33,7 +35,6 @@ from quivr_api.modules.dependencies import get_service
 from quivr_api.modules.knowledge.repository.knowledges import KnowledgeRepository
 from quivr_api.modules.prompt.service.get_prompt_to_use import get_prompt_to_use
 from quivr_api.vectorstore.supabase import CustomSupabaseVectorStore
-from supabase.client import Client
 
 logger = get_logger(__name__)
 

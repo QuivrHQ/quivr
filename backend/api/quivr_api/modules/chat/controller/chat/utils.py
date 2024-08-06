@@ -2,6 +2,7 @@ import time
 from uuid import UUID
 
 from fastapi import HTTPException
+
 from quivr_api.logger import get_logger
 from quivr_api.models.databases.llm_models import LLMModel
 from quivr_api.modules.user.service.user_usage import UserUsage

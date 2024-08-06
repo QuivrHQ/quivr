@@ -1,6 +1,7 @@
 from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict
+
 from quivr_api.logger import get_logger
 
 logger = get_logger(__name__)

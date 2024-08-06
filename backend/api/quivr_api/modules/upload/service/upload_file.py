@@ -4,9 +4,10 @@ from multiprocessing import get_logger
 
 from langchain.pydantic_v1 import Field
 from langchain.schema import Document
+from supabase.client import Client
+
 from quivr_api.logger import get_logger
 from quivr_api.models.settings import get_supabase_client
-from supabase.client import Client
 
 logger = get_logger(__name__)
 

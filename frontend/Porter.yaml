@@ -20,4 +20,3 @@ envGroups:
 - preview-frontend
 autoRollback:
   enabled: false
-

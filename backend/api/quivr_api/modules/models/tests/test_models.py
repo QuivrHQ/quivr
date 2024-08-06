@@ -1,5 +1,6 @@
 import pytest
 import pytest_asyncio
+
 from quivr_api.modules.models.entity.model import Model
 
 

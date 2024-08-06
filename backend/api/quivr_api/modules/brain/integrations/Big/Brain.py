@@ -11,6 +11,7 @@ from langchain_core.prompts.chat import (
     SystemMessagePromptTemplate,
 )
 from langchain_core.prompts.prompt import PromptTemplate
+
 from quivr_api.logger import get_logger
 from quivr_api.modules.brain.knowledge_brain_qa import KnowledgeBrainQA
 from quivr_api.modules.chat.dto.chats import ChatQuestion
@@ -60,7 +61,7 @@ class BigBrain(KnowledgeBrainQA):
         CHAT_COMBINE_PROMPT = ChatPromptTemplate.from_messages(messages)
 
         ### Question prompt
-        question_prompt_template = """Use the following portion of a long document to see if any of the text is relevant to answer the question. 
+        question_prompt_template = """Use the following portion of a long document to see if any of the text is relevant to answer the question.
         Return any relevant text verbatim. Return the answer in the same language as the question. If the answer is not in the text, just say nothing in the same language as the question.
         {context}
         Question: {question}

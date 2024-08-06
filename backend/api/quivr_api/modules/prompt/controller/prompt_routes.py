@@ -1,6 +1,7 @@
 from uuid import UUID
 
 from fastapi import APIRouter, Depends
+
 from quivr_api.middlewares.auth import AuthBearer
 from quivr_api.modules.prompt.entity.prompt import (
     CreatePromptProperties,

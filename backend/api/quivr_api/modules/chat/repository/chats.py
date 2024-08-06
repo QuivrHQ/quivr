@@ -1,13 +1,14 @@
 from typing import Sequence
 from uuid import UUID
 
+from sqlalchemy import exc
+from sqlmodel import select
+from sqlmodel.ext.asyncio.session import AsyncSession
+
 from quivr_api.models.settings import get_supabase_client
 from quivr_api.modules.chat.dto.inputs import ChatMessageProperties, QuestionAndAnswer
 from quivr_api.modules.chat.entity.chat import Chat, ChatHistory
 from quivr_api.modules.dependencies import BaseRepository
-from sqlalchemy import exc
-from sqlmodel import select
-from sqlmodel.ext.asyncio.session import AsyncSession
 
 
 class ChatRepository(BaseRepository):
@@ -40,7 +41,8 @@ class ChatRepository(BaseRepository):
 
     async def get_chat_history(self, chat_id: UUID) -> Sequence[ChatHistory]:
         query = (
-            select(ChatHistory).where(ChatHistory.chat_id == chat_id)
+            select(ChatHistory)
+            .where(ChatHistory.chat_id == chat_id)
             # TODO: type hints of sqlmodel arent stable for order_by
             .order_by(ChatHistory.message_time)  # type: ignore
         )

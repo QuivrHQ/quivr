@@ -5,6 +5,7 @@ import threading
 
 import httpx
 from fastapi import Request
+
 from quivr_api.logger import get_logger
 
 logger = get_logger(__name__)

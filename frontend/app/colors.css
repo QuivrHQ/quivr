@@ -29,20 +29,20 @@
 
     /* Accent */
     --accent: #13abba;
-  
+
     /* Gold */
     --gold: #b8860b;
     --gold-lightest: #f0ebdd;;
-  
+
     /* Error */
     --dangerous-dark: #e30c17;
     --dangerous: #9b373c;
     --dangerous-lightest: #eedddd;
-  
+
     /* Warning */
     --warning: #c77d33;
     --warning-lightest: #f2e9e0;
-  
+
     /* Success */
     --success: #47a455;
     --success-lightest: #d0edd4;

@@ -3,6 +3,7 @@ from typing import Optional
 from uuid import UUID
 
 from fastapi import HTTPException, UploadFile
+
 from quivr_api.celery_worker import process_file_and_notify
 from quivr_api.logger import get_logger
 from quivr_api.modules.brain.entity.brain_entity import RoleEnum
@@ -74,13 +75,13 @@ async def upload_file(
                 status_code=403,
                 detail=f"File {upload_file.filename} already exists in storage.",
             )
-        
+
         else:
             notification_service.update_notification_by_id(
                 notification_id,
                 NotificationUpdatableProperties(
                     status=NotificationsStatusEnum.ERROR,
-                    description=f"There was an error uploading the file",
+                    description="There was an error uploading the file",
                 ),
             )
             raise HTTPException(

@@ -60,7 +60,6 @@ class PDFGenerator(FPDF):
         self.cell(0, 10, "Github", 0, 1, "C", link="https://github.com/quivrhq/quivr")
 
     def chapter_body(self):
-
         self.set_font("DejaVu", "", 12)
         self.multi_cell(0, 10, self.pdf_model.content, markdown=True)
         self.ln()
@@ -74,7 +73,7 @@ if __name__ == "__main__":
     pdf_model = PDFModel(
         title="Summary of Legal Services Rendered by Orrick",
         content="""
-**Summary:** 
+**Summary:**
 The document is an invoice from Quivr Technologies, Inc. for legal services provided to client YC W24, related to initial corporate work. The total fees and disbursements amount to $8,345.00 for services rendered through February 29, 2024. The invoice includes specific instructions for payment remittance and contact information for inquiries. Online payment through e-billexpress.com is also an option.
 
 **Key Points:**

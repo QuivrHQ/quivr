@@ -22,7 +22,7 @@ export const MenuButton = (props: ButtonProps): JSX.Element => {
   return (
     <div
       className={`
-      ${styles.menu_button_wrapper} 
+      ${styles.menu_button_wrapper}
       ${props.isSelected ? styles.selected : ""}
       ${props.color === "gold" ? styles.gold : ""}
       `}
@@ -34,7 +34,7 @@ export const MenuButton = (props: ButtonProps): JSX.Element => {
         <Icon name={props.iconName} size="normal" color={props.color} />
         <span
           className={`
-          ${styles.title} 
+          ${styles.title}
           ${
             props.color === "gold"
               ? styles.gold

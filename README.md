@@ -88,7 +88,7 @@ You can find the installation video [here](https://www.youtube.com/watch?v=cXBa6
   ```bash
   cd backend && supabase start
   ```
-  and then 
+  and then
   ```bash
   cd ../
   docker compose pull

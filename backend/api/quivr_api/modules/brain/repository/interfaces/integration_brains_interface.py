@@ -38,7 +38,6 @@ class IntegrationBrainInterface(ABC):
 
 
 class IntegrationDescriptionInterface(ABC):
-
     @abstractmethod
     def get_integration_description(
         self, integration_id: UUID

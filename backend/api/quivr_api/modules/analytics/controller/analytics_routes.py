@@ -1,6 +1,7 @@
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, Query
+
 from quivr_api.middlewares.auth.auth_bearer import AuthBearer, get_current_user
 from quivr_api.modules.analytics.entity.analytics import Range
 from quivr_api.modules.analytics.service.analytics_service import AnalyticsService

@@ -6,6 +6,7 @@ import tiktoken
 from langchain.schema import Document
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from llama_parse import LlamaParse
+
 from quivr_api.logger import get_logger
 from quivr_api.models.files import File
 from quivr_api.modules.brain.service.brain_vector_service import BrainVectorService
@@ -74,9 +75,7 @@ def process_file(
 
     if file.documents is not None:
         logger.info("Coming here?")
-        for index, doc in enumerate(
-            file.documents, start=1
-        ):  # pyright: ignore reportPrivateUsage=none
+        for index, doc in enumerate(file.documents, start=1):  # pyright: ignore reportPrivateUsage=none
             new_metadata = metadata.copy()
             logger.info(f"Processing document {doc}")
             # Add filename at beginning of page content

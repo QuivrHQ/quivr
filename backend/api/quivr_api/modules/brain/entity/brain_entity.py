@@ -4,18 +4,18 @@ from typing import List, Optional
 from uuid import UUID
 
 from pydantic import BaseModel
+
+# from sqlmodel import Enum as PGEnum
+from sqlalchemy.dialects.postgresql import ENUM as PGEnum
+from sqlalchemy.ext.asyncio import AsyncAttrs
+from sqlmodel import TIMESTAMP, Column, Field, Relationship, SQLModel, text
+from sqlmodel import UUID as PGUUID
+
 from quivr_api.modules.brain.entity.integration_brain import (
     IntegrationDescriptionEntity,
     IntegrationEntity,
 )
 from quivr_api.modules.prompt.entity.prompt import Prompt
-
-# from sqlmodel import Enum as PGEnum
-from sqlalchemy.dialects.postgresql import ENUM as PGEnum
-from sqlalchemy.ext.asyncio import AsyncAttrs
-from sqlmodel import TIMESTAMP
-from sqlmodel import UUID as PGUUID
-from sqlmodel import Column, Field, Relationship, SQLModel, text
 
 
 class BrainType(str, Enum):

@@ -13,7 +13,7 @@ export const UpdateMetadata = () => {
     if (metaDescription instanceof HTMLMetaElement) {
       metaDescription.content = description;
     }
-  }, [t]); 
+  }, [t]);
 
   return null;
 };

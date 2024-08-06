@@ -3,6 +3,7 @@ import time
 import openai
 from langchain.schema import Document
 from langchain.text_splitter import RecursiveCharacterTextSplitter
+
 from quivr_api.models.files import File
 from quivr_api.models.settings import get_documents_vector_store
 from quivr_api.packages.files.file import compute_sha1_from_content

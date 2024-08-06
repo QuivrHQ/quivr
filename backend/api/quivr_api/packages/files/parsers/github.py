@@ -4,6 +4,7 @@ import time
 from langchain.schema import Document
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_community.document_loaders import GitLoader
+
 from quivr_api.models.files import File
 from quivr_api.packages.embeddings.vectors import Neurons
 from quivr_api.packages.files.file import compute_sha1_from_content

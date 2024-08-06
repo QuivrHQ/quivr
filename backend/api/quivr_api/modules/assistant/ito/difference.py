@@ -11,6 +11,7 @@ from langchain_community.chat_models import ChatLiteLLM
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.prompts import ChatPromptTemplate, PromptTemplate
 from llama_parse import LlamaParse
+
 from quivr_api.logger import get_logger
 from quivr_api.modules.assistant.dto.inputs import InputAssistant
 from quivr_api.modules.assistant.dto.outputs import (
@@ -32,7 +33,6 @@ logger = get_logger(__name__)
 
 
 class DifferenceAssistant(ITO):
-
     def __init__(
         self,
         input: InputAssistant,
@@ -69,7 +69,6 @@ class DifferenceAssistant(ITO):
         return True
 
     async def process_assistant(self):
-
         document_1 = self.files[0]
         document_2 = self.files[1]
 

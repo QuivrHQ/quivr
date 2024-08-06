@@ -12,13 +12,14 @@ from langchain_core.pydantic_v1 import BaseModel as BaseModelV1
 from langchain_core.pydantic_v1 import Field as FieldV1
 from langchain_openai import ChatOpenAI
 from langgraph.graph import END, StateGraph
+from typing_extensions import TypedDict
+
 from quivr_api.logger import get_logger
 from quivr_api.modules.brain.knowledge_brain_qa import KnowledgeBrainQA
 from quivr_api.modules.chat.dto.chats import ChatQuestion
 from quivr_api.modules.chat.dto.outputs import GetChatHistoryOutput
 from quivr_api.modules.chat.service.chat_service import ChatService
 from quivr_api.modules.dependencies import get_service
-from typing_extensions import TypedDict
 
 
 # Post-processing
@@ -107,7 +108,7 @@ class SelfBrain(KnowledgeBrainQA):
         structured_llm_grader = llm.with_structured_output(GradeDocuments)
 
         # Prompt
-        system = """You are a grader assessing relevance of a retrieved document to a user question. \n 
+        system = """You are a grader assessing relevance of a retrieved document to a user question. \n
             It does not need to be a stringent test. The goal is to filter out erroneous retrievals. \n
             If the document contains keyword(s) or semantic meaning related to the user question, grade it as relevant. \n
             Give a binary score 'yes' or 'no' score to indicate whether the document is relevant to the question."""
@@ -129,9 +130,9 @@ class SelfBrain(KnowledgeBrainQA):
         # Prompt
         human_prompt = """You are an assistant for question-answering tasks. Use the following pieces of retrieved context to answer the question. If you don't know the answer, just say that you don't know. Use three sentences maximum and keep the answer concise.
 
-        Question: {question} 
+        Question: {question}
 
-        Context: {context} 
+        Context: {context}
 
         Answer:
         """
@@ -150,7 +151,7 @@ class SelfBrain(KnowledgeBrainQA):
         structured_llm_grader = llm.with_structured_output(GradeHallucinations)
 
         # Prompt
-        system = """You are a grader assessing whether an LLM generation is grounded in / supported by a set of retrieved facts. \n 
+        system = """You are a grader assessing whether an LLM generation is grounded in / supported by a set of retrieved facts. \n
             Give a binary score 'yes' or 'no'. 'Yes' means that the answer is grounded in / supported by the set of facts."""
         hallucination_prompt = ChatPromptTemplate.from_messages(
             [
@@ -172,7 +173,7 @@ class SelfBrain(KnowledgeBrainQA):
         structured_llm_grader = llm.with_structured_output(GradeAnswer)
 
         # Prompt
-        system = """You are a grader assessing whether an answer addresses / resolves a question \n 
+        system = """You are a grader assessing whether an answer addresses / resolves a question \n
             Give a binary score 'yes' or 'no'. Yes' means that the answer resolves the question."""
         answer_prompt = ChatPromptTemplate.from_messages(
             [
@@ -193,7 +194,7 @@ class SelfBrain(KnowledgeBrainQA):
         llm = ChatOpenAI(model="gpt-4o", temperature=0)
 
         # Prompt
-        system = """You a question re-writer that converts an input question to a better version that is optimized \n 
+        system = """You a question re-writer that converts an input question to a better version that is optimized \n
             for vectorstore retrieval. Look at the input and try to reason about the underlying semantic intent / meaning."""
         re_write_prompt = ChatPromptTemplate.from_messages(
             [
@@ -210,13 +211,11 @@ class SelfBrain(KnowledgeBrainQA):
         return question_rewriter
 
     def get_chain(self):
-
         graph = self.create_graph()
 
         return graph
 
     def create_graph(self):
-
         workflow = StateGraph(GraphState)
 
         # Define the nodes
