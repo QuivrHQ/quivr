@@ -1,5 +1,7 @@
 export interface Model {
-  id: string;
   name: string;
+  price: number;
   description: string;
+  display_name: string;
+  image_url: string;
 }
