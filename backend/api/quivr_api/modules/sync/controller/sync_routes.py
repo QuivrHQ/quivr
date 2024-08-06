@@ -3,6 +3,7 @@ import uuid
 from typing import List
 
 from fastapi import APIRouter, Depends, status
+
 from quivr_api.logger import get_logger
 from quivr_api.middlewares.auth import AuthBearer, get_current_user
 from quivr_api.modules.notification.dto.inputs import CreateNotification
@@ -12,6 +13,7 @@ from quivr_api.modules.notification.service.notification_service import (
 )
 from quivr_api.modules.sync.controller.azure_sync_routes import azure_sync_router
 from quivr_api.modules.sync.controller.dropbox_sync_routes import dropbox_sync_router
+from quivr_api.modules.sync.controller.github_sync_routes import github_sync_router
 from quivr_api.modules.sync.controller.google_sync_routes import google_sync_router
 from quivr_api.modules.sync.dto import SyncsDescription
 from quivr_api.modules.sync.dto.inputs import SyncsActiveInput, SyncsActiveUpdateInput
@@ -38,6 +40,7 @@ sync_router = APIRouter()
 # Add Google routes here
 sync_router.include_router(google_sync_router)
 sync_router.include_router(azure_sync_router)
+sync_router.include_router(github_sync_router)
 sync_router.include_router(dropbox_sync_router)
 
 
@@ -57,6 +60,12 @@ azure_sync = SyncsDescription(
 dropbox_sync = SyncsDescription(
     name="DropBox",
     description="Sync your DropBox Drive with Quivr",
+    auth_method=AuthMethodEnum.URI_WITH_CALLBACK,
+)
+
+github_sync = SyncsDescription(
+    name="GitHub",
+    description="Sync your GitHub Drive with Quivr",
     auth_method=AuthMethodEnum.URI_WITH_CALLBACK,
 )
 
