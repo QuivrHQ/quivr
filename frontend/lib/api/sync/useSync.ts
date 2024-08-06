@@ -11,8 +11,9 @@ import {
   syncDropbox,
   syncFiles,
   syncGoogleDrive,
+  syncNotion,
   syncSharepoint,
-  updateActiveSync,
+  updateActiveSync
 } from "./sync";
 import { Integration, OpenedConnection, Provider } from "./types";
 
@@ -27,6 +28,10 @@ export const useSync = () => {
       "https://quivr-cms.s3.eu-west-3.amazonaws.com/sharepoint_8c41cfdb09.png",
     DropBox:
       "https://quivr-cms.s3.eu-west-3.amazonaws.com/dropbox_dce4f3d753.png",
+    Notion:
+      "https://quivr-cms.s3.eu-west-3.amazonaws.com/Notion_app_logo_004168672c.png",
+    GitHub:
+      "https://quivr-cms.s3.eu-west-3.amazonaws.com/dropbox_dce4f3d753.png",
   };
 
   const integrationIconUrls: Record<Integration, string> = {
@@ -35,6 +40,10 @@ export const useSync = () => {
     "Share Point":
       "https://quivr-cms.s3.eu-west-3.amazonaws.com/sharepoint_8c41cfdb09.png",
     Dropbox:
+      "https://quivr-cms.s3.eu-west-3.amazonaws.com/dropbox_dce4f3d753.png",
+    Notion:
+      "https://quivr-cms.s3.eu-west-3.amazonaws.com/Notion_app_logo_004168672c.png",
+    GitHub:
       "https://quivr-cms.s3.eu-west-3.amazonaws.com/dropbox_dce4f3d753.png",
   };
 
@@ -49,6 +58,7 @@ export const useSync = () => {
       syncGoogleDrive(name, axiosInstance),
     syncSharepoint: async (name: string) => syncSharepoint(name, axiosInstance),
     syncDropbox: async (name: string) => syncDropbox(name, axiosInstance),
+    syncNotion: async (name: string) => syncNotion(name, axiosInstance),
     getUserSyncs: async () => getUserSyncs(axiosInstance),
     getSyncFiles: async (userSyncId: number, folderId?: string) =>
       getSyncFiles(axiosInstance, userSyncId, folderId),

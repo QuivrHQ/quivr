@@ -43,6 +43,8 @@ google-auth-httplib2 = "*"
 google-auth-oauthlib = "*"
 dropbox = "^12.0.2"
 msal = "*"
+notion-client = "^2.2.1"
+markdownify = "^0.13.1"
 
 # To keep (Maybe)
 langchain = "*"

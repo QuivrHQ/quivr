@@ -6,6 +6,7 @@ from uuid import UUID, uuid4
 from pydantic import BaseModel, ConfigDict
 from supabase.client import AsyncClient
 
+from quivr_api.celery_config import celery
 from quivr_api.logger import get_logger
 from quivr_api.models.settings import get_supabase_async_client
 from quivr_api.modules.brain.repository.brains_vectors import BrainsVectors
@@ -25,6 +26,7 @@ from quivr_api.modules.sync.dto.inputs import (
 )
 from quivr_api.modules.sync.entity.sync import DBSyncFile, SyncFile
 from quivr_api.modules.sync.repository.sync_files import SyncFiles
+from quivr_api.modules.sync.service.sync_notion import SyncNotionService
 from quivr_api.modules.sync.service.sync_service import SyncService, SyncUserService
 from quivr_api.modules.sync.utils.sync import BaseSync
 from quivr_api.modules.upload.service.upload_file import (
@@ -35,6 +37,8 @@ from quivr_api.modules.upload.service.upload_file import (
 notification_service = NotificationService()
 brain_vectors = BrainsVectors()
 logger = get_logger(__name__)
+
+celery_inspector = celery.control.inspect()
 
 
 def filter_supported_files(
@@ -260,7 +264,12 @@ class SyncUtils(BaseModel):
 
         return {"downloaded_files": downloaded_files}
 
-    async def sync(self, sync_active_id: int, user_id: UUID):
+    async def sync(
+        self,
+        sync_active_id: int,
+        user_id: UUID,
+        notion_service: SyncNotionService | None = None,
+    ):
         """
         Check if the Specific sync has not been synced and download the folders and files based on the settings.
 
@@ -338,24 +347,51 @@ class SyncUtils(BaseModel):
         files: List[SyncFile] = []
         files_metadata = []
         if len(folders) > 0:
-            for folder in folders:
+            if self.sync_cloud.lower_name == "notion":
                 files.extend(
-                    self.sync_cloud.get_files(
+                    await self.sync_cloud.aget_files_by_id(
                         sync_user["credentials"],
-                        folder_id=folder,
-                        recursive=True,
+                        folders,
                     )
                 )
+
+            for folder in folders:
+                # FIXME: should just put everything asynchrounous
+
+                if self.sync_cloud.lower_name == "notion":
+                    files.extend(
+                        await self.sync_cloud.aget_files(
+                            sync_user["credentials"],
+                            folder_id=folder,
+                            recursive=True,
+                        )
+                    )
+                else:
+                    files.extend(
+                        self.sync_cloud.get_files(
+                            sync_user["credentials"],
+                            folder_id=folder,
+                            recursive=True,
+                        )
+                    )
+        # FIXME: should just put everything asynchrounous
         if len(files_to_download) > 0:
-            files_metadata = self.sync_cloud.get_files_by_id(
-                sync_user["credentials"],
-                files_to_download,
-            )
+            if self.sync_cloud.lower_name == "notion":
+                files_metadata = await self.sync_cloud.aget_files_by_id(
+                    sync_user["credentials"],
+                    files_to_download,
+                )
+            else:
+                files_metadata = self.sync_cloud.get_files_by_id(
+                    sync_user["credentials"],
+                    files_to_download,
+                )
         files = files + files_metadata  # type: ignore
 
         if "error" in files:
             logger.error(
-                "Failed to download files from Azure for sync_active_id: %s",
+                "Failed to download files from %s for sync_active_id: %s",
+                self.sync_cloud.name,
                 sync_active_id,
             )
             return None
@@ -367,23 +403,40 @@ class SyncUtils(BaseModel):
             else None
         )
         logger.info("Files retrieved from %s: %s", self.sync_cloud.lower_name, files)
-
-        files_to_download = [
-            file
-            for file in files
-            if not file.is_folder
-            and (
-                (
-                    not last_synced_time
-                    or datetime.strptime(
-                        file.last_modified,
-                        (self.sync_cloud.datetime_format),
-                    ).replace(tzinfo=timezone.utc)
-                    > last_synced_time
+        if self.sync_cloud == "notion":
+            files_to_download = [
+                file
+                for file in files
+                if (
+                    (
+                        not last_synced_time
+                        or datetime.strptime(
+                            file.last_modified,
+                            (self.sync_cloud.datetime_format),
+                        ).replace(tzinfo=timezone.utc)
+                        > last_synced_time
+                    )
+                    or not check_file_exists(sync_active["brain_id"], file.name)
+                    or not file.mime_type == "db"
                 )
-                or not check_file_exists(sync_active["brain_id"], file.name)
-            )
-        ]
+            ]
+        else:
+            files_to_download = [
+                file
+                for file in files
+                if not file.is_folder
+                and (
+                    (
+                        not last_synced_time
+                        or datetime.strptime(
+                            file.last_modified,
+                            (self.sync_cloud.datetime_format),
+                        ).replace(tzinfo=timezone.utc)
+                        > last_synced_time
+                    )
+                    or not check_file_exists(sync_active["brain_id"], file.name)
+                )
+            ]
 
         downloaded_files = await self._process_sync_diff(
             sync_user["credentials"],
