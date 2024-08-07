@@ -20,7 +20,6 @@ import { useSupabase } from "@/lib/context/SupabaseProvider";
 import { useUserSettingsContext } from "@/lib/context/UserSettingsProvider/hooks/useUserSettingsContext";
 import { useUserData } from "@/lib/hooks/useUserData";
 import { redirectToLogin } from "@/lib/router/redirectToLogin";
-import { Model } from "@/lib/types/Models";
 import { ButtonType } from "@/lib/types/QuivrButton";
 import { Tab } from "@/lib/types/Tab";
 
@@ -33,7 +32,6 @@ const Search = (): JSX.Element => {
   const [isNewBrain, setIsNewBrain] = useState(false);
   const [currentPage, setCurrentPage] = useState(0);
   const [transitionDirection, setTransitionDirection] = useState("");
-  const [models, setModels] = useState<Model[]>([]);
   const brainsPerPage = 6;
 
   const pathname = usePathname();
@@ -62,14 +60,14 @@ const Search = (): JSX.Element => {
   const assistantsTabs: Tab[] = [
     {
       label: "Models",
-      isSelected: selectedTab === "Models",
-      onClick: () => setSelectedTab("Models"),
+      isSelected: selectedTab === "Knowledge",
+      onClick: () => setSelectedTab("Knowledge"),
       iconName: "file",
     },
     {
       label: "Brains",
-      isSelected: selectedTab === "Brains",
-      onClick: () => setSelectedTab("Brains"),
+      isSelected: selectedTab === "Models",
+      onClick: () => setSelectedTab("Models"),
       iconName: "settings",
     },
     {
@@ -113,7 +111,7 @@ const Search = (): JSX.Element => {
     void (async () => {
       try {
         const res = await getModels();
-        setModels(res);
+        console.info(res);
       } catch (error) {
         console.error(error);
       }
@@ -176,54 +174,6 @@ const Search = (): JSX.Element => {
     (currentPage + 1) * brainsPerPage
   );
 
-  const renderContent = () => {
-    switch (selectedTab) {
-      case "Models":
-        return models.map((model, index) => (
-          <BrainButton
-            key={index}
-            name={model.display_name}
-            description={model.description}
-            newBrain={newBrain}
-          />
-        ));
-      case "Brains":
-        return displayedBrains.map((brain, index) => (
-          <BrainButton
-            key={index}
-            id={brain.id}
-            name={brain.name}
-            description={brain.description}
-            newBrain={newBrain}
-          />
-        ));
-      case "All":
-        return (
-          <>
-            {models.map((model, index) => (
-              <BrainButton
-                key={index}
-                name={model.display_name}
-                description={model.description}
-                newBrain={newBrain}
-              />
-            ))}
-            {displayedBrains.map((brain, index) => (
-              <BrainButton
-                key={index}
-                id={brain.id}
-                name={brain.name}
-                description={brain.description}
-                newBrain={newBrain}
-              />
-            ))}
-          </>
-        );
-      default:
-        return null;
-    }
-  };
-
   return (
     <>
       <div className={styles.main_container}>
@@ -246,41 +196,49 @@ const Search = (): JSX.Element => {
               <div className={styles.tabs}>
                 <SmallTabs tabList={assistantsTabs} />
               </div>
-              <div className={styles.content_container}>
+              <div className={styles.brains_list_container}>
                 <div
-                  className={`${styles.content_wrapper} ${
+                  className={`${styles.chevron} ${
+                    currentPage === 0 ? styles.disabled : ""
+                  }`}
+                  onClick={handlePreviousPage}
+                >
+                  <Icon
+                    name="chevronLeft"
+                    size="big"
+                    color="black"
+                    handleHover={true}
+                  />
+                </div>
+                <div
+                  className={`${styles.brains_list_wrapper} ${
                     transitionDirection === "next"
                       ? styles.slide_next
                       : styles.slide_prev
                   }`}
                 >
-                  <div
-                    className={`${styles.chevron} ${
-                      currentPage === 0 ? styles.disabled : ""
-                    }`}
-                    onClick={handlePreviousPage}
-                  >
-                    <Icon
-                      name="chevronLeft"
-                      size="big"
-                      color="black"
-                      handleHover={true}
+                  {displayedBrains.map((brain, index) => (
+                    <BrainButton
+                      key={index}
+                      id={brain.id}
+                      name={brain.name}
+                      description={brain.description}
+                      newBrain={newBrain}
                     />
-                  </div>
-                  {renderContent()}
-                  <div
-                    className={`${styles.chevron} ${
-                      currentPage >= totalPages - 1 ? styles.disabled : ""
-                    }`}
-                    onClick={handleNextPage}
-                  >
-                    <Icon
-                      name="chevronRight"
-                      size="big"
-                      color="black"
-                      handleHover={true}
-                    />
-                  </div>
+                  ))}
+                </div>
+                <div
+                  className={`${styles.chevron} ${
+                    currentPage >= totalPages - 1 ? styles.disabled : ""
+                  }`}
+                  onClick={handleNextPage}
+                >
+                  <Icon
+                    name="chevronRight"
+                    size="big"
+                    color="black"
+                    handleHover={true}
+                  />
                 </div>
               </div>
             </div>
