@@ -22,7 +22,7 @@ import { redirectToLogin } from "@/lib/router/redirectToLogin";
 import { ButtonType } from "@/lib/types/QuivrButton";
 import { Tab } from "@/lib/types/Tab";
 
-import { BrainOrModel } from "./BrainButton/BrainButton";
+import { BrainOrModel } from "./BrainsList/BrainButton/BrainButton";
 import BrainsList from "./BrainsList/BrainsList";
 import styles from "./page.module.scss";
 
@@ -94,7 +94,11 @@ const Search = (): JSX.Element => {
     void (async () => {
       try {
         const res = await getModels();
-        setModels(res);
+        const adjustedModels = res.map((model) => ({
+          ...model,
+          name: model.display_name,
+        }));
+        setModels(adjustedModels);
       } catch (error) {
         console.error(error);
       }
