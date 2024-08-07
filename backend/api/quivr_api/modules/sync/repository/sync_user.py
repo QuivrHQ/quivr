@@ -10,7 +10,6 @@ from quivr_api.modules.notification.service.notification_service import (
 )
 from quivr_api.modules.sync.dto.inputs import SyncsUserInput, SyncUserUpdateInput
 from quivr_api.modules.sync.entity.sync import SyncFile, SyncsUser
-from quivr_api.modules.sync.repository.sync_interfaces import SyncUserInterface
 from quivr_api.modules.sync.service.sync_notion import SyncNotionService
 from quivr_api.modules.sync.utils.sync import (
     AzureDriveSync,
@@ -26,7 +25,7 @@ knowledge_service = KnowledgeService()
 logger = get_logger(__name__)
 
 
-class SyncUser(SyncUserInterface):
+class SyncUser:
     def __init__(self):
         """
         Initialize the Sync class with a Supabase client.
@@ -117,10 +116,11 @@ class SyncUser(SyncUserInterface):
         response = (
             self.db.from_("syncs_user").select("*").eq("state", state_str).execute()
         )
-        if response.data:
+        if response.data and len(response.data) > 0:
             logger.info("Sync user found by state: %s", response.data[0])
-            return response.data[0]
-        logger.warning("No sync user found for state: %s", state)
+            sync_user = SyncsUser.model_validate(response.data[0])
+            return sync_user
+        logger.error("No sync user found for state: %s", state)
         return None
 
     def delete_sync_user(self, sync_id: int, user_id: UUID | str):

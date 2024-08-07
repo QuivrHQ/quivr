@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { SyncElement } from "@/lib/api/sync/types";
 import { useSync } from "@/lib/api/sync/useSync";
 import { ConnectionCards } from "@/lib/components/ConnectionCards/ConnectionCards";
+import { LoaderIcon } from "@/lib/components/ui/LoaderIcon/LoaderIcon";
 import { TextButton } from "@/lib/components/ui/TextButton/TextButton";
 import { useUserData } from "@/lib/hooks/useUserData";
 
@@ -87,6 +88,12 @@ export const FromConnections = (): JSX.Element => {
             />
           </div>
           <div className={styles.connection_content}>
+            {loading ? (
+              <div className={styles.loader_icon}>
+                <LoaderIcon size="big" color="primary" />
+              </div>
+            ) : (
+              <>
                 {currentFolders.map((folder) => (
                   <div
                     key={folder.id}
@@ -112,6 +119,8 @@ export const FromConnections = (): JSX.Element => {
                     />
                   </div>
                 ))}
+              </>
+            )}
             {!currentFiles.length && !currentFolders.length && (
               <span className={styles.empty_folder}>Empty folder</span>
             )}
