@@ -140,7 +140,7 @@ class SyncUser(SyncUserInterface):
         logger.info("Sync user deleted successfully")
 
     def update_sync_user(
-        self, sync_user_id: int, state: dict, sync_user_input: SyncUserUpdateInput
+        self, sync_user_id: UUID, state: dict, sync_user_input: SyncUserUpdateInput
     ):
         """
         Update a sync user in the database.
@@ -159,7 +159,7 @@ class SyncUser(SyncUserInterface):
 
         state_str = json.dumps(state)
         self.db.from_("syncs_user").update(sync_user_input.model_dump()).eq(
-            "user_id", sync_user_id
+            "user_id", str(sync_user_id)
         ).eq("state", state_str).execute()
         logger.info("Sync user updated successfully")
 
