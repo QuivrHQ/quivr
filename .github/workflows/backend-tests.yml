@@ -21,6 +21,9 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
+      - name: Install poetry
+        run: pipx install poetry
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
@@ -70,8 +73,6 @@ jobs:
         run: |
           tesseract --version
           cd backend
-          python -m pip install --upgrade pip
-          pip install poetry
           poetry install --with dev,test
           supabase db start
           poetry run pytest worker
