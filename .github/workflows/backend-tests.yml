@@ -42,14 +42,6 @@ jobs:
             sudo dpkg -i supabase_1.163.6_linux_arm64.deb
           fi
 
-      - name: Cache system dependencies
-        uses: actions/cache@v4
-        with:
-          path: /var/cache/apt/archives
-          key: ${{ runner.os }}-apt-${{ hashFiles('**/apt-packages.txt') }}
-          restore-keys: |
-            ${{ runner.os }}-apt-
-
       - name: Install system dependencies
         run: |
           sudo apt-get update
