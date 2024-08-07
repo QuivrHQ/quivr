@@ -11,7 +11,7 @@ from quivr_api.modules.user.entity.user_identity import User
 
 class SyncsUser(BaseModel):
     id: int
-    user_id: str
+    user_id: UUID
     name: str
     provider: str
     credentials: dict

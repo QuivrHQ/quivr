@@ -96,11 +96,11 @@ def oauth2callback_notion(request: Request, background_tasks: BackgroundTasks):
     sync_user_state = sync_user_service.get_sync_user_by_state(state_dict)
 
     if not sync_user_state or state_dict != sync_user_state.state:
-        logger.error("Invalid state parameter")
+        logger.error(f"Invalid state parameter for {sync_user_state}")
         raise HTTPException(status_code=400, detail="Invalid state parameter")
     else:
         logger.info(
-            f"CURRENT USER: {current_user}, SYNC USER STATE USER: {sync_user_state.state}"
+            f"Current user: {current_user}, sync user state: {sync_user_state.state}"
         )
 
     if sync_user_state.user_id != current_user:
@@ -152,7 +152,7 @@ def oauth2callback_notion(request: Request, background_tasks: BackgroundTasks):
         logger.info(f"Notion sync created successfully for user: {current_user}")
         # launch celery task to sync notion data
         celery.send_task(
-            "fetch_and_store_notion_files",
+            "fetch_and_store_notion_files_task",
             kwargs={"access_token": access_token, "user_id": current_user},
         )
         return HTMLResponse(successfullConnectionPage)

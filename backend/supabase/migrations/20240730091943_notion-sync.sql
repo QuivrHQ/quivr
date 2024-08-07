@@ -13,7 +13,7 @@ create table "public"."notion_sync" (
 );
 alter table "public"."notion_sync" enable row level security;
 alter table "public"."syncs_active"
-add column "notification_id" uuid;
+add column if not exists "notification_id" uuid;
 CREATE UNIQUE INDEX notion_sync_pkey ON public.notion_sync USING btree (id, notion_id);
 alter table "public"."notion_sync"
 add constraint "notion_sync_pkey" PRIMARY KEY using index "notion_sync_pkey";
