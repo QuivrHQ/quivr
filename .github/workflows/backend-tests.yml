@@ -1,16 +1,9 @@
 name: Run Tests API and Worker
 
 on:
-  push:
-    paths:
-    #   - "backend/api/**"
-    #   - "backend/worker/**"
-    # branches:
-    #   - "main"
   pull_request:
-    # paths:
-    #   - "backend/api/**"
-    #   - "backend/worker/**"
+    paths:
+      - "backend/**"
   workflow_dispatch:
 
 jobs:
