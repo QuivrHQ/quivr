@@ -22,25 +22,11 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Set up Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v5
         with:
           python-version: "3.11"
+          cache: poetry
 
-      - name: Cache Python dependencies
-        uses: actions/cache@v2
-        with:
-          path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('**/poetry.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-pip-
-
-      - name: Cache Poetry virtualenv
-        uses: actions/cache@v2
-        with:
-          path: ~/.cache/pypoetry/virtualenvs
-          key: ${{ runner.os }}-poetry-${{ hashFiles('**/poetry.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-poetry-
 
       - name: Install Supabase CLI
         run: |
@@ -54,7 +40,7 @@ jobs:
           fi
 
       - name: Cache system dependencies
-        uses: actions/cache@v2
+        uses: actions/cache@v4
         with:
           path: /var/cache/apt/archives
           key: ${{ runner.os }}-apt-${{ hashFiles('**/apt-packages.txt') }}
@@ -87,6 +73,6 @@ jobs:
           python -m pip install --upgrade pip
           pip install poetry
           poetry install --with dev,test
-          supabase start
+          supabase db start
           poetry run pytest worker
           poetry run pytest api
