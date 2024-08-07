@@ -3,12 +3,14 @@ name: Run Tests API and Worker
 on:
   push:
     paths:
-      - "backend/api/**"
-      - "backend/worker/**"
+    #   - "backend/api/**"
+    #   - "backend/worker/**"
+    # branches:
+    #   - "main"
   pull_request:
-    paths:
-      - "backend/api/**"
-      - "backend/worker/**"
+    # paths:
+    #   - "backend/api/**"
+    #   - "backend/worker/**"
   workflow_dispatch:
 
 jobs:
@@ -24,6 +26,22 @@ jobs:
         with:
           python-version: "3.11"
 
+      - name: Cache Python dependencies
+        uses: actions/cache@v2
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/poetry.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
+      - name: Cache Poetry virtualenv
+        uses: actions/cache@v2
+        with:
+          path: ~/.cache/pypoetry/virtualenvs
+          key: ${{ runner.os }}-poetry-${{ hashFiles('**/poetry.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-poetry-
+
       - name: Install Supabase CLI
         run: |
           ARCHITECTURE=$(uname -m)
@@ -34,6 +52,19 @@ jobs:
             wget https://github.com/supabase/cli/releases/download/v1.163.6/supabase_1.163.6_linux_arm64.deb
             sudo dpkg -i supabase_1.163.6_linux_arm64.deb
           fi
+
+      - name: Cache system dependencies
+        uses: actions/cache@v2
+        with:
+          path: /var/cache/apt/archives
+          key: ${{ runner.os }}-apt-${{ hashFiles('**/apt-packages.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-apt-
+
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libmagic-dev poppler-utils libreoffice tesseract-ocr pandoc
 
       - name: Install dependencies and run tests
         env:
@@ -50,13 +81,11 @@ jobs:
             QUIVR_DOMAIN: http://localhost:3000/
             BACKEND_URL: http://localhost:5050
         run: |
-          sudo apt-get update
-          sudo apt-get install -y libmagic-dev poppler-utils libreoffice tesseract-ocr pandoc
           tesseract --version
           cd backend
           python -m pip install --upgrade pip
           pip install poetry
-          poetry install -E base --with dev,test
+          poetry install --with dev,test
           supabase start
           poetry run pytest worker
           poetry run pytest api
