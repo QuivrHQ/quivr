@@ -3,28 +3,31 @@ from typing import Optional
 from uuid import UUID
 
 from fastapi import HTTPException, UploadFile
-
 from quivr_api.celery_config import celery
 from quivr_api.logger import get_logger
 from quivr_api.models.settings import get_supabase_async_client
 from quivr_api.modules.brain.entity.brain_entity import RoleEnum
-from quivr_api.modules.brain.service.brain_authorization_service import (
-    validate_brain_authorization,
-)
+from quivr_api.modules.brain.service.brain_authorization_service import \
+    validate_brain_authorization
+from quivr_api.modules.dependencies import get_service
 from quivr_api.modules.knowledge.dto.inputs import CreateKnowledgeProperties
-from quivr_api.modules.knowledge.service.knowledge_service import KnowledgeService
-from quivr_api.modules.notification.dto.inputs import NotificationUpdatableProperties
-from quivr_api.modules.notification.entity.notification import NotificationsStatusEnum
-from quivr_api.modules.notification.service.notification_service import (
-    NotificationService,
-)
+from quivr_api.modules.knowledge.service.knowledge_service import \
+    KnowledgeService
+from quivr_api.modules.notification.dto.inputs import \
+    NotificationUpdatableProperties
+from quivr_api.modules.notification.entity.notification import \
+    NotificationsStatusEnum
+from quivr_api.modules.notification.service.notification_service import \
+    NotificationService
 from quivr_api.modules.upload.service.upload_file import upload_file_storage
 from quivr_api.modules.user.service.user_usage import UserUsage
 from quivr_api.utils.telemetry import maybe_send_telemetry
 
 logger = get_logger("upload_file")
 
-knowledge_service = KnowledgeService()
+#knowledge_service = KnowledgeService()
+knowledge_service = get_service(KnowledgeService)()
+
 notification_service = NotificationService()
 
 
@@ -92,14 +95,17 @@ async def upload_file_sync(
     knowledge_to_add = CreateKnowledgeProperties(
         brain_id=brain_id,
         file_name=upload_file.filename,
-        extension=os.path.splitext(
+        mime_type=os.path.splitext(
             upload_file.filename  # pyright: ignore reportPrivateUsage=none
         )[-1].lower(),
-        integration=integration,
-        integration_link=integration_link,
+        source=integration,
+        source_link=integration_link,
+        file_size=1, #FIXME (len(file_content) / 1024 / 1024),
+        metadata= {}
+
     )
 
-    added_knowledge = knowledge_service.add_knowledge(knowledge_to_add)
+    added_knowledge = await knowledge_service.add_knowledge(knowledge_to_add)
 
     celery.send_task(
         "process_file_task",

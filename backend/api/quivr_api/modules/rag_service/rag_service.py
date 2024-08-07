@@ -13,8 +13,8 @@ from quivr_api.modules.chat.controller.chat.utils import (
 from quivr_api.modules.chat.dto.inputs import CreateChatHistory
 from quivr_api.modules.chat.dto.outputs import GetChatHistoryOutput
 from quivr_api.modules.chat.service.chat_service import ChatService
-from quivr_api.modules.knowledge.repository.knowledges import \
-    KnowledgeRepository
+from quivr_api.modules.knowledge.service.knowledge_service import \
+    KnowledgeService
 from quivr_api.modules.prompt.entity.prompt import Prompt
 from quivr_api.modules.prompt.service.prompt_service import PromptService
 from quivr_api.modules.user.entity.user_identity import UserIdentity
@@ -40,7 +40,7 @@ class RAGService:
         brain_service: BrainService,
         prompt_service: PromptService,
         chat_service: ChatService,
-        knowledge_service: KnowledgeRepository,
+        knowledge_service: KnowledgeService,
     ):
         # Services
         self.brain_service = brain_service
@@ -187,7 +187,7 @@ class RAGService:
         logger.debug(f"generate_answer with config : {rag_config.model_dump()}")
         history = await self.chat_service.get_chat_history(self.chat_id)
         # Get list of files
-        list_files = self.knowledge_service.get_all_knowledge_in_brain(
+        list_files = await self.knowledge_service.get_all_knowledge_in_brain(
             self.brain.brain_id
         )
         # Build RAG dependencies to inject
@@ -242,7 +242,7 @@ class RAGService:
 
         # Get list of files urls
         # TODO: Why do we get ALL the files ?
-        list_files = self.knowledge_service.get_all_knowledge_in_brain(
+        list_files = await self.knowledge_service.get_all_knowledge_in_brain(
             self.brain.brain_id
         )
         llm = self.get_llm(rag_config)

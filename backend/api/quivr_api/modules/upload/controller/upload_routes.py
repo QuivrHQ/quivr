@@ -3,45 +3,39 @@ import os
 from typing import Annotated, Optional
 from uuid import UUID
 
-from fastapi import (
-    APIRouter,
-    BackgroundTasks,
-    Depends,
-    HTTPException,
-    Query,
-    UploadFile,
-)
-from supabase.client import AsyncClient
-
+from fastapi import (APIRouter, BackgroundTasks, Depends, HTTPException, Query,
+                     UploadFile)
 from quivr_api.celery_config import celery
 from quivr_api.logger import get_logger
 from quivr_api.middlewares.auth import AuthBearer, get_current_user
 from quivr_api.models.settings import get_supabase_async_client
 from quivr_api.modules.brain.entity.brain_entity import RoleEnum
-from quivr_api.modules.brain.service.brain_authorization_service import (
-    validate_brain_authorization,
-)
+from quivr_api.modules.brain.service.brain_authorization_service import \
+    validate_brain_authorization
+from quivr_api.modules.dependencies import get_service
 from quivr_api.modules.knowledge.dto.inputs import CreateKnowledgeProperties
-from quivr_api.modules.knowledge.service.knowledge_service import KnowledgeService
+from quivr_api.modules.knowledge.service.knowledge_service import \
+    KnowledgeService
 from quivr_api.modules.notification.dto.inputs import (
-    CreateNotification,
-    NotificationUpdatableProperties,
-)
-from quivr_api.modules.notification.entity.notification import NotificationsStatusEnum
-from quivr_api.modules.notification.service.notification_service import (
-    NotificationService,
-)
+    CreateNotification, NotificationUpdatableProperties)
+from quivr_api.modules.notification.entity.notification import \
+    NotificationsStatusEnum
+from quivr_api.modules.notification.service.notification_service import \
+    NotificationService
 from quivr_api.modules.upload.service.upload_file import upload_file_storage
 from quivr_api.modules.user.entity.user_identity import UserIdentity
 from quivr_api.modules.user.service.user_usage import UserUsage
 from quivr_api.utils.byte_size import convert_bytes
 from quivr_api.utils.telemetry import maybe_send_telemetry
+from supabase.client import AsyncClient
 
 logger = get_logger(__name__)
 upload_router = APIRouter()
 
 notification_service = NotificationService()
-knowledge_service = KnowledgeService()
+#knowledge_service = KnowledgeService()
+knowledge_service = get_service(KnowledgeService)()
+
 AsyncClientDep = Annotated[AsyncClient, Depends(get_supabase_async_client)]
 
 
@@ -117,18 +111,19 @@ async def upload_file(
         raise HTTPException(
             status_code=500, detail=f"Failed to upload file to storage. {e}"
         )
-
+    #FIXME: @chloedia check if these are the correct properties
     knowledge_to_add = CreateKnowledgeProperties(
         brain_id=brain_id,
         file_name=uploadFile.filename,
-        extension=os.path.splitext(
+        mime_type=os.path.splitext(
             uploadFile.filename  # pyright: ignore reportPrivateUsage=none
         )[-1].lower(),
-        integration=integration,
-        integration_link=integration_link,
+        source=integration,
+        source_link=integration_link,
+        file_size=uploadFile.size,
     )
 
-    knowledge = knowledge_service.add_knowledge(knowledge_to_add)
+    knowledge = await knowledge_service.add_knowledge(knowledge_to_add)
 
     celery.send_task(
         "process_file_task",

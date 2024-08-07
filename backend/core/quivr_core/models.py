@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Any
+from typing import Any, Dict, Optional
 from uuid import UUID
 
 from langchain_core.documents import Document
@@ -75,12 +75,17 @@ class ParsedRAGChunkResponse(BaseModel):
 class QuivrKnowledge(BaseModel):
     id: UUID
     brain_id: UUID
-    file_name: str | None = None
-    url: str | None = None
-    extension: str = "txt"
+    file_name: Optional[str] = None
+    url: Optional[str] = None
+    mime_type: str = "txt"
     status: str = "PROCESSING"
-    integration: str | None = None
-    integration_link: str | None = None
+    source: Optional[str] = None
+    source_link: str | None = None
+    file_size: int 
+    file_sha1: str 
+    updated_at: Optional[datetime] = None
+    created_at: Optional[datetime] = None
+    metadata: Optional[Dict[str, str]] = None
 
 
 # NOTE: for compatibility issues with langchain <-> PydanticV1
