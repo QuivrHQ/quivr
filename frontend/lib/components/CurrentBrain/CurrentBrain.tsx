@@ -1,4 +1,7 @@
+import Image from "next/image";
+
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
+import { MinimalBrainForUser } from "@/lib/context/BrainProvider/types";
 import { useNotificationsContext } from "@/lib/context/NotificationsProvider/hooks/useNotificationsContext";
 
 import styles from "./CurrentBrain.module.scss";
@@ -12,6 +15,68 @@ interface CurrentBrainProps {
   isNewBrain?: boolean;
 }
 
+interface Model {
+  image_url?: string;
+  display_name?: string;
+}
+
+const BrainNameAndImage = ({
+  currentBrain,
+  currentModel,
+  isNewBrain,
+}: {
+  currentBrain?: MinimalBrainForUser;
+  currentModel: Model | null;
+  isNewBrain: boolean;
+}) => {
+  const imageUrl = currentModel?.image_url ?? "";
+
+  return (
+    <>
+      {currentBrain ? (
+        <Icon
+          name="brain"
+          size="small"
+          color={isNewBrain ? "primary" : "black"}
+        />
+      ) : (
+        <Image src={imageUrl} width={14} height={14} alt="Brain Image" />
+      )}
+      <span className={`${styles.brain_name} ${isNewBrain ? styles.new : ""}`}>
+        {currentBrain ? currentBrain.name : currentModel?.display_name}
+      </span>
+    </>
+  );
+};
+
+const ProcessingNotification = ({
+  currentBrain,
+  bulkNotifications,
+}: {
+  currentBrain?: MinimalBrainForUser;
+  bulkNotifications: Array<{
+    brain_id: string;
+    notifications: Array<{ status: string }>;
+  }>;
+}) => {
+  const isProcessing =
+    currentBrain &&
+    bulkNotifications.some(
+      (bulkNotif) =>
+        bulkNotif.brain_id === currentBrain.id &&
+        bulkNotif.notifications.some((notif) => notif.status === "info")
+    );
+
+  return (
+    isProcessing && (
+      <div className={styles.warning}>
+        <LoaderIcon size="small" color="warning" />
+        <span>Processing knowledges</span>
+      </div>
+    )
+  );
+};
+
 export const CurrentBrain = ({
   allowingRemoveBrain,
   remainingCredits,
@@ -19,11 +84,12 @@ export const CurrentBrain = ({
 }: CurrentBrainProps): JSX.Element => {
   const { currentBrain, setCurrentBrainId, currentModel, setCurrentModel } =
     useBrainContext();
+  const { bulkNotifications } = useNotificationsContext();
+
   const removeCurrentBrain = (): void => {
     setCurrentBrainId(null);
     setCurrentModel(null);
   };
-  const { bulkNotifications } = useNotificationsContext();
 
   if (remainingCredits === 0) {
     return (
@@ -45,29 +111,15 @@ export const CurrentBrain = ({
         <div className={styles.left}>
           <span className={styles.title}>Talking to</span>
           <div className={styles.brain_name_wrapper}>
-            <Icon
-              name="brain"
-              size="small"
-              color={isNewBrain ? "primary" : "black"}
+            <BrainNameAndImage
+              currentBrain={currentBrain}
+              currentModel={currentModel}
+              isNewBrain={!!isNewBrain}
             />
-            <span
-              className={`${styles.brain_name} ${isNewBrain ? styles.new : ""}`}
-            >
-              {currentBrain ? currentBrain.name : currentModel?.display_name}
-            </span>
-            {currentBrain &&
-              bulkNotifications.some(
-                (bulkNotif) =>
-                  bulkNotif.brain_id === currentBrain.id &&
-                  bulkNotif.notifications.some(
-                    (notif) => notif.status === "info"
-                  )
-              ) && (
-                <div className={styles.warning}>
-                  <LoaderIcon size="small" color="warning" />
-                  <span>Processing knowledges</span>
-                </div>
-              )}
+            <ProcessingNotification
+              currentBrain={currentBrain}
+              bulkNotifications={bulkNotifications}
+            />
           </div>
         </div>
         {allowingRemoveBrain && (
@@ -77,7 +129,7 @@ export const CurrentBrain = ({
               removeCurrentBrain();
             }}
           >
-            <Icon size="normal" name="close" color="black" handleHover={true} />
+            <Icon size="normal" name="close" color="black" handleHover />
           </div>
         )}
       </div>
