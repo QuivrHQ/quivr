@@ -4,14 +4,12 @@ interface FolderLineProps {
   name: string;
   selectable: boolean;
   id: string;
-  icon?: string;
 }
 
 export const FolderLine = ({
   name,
   selectable,
   id,
-  icon
 }: FolderLineProps): JSX.Element => {
   return (
     <SyncElementLine
@@ -19,7 +17,6 @@ export const FolderLine = ({
       selectable={selectable}
       id={id}
       isFolder={true}
-      icon= {icon}
     />
   );
 };

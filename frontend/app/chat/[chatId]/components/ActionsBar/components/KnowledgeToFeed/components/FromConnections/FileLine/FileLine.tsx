@@ -4,14 +4,12 @@ interface FileLineProps {
   name: string;
   selectable: boolean;
   id: string;
-  icon?: string;
 }
 
 export const FileLine = ({
   name,
   selectable,
   id,
-  icon
 }: FileLineProps): JSX.Element => {
   return (
     <SyncElementLine
@@ -19,7 +17,6 @@ export const FileLine = ({
       selectable={selectable}
       id={id}
       isFolder={false}
-      icon= {icon}
     />
   );
 };
