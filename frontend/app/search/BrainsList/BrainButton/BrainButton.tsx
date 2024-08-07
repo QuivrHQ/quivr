@@ -13,6 +13,8 @@ export interface BrainOrModel {
   description: string;
   image_url?: string;
   id?: UUID;
+  price?: number;
+  display_name?: string;
 }
 interface BrainButtonProps {
   brainOrModel: BrainOrModel;
@@ -23,7 +25,7 @@ const BrainButton = ({
   brainOrModel,
   newBrain,
 }: BrainButtonProps): JSX.Element => {
-  const { setCurrentBrainId } = useBrainContext();
+  const { setCurrentBrainId, setCurrentModel } = useBrainContext();
 
   return (
     <div
@@ -31,6 +33,14 @@ const BrainButton = ({
       onClick={() => {
         if (brainOrModel.id) {
           setCurrentBrainId(brainOrModel.id);
+        } else {
+          setCurrentModel({
+            name: brainOrModel.name,
+            display_name: brainOrModel.display_name ?? "",
+            price: brainOrModel.price ?? 0,
+            image_url: brainOrModel.image_url ?? "",
+            description: brainOrModel.description,
+          });
         }
         newBrain();
       }}
@@ -46,7 +56,9 @@ const BrainButton = ({
         ) : (
           <Icon name="brain" size="normal" color="black" />
         )}
-        <span className={styles.name}>{brainOrModel.name}</span>
+        <span className={styles.name}>
+          {brainOrModel.display_name ?? brainOrModel.name}
+        </span>
       </div>
       <span className={styles.description}>{brainOrModel.description}</span>
     </div>

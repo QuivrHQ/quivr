@@ -17,9 +17,11 @@ export const CurrentBrain = ({
   remainingCredits,
   isNewBrain,
 }: CurrentBrainProps): JSX.Element => {
-  const { currentBrain, setCurrentBrainId } = useBrainContext();
+  const { currentBrain, setCurrentBrainId, currentModel, setCurrentModel } =
+    useBrainContext();
   const removeCurrentBrain = (): void => {
     setCurrentBrainId(null);
+    setCurrentModel(null);
   };
   const { bulkNotifications } = useNotificationsContext();
 
@@ -33,7 +35,7 @@ export const CurrentBrain = ({
     );
   }
 
-  if (!currentBrain) {
+  if (!currentBrain && !currentModel) {
     return <></>;
   }
 
@@ -51,18 +53,21 @@ export const CurrentBrain = ({
             <span
               className={`${styles.brain_name} ${isNewBrain ? styles.new : ""}`}
             >
-              {currentBrain.name}
+              {currentBrain ? currentBrain.name : currentModel?.display_name}
             </span>
-            {bulkNotifications.some(
-              (bulkNotif) =>
-                bulkNotif.brain_id === currentBrain.id &&
-                bulkNotif.notifications.some((notif) => notif.status === "info")
-            ) && (
-              <div className={styles.warning}>
-                <LoaderIcon size="small" color="warning" />
-                <span>Processing knowledges</span>
-              </div>
-            )}
+            {currentBrain &&
+              bulkNotifications.some(
+                (bulkNotif) =>
+                  bulkNotif.brain_id === currentBrain.id &&
+                  bulkNotif.notifications.some(
+                    (notif) => notif.status === "info"
+                  )
+              ) && (
+                <div className={styles.warning}>
+                  <LoaderIcon size="small" color="warning" />
+                  <span>Processing knowledges</span>
+                </div>
+              )}
           </div>
         </div>
         {allowingRemoveBrain && (

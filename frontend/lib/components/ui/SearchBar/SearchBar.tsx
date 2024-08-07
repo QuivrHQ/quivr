@@ -26,7 +26,7 @@ export const SearchBar = ({
   const { message, setMessage } = useChatInput();
   const { setMessages } = useChatContext();
   const { addQuestion } = useChat();
-  const { currentBrain, setCurrentBrainId } = useBrainContext();
+  const { currentBrain, setCurrentBrainId, currentModel } = useBrainContext();
   const { remainingCredits } = useUserSettingsContext();
 
   useEffect(() => {
@@ -72,7 +72,7 @@ export const SearchBar = ({
       <div
         className={`${styles.editor_wrapper} ${
           !remainingCredits ? styles.disabled : ""
-        } ${currentBrain ? styles.current : ""}`}
+        } ${currentBrain || currentModel ? styles.current : ""}`}
       >
         <Editor
           message={message}

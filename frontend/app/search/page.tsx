@@ -94,11 +94,7 @@ const Search = (): JSX.Element => {
     void (async () => {
       try {
         const res = await getModels();
-        const adjustedModels = res.map((model) => ({
-          ...model,
-          name: model.display_name,
-        }));
-        setModels(adjustedModels);
+        setModels(res);
       } catch (error) {
         console.error(error);
       }
