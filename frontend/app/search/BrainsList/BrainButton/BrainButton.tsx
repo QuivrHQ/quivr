@@ -2,7 +2,6 @@
 
 import { UUID } from "crypto";
 import Image from "next/image";
-import { useState } from "react";
 
 import Icon from "@/lib/components/ui/Icon/Icon";
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
@@ -25,7 +24,6 @@ const BrainButton = ({
   newBrain,
 }: BrainButtonProps): JSX.Element => {
   const { setCurrentBrainId } = useBrainContext();
-  const [hovered, setHovered] = useState(false);
 
   return (
     <div
@@ -36,8 +34,6 @@ const BrainButton = ({
         }
         newBrain();
       }}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
     >
       <div className={styles.header}>
         {brainOrModel.image_url ? (
@@ -48,11 +44,7 @@ const BrainButton = ({
             height={16}
           />
         ) : (
-          <Icon
-            name="brain"
-            size="normal"
-            color={hovered ? "primary" : "black"}
-          />
+          <Icon name="brain" size="normal" color="black" />
         )}
         <span className={styles.name}>{brainOrModel.name}</span>
       </div>
