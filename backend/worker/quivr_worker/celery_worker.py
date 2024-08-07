@@ -213,7 +213,11 @@ async def fetch_and_store_notion_files_async(access_token: str, user_id: UUID):
         notion_service = SyncNotionService(notion_repository)
         notion_client = Client(auth=access_token)
         all_search_result = fetch_notion_pages(notion_client)
-        await store_notion_pages(all_search_result, notion_service, user_id)
+        pages = await store_notion_pages(all_search_result, notion_service, user_id)
+        if pages:
+            logger.info(f"stored {len(pages)} from notion for {user_id}")
+        else:
+            logger.warn("No notion page fetched")
 
 
 celery.conf.beat_schedule = {

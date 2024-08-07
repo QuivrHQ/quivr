@@ -5,14 +5,17 @@ from typing import List, Tuple
 import pytest
 import pytest_asyncio
 import sqlalchemy
-from quivr_api.celery_worker import fetch_and_store_notion_files
 from quivr_api.modules.brain.entity.brain_entity import Brain
 from quivr_api.modules.chat.entity.chat import Chat, ChatHistory
 from quivr_api.modules.sync.repository.sync import NotionRepository
-from quivr_api.modules.sync.service.sync_notion import (SyncNotionService,
-                                                        store_notion_pages)
+from quivr_api.modules.sync.service.sync_notion import (
+    SyncNotionService,
+    store_notion_pages,
+)
 from quivr_api.modules.user.entity.user_identity import User
+from sqlalchemy.ext.asyncio import create_async_engine
 from sqlmodel import Session, create_engine, select
+from sqlmodel.ext.asyncio.session import AsyncSession
 
 pg_database_base_url = "postgres:postgres@localhost:54322/postgres"
 
@@ -54,10 +57,6 @@ async def sync_session(sync_engine):
                 conn.sync_connection.begin_nested()
 
         yield sync_session
-
-
-def test_fetch_notion_pages():
-    pass
 
 
 @pytest.fixture
@@ -112,6 +111,38 @@ def search_result():
     ]
 
 
+@pytest_asyncio.fixture(scope="session")
+async def async_engine():
+    engine = create_async_engine(
+        "postgresql+asyncpg://" + pg_database_base_url,
+        echo=True if os.getenv("ORM_DEBUG") else False,
+        future=True,
+        pool_pre_ping=True,
+        pool_size=10,
+        pool_recycle=0.1,
+    )
+    yield engine
+
+
+@pytest_asyncio.fixture()
+async def session(async_engine):
+    async with async_engine.connect() as conn:
+        await conn.begin()
+        await conn.begin_nested()
+        async_session = AsyncSession(conn, expire_on_commit=False)
+
+        @sqlalchemy.event.listens_for(
+            async_session.sync_session, "after_transaction_end"
+        )
+        def end_savepoint(session, transaction):
+            if conn.closed:
+                return
+            if not conn.in_nested_transaction():
+                conn.sync_connection.begin_nested()
+
+        yield async_session
+
+
 @pytest.fixture
 def user_1(sync_session):
     user_1 = (
@@ -120,21 +151,10 @@ def user_1(sync_session):
     return user_1
 
 
-async def test_store_notion_pages(sync_session, search_result, user_1):
-    notion_repository = NotionRepository(sync_session)
+@pytest.mark.asyncio
+async def test_store_notion_pages(session: AsyncSession, search_result, user_1):
+    notion_repository = NotionRepository(session)
     notion_service = SyncNotionService(notion_repository)
     sync_files = await store_notion_pages(search_result, notion_service, user_1.id)
+    assert sync_files
     assert len(sync_files) == 1
-
-
-@pytest.mark.skip
-def test_celery_notion(monkeypatch, search_result, user_1):
-    def search(self, *args, **kwargs):
-        return {"results": search_result, "has_more": False}
-
-    from notion_client import Client
-
-    monkeypatch.setattr(Client, "search", search)
-
-    # Call the function under test
-    fetch_and_store_notion_files("test", user_1.id)
