@@ -1,19 +1,26 @@
 "use client";
 
+import { UUID } from "crypto";
 import { useState } from "react";
 
 import Icon from "@/lib/components/ui/Icon/Icon";
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
-import { MinimalBrainForUser } from "@/lib/context/BrainProvider/types";
 
 import styles from "./BrainButton.module.scss";
 
 interface BrainButtonProps {
-  brain: MinimalBrainForUser;
+  name: string;
+  description: string;
+  id?: UUID;
   newBrain: () => void;
 }
 
-const BrainButton = ({ brain, newBrain }: BrainButtonProps): JSX.Element => {
+const BrainButton = ({
+  name,
+  description,
+  id,
+  newBrain,
+}: BrainButtonProps): JSX.Element => {
   const { setCurrentBrainId } = useBrainContext();
   const [hovered, setHovered] = useState(false);
 
@@ -21,7 +28,9 @@ const BrainButton = ({ brain, newBrain }: BrainButtonProps): JSX.Element => {
     <div
       className={styles.brain_button_container}
       onClick={() => {
-        setCurrentBrainId(brain.id);
+        if (id) {
+          setCurrentBrainId(id);
+        }
         newBrain();
       }}
       onMouseEnter={() => setHovered(true)}
@@ -33,9 +42,9 @@ const BrainButton = ({ brain, newBrain }: BrainButtonProps): JSX.Element => {
           size="normal"
           color={hovered ? "primary" : "black"}
         />
-        <span className={styles.name}>{brain.name}</span>
+        <span className={styles.name}>{name}</span>
       </div>
-      <span className={styles.description}>{brain.description}</span>
+      <span className={styles.description}>{description}</span>
     </div>
   );
 };
