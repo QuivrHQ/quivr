@@ -23,6 +23,7 @@ export const UpgradeToPlusButton = (): JSX.Element => {
           color="gold"
         />
       }
+      user_email={userData?.email ?? ""}
     />
   );
 };
