@@ -9,6 +9,8 @@ from typing import List, Optional
 
 from fastapi import UploadFile
 from pydantic import BaseModel
+from unidecode import unidecode
+
 from quivr_api.logger import get_logger
 from quivr_api.models.settings import SendEmailSettings
 from quivr_api.modules.assistant.dto.inputs import InputAssistant
@@ -17,8 +19,7 @@ from quivr_api.modules.chat.controller.chat.utils import update_user_usage
 from quivr_api.modules.upload.controller.upload_routes import upload_file
 from quivr_api.modules.user.entity.user_identity import UserIdentity
 from quivr_api.modules.user.service.user_usage import UserUsage
-from quivr_api.packages.emails.send_email import send_email
-from unidecode import unidecode
+from quivr_api.utils.send_email import send_email
 
 logger = get_logger(__name__)
 
@@ -90,23 +91,23 @@ class ITO(BaseModel):
             body = f"""
             <div style="text-align: center;">
                 <img src="https://quivr-cms.s3.eu-west-3.amazonaws.com/logo_quivr_white_7e3c72620f.png" alt="Quivr Logo" style="width: 100px; height: 100px; border-radius: 50%; margin: 0 auto; display: block;">
-                
+
                 <p>Quivr's ingestion process has been completed. The processed file is attached.</p>
-                
+
                 <p><strong>Task:</strong> {task_name}</p>
-                
+
                 <p><strong>Output:</strong> {custom_message}</p>
                 <br />
-                
+
 
             </div>
             """
             if brain_id:
                 body += f"<div style='text-align: center;'>You can find the file <a href='{domain_quivr}studio/{brain_id}'>here</a>.</div> <br />"
-            body += f"""
+            body += """
             <div style="text-align: center;">
                 <p>Please let us know if you have any questions or need further assistance.</p>
-                
+
                 <p> The Quivr Team </p>
             </div>
             """

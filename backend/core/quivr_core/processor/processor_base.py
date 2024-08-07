@@ -31,7 +31,13 @@ class ProcessorBase(ABC):
         except PackageNotFoundError:
             qvr_version = "dev"
 
-        for idx, doc in enumerate(docs):
+        for idx, doc in enumerate(docs, start=1):
+            if "original_file_name" in doc.metadata:
+                doc.page_content = f"Filename: {doc.metadata['original_file_name']} Content: {doc.page_content}"
+            doc.page_content = doc.page_content.replace("\u0000", "")
+            doc.page_content = doc.page_content.encode("utf-8", "replace").decode(
+                "utf-8"
+            )
             doc.metadata = {
                 "id": uuid4(),
                 "chunk_index": idx,

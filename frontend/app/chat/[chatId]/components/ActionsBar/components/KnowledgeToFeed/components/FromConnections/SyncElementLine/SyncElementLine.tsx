@@ -13,6 +13,7 @@ interface SyncElementLineProps {
   selectable: boolean;
   id: string;
   isFolder: boolean;
+  icon?: string;
 }
 
 export const SyncElementLine = ({
@@ -20,6 +21,7 @@ export const SyncElementLine = ({
   selectable,
   id,
   isFolder,
+  icon
 }: SyncElementLineProps): JSX.Element => {
   const [isCheckboxHovered, setIsCheckboxHovered] = useState(false);
   const { currentSyncId, openedConnections, setOpenedConnections } =
@@ -90,11 +92,14 @@ export const SyncElementLine = ({
             />
           </div>
         )}
+      {
+        icon ?
+        <div>{icon}</div> :
 
-        <Icon name={isFolder ? "folder" : "file"} color="black" size="normal" />
-        <span className={styles.element_name}>{name}</span>
+        <Icon name={isFolder? "folder" : "file"} color="black" size="normal" />
+      }
+      <span className={styles.element_name}>{name}</span>
       </div>
-
       {isFolder && (
         <Icon
           name="chevronRight"

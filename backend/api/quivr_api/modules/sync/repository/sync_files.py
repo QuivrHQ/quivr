@@ -1,7 +1,7 @@
 from quivr_api.logger import get_logger
 from quivr_api.models.settings import get_supabase_client
 from quivr_api.modules.sync.dto.inputs import SyncFileInput, SyncFileUpdateInput
-from quivr_api.modules.sync.entity.sync import SyncsFiles
+from quivr_api.modules.sync.entity.sync import DBSyncFile
 from quivr_api.modules.sync.repository.sync_interfaces import SyncFileInterface
 
 logger = get_logger(__name__)
@@ -16,7 +16,7 @@ class SyncFiles(SyncFileInterface):
         self.db = supabase_client  # type: ignore
         logger.debug("Supabase client initialized")
 
-    def create_sync_file(self, sync_file_input: SyncFileInput) -> SyncsFiles:
+    def create_sync_file(self, sync_file_input: SyncFileInput) -> DBSyncFile:
         """
         Create a new sync file in the database.
 
@@ -41,11 +41,10 @@ class SyncFiles(SyncFileInterface):
         )
         if response.data:
             logger.info("Sync file created successfully: %s", response.data[0])
-            return SyncsFiles(**response.data[0])
+            return DBSyncFile(**response.data[0])
         logger.warning("Failed to create sync file")
-        return None
 
-    def get_sync_files(self, sync_active_id: int) -> list[SyncsFiles]:
+    def get_sync_files(self, sync_active_id: int) -> list[DBSyncFile]:
         """
         Retrieve sync files from the database.
 
@@ -64,7 +63,7 @@ class SyncFiles(SyncFileInterface):
         )
         if response.data:
             # logger.info("Sync files retrieved successfully: %s", response.data)
-            return [SyncsFiles(**file) for file in response.data]
+            return [DBSyncFile(**file) for file in response.data]
         logger.warning("No sync files found for sync_active_id: %s", sync_active_id)
         return []
 

@@ -4,7 +4,7 @@ from quivr_api.logger import get_logger
 from quivr_api.models.brains_subscription_invitations import BrainSubscription
 from quivr_api.models.settings import BrainSettings
 from quivr_api.modules.brain.service.brain_service import BrainService
-from quivr_api.packages.emails.send_email import send_email
+from quivr_api.utils.send_email import send_email
 
 logger = get_logger(__name__)
 

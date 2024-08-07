@@ -17,7 +17,7 @@ async def test_docx_filedocx():
         original_filename=p.stem,
         path=p,
         file_extension=FileExtension.docx,
-        file_md5="123",
+        file_sha1="123",
     )
     processor = DOCXProcessor()
     result = await processor.process_file(f)
