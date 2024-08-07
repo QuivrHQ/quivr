@@ -34,11 +34,7 @@ const BrainNameAndImage = ({
   return (
     <>
       {currentBrain ? (
-        <Icon
-          name="brain"
-          size="small"
-          color={isNewBrain ? "primary" : "black"}
-        />
+        <Icon name="brain" size="small" color="black" />
       ) : (
         <Image src={imageUrl} width={14} height={14} alt="Brain Image" />
       )}

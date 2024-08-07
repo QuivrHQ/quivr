@@ -33,6 +33,7 @@ const BrainButton = ({
       onClick={() => {
         if (brainOrModel.id) {
           setCurrentBrainId(brainOrModel.id);
+          setCurrentModel(null);
         } else {
           setCurrentModel({
             name: brainOrModel.name,
@@ -41,6 +42,7 @@ const BrainButton = ({
             image_url: brainOrModel.image_url ?? "",
             description: brainOrModel.description,
           });
+          setCurrentBrainId(null);
         }
         newBrain();
       }}
