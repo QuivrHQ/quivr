@@ -61,14 +61,14 @@ const Search = (): JSX.Element => {
   const assistantsTabs: Tab[] = [
     {
       label: "Models",
-      isSelected: selectedTab === "Knowledge",
-      onClick: () => setSelectedTab("Knowledge"),
+      isSelected: selectedTab === "Models",
+      onClick: () => setSelectedTab("Models"),
       iconName: "file",
     },
     {
       label: "Brains",
-      isSelected: selectedTab === "Models",
-      onClick: () => setSelectedTab("Models"),
+      isSelected: selectedTab === "Brains",
+      onClick: () => setSelectedTab("Brains"),
       iconName: "settings",
     },
     {
@@ -218,20 +218,22 @@ const Search = (): JSX.Element => {
                       : styles.slide_prev
                   }`}
                 >
-                  {displayedBrains.map((brain, index) => (
-                    <BrainButton
-                      key={index}
-                      brainOrModel={brain}
-                      newBrain={newBrain}
-                    />
-                  ))}
-                  {models.map((model, index) => (
-                    <BrainButton
-                      key={index}
-                      brainOrModel={model}
-                      newBrain={newBrain}
-                    />
-                  ))}
+                  {selectedTab !== "Brains" &&
+                    models.map((model, index) => (
+                      <BrainButton
+                        key={index}
+                        brainOrModel={model}
+                        newBrain={newBrain}
+                      />
+                    ))}
+                  {selectedTab !== "Models" &&
+                    displayedBrains.map((brain, index) => (
+                      <BrainButton
+                        key={index}
+                        brainOrModel={brain}
+                        newBrain={newBrain}
+                      />
+                    ))}
                 </div>
                 <div
                   className={`${styles.chevron} ${
