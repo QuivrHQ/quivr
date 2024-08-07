@@ -117,10 +117,11 @@ class SyncUser(SyncUserInterface):
         response = (
             self.db.from_("syncs_user").select("*").eq("state", state_str).execute()
         )
-        if response.data:
+        if response.data and len(response.data) > 0:
             logger.info("Sync user found by state: %s", response.data[0])
-            return response.data[0]
-        logger.warning("No sync user found for state: %s", state)
+            sync_user = SyncsUser.model_validate(response.data[0])
+            return sync_user
+        logger.error("No sync user found for state: %s", state)
         return None
 
     def delete_sync_user(self, sync_id: int, user_id: UUID | str):

@@ -17,11 +17,12 @@ from google.auth.transport.requests import Request as GoogleRequest
 from google.oauth2.credentials import Credentials
 from googleapiclient.discovery import build
 from notion_client import Client
+from requests import HTTPError
+
 from quivr_api.logger import get_logger
 from quivr_api.modules.sync.entity.sync import SyncFile
 from quivr_api.modules.sync.service.sync_notion import SyncNotionService
 from quivr_api.modules.sync.utils.normalize import remove_special_characters
-from requests import HTTPError
 
 logger = get_logger(__name__)
 redis_client = redis.Redis(host="redis", port=os.getenv("REDIS_PORT"), db=0)
@@ -776,7 +777,6 @@ class NotionSync(BaseSync):
     async def aget_files(
         self, credentials: Dict, folder_id: str | None = None, recursive: bool = False
     ) -> List[SyncFile]:
-        t_0 = time.time()
         pages = []
 
         if not self.notion:
@@ -972,6 +972,7 @@ class NotionSync(BaseSync):
         loop = asyncio.get_event_loop()
         return loop.run_until_complete(self.adownload_file(credentials, file))
 
+
 class GitHubSync(BaseSync):
     name = "GitHub"
     lower_name = "github"
@@ -1011,8 +1012,10 @@ class GitHubSync(BaseSync):
             )
         else:
             return self.list_github_repos(credentials, recursive=recursive)
-        
-    async def aget_files(self, credentials: Dict, folder_id: str | None = None, recursive: bool = False) -> List[SyncFile]:
+
+    async def aget_files(
+        self, credentials: Dict, folder_id: str | None = None, recursive: bool = False
+    ) -> List[SyncFile]:
         return self.get_files(credentials, folder_id, recursive)
 
     def get_files_by_id(self, credentials: Dict, file_ids: List[str]) -> List[SyncFile]:
@@ -1047,10 +1050,11 @@ class GitHubSync(BaseSync):
 
         logger.info("GitHub files retrieved successfully: %s", len(files))
         return files
-    
-    async def aget_files_by_id(self, credentials: Dict, file_ids: List[str]) -> List[SyncFile]:
+
+    async def aget_files_by_id(
+        self, credentials: Dict, file_ids: List[str]
+    ) -> List[SyncFile]:
         return self.get_files_by_id(credentials, file_ids)
-    
 
     def download_file(
         self, credentials: Dict, file: SyncFile
@@ -1079,8 +1083,7 @@ class GitHubSync(BaseSync):
 
         return {"file_name": file.name, "content": BytesIO(file_content)}
 
-    async def adownload_file(
-        self, credentials: Dict, file: SyncFile):
+    async def adownload_file(self, credentials: Dict, file: SyncFile):
         return self.download_file(credentials, file)
 
     def list_github_repos(self, credentials, recursive=False):

@@ -3,32 +3,26 @@ import uuid
 from typing import Annotated, List
 
 from fastapi import APIRouter, Depends, status
+
 from quivr_api.logger import get_logger
 from quivr_api.middlewares.auth import AuthBearer, get_current_user
 from quivr_api.modules.dependencies import get_service
 from quivr_api.modules.notification.dto.inputs import CreateNotification
-from quivr_api.modules.notification.entity.notification import \
-    NotificationsStatusEnum
-from quivr_api.modules.notification.service.notification_service import \
-    NotificationService
-from quivr_api.modules.sync.controller.azure_sync_routes import \
-    azure_sync_router
-from quivr_api.modules.sync.controller.dropbox_sync_routes import \
-    dropbox_sync_router
-from quivr_api.modules.sync.controller.github_sync_routes import \
-    github_sync_router
-from quivr_api.modules.sync.controller.google_sync_routes import \
-    google_sync_router
-from quivr_api.modules.sync.controller.notion_sync_routes import \
-    notion_sync_router
+from quivr_api.modules.notification.entity.notification import NotificationsStatusEnum
+from quivr_api.modules.notification.service.notification_service import (
+    NotificationService,
+)
+from quivr_api.modules.sync.controller.azure_sync_routes import azure_sync_router
+from quivr_api.modules.sync.controller.dropbox_sync_routes import dropbox_sync_router
+from quivr_api.modules.sync.controller.github_sync_routes import github_sync_router
+from quivr_api.modules.sync.controller.google_sync_routes import google_sync_router
+from quivr_api.modules.sync.controller.notion_sync_routes import notion_sync_router
 from quivr_api.modules.sync.dto import SyncsDescription
-from quivr_api.modules.sync.dto.inputs import (SyncsActiveInput,
-                                               SyncsActiveUpdateInput)
+from quivr_api.modules.sync.dto.inputs import SyncsActiveInput, SyncsActiveUpdateInput
 from quivr_api.modules.sync.dto.outputs import AuthMethodEnum
 from quivr_api.modules.sync.entity.sync import SyncsActive
 from quivr_api.modules.sync.service.sync_notion import SyncNotionService
-from quivr_api.modules.sync.service.sync_service import (SyncService,
-                                                         SyncUserService)
+from quivr_api.modules.sync.service.sync_service import SyncService, SyncUserService
 from quivr_api.modules.user.entity.user_identity import UserIdentity
 
 notification_service = NotificationService()
@@ -78,8 +72,8 @@ dropbox_sync = SyncsDescription(
 notion_sync = SyncsDescription(
     name="Notion",
     description="Sync your Notion with Quivr",
-    auth_method=AuthMethodEnum.URI_WITH_CALLBACK
-    )
+    auth_method=AuthMethodEnum.URI_WITH_CALLBACK,
+)
 
 github_sync = SyncsDescription(
     name="GitHub",
