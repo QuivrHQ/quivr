@@ -23,6 +23,7 @@ from quivr_api.modules.chat.service.chat_service import ChatService
 from quivr_api.modules.models.service.model_service import ModelService
 from quivr_api.modules.user.entity.user_identity import UserIdentity
 from quivr_api.modules.user.service.user_usage import UserUsage
+from quivr_api.packages.utils.uuid_generator import generate_uuid_from_string
 
 logger = get_logger(__name__)
 
@@ -140,11 +141,14 @@ class ChatLLMService:
         parsed_response = chat_llm.answer(question, chat_history)
 
         if parsed_response.metadata:
+            # TODO: check if this is the right way to do it
             parsed_response.metadata.metadata_model = ChatLLMMetadata(
                 name=self.model_to_use.name,
                 description=model_metadata.description,
                 image_url=model_metadata.image_url,
                 display_name=model_metadata.display_name,
+                brain_id=str(generate_uuid_from_string(self.model_to_use.name)),
+                brain_name=self.model_to_use.name,
             )
 
         # Save the answer to db
@@ -224,6 +228,8 @@ class ChatLLMService:
             description=model_metadata.description,
             image_url=model_metadata.image_url,
             display_name=model_metadata.display_name,
+            brain_id=str(generate_uuid_from_string(self.model_to_use.name)),
+            brain_name=self.model_to_use.name,
         )
         streamed_chat_history.metadata = metadata.model_dump()
 

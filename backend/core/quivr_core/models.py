@@ -60,6 +60,8 @@ class ChatLLMMetadata(BaseModel):
     display_name: str | None = None
     description: str | None = None
     image_url: str | None = None
+    brain_id: str | None = None
+    brain_name: str | None = None
 
 
 class RAGResponseMetadata(BaseModel):
