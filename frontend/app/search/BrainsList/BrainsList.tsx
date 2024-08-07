@@ -25,7 +25,6 @@ const BrainsList = ({
   const [currentPage, setCurrentPage] = useState(0);
   const [transitionDirection, setTransitionDirection] = useState("");
 
-  // Adjusted to include models in the calculation for total items
   const totalItems =
     selectedTab === "All"
       ? brains.length + models.length
@@ -80,11 +79,9 @@ const BrainsList = ({
     };
   }, [handlePreviousPage, handleNextPage]);
 
-  // Function to determine which items to display based on the selected tab
   const getDisplayedItems = () => {
     let combinedItems = [];
     if (selectedTab === "All") {
-      // Models are now shown first before brains
       combinedItems = [...models, ...brains];
     } else if (selectedTab === "Brains") {
       combinedItems = brains;
