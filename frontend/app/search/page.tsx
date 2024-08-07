@@ -23,7 +23,7 @@ import { redirectToLogin } from "@/lib/router/redirectToLogin";
 import { ButtonType } from "@/lib/types/QuivrButton";
 import { Tab } from "@/lib/types/Tab";
 
-import BrainButton from "./BrainButton/BrainButton";
+import BrainButton, { BrainOrModel } from "./BrainButton/BrainButton";
 import styles from "./page.module.scss";
 
 const Search = (): JSX.Element => {
@@ -32,6 +32,7 @@ const Search = (): JSX.Element => {
   const [isNewBrain, setIsNewBrain] = useState(false);
   const [currentPage, setCurrentPage] = useState(0);
   const [transitionDirection, setTransitionDirection] = useState("");
+  const [models, setModels] = useState<BrainOrModel[]>([]);
   const brainsPerPage = 6;
 
   const pathname = usePathname();
@@ -111,7 +112,7 @@ const Search = (): JSX.Element => {
     void (async () => {
       try {
         const res = await getModels();
-        console.info(res);
+        setModels(res);
       } catch (error) {
         console.error(error);
       }
@@ -220,9 +221,14 @@ const Search = (): JSX.Element => {
                   {displayedBrains.map((brain, index) => (
                     <BrainButton
                       key={index}
-                      id={brain.id}
-                      name={brain.name}
-                      description={brain.description}
+                      brainOrModel={brain}
+                      newBrain={newBrain}
+                    />
+                  ))}
+                  {models.map((model, index) => (
+                    <BrainButton
+                      key={index}
+                      brainOrModel={model}
                       newBrain={newBrain}
                     />
                   ))}

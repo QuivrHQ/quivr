@@ -8,17 +8,18 @@ import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainConte
 
 import styles from "./BrainButton.module.scss";
 
-interface BrainButtonProps {
+export interface BrainOrModel {
   name: string;
   description: string;
   id?: UUID;
+}
+interface BrainButtonProps {
+  brainOrModel: BrainOrModel;
   newBrain: () => void;
 }
 
 const BrainButton = ({
-  name,
-  description,
-  id,
+  brainOrModel,
   newBrain,
 }: BrainButtonProps): JSX.Element => {
   const { setCurrentBrainId } = useBrainContext();
@@ -28,8 +29,8 @@ const BrainButton = ({
     <div
       className={styles.brain_button_container}
       onClick={() => {
-        if (id) {
-          setCurrentBrainId(id);
+        if (brainOrModel.id) {
+          setCurrentBrainId(brainOrModel.id);
         }
         newBrain();
       }}
@@ -42,9 +43,9 @@ const BrainButton = ({
           size="normal"
           color={hovered ? "primary" : "black"}
         />
-        <span className={styles.name}>{name}</span>
+        <span className={styles.name}>{brainOrModel.name}</span>
       </div>
-      <span className={styles.description}>{description}</span>
+      <span className={styles.description}>{brainOrModel.description}</span>
     </div>
   );
 };
