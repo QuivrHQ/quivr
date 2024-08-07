@@ -10,7 +10,6 @@ from quivr_api.modules.notification.service.notification_service import (
 )
 from quivr_api.modules.sync.dto.inputs import SyncsUserInput, SyncUserUpdateInput
 from quivr_api.modules.sync.entity.sync import SyncFile, SyncsUser
-from quivr_api.modules.sync.repository.sync_interfaces import SyncUserInterface
 from quivr_api.modules.sync.service.sync_notion import SyncNotionService
 from quivr_api.modules.sync.utils.sync import (
     AzureDriveSync,
@@ -26,7 +25,7 @@ knowledge_service = KnowledgeService()
 logger = get_logger(__name__)
 
 
-class SyncUser(SyncUserInterface):
+class SyncUser:
     def __init__(self):
         """
         Initialize the Sync class with a Supabase client.

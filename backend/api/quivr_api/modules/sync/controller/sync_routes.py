@@ -118,7 +118,7 @@ async def get_user_syncs(current_user: UserIdentity = Depends(get_current_user))
         List: A list of syncs for the user.
     """
     logger.debug(f"Fetching user syncs for user: {current_user.id}")
-    return sync_user_service.get_syncs_user(str(current_user.id))
+    return sync_user_service.get_syncs_user(current_user.id)
 
 
 @sync_router.delete(
@@ -327,7 +327,7 @@ async def get_files_folder_user_sync(
         f"Fetching files for user sync: {user_sync_id} for user: {current_user.id}"
     )
     return await sync_user_service.get_files_folder_user_sync(
-        user_sync_id, str(current_user.id), folder_id, notion_service=notion_service
+        user_sync_id, current_user.id, folder_id, notion_service=notion_service
     )
 
 

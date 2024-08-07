@@ -25,7 +25,7 @@ from quivr_api.modules.sync.service.sync_notion import SyncNotionService
 from quivr_api.modules.sync.utils.normalize import remove_special_characters
 
 logger = get_logger(__name__)
-redis_client = redis.Redis(host="redis", port=os.getenv("REDIS_PORT"), db=0)
+redis_client = redis.Redis(host="redis", port=int(os.getenv("REDIS_PORT", 6379)), db=0)
 
 
 class BaseSync(ABC):
@@ -433,9 +433,11 @@ class AzureDriveSync(BaseSync):
         for item in items:
             file_data = SyncFile(
                 name=item.get("name") if site_folder_id else item.get("displayName"),
-                id=f'{item.get("id", {}).split(",")[1]}:'
-                if not site_folder_id
-                else f'{site_id}:{item.get("id")}',
+                id=(
+                    f'{item.get("id", {}).split(",")[1]}:'
+                    if not site_folder_id
+                    else f'{site_id}:{item.get("id")}'
+                ),
                 is_folder="folder" in item or not site_folder_id,
                 last_modified=item.get("lastModifiedDateTime"),
                 mime_type=item.get("file", {}).get("mimeType", "folder"),
