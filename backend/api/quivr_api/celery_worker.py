@@ -1,20 +1,29 @@
+import asyncio
 import os
 from datetime import datetime, timedelta
 from tempfile import NamedTemporaryFile
 from uuid import UUID
 
 from celery.schedules import crontab
-from pytz import timezone
+from celery.signals import worker_process_init
+from notion_client import Client
+from pytz import timezone  # type: ignore
+from sqlalchemy.ext.asyncio import AsyncEngine, create_async_engine
+from sqlmodel.ext.asyncio.session import AsyncSession
+
 from quivr_api.celery_config import celery
 from quivr_api.logger import get_logger
 from quivr_api.middlewares.auth.auth_bearer import AuthBearer
 from quivr_api.models.files import File
-from quivr_api.models.settings import get_supabase_client, get_supabase_db
+from quivr_api.models.settings import get_supabase_client, get_supabase_db, settings
 from quivr_api.modules.brain.integrations.Notion.Notion_connector import NotionConnector
 from quivr_api.modules.brain.service.brain_service import BrainService
 from quivr_api.modules.brain.service.brain_vector_service import BrainVectorService
-from quivr_api.modules.notification.service.notification_service import (
-    NotificationService,
+from quivr_api.modules.sync.repository.sync import NotionRepository
+from quivr_api.modules.sync.service.sync_notion import (
+    SyncNotionService,
+    fetch_notion_pages,
+    store_notion_pages,
 )
 from quivr_api.packages.files.crawl.crawler import CrawlWebsite, slugify
 from quivr_api.packages.files.processors import filter_file
@@ -22,9 +31,25 @@ from quivr_api.packages.utils.telemetry import maybe_send_telemetry
 
 logger = get_logger(__name__)
 
-notification_service = NotificationService()
+notion_service: SyncNotionService | None = None
 brain_service = BrainService()
 auth_bearer = AuthBearer()
+async_engine: AsyncEngine | None = None
+
+
+@worker_process_init.connect
+def init_worker(**kwargs):
+    global async_engine
+    if not async_engine:
+        async_engine = create_async_engine(
+            settings.pg_database_async_url,
+            echo=True if os.getenv("ORM_DEBUG") else False,
+            future=True,
+            # NOTE: pessimistic bound on
+            pool_pre_ping=True,
+            pool_size=10,  # NOTE: no bouncer for now, if 6 process workers => 6
+            pool_recycle=1800,
+        )
 
 
 @celery.task(
@@ -43,7 +68,7 @@ def process_file_and_notify(
     integration_link=None,
     delete_file=False,
 ):
-    logger.debug(
+    logger.info(
         f"process_file file_name={file_name}, knowledge_id={knowledge_id}, brain_id={brain_id}, notification_id={notification_id}"
     )
     supabase_client = get_supabase_client()
@@ -151,8 +176,6 @@ def check_if_is_premium_user():
     paris_tz = timezone("Europe/Paris")
     current_time = datetime.now(paris_tz)
     current_time_str = current_time.strftime("%Y-%m-%d %H:%M:%S.%f")
-    logger.debug(f"Current time: {current_time_str}")
-
     # Define the memoization period (e.g., 1 hour)
     memoization_period = timedelta(hours=1)
     memoization_cutoff = current_time - memoization_period
@@ -270,6 +293,28 @@ def check_if_is_premium_user():
     return True
 
 
+@celery.task(name="fetch_and_store_notion_files")
+def fetch_and_store_notion_files(access_token: str, user_id: UUID):
+    if async_engine is None:
+        init_worker()
+    logger.debug("Fetching and storing Notion files")
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(fetch_and_store_notion_files_async(access_token, user_id))
+
+
+async def fetch_and_store_notion_files_async(access_token: str, user_id: UUID):
+    global async_engine
+    assert async_engine
+    async with AsyncSession(
+        async_engine, expire_on_commit=False, autoflush=False
+    ) as session:
+        notion_repository = NotionRepository(session)
+        notion_service = SyncNotionService(notion_repository)
+        notion_client = Client(auth=access_token)
+        all_search_result = fetch_notion_pages(notion_client)
+        await store_notion_pages(all_search_result, notion_service, user_id)
+
+
 celery.conf.beat_schedule = {
     "ping_telemetry": {
         "task": f"{__name__}.ping_telemetry",
@@ -278,6 +323,10 @@ celery.conf.beat_schedule = {
     "process_sync_active": {
         "task": "process_sync_active",
         "schedule": crontab(minute="*/1", hour="*"),
+    },
+    "process_notion_sync": {
+        "task": "process_notion_sync",
+        "schedule": crontab(minute="0", hour="*/6"),
     },
     "process_premium_users": {
         "task": "check_if_is_premium_user",

@@ -16,6 +16,7 @@ class User(SQLModel, table=True):
     email: str
     onboarded: bool | None = None
     chats: List["Chat"] | None = Relationship(back_populates="user")  # type: ignore
+    notion_syncs: List["NotionSyncFile"] | None = Relationship(back_populates="user")  # type: ignore
 
 
 class UserIdentity(BaseModel):
