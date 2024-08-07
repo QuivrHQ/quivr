@@ -1,6 +1,8 @@
+from typing import Annotated
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Request
+
 from quivr_api.logger import get_logger
 from quivr_api.middlewares.auth.auth_bearer import AuthBearer, get_current_user
 from quivr_api.modules.brain.dto.inputs import (
@@ -8,7 +10,11 @@ from quivr_api.modules.brain.dto.inputs import (
     BrainUpdatableProperties,
     CreateBrainProperties,
 )
-from quivr_api.modules.brain.entity.brain_entity import RoleEnum
+from quivr_api.modules.brain.entity.brain_entity import (
+    BrainType,
+    MinimalUserBrainEntity,
+    RoleEnum,
+)
 from quivr_api.modules.brain.entity.integration_brain import (
     IntegrationDescriptionEntity,
 )
@@ -23,10 +29,13 @@ from quivr_api.modules.brain.service.get_question_context_from_brain import (
 from quivr_api.modules.brain.service.integration_brain_service import (
     IntegrationBrainDescriptionService,
 )
+from quivr_api.modules.dependencies import get_service
+from quivr_api.modules.models.service.model_service import ModelService
 from quivr_api.modules.prompt.service.prompt_service import PromptService
 from quivr_api.modules.user.entity.user_identity import UserIdentity
 from quivr_api.modules.user.service.user_usage import UserUsage
 from quivr_api.packages.utils.telemetry import maybe_send_telemetry
+from quivr_api.packages.utils.uuid_generator import generate_uuid_from_string
 
 logger = get_logger(__name__)
 brain_router = APIRouter()
@@ -35,6 +44,7 @@ prompt_service = PromptService()
 brain_service = BrainService()
 brain_user_service = BrainUserService()
 integration_brain_description_service = IntegrationBrainDescriptionService()
+ModelServiceDep = Annotated[ModelService, Depends(get_service(ModelService))]
 
 
 @brain_router.get(
@@ -49,10 +59,32 @@ async def get_integration_brain_description() -> list[IntegrationDescriptionEnti
 
 @brain_router.get("/brains/", dependencies=[Depends(AuthBearer())], tags=["Brain"])
 async def retrieve_all_brains_for_user(
+    model_service: ModelServiceDep,
     current_user: UserIdentity = Depends(get_current_user),
 ):
     """Retrieve all brains for the current user."""
     brains = brain_user_service.get_user_brains(current_user.id)
+    models = await model_service.get_models()
+
+    for model in models:
+        brains.append(
+            MinimalUserBrainEntity(
+                id=generate_uuid_from_string(model.name),
+                status="private",
+                brain_type=BrainType.model,
+                name=model.name,
+                rights=RoleEnum.Viewer,
+                model=True,
+                price=model.price,
+                max_input=model.max_input,
+                max_output=model.max_output,
+                display_name=model.display_name,
+                image_url=model.image_url,
+                description=model.description,
+                integration_logo_url="model.integration_id",
+                max_files=0,
+            )
+        )
     return {"brains": brains}
 
 
