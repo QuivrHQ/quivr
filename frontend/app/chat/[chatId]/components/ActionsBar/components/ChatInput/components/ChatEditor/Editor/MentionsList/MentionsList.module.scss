@@ -7,16 +7,18 @@
   background-color: var(--background-0);
   flex-direction: column;
   padding: Spacings.$spacing03;
-  box-shadow: BoxShadow.$small;
+  box-shadow: BoxShadow.$medium;
+  border: 1px solid var(--border-1);
   border-radius: Radius.$normal;
-  gap: Spacings.$spacing03;
+  gap: Spacings.$spacing02;
   max-width: 300px;
+  min-width: 200px;
   overflow: scroll;
   max-height: 300px;
+  overflow-y: scroll;
 
   .mentions_list {
     display: flex;
     flex-direction: column;
-    gap: Spacings.$spacing02;
   }
 }
