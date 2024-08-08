@@ -33,7 +33,7 @@ celery_inspector = celery.control.inspect()
 logger = get_logger("celery_worker")
 
 
-async def process_all_syncs(
+async def process_all_active_syncs(
     async_engine: AsyncEngine,
     sync_active_service: SyncService,
     sync_user_service: SyncUserService,
@@ -78,6 +78,7 @@ async def process_all_syncs(
             sync_active_service=sync_active_service,
             sync_user_service=sync_user_service,
             mapping_syncs_utils=mapping_sync_utils,
+            notification_service=notification_service,
         )
 
 
@@ -85,13 +86,16 @@ async def process_active_syncs(
     sync_active_service: SyncService,
     sync_user_service: SyncUserService,
     mapping_syncs_utils: dict[str, SyncUtils],
+    notification_service: NotificationService,
 ):
-    active = await sync_active_service.get_syncs_active_in_interval()
-    logger.debug(f"Found active syncs: {active}")
-    for sync in active:
-        logger.info(f"Syncing {sync}...")
+    active_syncs = await sync_active_service.get_syncs_active_in_interval()
+    logger.debug(f"Found active syncs: {active_syncs}")
+    for sync in active_syncs:
         try:
             user_sync = sync_user_service.get_sync_user_by_id(sync.syncs_user_id)
+            # TODO: this should be global
+            # NOTE: Remove the global notification
+            notification_service.remove_notification_by_id(sync.notification_id)
             assert user_sync, f"No user sync found for active sync: {sync}"
             sync_util = mapping_syncs_utils[user_sync.provider.lower()]
             await sync_util.sync(sync_active=sync, user_sync=user_sync)

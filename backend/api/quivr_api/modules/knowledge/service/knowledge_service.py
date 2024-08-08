@@ -1,22 +1,18 @@
 from uuid import UUID
 
+from quivr_core.models import QuivrKnowledge as Knowledge
+
 from quivr_api.logger import get_logger
 from quivr_api.modules.knowledge.dto.inputs import (
     CreateKnowledgeProperties,
     KnowledgeStatus,
 )
-from quivr_api.modules.knowledge.repository.knowledge_interface import (
-    KnowledgeInterface,
-)
 from quivr_api.modules.knowledge.repository.knowledges import KnowledgeRepository
-from quivr_core.models import QuivrKnowledge as Knowledge
 
 logger = get_logger(__name__)
 
 
 class KnowledgeService:
-    repository: KnowledgeInterface
-
     def __init__(self):
         self.repository = KnowledgeRepository()
 

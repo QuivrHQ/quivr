@@ -183,7 +183,11 @@ async def create_sync_active(
         )
     )
     sync_active_input.notification_id = str(notification.id)
-    return sync_service.create_sync_active(sync_active_input, str(current_user.id))
+    sync_active = sync_service.create_sync_active(
+        sync_active_input, str(current_user.id)
+    )
+    # TODO(@aminediro): Send processing task now !
+    return sync_active
 
 
 @sync_router.put(
@@ -235,7 +239,9 @@ async def update_sync_active(
         )
         sync_active_input.force_sync = True
         sync_active_input.notification_id = str(notification.id)
+        # TODO: Send processing task now !
         return sync_service.update_sync_active(sync_id, sync_active_input)
+
     else:
         return None
 

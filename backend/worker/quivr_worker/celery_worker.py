@@ -30,7 +30,7 @@ from quivr_worker.check_premium import check_is_premium
 from quivr_worker.process.process_s3_file import process_uploaded_file
 from quivr_worker.process.process_url import process_url_func
 from quivr_worker.syncs.process_active_syncs import (
-    process_all_syncs,
+    process_all_active_syncs,
     process_notion_sync,
 )
 from quivr_worker.syncs.store_notion import fetch_and_store_notion_files_async
@@ -171,7 +171,7 @@ def process_active_syncs_task():
     assert async_engine
     loop = asyncio.get_event_loop()
     loop.run_until_complete(
-        process_all_syncs(
+        process_all_active_syncs(
             async_engine=async_engine,
             sync_active_service=sync_active_service,
             sync_user_service=sync_user_service,
