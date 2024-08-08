@@ -16,4 +16,5 @@ export const mapBackendMinimalBrainToMinimalBrain = (
   max_files: backendMinimalBrain.max_files,
   allow_model_change: backendMinimalBrain.allow_model_change,
   image_url: backendMinimalBrain.image_url,
+  display_name: backendMinimalBrain.display_name,
 });
