@@ -3,12 +3,14 @@ from uuid import UUID
 from notion_client import Client
 from quivr_api.celery_config import celery
 from quivr_api.logger import get_logger
+from quivr_api.modules.brain.repository.brains_vectors import BrainsVectors
 from quivr_api.modules.knowledge.repository.storage import Storage
+from quivr_api.modules.knowledge.service.knowledge_service import KnowledgeService
 from quivr_api.modules.notification.service.notification_service import (
     NotificationService,
 )
 from quivr_api.modules.sync.repository.sync import NotionRepository
-from quivr_api.modules.sync.repository.sync_files import SyncFiles
+from quivr_api.modules.sync.repository.sync_files import SyncFilesRepository
 from quivr_api.modules.sync.service.sync_notion import (
     SyncNotionService,
     fetch_notion_pages,
@@ -26,109 +28,80 @@ from quivr_api.modules.sync.utils.syncutils import SyncUtils
 from sqlalchemy.ext.asyncio import AsyncEngine
 from sqlmodel.ext.asyncio.session import AsyncSession
 
-notification_service = NotificationService()
 celery_inspector = celery.control.inspect()
 
-logger = get_logger(__name__)
+logger = get_logger("celery_worker")
 
 
 async def process_all_syncs(
     async_engine: AsyncEngine,
     sync_active_service: SyncService,
     sync_user_service: SyncUserService,
-    sync_files_repo_service: SyncFiles,
+    sync_files_repo_service: SyncFilesRepository,
+    knowledge_service: KnowledgeService,
     storage: Storage,
 ):
     async with AsyncSession(
         async_engine, expire_on_commit=False, autoflush=False
     ) as session:
+        # TODO pass services from celery_worker
+        notification_service = NotificationService()
+        brain_vectors = BrainsVectors()
         sync_active_service = SyncService()
         sync_user_service = SyncUserService()
-        sync_files_repo_service = SyncFiles()
-        storage = Storage()
-
-        google_sync_utils = SyncUtils(
-            sync_user_service=sync_user_service,
-            sync_active_service=sync_active_service,
-            sync_files_repo=sync_files_repo_service,
-            storage=storage,
-            sync_cloud=GoogleDriveSync(),
-        )
-
-        azure_sync_utils = SyncUtils(
-            sync_user_service=sync_user_service,
-            sync_active_service=sync_active_service,
-            sync_files_repo=sync_files_repo_service,
-            storage=storage,
-            sync_cloud=AzureDriveSync(),
-        )
-
-        dropbox_sync_utils = SyncUtils(
-            sync_user_service=sync_user_service,
-            sync_active_service=sync_active_service,
-            sync_files_repo=sync_files_repo_service,
-            storage=storage,
-            sync_cloud=DropboxSync(),
-        )
-        github_sync_utils = SyncUtils(
-            sync_user_service=sync_user_service,
-            sync_active_service=sync_active_service,
-            sync_files_repo=sync_files_repo_service,
-            storage=storage,
-            sync_cloud=GitHubSync(),
-        )
-
-        active = await sync_active_service.get_syncs_active_in_interval()
-
+        sync_files_repo_service = SyncFilesRepository()
         notion_repository = NotionRepository(session)
         notion_service = SyncNotionService(notion_repository)
+        storage = Storage()
 
-        notion_sync_utils = SyncUtils(
-            sync_user_service=sync_user_service,
+        mapping_sync_utils = {}
+        for provider_name, sync_cloud in [
+            ("google", GoogleDriveSync()),
+            ("azure", AzureDriveSync()),
+            ("dropbox", DropboxSync()),
+            ("github", GitHubSync()),
+            ("github", NotionSync(notion_service=notion_service)),
+        ]:
+            provider_sync_util = SyncUtils(
+                sync_user_service=sync_user_service,
+                sync_active_service=sync_active_service,
+                sync_files_repo=sync_files_repo_service,
+                storage=storage,
+                sync_cloud=sync_cloud,
+                notification_service=notification_service,
+                brain_vectors=brain_vectors,
+                knowledge_service=knowledge_service,
+            )
+            mapping_sync_utils[provider_name] = provider_sync_util
+
+        await process_active_syncs(
             sync_active_service=sync_active_service,
-            sync_files_repo=sync_files_repo_service,
-            storage=storage,
-            sync_cloud=NotionSync(notion_service=notion_service),
+            sync_user_service=sync_user_service,
+            mapping_syncs_utils=mapping_sync_utils,
         )
 
-        active = await sync_active_service.get_syncs_active_in_interval()
 
-        # FIXME: THIS SHOULD BE a separate function
-        for sync in active:
-            try:
-                details_user_sync = sync_user_service.get_sync_user_by_id(
-                    sync.syncs_user_id
-                )
-                assert details_user_sync
-                if details_user_sync["provider"].lower() == "google":
-                    await google_sync_utils.sync(
-                        sync_active_id=sync.id, user_id=sync.user_id
-                    )
-                elif details_user_sync["provider"].lower() == "azure":
-                    await azure_sync_utils.sync(
-                        sync_active_id=sync.id, user_id=sync.user_id
-                    )
-                elif details_user_sync["provider"].lower() == "dropbox":
-                    await dropbox_sync_utils.sync(
-                        sync_active_id=sync.id, user_id=sync.user_id
-                    )
-                elif details_user_sync["provider"].lower() == "notion":
-                    await notion_sync_utils.sync(
-                        sync_active_id=sync.id,
-                        user_id=sync.user_id,
-                        notion_service=notion_service,
-                    )
-                elif details_user_sync["provider"].lower() == "github":
-                    await github_sync_utils.sync(
-                        sync_active_id=sync.id, user_id=sync.user_id
-                    )
-                else:
-                    logger.info(
-                        "Provider not supported: %s", details_user_sync["provider"]
-                    )
-            except Exception as e:
-                logger.error(f"Error syncing: {e}")
-                continue
+async def process_active_syncs(
+    sync_active_service: SyncService,
+    sync_user_service: SyncUserService,
+    mapping_syncs_utils: dict[str, SyncUtils],
+):
+    active = await sync_active_service.get_syncs_active_in_interval()
+    logger.debug(f"Found active syncs: {active}")
+    for sync in active:
+        logger.info(f"Syncing {sync}...")
+        try:
+            user_sync = sync_user_service.get_sync_user_by_id(sync.syncs_user_id)
+            assert user_sync, f"No user sync found for active sync: {sync}"
+            sync_util = mapping_syncs_utils[user_sync.provider.lower()]
+            await sync_util.sync(sync_active=sync, user_sync=user_sync)
+        except KeyError as e:
+            logger.error(
+                f"Provider not supported: {e}",
+            )
+        except Exception as e:
+            logger.error(f"Error syncing: {e}")
+            continue
 
 
 async def process_notion_sync(
@@ -139,9 +112,9 @@ async def process_notion_sync(
     ) as session:
         sync_user_service = SyncUserService()
         notion_repository = NotionRepository(session)
-
         notion_service = SyncNotionService(notion_repository)
 
+        # TODO: Add state in sync_user to check if the same fetching is running
         # Get active tasks for all workers
         active_tasks = celery_inspector.active()
         is_uploading_task_running = any(

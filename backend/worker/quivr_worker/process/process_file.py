@@ -97,10 +97,9 @@ async def parse_file(
                 },
             )
             processor_cls = get_processor_class(file.file_extension)
-            logger.debug(f"processing {file} using class {processor_cls.__name__}")
             processor = processor_cls(**processor_kwargs)
             docs = await processor.process_file(qfile)
-            logger.debug(f"parsed {file} to : {docs}")
+            logger.debug(f"Parsed {qfile} to : {docs}")
             return docs
     except KeyError as e:
         raise ValueError(f"Can't parse {file}. No available processor") from e

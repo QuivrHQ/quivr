@@ -11,7 +11,7 @@ from quivr_core.files.file import FileExtension, QuivrFile
 
 from quivr_worker.utils import get_tmp_name
 
-logger = get_logger(__name__)
+logger = get_logger("celery_worker")
 
 
 def compute_sha1(content: bytes):

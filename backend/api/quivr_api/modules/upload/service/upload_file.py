@@ -39,16 +39,16 @@ def check_file_exists(brain_id: str, file_identifier: str) -> bool:
 async def upload_file_storage(
     supabase_client: AsyncClient,
     file: FileIO | BufferedReader | bytes,
-    file_name: str,
+    storage_path: str,
     upsert: bool = False,
 ):
-    _, file_extension = os.path.splitext(file_name)
-    mime_type, _ = mimetypes.guess_type(file_name)
-    logger.debug(f"Uploading {file_name} to supabase storage.")
+    _, file_extension = os.path.splitext(storage_path)
+    mime_type, _ = mimetypes.guess_type(storage_path)
+    logger.debug(f"Uploading {storage_path} to supabase storage.")
 
     if upsert:
-        response = supabase_client.storage.from_("quivr").update(
-            file_name,
+        response = await supabase_client.storage.from_("quivr").update(
+            storage_path,
             file,  # type: ignore
             file_options={
                 "content-type": mime_type or "txt/html",
@@ -56,10 +56,11 @@ async def upload_file_storage(
                 "cache-control": "3600",
             },
         )
+        return response
     else:
         try:
             response = await supabase_client.storage.from_("quivr").upload(
-                file_name,
+                storage_path,
                 file,  # type: ignore
                 file_options={
                     "content-type": mime_type or "text/html",

@@ -59,7 +59,6 @@ services:
     container_name: worker
     volumes:
       - ./backend/:/code/
-    # command: "poetry install -q && celery -A quivr_worker.celery_worker worker -l info"
     command: >
       /bin/bash -c "poetry install -q && poetry run celery -A quivr_worker.celery_worker worker -l info"
     restart: always

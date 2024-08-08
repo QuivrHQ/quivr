@@ -45,13 +45,13 @@ def notifier(app):
                             ),
                         ),
                     )
+                    logger.error(
+                        f"task {task.id} process_file_task {task_kwargs} failed. Updating knowledge {knowledge_id} to Error"
+                    )
                     if knowledge_id:
                         knowledge_service.update_status_knowledge(
                             knowledge_id, KnowledgeStatus.ERROR
                         )
-                    logger.error(
-                        f"task {task.id} process_file_task {task_kwargs} failed. Updating knowledge {knowledge_id} to Error"
-                    )
 
                 if event["type"] == "task-succeeded":
                     logger.info(

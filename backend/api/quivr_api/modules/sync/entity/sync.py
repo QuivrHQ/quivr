@@ -1,3 +1,5 @@
+import io
+from dataclasses import dataclass
 from datetime import datetime
 from typing import Optional
 from uuid import UUID
@@ -7,6 +9,13 @@ from sqlmodel import TIMESTAMP, Column, Field, Relationship, SQLModel, text
 from sqlmodel import UUID as PGUUID
 
 from quivr_api.modules.user.entity.user_identity import User
+
+
+@dataclass
+class DownloadedSyncFile:
+    file_name: str
+    extension: str
+    file_data: io.BufferedReader
 
 
 class SyncsUser(BaseModel):
@@ -26,7 +35,7 @@ class SyncFile(BaseModel):
     last_modified: str
     mime_type: str
     web_view_link: str
-    notification_id: Optional[str] = None
+    notification_id: UUID | None = None
     icon: Optional[str] = None
     parent_id: Optional[str] = None
     type: Optional[str] = None
@@ -76,11 +85,16 @@ class SyncsActive(BaseModel):
     syncs_user_id: int
     user_id: UUID
     settings: dict
-    last_synced: datetime
+    last_synced: str
     sync_interval_minutes: int
-    brain_id: str
+    brain_id: UUID
     syncs_user: Optional[SyncsUser] = None
     notification_id: Optional[str] = None
+
+
+# TODO: all of this should be rewritten
+class SyncsActiveDetails(BaseModel):
+    pass
 
 
 class DBSyncFile(BaseModel):

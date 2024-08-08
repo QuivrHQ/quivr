@@ -1,13 +1,13 @@
 from quivr_api.logger import get_logger
 from quivr_api.models.settings import get_supabase_client
 from quivr_api.modules.sync.dto.inputs import SyncFileInput, SyncFileUpdateInput
-from quivr_api.modules.sync.entity.sync import DBSyncFile
+from quivr_api.modules.sync.entity.sync import DBSyncFile, SyncFile, SyncsActive
 from quivr_api.modules.sync.repository.sync_interfaces import SyncFileInterface
 
 logger = get_logger(__name__)
 
 
-class SyncFiles(SyncFileInterface):
+class SyncFilesRepository(SyncFileInterface):
     def __init__(self):
         """
         Initialize the SyncFiles class with a Supabase client.
@@ -16,7 +16,7 @@ class SyncFiles(SyncFileInterface):
         self.db = supabase_client  # type: ignore
         logger.debug("Supabase client initialized")
 
-    def create_sync_file(self, sync_file_input: SyncFileInput) -> DBSyncFile:
+    def create_sync_file(self, sync_file_input: SyncFileInput) -> DBSyncFile | None:
         """
         Create a new sync file in the database.
 
@@ -84,6 +84,33 @@ class SyncFiles(SyncFileInterface):
             sync_file_input.model_dump(exclude_unset=True)
         ).eq("id", sync_file_id).execute()
         logger.info("Sync file updated successfully")
+
+    def update_or_create_sync_file(
+        self,
+        file: SyncFile,
+        sync_active: SyncsActive,
+        previous_file: DBSyncFile | None,
+        supported: bool,
+    ):
+        if previous_file:
+            logger.debug(f"Upserting file {previous_file} in database.")
+            self.update_sync_file(
+                previous_file.id,
+                SyncFileUpdateInput(
+                    last_modified=file.last_modified,
+                    supported=previous_file.supported or supported,
+                ),
+            )
+        else:
+            self.create_sync_file(
+                SyncFileInput(
+                    path=file.name,
+                    syncs_active_id=sync_active.id,
+                    last_modified=file.last_modified,
+                    brain_id=str(sync_active.brain_id),
+                    supported=supported,
+                )
+            )
 
     def delete_sync_file(self, sync_file_id: int):
         """

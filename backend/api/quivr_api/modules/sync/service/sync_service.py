@@ -10,7 +10,7 @@ from quivr_api.modules.sync.dto.inputs import (
 )
 from quivr_api.modules.sync.entity.sync import SyncsActive, SyncsUser
 from quivr_api.modules.sync.repository.sync import Sync
-from quivr_api.modules.sync.repository.sync_user import SyncUser
+from quivr_api.modules.sync.repository.sync_user import SyncUserRepository
 from quivr_api.modules.sync.service.sync_notion import SyncNotionService
 from quivr_api.modules.user.service.user_service import UserService
 
@@ -22,7 +22,7 @@ user_service = UserService()
 
 class SyncUserService:
     def __init__(self):
-        self.repository = SyncUser()
+        self.repository = SyncUserRepository()
 
     def get_syncs_user(self, user_id: UUID, sync_user_id: int | None = None):
         return self.repository.get_syncs_user(user_id, sync_user_id)
