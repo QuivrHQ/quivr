@@ -17,5 +17,3 @@ def test_chat_llm(fake_llm):
     assert answer.metadata.sources == []
     assert answer.metadata.metadata_model is not None
     assert answer.metadata.metadata_model.name is not None
-
-
