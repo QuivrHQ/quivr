@@ -10,6 +10,7 @@
   p {
     margin: 0;
     padding: 0;
+    align-items: center;
   }
 
   ul {
@@ -99,7 +100,7 @@
     padding: Spacings.$spacing01;
     border-radius: Radius.$normal;
     font-family: "Courier New", Courier, monospace;
-    font-size: Typography.$small;
+    font-size: Typography.$medium;
   }
 
   .code_block {
