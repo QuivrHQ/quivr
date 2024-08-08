@@ -1,0 +1,68 @@
+@use "styles/Radius.module.scss";
+@use "styles/ScreenSizes.module.scss";
+@use "styles/Spacings.module.scss";
+@use "styles/Typography.module.scss";
+
+.tabs_container {
+  display: flex;
+  border-bottom: 1px solid var(--border-2);
+  position: relative;
+}
+
+.tab_wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-block: Spacings.$spacing02;
+  border-bottom: 1px solid transparent;
+  padding-inline: Spacings.$spacing05;
+  cursor: pointer;
+  box-sizing: border-box;
+  gap: Spacings.$spacing03;
+  margin-bottom: -1px;
+  z-index: 1;
+
+  &.selected {
+    border-bottom-color: var(--primary-0);
+    color: var(--primary-0);
+    background-color: var(--background-2);
+  }
+
+  &:hover {
+    color: var(--primary-0);
+  }
+
+  &.disabled {
+    pointer-events: none;
+    color: var(--text-1);
+  }
+
+  @media (max-width: ScreenSizes.$small) {
+    .label {
+      display: none;
+    }
+  }
+
+  .label_wrapper {
+    display: flex;
+    position: relative;
+    gap: Spacings.$spacing02;
+
+    .label {
+      font-size: Typography.$tiny;
+      font-weight: 500;
+    }
+
+    .label_badge {
+      border-radius: Radius.$circle;
+      width: 16px;
+      height: 16px;
+      color: var(--white-0);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background-color: var(--primary-0);
+      font-size: Typography.$very-tiny;
+    }
+  }
+}

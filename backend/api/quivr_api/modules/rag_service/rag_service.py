@@ -1,30 +1,37 @@
 import datetime
 from uuid import UUID, uuid4
 
-from quivr_api.logger import get_logger
-from quivr_api.models.settings import (get_embedding_client,
-                                       get_supabase_client, settings)
-from quivr_api.modules.brain.entity.brain_entity import BrainEntity
-from quivr_api.modules.brain.service.brain_service import BrainService
-from quivr_api.modules.brain.service.utils.format_chat_history import \
-    format_chat_history
-from quivr_api.modules.chat.controller.chat.utils import (
-    compute_cost, find_model_and_generate_metadata, update_user_usage)
-from quivr_api.modules.chat.dto.inputs import CreateChatHistory
-from quivr_api.modules.chat.dto.outputs import GetChatHistoryOutput
-from quivr_api.modules.chat.service.chat_service import ChatService
-from quivr_api.modules.knowledge.repository.knowledges import \
-    KnowledgeRepository
-from quivr_api.modules.prompt.entity.prompt import Prompt
-from quivr_api.modules.prompt.service.prompt_service import PromptService
-from quivr_api.modules.user.entity.user_identity import UserIdentity
-from quivr_api.modules.user.service.user_usage import UserUsage
-from quivr_api.vectorstore.supabase import CustomSupabaseVectorStore
 from quivr_core.chat import ChatHistory as ChatHistoryCore
 from quivr_core.config import LLMEndpointConfig, RAGConfig
 from quivr_core.llm.llm_endpoint import LLMEndpoint
 from quivr_core.models import ParsedRAGResponse, RAGResponseMetadata
 from quivr_core.quivr_rag import QuivrQARAG
+
+from quivr_api.logger import get_logger
+from quivr_api.models.settings import (
+    get_embedding_client,
+    get_supabase_client,
+    settings,
+)
+from quivr_api.modules.brain.entity.brain_entity import BrainEntity
+from quivr_api.modules.brain.service.brain_service import BrainService
+from quivr_api.modules.brain.service.utils.format_chat_history import (
+    format_chat_history,
+)
+from quivr_api.modules.chat.controller.chat.utils import (
+    compute_cost,
+    find_model_and_generate_metadata,
+    update_user_usage,
+)
+from quivr_api.modules.chat.dto.inputs import CreateChatHistory
+from quivr_api.modules.chat.dto.outputs import GetChatHistoryOutput
+from quivr_api.modules.chat.service.chat_service import ChatService
+from quivr_api.modules.knowledge.repository.knowledges import KnowledgeRepository
+from quivr_api.modules.prompt.entity.prompt import Prompt
+from quivr_api.modules.prompt.service.prompt_service import PromptService
+from quivr_api.modules.user.entity.user_identity import UserIdentity
+from quivr_api.modules.user.service.user_usage import UserUsage
+from quivr_api.vectorstore.supabase import CustomSupabaseVectorStore
 
 from .utils import generate_source
 

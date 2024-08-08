@@ -22,5 +22,6 @@
 
   .brain_name {
     @include Typography.EllipsisOverflow;
+    font-size: Typography.$small;
   }
 }

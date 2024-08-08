@@ -10,9 +10,9 @@ export const useBrainMention = () => {
 
   const items: SuggestionItem[] = allBrains.map((brain) => ({
     id: brain.id,
-    label: brain.name,
+    label: brain.display_name ?? brain.name,
     type: "brain",
-    iconUrl: brain.integration_logo_url,
+    iconUrl: brain.image_url,
   }));
 
   const { Mention: BrainMention } = useMentionConfig({

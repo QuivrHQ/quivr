@@ -1,3 +1,5 @@
+import Image from "next/image";
+
 import { Icon } from "@/lib/components/ui/Icon/Icon";
 
 import styles from "./MentionItem.module.scss";
@@ -23,7 +25,15 @@ export const MentionItem = ({
       key={item.id}
       onClick={onClick}
     >
-      <Icon name="brain" size="normal" color={selected ? "primary" : "black"} />
+      {item.iconUrl ? (
+        <Image src={item.iconUrl} alt="Brain or Model" width={14} height={14} />
+      ) : (
+        <Icon
+          name="brain"
+          size="small"
+          color={selected ? "primary" : "black"}
+        />
+      )}
       <span className={styles.brain_name}>{item.label}</span>
     </span>
   );

@@ -201,6 +201,14 @@ class ChatLLMService:
             "brain_name": None,
             "brain_id": None,
         }
+        metadata_model = ChatLLMMetadata(
+            name=self.model_to_use.name,
+            description=model_metadata.description,
+            image_url=model_metadata.image_url,
+            display_name=model_metadata.display_name,
+            brain_id=str(generate_uuid_from_string(self.model_to_use.name)),
+            brain_name=self.model_to_use.name,
+        )
 
         async for response in chat_llm.answer_astream(question, chat_history):
             # Format output to be correct servicedf;j
@@ -210,6 +218,7 @@ class ChatLLMService:
                     metadata=response.metadata.model_dump(),
                     **message_metadata,
                 )
+                streamed_chat_history.metadata["metadata_model"] = metadata_model  # type: ignore
                 full_answer += response.answer
                 yield f"data: {streamed_chat_history.model_dump_json()}"
             if response.last_chunk and full_answer == "":
@@ -217,7 +226,7 @@ class ChatLLMService:
 
         # For last chunk  parse the sources, and the full answer
         streamed_chat_history = GetChatHistoryOutput(
-            assistant=full_answer,
+            assistant="",
             metadata=response.metadata.model_dump(),
             **message_metadata,
         )

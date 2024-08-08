@@ -55,8 +55,9 @@ export const Analytics = (): JSX.Element => {
     { label: "Last 90 days", value: Range.QUARTER },
   ];
 
-  const brainsWithUploadRights =
-    formatMinimalBrainsToSelectComponentInput(allBrains);
+  const brainsWithUploadRights = formatMinimalBrainsToSelectComponentInput(
+    allBrains.filter((brain) => brain.brain_type === "doc")
+  );
 
   const selectedGraphRangeOption = graphRangeOptions.find(
     (option) => option.value === currentChartRange
