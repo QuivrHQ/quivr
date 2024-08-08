@@ -111,6 +111,7 @@ class BrainUser(BaseModel):
 class MinimalUserBrainEntity(BaseModel):
     id: UUID
     name: str
+    brain_model: Optional[str] = None
     rights: RoleEnum
     status: str
     brain_type: BrainType

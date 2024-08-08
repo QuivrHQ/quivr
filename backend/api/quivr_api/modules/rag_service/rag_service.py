@@ -1,4 +1,5 @@
 import datetime
+import os
 from uuid import UUID, uuid4
 
 from quivr_core.chat import ChatHistory as ChatHistoryCore
@@ -11,26 +12,20 @@ from quivr_api.logger import get_logger
 from quivr_api.models.settings import (
     get_embedding_client,
     get_supabase_client,
-    settings,
 )
 from quivr_api.modules.brain.entity.brain_entity import BrainEntity
 from quivr_api.modules.brain.service.brain_service import BrainService
 from quivr_api.modules.brain.service.utils.format_chat_history import (
     format_chat_history,
 )
-from quivr_api.modules.chat.controller.chat.utils import (
-    compute_cost,
-    find_model_and_generate_metadata,
-    update_user_usage,
-)
 from quivr_api.modules.chat.dto.inputs import CreateChatHistory
 from quivr_api.modules.chat.dto.outputs import GetChatHistoryOutput
 from quivr_api.modules.chat.service.chat_service import ChatService
 from quivr_api.modules.knowledge.repository.knowledges import KnowledgeRepository
+from quivr_api.modules.models.service.model_service import ModelService
 from quivr_api.modules.prompt.entity.prompt import Prompt
 from quivr_api.modules.prompt.service.prompt_service import PromptService
 from quivr_api.modules.user.entity.user_identity import UserIdentity
-from quivr_api.modules.user.service.user_usage import UserUsage
 from quivr_api.vectorstore.supabase import CustomSupabaseVectorStore
 
 from .utils import generate_source
@@ -42,29 +37,30 @@ class RAGService:
     def __init__(
         self,
         current_user: UserIdentity,
-        brain_id: UUID | None,
+        brain: BrainEntity,
         chat_id: UUID,
         brain_service: BrainService,
         prompt_service: PromptService,
         chat_service: ChatService,
         knowledge_service: KnowledgeRepository,
+        model_service: ModelService,
     ):
         # Services
         self.brain_service = brain_service
         self.prompt_service = prompt_service
         self.chat_service = chat_service
         self.knowledge_service = knowledge_service
+        self.model_service = model_service
 
         # Base models
         self.current_user = current_user
         self.chat_id = chat_id
-        self.brain = self.get_or_create_brain(brain_id, self.current_user.id)
+        self.brain = brain
         self.prompt = self.get_brain_prompt(self.brain)
 
         # check at init time
-        self.model_to_use = self.check_and_update_user_usage(
-            self.current_user, self.brain
-        )
+        self.model_to_use = brain.model
+        assert self.model_to_use is not None
 
     def get_brain_prompt(self, brain: BrainEntity) -> Prompt | None:
         return (
@@ -85,30 +81,18 @@ class RAGService:
         [chat_history.append(m) for m in transformed_history]
         return chat_history
 
-    def _build_rag_config(self) -> RAGConfig:
-        ollama_url = (
-            settings.ollama_api_base_url
-            if settings.ollama_api_base_url
-            and self.model_to_use.name.startswith("ollama")
-            else None
-        )
+    async def _build_rag_config(self) -> RAGConfig:
+        model = await self.model_service.get_model(self.model_to_use)  # type: ignore
+        api_key = os.getenv(model.env_variable_name, "not-defined")
 
         rag_config = RAGConfig(
             llm_config=LLMEndpointConfig(
-                model=self.model_to_use.name,
-                llm_base_url=ollama_url,
-                llm_api_key="abc-123" if ollama_url else None,
-                temperature=(
-                    self.brain.temperature
-                    if self.brain.temperature
-                    else LLMEndpointConfig.model_fields["temperature"].default
-                ),
-                max_input=self.model_to_use.max_input,
-                max_tokens=(
-                    self.brain.max_tokens
-                    if self.brain.max_tokens
-                    else LLMEndpointConfig.model_fields["max_tokens"].default
-                ),
+                model=self.model_to_use,  # type: ignore
+                llm_base_url=model.endpoint_url,
+                llm_api_key=api_key,
+                temperature=(LLMEndpointConfig.model_fields["temperature"].default),
+                max_input=model.max_input,
+                max_tokens=model.max_output,
             ),
             prompt=self.prompt.content if self.prompt else None,
         )
@@ -116,44 +100,6 @@ class RAGService:
 
     def get_llm(self, rag_config: RAGConfig):
         return LLMEndpoint.from_config(rag_config.llm_config)
-
-    def get_or_create_brain(self, brain_id: UUID | None, user_id: UUID) -> BrainEntity:
-        brain = None
-        if brain_id is not None:
-            brain = self.brain_service.get_brain_details(brain_id, user_id)
-
-        # TODO: Create if doesn't exist
-        assert brain
-
-        if brain.integration:
-            # TODO: entity should be UUID
-            assert brain.integration.user_id == str(user_id)
-        return brain
-
-    def check_and_update_user_usage(self, user: UserIdentity, brain: BrainEntity):
-        """Check user limits and raises if user reached his limits:
-        1. Raise if one of the conditions :
-           - User doesn't have access to brains
-           - Model of brain is not is user_settings.models
-           - Latest sum_30d(user_daily_user) < user_settings.max_monthly_usage
-           - Check sum(user_settings.daily_user_count)+ model_price <  user_settings.monthly_chat_credits
-        2. Updates user usage
-        """
-        # TODO(@aminediro) : THIS is bug prone, should retrieve it from DB here
-        user_usage = UserUsage(id=user.id, email=user.email)
-        user_settings = user_usage.get_user_settings()
-        all_models = user_usage.get_models()
-
-        # TODO(@aminediro): refactor this function
-        model_to_use = find_model_and_generate_metadata(
-            brain.model,
-            user_settings,
-            all_models,
-        )
-        cost = compute_cost(model_to_use, all_models)
-        # Raises HTTP if user usage exceeds limits
-        update_user_usage(user_usage, user_settings, cost)  # noqa: F821
-        return model_to_use
 
     def create_vector_store(
         self, brain_id: UUID, max_input: int
@@ -190,7 +136,7 @@ class RAGService:
         logger.info(
             f"Creating question for chat {self.chat_id} with brain {self.brain.brain_id} "
         )
-        rag_config = self._build_rag_config()
+        rag_config = await self._build_rag_config()
         logger.debug(f"generate_answer with config : {rag_config.model_dump()}")
         history = await self.chat_service.get_chat_history(self.chat_id)
         # Get list of files
@@ -241,7 +187,7 @@ class RAGService:
             f"Creating question for chat {self.chat_id} with brain {self.brain.brain_id} "
         )
         # Build the rag config
-        rag_config = self._build_rag_config()
+        rag_config = await self._build_rag_config()
         # Get chat history
         history = await self.chat_service.get_chat_history(self.chat_id)
         #  Format the history, sanitize the input

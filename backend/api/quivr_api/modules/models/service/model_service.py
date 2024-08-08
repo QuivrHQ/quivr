@@ -25,3 +25,10 @@ class ModelService(BaseService[ModelRepository]):
         model = await self.repository.get_model(model_name)
 
         return model
+
+    async def get_default_model(self) -> Model | None:
+        logger.info("Getting default model")
+
+        model = await self.repository.get_default_model()
+
+        return model
