@@ -46,4 +46,15 @@
     /* Success */
     --success: #47a455;
     --success-lightest: #d0edd4;
+
+    /* Code */
+    --code-yellow: #e6db74;
+    --code-grey: #f8f8f2; 
+    --code-green: #a6e22e;
+    --code-purple: #ae81ff;
+    --code-red: #f92672;
+    --code-dark-grey: #f8f8f2;
+    --code-very-dark-grey: #75715e;
+    --code-blue: #66d9ef;
+    --code-orange: #fd971f;
 }
