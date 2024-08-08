@@ -5,14 +5,16 @@ import Image from "next/image";
 
 import Icon from "@/lib/components/ui/Icon/Icon";
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
+import { BrainType } from "@/lib/types/BrainConfig";
 
 import styles from "./BrainButton.module.scss";
 
 export interface BrainOrModel {
   name: string;
   description: string;
+  id: UUID;
+  brain_type: BrainType;
   image_url?: string;
-  id?: UUID;
   price?: number;
   display_name?: string;
 }
@@ -25,25 +27,13 @@ const BrainButton = ({
   brainOrModel,
   newBrain,
 }: BrainButtonProps): JSX.Element => {
-  const { setCurrentBrainId, setCurrentModel } = useBrainContext();
+  const { setCurrentBrainId } = useBrainContext();
 
   return (
     <div
       className={styles.brain_button_container}
       onClick={() => {
-        if (brainOrModel.id) {
-          setCurrentBrainId(brainOrModel.id);
-          setCurrentModel(null);
-        } else {
-          setCurrentModel({
-            name: brainOrModel.name,
-            display_name: brainOrModel.display_name ?? "",
-            price: brainOrModel.price ?? 0,
-            image_url: brainOrModel.image_url ?? "",
-            description: brainOrModel.description,
-          });
-          setCurrentBrainId(null);
-        }
+        setCurrentBrainId(brainOrModel.id);
         newBrain();
       }}
     >

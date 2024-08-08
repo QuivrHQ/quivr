@@ -8,7 +8,6 @@ import styles from "./BrainsList.module.scss";
 
 interface BrainsListProps {
   brains: BrainOrModel[];
-  models: BrainOrModel[];
   selectedTab: string;
   brainsPerPage: number;
   newBrain: () => void;
@@ -16,7 +15,6 @@ interface BrainsListProps {
 
 const BrainsList = ({
   brains,
-  models,
   selectedTab,
   brainsPerPage,
   newBrain,
@@ -24,13 +22,7 @@ const BrainsList = ({
   const [currentPage, setCurrentPage] = useState(0);
   const [transitionDirection, setTransitionDirection] = useState("");
 
-  const totalItems =
-    selectedTab === "All"
-      ? brains.length + models.length
-      : selectedTab === "Brains"
-      ? brains.length
-      : models.length;
-  const totalPages = Math.ceil(totalItems / brainsPerPage);
+  const totalPages = Math.ceil(brains.length / brainsPerPage);
 
   const handleNextPage = () => {
     if (currentPage < totalPages - 1) {
@@ -59,6 +51,8 @@ const BrainsList = ({
         }
       }
 
+      console.info(brains);
+
       switch (event.key) {
         case "ArrowLeft":
           handlePreviousPage();
@@ -79,16 +73,7 @@ const BrainsList = ({
   }, [handlePreviousPage, handleNextPage]);
 
   const getDisplayedItems = () => {
-    let combinedItems = [];
-    if (selectedTab === "All") {
-      combinedItems = [...models, ...brains];
-    } else if (selectedTab === "Brains") {
-      combinedItems = brains;
-    } else {
-      combinedItems = models;
-    }
-
-    return combinedItems.slice(
+    return brains.slice(
       currentPage * brainsPerPage,
       (currentPage + 1) * brainsPerPage
     );

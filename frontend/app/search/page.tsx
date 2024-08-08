@@ -2,7 +2,6 @@
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 
-import { useModels } from "@/lib/api/models/useModels";
 import { QuivrLogo } from "@/lib/assets/QuivrLogo";
 import { AddBrainModal } from "@/lib/components/AddBrainModal";
 import { useBrainCreationContext } from "@/lib/components/AddBrainModal/brainCreation-provider";
@@ -22,7 +21,6 @@ import { redirectToLogin } from "@/lib/router/redirectToLogin";
 import { ButtonType } from "@/lib/types/QuivrButton";
 import { Tab } from "@/lib/types/Tab";
 
-import { BrainOrModel } from "./BrainsList/BrainButton/BrainButton";
 import BrainsList from "./BrainsList/BrainsList";
 import styles from "./page.module.scss";
 
@@ -30,7 +28,6 @@ const Search = (): JSX.Element => {
   const [selectedTab, setSelectedTab] = useState("Models");
   const [isUserDataFetched, setIsUserDataFetched] = useState(false);
   const [isNewBrain, setIsNewBrain] = useState(false);
-  const [models, setModels] = useState<BrainOrModel[]>([]);
   const brainsPerPage = 6;
 
   const pathname = usePathname();
@@ -41,7 +38,6 @@ const Search = (): JSX.Element => {
   const { isDarkMode } = useUserSettingsContext();
   const { isBrainCreated } = useOnboardingContext();
   const { allBrains } = useBrainContext();
-  const { getModels } = useModels();
 
   const [buttons, setButtons] = useState<ButtonType[]>([
     {
@@ -91,17 +87,6 @@ const Search = (): JSX.Element => {
   }, [userIdentityData]);
 
   useEffect(() => {
-    void (async () => {
-      try {
-        const res = await getModels();
-        setModels(res);
-      } catch (error) {
-        console.error(error);
-      }
-    })();
-  }, [getModels]);
-
-  useEffect(() => {
     if (userData) {
       setButtons((prevButtons) => {
         return prevButtons.map((button) => {
@@ -148,7 +133,6 @@ const Search = (): JSX.Element => {
               </div>
               <BrainsList
                 brains={allBrains}
-                models={models}
                 selectedTab={selectedTab}
                 brainsPerPage={brainsPerPage}
                 newBrain={newBrain}
