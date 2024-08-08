@@ -11,6 +11,7 @@ from quivr_api.modules.brain.service.brain_authorization_service import (
     validate_brain_authorization,
 )
 from quivr_api.modules.brain.service.brain_service import BrainService
+from quivr_api.modules.chat.controller.chat.utils import check_and_update_user_usage
 from quivr_api.modules.chat.dto.chats import ChatItem, ChatQuestion
 from quivr_api.modules.chat.dto.inputs import (
     ChatMessageProperties,
@@ -179,31 +180,44 @@ async def create_question_handler(
         if brain_id == generate_uuid_from_string(model.name):
             model_to_use = model
             break
+
     try:
-        service = None
+        service = None | RAGService | ChatLLMService
         if not model_to_use:
-            # TODO: check logic into middleware
+            brain = brain_service.get_brain_details(brain_id, current_user.id)  # type: ignore
+            model = await check_and_update_user_usage(
+                current_user, str(brain.model), model_service
+            )  # type: ignore
+            assert model is not None  # type: ignore
+            assert brain is not None  # type: ignore
+
+            brain.model = model.name
             validate_authorization(user_id=current_user.id, brain_id=brain_id)
             service = RAGService(
                 current_user,
-                brain_id,
+                brain,
                 chat_id,
                 brain_service,
                 prompt_service,
                 chat_service,
                 knowledge_service,
+                model_service,
             )
         else:
+            await check_and_update_user_usage(
+                current_user, model_to_use.name, model_service
+            )  # type: ignore
             service = ChatLLMService(
                 current_user,
                 model_to_use.name,
                 chat_id,
                 chat_service,
                 model_service,
-            )
+            )  # type: ignore
+        assert service is not None  # type: ignore
+        maybe_send_telemetry("question_asked", {"streaming": True}, request)
         chat_answer = await service.generate_answer(chat_question.question)
 
-        maybe_send_telemetry("question_asked", {"streaming": False}, request)
         return chat_answer
 
     except AssertionError:
@@ -252,24 +266,37 @@ async def create_stream_question_handler(
     try:
         service = None
         if not model_to_use:
+            brain = brain_service.get_brain_details(brain_id, current_user.id)  # type: ignore
+            model = await check_and_update_user_usage(
+                current_user, str(brain.model), model_service
+            )  # type: ignore
+            assert model is not None  # type: ignore
+            assert brain is not None  # type: ignore
+
+            brain.model = model.name
             validate_authorization(user_id=current_user.id, brain_id=brain_id)
             service = RAGService(
                 current_user,
-                brain_id,
+                brain,
                 chat_id,
                 brain_service,
                 prompt_service,
                 chat_service,
                 knowledge_service,
+                model_service,
             )
         else:
+            await check_and_update_user_usage(
+                current_user, model_to_use.name, model_service
+            )  # type: ignore
             service = ChatLLMService(
                 current_user,
                 model_to_use.name,
                 chat_id,
                 chat_service,
                 model_service,
-            )
+            )  # type: ignore
+        assert service is not None  # type: ignore
         maybe_send_telemetry("question_asked", {"streaming": True}, request)
 
         return StreamingResponse(

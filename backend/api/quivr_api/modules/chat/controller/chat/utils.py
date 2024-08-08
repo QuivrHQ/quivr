@@ -2,8 +2,11 @@ import time
 from uuid import UUID
 
 from fastapi import HTTPException
+
 from quivr_api.logger import get_logger
-from quivr_api.models.databases.llm_models import LLMModel
+from quivr_api.modules.models.entity.model import Model
+from quivr_api.modules.models.service.model_service import ModelService
+from quivr_api.modules.user.entity.user_identity import UserIdentity
 from quivr_api.modules.user.service.user_usage import UserUsage
 
 logger = get_logger(__name__)
@@ -26,59 +29,14 @@ class NullableUUID(UUID):
 
 
 # TODO: rewrite
-def compute_cost(model_to_use, models_settings):
-    model = model_to_use.name
-    user_choosen_model_price = 1000
-    for model_setting in models_settings:
-        if model_setting["name"] == model:
-            user_choosen_model_price = model_setting["price"]
-    return user_choosen_model_price
-
-
-# TODO: rewrite
-def find_model_and_generate_metadata(
+async def find_model_and_generate_metadata(
     brain_model: str | None,
-    user_settings,
-    models_settings,
-):
-    # Default model is gpt-3.5-turbo-0125
-    default_model = "gpt-3.5-turbo-0125"
-    model_to_use = LLMModel(  # TODO Implement default models in database
-        name=default_model, price=1, max_input=4000, max_output=1000
-    )
-
-    logger.debug("Brain model: %s", brain_model)
-
-    # If brain.model is None, set it to the default_model
-    if brain_model is None:
-        brain_model = default_model
-
-    is_brain_model_available = any(
-        brain_model == model_dict.get("name") for model_dict in models_settings
-    )
-
-    is_user_allowed_model = brain_model in user_settings.get(
-        "models", [default_model]
-    )  # Checks if the model is available in the list of models
-
-    logger.debug(f"Brain model: {brain_model}")
-    logger.debug(f"User models: {user_settings.get('models', [])}")
-    logger.debug(f"Model available: {is_brain_model_available}")
-    logger.debug(f"User allowed model: {is_user_allowed_model}")
-
-    if is_brain_model_available and is_user_allowed_model:
-        # Use the model from the brain
-        model_to_use.name = brain_model
-        for model_dict in models_settings:
-            if model_dict.get("name") == model_to_use.name:
-                model_to_use.price = model_dict.get("price")
-                model_to_use.max_input = model_dict.get("max_input")
-                model_to_use.max_output = model_dict.get("max_output")
-                break
-
-    logger.info(f"Model to use: {model_to_use}")
-
-    return model_to_use
+    model_service: ModelService,
+) -> Model:
+    model = await model_service.get_model(brain_model)
+    if model is None:
+        model = await model_service.get_default_model()
+    return model
 
 
 def update_user_usage(usage: UserUsage, user_settings, cost: int = 100):
@@ -107,3 +65,30 @@ def update_user_usage(usage: UserUsage, user_settings, cost: int = 100):
     else:
         usage.handle_increment_user_request_count(date, cost)
         pass
+
+
+async def check_and_update_user_usage(
+    user: UserIdentity, model_name: str, model_service: ModelService
+):
+    """Check user limits and raises if user reached his limits:
+    1. Raise if one of the conditions :
+       - User doesn't have access to brains
+       - Model of brain is not is user_settings.models
+       - Latest sum_30d(user_daily_user) < user_settings.max_monthly_usage
+       - Check sum(user_settings.daily_user_count)+ model_price <  user_settings.monthly_chat_credits
+    2. Updates user usage
+    """
+    # TODO(@aminediro) : THIS is bug prone, should retrieve it from DB here
+    user_usage = UserUsage(id=user.id, email=user.email)
+    user_settings = user_usage.get_user_settings()
+
+    # Get the model to use
+    model = await model_service.get_model(model_name)
+    logger.info(f"Model 🔥: {model}")
+    if model is None:
+        model = await model_service.get_default_model()
+        logger.info(f"Model 🔥: {model}")
+
+    # Raises HTTP if user usage exceeds limits
+    update_user_usage(user_usage, user_settings, model.price)  # noqa: F821
+    return model

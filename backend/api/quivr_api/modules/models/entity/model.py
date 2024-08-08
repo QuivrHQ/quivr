@@ -11,6 +11,9 @@ class Model(SQLModel, table=True):  # type: ignore
     description: str = Field(default="")
     display_name: str = Field(default="")
     image_url: str = Field(default="")
+    endpoint_url: str = Field(default="")
+    env_variable_name: str = Field(default="")
+    default: bool = Field(default=False)
 
     class Config:
         arbitrary_types_allowed = True

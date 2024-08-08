@@ -19,7 +19,12 @@ class ModelRepository(BaseRepository):
         response = await self.session.exec(query)
         return response.all()
 
-    async def get_model(self, model_name: str) -> Model:
+    async def get_model(self, model_name: str) -> Model | None:
         query = select(Model).where(Model.name == model_name)
+        response = await self.session.exec(query)
+        return response.first()
+
+    async def get_default_model(self) -> Model:
+        query = select(Model).where(Model.default == True)  # noqa: E712
         response = await self.session.exec(query)
         return response.first()
