@@ -8,7 +8,6 @@ import { CreateBrainInput } from "@/lib/api/brain/types";
 import { useBrainApi } from "@/lib/api/brain/useBrainApi";
 import { usePromptApi } from "@/lib/api/prompt/usePromptApi";
 import { useToast } from "@/lib/hooks";
-import { Model } from "@/lib/types/Models";
 import { Prompt } from "@/lib/types/Prompt";
 import { useEventTracking } from "@/services/analytics/june/useEventTracking";
 
@@ -24,7 +23,6 @@ export const useBrainProvider = () => {
 
   const [allBrains, setAllBrains] = useState<MinimalBrainForUser[]>([]);
   const [currentBrainId, setCurrentBrainId] = useState<null | UUID>(null);
-  const [currentModel, setCurrentModel] = useState<null | Model>(null);
   const [isFetchingBrains, setIsFetchingBrains] = useState(true);
   const [publicPrompts, setPublicPrompts] = useState<Prompt[]>([]);
   const [currentPromptId, setCurrentPromptId] = useState<null | string>(null);
@@ -100,8 +98,6 @@ export const useBrainProvider = () => {
     currentBrainDetails,
     currentBrainId,
     setCurrentBrainId,
-    currentModel,
-    setCurrentModel,
 
     fetchPublicPrompts,
     publicPrompts,

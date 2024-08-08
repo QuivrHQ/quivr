@@ -1,5 +1,3 @@
-import Image from "next/image";
-
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
 import { MinimalBrainForUser } from "@/lib/context/BrainProvider/types";
 import { useNotificationsContext } from "@/lib/context/NotificationsProvider/hooks/useNotificationsContext";
@@ -15,31 +13,18 @@ interface CurrentBrainProps {
   isNewBrain?: boolean;
 }
 
-interface Model {
-  image_url?: string;
-  display_name?: string;
-}
-
 const BrainNameAndImage = ({
   currentBrain,
-  currentModel,
   isNewBrain,
 }: {
-  currentBrain?: MinimalBrainForUser;
-  currentModel: Model | null;
+  currentBrain: MinimalBrainForUser;
   isNewBrain: boolean;
 }) => {
-  const imageUrl = currentModel?.image_url ?? "";
-
   return (
     <>
-      {currentBrain ? (
-        <Icon name="brain" size="small" color="black" />
-      ) : (
-        <Image src={imageUrl} width={14} height={14} alt="Brain Image" />
-      )}
+      <Icon name="brain" size="small" color="black" />
       <span className={`${styles.brain_name} ${isNewBrain ? styles.new : ""}`}>
-        {currentBrain ? currentBrain.name : currentModel?.display_name}
+        {currentBrain.name}
       </span>
     </>
   );
@@ -78,13 +63,11 @@ export const CurrentBrain = ({
   remainingCredits,
   isNewBrain,
 }: CurrentBrainProps): JSX.Element => {
-  const { currentBrain, setCurrentBrainId, currentModel, setCurrentModel } =
-    useBrainContext();
+  const { currentBrain, setCurrentBrainId } = useBrainContext();
   const { bulkNotifications } = useNotificationsContext();
 
   const removeCurrentBrain = (): void => {
     setCurrentBrainId(null);
-    setCurrentModel(null);
   };
 
   if (remainingCredits === 0) {
@@ -97,7 +80,7 @@ export const CurrentBrain = ({
     );
   }
 
-  if (!currentBrain && !currentModel) {
+  if (!currentBrain) {
     return <></>;
   }
 
@@ -109,7 +92,6 @@ export const CurrentBrain = ({
           <div className={styles.brain_name_wrapper}>
             <BrainNameAndImage
               currentBrain={currentBrain}
-              currentModel={currentModel}
               isNewBrain={!!isNewBrain}
             />
             <ProcessingNotification
