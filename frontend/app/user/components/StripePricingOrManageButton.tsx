@@ -39,6 +39,7 @@ export const StripePricingOrManageButton = ({
           ></QuivrButton>
         </div>
       }
+      user_email={userData?.email ?? ""}
     />
   );
 };

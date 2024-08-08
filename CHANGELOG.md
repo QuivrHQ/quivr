@@ -1,5 +1,25 @@
 # Changelog
 
+## 0.0.294 (2024-08-07)
+
+## What's Changed
+* Delete Porter Application quivr-com by @porter-deployment-app in https://github.com/QuivrHQ/quivr/pull/2927
+* Delete Porter Application quivr-com-backend by @porter-deployment-app in https://github.com/QuivrHQ/quivr/pull/2928
+* feat: quivr core tox test + parsers by @AmineDiro in https://github.com/QuivrHQ/quivr/pull/2929
+* feat(frontend): handle no brain selection by @Zewed in https://github.com/QuivrHQ/quivr/pull/2932
+* fix: processor quivr version by @AmineDiro in https://github.com/QuivrHQ/quivr/pull/2934
+* fix: quivr core fix tests by @AmineDiro in https://github.com/QuivrHQ/quivr/pull/2935
+* chore(main): release core 0.0.13 by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2930
+* feat: Add GitHub sync functionality to sync router by @chloedia in https://github.com/QuivrHQ/quivr/pull/2871
+* refactor: Remove syncGitHub function from useSync.ts by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2942
+* feat: add chat with models by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2933
+* ci: precommit in CI by @AmineDiro in https://github.com/QuivrHQ/quivr/pull/2946
+* feat: Add get_model method to ModelRepository by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2949
+* feat: Add user email to StripePricingOrManageButton and UpgradeToPlusButton components by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2951
+
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.293...v0.0.294
+
 ## 0.0.293 (2024-07-30)
 
 ## What's Changed
