@@ -226,7 +226,7 @@ class ChatLLMService:
 
         # For last chunk  parse the sources, and the full answer
         streamed_chat_history = GetChatHistoryOutput(
-            assistant=full_answer,
+            assistant="",
             metadata=response.metadata.model_dump(),
             **message_metadata,
         )
