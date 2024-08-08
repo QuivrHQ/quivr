@@ -12,7 +12,7 @@ import { useEffect, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import gfm from "remark-gfm";
 
-import Icon from "@/lib/components/ui/Icon/Icon";
+import { Icon } from "@/lib/components/ui/Icon/Icon";
 
 import styles from "./MessageContent.module.scss";
 

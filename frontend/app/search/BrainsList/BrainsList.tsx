@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-import Icon from "@/lib/components/ui/Icon/Icon";
+import { Icon } from "@/lib/components/ui/Icon/Icon";
 
 import BrainButton, { BrainOrModel } from "./BrainButton/BrainButton";
 import styles from "./BrainsList.module.scss";

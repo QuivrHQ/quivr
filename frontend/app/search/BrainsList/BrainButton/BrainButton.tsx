@@ -3,7 +3,7 @@
 import { UUID } from "crypto";
 import Image from "next/image";
 
-import Icon from "@/lib/components/ui/Icon/Icon";
+import { Icon } from "@/lib/components/ui/Icon/Icon";
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
 import { BrainType } from "@/lib/types/BrainConfig";
 

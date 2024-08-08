@@ -79,8 +79,8 @@
     padding: Spacings.$spacing05;
     border-radius: Radius.$normal;
     overflow: auto;
-    margin: 0 0 1em 0;
-    white-space: pre-wrap; /* Conserver les espaces et les indentations */
+    margin: 0 0 Spacings.$spacing05 0;
+    white-space: pre-wrap;
     font-size: Typography.$small;
     font-family: "Courier New", Courier, monospace;
   }
