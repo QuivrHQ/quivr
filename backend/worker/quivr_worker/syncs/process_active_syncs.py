@@ -3,7 +3,9 @@ from uuid import UUID
 from notion_client import Client
 from quivr_api.celery_config import celery
 from quivr_api.logger import get_logger
+from quivr_api.modules.knowledge.repository.knowledges import KnowledgeRepository
 from quivr_api.modules.knowledge.repository.storage import Storage
+from quivr_api.modules.knowledge.service.knowledge_service import KnowledgeService
 from quivr_api.modules.notification.service.notification_service import (
     NotificationService,
 )
@@ -45,6 +47,8 @@ async def process_all_syncs(
         sync_active_service = SyncService()
         sync_user_service = SyncUserService()
         sync_files_repo_service = SyncFiles()
+        knowledge_repository = KnowledgeRepository(session)
+        knowledge_service = KnowledgeService(knowledge_repository)
         storage = Storage()
 
         google_sync_utils = SyncUtils(
@@ -53,6 +57,7 @@ async def process_all_syncs(
             sync_files_repo=sync_files_repo_service,
             storage=storage,
             sync_cloud=GoogleDriveSync(),
+            knowledge_service=knowledge_service,
         )
 
         azure_sync_utils = SyncUtils(
@@ -61,6 +66,7 @@ async def process_all_syncs(
             sync_files_repo=sync_files_repo_service,
             storage=storage,
             sync_cloud=AzureDriveSync(),
+            knowledge_service=knowledge_service,
         )
 
         dropbox_sync_utils = SyncUtils(
@@ -69,6 +75,7 @@ async def process_all_syncs(
             sync_files_repo=sync_files_repo_service,
             storage=storage,
             sync_cloud=DropboxSync(),
+            knowledge_service=knowledge_service,
         )
         github_sync_utils = SyncUtils(
             sync_user_service=sync_user_service,
@@ -76,6 +83,7 @@ async def process_all_syncs(
             sync_files_repo=sync_files_repo_service,
             storage=storage,
             sync_cloud=GitHubSync(),
+            knowledge_service=knowledge_service,
         )
 
         active = await sync_active_service.get_syncs_active_in_interval()
@@ -89,6 +97,7 @@ async def process_all_syncs(
             sync_files_repo=sync_files_repo_service,
             storage=storage,
             sync_cloud=NotionSync(notion_service=notion_service),
+            knowledge_service=knowledge_service,
         )
 
         active = await sync_active_service.get_syncs_active_in_interval()

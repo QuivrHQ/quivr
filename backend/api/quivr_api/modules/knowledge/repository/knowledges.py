@@ -1,15 +1,22 @@
 from typing import Sequence
 from uuid import UUID
+from venv import logger
 
 from fastapi import HTTPException
+from sqlalchemy.exc import IntegrityError
+from sqlmodel import select
+from sqlmodel.ext.asyncio.session import AsyncSession
+
+from quivr_api.logger import get_logger
 from quivr_api.models.settings import get_supabase_client
 from quivr_api.modules.dependencies import BaseRepository
 from quivr_api.modules.knowledge.dto.inputs import KnowledgeStatus
 from quivr_api.modules.knowledge.dto.outputs import DeleteKnowledgeResponse
-#from quivr_core.models import QuivrKnowledge as Knowledge
+
+# from quivr_core.models import QuivrKnowledge as Knowledge
 from quivr_api.modules.knowledge.entity.knowledge import KnowledgeDB
-from sqlmodel import select
-from sqlmodel.ext.asyncio.session import AsyncSession
+
+logger = get_logger(__name__)
 
 
 class KnowledgeRepository(BaseRepository):
@@ -19,9 +26,10 @@ class KnowledgeRepository(BaseRepository):
         self.db = supabase_client
 
     async def insert_knowledge(self, knowledge: KnowledgeDB) -> KnowledgeDB:
+        logger.debug(f"Inserting knowledge {knowledge}")
         query = select(KnowledgeDB).where(
             KnowledgeDB.brain_id == knowledge.brain_id,
-            KnowledgeDB.file_name == knowledge.file_name
+            KnowledgeDB.file_name == knowledge.file_name,
         )
         result = await self.session.exec(query)
         existing_knowledge = result.first()
@@ -29,12 +37,21 @@ class KnowledgeRepository(BaseRepository):
         if existing_knowledge:
             return existing_knowledge
 
-        self.session.add(knowledge)
-        await self.session.commit()
-        await self.session.refresh(knowledge)
+        try:
+            self.session.add(knowledge)
+            await self.session.commit()
+        except IntegrityError:
+            await self.session.rollback()
+            raise Exception("Integrity error while creating notion files.")
+        except Exception as e:
+            await self.session.rollback()
+            raise e
+
         return knowledge
 
-    async def remove_knowledge_by_id(self, knowledge_id: UUID) -> DeleteKnowledgeResponse:
+    async def remove_knowledge_by_id(
+        self, knowledge_id: UUID
+    ) -> DeleteKnowledgeResponse:
         query = select(KnowledgeDB).where(KnowledgeDB.id == knowledge_id)
         result = await self.session.exec(query)
         knowledge = result.first()
@@ -79,7 +96,7 @@ class KnowledgeRepository(BaseRepository):
                 knowledge_to_delete_list.append(f"{brain_id}/{knowledge.file_name}")
 
         if knowledge_to_delete_list:
-            #FIXME: Can we bypass db ? @Amine
+            # FIXME: Can we bypass db ? @Amine
             self.db.storage.from_("quivr").remove(knowledge_to_delete_list)
 
         select_query = select(KnowledgeDB).where(KnowledgeDB.brain_id == brain_id)
@@ -88,7 +105,9 @@ class KnowledgeRepository(BaseRepository):
             await self.session.delete(item)
         await self.session.commit()
 
-    async def update_status_knowledge(self, knowledge_id: UUID, status: KnowledgeStatus) -> bool:
+    async def update_status_knowledge(
+        self, knowledge_id: UUID, status: KnowledgeStatus
+    ) -> bool:
         query = select(KnowledgeDB).where(KnowledgeDB.id == knowledge_id)
         result = await self.session.exec(query)
         knowledge = result.first()

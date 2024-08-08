@@ -1,25 +1,21 @@
 import asyncio
-from asyncore import loop
 
 from celery.result import AsyncResult
 from quivr_api.celery_config import celery
 from quivr_api.logger import get_logger
 from quivr_api.modules.dependencies import get_service
 from quivr_api.modules.knowledge.dto.inputs import KnowledgeStatus
-from quivr_api.modules.knowledge.service.knowledge_service import \
-    KnowledgeService
-from quivr_api.modules.notification.dto.inputs import \
-    NotificationUpdatableProperties
-from quivr_api.modules.notification.entity.notification import \
-    NotificationsStatusEnum
-from quivr_api.modules.notification.service.notification_service import \
-    NotificationService
+from quivr_api.modules.knowledge.service.knowledge_service import KnowledgeService
+from quivr_api.modules.notification.dto.inputs import NotificationUpdatableProperties
+from quivr_api.modules.notification.entity.notification import NotificationsStatusEnum
+from quivr_api.modules.notification.service.notification_service import (
+    NotificationService,
+)
 
 logger = get_logger("notifier_service", "notifier_service.log")
 notification_service = NotificationService()
-#knowledge_service = KnowledgeService()
+# knowledge_service = KnowledgeService()
 knowledge_service = get_service(KnowledgeService)()
-
 
 
 async def notifier(app):
@@ -91,8 +87,8 @@ async def notifier(app):
         recv = app.events.Receiver(
             connection,
             handlers={
-                "task-failed": await handle_task_event,
-                "task-succeeded": await handle_task_event,
+                "task-failed": handle_task_event,  # FIXME: @aminediro check how to handle this
+                "task-succeeded": handle_task_event,
             },
         )
         recv.capture(limit=None, timeout=None, wakeup=True)

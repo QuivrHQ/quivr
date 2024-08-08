@@ -2,22 +2,23 @@ from typing import Optional
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, Query
+
 from quivr_api.celery_config import celery
 from quivr_api.logger import get_logger
 from quivr_api.middlewares.auth import AuthBearer, get_current_user
 from quivr_api.models.crawler import CrawlWebsite
 from quivr_api.modules.brain.entity.brain_entity import RoleEnum
-from quivr_api.modules.brain.service.brain_authorization_service import \
-    validate_brain_authorization
+from quivr_api.modules.brain.service.brain_authorization_service import (
+    validate_brain_authorization,
+)
 from quivr_api.modules.dependencies import get_service
 from quivr_api.modules.knowledge.dto.inputs import CreateKnowledgeProperties
-from quivr_api.modules.knowledge.service.knowledge_service import \
-    KnowledgeService
+from quivr_api.modules.knowledge.service.knowledge_service import KnowledgeService
 from quivr_api.modules.notification.dto.inputs import CreateNotification
-from quivr_api.modules.notification.entity.notification import \
-    NotificationsStatusEnum
-from quivr_api.modules.notification.service.notification_service import \
-    NotificationService
+from quivr_api.modules.notification.entity.notification import NotificationsStatusEnum
+from quivr_api.modules.notification.service.notification_service import (
+    NotificationService,
+)
 from quivr_api.modules.user.entity.user_identity import UserIdentity
 from quivr_api.modules.user.service.user_usage import UserUsage
 from quivr_api.utils.byte_size import convert_bytes
@@ -26,9 +27,8 @@ logger = get_logger(__name__)
 crawl_router = APIRouter()
 
 notification_service = NotificationService()
-#knowledge_service = KnowledgeService()
+# knowledge_service = KnowledgeService()
 knowledge_service = get_service(KnowledgeService)()
-
 
 
 @crawl_router.get("/crawl/healthz", tags=["Health"])
@@ -81,6 +81,8 @@ async def crawl_endpoint(
             brain_id=brain_id,
             url=crawl_website.url,
             mime_type="html",
+            source="web",
+            source_link=crawl_website.url,
         )
 
         added_knowledge = await knowledge_service.add_knowledge(knowledge_to_add)

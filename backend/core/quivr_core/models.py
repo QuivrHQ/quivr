@@ -81,8 +81,8 @@ class QuivrKnowledge(BaseModel):
     status: str = "PROCESSING"
     source: Optional[str] = None
     source_link: str | None = None
-    file_size: int 
-    file_sha1: str 
+    file_size: Optional[int] = 1  # FIXME: Should not be optional @chloedia
+    file_sha1: Optional[str] = None  # FIXME: Should not be optional @chloedia
     updated_at: Optional[datetime] = None
     created_at: Optional[datetime] = None
     metadata: Optional[Dict[str, str]] = None

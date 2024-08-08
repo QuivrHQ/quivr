@@ -1,34 +1,40 @@
+import hashlib
 import os
 from typing import Optional
 from uuid import UUID
 
 from fastapi import HTTPException, UploadFile
+
 from quivr_api.celery_config import celery
 from quivr_api.logger import get_logger
 from quivr_api.models.settings import get_supabase_async_client
 from quivr_api.modules.brain.entity.brain_entity import RoleEnum
-from quivr_api.modules.brain.service.brain_authorization_service import \
-    validate_brain_authorization
+from quivr_api.modules.brain.service.brain_authorization_service import (
+    validate_brain_authorization,
+)
 from quivr_api.modules.dependencies import get_service
 from quivr_api.modules.knowledge.dto.inputs import CreateKnowledgeProperties
-from quivr_api.modules.knowledge.service.knowledge_service import \
-    KnowledgeService
-from quivr_api.modules.notification.dto.inputs import \
-    NotificationUpdatableProperties
-from quivr_api.modules.notification.entity.notification import \
-    NotificationsStatusEnum
-from quivr_api.modules.notification.service.notification_service import \
-    NotificationService
+from quivr_api.modules.knowledge.service.knowledge_service import KnowledgeService
+from quivr_api.modules.notification.dto.inputs import NotificationUpdatableProperties
+from quivr_api.modules.notification.entity.notification import NotificationsStatusEnum
+from quivr_api.modules.notification.service.notification_service import (
+    NotificationService,
+)
 from quivr_api.modules.upload.service.upload_file import upload_file_storage
 from quivr_api.modules.user.service.user_usage import UserUsage
 from quivr_api.utils.telemetry import maybe_send_telemetry
 
 logger = get_logger("upload_file")
 
-#knowledge_service = KnowledgeService()
+# knowledge_service = KnowledgeService()
 knowledge_service = get_service(KnowledgeService)()
 
 notification_service = NotificationService()
+
+
+def compute_sha1(content: bytes):
+    readable_hash = hashlib.sha1(content).hexdigest()
+    return readable_hash
 
 
 async def upload_file_sync(
@@ -98,13 +104,13 @@ async def upload_file_sync(
         mime_type=os.path.splitext(
             upload_file.filename  # pyright: ignore reportPrivateUsage=none
         )[-1].lower(),
-        source=integration,
+        source=integration if integration else "local",
         source_link=integration_link,
-        file_size=1, #FIXME (len(file_content) / 1024 / 1024),
-        metadata= {}
-
+        file_size=upload_file.size,
+        file_sha1=compute_sha1(file_content),
+        metadata={},
     )
-
+    logger.debug(f"(UPLOAD) Adding knowledge {knowledge_to_add}")
     added_knowledge = await knowledge_service.add_knowledge(knowledge_to_add)
 
     celery.send_task(
