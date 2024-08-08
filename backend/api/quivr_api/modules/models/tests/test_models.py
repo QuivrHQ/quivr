@@ -1,14 +1,6 @@
 import pytest
-import pytest_asyncio
+
 from quivr_api.modules.models.entity.model import Model
-
-
-@pytest_asyncio.fixture()
-async def sample_models():
-    return [
-        Model(name="gpt-3.5-turbo", price=1, max_input=4000, max_output=2000),
-        Model(name="gpt-4", price=5, max_input=8000, max_output=4000),
-    ]
 
 
 @pytest.mark.asyncio
@@ -21,8 +13,8 @@ async def test_model_creation():
 
 
 @pytest.mark.asyncio
-async def test_model_attributes(sample_models):
-    model = sample_models[0]
+async def test_model_attributes(test_data):
+    model = test_data[0]
     assert hasattr(model, "name")
     assert hasattr(model, "price")
     assert hasattr(model, "max_input")
@@ -66,5 +58,8 @@ async def test_model_dict_representation():
         "price": 2,
         "max_input": 3000,
         "max_output": 1500,
+        "description": "",
+        "image_url": "",
+        "display_name": "",
     }
     assert model.dict() == expected_dict
