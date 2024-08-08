@@ -4,25 +4,23 @@ from uuid import UUID
 from fastapi import HTTPException
 from quivr_api.celery_config import celery
 from quivr_api.logger import get_logger
-from quivr_api.modules.brain.dto.inputs import (
-    BrainUpdatableProperties,
-    CreateBrainProperties,
-)
+from quivr_api.modules.brain.dto.inputs import (BrainUpdatableProperties,
+                                                CreateBrainProperties)
 from quivr_api.modules.brain.entity.brain_entity import BrainEntity, BrainType
 from quivr_api.modules.brain.entity.integration_brain import IntegrationEntity
-from quivr_api.modules.brain.repository import (
-    Brains,
-    BrainsUsers,
-    BrainsVectors,
-    IntegrationBrain,
-    IntegrationDescription,
-)
-from quivr_api.modules.knowledge.service.knowledge_service import KnowledgeService
+from quivr_api.modules.brain.repository import (Brains, BrainsUsers,
+                                                BrainsVectors,
+                                                IntegrationBrain,
+                                                IntegrationDescription)
+from quivr_api.modules.dependencies import get_service
+from quivr_api.modules.knowledge.service.knowledge_service import \
+    KnowledgeService
 from quivr_api.vectorstore.supabase import CustomSupabaseVectorStore
 
 logger = get_logger(__name__)
 
-knowledge_service = KnowledgeService()
+#knowledge_service = KnowledgeService()
+knowledge_service = get_service(KnowledgeService)()
 
 
 class BrainService:
