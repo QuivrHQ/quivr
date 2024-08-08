@@ -12,7 +12,7 @@ export const useBrainMention = () => {
     id: brain.id,
     label: brain.name,
     type: "brain",
-    iconUrl: brain.integration_logo_url,
+    iconUrl: brain.image_url,
   }));
 
   const { Mention: BrainMention } = useMentionConfig({

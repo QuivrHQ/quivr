@@ -60,7 +60,17 @@ export const getBrains = async (
     )
   ).data;
 
-  return brains.map(mapBackendMinimalBrainToMinimalBrain);
+  const sortedBrains = brains.sort((a, b) => {
+    if (a.brain_type === "model" && b.brain_type !== "model") {
+      return -1;
+    } else if (a.brain_type !== "model" && b.brain_type === "model") {
+      return 1;
+    }
+
+    return 0;
+  });
+
+  return sortedBrains.map(mapBackendMinimalBrainToMinimalBrain);
 };
 
 export type Subscription = { email: string; role: BrainRoleType };

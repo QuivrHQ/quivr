@@ -65,8 +65,6 @@ const BrainsList = ({
       }
     };
 
-    console.info(brains);
-
     document.addEventListener("keydown", handleKeyDown);
 
     return () => {
