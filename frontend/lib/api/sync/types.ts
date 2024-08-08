@@ -1,11 +1,12 @@
-export type Provider = "Google" | "Azure" | "DropBox" | "GitHub";
+export type Provider = "Google" | "Azure" | "DropBox" | "Notion" | "GitHub";
 
-export type Integration = "Google Drive" | "Share Point" | "Dropbox" | "GitHub";
+export type Integration = "Google Drive" | "Share Point" | "Dropbox"| "Notion" | "GitHub";
 
 export interface SyncElement {
   name?: string;
   id: string;
   is_folder: boolean;
+  icon?: string;
 }
 
 export interface SyncElements {

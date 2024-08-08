@@ -40,16 +40,21 @@ ENV PATH="/root/.cargo/bin:${PATH}" \
     POETRY_CACHE_DIR=/tmp/poetry_cache \
     PYTHONDONTWRITEBYTECODE=1
 
-WORKDIR /code
+WORKDIR /code/worker
 
 # Copy monorepo dependencies
 # CORE
 COPY core/pyproject.toml core/README.md core/poetry.lock  /code/core/
 COPY core/quivr_core /code/core/quivr_core
 # API
-COPY api/pyproject.toml  api/poetry.lock api/README.md /code/api/
-COPY api/quivr_api /code/api/quivr_api
+COPY ../api/pyproject.toml  ../api/poetry.lock ../api/README.md /code/api/
+COPY ../api/quivr_api /code/api/quivr_api
 COPY ./pyproject.toml ./poetry.lock* /code/
+
+# Worker
+COPY pyproject.toml  poetry.lock README.md /code/api/
+COPY quivr_api /code/api/quivr_api
+COPY pyproject.toml poetry.lock* /code/
 
 # Run install
 RUN poetry install --no-root --with dev,test && \

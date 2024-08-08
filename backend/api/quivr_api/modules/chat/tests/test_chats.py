@@ -39,7 +39,6 @@ async def async_engine():
         pool_size=10,
         pool_recycle=0.1,
     )
-
     yield engine
 
 

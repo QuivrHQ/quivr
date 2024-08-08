@@ -59,7 +59,7 @@ backend/core/local_models/*
 
 ## scripts
 package-lock.json
-backend/celerybeat-schedule
+celerybeat-schedule
 frontend/public/robots.txt
 frontend/public/sitemap*
 
@@ -98,3 +98,4 @@ backend/core/examples/chatbot/.chainlit/translations/en-US.json
 
 # Tox
 .tox
+Pipfile

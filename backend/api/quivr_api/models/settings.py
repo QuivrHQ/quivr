@@ -7,10 +7,11 @@ from langchain_community.vectorstores.supabase import SupabaseVectorStore
 from langchain_openai import OpenAIEmbeddings
 from posthog import Posthog
 from pydantic_settings import BaseSettings, SettingsConfigDict
+from sqlalchemy import Engine, create_engine
+from supabase.client import AsyncClient, Client, create_async_client, create_client
+
 from quivr_api.logger import get_logger
 from quivr_api.models.databases.supabase.supabase import SupabaseDB
-from sqlalchemy import Engine, create_engine
-from supabase.client import Client, create_client
 
 logger = get_logger(__name__)
 
@@ -29,9 +30,9 @@ class SendEmailSettings(BaseSettings):
 # The `PostHogSettings` class is used to initialize and interact with the PostHog analytics service.
 class PostHogSettings(BaseSettings):
     model_config = SettingsConfigDict(validate_default=False)
-    posthog_api_key: str = None
-    posthog_api_url: str = None
-    posthog: Posthog = None
+    posthog_api_key: str | None = None
+    posthog_api_url: str | None = None
+    posthog: Posthog | None = None
 
     def __init__(self, *args, **kwargs):
         """
@@ -133,11 +134,12 @@ class ResendSettings(BaseSettings):
 
 # Global variables to store the Supabase client and database instances
 _supabase_client: Optional[Client] = None
+_supabase_async_client: Optional[AsyncClient] = None
 _supabase_db: Optional[SupabaseDB] = None
 _db_engine: Optional[Engine] = None
 _embedding_service = None
 
-settings = BrainSettings()
+settings = BrainSettings()  # type: ignore
 
 
 def get_pg_database_engine():
@@ -154,6 +156,16 @@ def get_pg_database_async_engine():
         logger.info("Creating Postgres DB engine")
         _db_engine = create_engine(settings.pg_database_async_url, pool_pre_ping=True)
     return _db_engine
+
+
+async def get_supabase_async_client() -> AsyncClient:
+    global _supabase_async_client
+    if _supabase_async_client is None:
+        logger.info("Creating Supabase client")
+        _supabase_async_client = await create_async_client(
+            settings.supabase_url, settings.supabase_service_key
+        )
+    return _supabase_async_client
 
 
 def get_supabase_client() -> Client:

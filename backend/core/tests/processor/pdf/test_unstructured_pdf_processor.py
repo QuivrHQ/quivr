@@ -18,7 +18,7 @@ async def test_unstructured_pdf_processor():
         original_filename=p.stem,
         path=p,
         file_extension=FileExtension.pdf,
-        file_md5="123",
+        file_sha1="123",
     )
     processor = UnstructuredPDFProcessor()
     result = await processor.process_file(f)
@@ -35,7 +35,7 @@ async def test_unstructured_pdf_processor_fail(ext):
         original_filename=p.stem,
         path=p,
         file_extension=ext,
-        file_md5="123",
+        file_sha1="123",
     )
     processor = UnstructuredPDFProcessor()
     with pytest.raises(ValueError):

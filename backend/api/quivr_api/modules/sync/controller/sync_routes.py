@@ -1,11 +1,12 @@
 import os
 import uuid
-from typing import List
+from typing import Annotated, List
 
 from fastapi import APIRouter, Depends, status
 
 from quivr_api.logger import get_logger
 from quivr_api.middlewares.auth import AuthBearer, get_current_user
+from quivr_api.modules.dependencies import get_service
 from quivr_api.modules.notification.dto.inputs import CreateNotification
 from quivr_api.modules.notification.entity.notification import NotificationsStatusEnum
 from quivr_api.modules.notification.service.notification_service import (
@@ -15,10 +16,12 @@ from quivr_api.modules.sync.controller.azure_sync_routes import azure_sync_route
 from quivr_api.modules.sync.controller.dropbox_sync_routes import dropbox_sync_router
 from quivr_api.modules.sync.controller.github_sync_routes import github_sync_router
 from quivr_api.modules.sync.controller.google_sync_routes import google_sync_router
+from quivr_api.modules.sync.controller.notion_sync_routes import notion_sync_router
 from quivr_api.modules.sync.dto import SyncsDescription
 from quivr_api.modules.sync.dto.inputs import SyncsActiveInput, SyncsActiveUpdateInput
 from quivr_api.modules.sync.dto.outputs import AuthMethodEnum
 from quivr_api.modules.sync.entity.sync import SyncsActive
+from quivr_api.modules.sync.service.sync_notion import SyncNotionService
 from quivr_api.modules.sync.service.sync_service import SyncService, SyncUserService
 from quivr_api.modules.user.entity.user_identity import UserIdentity
 
@@ -33,6 +36,8 @@ logger = get_logger(__name__)
 # Initialize sync service
 sync_service = SyncService()
 sync_user_service = SyncUserService()
+NotionServiceDep = Annotated[SyncNotionService, Depends(get_service(SyncNotionService))]
+
 
 # Initialize API router
 sync_router = APIRouter()
@@ -42,6 +47,7 @@ sync_router.include_router(google_sync_router)
 sync_router.include_router(azure_sync_router)
 sync_router.include_router(github_sync_router)
 sync_router.include_router(dropbox_sync_router)
+sync_router.include_router(notion_sync_router)
 
 
 # Google sync description
@@ -60,6 +66,12 @@ azure_sync = SyncsDescription(
 dropbox_sync = SyncsDescription(
     name="DropBox",
     description="Sync your DropBox Drive with Quivr",
+    auth_method=AuthMethodEnum.URI_WITH_CALLBACK,
+)
+
+notion_sync = SyncsDescription(
+    name="Notion",
+    description="Sync your Notion with Quivr",
     auth_method=AuthMethodEnum.URI_WITH_CALLBACK,
 )
 
@@ -87,7 +99,7 @@ async def get_syncs(current_user: UserIdentity = Depends(get_current_user)):
         List[SyncsDescription]: A list of available sync descriptions.
     """
     logger.debug(f"Fetching all sync descriptions for user: {current_user.id}")
-    return [google_sync, azure_sync, dropbox_sync]
+    return [google_sync, azure_sync, dropbox_sync, notion_sync]
 
 
 @sync_router.get(
@@ -106,7 +118,7 @@ async def get_user_syncs(current_user: UserIdentity = Depends(get_current_user))
         List: A list of syncs for the user.
     """
     logger.debug(f"Fetching user syncs for user: {current_user.id}")
-    return sync_user_service.get_syncs_user(str(current_user.id))
+    return sync_user_service.get_syncs_user(current_user.id)
 
 
 @sync_router.delete(
@@ -131,7 +143,7 @@ async def delete_user_sync(
     logger.debug(
         f"Deleting user sync for user: {current_user.id} with sync ID: {sync_id}"
     )
-    sync_user_service.delete_sync_user(sync_id, str(current_user.id))
+    sync_user_service.delete_sync_user(sync_id, str(current_user.id))  # type: ignore
     return None
 
 
@@ -208,6 +220,7 @@ async def update_sync_active(
             != sync_active_input.settings.folders
         )
     ):
+        sync_active_input.force_sync = True
         bulk_id = uuid.uuid4()
         notification = notification_service.add_notification(
             CreateNotification(
@@ -262,7 +275,7 @@ async def delete_sync_active(
             brain_id=details_sync_active["brain_id"],  # type: ignore
         )
     )
-    sync_service.delete_sync_active(sync_id, str(current_user.id))
+    sync_service.delete_sync_active(sync_id, str(current_user.id))  # type: ignore
     return None
 
 
@@ -295,7 +308,8 @@ async def get_active_syncs_for_user(
 )
 async def get_files_folder_user_sync(
     user_sync_id: int,
-    folder_id: str = None,
+    notion_service: NotionServiceDep,
+    folder_id: str | None = None,
     current_user: UserIdentity = Depends(get_current_user),
 ):
     """
@@ -312,8 +326,8 @@ async def get_files_folder_user_sync(
     logger.debug(
         f"Fetching files for user sync: {user_sync_id} for user: {current_user.id}"
     )
-    return sync_user_service.get_files_folder_user_sync(
-        user_sync_id, str(current_user.id), folder_id
+    return await sync_user_service.get_files_folder_user_sync(
+        user_sync_id, current_user.id, folder_id, notion_service=notion_service
     )
 
 

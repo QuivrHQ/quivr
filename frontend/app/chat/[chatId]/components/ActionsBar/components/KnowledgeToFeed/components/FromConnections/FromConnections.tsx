@@ -105,6 +105,7 @@ export const FromConnections = (): JSX.Element => {
                       name={folder.name ?? ""}
                       selectable={!!isPremium}
                       id={folder.id}
+                      icon= {folder.icon}
                     />
                   </div>
                 ))}
@@ -114,6 +115,7 @@ export const FromConnections = (): JSX.Element => {
                       name={file.name ?? ""}
                       selectable={true}
                       id={file.id}
+                      icon= {file.icon}
                     />
                   </div>
                 ))}
