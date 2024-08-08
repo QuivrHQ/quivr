@@ -49,13 +49,16 @@ services:
       - 5050:5050
 
   notifier:
-    pull_policy: never
-    image: backend-base:latest
+    pull_policy: if_not_present
+    image: stangirard/quivr-backend-prebuilt:latest
     extra_hosts:
       - "host.docker.internal:host-gateway"
     env_file:
       - .env
     container_name: notifier
+    build:
+      context: backend
+      dockerfile: Dockerfile
     command:
       - "python"
       - "/code/api/quivr_api/celery_monitor.py"
@@ -122,7 +125,3 @@ services:
       - beat
     ports:
       - 5555:5555
-
-networks:
-  quivr-network:
-    driver: bridge
