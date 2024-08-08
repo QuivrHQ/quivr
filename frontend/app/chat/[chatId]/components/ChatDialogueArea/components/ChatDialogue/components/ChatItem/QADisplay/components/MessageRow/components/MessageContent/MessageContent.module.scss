@@ -74,9 +74,9 @@
 
   pre[class*="language-"] {
     background: var(--background-5);
-    color: var(--text-0);
-    padding: 1em;
-    border-radius: 0.3em;
+    color: var(--white-0);
+    padding: Spacings.$spacing05;
+    border-radius: Radius.$normal;
     overflow: auto;
     margin: 0 0 1em 0;
     white-space: pre-wrap; /* Conserver les espaces et les indentations */
@@ -95,11 +95,22 @@
 
   code {
     background: var(--background-5);
-    color: var(--text-0);
+    color: var(--white-0);
     padding: Spacings.$spacing01;
     border-radius: Radius.$normal;
     font-family: "Courier New", Courier, monospace;
     font-size: Typography.$small;
+  }
+
+  .code_block {
+    .icon {
+      position: absolute;
+      right: 0;
+      padding: Spacings.$spacing05;
+    }
+    code {
+      white-space: pre-wrap;
+    }
   }
 }
 
