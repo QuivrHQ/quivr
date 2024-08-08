@@ -24,6 +24,10 @@ type MessageRowProps = {
     sources?: Source[];
     thoughts?: string;
     followup_questions?: string[];
+    metadata_model: {
+      display_name: string;
+      image_url: string;
+    };
   };
   index?: number;
   messageId?: string;
@@ -102,7 +106,10 @@ export const MessageRow = ({
       return (
         <div className={styles.message_header_wrapper}>
           <div className={styles.message_header}>
-            <QuestionBrain brainName={brainName} />
+            <QuestionBrain
+              brainName={brainName}
+              imageUrl={metadata?.metadata_model.image_url}
+            />
           </div>
         </div>
       );
