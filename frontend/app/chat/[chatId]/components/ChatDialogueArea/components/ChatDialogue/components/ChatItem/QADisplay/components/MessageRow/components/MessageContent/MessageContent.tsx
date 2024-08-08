@@ -1,3 +1,4 @@
+import Prism from "prismjs";
 import { useEffect, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import gfm from "remark-gfm";
@@ -38,6 +39,8 @@ export const MessageContent = ({
     } else {
       setIsLog(false);
     }
+
+    Prism.highlightAll(); // Si vous utilisez Prism.js
   }, [text]);
 
   const { logs, cleanedText } = extractLog(text);
@@ -48,15 +51,17 @@ export const MessageContent = ({
       data-testid="chat-message-text"
     >
       {isLog && showLog && logs.length > 0 && (
-        <div className="text-xs text-white p-2 rounded">
+        <div
+          className={`${styles.logContainer} text-xs text-white p-2 rounded`}
+        >
           <ReactMarkdown remarkPlugins={[gfm]}>{logs}</ReactMarkdown>
         </div>
       )}
       <ReactMarkdown
         className={`
-        ${styles.markdown} 
-        ${isUser ? styles.user : styles.brain}
-        ${cleanedText === "🧠" ? styles.thinking : ""} 
+          ${styles.markdown} 
+          ${isUser ? styles.user : styles.brain}
+          ${cleanedText === "🧠" ? styles.thinking : ""} 
         `}
         remarkPlugins={[gfm]}
       >
