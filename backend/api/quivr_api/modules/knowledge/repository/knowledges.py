@@ -3,18 +3,16 @@ from uuid import UUID
 from venv import logger
 
 from fastapi import HTTPException
-from sqlalchemy.exc import IntegrityError
-from sqlmodel import select
-from sqlmodel.ext.asyncio.session import AsyncSession
-
 from quivr_api.logger import get_logger
 from quivr_api.models.settings import get_supabase_client
 from quivr_api.modules.dependencies import BaseRepository
 from quivr_api.modules.knowledge.dto.inputs import KnowledgeStatus
 from quivr_api.modules.knowledge.dto.outputs import DeleteKnowledgeResponse
-
 # from quivr_core.models import QuivrKnowledge as Knowledge
 from quivr_api.modules.knowledge.entity.knowledge import KnowledgeDB
+from sqlalchemy.exc import IntegrityError
+from sqlmodel import select
+from sqlmodel.ext.asyncio.session import AsyncSession
 
 logger = get_logger(__name__)
 
@@ -34,11 +32,12 @@ class KnowledgeRepository(BaseRepository):
         result = await self.session.exec(query)
         existing_knowledge = result.first()
 
-        if existing_knowledge:
-            return existing_knowledge
-
         try:
-            self.session.add(knowledge)
+            if existing_knowledge:
+                existing_knowledge.source_link = knowledge.source_link
+                self.session.add(existing_knowledge)
+            else:
+                self.session.add(knowledge)
             await self.session.commit()
         except IntegrityError:
             await self.session.rollback()

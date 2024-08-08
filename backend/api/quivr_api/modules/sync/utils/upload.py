@@ -4,22 +4,22 @@ from typing import Optional
 from uuid import UUID
 
 from fastapi import HTTPException, UploadFile
-
 from quivr_api.celery_config import celery
 from quivr_api.logger import get_logger
 from quivr_api.models.settings import get_supabase_async_client
 from quivr_api.modules.brain.entity.brain_entity import RoleEnum
-from quivr_api.modules.brain.service.brain_authorization_service import (
-    validate_brain_authorization,
-)
+from quivr_api.modules.brain.service.brain_authorization_service import \
+    validate_brain_authorization
 from quivr_api.modules.dependencies import get_service
 from quivr_api.modules.knowledge.dto.inputs import CreateKnowledgeProperties
-from quivr_api.modules.knowledge.service.knowledge_service import KnowledgeService
-from quivr_api.modules.notification.dto.inputs import NotificationUpdatableProperties
-from quivr_api.modules.notification.entity.notification import NotificationsStatusEnum
-from quivr_api.modules.notification.service.notification_service import (
-    NotificationService,
-)
+from quivr_api.modules.knowledge.service.knowledge_service import \
+    KnowledgeService
+from quivr_api.modules.notification.dto.inputs import \
+    NotificationUpdatableProperties
+from quivr_api.modules.notification.entity.notification import \
+    NotificationsStatusEnum
+from quivr_api.modules.notification.service.notification_service import \
+    NotificationService
 from quivr_api.modules.upload.service.upload_file import upload_file_storage
 from quivr_api.modules.user.service.user_usage import UserUsage
 from quivr_api.utils.telemetry import maybe_send_telemetry
