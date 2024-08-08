@@ -45,13 +45,7 @@ export const MessageContent = ({
   };
 
   useEffect(() => {
-    if (text.includes("🧠<")) {
-      setIsLog(true);
-    } else {
-      setIsLog(false);
-    }
-
-    Prism.highlightAll();
+    setIsLog(text.includes("🧠<"));
   }, [text]);
 
   const { logs, cleanedText } = extractLog(text);
@@ -78,37 +72,42 @@ export const MessageContent = ({
         components={{
           code: ({ className, children, ...props }) => {
             const match = /language-(\w+)/.exec(className ?? "");
+            if (match) {
+              const language = match[1];
+              const code = String(children).trim();
+              const html = Prism.highlight(
+                code,
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+                Prism.languages[language],
+                language
+              );
 
-            return match ? (
-              <div className={styles.code_block}>
-                <div
-                  className={styles.icon}
-                  onClick={() => {
-                    void navigator.clipboard.writeText(String(children));
-                  }}
-                >
-                  <Icon
-                    name="copy"
-                    size="small"
-                    color="black"
-                    handleHover={true}
-                  />
-                </div>
-                <pre className={className}>
-                  <code
-                    {...props}
-                    dangerouslySetInnerHTML={{
-                      __html: Prism.highlight(
-                        String(children).trim(),
-                        // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-                        Prism.languages[match[1]],
-                        match[1]
-                      ),
+              return (
+                <div className={styles.code_block}>
+                  <div
+                    className={styles.icon}
+                    onClick={() => {
+                      void navigator.clipboard.writeText(code);
                     }}
-                  />
-                </pre>
-              </div>
-            ) : (
+                  >
+                    <Icon
+                      name="copy"
+                      size="small"
+                      color="black"
+                      handleHover={true}
+                    />
+                  </div>
+                  <pre className={className}>
+                    <code
+                      {...props}
+                      dangerouslySetInnerHTML={{ __html: html }}
+                    />
+                  </pre>
+                </div>
+              );
+            }
+
+            return (
               <code {...props} className={className}>
                 {children}
               </code>
