@@ -1,3 +1,5 @@
+import Image from "next/image";
+
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
 import { MinimalBrainForUser } from "@/lib/context/BrainProvider/types";
 import { useNotificationsContext } from "@/lib/context/NotificationsProvider/hooks/useNotificationsContext";
@@ -22,9 +24,13 @@ const BrainNameAndImage = ({
 }) => {
   return (
     <>
-      <Icon name="brain" size="small" color="black" />
+      {currentBrain.image_url ? (
+        <Image src={currentBrain.image_url} alt="" width={18} height={18} />
+      ) : (
+        <Icon name="brain" size="normal" color="black" />
+      )}
       <span className={`${styles.brain_name} ${isNewBrain ? styles.new : ""}`}>
-        {currentBrain.name}
+        {currentBrain.display_name ?? currentBrain.name}
       </span>
     </>
   );

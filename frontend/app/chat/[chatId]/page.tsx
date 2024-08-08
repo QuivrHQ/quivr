@@ -1,6 +1,5 @@
 "use client";
 
-import { UUID } from "crypto";
 import { useEffect } from "react";
 
 import { AddBrainModal } from "@/lib/components/AddBrainModal";
@@ -61,7 +60,12 @@ const SelectedChatPage = (): JSX.Element => {
 
   useEffect(() => {
     if (!currentBrain && messages.length > 0) {
-      setCurrentBrainId(messages[messages.length - 1].brain_id as UUID);
+      const lastMessage = messages[messages.length - 1];
+      setCurrentBrainId(
+        lastMessage.brain_id
+          ? lastMessage.brain_id
+          : lastMessage.metadata?.metadata_model?.brain_id ?? null
+      );
     }
   }, [messages]);
 

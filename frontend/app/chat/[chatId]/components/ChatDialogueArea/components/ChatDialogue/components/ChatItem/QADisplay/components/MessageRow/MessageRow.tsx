@@ -1,3 +1,4 @@
+import { UUID } from "crypto";
 import React, { useEffect, useState } from "react";
 
 import { useChatInput } from "@/app/chat/[chatId]/components/ActionsBar/components/ChatInput/hooks/useChatInput";
@@ -24,9 +25,10 @@ type MessageRowProps = {
     sources?: Source[];
     thoughts?: string;
     followup_questions?: string[];
-    metadata_model: {
+    metadata_model?: {
       display_name: string;
       image_url: string;
+      brain_id: UUID;
     };
   };
   index?: number;
@@ -108,7 +110,7 @@ export const MessageRow = ({
           <div className={styles.message_header}>
             <QuestionBrain
               brainName={brainName}
-              imageUrl={metadata?.metadata_model.image_url}
+              imageUrl={metadata?.metadata_model?.image_url ?? ""}
             />
           </div>
         </div>
