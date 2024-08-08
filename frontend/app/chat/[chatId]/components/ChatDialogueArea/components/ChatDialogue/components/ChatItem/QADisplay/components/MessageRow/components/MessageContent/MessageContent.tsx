@@ -1,7 +1,6 @@
 import Prism from "prismjs";
 import { useEffect, useState } from "react";
 import ReactMarkdown from "react-markdown";
-import rehypeRaw from "rehype-raw";
 import gfm from "remark-gfm";
 
 import styles from "./MessageContent.module.scss";
@@ -67,7 +66,6 @@ export const MessageContent = ({
           ${cleanedText === "🧠" ? styles.thinking : ""} 
         `}
         remarkPlugins={[gfm]}
-        rehypePlugins={[rehypeRaw]}
       >
         {cleanedText}
       </ReactMarkdown>

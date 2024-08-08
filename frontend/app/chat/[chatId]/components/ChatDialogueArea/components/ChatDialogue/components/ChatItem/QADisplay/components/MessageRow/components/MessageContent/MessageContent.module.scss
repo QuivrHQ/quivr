@@ -90,10 +90,7 @@
     border-radius: Radius.$normal;
     font-family: "Courier New", Courier, monospace;
     font-size: Typography.$small;
-
-    span {
-      white-space: pre-wrap;
-    }
+    white-space: pre-wrap;
   }
 
   code {
