@@ -1,6 +1,13 @@
 #!/bin/bash
 set -e
 
+## TESTS SUITES
+test_suites=(
+        "Backend Core:cd backend/core && tox -p auto"
+        "Worker:cd backend && pytest worker"
+        "API:cd backend && pytest api"
+    )
+
 # Check if gum is installed
 if ! command -v gum &>/dev/null; then
     echo "gum is not installed. Please install it with 'brew install gum'."
@@ -18,6 +25,24 @@ check_tika_server() {
         gum style --foreground 226 "Please start the Tika server before running the tests."
         gum style --foreground 226 "Run 'docker run -d -p 9998:9998 apache/tika' to start the Tika server."
         return 1
+    fi
+}
+
+# select test suites to run, either all or one of the following
+get_test_suites_to_run() {
+    gum style --bold "Select test suites to run:"
+    options=("All" "${test_suites[@]%%:*}")
+    selected=$(gum choose "${options[@]}")
+    if [[ "$selected" == "All" ]]; then
+        gum style --bold "Running all test suites"
+    else
+        # Find the matching test suite
+        for suite in "${test_suites[@]}"; do
+            if [[ "${suite%%:*}" == "$selected" ]]; then
+                test_suites=("$suite")
+                break
+            fi
+        done
     fi
 }
 
@@ -42,13 +67,8 @@ run_test_suite() {
 }
 
 run_tests() {
-    gum spin --spinner dot --title "Running tests..." -- sleep 1
-
-    local test_suites=(
-        "Backend Core:cd backend/core && tox -p auto"
-        "Worker:cd backend && pytest worker"
-        "API:cd backend && pytest api"
-    )
+    get_test_suites_to_run
+    # gum spin --spinner dot --title "Running tests..." -- sleep 1
 
     local all_passed=true
     local results=()
@@ -59,6 +79,17 @@ run_tests() {
             all_passed=false
         fi
         results+=("$suite_name:$?")
+    done
+
+    # Print summary of test results
+    gum style --border double --border-foreground 99 --padding "1 2" --bold "Test Summary"
+    for result in "${results[@]}"; do
+        IFS=':' read -r suite_name exit_code <<< "$result"
+        if [ "$exit_code" -eq 0 ]; then
+            gum style --foreground 46 "✓ $suite_name: PASSED"
+        else
+            gum style --foreground 196 "✗ $suite_name: FAILED"
+        fi
     done
 
     # Return overall exit code
