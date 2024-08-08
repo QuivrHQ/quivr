@@ -1,3 +1,4 @@
+@use "styles/Radius.module.scss";
 @use "styles/Spacings.module.scss";
 @use "styles/Typography.module.scss";
 
@@ -69,6 +70,39 @@
 
   th {
     font-weight: bold;
+  }
+
+  pre[class*="language-"] {
+    background: var(--background-5);
+    color: var(--text-0);
+    padding: 1em;
+    border-radius: 0.3em;
+    overflow: auto;
+    margin: 0 0 1em 0;
+    white-space: pre-wrap; /* Conserver les espaces et les indentations */
+    font-size: Typography.$small;
+    font-family: "Courier New", Courier, monospace;
+  }
+
+  code[class*="language-"] {
+    background: none;
+    color: inherit;
+    border-radius: Radius.$normal;
+    font-family: "Courier New", Courier, monospace;
+    font-size: Typography.$small;
+
+    span {
+      white-space: pre-wrap;
+    }
+  }
+
+  code {
+    background: var(--background-5);
+    color: var(--text-0);
+    padding: Spacings.$spacing01;
+    border-radius: Radius.$normal;
+    font-family: "Courier New", Courier, monospace;
+    font-size: Typography.$small;
   }
 }
 
