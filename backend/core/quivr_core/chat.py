@@ -3,12 +3,11 @@ from typing import Any, Generator, Tuple
 from uuid import UUID, uuid4
 
 from langchain_core.messages import AIMessage, HumanMessage
-
 from quivr_core.models import ChatMessage
 
 
 class ChatHistory:
-    def __init__(self, chat_id: UUID, brain_id: UUID) -> None:
+    def __init__(self, chat_id: UUID, brain_id: UUID | None) -> None:
         self.id = chat_id
         self.brain_id = brain_id
         # TODO(@aminediro): maybe use a deque() instead ?
