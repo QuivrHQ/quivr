@@ -1,4 +1,3 @@
-"use client";
 import { useEffect, useState } from "react";
 
 import Icon from "@/lib/components/ui/Icon/Icon";
@@ -21,8 +20,8 @@ const BrainsList = ({
 }: BrainsListProps): JSX.Element => {
   const [currentPage, setCurrentPage] = useState(0);
   const [transitionDirection, setTransitionDirection] = useState("");
-
-  const totalPages = Math.ceil(brains.length / brainsPerPage);
+  const [filteredBrains, setFilteredBrains] = useState<BrainOrModel[]>([]);
+  const [totalPages, setTotalPages] = useState(0);
 
   const handleNextPage = () => {
     if (currentPage < totalPages - 1) {
@@ -40,46 +39,45 @@ const BrainsList = ({
 
   useEffect(() => {
     setCurrentPage(0);
-  }, [selectedTab]);
+    let filtered = brains;
+
+    if (selectedTab === "Brains") {
+      filtered = brains.filter((brain) => brain.brain_type === "doc");
+    } else if (selectedTab === "Models") {
+      filtered = brains.filter((brain) => brain.brain_type === "model");
+    }
+
+    setFilteredBrains(filtered);
+    setTotalPages(Math.ceil(filtered.length / brainsPerPage));
+  }, [brains, selectedTab, brainsPerPage]);
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (document.activeElement) {
-        const tagName = document.activeElement.tagName.toLowerCase();
-        if (tagName !== "body") {
-          return;
-        }
-      }
-
-      console.info(brains);
-
       switch (event.key) {
-        case "ArrowLeft":
-          handlePreviousPage();
-          break;
         case "ArrowRight":
           handleNextPage();
+          break;
+        case "ArrowLeft":
+          handlePreviousPage();
           break;
         default:
           break;
       }
     };
 
-    window.addEventListener("keydown", handleKeyDown);
+    console.info(brains);
+
+    document.addEventListener("keydown", handleKeyDown);
 
     return () => {
-      window.removeEventListener("keydown", handleKeyDown);
+      document.removeEventListener("keydown", handleKeyDown);
     };
-  }, [handlePreviousPage, handleNextPage]);
+  }, [handleNextPage, handlePreviousPage]);
 
-  const getDisplayedItems = () => {
-    return brains.slice(
-      currentPage * brainsPerPage,
-      (currentPage + 1) * brainsPerPage
-    );
-  };
-
-  const displayedItems = getDisplayedItems();
+  const displayedItems = filteredBrains.slice(
+    currentPage * brainsPerPage,
+    (currentPage + 1) * brainsPerPage
+  );
 
   return (
     <div className={styles.brains_list_container}>

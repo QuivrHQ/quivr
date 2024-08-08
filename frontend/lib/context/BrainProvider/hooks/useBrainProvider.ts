@@ -39,6 +39,7 @@ export const useBrainProvider = () => {
     setIsFetchingBrains(true);
     try {
       const brains = await getBrains();
+      console.info(brains);
       setAllBrains(brains);
     } catch (error) {
       console.error(error);
