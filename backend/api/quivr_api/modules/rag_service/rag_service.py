@@ -8,11 +8,6 @@ from quivr_core.models import ParsedRAGResponse, RAGResponseMetadata
 from quivr_core.quivr_rag import QuivrQARAG
 
 from quivr_api.logger import get_logger
-from quivr_api.models.settings import (
-    get_embedding_client,
-    get_supabase_client,
-    settings,
-)
 from quivr_api.modules.brain.entity.brain_entity import BrainEntity
 from quivr_api.modules.brain.service.brain_service import BrainService
 from quivr_api.modules.brain.service.utils.format_chat_history import (
@@ -26,6 +21,11 @@ from quivr_api.modules.chat.controller.chat.utils import (
 from quivr_api.modules.chat.dto.inputs import CreateChatHistory
 from quivr_api.modules.chat.dto.outputs import GetChatHistoryOutput
 from quivr_api.modules.chat.service.chat_service import ChatService
+from quivr_api.modules.dependencies import (
+    get_embedding_client,
+    get_supabase_client,
+    settings,
+)
 from quivr_api.modules.knowledge.service.knowledge_service import KnowledgeService
 from quivr_api.modules.prompt.entity.prompt import Prompt
 from quivr_api.modules.prompt.service.prompt_service import PromptService

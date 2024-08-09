@@ -3,22 +3,25 @@ from typing import List, Literal
 from uuid import UUID
 
 from quivr_api.logger import get_logger
-from quivr_api.models.settings import get_supabase_client
-from quivr_api.modules.dependencies import get_service
-from quivr_api.modules.knowledge.service.knowledge_service import \
-    KnowledgeService
-from quivr_api.modules.notification.service.notification_service import \
-    NotificationService
-from quivr_api.modules.sync.dto.inputs import (SyncsUserInput,
-                                               SyncUserUpdateInput)
+from quivr_api.modules.dependencies import get_service, get_supabase_client
+from quivr_api.modules.knowledge.service.knowledge_service import KnowledgeService
+from quivr_api.modules.notification.service.notification_service import (
+    NotificationService,
+)
+from quivr_api.modules.sync.dto.inputs import SyncsUserInput, SyncUserUpdateInput
 from quivr_api.modules.sync.entity.sync import SyncFile, SyncsUser
 from quivr_api.modules.sync.service.sync_notion import SyncNotionService
-from quivr_api.modules.sync.utils.sync import (AzureDriveSync, BaseSync,
-                                               DropboxSync, GitHubSync,
-                                               GoogleDriveSync, NotionSync)
+from quivr_api.modules.sync.utils.sync import (
+    AzureDriveSync,
+    BaseSync,
+    DropboxSync,
+    GitHubSync,
+    GoogleDriveSync,
+    NotionSync,
+)
 
 notification_service = NotificationService()
-#knowledge_service = KnowledgeService()
+# knowledge_service = KnowledgeService()
 knowledge_service = get_service(KnowledgeService)()
 
 logger = get_logger(__name__)

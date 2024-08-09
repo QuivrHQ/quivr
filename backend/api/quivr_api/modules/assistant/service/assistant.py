@@ -1,8 +1,8 @@
-from quivr_api.models.settings import get_supabase_client
 from quivr_api.modules.assistant.entity.assistant import AssistantEntity
 from quivr_api.modules.assistant.repository.assistant_interface import (
     AssistantInterface,
 )
+from quivr_api.modules.dependencies import get_supabase_client
 
 
 class Assistant(AssistantInterface):

@@ -9,14 +9,15 @@ from notion_client import Client
 from quivr_api.celery_config import celery
 from quivr_api.logger import get_logger
 from quivr_api.middlewares.auth.auth_bearer import AuthBearer
-from quivr_api.models.settings import (
-    get_documents_vector_store,
-    get_supabase_client,
-    settings,
-)
+from quivr_api.models.settings import settings
 from quivr_api.modules.brain.integrations.Notion.Notion_connector import NotionConnector
 from quivr_api.modules.brain.service.brain_service import BrainService
 from quivr_api.modules.brain.service.brain_vector_service import BrainVectorService
+from quivr_api.modules.dependencies import (
+    get_documents_vector_store,
+    get_embedding_client,
+    get_supabase_client,
+)
 from quivr_api.modules.knowledge.repository.storage import Storage
 from quivr_api.modules.knowledge.service.knowledge_service import KnowledgeService
 from quivr_api.modules.notification.service.notification_service import (
@@ -31,6 +32,8 @@ from quivr_api.modules.sync.service.sync_notion import (
 )
 from quivr_api.modules.sync.service.sync_service import SyncService, SyncUserService
 from quivr_api.utils.telemetry import maybe_send_telemetry
+from quivr_api.vector.repository.vectors_repository import VectorRepository
+from quivr_api.vector.service.vector_service import VectorService
 from sqlalchemy.ext.asyncio import AsyncEngine, create_async_engine
 from sqlmodel.ext.asyncio.session import AsyncSession
 
@@ -96,18 +99,53 @@ def process_file_task(
     source_link: str | None = None,
     delete_file: bool = False,
 ):
+    if async_engine is None:
+        init_worker()
+
     logger.info(
         f"Task process_file started for file_name={file_name}, knowledge_id={knowledge_id}, brain_id={brain_id}, notification_id={notification_id}"
     )
 
-    brain_vector_service = BrainVectorService(brain_id)
     loop = asyncio.get_event_loop()
     loop.run_until_complete(
-        process_uploaded_file(
+        aprocess_file_task(
+            file_name=file_name,
+            file_original_name=file_original_name,
+            brain_id=brain_id,
+            notification_id=notification_id,
+            knowledge_id=knowledge_id,
+            source=source,
+            source_link=source_link,
+            delete_file=delete_file,
+        )
+    )
+
+
+async def aprocess_file_task(
+    file_name: str,
+    file_original_name: str,
+    brain_id: UUID,
+    notification_id: UUID,
+    knowledge_id: UUID,
+    source: str | None = None,
+    source_link: str | None = None,
+    delete_file: bool = False,
+):
+    global async_engine
+    assert async_engine
+    async with AsyncSession(
+        async_engine, expire_on_commit=False, autoflush=False
+    ) as session:
+        embeddings = get_embedding_client()
+        vector_repository = VectorRepository(session, embeddings=embeddings)
+        vector_service = VectorService(vector_repository)
+        brain_vector_service = BrainVectorService(brain_id)
+
+        await process_uploaded_file(
             supabase_client=supabase_client,
             brain_service=brain_service,
             brain_vector_service=brain_vector_service,
-            document_vector_store=document_vector_store,
+            vector_service=vector_service,
             file_name=file_name,
             brain_id=brain_id,
             file_original_name=file_original_name,
@@ -116,7 +154,6 @@ def process_file_task(
             integration_link=source_link,
             delete_file=delete_file,
         )
-    )
 
 
 @celery.task(

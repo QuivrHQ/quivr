@@ -1,12 +1,32 @@
 import os
-from typing import AsyncGenerator, Callable, Generator, Generic, Type, TypeVar
+from typing import AsyncGenerator, Callable, Generator, Generic, Optional, Type, TypeVar
 
 from fastapi import Depends
+from langchain.embeddings.base import Embeddings
+from langchain_community.embeddings.ollama import OllamaEmbeddings
+from langchain_community.vectorstores.supabase import SupabaseVectorStore
+from langchain_openai import OpenAIEmbeddings
+from sqlalchemy import Engine, create_engine
 from sqlalchemy.ext.asyncio import create_async_engine
 from sqlmodel import Session, create_engine
 from sqlmodel.ext.asyncio.session import AsyncSession
+from supabase.client import AsyncClient, Client, create_async_client, create_client
 
-from quivr_api.models.settings import settings
+from quivr_api.logger import get_logger
+from quivr_api.models.databases.supabase.supabase import SupabaseDB
+from quivr_api.models.settings import BrainSettings
+from quivr_api.vectorstore.supabase import CustomSupabaseVectorStore
+
+# Global variables to store the Supabase client and database instances
+_supabase_client: Optional[Client] = None
+_supabase_async_client: Optional[AsyncClient] = None
+_supabase_db: Optional[SupabaseDB] = None
+_db_engine: Optional[Engine] = None
+_embedding_service = None
+
+settings = BrainSettings()  # type: ignore
+
+logger = get_logger(__name__)
 
 
 class BaseRepository:
@@ -57,6 +77,15 @@ def get_sync_session() -> Generator[Session, None, None]:
         yield session
 
 
+def get_documents_vector_store() -> SupabaseVectorStore:
+    embeddings = get_embedding_client()
+    supabase_client: Client = get_supabase_client()
+    documents_vector_store = CustomSupabaseVectorStore(  # Modified by @chloe Check
+        supabase_client, embeddings, table_name="vectors"
+    )
+    return documents_vector_store
+
+
 async def get_async_session() -> AsyncGenerator[AsyncSession, None]:
     async with AsyncSession(
         async_engine, expire_on_commit=False, autoflush=False
@@ -69,6 +98,61 @@ def get_repository(repository_model: Type[R]) -> Callable[..., R]:
         return repository_model(session)
 
     return _get_repository
+
+
+def get_embedding_client() -> Embeddings:
+    global _embedding_service
+    if settings.ollama_api_base_url:
+        embeddings = OllamaEmbeddings(
+            base_url=settings.ollama_api_base_url,
+        )  # pyright: ignore reportPrivateUsage=none
+    else:
+        embeddings = OpenAIEmbeddings()  # pyright: ignore reportPrivateUsage=none
+    return embeddings
+
+
+def get_pg_database_engine():
+    global _db_engine
+    if _db_engine is None:
+        logger.info("Creating Postgres DB engine")
+        _db_engine = create_engine(settings.pg_database_url, pool_pre_ping=True)
+    return _db_engine
+
+
+def get_pg_database_async_engine():
+    global _db_engine
+    if _db_engine is None:
+        logger.info("Creating Postgres DB engine")
+        _db_engine = create_engine(settings.pg_database_async_url, pool_pre_ping=True)
+    return _db_engine
+
+
+async def get_supabase_async_client() -> AsyncClient:
+    global _supabase_async_client
+    if _supabase_async_client is None:
+        logger.info("Creating Supabase client")
+        _supabase_async_client = await create_async_client(
+            settings.supabase_url, settings.supabase_service_key
+        )
+    return _supabase_async_client
+
+
+def get_supabase_client() -> Client:
+    global _supabase_client
+    if _supabase_client is None:
+        logger.info("Creating Supabase client")
+        _supabase_client = create_client(
+            settings.supabase_url, settings.supabase_service_key
+        )
+    return _supabase_client
+
+
+def get_supabase_db() -> SupabaseDB:
+    global _supabase_db
+    if _supabase_db is None:
+        logger.info("Creating Supabase DB")
+        _supabase_db = SupabaseDB(get_supabase_client())
+    return _supabase_db
 
 
 def get_service(service: Type[S]) -> Callable[..., S]:

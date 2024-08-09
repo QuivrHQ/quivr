@@ -8,8 +8,7 @@ from sqlmodel import select
 from sqlmodel.ext.asyncio.session import AsyncSession
 
 from quivr_api.logger import get_logger
-from quivr_api.models.settings import get_supabase_client
-from quivr_api.modules.dependencies import BaseRepository
+from quivr_api.modules.dependencies import BaseRepository, get_supabase_client
 from quivr_api.modules.knowledge.dto.inputs import KnowledgeStatus
 from quivr_api.modules.knowledge.dto.outputs import DeleteKnowledgeResponse
 

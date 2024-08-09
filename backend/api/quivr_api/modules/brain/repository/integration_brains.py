@@ -1,7 +1,6 @@
 from abc import ABC, abstractmethod
 from typing import List
 
-from quivr_api.models.settings import get_supabase_client
 from quivr_api.modules.brain.entity.integration_brain import (
     IntegrationDescriptionEntity,
     IntegrationEntity,
@@ -10,10 +9,10 @@ from quivr_api.modules.brain.repository.interfaces.integration_brains_interface 
     IntegrationBrainInterface,
     IntegrationDescriptionInterface,
 )
+from quivr_api.modules.dependencies import get_supabase_client
 
 
 class Integration(ABC):
-
     @abstractmethod
     def load(self):
         pass
@@ -63,7 +62,6 @@ class IntegrationBrain(IntegrationBrainInterface):
         return IntegrationEntity(**response.data[0])
 
     def add_integration_brain(self, brain_id, user_id, integration_id, settings):
-
         response = (
             self.db.table("integrations_user")
             .insert(
@@ -116,7 +114,6 @@ class IntegrationBrain(IntegrationBrainInterface):
 
 
 class IntegrationDescription(IntegrationDescriptionInterface):
-
     def __init__(self):
         self.db = get_supabase_client()
 

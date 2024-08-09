@@ -8,8 +8,8 @@ from supabase.client import AsyncClient
 
 from quivr_api.celery_config import celery
 from quivr_api.logger import get_logger
-from quivr_api.models.settings import get_supabase_async_client
 from quivr_api.modules.brain.repository.brains_vectors import BrainsVectors
+from quivr_api.modules.dependencies import get_supabase_async_client
 from quivr_api.modules.knowledge.repository.storage import Storage
 from quivr_api.modules.knowledge.service.knowledge_service import KnowledgeService
 from quivr_api.modules.notification.dto.inputs import (

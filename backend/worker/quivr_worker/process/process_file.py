@@ -2,11 +2,11 @@ from typing import Any
 from uuid import UUID
 
 from langchain_core.documents import Document
-from langchain_core.vectorstores import VectorStore
 from quivr_api.logger import get_logger
 from quivr_api.modules.brain.entity.brain_entity import BrainEntity
 from quivr_api.modules.brain.service.brain_service import BrainService
 from quivr_api.modules.brain.service.brain_vector_service import BrainVectorService
+from quivr_api.vector.service.vector_service import VectorService
 from quivr_core.processor.registry import get_processor_class
 
 from quivr_worker.files import File
@@ -31,7 +31,7 @@ async def process_file(
     brain: BrainEntity,
     brain_service: BrainService,
     brain_vector_service: BrainVectorService,
-    document_vector_store: VectorStore,
+    vector_service: VectorService,
     integration: str | None,
     integration_link: str | None,
 ):
@@ -41,37 +41,43 @@ async def process_file(
         integration=integration,
         integration_link=integration_link,
     )
-    store_chunks(
+    await store_chunks(
         file=file_instance,
         brain_id=brain.brain_id,
         chunks=chunks,
-        document_vector_store=document_vector_store,
         brain_service=brain_service,
         brain_vector_service=brain_vector_service,
+        vector_service=vector_service,
     )
 
 
-def store_chunks(
+async def store_chunks(
     *,
     file: File,
     brain_id: UUID,
     chunks: list[Document],
     brain_service: BrainService,
     brain_vector_service: BrainVectorService,
-    document_vector_store: VectorStore,
+    vector_service: VectorService,
 ):
-    vector_ids = document_vector_store.add_documents(chunks)
+    # vector_ids = document_vector_store.add_documents(chunks)
+    vector_ids = await vector_service.create_vectors(chunks, file.id)
     logger.debug(f"Inserted {len(chunks)} chunks in vectors table for {file}")
 
     if vector_ids is None or len(vector_ids) == 0:
         raise Exception(f"Error inserting chunks for file {file.file_name}")
 
     # TODO(@chloedia) : Brains should be associated with knowledge NOT vectors...
-    for created_vector_id in vector_ids:
-        result = brain_vector_service.create_brain_vector(
-            created_vector_id, file.file_sha1
-        )
-        logger.debug(f"Inserted : {len(result)} in brain_vectors for {file}")
+    # for created_vector_id in vector_ids:
+    #     result = brain_vector_service.create_brain_vector(
+    #         created_vector_id, file.file_sha1
+    #     )
+    #     logger.debug(f"Inserted : {len(result)} in brain_vectors for {file}")
+
+    # assert isinstance(document_vector_store, CustomSupabaseVectorStore), f'Expected document_vector_store to be a CustomSupabaseVectorStore, got {document_vector_store}'
+    # for created_vector_id in vector_ids:
+    #     logger.debug(f"Adding knowledge_id {file.id} to vector_id {created_vector_id}")
+    #     document_vector_store.add_knowledge_id_to_vector(vector_id = UUID(created_vector_id), knowledge_id = file.id)
     brain_service.update_brain_last_update_time(brain_id)
 
 
