@@ -1,6 +1,9 @@
+import asyncio
+
 from celery.result import AsyncResult
 from quivr_api.celery_config import celery
 from quivr_api.logger import get_logger
+from quivr_api.modules.dependencies import get_service
 from quivr_api.modules.knowledge.dto.inputs import KnowledgeStatus
 from quivr_api.modules.knowledge.service.knowledge_service import KnowledgeService
 from quivr_api.modules.notification.dto.inputs import NotificationUpdatableProperties
@@ -11,13 +14,14 @@ from quivr_api.modules.notification.service.notification_service import (
 
 logger = get_logger("notifier_service", "notifier_service.log")
 notification_service = NotificationService()
-knowledge_service = KnowledgeService()
+# knowledge_service = KnowledgeService()
+knowledge_service = get_service(KnowledgeService)()
 
 
-def notifier(app):
+async def notifier(app):
     state = app.events.State()
 
-    def handle_task_event(event):
+    async def handle_task_event(event):
         try:
             state.event(event)
             task = state.tasks.get(event["uuid"])
@@ -46,7 +50,7 @@ def notifier(app):
                         ),
                     )
                     if knowledge_id:
-                        knowledge_service.update_status_knowledge(
+                        await knowledge_service.update_status_knowledge(
                             knowledge_id, KnowledgeStatus.ERROR
                         )
                     logger.error(
@@ -70,7 +74,7 @@ def notifier(app):
                     )
                     # TODO(@aminediro): implement retry  if failure
                     if knowledge_id:
-                        knowledge_service.update_status_knowledge(
+                        await knowledge_service.update_status_knowledge(
                             knowledge_id, KnowledgeStatus.UPLOADED
                         )
                     logger.info(
@@ -83,7 +87,7 @@ def notifier(app):
         recv = app.events.Receiver(
             connection,
             handlers={
-                "task-failed": handle_task_event,
+                "task-failed": handle_task_event,  # FIXME: @aminediro check how to handle this
                 "task-succeeded": handle_task_event,
             },
         )
@@ -92,4 +96,5 @@ def notifier(app):
 
 if __name__ == "__main__":
     logger.info("Started  quivr-notifier notification...")
-    notifier(celery)
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(notifier(celery))

@@ -11,6 +11,7 @@ from quivr_api.modules.brain.entity.brain_entity import RoleEnum
 from quivr_api.modules.brain.service.brain_authorization_service import (
     validate_brain_authorization,
 )
+from quivr_api.modules.dependencies import get_service
 from quivr_api.modules.knowledge.dto.inputs import CreateKnowledgeProperties
 from quivr_api.modules.knowledge.service.knowledge_service import KnowledgeService
 from quivr_api.modules.notification.dto.inputs import CreateNotification
@@ -26,7 +27,8 @@ logger = get_logger(__name__)
 crawl_router = APIRouter()
 
 notification_service = NotificationService()
-knowledge_service = KnowledgeService()
+# knowledge_service = KnowledgeService()
+knowledge_service = get_service(KnowledgeService)()
 
 
 @crawl_router.get("/crawl/healthz", tags=["Health"])
@@ -78,10 +80,12 @@ async def crawl_endpoint(
         knowledge_to_add = CreateKnowledgeProperties(
             brain_id=brain_id,
             url=crawl_website.url,
-            extension="html",
+            mime_type="html",
+            source="web",
+            source_link=crawl_website.url,
         )
 
-        added_knowledge = knowledge_service.add_knowledge(knowledge_to_add)
+        added_knowledge = await knowledge_service.add_knowledge(knowledge_to_add)
         logger.info(f"Knowledge {added_knowledge} added successfully")
 
         celery.send_task(

@@ -2,24 +2,26 @@ from datetime import datetime, timedelta
 from typing import List, Sequence
 from uuid import UUID
 
+from quivr_api.logger import get_logger
+from quivr_api.models.settings import get_supabase_client
+from quivr_api.modules.dependencies import BaseRepository, get_service
+from quivr_api.modules.knowledge.service.knowledge_service import \
+    KnowledgeService
+from quivr_api.modules.notification.service.notification_service import \
+    NotificationService
+from quivr_api.modules.sync.dto.inputs import (SyncsActiveInput,
+                                               SyncsActiveUpdateInput)
+from quivr_api.modules.sync.entity.sync import NotionSyncFile, SyncsActive
+from quivr_api.modules.sync.repository.sync_interfaces import SyncInterface
 from sqlalchemy import or_
 from sqlalchemy.exc import IntegrityError
 from sqlmodel import col, select
 from sqlmodel.ext.asyncio.session import AsyncSession
 
-from quivr_api.logger import get_logger
-from quivr_api.models.settings import get_supabase_client
-from quivr_api.modules.dependencies import BaseRepository
-from quivr_api.modules.knowledge.service.knowledge_service import KnowledgeService
-from quivr_api.modules.notification.service.notification_service import (
-    NotificationService,
-)
-from quivr_api.modules.sync.dto.inputs import SyncsActiveInput, SyncsActiveUpdateInput
-from quivr_api.modules.sync.entity.sync import NotionSyncFile, SyncsActive
-from quivr_api.modules.sync.repository.sync_interfaces import SyncInterface
-
 notification_service = NotificationService()
-knowledge_service = KnowledgeService()
+#knowledge_service = KnowledgeService()
+knowledge_service = get_service(KnowledgeService)()
+
 logger = get_logger(__name__)
 
 
