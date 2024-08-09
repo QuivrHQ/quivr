@@ -3,16 +3,19 @@ from uuid import UUID
 from venv import logger
 
 from fastapi import HTTPException
+from sqlalchemy.exc import IntegrityError
+from sqlmodel import select
+from sqlmodel.ext.asyncio.session import AsyncSession
+
 from quivr_api.logger import get_logger
 from quivr_api.models.settings import get_supabase_client
 from quivr_api.modules.dependencies import BaseRepository
 from quivr_api.modules.knowledge.dto.inputs import KnowledgeStatus
 from quivr_api.modules.knowledge.dto.outputs import DeleteKnowledgeResponse
+
 # from quivr_core.models import QuivrKnowledge as Knowledge
 from quivr_api.modules.knowledge.entity.knowledge import KnowledgeDB
-from sqlalchemy.exc import IntegrityError
-from sqlmodel import select
-from sqlmodel.ext.asyncio.session import AsyncSession
+from quivr_api.modules.knowledge.entity.knowledge_brain import KnowledgeBrain
 
 logger = get_logger(__name__)
 
@@ -36,6 +39,13 @@ class KnowledgeRepository(BaseRepository):
             if existing_knowledge:
                 existing_knowledge.source_link = knowledge.source_link
                 self.session.add(existing_knowledge)
+                # create link
+                assert existing_knowledge.id, "Knowledge ID not generated"
+                knowledge_brain = KnowledgeBrain(
+                    brain_id=existing_knowledge.brain_id,
+                    knowledge_id=existing_knowledge.id,
+                )
+                self.session.add(knowledge_brain)
             else:
                 self.session.add(knowledge)
             await self.session.commit()
