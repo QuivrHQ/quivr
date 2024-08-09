@@ -71,7 +71,7 @@ def store_chunks(
         result = brain_vector_service.create_brain_vector(
             created_vector_id, file.file_sha1
         )
-        logger.debug(f"Inserted : {len(result)} in brain_vectors for {file}")
+        logger.debug(f"Inserted : {len(result)} in brain_vectors for {file.file_name}")
     brain_service.update_brain_last_update_time(brain_id)
 
 

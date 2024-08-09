@@ -8,8 +8,8 @@ from quivr_api.modules.sync.dto.inputs import (
     SyncsUserInput,
     SyncUserUpdateInput,
 )
-from quivr_api.modules.sync.entity.sync import SyncsActive, SyncsUser
-from quivr_api.modules.sync.repository.sync import Sync
+from quivr_api.modules.sync.entity.sync_models import SyncsActive, SyncsUser
+from quivr_api.modules.sync.repository.sync_repository import Sync
 from quivr_api.modules.sync.repository.sync_user import SyncUserRepository
 from quivr_api.modules.sync.service.sync_notion import SyncNotionService
 from quivr_api.modules.user.service.user_service import UserService

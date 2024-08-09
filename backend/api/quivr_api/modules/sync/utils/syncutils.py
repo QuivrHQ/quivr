@@ -22,7 +22,7 @@ from quivr_api.modules.notification.service.notification_service import (
     NotificationService,
 )
 from quivr_api.modules.sync.dto.inputs import SyncsActiveUpdateInput
-from quivr_api.modules.sync.entity.sync import (
+from quivr_api.modules.sync.entity.sync_models import (
     DBSyncFile,
     DownloadedSyncFile,
     SyncFile,
@@ -95,7 +95,6 @@ class SyncUtils:
         self.sync_files_repo = sync_files_repo
         self.storage = storage
         self.sync_cloud = sync_cloud
-
         self.notification_service = notification_service
         self.brain_vectors = brain_vectors
 
@@ -326,8 +325,7 @@ class SyncUtils:
                 files_to_download,
             )
         files = files + files_metadata
-
-        logger.debug(f"original files to download for {sync_active} : {files}")
+        logger.debug(f"original files to download for {sync_active.id} : {files}")
 
         # Filter files that have been modified since the last sync
         # TODO: what is this ????
@@ -387,8 +385,6 @@ class SyncUtils:
             ),
         )
         logger.info(
-            "%s sync completed for sync_active: %s",
-            self.sync_cloud.lower_name,
-            sync_active,
+            f"{self.sync_cloud.lower_name} sync completed for sync_active: {sync_active.id}. Synced all {len(processed_files)} files.",
         )
         return processed_files

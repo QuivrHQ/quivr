@@ -9,7 +9,7 @@ from quivr_api.modules.notification.service.notification_service import (
     NotificationService,
 )
 from quivr_api.modules.sync.dto.inputs import SyncsUserInput, SyncUserUpdateInput
-from quivr_api.modules.sync.entity.sync import SyncFile, SyncsUser
+from quivr_api.modules.sync.entity.sync_models import SyncFile, SyncsUser
 from quivr_api.modules.sync.service.sync_notion import SyncNotionService
 from quivr_api.modules.sync.utils.sync import (
     AzureDriveSync,

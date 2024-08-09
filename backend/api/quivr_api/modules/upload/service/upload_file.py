@@ -1,5 +1,4 @@
 import mimetypes
-import os
 from io import BufferedReader, FileIO
 
 from supabase.client import AsyncClient, Client
@@ -42,16 +41,17 @@ async def upload_file_storage(
     storage_path: str,
     upsert: bool = False,
 ):
-    _, file_extension = os.path.splitext(storage_path)
     mime_type, _ = mimetypes.guess_type(storage_path)
-    logger.debug(f"Uploading {storage_path} to supabase storage.")
+    logger.debug(
+        f"Uploading {file} to {storage_path} using supabse. upsert={upsert}, mimetype={mime_type}"
+    )
 
     if upsert:
         response = await supabase_client.storage.from_("quivr").update(
             storage_path,
             file,  # type: ignore
             file_options={
-                "content-type": mime_type or "txt/html",
+                "content-type": mime_type or "application/html",
                 "upsert": "true",
                 "cache-control": "3600",
             },
@@ -63,7 +63,7 @@ async def upload_file_storage(
                 storage_path,
                 file,  # type: ignore
                 file_options={
-                    "content-type": mime_type or "text/html",
+                    "content-type": mime_type or "application/html",
                     "upsert": "false",
                     "cache-control": "3600",
                 },

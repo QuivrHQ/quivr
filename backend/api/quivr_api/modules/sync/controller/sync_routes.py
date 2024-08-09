@@ -2,8 +2,9 @@ import os
 import uuid
 from typing import Annotated, List
 
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, Depends, HTTPException, status
 
+from quivr_api.celery_config import celery
 from quivr_api.logger import get_logger
 from quivr_api.middlewares.auth import AuthBearer, get_current_user
 from quivr_api.modules.dependencies import get_service
@@ -20,7 +21,7 @@ from quivr_api.modules.sync.controller.notion_sync_routes import notion_sync_rou
 from quivr_api.modules.sync.dto import SyncsDescription
 from quivr_api.modules.sync.dto.inputs import SyncsActiveInput, SyncsActiveUpdateInput
 from quivr_api.modules.sync.dto.outputs import AuthMethodEnum
-from quivr_api.modules.sync.entity.sync import SyncsActive
+from quivr_api.modules.sync.entity.sync_models import SyncsActive
 from quivr_api.modules.sync.service.sync_notion import SyncNotionService
 from quivr_api.modules.sync.service.sync_service import SyncService, SyncUserService
 from quivr_api.modules.user.entity.user_identity import UserIdentity
@@ -186,7 +187,16 @@ async def create_sync_active(
     sync_active = sync_service.create_sync_active(
         sync_active_input, str(current_user.id)
     )
-    # TODO(@aminediro): Send processing task now !
+    if not sync_active:
+        raise HTTPException(
+            status_code=500, detail=f"Error creating sync active for {current_user}"
+        )
+
+    celery.send_task(
+        "process_sync_task",
+        kwargs={"sync_id": sync_active.id, "user_id": sync_active.user_id},
+    )
+
     return sync_active
 
 
@@ -212,7 +222,7 @@ async def update_sync_active(
     Returns:
         SyncsActive: The updated sync active data.
     """
-    logger.debug(
+    logger.info(
         f"Updating active sync for user: {current_user.id} with data: {sync_active_input}"
     )
 
@@ -239,8 +249,19 @@ async def update_sync_active(
         )
         sync_active_input.force_sync = True
         sync_active_input.notification_id = str(notification.id)
-        # TODO: Send processing task now !
-        return sync_service.update_sync_active(sync_id, sync_active_input)
+        sync_active = sync_service.update_sync_active(sync_id, sync_active_input)
+        if not sync_active:
+            raise HTTPException(
+                status_code=500,
+                detail=f"Error updating sync active for {current_user.id}",
+            )
+        logger.info(
+            f"Sending task process_sync_task for sync_id={sync_id}, user_id={current_user}"
+        )
+        celery.send_task(
+            "process_sync_task",
+            kwargs={"sync_id": sync_active.id, "user_id": sync_active.user_id},
+        )
 
     else:
         return None

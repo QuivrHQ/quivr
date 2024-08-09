@@ -18,14 +18,13 @@ class DownloadedSyncFile:
     file_data: io.BufferedReader
 
 
-class SyncsUser(BaseModel):
+class DBSyncFile(BaseModel):
     id: int
-    user_id: UUID
-    name: str
-    provider: str
-    credentials: dict
-    state: dict
-    additional_data: dict
+    path: str
+    syncs_active_id: int
+    last_modified: str
+    brain_id: str
+    supported: bool
 
 
 class SyncFile(BaseModel):
@@ -39,6 +38,34 @@ class SyncFile(BaseModel):
     icon: Optional[str] = None
     parent_id: Optional[str] = None
     type: Optional[str] = None
+
+
+class SyncsUser(BaseModel):
+    id: int
+    user_id: UUID
+    name: str
+    provider: str
+    credentials: dict
+    state: dict
+    additional_data: dict
+
+
+class SyncsActive(BaseModel):
+    id: int
+    name: str
+    syncs_user_id: int
+    user_id: UUID
+    settings: dict
+    last_synced: str
+    sync_interval_minutes: int
+    brain_id: UUID
+    syncs_user: Optional[SyncsUser] = None
+    notification_id: Optional[str] = None
+
+
+# TODO: all of this should be rewritten
+class SyncsActiveDetails(BaseModel):
+    pass
 
 
 class NotionSyncFile(SQLModel, table=True):
@@ -77,30 +104,3 @@ class NotionSyncFile(SQLModel, table=True):
         description="The ID of the user who owns the file",
     )
     user: User = Relationship(back_populates="notion_syncs")
-
-
-class SyncsActive(BaseModel):
-    id: int
-    name: str
-    syncs_user_id: int
-    user_id: UUID
-    settings: dict
-    last_synced: str
-    sync_interval_minutes: int
-    brain_id: UUID
-    syncs_user: Optional[SyncsUser] = None
-    notification_id: Optional[str] = None
-
-
-# TODO: all of this should be rewritten
-class SyncsActiveDetails(BaseModel):
-    pass
-
-
-class DBSyncFile(BaseModel):
-    id: int
-    path: str
-    syncs_active_id: int
-    last_modified: str
-    brain_id: str
-    supported: bool

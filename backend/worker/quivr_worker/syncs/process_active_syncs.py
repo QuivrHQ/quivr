@@ -1,3 +1,6 @@
+from contextlib import asynccontextmanager
+from dataclasses import dataclass
+from typing import AsyncGenerator
 from uuid import UUID
 
 from notion_client import Client
@@ -9,8 +12,9 @@ from quivr_api.modules.knowledge.service.knowledge_service import KnowledgeServi
 from quivr_api.modules.notification.service.notification_service import (
     NotificationService,
 )
-from quivr_api.modules.sync.repository.sync import NotionRepository
+from quivr_api.modules.sync.entity.sync_models import SyncsActive
 from quivr_api.modules.sync.repository.sync_files import SyncFilesRepository
+from quivr_api.modules.sync.repository.sync_repository import NotionRepository
 from quivr_api.modules.sync.service.sync_notion import (
     SyncNotionService,
     fetch_notion_pages,
@@ -33,56 +37,91 @@ celery_inspector = celery.control.inspect()
 logger = get_logger("celery_worker")
 
 
-async def process_all_active_syncs(
-    async_engine: AsyncEngine,
-    sync_active_service: SyncService,
-    sync_user_service: SyncUserService,
-    sync_files_repo_service: SyncFilesRepository,
-    knowledge_service: KnowledgeService,
-    storage: Storage,
-):
+@dataclass
+class SyncServices:
+    async_engine: AsyncEngine
+    knowledge_service: KnowledgeService
+    sync_active_service: SyncService
+    sync_user_service: SyncUserService
+    sync_files_repo_service: SyncFilesRepository
+    notification_service: NotificationService
+    brain_vectors: BrainsVectors
+    storage: Storage
+
+
+@asynccontextmanager
+async def build_syncs_utils(
+    deps: SyncServices,
+) -> AsyncGenerator[dict[str, SyncUtils], None]:
     async with AsyncSession(
-        async_engine, expire_on_commit=False, autoflush=False
+        deps.async_engine, expire_on_commit=False, autoflush=False
     ) as session:
-        # TODO pass services from celery_worker
-        notification_service = NotificationService()
-        brain_vectors = BrainsVectors()
-        sync_active_service = SyncService()
-        sync_user_service = SyncUserService()
-        sync_files_repo_service = SyncFilesRepository()
-        notion_repository = NotionRepository(session)
-        notion_service = SyncNotionService(notion_repository)
-        storage = Storage()
+        try:
+            # TODO pass services from celery_worker
+            notion_repository = NotionRepository(session)
+            notion_service = SyncNotionService(notion_repository)
 
-        mapping_sync_utils = {}
-        for provider_name, sync_cloud in [
-            ("google", GoogleDriveSync()),
-            ("azure", AzureDriveSync()),
-            ("dropbox", DropboxSync()),
-            ("github", GitHubSync()),
-            ("github", NotionSync(notion_service=notion_service)),
-        ]:
-            provider_sync_util = SyncUtils(
-                sync_user_service=sync_user_service,
-                sync_active_service=sync_active_service,
-                sync_files_repo=sync_files_repo_service,
-                storage=storage,
-                sync_cloud=sync_cloud,
-                notification_service=notification_service,
-                brain_vectors=brain_vectors,
-                knowledge_service=knowledge_service,
+            mapping_sync_utils = {}
+            for provider_name, sync_cloud in [
+                ("google", GoogleDriveSync()),
+                ("azure", AzureDriveSync()),
+                ("dropbox", DropboxSync()),
+                ("github", GitHubSync()),
+                (
+                    "notion",
+                    NotionSync(notion_service=notion_service),
+                ),  # Fixed duplicate "github" key
+            ]:
+                provider_sync_util = SyncUtils(
+                    sync_user_service=deps.sync_user_service,
+                    sync_active_service=deps.sync_active_service,
+                    sync_files_repo=deps.sync_files_repo_service,
+                    storage=deps.storage,
+                    sync_cloud=sync_cloud,
+                    notification_service=deps.notification_service,
+                    brain_vectors=deps.brain_vectors,
+                    knowledge_service=deps.knowledge_service,
+                )
+                mapping_sync_utils[provider_name] = provider_sync_util
+
+            yield mapping_sync_utils
+        finally:
+            # No need to close the session explicitly as it's handled by the context manager
+            pass
+
+
+async def process_sync(sync: SyncsActive, services: SyncServices):
+    async with build_syncs_utils(services) as mapping_syncs_utils:
+        try:
+            user_sync = services.sync_user_service.get_sync_user_by_id(
+                sync.syncs_user_id
             )
-            mapping_sync_utils[provider_name] = provider_sync_util
+            # NOTE: remove notification id
+            services.notification_service.remove_notification_by_id(
+                sync.notification_id
+            )
+            assert user_sync, f"No user sync found for active sync: {sync}"
+            sync_util = mapping_syncs_utils[user_sync.provider.lower()]
+            await sync_util.sync(sync_active=sync, user_sync=user_sync)
+        except KeyError as e:
+            logger.error(
+                f"Provider not supported: {e}",
+            )
+        except Exception as e:
+            logger.error(f"Error syncing: {e}")
 
-        await process_active_syncs(
-            sync_active_service=sync_active_service,
-            sync_user_service=sync_user_service,
+
+async def process_all_active_syncs(sync_services: SyncServices):
+    async with build_syncs_utils(sync_services) as mapping_sync_utils:
+        await _process_all_active_syncs(
+            sync_active_service=sync_services.sync_active_service,
+            sync_user_service=sync_services.sync_user_service,
             mapping_syncs_utils=mapping_sync_utils,
-            notification_service=notification_service,
+            notification_service=sync_services.notification_service,
         )
 
 
-async def process_active_syncs(
+async def _process_all_active_syncs(
     sync_active_service: SyncService,
     sync_user_service: SyncUserService,
     mapping_syncs_utils: dict[str, SyncUtils],

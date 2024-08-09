@@ -2,7 +2,6 @@ import asyncio
 import os
 from uuid import UUID
 
-from celery.schedules import crontab
 from celery.signals import worker_process_init
 from dotenv import load_dotenv
 from quivr_api.celery_config import celery
@@ -13,6 +12,7 @@ from quivr_api.models.settings import (
     settings,
 )
 from quivr_api.modules.brain.integrations.Notion.Notion_connector import NotionConnector
+from quivr_api.modules.brain.repository.brains_vectors import BrainsVectors
 from quivr_api.modules.brain.service.brain_service import BrainService
 from quivr_api.modules.brain.service.brain_vector_service import BrainVectorService
 from quivr_api.modules.knowledge.repository.storage import Storage
@@ -30,8 +30,10 @@ from quivr_worker.check_premium import check_is_premium
 from quivr_worker.process.process_s3_file import process_uploaded_file
 from quivr_worker.process.process_url import process_url_func
 from quivr_worker.syncs.process_active_syncs import (
+    SyncServices,
     process_all_active_syncs,
     process_notion_sync,
+    process_sync,
 )
 from quivr_worker.syncs.store_notion import fetch_and_store_notion_files_async
 from quivr_worker.utils import _patch_json
@@ -53,6 +55,7 @@ sync_active_service = SyncService()
 sync_user_service = SyncUserService()
 sync_files_repo_service = SyncFilesRepository()
 brain_service = BrainService()
+brain_vectors = BrainsVectors()
 storage = Storage()
 notion_service: SyncNotionService | None = None
 async_engine: AsyncEngine | None = None
@@ -165,6 +168,31 @@ def check_is_premium_task():
     check_is_premium(supabase_client)
 
 
+@celery.task(name="process_sync_task")
+def process_sync_task(sync_id: int, user_id: str):
+    global async_engine
+    assert async_engine
+    sync = next(
+        filter(lambda s: s.id == sync_id, sync_active_service.get_syncs_active(user_id))
+    )
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(
+        process_sync(
+            sync,
+            SyncServices(
+                async_engine=async_engine,
+                sync_active_service=sync_active_service,
+                sync_user_service=sync_user_service,
+                sync_files_repo_service=sync_files_repo_service,
+                storage=storage,
+                brain_vectors=brain_vectors,
+                knowledge_service=knowledge_service,
+                notification_service=notification_service,
+            ),
+        )
+    )
+
+
 @celery.task(name="process_active_syncs_task")
 def process_active_syncs_task():
     global async_engine
@@ -172,12 +200,16 @@ def process_active_syncs_task():
     loop = asyncio.get_event_loop()
     loop.run_until_complete(
         process_all_active_syncs(
-            async_engine=async_engine,
-            sync_active_service=sync_active_service,
-            sync_user_service=sync_user_service,
-            sync_files_repo_service=sync_files_repo_service,
-            storage=storage,
-            knowledge_service=knowledge_service,
+            SyncServices(
+                async_engine=async_engine,
+                sync_active_service=sync_active_service,
+                sync_user_service=sync_user_service,
+                sync_files_repo_service=sync_files_repo_service,
+                storage=storage,
+                brain_vectors=brain_vectors,
+                knowledge_service=knowledge_service,
+                notification_service=notification_service,
+            ),
         )
     )
 
@@ -207,10 +239,10 @@ celery.conf.beat_schedule = {
     #     "task": f"{__name__}.ping_telemetry",
     #     "schedule": crontab(minute="*/30", hour="*"),
     # },
-    "process_active_syncs": {
-        "task": "process_active_syncs_task",
-        "schedule": crontab(minute="*/1", hour="*"),
-    },
+    # "process_active_syncs": {
+    #     "task": "process_active_syncs_task",
+    #     "schedule": crontab(minute="*/1", hour="*"),
+    # },
     # "process_premium_users": {
     #     "task": "check_is_premium_task",
     #     "schedule": crontab(minute="*/1", hour="*"),
