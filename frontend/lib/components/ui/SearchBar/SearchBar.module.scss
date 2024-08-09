@@ -10,7 +10,7 @@
   background-color: var(--background-0);
   border-radius: Radius.$big;
   border: 1px solid var(--border-0);
-  overflow: hidden;
+  overflow: auto;
   box-shadow: BoxShadow.$large;
 
   &.new_brain {
