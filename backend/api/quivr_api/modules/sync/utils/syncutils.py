@@ -128,6 +128,7 @@ class SyncUtils:
         logger.debug(f"Fetch sync file response: {file_response}")
         file_name = str(file_response["file_name"])
         raw_data = file_response["content"]
+        assert isinstance(raw_data, io.BytesIO)
         file_data = (
             io.BufferedReader(raw_data)  # type: ignore
             if isinstance(raw_data, io.BytesIO)
@@ -194,12 +195,12 @@ class SyncUtils:
         knowledge_to_add = CreateKnowledgeProperties(
             brain_id=brain_id,
             file_name=file.name,
-            extension=downloaded_file.extension,
-            integration=integration,
-            integration_link=integration_link,
+            mime_type=downloaded_file.extension,
+            source=integration,
+            source_link=integration_link,
         )
 
-        added_knowledge = self.knowledge_service.add_knowledge(knowledge_to_add)
+        added_knowledge = await self.knowledge_service.add_knowledge(knowledge_to_add)
         # Send file for processing
         celery.send_task(
             "process_file_task",

@@ -18,6 +18,8 @@ backend/.python-version
 **/.pnp
 .pnp.js
 
+Pipfile
+
 # testing
 **/coverage
 
@@ -98,3 +100,4 @@ backend/core/examples/chatbot/.chainlit/translations/en-US.json
 
 # Tox
 .tox
+Pipfile
