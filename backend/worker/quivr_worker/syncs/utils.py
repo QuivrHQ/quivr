@@ -51,36 +51,32 @@ async def build_syncs_utils(
     async with AsyncSession(
         deps.async_engine, expire_on_commit=False, autoflush=False
     ) as session:
-        try:
-            # TODO pass services from celery_worker
-            notion_repository = NotionRepository(session)
-            notion_service = SyncNotionService(notion_repository)
-            knowledge_service = KnowledgeService(KnowledgeRepository(session))
+        # TODO pass services from celery_worker
+        notion_repository = NotionRepository(session)
+        notion_service = SyncNotionService(notion_repository)
+        knowledge_service = KnowledgeService(KnowledgeRepository(session))
 
-            mapping_sync_utils = {}
-            for provider_name, sync_cloud in [
-                ("google", GoogleDriveSync()),
-                ("azure", AzureDriveSync()),
-                ("dropbox", DropboxSync()),
-                ("github", GitHubSync()),
-                (
-                    "notion",
-                    NotionSync(notion_service=notion_service),
-                ),  # Fixed duplicate "github" key
-            ]:
-                provider_sync_util = SyncUtils(
-                    sync_user_service=deps.sync_user_service,
-                    sync_active_service=deps.sync_active_service,
-                    sync_files_repo=deps.sync_files_repo_service,
-                    storage=deps.storage,
-                    sync_cloud=sync_cloud,
-                    notification_service=deps.notification_service,
-                    brain_vectors=deps.brain_vectors,
-                    knowledge_service=knowledge_service,
-                )
-                mapping_sync_utils[provider_name] = provider_sync_util
+        mapping_sync_utils = {}
+        for provider_name, sync_cloud in [
+            ("google", GoogleDriveSync()),
+            ("azure", AzureDriveSync()),
+            ("dropbox", DropboxSync()),
+            ("github", GitHubSync()),
+            (
+                "notion",
+                NotionSync(notion_service=notion_service),
+            ),  # Fixed duplicate "github" key
+        ]:
+            provider_sync_util = SyncUtils(
+                sync_user_service=deps.sync_user_service,
+                sync_active_service=deps.sync_active_service,
+                sync_files_repo=deps.sync_files_repo_service,
+                storage=deps.storage,
+                sync_cloud=sync_cloud,
+                notification_service=deps.notification_service,
+                brain_vectors=deps.brain_vectors,
+                knowledge_service=knowledge_service,
+            )
+            mapping_sync_utils[provider_name] = provider_sync_util
 
-            yield mapping_sync_utils
-        finally:
-            # No need to close the session explicitly as it's handled by the context manager
-            pass
+        yield mapping_sync_utils
