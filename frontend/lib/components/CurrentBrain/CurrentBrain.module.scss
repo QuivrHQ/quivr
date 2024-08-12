@@ -1,3 +1,4 @@
+@use "styles/Radius.module.scss";
 @use "styles/Spacings.module.scss";
 @use "styles/Typography.module.scss";
 
@@ -41,6 +42,10 @@
 
         .dark_image {
           filter: invert(100%);
+        }
+
+        .brain_image {
+          border-radius: Radius.$normal;
         }
 
         .brain_name {

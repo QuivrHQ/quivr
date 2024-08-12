@@ -9,6 +9,10 @@
   color: var(--text-3);
   overflow: hidden;
 
+  .brain_image {
+    border-radius: Radius.$normal;
+  }
+
   .brain_name {
     @include Typography.EllipsisOverflow;
   }
