@@ -5,6 +5,7 @@ from typing import AsyncGenerator
 from quivr_api.celery_config import celery
 from quivr_api.logger import get_logger
 from quivr_api.modules.brain.repository.brains_vectors import BrainsVectors
+from quivr_api.modules.knowledge.repository.knowledges import KnowledgeRepository
 from quivr_api.modules.knowledge.repository.storage import Storage
 from quivr_api.modules.knowledge.service.knowledge_service import KnowledgeService
 from quivr_api.modules.notification.service.notification_service import (
@@ -35,7 +36,6 @@ logger = get_logger("celery_worker")
 @dataclass
 class SyncServices:
     async_engine: AsyncEngine
-    knowledge_service: KnowledgeService
     sync_active_service: SyncService
     sync_user_service: SyncUserService
     sync_files_repo_service: SyncFilesRepository
@@ -55,6 +55,7 @@ async def build_syncs_utils(
             # TODO pass services from celery_worker
             notion_repository = NotionRepository(session)
             notion_service = SyncNotionService(notion_repository)
+            knowledge_service = KnowledgeService(KnowledgeRepository(session))
 
             mapping_sync_utils = {}
             for provider_name, sync_cloud in [
@@ -75,7 +76,7 @@ async def build_syncs_utils(
                     sync_cloud=sync_cloud,
                     notification_service=deps.notification_service,
                     brain_vectors=deps.brain_vectors,
-                    knowledge_service=deps.knowledge_service,
+                    knowledge_service=knowledge_service,
                 )
                 mapping_sync_utils[provider_name] = provider_sync_util
 

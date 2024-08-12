@@ -2,6 +2,7 @@ import asyncio
 import os
 from uuid import UUID
 
+from celery.schedules import crontab
 from celery.signals import worker_process_init
 from dotenv import load_dotenv
 from quivr_api.celery_config import celery
@@ -16,7 +17,6 @@ from quivr_api.modules.brain.repository.brains_vectors import BrainsVectors
 from quivr_api.modules.brain.service.brain_service import BrainService
 from quivr_api.modules.brain.service.brain_vector_service import BrainVectorService
 from quivr_api.modules.knowledge.repository.storage import Storage
-from quivr_api.modules.knowledge.service.knowledge_service import KnowledgeService
 from quivr_api.modules.notification.service.notification_service import (
     NotificationService,
 )
@@ -42,15 +42,14 @@ load_dotenv()
 
 get_logger("quivr_core")
 logger = get_logger("celery_worker")
-
 _patch_json()
+
 
 # FIXME: load at init time
 # Services
 supabase_client = get_supabase_client()
 document_vector_store = get_documents_vector_store()
 notification_service = NotificationService()
-knowledge_service = KnowledgeService()
 sync_active_service = SyncService()
 sync_user_service = SyncUserService()
 sync_files_repo_service = SyncFilesRepository()
@@ -190,7 +189,6 @@ def process_sync_task(
                 sync_files_repo_service=sync_files_repo_service,
                 storage=storage,
                 brain_vectors=brain_vectors,
-                knowledge_service=knowledge_service,
                 notification_service=notification_service,
             ),
         )
@@ -211,7 +209,6 @@ def process_active_syncs_task():
                 sync_files_repo_service=sync_files_repo_service,
                 storage=storage,
                 brain_vectors=brain_vectors,
-                knowledge_service=knowledge_service,
                 notification_service=notification_service,
             ),
         )
@@ -239,10 +236,10 @@ def fetch_and_store_notion_files_task(access_token: str, user_id: UUID):
 
 
 celery.conf.beat_schedule = {
-    # "ping_telemetry": {
-    #     "task": f"{__name__}.ping_telemetry",
-    #     "schedule": crontab(minute="*/30", hour="*"),
-    # },
+    "ping_telemetry": {
+        "task": f"{__name__}.ping_telemetry",
+        "schedule": crontab(minute="*/30", hour="*"),
+    },
     # "process_active_syncs": {
     #     "task": "process_active_syncs_task",
     #     "schedule": crontab(minute="*/1", hour="*"),
