@@ -104,7 +104,7 @@ export const MessageContent = ({
                       <Icon
                         name="copy"
                         size="small"
-                        color="black"
+                        color="static-white"
                         handleHover={true}
                       />
                     </div>

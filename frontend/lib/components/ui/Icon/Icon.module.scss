@@ -67,6 +67,14 @@
   color: var(--icon-0);
 }
 
+.static-white {
+  color: var(--white);
+
+  &:hover {
+    color: var(--primary-0);
+  }
+}
+
 .dangerous {
   color: var(--dangerous);
 
