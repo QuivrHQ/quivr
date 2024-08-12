@@ -18,6 +18,7 @@ aiofiles = ">=23.0.0,<25.0.0"
 faiss-cpu = { version = "^1.8.0.post1", optional = true }
 langchain-community = { version = "^0.2.6", optional = true }
 langchain-openai = { version = "^0.1.14", optional = true }
+langchain-anthropic = { version = "^0.1.22", optional = true }
 # To install unstructured, you’ll also need to install the following system dependencies:
 # libmagic, poppler, libreoffice, pandoc, and tesseract.
 # NOTE: for now poetry doesn't support groups as extra:
@@ -49,7 +50,7 @@ unstructured = { version = "^0.15.0", optional = true, extras = [
 docx2txt = { version = "^0.8", optional = true }
 
 [tool.poetry.extras]
-base = ["langchain-community", "faiss-cpu", "langchain-openai"]
+base = ["langchain-community", "faiss-cpu", "langchain-openai", "langchain-anthropic"]
 csv = ["langchain-community"]
 md = ["langchain-community", "unstructured"]
 ipynb = ["langchain-community"]
@@ -66,6 +67,7 @@ all = [
     "unstructured",
     "docx2txt",
     "megaparse",
+    "langchain-anthropic",
 ]
 
 [tool.poetry.group.dev]

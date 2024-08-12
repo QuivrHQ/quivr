@@ -1,5 +1,6 @@
 from langchain_core.language_models.chat_models import BaseChatModel
 from pydantic.v1 import SecretStr
+
 from quivr_core.brain.info import LLMInfo
 from quivr_core.config import LLMEndpointConfig
 from quivr_core.utils import model_supports_function_calling
@@ -19,13 +20,26 @@ class LLMEndpoint:
     @classmethod
     def from_config(cls, config: LLMEndpointConfig = LLMEndpointConfig()):
         try:
-            from langchain_openai import ChatOpenAI
+            if config.model.startswith("claude"):
+                from langchain_anthropic import ChatAnthropic
 
-            _llm = ChatOpenAI(
-                model=config.model,
-                api_key=SecretStr(config.llm_api_key) if config.llm_api_key else None,
-                base_url=config.llm_base_url,
-            )
+                _llm = ChatAnthropic(
+                    model=config.model,
+                    api_key=SecretStr(config.llm_api_key)
+                    if config.llm_api_key
+                    else None,
+                    base_url=config.llm_base_url,
+                )
+            else:
+                from langchain_openai import ChatOpenAI
+
+                _llm = ChatOpenAI(
+                    model=config.model,
+                    api_key=SecretStr(config.llm_api_key)
+                    if config.llm_api_key
+                    else None,
+                    base_url=config.llm_base_url,
+                )
             return cls(llm=_llm, llm_config=config)
 
         except ImportError as e:

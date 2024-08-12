@@ -1,4 +1,5 @@
 import logging
+import re
 from typing import Any, List, Tuple, no_type_check
 
 from langchain_core.messages import AIMessage, BaseMessage, HumanMessage, SystemMessage
@@ -23,19 +24,19 @@ logger = logging.getLogger("quivr_core")
 
 def model_supports_function_calling(model_name: str):
     models_supporting_function_calls = [
-        "gpt-4",
-        "gpt-4-1106-preview",
-        "gpt-4-0613",
-        "gpt-3.5-turbo-0125",
-        "gpt-3.5-turbo-1106",
-        "gpt-3.5-turbo-0613",
-        "gpt-4-0125-preview",
-        "gpt-3.5-turbo",
-        "gpt-4-turbo",
-        "gpt-4o",
-        "gpt-4o-mini",
+        r"gpt-4(-\d{4}-preview)?",
+        r"gpt-4-\d{4}",
+        r"gpt-3\.5-turbo(-\d{4})?",
+        r"gpt-4-turbo",
+        r"gpt-4o(-mini)?",
+        r"mistral-(small|large)-latest",
+        r"claude-3-opus-\d{8}",
+        r"claude-3-haiku-\d{8}",
+        r"claude-3-sonnet-\d{8}",
     ]
-    return model_name in models_supporting_function_calls
+    return any(
+        re.match(pattern, model_name) for pattern in models_supporting_function_calls
+    )
 
 
 def format_history_to_openai_mesages(

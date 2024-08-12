@@ -3,6 +3,7 @@ from typing import Any, Generator, Tuple
 from uuid import UUID, uuid4
 
 from langchain_core.messages import AIMessage, HumanMessage
+
 from quivr_core.models import ChatMessage
 
 

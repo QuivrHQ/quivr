@@ -13,7 +13,18 @@ from quivr_core.utils import (
 
 def test_model_supports_function_calling():
     assert model_supports_function_calling("gpt-4") is True
+    assert model_supports_function_calling("gpt-4-turbo") is True
+    assert model_supports_function_calling("gpt-4o") is True
+    assert model_supports_function_calling("gpt-4o-mini") is True
     assert model_supports_function_calling("ollama3") is False
+    assert model_supports_function_calling("mistral-small-latest") is True
+    assert model_supports_function_calling("mistral-large-latest") is True
+    assert model_supports_function_calling("gpt-3.5-turbo") is True
+    assert model_supports_function_calling("gpt-3.5-turbo-0125") is True
+
+    assert model_supports_function_calling("gpt-8.4") is False
+    assert model_supports_function_calling("mistral-burger-latest") is False
+    assert model_supports_function_calling("claude-3-opus-20240229") is True
 
 
 def test_get_prev_message_incorrect_message():
