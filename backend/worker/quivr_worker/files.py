@@ -109,26 +109,3 @@ class File:
                 **metadata,
             },
         )
-
-
-def set_file_vectors_ids(self):
-    """
-    Set the vectors_ids property with the ids of the vectors
-    that are associated with the file in the vectors table
-    """
-    self.vectors_ids = self.supabase_db.get_vectors_by_file_sha1(self.file_sha1).data
-
-
-def file_already_exists(file: File):
-    """
-    Check if file already exists in vectors table
-    """
-    # FIXME: @chloedia @AmineDiro
-    # Checking if file exists should be based on the sha1 hash
-    # We also return the associated brain(s) here
-    return True
-
-
-# TODO: this is a crazy way to check if file exists
-def file_already_exists_in_brain():
-    return True
