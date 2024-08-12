@@ -26,11 +26,17 @@ export const MentionItem = ({
       onClick={onClick}
     >
       {item.iconUrl ? (
-        <Image src={item.iconUrl} alt="Brain or Model" width={14} height={14} />
+        <Image
+          className={styles.brain_image}
+          src={item.iconUrl}
+          alt="Brain or Model"
+          width={18}
+          height={18}
+        />
       ) : (
         <Icon
           name="brain"
-          size="small"
+          size="normal"
           color={selected ? "primary" : "black"}
         />
       )}

@@ -20,7 +20,13 @@ export const QuestionBrain = ({
   return (
     <div data-testid="brain-tags" className={styles.brain_name_wrapper}>
       {imageUrl ? (
-        <Image src={imageUrl} alt="" width={18} height={18} />
+        <Image
+          className={styles.brain_image}
+          src={imageUrl}
+          alt=""
+          width={24}
+          height={24}
+        />
       ) : (
         <Icon name="brain" size="normal" color="black" />
       )}
