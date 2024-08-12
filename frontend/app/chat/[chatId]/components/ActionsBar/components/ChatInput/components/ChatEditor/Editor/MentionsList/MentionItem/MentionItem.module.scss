@@ -20,6 +20,10 @@
     color: var(--primary-0);
   }
 
+  .brain_image {
+    border-radius: Radius.$normal;
+  }
+
   .brain_name {
     @include Typography.EllipsisOverflow;
     font-size: Typography.$small;

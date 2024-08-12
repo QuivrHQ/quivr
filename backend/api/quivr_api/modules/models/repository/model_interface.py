@@ -17,3 +17,10 @@ class ModelsInterface(ABC):
         Get a model by name
         """
         pass
+
+    @abstractmethod
+    def get_default_model(self) -> Model:
+        """
+        Get the default model
+        """
+        pass

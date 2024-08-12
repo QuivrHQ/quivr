@@ -25,6 +25,10 @@
     width: 100%;
     align-items: center;
 
+    .brain_image {
+      border-radius: Radius.$normal;
+    }
+
     .name {
       @include Typography.EllipsisOverflow;
       font-size: Typography.$small;
@@ -39,7 +43,7 @@
     font-style: italic;
     overflow: hidden;
     display: -webkit-box;
-    -webkit-line-clamp: 2;
+    -webkit-line-clamp: 3;
     -webkit-box-orient: vertical;
     text-overflow: ellipsis;
   }

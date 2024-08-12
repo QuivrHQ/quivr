@@ -1,6 +1,11 @@
+from typing import Annotated
+
 from fastapi import APIRouter, Depends, Request
+
 from quivr_api.middlewares.auth import AuthBearer, get_current_user
 from quivr_api.modules.brain.service.brain_user_service import BrainUserService
+from quivr_api.modules.dependencies import get_service
+from quivr_api.modules.models.service.model_service import ModelService
 from quivr_api.modules.user.dto.inputs import UserUpdatableProperties
 from quivr_api.modules.user.entity.user_identity import UserIdentity
 from quivr_api.modules.user.repository.users import Users
@@ -8,12 +13,15 @@ from quivr_api.modules.user.service.user_usage import UserUsage
 
 user_router = APIRouter()
 brain_user_service = BrainUserService()
+ModelServiceDep = Annotated[ModelService, Depends(get_service(ModelService))]
 user_repository = Users()
 
 
 @user_router.get("/user", dependencies=[Depends(AuthBearer())], tags=["User"])
 async def get_user_endpoint(
-    request: Request, current_user: UserIdentity = Depends(get_current_user)
+    request: Request,
+    model_service: ModelServiceDep,
+    current_user: UserIdentity = Depends(get_current_user),
 ):
     """
     Get user information and statistics.
@@ -38,14 +46,15 @@ async def get_user_endpoint(
     monthly_chat_credit = user_settings.get("monthly_chat_credit", 10)
 
     user_daily_usage = UserUsage(id=current_user.id)
-
+    models = await model_service.get_models()
+    models_names = [model.name for model in models]
     return {
         "email": current_user.email,
         "max_brain_size": max_brain_size,
         "max_brains": max_brains,
         "current_brain_size": 0,
         "monthly_chat_credit": monthly_chat_credit,
-        "models": user_settings.get("models", []),
+        "models": models_names,
         "id": current_user.id,
         "is_premium": user_settings["is_premium"],
     }

@@ -65,6 +65,19 @@ async def retrieve_all_brains_for_user(
     """Retrieve all brains for the current user."""
     brains = brain_user_service.get_user_brains(current_user.id)
     models = await model_service.get_models()
+    default_model = await model_service.get_default_model()
+
+    for brain in brains:
+        # find the brain.model in models and set the brain.price to the model.price
+        found = False
+        if brain.model:
+            for model in models:
+                if model.name == brain.model:
+                    brain.price = model.price
+                    found = True
+                    break
+        if not found:
+            brain.price = default_model.price
 
     for model in models:
         brains.append(
@@ -85,6 +98,7 @@ async def retrieve_all_brains_for_user(
                 max_files=0,
             )
         )
+
     return {"brains": brains}
 
 

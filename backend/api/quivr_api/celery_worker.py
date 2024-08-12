@@ -5,6 +5,7 @@ from uuid import UUID
 
 from celery.schedules import crontab
 from pytz import timezone
+
 from quivr_api.celery_config import celery
 from quivr_api.logger import get_logger
 from quivr_api.middlewares.auth.auth_bearer import AuthBearer
@@ -241,7 +242,6 @@ def check_if_is_premium_user():
             "max_brain_size": product["max_brain_size"],
             "monthly_chat_credit": product["monthly_chat_credit"],
             "api_access": product["api_access"],
-            "models": product["models"],
             "is_premium": True,
             "last_stripe_check": current_time_str,
         }

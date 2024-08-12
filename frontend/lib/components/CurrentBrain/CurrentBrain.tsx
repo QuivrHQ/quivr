@@ -25,7 +25,13 @@ const BrainNameAndImage = ({
   return (
     <>
       {currentBrain.image_url ? (
-        <Image src={currentBrain.image_url} alt="" width={18} height={18} />
+        <Image
+          className={styles.brain_image}
+          src={currentBrain.image_url}
+          alt=""
+          width={18}
+          height={18}
+        />
       ) : (
         <Icon name="brain" size="normal" color="black" />
       )}

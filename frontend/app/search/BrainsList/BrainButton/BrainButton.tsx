@@ -40,13 +40,14 @@ const BrainButton = ({
       <div className={styles.header}>
         {brainOrModel.image_url ? (
           <Image
+            className={styles.brain_image}
             src={brainOrModel.image_url}
             alt="Brain or Model"
-            width={16}
-            height={16}
+            width={24}
+            height={24}
           />
         ) : (
-          <Icon name="brain" size="normal" color="black" />
+          <Icon name="brain" size="large" color="black" />
         )}
         <span className={styles.name}>
           {brainOrModel.display_name ?? brainOrModel.name}

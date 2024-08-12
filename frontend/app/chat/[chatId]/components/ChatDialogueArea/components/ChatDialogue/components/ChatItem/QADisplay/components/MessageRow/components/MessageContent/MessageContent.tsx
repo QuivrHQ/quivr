@@ -1,12 +1,21 @@
 import Prism from "prismjs";
+import "prismjs/components/prism-bash";
+import "prismjs/components/prism-basic";
 import "prismjs/components/prism-c";
 import "prismjs/components/prism-cpp";
 import "prismjs/components/prism-csharp";
+import "prismjs/components/prism-css";
+import "prismjs/components/prism-dart";
 import "prismjs/components/prism-go";
 import "prismjs/components/prism-java";
+import "prismjs/components/prism-kotlin";
 import "prismjs/components/prism-markup";
 import "prismjs/components/prism-python";
+import "prismjs/components/prism-ruby";
 import "prismjs/components/prism-rust";
+import "prismjs/components/prism-scss";
+import "prismjs/components/prism-sql";
+import "prismjs/components/prism-swift";
 import "prismjs/components/prism-typescript";
 import { useEffect, useState } from "react";
 import ReactMarkdown from "react-markdown";
@@ -75,36 +84,51 @@ export const MessageContent = ({
             if (match) {
               const language = match[1];
               const code = String(children).trim();
-              const html = Prism.highlight(
-                code,
-                // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-                Prism.languages[language],
-                language
-              );
 
-              return (
-                <div className={styles.code_block}>
-                  <div
-                    className={styles.icon}
-                    onClick={() => {
-                      void navigator.clipboard.writeText(code);
-                    }}
-                  >
-                    <Icon
-                      name="copy"
-                      size="small"
-                      color="black"
-                      handleHover={true}
-                    />
+              if (Prism.languages[language]) {
+                const html = Prism.highlight(
+                  code,
+                  // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+                  Prism.languages[language],
+                  language
+                );
+
+                return (
+                  <div className={styles.code_block}>
+                    <div
+                      className={styles.icon}
+                      onClick={() => {
+                        void navigator.clipboard.writeText(code);
+                      }}
+                    >
+                      <Icon
+                        name="copy"
+                        size="small"
+                        color="black"
+                        handleHover={true}
+                      />
+                    </div>
+                    <pre className={className}>
+                      <code
+                        {...props}
+                        dangerouslySetInnerHTML={{ __html: html }}
+                      />
+                    </pre>
                   </div>
-                  <pre className={className}>
-                    <code
-                      {...props}
-                      dangerouslySetInnerHTML={{ __html: html }}
-                    />
-                  </pre>
-                </div>
-              );
+                );
+              } else {
+                console.error(
+                  `The language '${language}' has no grammar loaded.`
+                );
+
+                return (
+                  <div className={styles.code_block}>
+                    <pre className={className}>
+                      <code {...props}>{children}</code>
+                    </pre>
+                  </div>
+                );
+              }
             }
 
             return (
