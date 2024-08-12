@@ -65,4 +65,6 @@ class KnowledgeDB(SQLModel, table=True):
             server_default=text("CURRENT_TIMESTAMP"),
         ),
     )
-    metadata_: Optional[Dict[str, str]] = Field(default=None, sa_column=Column(JSON))
+    metadata_: Optional[Dict[str, str]] = Field(
+        default=None, sa_column=Column("metadata", JSON)
+    )

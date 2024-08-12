@@ -95,7 +95,7 @@ class QuivrKnowledge(BaseModel):
     file_name: Optional[str] = None
     url: Optional[str] = None
     mime_type: str = "txt"
-    status: str = "PROCESSING"
+    status: KnowledgeStatus = KnowledgeStatus.PROCESSING
     source: Optional[str] = None
     source_link: str | None = None
     file_size: int | None = None  # FIXME: Should not be optional @chloedia
