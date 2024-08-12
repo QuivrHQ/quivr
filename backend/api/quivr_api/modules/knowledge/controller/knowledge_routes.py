@@ -1,6 +1,8 @@
+from typing import Annotated
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Query
+
 from quivr_api.logger import get_logger
 from quivr_api.middlewares.auth import AuthBearer, get_current_user
 from quivr_api.modules.brain.entity.brain_entity import RoleEnum
@@ -9,6 +11,7 @@ from quivr_api.modules.brain.service.brain_authorization_service import (
     validate_brain_authorization,
 )
 from quivr_api.modules.brain.service.brain_vector_service import BrainVectorService
+from quivr_api.modules.dependencies import get_service
 from quivr_api.modules.knowledge.service.knowledge_service import KnowledgeService
 from quivr_api.modules.upload.service.generate_file_signed_url import (
     generate_file_signed_url,
@@ -18,13 +21,16 @@ from quivr_api.modules.user.entity.user_identity import UserIdentity
 knowledge_router = APIRouter()
 logger = get_logger(__name__)
 
-knowledge_service = KnowledgeService()
+KnowledgeServiceDep = Annotated[
+    KnowledgeService, Depends(get_service(KnowledgeService))
+]
 
 
 @knowledge_router.get(
     "/knowledge", dependencies=[Depends(AuthBearer())], tags=["Knowledge"]
 )
 async def list_knowledge_in_brain_endpoint(
+    knowledge_service: KnowledgeServiceDep,
     brain_id: UUID = Query(..., description="The ID of the brain"),
     current_user: UserIdentity = Depends(get_current_user),
 ):
@@ -34,7 +40,7 @@ async def list_knowledge_in_brain_endpoint(
 
     validate_brain_authorization(brain_id=brain_id, user_id=current_user.id)
 
-    knowledges = knowledge_service.get_all_knowledge(brain_id)
+    knowledges = await knowledge_service.get_all_knowledge(brain_id)
 
     return {"knowledges": knowledges}
 
@@ -49,6 +55,7 @@ async def list_knowledge_in_brain_endpoint(
 )
 async def delete_endpoint(
     knowledge_id: UUID,
+    knowledge_service: KnowledgeServiceDep,
     current_user: UserIdentity = Depends(get_current_user),
     brain_id: UUID = Query(..., description="The ID of the brain"),
 ):
@@ -56,9 +63,9 @@ async def delete_endpoint(
     Delete a specific knowledge from a brain.
     """
 
-    knowledge = knowledge_service.get_knowledge(knowledge_id)
+    knowledge = await knowledge_service.get_knowledge(knowledge_id)
     file_name = knowledge.file_name if knowledge.file_name else knowledge.url
-    knowledge_service.remove_knowledge(knowledge_id)
+    await knowledge_service.remove_knowledge(knowledge_id)
 
     brain_vector_service = BrainVectorService(brain_id)
     if knowledge.file_name:
@@ -78,13 +85,14 @@ async def delete_endpoint(
 )
 async def generate_signed_url_endpoint(
     knowledge_id: UUID,
+    knowledge_service: KnowledgeServiceDep,
     current_user: UserIdentity = Depends(get_current_user),
 ):
     """
     Generate a signed url to download the file from storage.
     """
 
-    knowledge = knowledge_service.get_knowledge(knowledge_id)
+    knowledge = await knowledge_service.get_knowledge(knowledge_id)
 
     validate_brain_authorization(brain_id=knowledge.brain_id, user_id=current_user.id)
 

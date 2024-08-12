@@ -11,6 +11,7 @@ from quivr_api.logger import get_logger
 from quivr_api.models.settings import get_supabase_async_client
 from quivr_api.modules.brain.repository.brains_vectors import BrainsVectors
 from quivr_api.modules.knowledge.repository.storage import Storage
+from quivr_api.modules.knowledge.service.knowledge_service import KnowledgeService
 from quivr_api.modules.notification.dto.inputs import (
     CreateNotification,
     NotificationUpdatableProperties,
@@ -79,6 +80,7 @@ class SyncUtils(BaseModel):
     sync_files_repo: SyncFiles
     storage: Storage
     sync_cloud: BaseSync
+    knowledge_service: KnowledgeService
 
     def _upsert_sync_file(
         self,
@@ -142,10 +144,11 @@ class SyncUtils(BaseModel):
         # TODO: function
         # TODO: Encode response in some Type for type checking
         logger.debug(f"Downloading {file} using {self.sync_cloud}")
-        file_response = self.sync_cloud.download_file(credentials, file)
+        file_response = await self.sync_cloud.adownload_file(credentials, file)
         logger.debug(f"Fetch sync file : {file_response}")
         file_name = str(file_response["file_name"])
         raw_data = file_response["content"]
+        assert isinstance(raw_data, io.BytesIO)
         file_data = (
             io.BufferedReader(raw_data)  # type: ignore
             if isinstance(raw_data, io.BytesIO)
@@ -159,7 +162,18 @@ class SyncUtils(BaseModel):
         await upload_file_storage(client, file_data, storage_path, upsert=True)
 
         # TODO
-        # Add knowledge and send_task
+        # knowlegge_to_add = CreateKnowledgeProperties(
+        #         brain_id=brain_id,
+        #         file_name=file.name,
+        #         mime_type= file.mime_type,
+        #         source=self.sync_cloud.name,
+        #         source_link=file.web_view_link,
+        #         file_size=sys.getsizeof(raw_data),
+        #         file_sha1=compute_sha1(raw_data.read()),
+        #     )
+
+        # await self.knowledge_service.add_knowledge(knowlegge_to_add)
+
         # Send file for processing
 
         self._upsert_sync_file(

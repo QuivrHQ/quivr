@@ -90,8 +90,8 @@ def process_file_task(
     brain_id: UUID,
     notification_id: UUID,
     knowledge_id: UUID,
-    integration: str | None = None,
-    integration_link: str | None = None,
+    source: str | None = None,
+    source_link: str | None = None,
     delete_file: bool = False,
 ):
     logger.info(
@@ -110,8 +110,8 @@ def process_file_task(
             brain_id=brain_id,
             file_original_name=file_original_name,
             knowledge_id=knowledge_id,
-            integration=integration,
-            integration_link=integration_link,
+            integration=source,
+            integration_link=source_link,
             delete_file=delete_file,
         )
     )

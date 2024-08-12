@@ -1,4 +1,4 @@
-import os
+import hashlib
 from typing import Optional
 from uuid import UUID
 
@@ -12,7 +12,6 @@ from quivr_api.modules.brain.service.brain_authorization_service import (
     validate_brain_authorization,
 )
 from quivr_api.modules.knowledge.dto.inputs import CreateKnowledgeProperties
-from quivr_api.modules.knowledge.service.knowledge_service import KnowledgeService
 from quivr_api.modules.notification.dto.inputs import NotificationUpdatableProperties
 from quivr_api.modules.notification.entity.notification import NotificationsStatusEnum
 from quivr_api.modules.notification.service.notification_service import (
@@ -24,8 +23,12 @@ from quivr_api.utils.telemetry import maybe_send_telemetry
 
 logger = get_logger("upload_file")
 
-knowledge_service = KnowledgeService()
 notification_service = NotificationService()
+
+
+def compute_sha1(content: bytes):
+    readable_hash = hashlib.sha1(content).hexdigest()
+    return readable_hash
 
 
 async def upload_file_sync(
@@ -92,20 +95,20 @@ async def upload_file_sync(
     knowledge_to_add = CreateKnowledgeProperties(
         brain_id=brain_id,
         file_name=upload_file.filename,
-        extension=os.path.splitext(
-            upload_file.filename  # pyright: ignore reportPrivateUsage=none
-        )[-1].lower(),
-        integration=integration,
-        integration_link=integration_link,
+        mime_type=str(upload_file.content_type),
+        source=integration if integration else "local",
+        source_link=integration_link,
+        file_size=upload_file.size,
+        file_sha1=compute_sha1(file_content),
+        metadata={},
     )
-
-    added_knowledge = knowledge_service.add_knowledge(knowledge_to_add)
+    # added_knowledge = await knowledge_service.add_knowledge(knowledge_to_add)
 
     celery.send_task(
         "process_file_task",
         kwargs={
             "brain_id": brain_id,
-            "knowledge_id": added_knowledge.id,
+            "knowledge_id": added_knowledge.id,  # @amine
             "file_name": filename_with_brain_id,
             "file_original_name": upload_file.filename,
             "integration": integration,

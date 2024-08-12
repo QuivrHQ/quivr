@@ -2,12 +2,14 @@ from celery.result import AsyncResult
 from quivr_api.celery_config import celery
 from quivr_api.logger import get_logger
 from quivr_api.modules.knowledge.dto.inputs import KnowledgeStatus
-from quivr_api.modules.knowledge.service.knowledge_service import KnowledgeService
-from quivr_api.modules.notification.dto.inputs import NotificationUpdatableProperties
-from quivr_api.modules.notification.entity.notification import NotificationsStatusEnum
-from quivr_api.modules.notification.service.notification_service import (
-    NotificationService,
-)
+from quivr_api.modules.knowledge.service.knowledge_service import \
+    KnowledgeService
+from quivr_api.modules.notification.dto.inputs import \
+    NotificationUpdatableProperties
+from quivr_api.modules.notification.entity.notification import \
+    NotificationsStatusEnum
+from quivr_api.modules.notification.service.notification_service import \
+    NotificationService
 
 logger = get_logger("notifier_service", "notifier_service.log")
 notification_service = NotificationService()
@@ -46,9 +48,9 @@ def notifier(app):
                         ),
                     )
                     if knowledge_id:
-                        knowledge_service.update_status_knowledge(
-                            knowledge_id, KnowledgeStatus.ERROR
-                        )
+                        # knowledge_service.update_status_knowledge(
+                        #     knowledge_id, KnowledgeStatus.ERROR
+                        # ) @amine #FIXME
                     logger.error(
                         f"task {task.id} process_file_task {task_kwargs} failed. Updating knowledge {knowledge_id} to Error"
                     )
