@@ -1,4 +1,5 @@
 from datetime import datetime
+from enum import Enum
 from typing import Any, Dict, Optional
 from uuid import UUID
 
@@ -82,6 +83,12 @@ class ParsedRAGChunkResponse(BaseModel):
     last_chunk: bool = False
 
 
+class KnowledgeStatus(str, Enum):
+    PROCESSING = "PROCESSING"
+    UPLOADED = "UPLOADED"
+    ERROR = "ERROR"
+
+
 class QuivrKnowledge(BaseModel):
     id: UUID
     brain_id: UUID
@@ -91,7 +98,7 @@ class QuivrKnowledge(BaseModel):
     status: str = "PROCESSING"
     source: Optional[str] = None
     source_link: str | None = None
-    file_size: Optional[int] = 1  # FIXME: Should not be optional @chloedia
+    file_size: int | None = None  # FIXME: Should not be optional @chloedia
     file_sha1: Optional[str] = None  # FIXME: Should not be optional @chloedia
     updated_at: Optional[datetime] = None
     created_at: Optional[datetime] = None

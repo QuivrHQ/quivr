@@ -3,16 +3,18 @@ from uuid import UUID
 from venv import logger
 
 from fastapi import HTTPException
+from sqlalchemy.exc import IntegrityError
+from sqlmodel import select
+from sqlmodel.ext.asyncio.session import AsyncSession
+
 from quivr_api.logger import get_logger
 from quivr_api.models.settings import get_supabase_client
 from quivr_api.modules.dependencies import BaseRepository
 from quivr_api.modules.knowledge.dto.inputs import KnowledgeStatus
 from quivr_api.modules.knowledge.dto.outputs import DeleteKnowledgeResponse
+
 # from quivr_core.models import QuivrKnowledge as Knowledge
 from quivr_api.modules.knowledge.entity.knowledge import KnowledgeDB
-from sqlalchemy.exc import IntegrityError
-from sqlmodel import select
-from sqlmodel.ext.asyncio.session import AsyncSession
 
 logger = get_logger(__name__)
 
@@ -81,18 +83,18 @@ class KnowledgeRepository(BaseRepository):
         result = await self.session.exec(query)
         return result.all()
 
-    async def remove_brain_all_knowledge(self, brain_id):
+    async def remove_brain_all_knowledge(self, brain_id) -> int:
         """
         Remove all knowledge in a brain
         Args:
             brain_id (UUID): The id of the brain
         """
         all_knowledge = await self.get_all_knowledge_in_brain(brain_id)
-        knowledge_to_delete_list = []
-
-        for knowledge in all_knowledge:
-            if knowledge.file_name:
-                knowledge_to_delete_list.append(f"{brain_id}/{knowledge.file_name}")
+        knowledge_to_delete_list = [
+            knowledge.source_link
+            for knowledge in all_knowledge
+            if knowledge.source == "local"
+        ]
 
         if knowledge_to_delete_list:
             # FIXME: Can we bypass db ? @Amine
@@ -103,23 +105,24 @@ class KnowledgeRepository(BaseRepository):
         for item in items_to_delete:
             await self.session.delete(item)
         await self.session.commit()
+        return len(knowledge_to_delete_list)
 
     async def update_status_knowledge(
         self, knowledge_id: UUID, status: KnowledgeStatus
-    ) -> bool:
+    ) -> KnowledgeDB | None:
         query = select(KnowledgeDB).where(KnowledgeDB.id == knowledge_id)
         result = await self.session.exec(query)
         knowledge = result.first()
 
         if not knowledge:
-            return False
+            return None
 
         knowledge.status = status
         self.session.add(knowledge)
         await self.session.commit()
         await self.session.refresh(knowledge)
 
-        return True
+        return knowledge
 
     async def get_all_knowledge(self) -> Sequence[KnowledgeDB]:
         query = select(KnowledgeDB)

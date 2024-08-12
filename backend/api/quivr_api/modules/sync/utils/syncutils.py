@@ -162,7 +162,6 @@ class SyncUtils(BaseModel):
         await upload_file_storage(client, file_data, storage_path, upsert=True)
 
         # TODO
-        # Add knowledge and send_task
         # knowlegge_to_add = CreateKnowledgeProperties(
         #         brain_id=brain_id,
         #         file_name=file.name,

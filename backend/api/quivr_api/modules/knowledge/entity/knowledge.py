@@ -46,7 +46,7 @@ class KnowledgeDB(SQLModel, table=True):
     mime_type: str = Field(default="txt", max_length=100)
     status: str = Field(max_length=50)
     source: str = Field(max_length=255)
-    source_link: str = Field(max_length=2048, default = f"s3://quivr/{brain_id}/{id}")
+    source_link: str = Field(max_length=2048)
     file_size: Optional[int] = Field(gt=0)  # FIXME: Should not be optional @chloedia
     file_sha1: Optional[str] = Field(
         max_length=40

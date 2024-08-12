@@ -18,6 +18,8 @@ backend/.python-version
 **/.pnp
 .pnp.js
 
+Pipfile
+
 # testing
 **/coverage
 

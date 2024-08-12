@@ -18,7 +18,6 @@ from quivr_api.modules.brain.integrations.Notion.Notion_connector import NotionC
 from quivr_api.modules.brain.service.brain_service import BrainService
 from quivr_api.modules.brain.service.brain_vector_service import BrainVectorService
 from quivr_api.modules.knowledge.repository.storage import Storage
-from quivr_api.modules.knowledge.service.knowledge_service import KnowledgeService
 from quivr_api.modules.notification.service.notification_service import (
     NotificationService,
 )
@@ -59,7 +58,6 @@ storage = Storage()
 brain_service = BrainService()
 auth_bearer = AuthBearer()
 notion_service: SyncNotionService | None = None
-knowledge_service: KnowledgeService | None = None
 async_engine: AsyncEngine | None = None
 
 _patch_json()
@@ -231,10 +229,10 @@ celery.conf.beat_schedule = {
         "task": "process_active_syncs_task",
         "schedule": crontab(minute="*/1", hour="*"),
     },
-    # "process_premium_users": {
-    #     "task": "check_is_premium_task",
-    #     "schedule": crontab(minute="*/1", hour="*"),
-    # },
+    "process_premium_users": {
+        "task": "check_is_premium_task",
+        "schedule": crontab(minute="*/1", hour="*"),
+    },
     "process_notion_sync": {
         "task": "process_notion_sync",
         "schedule": crontab(minute="0", hour="*/6"),

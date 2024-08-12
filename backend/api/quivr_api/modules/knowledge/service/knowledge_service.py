@@ -1,21 +1,26 @@
 from typing import List
 from uuid import UUID
 
+from quivr_core.models import QuivrKnowledge as Knowledge
+
 from quivr_api.logger import get_logger
 from quivr_api.modules.dependencies import BaseService
-from quivr_api.modules.knowledge.dto.inputs import (CreateKnowledgeProperties,
-                                                    KnowledgeStatus)
+from quivr_api.modules.knowledge.dto.inputs import (
+    CreateKnowledgeProperties,
+    KnowledgeStatus,
+)
 from quivr_api.modules.knowledge.dto.outputs import DeleteKnowledgeResponse
 from quivr_api.modules.knowledge.entity.knowledge import KnowledgeDB
-from quivr_api.modules.knowledge.repository.knowledges import \
-    KnowledgeRepository
-from quivr_core.models import QuivrKnowledge as Knowledge
+from quivr_api.modules.knowledge.repository.knowledges import KnowledgeRepository
 
 logger = get_logger(__name__)
 
 
 class KnowledgeService(BaseService[KnowledgeRepository]):
     repository_cls = KnowledgeRepository
+
+    def __init__(self, repository: KnowledgeRepository):
+        self.repository = repository
 
     async def add_knowledge(
         self, knowledge_to_add: CreateKnowledgeProperties
@@ -31,9 +36,10 @@ class KnowledgeService(BaseService[KnowledgeRepository]):
         if inserted_knowledge_db_instance.source == "local":
             source_link = f"s3://quivr/{inserted_knowledge_db_instance.brain_id}/{inserted_knowledge_db_instance.id}"
             inserted_knowledge_db_instance.source_link = source_link
-        
-        inserted_knowledge = await self.repository.insert_knowledge(inserted_knowledge_db_instance)
 
+        inserted_knowledge = await self.repository.insert_knowledge(
+            inserted_knowledge_db_instance
+        )
 
         inserted_knowledge = Knowledge(
             id=inserted_knowledge_db_instance.id,

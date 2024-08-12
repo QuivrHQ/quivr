@@ -1,27 +1,25 @@
-import asyncio
-
 from celery.result import AsyncResult
 from quivr_api.celery_config import celery
 from quivr_api.logger import get_logger
-from quivr_api.modules.dependencies import get_service
 from quivr_api.modules.knowledge.dto.inputs import KnowledgeStatus
-from quivr_api.modules.knowledge.service.knowledge_service import KnowledgeService
-from quivr_api.modules.notification.dto.inputs import NotificationUpdatableProperties
-from quivr_api.modules.notification.entity.notification import NotificationsStatusEnum
-from quivr_api.modules.notification.service.notification_service import (
-    NotificationService,
-)
+from quivr_api.modules.knowledge.service.knowledge_service import \
+    KnowledgeService
+from quivr_api.modules.notification.dto.inputs import \
+    NotificationUpdatableProperties
+from quivr_api.modules.notification.entity.notification import \
+    NotificationsStatusEnum
+from quivr_api.modules.notification.service.notification_service import \
+    NotificationService
 
 logger = get_logger("notifier_service", "notifier_service.log")
 notification_service = NotificationService()
-# knowledge_service = KnowledgeService()
-knowledge_service = get_service(KnowledgeService)()
+knowledge_service = KnowledgeService()
 
 
-async def notifier(app):
+def notifier(app):
     state = app.events.State()
 
-    async def handle_task_event(event):
+    def handle_task_event(event):
         try:
             state.event(event)
             task = state.tasks.get(event["uuid"])
@@ -50,9 +48,9 @@ async def notifier(app):
                         ),
                     )
                     if knowledge_id:
-                        await knowledge_service.update_status_knowledge(
-                            knowledge_id, KnowledgeStatus.ERROR
-                        )
+                        # knowledge_service.update_status_knowledge(
+                        #     knowledge_id, KnowledgeStatus.ERROR
+                        # ) @amine #FIXME
                     logger.error(
                         f"task {task.id} process_file_task {task_kwargs} failed. Updating knowledge {knowledge_id} to Error"
                     )
@@ -74,7 +72,7 @@ async def notifier(app):
                     )
                     # TODO(@aminediro): implement retry  if failure
                     if knowledge_id:
-                        await knowledge_service.update_status_knowledge(
+                        knowledge_service.update_status_knowledge(
                             knowledge_id, KnowledgeStatus.UPLOADED
                         )
                     logger.info(
@@ -87,7 +85,7 @@ async def notifier(app):
         recv = app.events.Receiver(
             connection,
             handlers={
-                "task-failed": handle_task_event,  # FIXME: @aminediro check how to handle this
+                "task-failed": handle_task_event,
                 "task-succeeded": handle_task_event,
             },
         )
@@ -96,5 +94,4 @@ async def notifier(app):
 
 if __name__ == "__main__":
     logger.info("Started  quivr-notifier notification...")
-    loop = asyncio.get_event_loop()
-    loop.run_until_complete(notifier(celery))
+    notifier(celery)

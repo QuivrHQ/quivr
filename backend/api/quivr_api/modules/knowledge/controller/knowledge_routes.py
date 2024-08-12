@@ -39,9 +39,6 @@ async def list_knowledge_in_brain_endpoint(
     """
 
     validate_brain_authorization(brain_id=brain_id, user_id=current_user.id)
-    logger.debug(
-        f"REPO {knowledge_service.repository}, REPO SESSION {knowledge_service.repository.session}"
-    )
 
     knowledges = await knowledge_service.get_all_knowledge(brain_id)
 
