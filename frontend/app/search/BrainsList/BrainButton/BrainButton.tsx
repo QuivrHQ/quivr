@@ -53,10 +53,7 @@ const BrainButton = ({
           {brainOrModel.display_name ?? brainOrModel.name}
         </span>
       </div>
-      <span className={styles.description}>
-        {brainOrModel.description}lorem dhhd dsugfd hhfhhf dfkhkh
-        fhhfhsdhqshkqsdh
-      </span>
+      <span className={styles.description}>{brainOrModel.description}</span>
     </div>
   );
 };
