@@ -92,7 +92,7 @@ async def upload_file(
         # It specifically checks for BufferedReader | bytes before sending
         # TODO: We bypass this to write to S3 Storage directly
         buff_reader = io.BufferedReader(uploadFile.file)  # type: ignore
-        await upload_file_storage(client, buff_reader, filename_with_brain_id)
+        await upload_file_storage(buff_reader, filename_with_brain_id)
     except FileExistsError:
         notification_service.update_notification_by_id(
             upload_notification.id if upload_notification else None,

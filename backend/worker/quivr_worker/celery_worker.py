@@ -169,7 +169,9 @@ def check_is_premium_task():
 
 
 @celery.task(name="process_sync_task")
-def process_sync_task(sync_id: int, user_id: str):
+def process_sync_task(
+    sync_id: int, user_id: str, files_ids: list[str], folder_ids: list[str]
+):
     global async_engine
     assert async_engine
     sync = next(
@@ -178,8 +180,10 @@ def process_sync_task(sync_id: int, user_id: str):
     loop = asyncio.get_event_loop()
     loop.run_until_complete(
         process_sync(
-            sync,
-            SyncServices(
+            sync=sync,
+            files_ids=files_ids,
+            folder_ids=folder_ids,
+            services=SyncServices(
                 async_engine=async_engine,
                 sync_active_service=sync_active_service,
                 sync_user_service=sync_user_service,
