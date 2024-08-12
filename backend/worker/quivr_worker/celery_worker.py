@@ -137,8 +137,8 @@ async def aprocess_file_task(
         async_engine, expire_on_commit=False, autoflush=False
     ) as session:
         embeddings = get_embedding_client()
-        vector_repository = VectorRepository(session, embeddings=embeddings)
-        vector_service = VectorService(vector_repository)
+        vector_repository = VectorRepository(session)
+        vector_service = VectorService(vector_repository, embeddings=embeddings)
         brain_vector_service = BrainVectorService(brain_id)
 
         await process_uploaded_file(

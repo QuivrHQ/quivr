@@ -56,6 +56,7 @@ langchain-openai = "*"
 langchain-cohere = "*"
 # This is needed for ITO assistant
 llama-parse = "^0.4.9"
+pgvector = "^0.3.2"
 
 
 [tool.poetry.group.dev]

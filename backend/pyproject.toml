@@ -10,7 +10,6 @@ readme = "README.md"
 [tool.poetry.dependencies]
 python = "^3.11,<3.13"
 
-pgvector = "^0.3.2"
 [tool.poetry.group.dev.dependencies]
 quivr-core = { path = "core", develop = true, extras = ["base"] }
 quivr-api = { path = "api", develop = true }

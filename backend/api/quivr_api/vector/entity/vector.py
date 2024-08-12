@@ -1,3 +1,4 @@
+from typing import Optional
 from uuid import UUID
 
 from pgvector.sqlalchemy import Vector as PGVector
@@ -19,13 +20,17 @@ class Vector(SQLModel, table=True):
     )
     content: str = Field(default=None)
     metadata_: dict = Field(default={}, sa_column=Column("metadata", JSON, default={}))
-    embedding: PGVector | None = Field(sa_column=Column(PGVector(256)))
+    embedding: Optional[PGVector] = Field(
+        sa_column=Column(PGVector(1536))
+    )  # Verify with text_ada -> put it in Env variabme
     knowledge_id: UUID = Field(default=None, foreign_key="knowledge.id")
+
+    class Config:
+        arbitrary_types_allowed = True
 
 
 class VectorType(BaseModel):
     id: UUID | None
     content: str
     metadata_: dict
-    embedding: PGVector | None
     knowledge_id: UUID
