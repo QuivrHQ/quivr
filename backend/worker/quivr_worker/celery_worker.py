@@ -240,16 +240,16 @@ celery.conf.beat_schedule = {
         "task": f"{__name__}.ping_telemetry",
         "schedule": crontab(minute="*/30", hour="*"),
     },
-    # "process_active_syncs": {
-    #     "task": "process_active_syncs_task",
-    #     "schedule": crontab(minute="*/1", hour="*"),
-    # },
-    # "process_premium_users": {
-    #     "task": "check_is_premium_task",
-    #     "schedule": crontab(minute="*/1", hour="*"),
-    # },
-    # "process_notion_sync": {
-    #     "task": "process_notion_sync_task",
-    #     "schedule": crontab(minute="0", hour="*/6"),
-    # },
+    "process_active_syncs": {
+        "task": "process_active_syncs_task",
+        "schedule": crontab(minute="*/1", hour="*"),
+    },
+    "process_premium_users": {
+        "task": "check_is_premium_task",
+        "schedule": crontab(minute="*/1", hour="*"),
+    },
+    "process_notion_sync": {
+        "task": "process_notion_sync_task",
+        "schedule": crontab(minute="0", hour="*/6"),
+    },
 }
