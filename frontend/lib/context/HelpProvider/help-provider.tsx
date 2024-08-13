@@ -9,7 +9,7 @@ export const HelpContext = createContext<HelpContextType | undefined>(
   undefined
 );
 
-export const NotificationsProvider = ({
+export const HelpProvider = ({
   children,
 }: {
   children: React.ReactNode;

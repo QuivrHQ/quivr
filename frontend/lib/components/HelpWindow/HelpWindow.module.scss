@@ -1,0 +1,13 @@
+@use "styles/BoxShadow.module.scss";
+@use "styles/ScreenSizes.module.scss";
+@use "styles/ZIndexes.module.scss";
+
+.help_wrapper {
+  position: absolute;
+  height: 100vh;
+  right: 0;
+  width: 600px;
+  z-index: ZIndexes.$modal + 1;
+  box-shadow: BoxShadow.$medium;
+  background-color: var(--background-0);
+}

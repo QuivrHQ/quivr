@@ -1,3 +1,4 @@
+import { useHelpContext } from "@/lib/context/HelpProvider/hooks/useHelpContext";
 import { useMenuContext } from "@/lib/context/MenuProvider/hooks/useMenuContext";
 import { ButtonType } from "@/lib/types/QuivrButton";
 
@@ -18,6 +19,7 @@ export const PageHeader = ({
   buttons,
 }: Props): JSX.Element => {
   const { isOpened } = useMenuContext();
+  const { isVisible, setIsVisible } = useHelpContext();
 
   return (
     <>
@@ -43,7 +45,10 @@ export const PageHeader = ({
           ))}
         </div>
       </div>
-      <div className={styles.help_button}>
+      <div
+        className={styles.help_button}
+        onClick={() => setIsVisible(!isVisible)}
+      >
         <Icon name="help" size="normal" color="black" />
       </div>
     </>
