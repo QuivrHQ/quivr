@@ -1,37 +1,31 @@
 import datetime
 from uuid import UUID, uuid4
 
+from quivr_api.logger import get_logger
+from quivr_api.modules.brain.entity.brain_entity import BrainEntity
+from quivr_api.modules.brain.service.brain_service import BrainService
+from quivr_api.modules.brain.service.utils.format_chat_history import \
+    format_chat_history
+from quivr_api.modules.chat.controller.chat.utils import (
+    compute_cost, find_model_and_generate_metadata, update_user_usage)
+from quivr_api.modules.chat.dto.inputs import CreateChatHistory
+from quivr_api.modules.chat.dto.outputs import GetChatHistoryOutput
+from quivr_api.modules.chat.service.chat_service import ChatService
+from quivr_api.modules.dependencies import (get_embedding_client,
+                                            get_supabase_client, settings)
+from quivr_api.modules.knowledge.service.knowledge_service import \
+    KnowledgeService
+from quivr_api.modules.prompt.entity.prompt import Prompt
+from quivr_api.modules.prompt.service.prompt_service import PromptService
+from quivr_api.modules.user.entity.user_identity import UserIdentity
+from quivr_api.modules.user.service.user_usage import UserUsage
+from quivr_api.vector.service.vector_service import VectorService
+from quivr_api.vectorstore.supabase import CustomSupabaseVectorStore
 from quivr_core.chat import ChatHistory as ChatHistoryCore
 from quivr_core.config import LLMEndpointConfig, RAGConfig
 from quivr_core.llm.llm_endpoint import LLMEndpoint
 from quivr_core.models import ParsedRAGResponse, RAGResponseMetadata
 from quivr_core.quivr_rag import QuivrQARAG
-
-from quivr_api.logger import get_logger
-from quivr_api.modules.brain.entity.brain_entity import BrainEntity
-from quivr_api.modules.brain.service.brain_service import BrainService
-from quivr_api.modules.brain.service.utils.format_chat_history import (
-    format_chat_history,
-)
-from quivr_api.modules.chat.controller.chat.utils import (
-    compute_cost,
-    find_model_and_generate_metadata,
-    update_user_usage,
-)
-from quivr_api.modules.chat.dto.inputs import CreateChatHistory
-from quivr_api.modules.chat.dto.outputs import GetChatHistoryOutput
-from quivr_api.modules.chat.service.chat_service import ChatService
-from quivr_api.modules.dependencies import (
-    get_embedding_client,
-    get_supabase_client,
-    settings,
-)
-from quivr_api.modules.knowledge.service.knowledge_service import KnowledgeService
-from quivr_api.modules.prompt.entity.prompt import Prompt
-from quivr_api.modules.prompt.service.prompt_service import PromptService
-from quivr_api.modules.user.entity.user_identity import UserIdentity
-from quivr_api.modules.user.service.user_usage import UserUsage
-from quivr_api.vectorstore.supabase import CustomSupabaseVectorStore
 
 from .utils import generate_source
 
@@ -48,12 +42,14 @@ class RAGService:
         prompt_service: PromptService,
         chat_service: ChatService,
         knowledge_service: KnowledgeService,
+        vector_service: VectorService
     ):
         # Services
         self.brain_service = brain_service
         self.prompt_service = prompt_service
         self.chat_service = chat_service
         self.knowledge_service = knowledge_service
+        self.vector_service = vector_service
 
         # Base models
         self.current_user = current_user
@@ -166,6 +162,7 @@ class RAGService:
             table_name="vectors",
             brain_id=brain_id,
             max_input=max_input,
+            vector_service= self.vector_service
         )
 
     def save_answer(self, question: str, answer: ParsedRAGResponse):
@@ -246,7 +243,6 @@ class RAGService:
         chat_history = self._build_chat_history(history)
 
         # Get list of files urls
-        # TODO: Why do we get ALL the files ?
         list_files = await self.knowledge_service.get_all_knowledge(self.brain.brain_id)
         llm = self.get_llm(rag_config)
         vector_store = self.create_vector_store(

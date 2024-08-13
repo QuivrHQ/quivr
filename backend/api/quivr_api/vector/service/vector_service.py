@@ -4,29 +4,19 @@ from uuid import UUID
 from langchain.docstore.document import Document
 from langchain.embeddings.base import Embeddings
 from quivr_api.logger import get_logger
-from quivr_api.modules.brain.service.brain_service import BrainService
-from quivr_api.modules.dependencies import BaseService
-from quivr_api.modules.notification.service.notification_service import \
-    NotificationService
-from quivr_api.modules.prompt.service.prompt_service import PromptService
+from quivr_api.modules.dependencies import BaseService, get_embedding_client
 from quivr_api.vector.entity.vector import Vector
 from quivr_api.vector.repository.vectors_repository import VectorRepository
 
 logger = get_logger(__name__)
-
-prompt_service = PromptService()
-brain_service = BrainService()
-notification_service = NotificationService()
-
-
 class VectorService(BaseService[VectorRepository]):
     repository_cls = VectorRepository
+    _embedding: Embeddings = get_embedding_client()
 
-    def __init__(self, repository: VectorRepository, embeddings: Embeddings):
+    def __init__(self, repository: VectorRepository):
         self.repository = repository
-        self._embedding = embeddings
 
-    async def create_vectors(
+    def create_vectors(
         self, chunks: List[Document], knowledge_id: UUID
     ) -> List[str]:
         # Vector is created upon the user's first question asked
@@ -46,26 +36,26 @@ class VectorService(BaseService[VectorRepository]):
             )
             for i, chunk in enumerate(chunks)
         ]
-        created_vector = await self.repository.create_vectors(new_vectors)
+        created_vector = self.repository.create_vectors(new_vectors)
 
         return [str(vector.id) for vector in created_vector]
 
-    async def similarity_search(self, query: str, brain_id: str, k: int = 40) -> List[Document]:
+    def similarity_search(self, query: str, brain_id: UUID, k: int = 40):
         vectors = self._embedding.embed_documents([query])
         query_embedding = vectors[0]
-        vectors = await self.repository.similarity_search(query_embedding, brain_id, k)
+        vectors = self.repository.similarity_search(query_embedding= query_embedding, brain_id=brain_id, k=k)
 
         match_result = [
             Document(
                 metadata={
-                    search.metadata,
+                    **search.metadata_,
                     "id": search.id,
-                    "similarity": search.get("similarity", 0.0),
+                    "similarity": search.similarity,
                 },
-                page_content=search.get("content", ""),
+                page_content=search.content,
             )
             for search in vectors
-            if search.get("content")
+            if search.content
         ]
 
         sorted_match_result_by_file_name_metadata = sorted(
@@ -76,5 +66,5 @@ class VectorService(BaseService[VectorRepository]):
             ),
         )
 
+
         return sorted_match_result_by_file_name_metadata
-        return vectors

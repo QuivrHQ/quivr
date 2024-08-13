@@ -17,6 +17,9 @@ logger = get_logger(__name__)
 class KnowledgeService(BaseService[KnowledgeRepository]):
     repository_cls = KnowledgeRepository
 
+    def __init__(self, repository: KnowledgeRepository):
+        self.repository = repository
+
     async def add_knowledge(
         self, knowledge_to_add: CreateKnowledgeProperties
     ) -> Knowledge:

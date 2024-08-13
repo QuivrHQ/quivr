@@ -1,21 +1,23 @@
 import os
-from typing import AsyncGenerator, Callable, Generator, Generic, Optional, Type, TypeVar
+from typing import (AsyncGenerator, Callable, Generator, Generic, Optional,
+                    Type, TypeVar)
 
 from fastapi import Depends
 from langchain.embeddings.base import Embeddings
 from langchain_community.embeddings.ollama import OllamaEmbeddings
-from langchain_community.vectorstores.supabase import SupabaseVectorStore
+#from langchain_community.vectorstores.supabase import SupabaseVectorStore
 from langchain_openai import OpenAIEmbeddings
+from quivr_api.logger import get_logger
+from quivr_api.models.databases.supabase.supabase import SupabaseDB
+from quivr_api.models.settings import BrainSettings
+#from quivr_api.vector.service.vector_service import VectorService
+#from quivr_api.vectorstore.supabase import CustomSupabaseVectorStore
 from sqlalchemy import Engine, create_engine
 from sqlalchemy.ext.asyncio import create_async_engine
 from sqlmodel import Session, create_engine
 from sqlmodel.ext.asyncio.session import AsyncSession
-from supabase.client import AsyncClient, Client, create_async_client, create_client
-
-from quivr_api.logger import get_logger
-from quivr_api.models.databases.supabase.supabase import SupabaseDB
-from quivr_api.models.settings import BrainSettings
-from quivr_api.vectorstore.supabase import CustomSupabaseVectorStore
+from supabase.client import (AsyncClient, Client, create_async_client,
+                             create_client)
 
 # Global variables to store the Supabase client and database instances
 _supabase_client: Optional[Client] = None
@@ -77,13 +79,13 @@ def get_sync_session() -> Generator[Session, None, None]:
         yield session
 
 
-def get_documents_vector_store() -> SupabaseVectorStore:
-    embeddings = get_embedding_client()
-    supabase_client: Client = get_supabase_client()
-    documents_vector_store = CustomSupabaseVectorStore(  # Modified by @chloe Check
-        supabase_client, embeddings, table_name="vectors"
-    )
-    return documents_vector_store
+# def get_documents_vector_store(vector_service: VectorService) -> SupabaseVectorStore:
+#     embeddings = get_embedding_client()
+#     supabase_client: Client = get_supabase_client()
+#     documents_vector_store = CustomSupabaseVectorStore(  # Modified by @chloe Check
+#         supabase_client, embeddings, table_name="vectors", vector_service=vector_service
+#     )
+#     return documents_vector_store
 
 
 async def get_async_session() -> AsyncGenerator[AsyncSession, None]:
@@ -93,11 +95,14 @@ async def get_async_session() -> AsyncGenerator[AsyncSession, None]:
         yield session
 
 
-def get_repository(repository_model: Type[R]) -> Callable[..., R]:
+def get_repository(repository_model: Type[R], asynchronous = True) -> Callable[..., R]:
     def _get_repository(session: AsyncSession = Depends(get_async_session)) -> R:
         return repository_model(session)
-
-    return _get_repository
+    def _get_sync_repository(session: Session = Depends(get_sync_session)) -> R:
+        return repository_model(session)
+    if asynchronous:
+        return _get_repository
+    return _get_sync_repository
 
 
 def get_embedding_client() -> Embeddings:
@@ -155,10 +160,10 @@ def get_supabase_db() -> SupabaseDB:
     return _supabase_db
 
 
-def get_service(service: Type[S]) -> Callable[..., S]:
+def get_service(service: Type[S], asynchronous = True) -> Callable[..., S]:
     def _get_service(
         repository: BaseRepository = Depends(
-            get_repository(service.get_repository_cls())
+            get_repository(service.get_repository_cls(), asynchronous)
         ),
     ) -> S:
         return service(repository)

@@ -10,41 +10,37 @@ from quivr_api.celery_config import celery
 from quivr_api.logger import get_logger
 from quivr_api.middlewares.auth.auth_bearer import AuthBearer
 from quivr_api.models.settings import settings
-from quivr_api.modules.brain.integrations.Notion.Notion_connector import NotionConnector
+from quivr_api.modules.brain.integrations.Notion.Notion_connector import \
+    NotionConnector
 from quivr_api.modules.brain.service.brain_service import BrainService
-from quivr_api.modules.brain.service.brain_vector_service import BrainVectorService
-from quivr_api.modules.dependencies import (
-    get_documents_vector_store,
-    get_embedding_client,
-    get_supabase_client,
-)
+from quivr_api.modules.brain.service.brain_vector_service import \
+    BrainVectorService
+from quivr_api.modules.dependencies import get_supabase_client
 from quivr_api.modules.knowledge.repository.storage import Storage
-from quivr_api.modules.knowledge.service.knowledge_service import KnowledgeService
-from quivr_api.modules.notification.service.notification_service import (
-    NotificationService,
-)
+from quivr_api.modules.knowledge.service.knowledge_service import \
+    KnowledgeService
+from quivr_api.modules.notification.service.notification_service import \
+    NotificationService
 from quivr_api.modules.sync.repository.sync import NotionRepository
 from quivr_api.modules.sync.repository.sync_files import SyncFiles
-from quivr_api.modules.sync.service.sync_notion import (
-    SyncNotionService,
-    fetch_notion_pages,
-    store_notion_pages,
-)
-from quivr_api.modules.sync.service.sync_service import SyncService, SyncUserService
+from quivr_api.modules.sync.service.sync_notion import (SyncNotionService,
+                                                        fetch_notion_pages,
+                                                        store_notion_pages)
+from quivr_api.modules.sync.service.sync_service import (SyncService,
+                                                         SyncUserService)
 from quivr_api.utils.telemetry import maybe_send_telemetry
 from quivr_api.vector.repository.vectors_repository import VectorRepository
 from quivr_api.vector.service.vector_service import VectorService
-from sqlalchemy.ext.asyncio import AsyncEngine, create_async_engine
-from sqlmodel.ext.asyncio.session import AsyncSession
-
 from quivr_worker.check_premium import check_is_premium
 from quivr_worker.process.process_s3_file import process_uploaded_file
 from quivr_worker.process.process_url import process_url_func
-from quivr_worker.syncs.process_active_syncs import (
-    process_all_syncs,
-    process_notion_sync,
-)
+from quivr_worker.syncs.process_active_syncs import (process_all_syncs,
+                                                     process_notion_sync)
 from quivr_worker.utils import _patch_json
+from sqlalchemy import Engine, create_engine
+from sqlalchemy.ext.asyncio import AsyncEngine, create_async_engine
+from sqlmodel import Session
+from sqlmodel.ext.asyncio.session import AsyncSession
 
 load_dotenv()
 
@@ -53,7 +49,7 @@ logger = get_logger("celery_worker")
 # FIXME: load at init time
 # Services
 supabase_client = get_supabase_client()
-document_vector_store = get_documents_vector_store()
+#document_vector_store = get_documents_vector_store()
 notification_service = NotificationService()
 sync_active_service = SyncService()
 sync_user_service = SyncUserService()
@@ -64,6 +60,7 @@ auth_bearer = AuthBearer()
 notion_service: SyncNotionService | None = None
 knowledge_service: KnowledgeService | None = None
 async_engine: AsyncEngine | None = None
+engine: Engine | None = None
 
 _patch_json()
 
@@ -71,8 +68,20 @@ _patch_json()
 @worker_process_init.connect
 def init_worker(**kwargs):
     global async_engine
+    global engine
     if not async_engine:
         async_engine = create_async_engine(
+            settings.pg_database_async_url,
+            echo=True if os.getenv("ORM_DEBUG") else False,
+            future=True,
+            # NOTE: pessimistic bound on
+            pool_pre_ping=True,
+            pool_size=10,  # NOTE: no bouncer for now, if 6 process workers => 6
+            pool_recycle=1800,
+        )
+    
+    if not engine:
+        engine = create_engine(
             settings.pg_database_async_url,
             echo=True if os.getenv("ORM_DEBUG") else False,
             future=True,
@@ -131,14 +140,11 @@ async def aprocess_file_task(
     source_link: str | None = None,
     delete_file: bool = False,
 ):
-    global async_engine
-    assert async_engine
-    async with AsyncSession(
-        async_engine, expire_on_commit=False, autoflush=False
-    ) as session:
-        embeddings = get_embedding_client()
+    global engine
+    assert engine
+    with Session(engine, expire_on_commit=False, autoflush=False) as session:
         vector_repository = VectorRepository(session)
-        vector_service = VectorService(vector_repository, embeddings=embeddings)
+        vector_service = VectorService(vector_repository)
         brain_vector_service = BrainVectorService(brain_id)
 
         await process_uploaded_file(
@@ -171,8 +177,12 @@ async def process_crawl_task(
     logger.info(
         f"Task process_crawl_task started for url={crawl_website_url}, knowledge_id={knowledge_id}, brain_id={brain_id}, notification_id={notification_id}"
     )
-
-    brain_vector_service = BrainVectorService(brain_id)
+    global engine
+    assert engine
+    with Session(engine, expire_on_commit=False, autoflush=False) as session:
+        brain_vector_service = BrainVectorService(brain_id)
+        vector_repository = VectorRepository(session)
+        vector_service = VectorService(vector_repository)
     loop = asyncio.get_event_loop()
     loop.run_until_complete(
         process_url_func(
@@ -181,7 +191,7 @@ async def process_crawl_task(
             knowledge_id=knowledge_id,
             brain_service=brain_service,
             brain_vector_service=brain_vector_service,
-            document_vector_store=document_vector_store,
+            vector_service=vector_service,
         )
     )
 
