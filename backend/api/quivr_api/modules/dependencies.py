@@ -33,20 +33,27 @@ S = TypeVar("S", bound=BaseService)
 # TODO: env variable debug sql_alchemy
 async_engine = create_async_engine(
     settings.pg_database_async_url,
+    connect_args={"server_settings": {"application_name": "quivr-api-async"}},
     echo=True if os.getenv("ORM_DEBUG") else False,
     future=True,
     # NOTE: pessimistic bound on
     pool_pre_ping=True,
-    pool_size=10,  # NOTE: no bouncer for now, if 6 process workers => 6
+    pool_size=5,  # NOTE: no bouncer for now, if 6 process workers => 6
     pool_recycle=1800,
+    isolation_level="AUTOCOMMIT",
 )
 
 
 async def get_async_session() -> AsyncGenerator[AsyncSession, None]:
     async with AsyncSession(
-        async_engine, expire_on_commit=False, autoflush=False
+        async_engine,
     ) as session:
-        yield session
+        try:
+            yield session
+        except Exception:
+            await session.rollback()
+        finally:
+            await session.close()
 
 
 def get_repository(repository_model: Type[R]) -> Callable[..., R]:
