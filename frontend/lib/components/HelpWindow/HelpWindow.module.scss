@@ -8,20 +8,31 @@
   position: absolute;
   height: 100vh;
   right: 0;
-  width: 600px;
+  width: 0;
   z-index: ZIndexes.$modal + 1;
   box-shadow: BoxShadow.$medium;
   background-color: var(--background-0);
+  overflow: hidden;
+  transition: width 0.2s ease-in-out;
+
+  &.visible {
+    width: 600px;
+
+    .header {
+      display: block;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: Spacings.$spacing04;
+      border-bottom: 1px solid var(--border-1);
+
+      .title {
+        @include Typography.H2;
+      }
+    }
+  }
 
   .header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: Spacings.$spacing04;
-    border-bottom: 1px solid var(--border-1);
-
-    .title {
-      @include Typography.H2;
-    }
+    display: none;
   }
 }

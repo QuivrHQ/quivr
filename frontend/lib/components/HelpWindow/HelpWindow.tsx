@@ -27,12 +27,11 @@ export const HelpWindow = (): JSX.Element => {
     };
   }, [setIsVisible]);
 
-  if (!isVisible) {
-    return <></>;
-  }
-
   return (
-    <div className={styles.help_wrapper} ref={helpWindowRef}>
+    <div
+      className={`${styles.help_wrapper} ${isVisible ? styles.visible : ""}`}
+      ref={helpWindowRef}
+    >
       <div className={styles.header}>
         <span className={styles.title}>🧠 What is Quivr ?</span>
         <Icon
