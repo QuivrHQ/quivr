@@ -47,7 +47,6 @@ import { GoLightBulb } from "react-icons/go";
 import { HiBuildingOffice } from "react-icons/hi2";
 import {
   IoIosAdd,
-  IoIosHelpCircleOutline,
   IoIosRadio,
   IoMdClose,
   IoMdLogOut,
@@ -59,6 +58,7 @@ import {
   IoBookOutline,
   IoCloudDownloadOutline,
   IoFootsteps,
+  IoHelp,
   IoHomeOutline,
   IoShareSocial,
   IoWarningOutline,
@@ -146,7 +146,7 @@ export const iconList: { [name: string]: IconType } = {
   goal: LuGoal,
   graph: VscGraph,
   hashtag: RiHashtag,
-  help: IoIosHelpCircleOutline,
+  help: IoHelp,
   hide: LuArrowLeftFromLine,
   history: MdHistory,
   home: IoHomeOutline,

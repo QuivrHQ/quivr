@@ -20,26 +20,33 @@ export const PageHeader = ({
   const { isOpened } = useMenuContext();
 
   return (
-    <div className={styles.page_header_wrapper}>
-      <div className={`${styles.left} ${!isOpened ? styles.menu_closed : ""}`}>
-        <Icon name={iconName} size="large" color="primary" />
-        <span>{label}</span>
+    <>
+      <div className={styles.page_header_wrapper}>
+        <div
+          className={`${styles.left} ${!isOpened ? styles.menu_closed : ""}`}
+        >
+          <Icon name={iconName} size="large" color="primary" />
+          <span>{label}</span>
+        </div>
+        <div className={styles.buttons_wrapper}>
+          {buttons.map((button, index) => (
+            <QuivrButton
+              key={index}
+              label={button.label}
+              onClick={button.onClick}
+              color={button.color}
+              iconName={button.iconName}
+              hidden={button.hidden}
+              disabled={button.disabled}
+              tooltip={button.tooltip}
+            />
+          ))}
+        </div>
       </div>
-      <div className={styles.buttons_wrapper}>
-        {buttons.map((button, index) => (
-          <QuivrButton
-            key={index}
-            label={button.label}
-            onClick={button.onClick}
-            color={button.color}
-            iconName={button.iconName}
-            hidden={button.hidden}
-            disabled={button.disabled}
-            tooltip={button.tooltip}
-          />
-        ))}
+      <div className={styles.help_button}>
+        <Icon name="help" size="normal" color="black" />
       </div>
-    </div>
+    </>
   );
 };
 

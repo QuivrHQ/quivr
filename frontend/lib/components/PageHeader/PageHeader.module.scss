@@ -1,3 +1,4 @@
+@use "styles/Radius.module.scss";
 @use "styles/ScreenSizes.module.scss";
 @use "styles/Spacings.module.scss";
 @use "styles/Typography.module.scss";
@@ -38,5 +39,20 @@
     .left {
       display: none;
     }
+  }
+}
+
+.help_button {
+  display: flex;
+  padding: Spacings.$spacing02;
+  position: absolute;
+  top: Spacings.$spacing04;
+  right: Spacings.$spacing03;
+  border-radius: Radius.$circle;
+  cursor: pointer;
+  background-color: var(--background-2);
+
+  &:hover {
+    background-color: var(--background-3);
   }
 }
