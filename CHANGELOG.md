@@ -1,5 +1,20 @@
 # Changelog
 
+## 0.0.295 (2024-08-12)
+
+## What's Changed
+* chore: Update frontend README.md with yarn dev command (#2931) by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2958
+* feat: Add brain_id and brain_name to ChatLLMMetadata model by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2968
+* feat(frontend): talk with models and handle code markdown by @Zewed in https://github.com/QuivrHQ/quivr/pull/2980
+* fix(frontend): talk with models by @Zewed in https://github.com/QuivrHQ/quivr/pull/2981
+* feat(models): all models by default by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2983
+* chore(env): add deactivate stripe env variable by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2986
+* fix(frontend): handling unimported languages in Prism js by @Zewed in https://github.com/QuivrHQ/quivr/pull/2990
+* fix(frontend): logo design of models by @Zewed in https://github.com/QuivrHQ/quivr/pull/2992
+
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.294...v0.0.295
+
 ## 0.0.294 (2024-08-07)
 
 ## What's Changed
