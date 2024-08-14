@@ -1,13 +1,13 @@
 from typing import List
 from uuid import UUID
 
+from quivr_core.models import KnowledgeStatus
 from quivr_core.models import QuivrKnowledge as Knowledge
 
 from quivr_api.logger import get_logger
 from quivr_api.modules.dependencies import BaseService
 from quivr_api.modules.knowledge.dto.inputs import (
     CreateKnowledgeProperties,
-    KnowledgeStatus,
 )
 from quivr_api.modules.knowledge.dto.outputs import DeleteKnowledgeResponse
 from quivr_api.modules.knowledge.entity.knowledge import KnowledgeDB
@@ -47,7 +47,7 @@ class KnowledgeService(BaseService[KnowledgeRepository]):
             file_name=inserted_knowledge_db_instance.file_name,
             url=inserted_knowledge_db_instance.url,
             mime_type=inserted_knowledge_db_instance.mime_type,
-            status=inserted_knowledge_db_instance.status,
+            status=KnowledgeStatus(inserted_knowledge_db_instance.status),
             source=inserted_knowledge_db_instance.source,
             source_link=inserted_knowledge_db_instance.source_link,
             file_size=inserted_knowledge_db_instance.file_size,
@@ -68,7 +68,7 @@ class KnowledgeService(BaseService[KnowledgeRepository]):
                 file_name=knowledge.file_name,
                 url=knowledge.url,
                 mime_type=knowledge.mime_type,
-                status=knowledge.status,
+                status=KnowledgeStatus(knowledge.status),
                 source=knowledge.source,
                 source_link=knowledge.source_link,
                 file_size=knowledge.file_size
@@ -106,7 +106,7 @@ class KnowledgeService(BaseService[KnowledgeRepository]):
             file_name=inserted_knowledge_db_instance.file_name,
             url=inserted_knowledge_db_instance.url,
             mime_type=inserted_knowledge_db_instance.mime_type,
-            status=inserted_knowledge_db_instance.status,
+            status=KnowledgeStatus(inserted_knowledge_db_instance.status),
             source=inserted_knowledge_db_instance.source,
             source_link=inserted_knowledge_db_instance.source_link,
             file_size=inserted_knowledge_db_instance.file_size,

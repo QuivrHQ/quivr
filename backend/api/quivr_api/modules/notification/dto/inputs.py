@@ -1,8 +1,8 @@
 from typing import Optional
 from uuid import UUID
-from venv import logger
 
 from pydantic import BaseModel
+
 from quivr_api.logger import get_logger
 from quivr_api.modules.notification.entity.notification import NotificationsStatusEnum
 

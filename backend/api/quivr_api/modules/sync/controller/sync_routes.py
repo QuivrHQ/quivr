@@ -2,8 +2,9 @@ import os
 import uuid
 from typing import Annotated, List
 
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, Depends, HTTPException, status
 
+from quivr_api.celery_config import celery
 from quivr_api.logger import get_logger
 from quivr_api.middlewares.auth import AuthBearer, get_current_user
 from quivr_api.modules.dependencies import get_service
@@ -20,7 +21,7 @@ from quivr_api.modules.sync.controller.notion_sync_routes import notion_sync_rou
 from quivr_api.modules.sync.dto import SyncsDescription
 from quivr_api.modules.sync.dto.inputs import SyncsActiveInput, SyncsActiveUpdateInput
 from quivr_api.modules.sync.dto.outputs import AuthMethodEnum
-from quivr_api.modules.sync.entity.sync import SyncsActive
+from quivr_api.modules.sync.entity.sync_models import SyncsActive
 from quivr_api.modules.sync.service.sync_notion import SyncNotionService
 from quivr_api.modules.sync.service.sync_service import SyncService, SyncUserService
 from quivr_api.modules.user.entity.user_identity import UserIdentity
@@ -183,7 +184,26 @@ async def create_sync_active(
         )
     )
     sync_active_input.notification_id = str(notification.id)
-    return sync_service.create_sync_active(sync_active_input, str(current_user.id))
+
+    sync_active = sync_service.create_sync_active(
+        sync_active_input, str(current_user.id)
+    )
+    if not sync_active:
+        raise HTTPException(
+            status_code=500, detail=f"Error creating sync active for {current_user}"
+        )
+
+    celery.send_task(
+        "process_sync_task",
+        kwargs={
+            "sync_id": sync_active.id,
+            "user_id": sync_active.user_id,
+            "files_ids": sync_active_input.settings.files,
+            "folder_ids": sync_active_input.settings.folders,
+        },
+    )
+
+    return sync_active
 
 
 @sync_router.put(
@@ -208,34 +228,78 @@ async def update_sync_active(
     Returns:
         SyncsActive: The updated sync active data.
     """
-    logger.debug(
+    logger.info(
         f"Updating active sync for user: {current_user.id} with data: {sync_active_input}"
     )
 
     details_sync_active = sync_service.get_details_sync_active(sync_id)
-    if (details_sync_active and sync_active_input.settings) and (
-        (details_sync_active["settings"]["files"] != sync_active_input.settings.files)
-        or (
-            details_sync_active["settings"]["folders"]
-            != sync_active_input.settings.folders
+
+    if details_sync_active is None:
+        raise HTTPException(
+            status_code=500,
+            detail="Error updating sync",
         )
+
+    if sync_active_input.settings is None:
+        return {"message": "No modification to sync active"}
+
+    input_file_ids = (
+        sync_active_input.settings.files if sync_active_input.settings.files else []
+    )
+    input_folder_ids = (
+        sync_active_input.settings.files if sync_active_input.settings.files else []
+    )
+
+    if (input_file_ids == details_sync_active["settings"]["files"]) and (
+        input_folder_ids == details_sync_active["settings"]["folders"]
     ):
-        sync_active_input.force_sync = True
-        bulk_id = uuid.uuid4()
-        notification = notification_service.add_notification(
-            CreateNotification(
-                user_id=current_user.id,
-                status=NotificationsStatusEnum.INFO,
-                title="Sync updated! Synchronization takes a few minutes to complete",
-                description="Your brain is syncing files. This may take a few minutes before proceeding.",
-                category="generic",
-                bulk_id=bulk_id,
-                brain_id=details_sync_active["brain_id"],  # type: ignore
-            )
+        return {"message": "No modification to sync active"}
+
+    logger.debug(
+        f"Updating sync_id {details_sync_active['id']}. Sync prev_settings={details_sync_active['settings'] }, Sync active input={sync_active_input.settings}"
+    )
+
+    bulk_id = uuid.uuid4()
+    sync_active_input.force_sync = True
+    notification = notification_service.add_notification(
+        CreateNotification(
+            user_id=current_user.id,
+            status=NotificationsStatusEnum.INFO,
+            title="Sync updated! Synchronization takes a few minutes to complete",
+            description="Your brain is syncing files. This may take a few minutes before proceeding.",
+            category="generic",
+            bulk_id=bulk_id,
+            brain_id=details_sync_active["brain_id"],  # type: ignore
         )
-        sync_active_input.force_sync = True
-        sync_active_input.notification_id = str(notification.id)
-        return sync_service.update_sync_active(sync_id, sync_active_input)
+    )
+    sync_active_input.notification_id = str(notification.id)
+    sync_active = sync_service.update_sync_active(sync_id, sync_active_input)
+    if not sync_active:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Error updating sync active for {current_user.id}",
+        )
+    logger.debug(
+        f"Sending task process_sync_task for sync_id={sync_id}, user_id={current_user.id}"
+    )
+
+    added_files_ids = set(input_file_ids).difference(
+        set(details_sync_active["settings"]["files"])
+    )
+    added_folder_ids = set(input_folder_ids).difference(
+        set(details_sync_active["settings"]["folders"])
+    )
+    if len(added_files_ids) + len(added_folder_ids) > 0:
+        celery.send_task(
+            "process_sync_task",
+            kwargs={
+                "sync_id": sync_active.id,
+                "user_id": sync_active.user_id,
+                "files_ids": list(added_files_ids),
+                "folder_ids": list(added_folder_ids),
+            },
+        )
+
     else:
         return None
 

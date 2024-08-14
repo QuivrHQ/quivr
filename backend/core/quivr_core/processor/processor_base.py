@@ -1,3 +1,4 @@
+import logging
 from abc import ABC, abstractmethod
 from importlib.metadata import PackageNotFoundError, version
 from typing import Any
@@ -6,6 +7,8 @@ from uuid import uuid4
 from langchain_core.documents import Document
 
 from quivr_core.files.file import FileExtension, QuivrFile
+
+logger = logging.getLogger("quivr_core")
 
 
 # TODO: processors should be cached somewhere ?
@@ -24,6 +27,7 @@ class ProcessorBase(ABC):
         raise NotImplementedError
 
     async def process_file(self, file: QuivrFile) -> list[Document]:
+        logger.debug(f"Processing file {file}")
         self.check_supported(file)
         docs = await self.process_file_inner(file)
         try:

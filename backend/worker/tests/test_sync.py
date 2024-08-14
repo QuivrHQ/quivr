@@ -7,7 +7,7 @@ import pytest_asyncio
 import sqlalchemy
 from quivr_api.modules.brain.entity.brain_entity import Brain
 from quivr_api.modules.chat.entity.chat import Chat, ChatHistory
-from quivr_api.modules.sync.repository.sync import NotionRepository
+from quivr_api.modules.sync.repository.sync_repository import NotionRepository
 from quivr_api.modules.sync.service.sync_notion import (
     SyncNotionService,
     store_notion_pages,

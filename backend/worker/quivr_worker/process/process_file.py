@@ -71,7 +71,7 @@ def store_chunks(
         result = brain_vector_service.create_brain_vector(
             created_vector_id, file.file_sha1
         )
-        logger.debug(f"Inserted : {len(result)} in brain_vectors for {file}")
+        logger.debug(f"Inserted : {len(result)} in brain_vectors for {file.file_name}")
     brain_service.update_brain_last_update_time(brain_id)
 
 
@@ -97,10 +97,9 @@ async def parse_file(
                 },
             )
             processor_cls = get_processor_class(file.file_extension)
-            logger.debug(f"processing {file} using class {processor_cls.__name__}")
             processor = processor_cls(**processor_kwargs)
             docs = await processor.process_file(qfile)
-            logger.debug(f"parsed {file} to : {docs}")
+            logger.debug(f"Parsed {qfile} to : {docs}")
             return docs
     except KeyError as e:
         raise ValueError(f"Can't parse {file}. No available processor") from e

@@ -20,7 +20,7 @@ from notion_client import Client
 from requests import HTTPError
 
 from quivr_api.logger import get_logger
-from quivr_api.modules.sync.entity.sync import SyncFile
+from quivr_api.modules.sync.entity.sync_models import SyncFile
 from quivr_api.modules.sync.service.sync_notion import SyncNotionService
 from quivr_api.modules.sync.utils.normalize import remove_special_characters
 

@@ -1,3 +1,4 @@
+import hashlib
 import io
 import os
 from typing import Annotated, Optional
@@ -32,7 +33,6 @@ from quivr_api.modules.notification.entity.notification import NotificationsStat
 from quivr_api.modules.notification.service.notification_service import (
     NotificationService,
 )
-from quivr_api.modules.sync.utils.upload import compute_sha1
 from quivr_api.modules.upload.service.upload_file import upload_file_storage
 from quivr_api.modules.user.entity.user_identity import UserIdentity
 from quivr_api.modules.user.service.user_usage import UserUsage
@@ -98,7 +98,7 @@ async def upload_file(
         # It specifically checks for BufferedReader | bytes before sending
         # TODO: We bypass this to write to S3 Storage directly
         buff_reader = io.BufferedReader(uploadFile.file)  # type: ignore
-        await upload_file_storage(client, buff_reader, filename_with_brain_id)
+        await upload_file_storage(buff_reader, filename_with_brain_id)
     except FileExistsError:
         notification_service.update_notification_by_id(
             upload_notification.id if upload_notification else None,
@@ -134,9 +134,9 @@ async def upload_file(
         source=integration if integration else "local",
         source_link=integration_link,  # FIXME: Should return the s3 link @chloedia
         file_size=uploadFile.size,
-        file_sha1=compute_sha1(file_content),
+        file_sha1=hashlib.sha1(file_content).hexdigest(),
     )
-    knowledge = await knowledge_service.add_knowledge(knowledge_to_add)
+    knowledge = await knowledge_service.add_knowledge(knowledge_to_add)  # type: ignore
 
     celery.send_task(
         "process_file_task",
