@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.0.297 (2024-08-14)
+
+## What's Changed
+* fix(frontend): remove onboarding modal by @Zewed in https://github.com/QuivrHQ/quivr/pull/3001
+* fix(frontend): max height for user message by @Zewed in https://github.com/QuivrHQ/quivr/pull/3000
+* fix: commit on try sqlalchemy by @AmineDiro in https://github.com/QuivrHQ/quivr/pull/3004
+
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.296...v0.0.297
+
 ## 0.0.296 (2024-08-13)
 
 ## What's Changed
