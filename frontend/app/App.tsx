@@ -64,10 +64,6 @@ const App = ({ children }: PropsWithChildren): JSX.Element => {
     }
   }, [session]);
 
-  useEffect(() => {
-    console.info(isVisible);
-  }, [isVisible]);
-
   return (
     <>
       <PostHogProvider client={posthog}>
