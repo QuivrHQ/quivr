@@ -35,4 +35,10 @@
   .header {
     display: none;
   }
+
+  @media screen and (max-width: ScreenSizes.$small) {
+    &.visible {
+      width: 100%;
+    }
+  }
 }
