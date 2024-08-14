@@ -209,8 +209,8 @@ class SyncUtils:
                 "knowledge_id": added_knowledge.id,
                 "file_name": storage_path,
                 "file_original_name": file.name,
-                "integration": integration,
-                "integration_link": integration_link,
+                "source": integration,
+                "source_link": integration_link,
                 "notification_id": file.notification_id,
             },
         )

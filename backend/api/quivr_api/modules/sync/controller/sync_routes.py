@@ -247,13 +247,14 @@ async def update_sync_active(
         sync_active_input.settings.files if sync_active_input.settings.files else []
     )
     input_folder_ids = (
-        sync_active_input.settings.files if sync_active_input.settings.files else []
+        sync_active_input.settings.folders if sync_active_input.settings.folders else []
     )
 
     if (input_file_ids == details_sync_active["settings"]["files"]) and (
         input_folder_ids == details_sync_active["settings"]["folders"]
     ):
-        return {"message": "No modification to sync active"}
+        logger.info({"message": "No modification to sync active"})
+        return None
 
     logger.debug(
         f"Updating sync_id {details_sync_active['id']}. Sync prev_settings={details_sync_active['settings'] }, Sync active input={sync_active_input.settings}"
