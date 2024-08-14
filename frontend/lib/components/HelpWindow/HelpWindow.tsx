@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { useUserApi } from "@/lib/api/user/useUserApi";
 import { useHelpContext } from "@/lib/context/HelpProvider/hooks/useHelpContext";
@@ -11,6 +11,7 @@ import { Icon } from "../ui/Icon/Icon";
 
 export const HelpWindow = (): JSX.Element => {
   const { isVisible, setIsVisible } = useHelpContext();
+  const [loadingOnboarded, setLoadingOnboarded] = useState(false);
   const helpWindowRef = useRef<HTMLDivElement>(null);
   const { userIdentityData } = useUserData();
   const { updateUserIdentity } = useUserApi();
@@ -18,6 +19,7 @@ export const HelpWindow = (): JSX.Element => {
   const closeHelpWindow = async () => {
     setIsVisible(false);
     if (!userIdentityData?.onboarded) {
+      setLoadingOnboarded(true);
       await updateUserIdentity({
         ...userIdentityData,
         username: userIdentityData?.username ?? "",
@@ -25,6 +27,16 @@ export const HelpWindow = (): JSX.Element => {
       });
     }
   };
+
+  useEffect(() => {
+    if (
+      userIdentityData?.username &&
+      !userIdentityData.onboarded &&
+      !loadingOnboarded
+    ) {
+      setIsVisible(true);
+    }
+  });
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
