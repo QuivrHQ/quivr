@@ -14,6 +14,7 @@
   background-color: var(--background-0);
   overflow: hidden;
   transition: width 0.2s ease-in-out;
+  overflow-y: auto;
 
   &.visible {
     width: 600px;
@@ -23,16 +24,65 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: Spacings.$spacing04;
+      padding: Spacings.$spacing05;
       border-bottom: 1px solid var(--border-1);
 
       .title {
-        @include Typography.H2;
+        @include Typography.H1;
+      }
+    }
+
+    .content {
+      padding: Spacings.$spacing05;
+      display: block;
+
+      .section {
+        display: flex;
+        flex-direction: column;
+
+        .title {
+          @include Typography.H2;
+        }
+
+        .section_content {
+          padding: Spacings.$spacing05;
+          padding-inline: Spacings.$spacing06;
+          font-size: Typography.$small;
+
+          ul {
+            padding: Spacings.$spacing05;
+            li {
+              padding-block: Spacings.$spacing03;
+
+              .connection {
+                display: inline-flex;
+                align-items: center;
+                gap: Spacings.$spacing02;
+                padding-right: Spacings.$spacing02;
+
+                .pre {
+                  white-space: pre;
+                }
+              }
+            }
+          }
+        }
+
+        .image {
+          display: flex;
+          justify-content: center;
+          width: 100%;
+          padding-top: Spacings.$spacing05;
+        }
       }
     }
   }
 
   .header {
+    display: none;
+  }
+
+  .content {
     display: none;
   }
 
