@@ -65,9 +65,16 @@ export const getBrains = async (
       return -1;
     } else if (a.brain_type !== "model" && b.brain_type === "model") {
       return 1;
+    } else if (
+      a.brain_type === "model" &&
+      b.brain_type === "model" &&
+      a.display_name &&
+      b.display_name
+    ) {
+      return a.display_name.localeCompare(b.display_name);
+    } else {
+      return a.name.localeCompare(b.name);
     }
-
-    return 0;
   });
 
   return sortedBrains.map(mapBackendMinimalBrainToMinimalBrain);
