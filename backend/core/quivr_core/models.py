@@ -1,5 +1,4 @@
 from datetime import datetime
-from enum import Enum
 from typing import Any, Dict, Optional
 from uuid import UUID
 
@@ -8,6 +7,7 @@ from langchain_core.messages import AIMessage, HumanMessage
 from langchain_core.pydantic_v1 import BaseModel as BaseModelV1
 from langchain_core.pydantic_v1 import Field as FieldV1
 from pydantic import BaseModel
+from quivr_api.modules.knowledge.dto.inputs import KnowledgeStatus
 from typing_extensions import TypedDict
 
 
@@ -81,12 +81,6 @@ class ParsedRAGChunkResponse(BaseModel):
     answer: str
     metadata: RAGResponseMetadata
     last_chunk: bool = False
-
-
-class KnowledgeStatus(str, Enum):
-    PROCESSING = "PROCESSING"
-    UPLOADED = "UPLOADED"
-    ERROR = "ERROR"
 
 
 class QuivrKnowledge(BaseModel):

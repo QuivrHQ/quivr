@@ -1,11 +1,13 @@
 import mimetypes
-import os
 from io import BufferedReader, FileIO
 
-from supabase.client import AsyncClient, Client
+from supabase.client import Client
 
 from quivr_api.logger import get_logger
-from quivr_api.modules.dependencies import get_supabase_client
+from quivr_api.modules.dependencies import (
+    get_supabase_async_client,
+    get_supabase_client,
+)
 
 logger = get_logger(__name__)
 
@@ -23,13 +25,10 @@ def check_file_exists(brain_id: str, file_identifier: str) -> bool:
             file["name"].split(".")[0] == file_identifier.split(".")[0]
             for file in response
         )
-        logger.info(f"File identifier: {file_identifier}")
-        logger.info(f"File exists: {file_exists}")
+        logger.debug(f"File identifier: {file_identifier} exists: {file_exists}")
         if file_exists:
-            logger.info(f"File {file_identifier} exists.")
             return True
         else:
-            logger.info(f"File {file_identifier} does not exist.")
             return False
     except Exception as e:
         logger.error(f"An error occurred while checking the file: {e}")
@@ -37,32 +36,34 @@ def check_file_exists(brain_id: str, file_identifier: str) -> bool:
 
 
 async def upload_file_storage(
-    supabase_client: AsyncClient,
     file: FileIO | BufferedReader | bytes,
-    file_name: str,
+    storage_path: str,
     upsert: bool = False,
 ):
-    _, file_extension = os.path.splitext(file_name)
-    mime_type, _ = mimetypes.guess_type(file_name)
-    logger.debug(f"Uploading {file_name} to supabase storage.")
+    supabase_client = await get_supabase_async_client()
+    mime_type, _ = mimetypes.guess_type(storage_path)
+    logger.debug(
+        f"Uploading file to {storage_path} using supabase. upsert={upsert}, mimetype={mime_type}"
+    )
 
     if upsert:
-        response = supabase_client.storage.from_("quivr").update(
-            file_name,
+        response = await supabase_client.storage.from_("quivr").update(
+            storage_path,
             file,  # type: ignore
             file_options={
-                "content-type": mime_type or "txt/html",
+                "content-type": mime_type or "application/html",
                 "upsert": "true",
                 "cache-control": "3600",
             },
         )
+        return response
     else:
         try:
             response = await supabase_client.storage.from_("quivr").upload(
-                file_name,
+                storage_path,
                 file,  # type: ignore
                 file_options={
-                    "content-type": mime_type or "text/html",
+                    "content-type": mime_type or "application/html",
                     "upsert": "false",
                     "cache-control": "3600",
                 },
@@ -71,5 +72,5 @@ async def upload_file_storage(
         except Exception as e:
             # FIXME: Supabase client to return the correct error
             if "The resource already exists" in str(e) and not upsert:
-                raise FileExistsError("The resource already exists")
+                raise FileExistsError(f"File {storage_path} already exists")
             raise e

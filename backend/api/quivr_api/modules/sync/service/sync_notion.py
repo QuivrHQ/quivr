@@ -6,8 +6,8 @@ from notion_client import Client
 
 from quivr_api.logger import get_logger
 from quivr_api.modules.dependencies import BaseService
-from quivr_api.modules.sync.entity.sync import NotionSyncFile
-from quivr_api.modules.sync.repository.sync import NotionRepository
+from quivr_api.modules.sync.entity.sync_models import NotionSyncFile
+from quivr_api.modules.sync.repository.sync_repository import NotionRepository
 
 logger = get_logger(__name__)
 

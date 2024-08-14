@@ -1,3 +1,5 @@
+import io
+from dataclasses import dataclass
 from datetime import datetime
 from typing import Optional
 from uuid import UUID
@@ -7,6 +9,35 @@ from sqlmodel import TIMESTAMP, Column, Field, Relationship, SQLModel, text
 from sqlmodel import UUID as PGUUID
 
 from quivr_api.modules.user.entity.user_identity import User
+
+
+@dataclass
+class DownloadedSyncFile:
+    file_name: str
+    extension: str
+    file_data: io.BufferedReader
+
+
+class DBSyncFile(BaseModel):
+    id: int
+    path: str
+    syncs_active_id: int
+    last_modified: str
+    brain_id: str
+    supported: bool
+
+
+class SyncFile(BaseModel):
+    id: str
+    name: str
+    is_folder: bool
+    last_modified: str
+    mime_type: str
+    web_view_link: str
+    notification_id: UUID | None = None
+    icon: Optional[str] = None
+    parent_id: Optional[str] = None
+    type: Optional[str] = None
 
 
 class SyncsUser(BaseModel):
@@ -19,17 +50,22 @@ class SyncsUser(BaseModel):
     additional_data: dict
 
 
-class SyncFile(BaseModel):
-    id: str
+class SyncsActive(BaseModel):
+    id: int
     name: str
-    is_folder: bool
-    last_modified: str
-    mime_type: str
-    web_view_link: str
+    syncs_user_id: int
+    user_id: UUID
+    settings: dict
+    last_synced: str
+    sync_interval_minutes: int
+    brain_id: UUID
+    syncs_user: Optional[SyncsUser] = None
     notification_id: Optional[str] = None
-    icon: Optional[str] = None
-    parent_id: Optional[str] = None
-    type: Optional[str] = None
+
+
+# TODO: all of this should be rewritten
+class SyncsActiveDetails(BaseModel):
+    pass
 
 
 class NotionSyncFile(SQLModel, table=True):
@@ -68,25 +104,3 @@ class NotionSyncFile(SQLModel, table=True):
         description="The ID of the user who owns the file",
     )
     user: User = Relationship(back_populates="notion_syncs")
-
-
-class SyncsActive(BaseModel):
-    id: int
-    name: str
-    syncs_user_id: int
-    user_id: UUID
-    settings: dict
-    last_synced: datetime
-    sync_interval_minutes: int
-    brain_id: str
-    syncs_user: Optional[SyncsUser] = None
-    notification_id: Optional[str] = None
-
-
-class DBSyncFile(BaseModel):
-    id: int
-    path: str
-    syncs_active_id: int
-    last_modified: str
-    brain_id: str
-    supported: bool

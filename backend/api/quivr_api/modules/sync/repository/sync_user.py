@@ -9,7 +9,7 @@ from quivr_api.modules.notification.service.notification_service import (
     NotificationService,
 )
 from quivr_api.modules.sync.dto.inputs import SyncsUserInput, SyncUserUpdateInput
-from quivr_api.modules.sync.entity.sync import SyncFile, SyncsUser
+from quivr_api.modules.sync.entity.sync_models import SyncFile, SyncsUser
 from quivr_api.modules.sync.service.sync_notion import SyncNotionService
 from quivr_api.modules.sync.utils.sync import (
     AzureDriveSync,
@@ -27,7 +27,7 @@ knowledge_service = get_service(KnowledgeService)()
 logger = get_logger(__name__)
 
 
-class SyncUser:
+class SyncUserRepository:
     def __init__(self):
         """
         Initialize the Sync class with a Supabase client.
@@ -61,16 +61,15 @@ class SyncUser:
         logger.warning("Failed to create sync user")
         return None
 
-    def get_sync_user_by_id(self, sync_id: int):
+    def get_sync_user_by_id(self, sync_id: int) -> SyncsUser | None:
         """
         Retrieve sync users from the database.
         """
         response = self.db.from_("syncs_user").select("*").eq("id", sync_id).execute()
         if response.data:
             logger.info("Sync user found: %s", response.data[0])
-            return response.data[0]
-        logger.warning("No sync user found for sync_id: %s", sync_id)
-        return None
+            return SyncsUser.model_validate(response.data[0])
+        logger.error("No sync user found for sync_id: %s", sync_id)
 
     def get_syncs_user(self, user_id: UUID, sync_user_id: int | None = None):
         """

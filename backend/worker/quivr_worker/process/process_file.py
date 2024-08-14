@@ -67,17 +67,6 @@ async def store_chunks(
     if vector_ids is None or len(vector_ids) == 0:
         raise Exception(f"Error inserting chunks for file {file.file_name}")
 
-    # TODO(@chloedia) : Brains should be associated with knowledge NOT vectors...
-    # for created_vector_id in vector_ids:
-    #     result = brain_vector_service.create_brain_vector(
-    #         created_vector_id, file.file_sha1
-    #     )
-    #     logger.debug(f"Inserted : {len(result)} in brain_vectors for {file}")
-
-    # assert isinstance(document_vector_store, CustomSupabaseVectorStore), f'Expected document_vector_store to be a CustomSupabaseVectorStore, got {document_vector_store}'
-    # for created_vector_id in vector_ids:
-    #     logger.debug(f"Adding knowledge_id {file.id} to vector_id {created_vector_id}")
-    #     document_vector_store.add_knowledge_id_to_vector(vector_id = UUID(created_vector_id), knowledge_id = file.id)
     brain_service.update_brain_last_update_time(brain_id)
 
 
@@ -103,10 +92,9 @@ async def parse_file(
                 },
             )
             processor_cls = get_processor_class(file.file_extension)
-            logger.debug(f"processing {file} using class {processor_cls.__name__}")
             processor = processor_cls(**processor_kwargs)
             docs = await processor.process_file(qfile)
-            logger.debug(f"parsed {file} to : {docs}")
+            logger.debug(f"Parsed {qfile} to : {docs}")
             return docs
     except KeyError as e:
         raise ValueError(f"Can't parse {file}. No available processor") from e

@@ -5,12 +5,11 @@ from uuid import UUID
 from celery.schedules import crontab
 from celery.signals import worker_process_init
 from dotenv import load_dotenv
-from notion_client import Client
 from quivr_api.celery_config import celery
 from quivr_api.logger import get_logger
-from quivr_api.middlewares.auth.auth_bearer import AuthBearer
 from quivr_api.models.settings import settings
 from quivr_api.modules.brain.integrations.Notion.Notion_connector import NotionConnector
+from quivr_api.modules.brain.repository.brains_vectors import BrainsVectors
 from quivr_api.modules.brain.service.brain_service import BrainService
 from quivr_api.modules.brain.service.brain_vector_service import BrainVectorService
 from quivr_api.modules.dependencies import get_supabase_client
@@ -19,13 +18,8 @@ from quivr_api.modules.knowledge.service.knowledge_service import KnowledgeServi
 from quivr_api.modules.notification.service.notification_service import (
     NotificationService,
 )
-from quivr_api.modules.sync.repository.sync import NotionRepository
-from quivr_api.modules.sync.repository.sync_files import SyncFiles
-from quivr_api.modules.sync.service.sync_notion import (
-    SyncNotionService,
-    fetch_notion_pages,
-    store_notion_pages,
-)
+from quivr_api.modules.sync.repository.sync_files import SyncFilesRepository
+from quivr_api.modules.sync.service.sync_notion import SyncNotionService
 from quivr_api.modules.sync.service.sync_service import SyncService, SyncUserService
 from quivr_api.utils.telemetry import maybe_send_telemetry
 from quivr_api.vector.repository.vectors_repository import VectorRepository
@@ -33,20 +27,25 @@ from quivr_api.vector.service.vector_service import VectorService
 from sqlalchemy import Engine, create_engine
 from sqlalchemy.ext.asyncio import AsyncEngine, create_async_engine
 from sqlmodel import Session
-from sqlmodel.ext.asyncio.session import AsyncSession
 
 from quivr_worker.check_premium import check_is_premium
 from quivr_worker.process.process_s3_file import process_uploaded_file
 from quivr_worker.process.process_url import process_url_func
 from quivr_worker.syncs.process_active_syncs import (
-    process_all_syncs,
+    SyncServices,
+    process_all_active_syncs,
     process_notion_sync,
+    process_sync,
 )
+from quivr_worker.syncs.store_notion import fetch_and_store_notion_files_async
 from quivr_worker.utils import _patch_json
 
 load_dotenv()
 
+get_logger("quivr_core")
 logger = get_logger("celery_worker")
+_patch_json()
+
 
 # FIXME: load at init time
 # Services
@@ -55,16 +54,14 @@ supabase_client = get_supabase_client()
 notification_service = NotificationService()
 sync_active_service = SyncService()
 sync_user_service = SyncUserService()
-sync_files_repo_service = SyncFiles()
-storage = Storage()
+sync_files_repo_service = SyncFilesRepository()
 brain_service = BrainService()
-auth_bearer = AuthBearer()
+brain_vectors = BrainsVectors()
+storage = Storage()
 notion_service: SyncNotionService | None = None
 knowledge_service: KnowledgeService | None = None
 async_engine: AsyncEngine | None = None
 engine: Engine | None = None
-
-_patch_json()
 
 
 @worker_process_init.connect
@@ -221,18 +218,50 @@ def check_is_premium_task():
     check_is_premium(supabase_client)
 
 
+@celery.task(name="process_sync_task")
+def process_sync_task(
+    sync_id: int, user_id: str, files_ids: list[str], folder_ids: list[str]
+):
+    global async_engine
+    assert async_engine
+    sync = next(
+        filter(lambda s: s.id == sync_id, sync_active_service.get_syncs_active(user_id))
+    )
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(
+        process_sync(
+            sync=sync,
+            files_ids=files_ids,
+            folder_ids=folder_ids,
+            services=SyncServices(
+                async_engine=async_engine,
+                sync_active_service=sync_active_service,
+                sync_user_service=sync_user_service,
+                sync_files_repo_service=sync_files_repo_service,
+                storage=storage,
+                brain_vectors=brain_vectors,
+                notification_service=notification_service,
+            ),
+        )
+    )
+
+
 @celery.task(name="process_active_syncs_task")
 def process_active_syncs_task():
     global async_engine
     assert async_engine
     loop = asyncio.get_event_loop()
     loop.run_until_complete(
-        process_all_syncs(
-            async_engine,
-            sync_active_service,
-            sync_user_service,
-            sync_files_repo_service,
-            storage,
+        process_all_active_syncs(
+            SyncServices(
+                async_engine=async_engine,
+                sync_active_service=sync_active_service,
+                sync_user_service=sync_user_service,
+                sync_files_repo_service=sync_files_repo_service,
+                storage=storage,
+                brain_vectors=brain_vectors,
+                notification_service=notification_service,
+            ),
         )
     )
 
@@ -249,26 +278,12 @@ def process_notion_sync_task():
 def fetch_and_store_notion_files_task(access_token: str, user_id: UUID):
     if async_engine is None:
         init_worker()
+    assert async_engine
     logger.debug("Fetching and storing Notion files")
     loop = asyncio.get_event_loop()
-    loop.run_until_complete(fetch_and_store_notion_files_async(access_token, user_id))
-
-
-async def fetch_and_store_notion_files_async(access_token: str, user_id: UUID):
-    global async_engine
-    assert async_engine
-    async with AsyncSession(
-        async_engine, expire_on_commit=False, autoflush=False
-    ) as session:
-        notion_repository = NotionRepository(session)
-        notion_service = SyncNotionService(notion_repository)
-        notion_client = Client(auth=access_token)
-        all_search_result = fetch_notion_pages(notion_client)
-        pages = await store_notion_pages(all_search_result, notion_service, user_id)
-        if pages:
-            logger.info(f"stored {len(pages)} from notion for {user_id}")
-        else:
-            logger.warn("No notion page fetched")
+    loop.run_until_complete(
+        fetch_and_store_notion_files_async(async_engine, access_token, user_id)
+    )
 
 
 celery.conf.beat_schedule = {
@@ -276,16 +291,16 @@ celery.conf.beat_schedule = {
         "task": f"{__name__}.ping_telemetry",
         "schedule": crontab(minute="*/30", hour="*"),
     },
-    "process_active_syncs_task": {
+    "process_active_syncs": {
         "task": "process_active_syncs_task",
         "schedule": crontab(minute="*/1", hour="*"),
     },
-    # "process_premium_users": {
-    #     "task": "check_is_premium_task",
-    #     "schedule": crontab(minute="*/1", hour="*"),
-    # },
+    "process_premium_users": {
+        "task": "check_is_premium_task",
+        "schedule": crontab(minute="*/1", hour="*"),
+    },
     "process_notion_sync": {
-        "task": "process_notion_sync",
+        "task": "process_notion_sync_task",
         "schedule": crontab(minute="0", hour="*/6"),
     },
 }

@@ -10,7 +10,7 @@ from quivr_api.modules.sync.dto.inputs import (
     SyncsUserInput,
     SyncUserUpdateInput,
 )
-from quivr_api.modules.sync.entity.sync import (
+from quivr_api.modules.sync.entity.sync_models import (
     DBSyncFile,
     SyncFile,
     SyncsActive,
