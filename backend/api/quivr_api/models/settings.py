@@ -1,16 +1,18 @@
 from typing import Optional
+from urllib.parse import urlparse
 from uuid import UUID
 
 from langchain.embeddings.base import Embeddings
 from langchain_community.embeddings.ollama import OllamaEmbeddings
 from langchain_community.vectorstores.supabase import SupabaseVectorStore
-from langchain_openai import OpenAIEmbeddings
+from langchain_openai import AzureOpenAIEmbeddings, OpenAIEmbeddings
 from posthog import Posthog
 from pydantic_settings import BaseSettings, SettingsConfigDict
-from quivr_api.logger import get_logger
-from quivr_api.models.databases.supabase.supabase import SupabaseDB
 from sqlalchemy import Engine, create_engine
 from supabase.client import Client, create_client
+
+from quivr_api.logger import get_logger
+from quivr_api.models.databases.supabase.supabase import SupabaseDB
 
 logger = get_logger(__name__)
 
@@ -115,6 +117,7 @@ class PostHogSettings(BaseSettings):
 class BrainSettings(BaseSettings):
     model_config = SettingsConfigDict(validate_default=False)
     openai_api_key: str = ""
+    azure_openai_embeddings_url: str = ""
     supabase_url: str = ""
     supabase_service_key: str = ""
     resend_api_key: str = "null"
@@ -144,7 +147,11 @@ def get_pg_database_engine():
     global _db_engine
     if _db_engine is None:
         logger.info("Creating Postgres DB engine")
-        _db_engine = create_engine(settings.pg_database_url, pool_pre_ping=True)
+        _db_engine = create_engine(
+            settings.pg_database_url,
+            pool_pre_ping=True,
+            isolation_level="AUTOCOMMIT",
+        )
     return _db_engine
 
 
@@ -152,7 +159,12 @@ def get_pg_database_async_engine():
     global _db_engine
     if _db_engine is None:
         logger.info("Creating Postgres DB engine")
-        _db_engine = create_engine(settings.pg_database_async_url, pool_pre_ping=True)
+        _db_engine = create_engine(
+            settings.pg_database_async_url,
+            connect_args={"server_settings": {"application_name": "quivr-api-async"}},
+            pool_pre_ping=True,
+            isolation_level="AUTOCOMMIT",
+        )
     return _db_engine
 
 
@@ -181,7 +193,22 @@ def get_embedding_client() -> Embeddings:
             base_url=settings.ollama_api_base_url,
         )  # pyright: ignore reportPrivateUsage=none
     else:
-        embeddings = OpenAIEmbeddings()  # pyright: ignore reportPrivateUsage=none
+        if settings.azure_openai_embeddings_url:
+            # https://quivr-test.openai.azure.com/openai/deployments/embedding/embeddings?api-version=2023-05-15
+            # parse the url to get the deployment name
+            deployment = settings.azure_openai_embeddings_url.split("/")[5]
+            netloc = "https://" + urlparse(settings.azure_openai_embeddings_url).netloc
+            api_version = settings.azure_openai_embeddings_url.split("=")[1]
+            logger.debug(f"Using Azure OpenAI embeddings: {deployment}")
+            logger.debug(f"Using Azure OpenAI embeddings: {netloc}")
+            logger.debug(f"Using Azure OpenAI embeddings: {api_version}")
+            embeddings = AzureOpenAIEmbeddings(
+                azure_deployment=deployment,
+                azure_endpoint=netloc,
+                api_version=api_version,
+            )
+        else:
+            embeddings = OpenAIEmbeddings()  # pyright: ignore reportPrivateUsage=none
     return embeddings
 
 

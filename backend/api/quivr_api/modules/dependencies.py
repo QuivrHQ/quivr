@@ -36,7 +36,6 @@ async_engine = create_async_engine(
     connect_args={"server_settings": {"application_name": "quivr-api-async"}},
     echo=True if os.getenv("ORM_DEBUG") else False,
     future=True,
-    # NOTE: pessimistic bound on
     pool_pre_ping=True,
     pool_size=5,  # NOTE: no bouncer for now, if 6 process workers => 6
     pool_recycle=1800,
@@ -50,8 +49,10 @@ async def get_async_session() -> AsyncGenerator[AsyncSession, None]:
     ) as session:
         try:
             yield session
-        except Exception:
+            await session.commit()
+        except Exception as e:
             await session.rollback()
+            raise e
         finally:
             await session.close()
 

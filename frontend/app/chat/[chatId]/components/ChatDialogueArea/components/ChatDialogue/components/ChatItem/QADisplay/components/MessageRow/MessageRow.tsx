@@ -57,6 +57,7 @@ export const MessageRow = ({
     initialThumbs
   );
   const [folded, setFolded] = useState<boolean>(false);
+  const [userMessageFolded, setUserMessageFolded] = useState<boolean>(true);
   const [sourceFiles, setSourceFiles] = useState<SourceFile[]>([]);
   const { submitQuestion } = useChatInput();
 
@@ -84,6 +85,10 @@ export const MessageRow = ({
   }, [initialThumbs, metadata]);
 
   const messageContent = text ?? "";
+
+  const userMessageTooLong = (): boolean => {
+    return !!isUserSpeaker && !!messageContent && messageContent.length > 100;
+  };
 
   const thumbsUp = async () => {
     if (chatId && messageId) {
@@ -211,7 +216,8 @@ export const MessageRow = ({
       className={`
       ${styles.message_row_container} 
       ${isUserSpeaker ? styles.user : styles.brain}
-      ${messageContent.length > 100 && isUserSpeaker ? styles.smaller : ""}
+      ${userMessageTooLong() ? styles.smaller : ""}
+      ${userMessageFolded ? styles.folded : ""}
       ${lastMessage ? styles.last : ""}
       `}
     >
@@ -231,13 +237,19 @@ export const MessageRow = ({
       {renderMessageHeader()}
       <div className={styles.message_row_content}>
         {children ?? (
-          <>
+          <div
+            onClick={() => {
+              if (isUserSpeaker) {
+                setUserMessageFolded(!userMessageFolded);
+              }
+            }}
+          >
             <MessageContent
               text={messageContent}
               isUser={isUserSpeaker}
               hide={folded}
             />
-          </>
+          </div>
         )}
       </div>
       {renderOtherSections()}
