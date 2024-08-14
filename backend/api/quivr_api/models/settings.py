@@ -7,10 +7,11 @@ from langchain_community.vectorstores.supabase import SupabaseVectorStore
 from langchain_openai import OpenAIEmbeddings
 from posthog import Posthog
 from pydantic_settings import BaseSettings, SettingsConfigDict
-from quivr_api.logger import get_logger
-from quivr_api.models.databases.supabase.supabase import SupabaseDB
 from sqlalchemy import Engine, create_engine
 from supabase.client import Client, create_client
+
+from quivr_api.logger import get_logger
+from quivr_api.models.databases.supabase.supabase import SupabaseDB
 
 logger = get_logger(__name__)
 
@@ -144,7 +145,11 @@ def get_pg_database_engine():
     global _db_engine
     if _db_engine is None:
         logger.info("Creating Postgres DB engine")
-        _db_engine = create_engine(settings.pg_database_url, pool_pre_ping=True)
+        _db_engine = create_engine(
+            settings.pg_database_url,
+            pool_pre_ping=True,
+            isolation_level="AUTOCOMMIT",
+        )
     return _db_engine
 
 
@@ -152,7 +157,12 @@ def get_pg_database_async_engine():
     global _db_engine
     if _db_engine is None:
         logger.info("Creating Postgres DB engine")
-        _db_engine = create_engine(settings.pg_database_async_url, pool_pre_ping=True)
+        _db_engine = create_engine(
+            settings.pg_database_async_url,
+            connect_args={"server_settings": {"application_name": "quivr-api-async"}},
+            pool_pre_ping=True,
+            isolation_level="AUTOCOMMIT",
+        )
     return _db_engine
 
 
