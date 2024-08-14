@@ -1,7 +1,9 @@
 import Image from "next/image";
 import { useEffect, useRef } from "react";
 
+import { useUserApi } from "@/lib/api/user/useUserApi";
 import { useHelpContext } from "@/lib/context/HelpProvider/hooks/useHelpContext";
+import { useUserData } from "@/lib/hooks/useUserData";
 
 import styles from "./HelpWindow.module.scss";
 
@@ -10,6 +12,19 @@ import { Icon } from "../ui/Icon/Icon";
 export const HelpWindow = (): JSX.Element => {
   const { isVisible, setIsVisible } = useHelpContext();
   const helpWindowRef = useRef<HTMLDivElement>(null);
+  const { userIdentityData } = useUserData();
+  const { updateUserIdentity } = useUserApi();
+
+  const closeHelpWindow = async () => {
+    setIsVisible(false);
+    if (!userIdentityData?.onboarded) {
+      await updateUserIdentity({
+        ...userIdentityData,
+        username: userIdentityData?.username ?? "",
+        onboarded: true,
+      });
+    }
+  };
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -17,6 +32,14 @@ export const HelpWindow = (): JSX.Element => {
         helpWindowRef.current &&
         !helpWindowRef.current.contains(event.target as Node)
       ) {
+        void (async () => {
+          try {
+            await closeHelpWindow();
+          } catch (error) {
+            console.error("Error while closing help window", error);
+          }
+        })();
+      } else {
         setIsVisible(false);
       }
     };
@@ -26,7 +49,7 @@ export const HelpWindow = (): JSX.Element => {
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, [setIsVisible]);
+  });
 
   return (
     <div
@@ -40,7 +63,7 @@ export const HelpWindow = (): JSX.Element => {
           size="normal"
           color="black"
           handleHover={true}
-          onClick={() => setIsVisible(false)}
+          onClick={() => closeHelpWindow()}
         />
       </div>
       <div className={styles.content}>
