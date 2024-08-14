@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.0.296 (2024-08-13)
+
+## What's Changed
+* fix(frontend): color of copy icon for code blocks by @Zewed in https://github.com/QuivrHQ/quivr/pull/2993
+* fix(frontend): search bar height by @Zewed in https://github.com/QuivrHQ/quivr/pull/2998
+* fix: autocommit isolation level by @AmineDiro in https://github.com/QuivrHQ/quivr/pull/2999
+
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.295...v0.0.296
+
 ## 0.0.295 (2024-08-12)
 
 ## What's Changed

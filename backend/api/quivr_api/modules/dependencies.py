@@ -39,6 +39,7 @@ async_engine = create_async_engine(
     pool_pre_ping=True,
     pool_size=5,  # NOTE: no bouncer for now, if 6 process workers => 6
     pool_recycle=1800,
+    isolation_level="AUTOCOMMIT",
 )
 
 
