@@ -9,16 +9,18 @@ class KnowledgeStatus(str, Enum):
     PROCESSING = "PROCESSING"
     UPLOADED = "UPLOADED"
     ERROR = "ERROR"
+
+
 class CreateKnowledgeProperties(BaseModel):
     brain_id: UUID
     file_name: Optional[str] = None
     url: Optional[str] = None
-    mime_type: str = "application/text" 
+    mime_type: str = "application/text"
     status: KnowledgeStatus = KnowledgeStatus.PROCESSING
     source: Optional[str] = None
-    source_link: Optional[str] = None 
-    file_size: Optional[int] = None 
-    file_sha1: Optional[str] = None  
+    source_link: Optional[str] = None
+    file_size: Optional[int] = None
+    file_sha1: Optional[str] = None
     metadata: Optional[Dict[str, str]] = None
 
     def dict(self, *args, **kwargs):

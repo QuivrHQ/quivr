@@ -50,9 +50,10 @@ async def notifier(app):
                         ),
                     )
                     if knowledge_id:
-                        await knowledge_service.update_status_knowledge(
-                            knowledge_id, KnowledgeStatus.ERROR
-                        )
+                        # knowledge_service.update_status_knowledge(
+                        #     knowledge_id, KnowledgeStatus.ERROR
+                        # ) @amine #FIXME
+                        pass
                     logger.error(
                         f"task {task.id} process_file_task {task_kwargs} failed. Updating knowledge {knowledge_id} to Error"
                     )

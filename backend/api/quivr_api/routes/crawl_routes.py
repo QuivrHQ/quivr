@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Annotated, Optional
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, Query
@@ -27,8 +27,9 @@ logger = get_logger(__name__)
 crawl_router = APIRouter()
 
 notification_service = NotificationService()
-# knowledge_service = KnowledgeService()
-knowledge_service = get_service(KnowledgeService)()
+KnowledgeServiceDep = Annotated[
+    KnowledgeService, Depends(get_service(KnowledgeService))
+]
 
 
 @crawl_router.get("/crawl/healthz", tags=["Health"])
@@ -39,6 +40,7 @@ async def healthz():
 @crawl_router.post("/crawl", dependencies=[Depends(AuthBearer())], tags=["Crawl"])
 async def crawl_endpoint(
     crawl_website: CrawlWebsite,
+    knowledge_service: KnowledgeServiceDep,
     bulk_id: Optional[UUID] = Query(None, description="The ID of the bulk upload"),
     brain_id: UUID = Query(..., description="The ID of the brain"),
     chat_id: Optional[UUID] = Query(None, description="The ID of the chat"),
@@ -80,7 +82,7 @@ async def crawl_endpoint(
         knowledge_to_add = CreateKnowledgeProperties(
             brain_id=brain_id,
             url=crawl_website.url,
-            mime_type="html",
+            mime_type="application/html",
             source="web",
             source_link=crawl_website.url,
         )

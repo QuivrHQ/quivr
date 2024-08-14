@@ -61,7 +61,7 @@ async def store_chunks(
     vector_service: VectorService,
 ):
     # vector_ids = document_vector_store.add_documents(chunks)
-    vector_ids = await vector_service.create_vectors(chunks, file.id)
+    vector_ids = vector_service.create_vectors(chunks, file.id)
     logger.debug(f"Inserted {len(chunks)} chunks in vectors table for {file}")
 
     if vector_ids is None or len(vector_ids) == 0:

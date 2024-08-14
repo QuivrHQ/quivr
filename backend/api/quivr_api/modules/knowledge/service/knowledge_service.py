@@ -1,15 +1,17 @@
 from typing import List
 from uuid import UUID
 
+from quivr_core.models import QuivrKnowledge as Knowledge
+
 from quivr_api.logger import get_logger
 from quivr_api.modules.dependencies import BaseService
-from quivr_api.modules.knowledge.dto.inputs import (CreateKnowledgeProperties,
-                                                    KnowledgeStatus)
+from quivr_api.modules.knowledge.dto.inputs import (
+    CreateKnowledgeProperties,
+    KnowledgeStatus,
+)
 from quivr_api.modules.knowledge.dto.outputs import DeleteKnowledgeResponse
 from quivr_api.modules.knowledge.entity.knowledge import KnowledgeDB
-from quivr_api.modules.knowledge.repository.knowledges import \
-    KnowledgeRepository
-from quivr_core.models import QuivrKnowledge as Knowledge
+from quivr_api.modules.knowledge.repository.knowledges import KnowledgeRepository
 
 logger = get_logger(__name__)
 
@@ -34,9 +36,10 @@ class KnowledgeService(BaseService[KnowledgeRepository]):
         if inserted_knowledge_db_instance.source == "local":
             source_link = f"s3://quivr/{inserted_knowledge_db_instance.brain_id}/{inserted_knowledge_db_instance.id}"
             inserted_knowledge_db_instance.source_link = source_link
-        
-        inserted_knowledge = await self.repository.insert_knowledge(inserted_knowledge_db_instance)
 
+        inserted_knowledge = await self.repository.insert_knowledge(
+            inserted_knowledge_db_instance
+        )
 
         inserted_knowledge = Knowledge(
             id=inserted_knowledge_db_instance.id,
@@ -65,7 +68,7 @@ class KnowledgeService(BaseService[KnowledgeRepository]):
                 file_name=knowledge.file_name,
                 url=knowledge.url,
                 mime_type=knowledge.mime_type,
-                status=knowledge.status,
+                status=knowledge.status,  # type: ignore
                 source=knowledge.source,
                 source_link=knowledge.source_link,
                 file_size=knowledge.file_size
@@ -103,7 +106,7 @@ class KnowledgeService(BaseService[KnowledgeRepository]):
             file_name=inserted_knowledge_db_instance.file_name,
             url=inserted_knowledge_db_instance.url,
             mime_type=inserted_knowledge_db_instance.mime_type,
-            status=inserted_knowledge_db_instance.status,
+            status=inserted_knowledge_db_instance.status,  # type: ignore
             source=inserted_knowledge_db_instance.source,
             source_link=inserted_knowledge_db_instance.source_link,
             file_size=inserted_knowledge_db_instance.file_size,

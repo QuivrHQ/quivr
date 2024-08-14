@@ -2,8 +2,7 @@ import datetime
 from operator import itemgetter
 from typing import List
 
-from langchain.prompts import (HumanMessagePromptTemplate,
-                               SystemMessagePromptTemplate)
+from langchain.prompts import HumanMessagePromptTemplate, SystemMessagePromptTemplate
 from langchain_community.chat_models import ChatLiteLLM
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.prompts import ChatPromptTemplate, PromptTemplate
@@ -11,6 +10,7 @@ from langchain_core.pydantic_v1 import BaseModel as BaseModelV1
 from langchain_core.pydantic_v1 import Field as FieldV1
 from langchain_core.runnables import RunnableLambda, RunnablePassthrough
 from langchain_openai import ChatOpenAI
+
 from quivr_api.logger import get_logger
 from quivr_api.modules.brain.knowledge_brain_qa import KnowledgeBrainQA
 
@@ -114,7 +114,6 @@ class MultiContractBrain(KnowledgeBrainQA):
         )
 
     def get_chain(self):
-
         list_files_array = (
             await self.knowledge_qa.knowledge_service.get_all_knowledge_in_brain(
                 self.brain_id
@@ -177,7 +176,6 @@ class MultiContractBrain(KnowledgeBrainQA):
             api_base=api_base,
         )  # pyright: ignore reportPrivateUsage=none
         if self.model_compatible_with_function_calling(self.model):
-
             # And finally, we do the part that returns the answers
             llm_function = ChatOpenAI(
                 max_tokens=self.max_tokens,
