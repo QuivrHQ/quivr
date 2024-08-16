@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.0.298 (2024-08-16)
+
+## What's Changed
+* feat(azure): quivr compatible with it by @StanGirard in https://github.com/QuivrHQ/quivr/pull/3005
+* feat(frontend): helpbox by @Zewed in https://github.com/QuivrHQ/quivr/pull/3007
+* feat(frontend): order models and brain by name by @Zewed in https://github.com/QuivrHQ/quivr/pull/3009
+* fix(frontend): help window by @Zewed in https://github.com/QuivrHQ/quivr/pull/3013
+
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.297...v0.0.298
+
 ## 0.0.297 (2024-08-14)
 
 ## What's Changed
