@@ -22,6 +22,8 @@ import { StudioButton } from "./components/StudioButton/StudioButton";
 import { ThreadsButton } from "./components/ThreadsButton/ThreadsButton";
 import { UpgradeToPlusButton } from "./components/UpgradeToPlusButton/UpgradeToPlusButton";
 
+const showUpgradeButton = process.env.NEXT_PUBLIC_SHOW_TOKENS === "true";
+
 export const Menu = (): JSX.Element => {
   const { isOpened } = useMenuContext();
   const { isVisible } = useNotificationsContext();
@@ -48,6 +50,8 @@ export const Menu = (): JSX.Element => {
   const isMenuDisplayed = displayedOnPages.some((page) =>
     pathname.includes(page)
   );
+
+  console.info(process.env.SUPABASE_URL);
 
   if (!isMenuDisplayed) {
     return <></>;
@@ -86,7 +90,7 @@ export const Menu = (): JSX.Element => {
                   <ThreadsButton />
                 </div>
                 <div className={styles.block}>
-                  <UpgradeToPlusButton />
+                  {!!showUpgradeButton && <UpgradeToPlusButton />}
                   <ProfileButton />
                 </div>
               </div>

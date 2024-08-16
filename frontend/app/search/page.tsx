@@ -75,7 +75,6 @@ const Search = (): JSX.Element => {
   };
 
   useEffect(() => {
-    console.info(allBrains.length);
     if (userData) {
       setButtons((prevButtons) => {
         return prevButtons.map((button) => {
