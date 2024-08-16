@@ -35,14 +35,6 @@ class CustomSupabaseVectorStore(SupabaseVectorStore):
         self.max_input = max_input
         self.vector_service = vector_service
 
-    def add_knowledge_id_to_vector(self, knowledge_id: UUID, vector_id: UUID) -> Any:
-        return (
-            self._client.table("vectors")
-            .update({"knowledge_id": knowledge_id})
-            .eq("id", vector_id)
-            .execute()
-        )
-
     def find_brain_closest_query(
         self,
         user_id: str,

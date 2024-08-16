@@ -1,24 +1,23 @@
 import os
-from typing import AsyncGenerator, Callable, Generator, Generic, Optional, Type, TypeVar
+from typing import (AsyncGenerator, Callable, Generator, Generic, Optional,
+                    Type, TypeVar)
 
 from fastapi import Depends
 from langchain.embeddings.base import Embeddings
 from langchain_community.embeddings.ollama import OllamaEmbeddings
-
 # from langchain_community.vectorstores.supabase import SupabaseVectorStore
 from langchain_openai import OpenAIEmbeddings
-
+from quivr_api.logger import get_logger
+from quivr_api.models.databases.supabase.supabase import SupabaseDB
+from quivr_api.models.settings import BrainSettings
 # from quivr_api.vector.service.vector_service import VectorService
 # from quivr_api.vectorstore.supabase import CustomSupabaseVectorStore
 from sqlalchemy import Engine, create_engine
 from sqlalchemy.ext.asyncio import create_async_engine
 from sqlmodel import Session
 from sqlmodel.ext.asyncio.session import AsyncSession
-from supabase.client import AsyncClient, Client, create_async_client, create_client
-
-from quivr_api.logger import get_logger
-from quivr_api.models.databases.supabase.supabase import SupabaseDB
-from quivr_api.models.settings import BrainSettings
+from supabase.client import (AsyncClient, Client, create_async_client,
+                             create_client)
 
 # Global variables to store the Supabase client and database instances
 _supabase_client: Optional[Client] = None
@@ -57,7 +56,7 @@ S = TypeVar("S", bound=BaseService)
 sync_engine = create_engine(
     settings.pg_database_url,
     echo=True if os.getenv("ORM_DEBUG") else False,
-    future=True,
+    future=False,
     # NOTE: pessimistic bound on
     pool_pre_ping=True,
     pool_size=10,  # NOTE: no bouncer for now, if 6 process workers => 6

@@ -1,12 +1,11 @@
 from typing import Any, List, Sequence
 from uuid import UUID
 
-from sqlalchemy import exc, text
-from sqlmodel import Session
-
 from quivr_api.logger import get_logger
 from quivr_api.modules.dependencies import BaseRepository
 from quivr_api.vector.entity.vector import SimilaritySearchOutput, Vector
+from sqlalchemy import exc, text
+from sqlmodel import Session
 
 logger = get_logger(__name__)
 
@@ -17,8 +16,6 @@ class VectorRepository(BaseRepository):
         self.session = session
 
     def create_vectors(self, new_vectors: List[Vector]) -> List[Vector]:
-        logger.debug("session type : %s", type(self.session))
-        logger.debug("engine type : %s", type(self.session))
         try:
             # Use SQLAlchemy session to add and commit the new vector
             self.session.add_all(new_vectors)
