@@ -51,8 +51,6 @@ export const Menu = (): JSX.Element => {
     pathname.includes(page)
   );
 
-  console.info(process.env.SUPABASE_URL);
-
   if (!isMenuDisplayed) {
     return <></>;
   }
