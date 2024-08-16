@@ -12,7 +12,6 @@ from fastapi import (
     Query,
     UploadFile,
 )
-from supabase.client import AsyncClient
 
 from quivr_api.celery_config import celery
 from quivr_api.logger import get_logger
@@ -32,11 +31,15 @@ from quivr_api.modules.notification.entity.notification import NotificationsStat
 from quivr_api.modules.notification.service.notification_service import (
     NotificationService,
 )
-from quivr_api.modules.upload.service.upload_file import upload_file_storage
+from quivr_api.modules.upload.service.upload_file import (
+    check_file_exists,
+    upload_file_storage,
+)
 from quivr_api.modules.user.entity.user_identity import UserIdentity
 from quivr_api.modules.user.service.user_usage import UserUsage
 from quivr_api.utils.byte_size import convert_bytes
 from quivr_api.utils.telemetry import maybe_send_telemetry
+from supabase.client import AsyncClient
 
 logger = get_logger(__name__)
 upload_router = APIRouter()
@@ -92,11 +95,21 @@ async def upload_file(
     )
 
     filename_with_brain_id = str(brain_id) + "/" + str(uploadFile.filename)
+    file_content = await uploadFile.read()
+    file_sha1 = hashlib.sha1(file_content).hexdigest()
     try:
         # NOTE(@aminediro) : This should redone. The supabase storage client interface is badly designed
         # It specifically checks for BufferedReader | bytes before sending
         # TODO: We bypass this to write to S3 Storage directly
+        logger.debug("FILE SHA1 : %s", file_sha1)
+        file_exists = await check_file_exists(
+            str(brain_id), file_sha1, knowledge_service=knowledge_service
+        )
+        if file_exists:
+            raise FileExistsError
+
         buff_reader = io.BufferedReader(uploadFile.file)  # type: ignore
+
         await upload_file_storage(buff_reader, filename_with_brain_id)
     except FileExistsError:
         notification_service.update_notification_by_id(
@@ -133,7 +146,7 @@ async def upload_file(
         source=integration if integration else "local",
         source_link=integration_link,  # FIXME: Should return the s3 link @chloedia
         file_size=uploadFile.size,
-        file_sha1=hashlib.sha1(file_content).hexdigest(),
+        file_sha1=file_sha1,
     )
     knowledge = await knowledge_service.add_knowledge(knowledge_to_add)  # type: ignore
 
