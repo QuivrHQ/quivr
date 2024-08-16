@@ -2,7 +2,6 @@ from typing import Sequence
 from uuid import UUID
 
 from fastapi import HTTPException
-from quivr_core.models import KnowledgeStatus
 from sqlalchemy.exc import IntegrityError
 from sqlmodel import select
 from sqlmodel.ext.asyncio.session import AsyncSession
@@ -10,6 +9,7 @@ from sqlmodel.ext.asyncio.session import AsyncSession
 from quivr_api.logger import get_logger
 from quivr_api.models.settings import get_supabase_client
 from quivr_api.modules.dependencies import BaseRepository
+from quivr_api.modules.knowledge.dto.inputs import KnowledgeStatus
 from quivr_api.modules.knowledge.dto.outputs import DeleteKnowledgeResponse
 from quivr_api.modules.knowledge.entity.knowledge import KnowledgeDB
 

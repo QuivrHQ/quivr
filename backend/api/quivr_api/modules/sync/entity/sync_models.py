@@ -15,6 +15,7 @@ from quivr_api.modules.user.entity.user_identity import User
 class DownloadedSyncFile:
     file_name: str
     extension: str
+    file_sha1: str
     file_data: io.BufferedReader
 
 
