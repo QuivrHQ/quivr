@@ -135,7 +135,6 @@ async def upload_file(
         raise HTTPException(
             status_code=500, detail=f"Failed to upload file to storage. {e}"
         )
-    file_content = await uploadFile.read()
     # FIXME: @chloedia check if these are the correct properties
     knowledge_to_add = CreateKnowledgeProperties(
         brain_id=brain_id,

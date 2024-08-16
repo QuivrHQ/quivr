@@ -173,7 +173,7 @@ def get_supabase_db() -> SupabaseDB:
 def get_service(service: Type[S], asynchronous=True) -> Callable[..., S]:
     def _get_service(
         repository: BaseRepository = Depends(
-            get_repository(service.get_repository_cls(), asynchronous)
+            get_repository(service.get_repository_cls(), asynchronous)  # type: ignore
         ),
     ) -> S:
         return service(repository)
