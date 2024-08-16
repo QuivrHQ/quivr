@@ -18,7 +18,7 @@ class VectorService(BaseService[VectorRepository]):
 
     def create_vectors(
         self, chunks: List[Document], knowledge_id: UUID
-    ) -> List[str]:
+    ) -> List[UUID]:
         # Vector is created upon the user's first question asked
         logger.info(
             f"New vector entry in vectors table for knowledge_id {knowledge_id}"
@@ -38,7 +38,7 @@ class VectorService(BaseService[VectorRepository]):
         ]
         created_vector = self.repository.create_vectors(new_vectors)
 
-        return [str(vector.id) for vector in created_vector]
+        return [vector.id for vector in created_vector if vector.id]
 
     def similarity_search(self, query: str, brain_id: UUID, k: int = 40):
         vectors = self._embedding.embed_documents([query])
