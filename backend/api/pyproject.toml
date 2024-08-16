@@ -1,125 +1,67 @@
-[build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
-
-[tool.poetry]
+[project]
 name = "quivr-api"
 version = "0.1.0"
 description = "quivr backend API"
-packages = [{ include = "quivr_api" }]
-authors = ["aminediro <amine@quivr.app>"]
+authors = [
+    { name = "Stan Girard", email = "stan@quivr.app" }
+    
+]
+dependencies = [
+    "quivr-core",
+    "supabase>=2.0.0",
+    "fastapi>=0.100.0",
+    "uvloop>=0.18.0",
+    "python-jose>=3.0.0",
+    "python-multipart>=0.0.9",
+    "uvicorn>=0.30.0",
+    "redis>=5.0.0",
+    "asyncpg>=0.29.0",
+    "psycopg2-binary>=2.9.9",
+    "sqlmodel>=0.0.21",
+    "celery[redis]>=5.4.0",
+    "pydantic-settings>=2.4.0",
+    "python-dotenv>=1.0.1",
+    "unidecode>=1.3.8",
+    "fpdf>=1.7.2",
+    "colorlog>=6.8.2",
+    "posthog>=3.5.0",
+    "pyinstrument>=4.7.2",
+    "sentry-sdk[fastapi]>=2.13.0",
+    "google-api-python-client>=2.141.0",
+    "google-auth-httplib2>=0.2.0",
+    "google-auth-oauthlib>=1.2.1",
+    "dropbox>=12.0.2",
+    "msal>=1.30.0",
+    "notion-client>=2.2.1",
+    "markdownify>=0.13.1",
+    "langchain-openai>=0.1.21",
+    "resend>=2.4.0",
+    "langchain>=0.2.14",
+    "litellm>=1.43.15",
+    "openai>=1.40.8",
+    "tiktoken>=0.7.0",
+    "langchain-community>=0.2.12",
+    "langchain-cohere>=0.2.2",
+    "llama-parse>=0.4.9",
+]
 readme = "README.md"
+requires-python = "< 3.12"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.rye]
+managed = true
+dev-dependencies = []
+
+[tool.hatch.metadata]
+allow-direct-references = true
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/api"]
 
 
-[tool.poetry.dependencies]
-python = "^3.11,<3.13"
-quivr-core = { path = "../core", extras = ["base"] }
-supabase = "*"
-fastapi = "*"
-uvloop = "^0.19.0"
-python-jose = "*"
-python-multipart = "*"
-uvicorn = "*"
-redis = "*"
-asyncpg = "*"
-psycopg2-binary = "*"
-sqlmodel = "^0.0.19"
-celery = { extras = ["redis"], version = "*" }
-pydantic-settings = "*"
-python-dotenv = "*"
-resend = "*"
-unidecode = "*"
-fpdf = "^1.7.2"
-
-# Monitoring
-colorlog = "*"
-posthog = "*"
-pyinstrument = "*"
-sentry-sdk = { version = "^2.5.0", extras = ["fastapi"] }
-
-# OAuth Clients
-google-api-python-client = "*"
-google-auth-httplib2 = "*"
-google-auth-oauthlib = "*"
-dropbox = "^12.0.2"
-msal = "*"
-notion-client = "^2.2.1"
-markdownify = "^0.13.1"
-
-# To keep (Maybe)
-langchain = "*"
-litellm = "*"
-openai = "*"
-tiktoken = "*"
-langchain-community = "*"
-langchain-openai = "*"
-langchain-cohere = "*"
-# This is needed for ITO assistant
-llama-parse = "^0.4.9"
-
-
-[tool.poetry.group.dev]
-optional = true
-
-[tool.poetry.group.dev.dependencies]
-mypy = "^1.10.0"
-pyright = "*"
-pre-commit = "^3.7.1"
-ipykernel = "*"
-ruff = "^0.4.8"
-pytest-asyncio = "^0.23.7"
-flake8 = "*"
-flake8-black = "*"
-
-[tool.poetry.group.test]
-optional = true
-
-[tool.poetry.group.test.dependencies]
-pytest = "*"
-pytest-dotenv = "*"
-pytest-mock = "*"
-pytest-celery = "*"
-
-[[tool.poetry.source]]
-name = "pytorch-cpu-src"
-url = "https://download.pytorch.org/whl/cpu"
-priority = "explicit"
-
-[tool.ruff]
-line-length = 88
-exclude = [".git", "__pycache__", ".mypy_cache", ".pytest_cache"]
-
-[tool.ruff.lint]
-select = [
-    "E", # pycodestyle errors
-    "W", # pycodestyle warnings
-    "F", # pyflakes
-    "I", # isort
-    "C", # flake8-comprehensions
-    "B", # flake8-bugbear
-]
-ignore = [
-    "B904",
-    "B006",
-    "E501", # line too long, handled by black
-    "B008", # do not perform function calls in argument defaults
-    "C901", # too complex
-]
-
-
-[tool.ruff.lint.isort]
-order-by-type = true
-relative-imports-order = "closest-to-furthest"
-extra-standard-library = ["typing"]
-section-order = [
-    "future",
-    "standard-library",
-    "third-party",
-    "first-party",
-    "local-folder",
-]
-known-first-party = []
-
-[tool.pytest.ini_options]
-addopts = "--tb=short -ra "
-filterwarnings = ["ignore::DeprecationWarning"]
+[[tool.rye.sources]]
+name = "quivr-core"
+path = "../core"
