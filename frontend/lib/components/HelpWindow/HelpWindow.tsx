@@ -51,8 +51,6 @@ export const HelpWindow = (): JSX.Element => {
             console.error("Error while closing help window", error);
           }
         })();
-      } else {
-        setIsVisible(false);
       }
     };
 
