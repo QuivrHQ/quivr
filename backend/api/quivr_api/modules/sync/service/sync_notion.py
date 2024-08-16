@@ -37,7 +37,9 @@ class SyncNotionService(BaseService[NotionRepository]):
                         else None
                     ),
                     name=f'{page["properties"]["title"]["title"][0]["text"]["content"]}.md',
-                    icon=page["icon"]["emoji"] if page["icon"] else None,
+                    icon=page["icon"]["emoji"]
+                    if "icon" in page and "emoji" in page["icon"]
+                    else None,
                     mime_type="md",
                     web_view_link=page["url"],
                     is_folder=True,
@@ -77,7 +79,9 @@ class SyncNotionService(BaseService[NotionRepository]):
                         notion_id=page["id"],
                         parent_id=page["parent"][parent_type],
                         name=f'{page["properties"]["title"]["title"][0]["text"]["content"]}.md',
-                        icon=page["icon"]["emoji"] if page["icon"] else None,
+                        icon=page["icon"]["emoji"]
+                        if "icon" in page and "emoji" in page["icon"]
+                        else None,
                         mime_type="md",
                         web_view_link=page["url"],
                         is_folder=True,
@@ -106,9 +110,9 @@ class SyncNotionService(BaseService[NotionRepository]):
                                     or child_notion_page["in_trash"]
                                 ):
                                     pages_to_delete.append(child.notion_id)
-                            except:
-                                logger.info(
-                                    f"Page {child.notion_id} is in trash or archived, we are deleting it"
+                            except Exception:
+                                logger.error(
+                                    f"Page {child.notion_id} is in trash or archived, we are deleting it."
                                 )
                                 pages_to_delete.append(child.notion_id)
 
@@ -186,27 +190,28 @@ async def store_notion_pages(
 
 
 def fetch_notion_pages(
-    notion_client: Client, notion_sync: dict[str, Any] | None = None
+    notion_client: Client,
+    last_sync_time: datetime = datetime.now() - timedelta(hours=6),
 ) -> List[dict[str, Any]]:
     all_search_result = []
-    last_sync_time = datetime.now() - timedelta(hours=6)
+
     search_result = notion_client.search(
         query="",
         filter={"property": "object", "value": "page"},
         sort={"direction": "descending", "timestamp": "last_edited_time"},
     )
     last_edited_time: datetime | None = None
-    if notion_sync:
-        for page in search_result["results"]:
-            last_edited_time = datetime.strptime(
-                page["last_edited_time"], "%Y-%m-%dT%H:%M:%S.%fZ"
-            )
-            if last_edited_time > last_sync_time:
-                all_search_result.append(page)
 
-        if last_edited_time and last_edited_time < last_sync_time:
-            # We check if the last element of the search result is older than 6 hours, if it is, we stop the search
-            return all_search_result
+    for page in search_result["results"]:
+        last_edited_time = datetime.strptime(
+            page["last_edited_time"], "%Y-%m-%dT%H:%M:%S.%fZ"
+        )
+        if last_edited_time > last_sync_time:
+            all_search_result.append(page)
+
+    if last_edited_time and last_edited_time < last_sync_time:
+        # We check if the last element of the search result is older than 6 hours, if it is, we stop the search
+        return all_search_result
 
     while search_result["has_more"]:  # type: ignore
         logger.debug("Next cursor: %s", search_result["next_cursor"])  # type: ignore
@@ -217,20 +222,15 @@ def fetch_notion_pages(
             sort={"direction": "descending", "timestamp": "last_edited_time"},
             start_cursor=search_result["next_cursor"],  # type: ignore
         )
-        end_sync_time = datetime.strptime(
-            search_result["results"][-1]["last_edited_time"],
-            "%Y-%m-%dT%H:%M:%S.%fZ",  # type: ignore
-        )
-        if notion_sync:
-            for page in search_result["results"]:
-                last_edited_time = datetime.strptime(
-                    page["last_edited_time"], "%Y-%m-%dT%H:%M:%S.%fZ"
-                )
-                if last_edited_time > last_sync_time:
-                    all_search_result.append(page)
+        for page in search_result["results"]:
+            last_edited_time = datetime.strptime(
+                page["last_edited_time"], "%Y-%m-%dT%H:%M:%S.%fZ"
+            )
+            if last_edited_time > last_sync_time:
+                all_search_result.append(page)
 
-            if last_edited_time and last_edited_time < last_sync_time:
-                # We check if the last element of the search result is older than 6 hours, if it is, we stop the search
-                return all_search_result
+        if last_edited_time and last_edited_time < last_sync_time:
+            # We check if the last element of the search result is older than 6 hours, if it is, we stop the search
+            return all_search_result
 
     return all_search_result
