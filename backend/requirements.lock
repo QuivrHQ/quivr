@@ -13,20 +13,22 @@
 --extra-index-url https://download.pytorch.org/whl/cpu
 
 -e file:api
-    # via worker
+    # via quivr-worker
 -e file:core
+    # via quivr-api
+    # via quivr-worker
 -e file:worker
 aiofiles==24.1.0 ; python_version >= '3.13' or (python_full_version < '3.12.4' and python_version < '3.12') or (python_full_version < '3.12.4' and python_version < '3.13' and python_version >= '3.12') or (python_full_version >= '3.12.4' and python_version < '3.13')
-    # via core
     # via quivr-core
-aiohappyeyeballs==2.3.6 ; python_version >= '3.13' or (python_full_version < '3.12.4' and python_version < '3.12') or (python_full_version < '3.12.4' and python_version < '3.13' and python_version >= '3.12') or (python_full_version >= '3.12.4' and python_version < '3.13')
+aiohappyeyeballs==2.3.7 ; python_version >= '3.13' or (python_full_version < '3.12.4' and python_version < '3.12') or (python_full_version < '3.12.4' and python_version < '3.13' and python_version >= '3.12') or (python_full_version >= '3.12.4' and python_version < '3.13')
     # via aiohttp
-aiohttp==3.10.3 ; python_version >= '3.13' or (python_full_version < '3.12.4' and python_version < '3.12') or (python_full_version < '3.12.4' and python_version < '3.13' and python_version >= '3.12') or (python_full_version >= '3.12.4' and python_version < '3.13')
+aiohttp==3.10.4 ; python_version >= '3.13' or (python_full_version < '3.12.4' and python_version < '3.12') or (python_full_version < '3.12.4' and python_version < '3.13' and python_version >= '3.12') or (python_full_version >= '3.12.4' and python_version < '3.13')
     # via langchain
     # via langchain-community
     # via litellm
     # via llama-index-core
     # via llama-index-legacy
+    # via realtime
 aiosignal==1.3.1 ; python_version >= '3.13' or (python_full_version < '3.12.4' and python_version < '3.12') or (python_full_version < '3.12.4' and python_version < '3.13' and python_version >= '3.12') or (python_full_version >= '3.12.4' and python_version < '3.13')
     # via aiohttp
 amqp==5.2.0 ; python_version >= '3.13' or (python_full_version < '3.12.4' and python_version < '3.12') or (python_full_version < '3.12.4' and python_version < '3.13' and python_version >= '3.12') or (python_full_version >= '3.12.4' and python_version < '3.13')
@@ -56,9 +58,9 @@ beautifulsoup4==4.12.3 ; python_version >= '3.13' or (python_full_version < '3.1
     # via unstructured
 billiard==4.2.0 ; python_version >= '3.13' or (python_full_version < '3.12.4' and python_version < '3.12') or (python_full_version < '3.12.4' and python_version < '3.13' and python_version >= '3.12') or (python_full_version >= '3.12.4' and python_version < '3.13')
     # via celery
-boto3==1.34.162 ; python_version >= '3.13' or (python_full_version < '3.12.4' and python_version < '3.12') or (python_full_version < '3.12.4' and python_version < '3.13' and python_version >= '3.12') or (python_full_version >= '3.12.4' and python_version < '3.13')
+boto3==1.35.0 ; python_version >= '3.13' or (python_full_version < '3.12.4' and python_version < '3.12') or (python_full_version < '3.12.4' and python_version < '3.13' and python_version >= '3.12') or (python_full_version >= '3.12.4' and python_version < '3.13')
     # via cohere
-botocore==1.34.162 ; python_version >= '3.13' or (python_full_version < '3.12.4' and python_version < '3.12') or (python_full_version < '3.12.4' and python_version < '3.13' and python_version >= '3.12') or (python_full_version >= '3.12.4' and python_version < '3.13')
+botocore==1.35.0 ; python_version >= '3.13' or (python_full_version < '3.12.4' and python_version < '3.12') or (python_full_version < '3.12.4' and python_version < '3.13' and python_version >= '3.12') or (python_full_version >= '3.12.4' and python_version < '3.13')
     # via boto3
     # via s3transfer
 cachetools==5.4.0 ; python_version >= '3.13' or (python_full_version < '3.12.4' and python_version < '3.12') or (python_full_version < '3.12.4' and python_version < '3.13' and python_version >= '3.12') or (python_full_version >= '3.12.4' and python_version < '3.13')
@@ -66,7 +68,7 @@ cachetools==5.4.0 ; python_version >= '3.13' or (python_full_version < '3.12.4' 
 celery==5.4.0
     # via flower
     # via quivr-api
-    # via worker
+    # via quivr-worker
 certifi==2022.12.7 ; python_version >= '3.13' or (python_full_version < '3.12.4' and python_version < '3.12') or (python_full_version < '3.12.4' and python_version < '3.13' and python_version >= '3.12') or (python_full_version >= '3.12.4' and python_version < '3.13')
     # via httpcore
     # via httpx
@@ -133,7 +135,7 @@ dirtyjson==1.0.8 ; python_version >= '3.13' or (python_full_version < '3.12.4' a
 distro==1.9.0 ; python_version >= '3.13' or (python_full_version < '3.12.4' and python_version < '3.12') or (python_full_version < '3.12.4' and python_version < '3.13' and python_version >= '3.12') or (python_full_version >= '3.12.4' and python_version < '3.13')
     # via openai
 docx2txt==0.8 ; python_version >= '3.13' or (python_full_version < '3.12.4' and python_version < '3.12') or (python_full_version < '3.12.4' and python_version < '3.13' and python_version >= '3.12') or (python_full_version >= '3.12.4' and python_version < '3.13')
-    # via core
+    # via quivr-core
 dropbox==12.0.2 ; python_version >= '3.13' or (python_full_version < '3.12.4' and python_version < '3.12') or (python_full_version < '3.12.4' and python_version < '3.13' and python_version >= '3.12') or (python_full_version >= '3.12.4' and python_version < '3.13')
     # via quivr-api
 ecdsa==0.19.0 ; python_version >= '3.13' or (python_full_version < '3.12.4' and python_version < '3.12') or (python_full_version < '3.12.4' and python_version < '3.13' and python_version >= '3.12') or (python_full_version >= '3.12.4' and python_version < '3.13')
@@ -145,7 +147,7 @@ emoji==2.12.1 ; python_version >= '3.13' or (python_full_version < '3.12.4' and 
 et-xmlfile==1.1.0 ; python_version >= '3.13' or (python_full_version < '3.12.4' and python_version < '3.12') or (python_full_version < '3.12.4' and python_version < '3.13' and python_version >= '3.12') or (python_full_version >= '3.12.4' and python_version < '3.13')
     # via openpyxl
 faiss-cpu==1.8.0.post1 ; python_version >= '3.13' or (python_full_version < '3.12.4' and python_version < '3.12') or (python_full_version < '3.12.4' and python_version < '3.13' and python_version >= '3.12') or (python_full_version >= '3.12.4' and python_version < '3.13')
-    # via core
+    # via quivr-core
 fastapi==0.112.1 ; python_version >= '3.13' or (python_full_version < '3.12.4' and python_version < '3.12') or (python_full_version < '3.12.4' and python_version < '3.13' and python_version >= '3.12') or (python_full_version >= '3.12.4' and python_version < '3.13')
     # via quivr-api
     # via sentry-sdk
@@ -162,7 +164,7 @@ fire==0.6.0 ; python_version >= '3.13' or (python_full_version < '3.12.4' and py
 flatbuffers==24.3.25 ; python_version >= '3.13' or (python_full_version < '3.12.4' and python_version < '3.12') or (python_full_version < '3.12.4' and python_version < '3.13' and python_version >= '3.12') or (python_full_version >= '3.12.4' and python_version < '3.13')
     # via onnxruntime
 flower==2.0.1 ; python_version >= '3.13' or (python_full_version < '3.12.4' and python_version < '3.12') or (python_full_version < '3.12.4' and python_version < '3.13' and python_version >= '3.12') or (python_full_version >= '3.12.4' and python_version < '3.13')
-    # via worker
+    # via quivr-worker
 fonttools==4.53.1 ; python_version >= '3.13' or (python_full_version < '3.12.4' and python_version < '3.12') or (python_full_version < '3.12.4' and python_version < '3.13' and python_version >= '3.12') or (python_full_version >= '3.12.4' and python_version < '3.13')
     # via matplotlib
     # via pdf2docx
@@ -202,10 +204,10 @@ gotrue==2.7.0 ; python_version >= '3.13' or (python_full_version < '3.12.4' and 
 greenlet==3.0.3 ; python_version >= '3.13' or (python_full_version < '3.12.4' and python_version < '3.12') or (python_full_version < '3.12.4' and python_version < '3.13' and python_version >= '3.12') or (python_full_version >= '3.12.4' and python_version < '3.13') or (python_version < '3.13' and (python_full_version >= '3.12.4' or (python_full_version < '3.12.4' and python_version < '3.12') or (python_full_version < '3.12.4' and python_version >= '3.12')) and (platform_machine == 'AMD64' or platform_machine == 'WIN32' or platform_machine == 'aarch64' or platform_machine == 'amd64' or platform_machine == 'ppc64le' or platform_machine == 'win32' or platform_machine == 'x86_64'))
     # via playwright
     # via sqlalchemy
-grpcio==1.65.4 ; python_version >= '3.13' or (python_full_version < '3.12.4' and python_version < '3.12') or (python_full_version < '3.12.4' and python_version < '3.13' and python_version >= '3.12') or (python_full_version >= '3.12.4' and python_version < '3.13')
+grpcio==1.65.5 ; python_version >= '3.13' or (python_full_version < '3.12.4' and python_version < '3.12') or (python_full_version < '3.12.4' and python_version < '3.13' and python_version >= '3.12') or (python_full_version >= '3.12.4' and python_version < '3.13')
     # via google-api-core
     # via grpcio-status
-grpcio-status==1.65.4 ; python_version >= '3.13' or (python_full_version < '3.12.4' and python_version < '3.12') or (python_full_version < '3.12.4' and python_version < '3.13' and python_version >= '3.12') or (python_full_version >= '3.12.4' and python_version < '3.13')
+grpcio-status==1.65.5 ; python_version >= '3.13' or (python_full_version < '3.12.4' and python_version < '3.12') or (python_full_version < '3.12.4' and python_version < '3.13' and python_version >= '3.12') or (python_full_version >= '3.12.4' and python_version < '3.13')
     # via google-api-core
 h11==0.14.0 ; python_version >= '3.13' or (python_full_version < '3.12.4' and python_version < '3.12') or (python_full_version < '3.12.4' and python_version < '3.13' and python_version >= '3.12') or (python_full_version >= '3.12.4' and python_version < '3.13')
     # via httpcore
@@ -221,7 +223,6 @@ httplib2==0.22.0 ; python_version >= '3.13' or (python_full_version < '3.12.4' a
     # via google-auth-httplib2
 httpx==0.27.0 ; python_version >= '3.13' or (python_full_version < '3.12.4' and python_version < '3.12') or (python_full_version < '3.12.4' and python_version < '3.13' and python_version >= '3.12') or (python_full_version >= '3.12.4' and python_version < '3.13')
     # via cohere
-    # via core
     # via gotrue
     # via llama-cloud
     # via llama-index-core
@@ -281,19 +282,18 @@ kiwisolver==1.4.5 ; python_version >= '3.13' or (python_full_version < '3.12.4' 
 kombu==5.4.0 ; python_version >= '3.13' or (python_full_version < '3.12.4' and python_version < '3.12') or (python_full_version < '3.12.4' and python_version < '3.13' and python_version >= '3.12') or (python_full_version >= '3.12.4' and python_version < '3.13')
     # via celery
 langchain==0.2.14 ; python_version >= '3.13' or (python_full_version < '3.12.4' and python_version < '3.12') or (python_full_version < '3.12.4' and python_version < '3.13' and python_version >= '3.12') or (python_full_version >= '3.12.4' and python_version < '3.13')
-    # via core
     # via langchain-community
     # via megaparse
     # via quivr-api
+    # via quivr-core
 langchain-cohere==0.2.2 ; python_version >= '3.13' or (python_full_version < '3.12.4' and python_version < '3.12') or (python_full_version < '3.12.4' and python_version < '3.13' and python_version >= '3.12') or (python_full_version >= '3.12.4' and python_version < '3.13')
     # via quivr-api
 langchain-community==0.2.12 ; python_version >= '3.13' or (python_full_version < '3.12.4' and python_version < '3.12') or (python_full_version < '3.12.4' and python_version < '3.13' and python_version >= '3.12') or (python_full_version >= '3.12.4' and python_version < '3.13')
-    # via core
     # via langchain-experimental
     # via megaparse
     # via quivr-api
-langchain-core==0.2.32 ; python_version >= '3.13' or (python_full_version < '3.12.4' and python_version < '3.12') or (python_full_version < '3.12.4' and python_version < '3.13' and python_version >= '3.12') or (python_full_version >= '3.12.4' and python_version < '3.13')
-    # via core
+    # via quivr-core
+langchain-core==0.2.33 ; python_version >= '3.13' or (python_full_version < '3.12.4' and python_version < '3.12') or (python_full_version < '3.12.4' and python_version < '3.13' and python_version >= '3.12') or (python_full_version >= '3.12.4' and python_version < '3.13')
     # via langchain
     # via langchain-cohere
     # via langchain-community
@@ -304,7 +304,7 @@ langchain-core==0.2.32 ; python_version >= '3.13' or (python_full_version < '3.1
     # via quivr-core
 langchain-experimental==0.0.64 ; python_version >= '3.13' or (python_full_version < '3.12.4' and python_version < '3.12') or (python_full_version < '3.12.4' and python_version < '3.13' and python_version >= '3.12') or (python_full_version >= '3.12.4' and python_version < '3.13')
     # via langchain-cohere
-langchain-openai==0.1.21 ; python_version >= '3.13' or (python_full_version < '3.12.4' and python_version < '3.12') or (python_full_version < '3.12.4' and python_version < '3.13' and python_version >= '3.12') or (python_full_version >= '3.12.4' and python_version < '3.13')
+langchain-openai==0.1.22 ; python_version >= '3.13' or (python_full_version < '3.12.4' and python_version < '3.12') or (python_full_version < '3.12.4' and python_version < '3.13' and python_version >= '3.12') or (python_full_version >= '3.12.4' and python_version < '3.13')
     # via megaparse
     # via quivr-api
 langchain-text-splitters==0.2.2 ; python_version >= '3.13' or (python_full_version < '3.12.4' and python_version < '3.12') or (python_full_version < '3.12.4' and python_version < '3.13' and python_version >= '3.12') or (python_full_version >= '3.12.4' and python_version < '3.13')
@@ -317,7 +317,7 @@ langsmith==0.1.99 ; python_version >= '3.13' or (python_full_version < '3.12.4' 
     # via langchain-core
 layoutparser==0.3.4 ; python_version >= '3.13' or (python_full_version < '3.12.4' and python_version < '3.12') or (python_full_version < '3.12.4' and python_version < '3.13' and python_version >= '3.12') or (python_full_version >= '3.12.4' and python_version < '3.13')
     # via unstructured-inference
-litellm==1.43.15 ; python_version >= '3.13' or (python_full_version < '3.12.4' and python_version < '3.12') or (python_full_version < '3.12.4' and python_version < '3.13' and python_version >= '3.12') or (python_full_version >= '3.12.4' and python_version < '3.13')
+litellm==1.43.18 ; python_version >= '3.13' or (python_full_version < '3.12.4' and python_version < '3.12') or (python_full_version < '3.12.4' and python_version < '3.13' and python_version >= '3.12') or (python_full_version >= '3.12.4' and python_version < '3.13')
     # via quivr-api
 llama-cloud==0.0.13 ; python_version >= '3.13' or (python_full_version < '3.12.4' and python_version < '3.12') or (python_full_version < '3.12.4' and python_version < '3.13' and python_version >= '3.12') or (python_full_version >= '3.12.4' and python_version < '3.13')
     # via llama-index-indices-managed-llama-cloud
@@ -328,7 +328,7 @@ llama-index-agent-openai==0.2.9 ; python_version >= '3.13' or (python_full_versi
     # via llama-index-program-openai
 llama-index-cli==0.1.13 ; python_version >= '3.13' or (python_full_version < '3.12.4' and python_version < '3.12') or (python_full_version < '3.12.4' and python_version < '3.13' and python_version >= '3.12') or (python_full_version >= '3.12.4' and python_version < '3.13')
     # via llama-index
-llama-index-core==0.10.66 ; python_version >= '3.13' or (python_full_version < '3.12.4' and python_version < '3.12') or (python_full_version < '3.12.4' and python_version < '3.13' and python_version >= '3.12') or (python_full_version >= '3.12.4' and python_version < '3.13')
+llama-index-core==0.10.67 ; python_version >= '3.13' or (python_full_version < '3.12.4' and python_version < '3.12') or (python_full_version < '3.12.4' and python_version < '3.13' and python_version >= '3.12') or (python_full_version >= '3.12.4' and python_version < '3.13')
     # via llama-index
     # via llama-index-agent-openai
     # via llama-index-cli
@@ -346,7 +346,7 @@ llama-index-embeddings-openai==0.1.11 ; python_version >= '3.13' or (python_full
     # via llama-index-cli
 llama-index-indices-managed-llama-cloud==0.2.7 ; python_version >= '3.13' or (python_full_version < '3.12.4' and python_version < '3.12') or (python_full_version < '3.12.4' and python_version < '3.13' and python_version >= '3.12') or (python_full_version >= '3.12.4' and python_version < '3.13')
     # via llama-index
-llama-index-legacy==0.9.48.post2 ; python_version >= '3.13' or (python_full_version < '3.12.4' and python_version < '3.12') or (python_full_version < '3.12.4' and python_version < '3.13' and python_version >= '3.12') or (python_full_version >= '3.12.4' and python_version < '3.13')
+llama-index-legacy==0.9.48.post3 ; python_version >= '3.13' or (python_full_version < '3.12.4' and python_version < '3.12') or (python_full_version < '3.12.4' and python_version < '3.13' and python_version >= '3.12') or (python_full_version >= '3.12.4' and python_version < '3.13')
     # via llama-index
 llama-index-llms-openai==0.1.29 ; python_version >= '3.13' or (python_full_version < '3.12.4' and python_version < '3.12') or (python_full_version < '3.12.4' and python_version < '3.13' and python_version >= '3.12') or (python_full_version >= '3.12.4' and python_version < '3.13')
     # via llama-index
@@ -397,7 +397,7 @@ matplotlib==3.9.2 ; python_version >= '3.13' or (python_full_version < '3.12.4' 
 mdurl==0.1.2 ; python_version >= '3.13' or (python_full_version < '3.12.4' and python_version < '3.12') or (python_full_version < '3.12.4' and python_version < '3.13' and python_version >= '3.12') or (python_full_version >= '3.12.4' and python_version < '3.13')
     # via markdown-it-py
 megaparse==0.0.28 ; python_version >= '3.13' or (python_full_version < '3.12.4' and python_version < '3.12') or (python_full_version < '3.12.4' and python_version < '3.13' and python_version >= '3.12') or (python_full_version >= '3.12.4' and python_version < '3.13')
-    # via core
+    # via quivr-core
 monotonic==1.6 ; python_version >= '3.13' or (python_full_version < '3.12.4' and python_version < '3.12') or (python_full_version < '3.12.4' and python_version < '3.13' and python_version >= '3.12') or (python_full_version >= '3.12.4' and python_version < '3.13')
     # via posthog
 mpmath==1.3.0 ; python_version >= '3.13' or (python_full_version < '3.12.4' and python_version < '3.12') or (python_full_version < '3.12.4' and python_version < '3.13' and python_version >= '3.12') or (python_full_version >= '3.12.4' and python_version < '3.13')
@@ -453,7 +453,7 @@ onnx==1.16.2 ; python_version >= '3.13' or (python_full_version < '3.12.4' and p
     # via unstructured-inference
 onnxruntime==1.19.0 ; python_version >= '3.13' or (python_full_version < '3.12.4' and python_version < '3.12') or (python_full_version < '3.12.4' and python_version < '3.13' and python_version >= '3.12') or (python_full_version >= '3.12.4' and python_version < '3.13')
     # via unstructured-inference
-openai==1.40.8 ; python_version >= '3.13' or (python_full_version < '3.12.4' and python_version < '3.12') or (python_full_version < '3.12.4' and python_version < '3.13' and python_version >= '3.12') or (python_full_version >= '3.12.4' and python_version < '3.13')
+openai==1.41.0 ; python_version >= '3.13' or (python_full_version < '3.12.4' and python_version < '3.12') or (python_full_version < '3.12.4' and python_version < '3.13' and python_version >= '3.12') or (python_full_version >= '3.12.4' and python_version < '3.13')
     # via langchain-openai
     # via litellm
     # via llama-index-agent-openai
@@ -461,7 +461,7 @@ openai==1.40.8 ; python_version >= '3.13' or (python_full_version < '3.12.4' and
     # via llama-index-legacy
     # via llama-index-llms-openai
     # via quivr-api
-    # via worker
+    # via quivr-worker
 opencv-python==4.10.0.84 ; python_version >= '3.13' or (python_full_version < '3.12.4' and python_version < '3.12') or (python_full_version < '3.12.4' and python_version < '3.13' and python_version >= '3.12') or (python_full_version >= '3.12.4' and python_version < '3.13')
     # via layoutparser
     # via unstructured-inference
@@ -518,7 +518,7 @@ pillow==10.2.0 ; python_version >= '3.13' or (python_full_version < '3.12.4' and
 pillow-heif==0.18.0 ; python_version >= '3.13' or (python_full_version < '3.12.4' and python_version < '3.12') or (python_full_version < '3.12.4' and python_version < '3.13' and python_version >= '3.12') or (python_full_version >= '3.12.4' and python_version < '3.13')
     # via unstructured
 playwright==1.46.0 ; python_version >= '3.13' or (python_full_version < '3.12.4' and python_version < '3.12') or (python_full_version < '3.12.4' and python_version < '3.13' and python_version >= '3.12') or (python_full_version >= '3.12.4' and python_version < '3.13')
-    # via worker
+    # via quivr-worker
 ply==3.11 ; python_version >= '3.13' or (python_full_version < '3.12.4' and python_version < '3.12') or (python_full_version < '3.12.4' and python_version < '3.13' and python_version >= '3.12') or (python_full_version >= '3.12.4' and python_version < '3.13')
     # via stone
 portalocker==2.10.1 ; python_version >= '3.13' or (python_full_version < '3.12.4' and python_version < '3.12') or (python_full_version < '3.12.4' and python_version < '3.13' and python_version >= '3.12') or (python_full_version >= '3.12.4' and python_version < '3.13')
@@ -560,7 +560,6 @@ pycryptodome==3.20.0 ; python_version >= '3.13' or (python_full_version < '3.12.
     # via megaparse
 pydantic==2.8.2 ; python_version >= '3.13' or (python_full_version < '3.12.4' and python_version < '3.12') or (python_full_version < '3.12.4' and python_version < '3.13' and python_version >= '3.12') or (python_full_version >= '3.12.4' and python_version < '3.13') or ((python_full_version < '3.12.4' or python_full_version >= '3.12.4') and ((python_full_version < '3.12.4' and python_version < '3.12') or (python_full_version < '3.12.4' and python_version < '3.13' and python_version >= '3.12') or (python_full_version >= '3.12.4' and python_version < '3.13')))
     # via cohere
-    # via core
     # via fastapi
     # via gotrue
     # via langchain
@@ -621,7 +620,7 @@ python-dotenv==1.0.1 ; python_version >= '3.13' or (python_full_version < '3.12.
     # via megaparse
     # via pydantic-settings
     # via quivr-api
-    # via worker
+    # via quivr-worker
 python-iso639==2024.4.27 ; python_version >= '3.13' or (python_full_version < '3.12.4' and python_version < '3.12') or (python_full_version < '3.12.4' and python_version < '3.13' and python_version >= '3.12') or (python_full_version >= '3.12.4' and python_version < '3.13')
     # via unstructured
 python-jose==3.3.0 ; python_version >= '3.13' or (python_full_version < '3.12.4' and python_version < '3.12') or (python_full_version < '3.12.4' and python_version < '3.13' and python_version >= '3.12') or (python_full_version >= '3.12.4' and python_version < '3.13')
@@ -649,13 +648,10 @@ pyyaml==6.0.2 ; python_version >= '3.13' or (python_full_version < '3.12.4' and 
     # via omegaconf
     # via timm
     # via transformers
-quivr-core==0.0.12 ; python_version >= '3.13' or (python_full_version < '3.12.4' and python_version < '3.12') or (python_full_version < '3.12.4' and python_version < '3.13' and python_version >= '3.12') or (python_full_version >= '3.12.4' and python_version < '3.13')
-    # via quivr-api
-    # via worker
 rapidfuzz==3.9.6 ; python_version >= '3.13' or (python_full_version < '3.12.4' and python_version < '3.12') or (python_full_version < '3.12.4' and python_version < '3.13' and python_version >= '3.12') or (python_full_version >= '3.12.4' and python_version < '3.13')
     # via unstructured
     # via unstructured-inference
-realtime==1.0.3 ; python_version >= '3.13' or (python_full_version < '3.12.4' and python_version < '3.12') or (python_full_version < '3.12.4' and python_version < '3.13' and python_version >= '3.12') or (python_full_version >= '3.12.4' and python_version < '3.13')
+realtime==2.0.1 ; python_version >= '3.13' or (python_full_version < '3.12.4' and python_version < '3.12') or (python_full_version < '3.12.4' and python_version < '3.13' and python_version >= '3.12') or (python_full_version >= '3.12.4' and python_version < '3.13')
     # via supabase
 redis==5.0.8 ; python_version >= '3.13' or (python_full_version < '3.12.4' and python_version < '3.12') or (python_full_version < '3.12.4' and python_version < '3.13' and python_version >= '3.12') or (python_full_version >= '3.12.4' and python_version < '3.13')
     # via celery
@@ -691,7 +687,6 @@ requests-oauthlib==2.0.0 ; python_version >= '3.13' or (python_full_version < '3
 resend==2.4.0 ; python_version >= '3.13' or (python_full_version < '3.12.4' and python_version < '3.12') or (python_full_version < '3.12.4' and python_version < '3.13' and python_version >= '3.12') or (python_full_version >= '3.12.4' and python_version < '3.13')
     # via quivr-api
 rich==13.7.1 ; python_version >= '3.13' or (python_full_version < '3.12.4' and python_version < '3.12') or (python_full_version < '3.12.4' and python_version < '3.13' and python_version >= '3.12') or (python_full_version >= '3.12.4' and python_version < '3.13')
-    # via core
     # via quivr-core
 rpds-py==0.20.0 ; python_version >= '3.13' or (python_full_version < '3.12.4' and python_version < '3.12') or (python_full_version < '3.12.4' and python_version < '3.13' and python_version >= '3.12') or (python_full_version >= '3.12.4' and python_version < '3.13')
     # via jsonschema
@@ -742,7 +737,7 @@ strenum==0.4.15 ; python_version >= '3.13' or (python_full_version < '3.12.4' an
     # via postgrest
 striprtf==0.0.26 ; python_version >= '3.13' or (python_full_version < '3.12.4' and python_version < '3.12') or (python_full_version < '3.12.4' and python_version < '3.13' and python_version >= '3.12') or (python_full_version >= '3.12.4' and python_version < '3.13')
     # via llama-index-readers-file
-supabase==2.6.0 ; python_version >= '3.13' or (python_full_version < '3.12.4' and python_version < '3.12') or (python_full_version < '3.12.4' and python_version < '3.13' and python_version >= '3.12') or (python_full_version >= '3.12.4' and python_version < '3.13')
+supabase==2.7.1 ; python_version >= '3.13' or (python_full_version < '3.12.4' and python_version < '3.12') or (python_full_version < '3.12.4' and python_version < '3.13' and python_version >= '3.12') or (python_full_version >= '3.12.4' and python_version < '3.13')
     # via quivr-api
 supafunc==0.5.1 ; python_version >= '3.13' or (python_full_version < '3.12.4' and python_version < '3.12') or (python_full_version < '3.12.4' and python_version < '3.13' and python_version >= '3.12') or (python_full_version >= '3.12.4' and python_version < '3.13')
     # via supabase
@@ -761,7 +756,6 @@ tenacity==8.5.0 ; python_version >= '3.13' or (python_full_version < '3.12.4' an
 termcolor==2.4.0 ; python_version >= '3.13' or (python_full_version < '3.12.4' and python_version < '3.12') or (python_full_version < '3.12.4' and python_version < '3.13' and python_version >= '3.12') or (python_full_version >= '3.12.4' and python_version < '3.13')
     # via fire
 tiktoken==0.7.0 ; python_version >= '3.13' or (python_full_version < '3.12.4' and python_version < '3.12') or (python_full_version < '3.12.4' and python_version < '3.13' and python_version >= '3.12') or (python_full_version >= '3.12.4' and python_version < '3.13')
-    # via core
     # via langchain-openai
     # via litellm
     # via llama-index-core
@@ -778,15 +772,15 @@ tokenizers==0.19.1 ; python_version >= '3.13' or (python_full_version < '3.12.4'
 torch==2.4.0+cpu ; python_version >= '3.13' or (python_full_version < '3.12.4' and python_version < '3.12') or (python_full_version < '3.12.4' and python_version < '3.13' and python_version >= '3.12') or (python_full_version >= '3.12.4' and python_version < '3.13')
     # via effdet
     # via megaparse
+    # via quivr-worker
     # via timm
     # via torchvision
     # via unstructured-inference
-    # via worker
 torchvision==0.19.0+cpu ; python_version >= '3.13' or (python_full_version < '3.12.4' and python_version < '3.12') or (python_full_version < '3.12.4' and python_version < '3.13' and python_version >= '3.12') or (python_full_version >= '3.12.4' and python_version < '3.13')
     # via effdet
     # via megaparse
+    # via quivr-worker
     # via timm
-    # via worker
 tornado==6.4.1 ; python_version >= '3.13' or (python_full_version < '3.12.4' and python_version < '3.12') or (python_full_version < '3.12.4' and python_version < '3.13' and python_version >= '3.12') or (python_full_version >= '3.12.4' and python_version < '3.13')
     # via flower
 tqdm==4.66.5 ; python_version >= '3.13' or (python_full_version < '3.12.4' and python_version < '3.12') or (python_full_version < '3.12.4' and python_version < '3.13' and python_version >= '3.12') or (python_full_version >= '3.12.4' and python_version < '3.13')
@@ -837,8 +831,8 @@ tzdata==2024.1 ; python_version >= '3.13' or (python_full_version < '3.12.4' and
 unidecode==1.3.8 ; python_version >= '3.13' or (python_full_version < '3.12.4' and python_version < '3.12') or (python_full_version < '3.12.4' and python_version < '3.13' and python_version >= '3.12') or (python_full_version >= '3.12.4' and python_version < '3.13')
     # via quivr-api
 unstructured==0.15.5 ; python_version >= '3.13' or (python_full_version < '3.12.4' and python_version < '3.12') or (python_full_version < '3.12.4' and python_version < '3.13' and python_version >= '3.12') or (python_full_version >= '3.12.4' and python_version < '3.13')
-    # via core
     # via megaparse
+    # via quivr-core
 unstructured-client==0.8.1 ; python_version >= '3.13' or (python_full_version < '3.12.4' and python_version < '3.12') or (python_full_version < '3.12.4' and python_version < '3.13' and python_version >= '3.12') or (python_full_version >= '3.12.4' and python_version < '3.13')
     # via unstructured
 unstructured-inference==0.7.36 ; python_version >= '3.13' or (python_full_version < '3.12.4' and python_version < '3.12') or (python_full_version < '3.12.4' and python_version < '3.13' and python_version >= '3.12') or (python_full_version >= '3.12.4' and python_version < '3.13')

@@ -38,7 +38,7 @@ dev-dependencies = [
 ]
 
 [tool.rye.workspace]
-members = [".", "worker", "api", "core"]
+members = [".", "core", "worker", "api"]
 
 [tool.hatch.metadata]
 allow-direct-references = true

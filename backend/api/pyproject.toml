@@ -55,13 +55,16 @@ build-backend = "hatchling.build"
 managed = true
 dev-dependencies = []
 
+[tool.rye.scripts]
+test-run = { cmd = "pytest", env-file = "../../.env"}
+
 [tool.hatch.metadata]
 allow-direct-references = true
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/api"]
+packages = ["quivr_api"]
 
 
 [[tool.rye.sources]]
 name = "quivr-core"
-path = "../core"
+path = "../quivr-core"

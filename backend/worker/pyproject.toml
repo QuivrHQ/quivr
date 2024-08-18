@@ -1,5 +1,5 @@
 [project]
-name = "worker"
+name = "quivr-worker"
 version = "0.1.0"
 description = "Add your description here"
 authors = [
@@ -25,13 +25,14 @@ build-backend = "hatchling.build"
 
 [tool.rye]
 managed = true
-dev-dependencies = []
+dev-dependencies = [
+]
 
 [tool.hatch.metadata]
 allow-direct-references = true
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/worker"]
+packages = ["quivr_worker"]
 
 [[tool.rye.sources]]
 name = "pytorch"
@@ -39,8 +40,8 @@ find_links = "https://download.pytorch.org/whl/torch_stable.html"
 
 [[tool.rye.sources]]
 name = "quivr-core"
-path = "../core"
+path = "../quivr-core"
 
 [[tool.rye.sources]]
 name = "quivr-api"
-path = "../api"
+path = "../quivr-api"

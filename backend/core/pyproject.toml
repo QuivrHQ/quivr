@@ -1,5 +1,5 @@
 [project]
-name = "core"
+name = "quivr-core"
 version = "0.0.13"
 description = "Quivr core RAG package"
 authors = [
@@ -46,4 +46,4 @@ dev-dependencies = [
 allow-direct-references = true
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/core"]
+packages = ["quivr_core"]
