@@ -209,7 +209,7 @@ def fetch_notion_pages(
         if last_edited_time > last_sync_time:
             all_search_result.append(page)
 
-    if last_edited_time and last_edited_time < last_sync_time:
+    if last_edited_time and last_sync_time > last_edited_time:
         # We check if the last element of the search result is older than 6 hours, if it is, we stop the search
         return all_search_result
 
