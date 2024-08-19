@@ -8,6 +8,7 @@ import { useBrainCreationContext } from "@/lib/components/AddBrainModal/brainCre
 import { OnboardingModal } from "@/lib/components/OnboardingModal/OnboardingModal";
 import { PageHeader } from "@/lib/components/PageHeader/PageHeader";
 import { UploadDocumentModal } from "@/lib/components/UploadDocumentModal/UploadDocumentModal";
+import { EmojiSelector } from "@/lib/components/ui/EmojiSelector/EmojiSelector";
 import { SearchBar } from "@/lib/components/ui/SearchBar/SearchBar";
 import { SmallTabs } from "@/lib/components/ui/SmallTabs/SmallTabs";
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
@@ -75,7 +76,6 @@ const Search = (): JSX.Element => {
   };
 
   useEffect(() => {
-    console.info(allBrains.length);
     if (userData) {
       setButtons((prevButtons) => {
         return prevButtons.map((button) => {
@@ -133,6 +133,7 @@ const Search = (): JSX.Element => {
       <UploadDocumentModal />
       <AddBrainModal />
       <OnboardingModal />
+      <EmojiSelector />
     </div>
   );
 };
