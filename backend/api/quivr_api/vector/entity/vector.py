@@ -3,6 +3,7 @@ from uuid import UUID
 
 from pgvector.sqlalchemy import Vector as PGVector
 from pydantic import BaseModel
+from quivr_api.models.settings import settings
 from sqlalchemy import Column
 from sqlmodel import JSON
 from sqlmodel import UUID as PGUUID
@@ -22,7 +23,7 @@ class Vector(SQLModel, table=True):
     content: str = Field(default=None)
     metadata_: dict = Field(default={}, sa_column=Column("metadata", JSON, default={}))
     embedding: Optional[PGVector] = Field(
-        sa_column=Column(PGVector(1536))
+        sa_column=Column(PGVector(settings.embedding_dim)),
     )  # Verify with text_ada -> put it in Env variabme
     knowledge_id: UUID = Field(default=None, foreign_key="knowledge.id")
 

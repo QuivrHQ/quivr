@@ -179,17 +179,17 @@ async def process_crawl_task(
         brain_vector_service = BrainVectorService(brain_id)
         vector_repository = VectorRepository(session)
         vector_service = VectorService(vector_repository)
-    loop = asyncio.get_event_loop()
-    loop.run_until_complete(
-        process_url_func(
-            url=crawl_website_url,
-            brain_id=brain_id,
-            knowledge_id=knowledge_id,
-            brain_service=brain_service,
-            brain_vector_service=brain_vector_service,
-            vector_service=vector_service,
+        loop = asyncio.get_event_loop()
+        loop.run_until_complete(
+            process_url_func(
+                url=crawl_website_url,
+                brain_id=brain_id,
+                knowledge_id=knowledge_id,
+                brain_service=brain_service,
+                brain_vector_service=brain_vector_service,
+                vector_service=vector_service,
+            )
         )
-    )
 
 
 @celery.task(name="NotionConnectorLoad")

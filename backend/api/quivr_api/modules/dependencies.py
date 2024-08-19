@@ -56,7 +56,7 @@ S = TypeVar("S", bound=BaseService)
 sync_engine = create_engine(
     settings.pg_database_url,
     echo=True if os.getenv("ORM_DEBUG") else False,
-    future=False,
+    future=True,
     # NOTE: pessimistic bound on
     pool_pre_ping=True,
     pool_size=10,  # NOTE: no bouncer for now, if 6 process workers => 6
