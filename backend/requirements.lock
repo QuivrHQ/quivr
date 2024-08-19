@@ -3,7 +3,7 @@
 #
 # last locked with the following flags:
 #   pre: false
-#   features: []
+#   features: ["quivr-core/all"]
 #   all-features: false
 #   with-sources: true
 #   generate-hashes: false
@@ -12,8 +12,8 @@
 --index-url https://pypi.org/simple/
 --extra-index-url https://download.pytorch.org/whl/cpu
 
+-e file:.
 -e file:api
-    # via quivr-worker
 -e file:core
     # via quivr-api
     # via quivr-worker
@@ -321,7 +321,7 @@ litellm==1.43.18 ; python_version >= '3.13' or (python_full_version < '3.12.4' a
     # via quivr-api
 llama-cloud==0.0.13 ; python_version >= '3.13' or (python_full_version < '3.12.4' and python_version < '3.12') or (python_full_version < '3.12.4' and python_version < '3.13' and python_version >= '3.12') or (python_full_version >= '3.12.4' and python_version < '3.13')
     # via llama-index-indices-managed-llama-cloud
-llama-index==0.10.65 ; python_version >= '3.13' or (python_full_version < '3.12.4' and python_version < '3.12') or (python_full_version < '3.12.4' and python_version < '3.13' and python_version >= '3.12') or (python_full_version >= '3.12.4' and python_version < '3.13')
+llama-index==0.10.67.post1 ; python_version >= '3.13' or (python_full_version < '3.12.4' and python_version < '3.12') or (python_full_version < '3.12.4' and python_version < '3.13' and python_version >= '3.12') or (python_full_version >= '3.12.4' and python_version < '3.13')
     # via megaparse
 llama-index-agent-openai==0.2.9 ; python_version >= '3.13' or (python_full_version < '3.12.4' and python_version < '3.12') or (python_full_version < '3.12.4' and python_version < '3.13' and python_version >= '3.12') or (python_full_version >= '3.12.4' and python_version < '3.13')
     # via llama-index
@@ -480,6 +480,7 @@ packaging==24.1 ; python_version >= '3.13' or (python_full_version < '3.12.4' an
     # via matplotlib
     # via onnxruntime
     # via pikepdf
+    # via quivr-monorepo
     # via transformers
     # via unstructured-client
     # via unstructured-pytesseract
@@ -499,7 +500,7 @@ pdf2image==1.17.0 ; python_version >= '3.13' or (python_full_version < '3.12.4' 
 pdfminer-six==20231228 ; python_version >= '3.13' or (python_full_version < '3.12.4' and python_version < '3.12') or (python_full_version < '3.12.4' and python_version < '3.13' and python_version >= '3.12') or (python_full_version >= '3.12.4' and python_version < '3.13')
     # via pdfplumber
     # via unstructured
-pdfplumber==0.11.3 ; python_version >= '3.13' or (python_full_version < '3.12.4' and python_version < '3.12') or (python_full_version < '3.12.4' and python_version < '3.13' and python_version >= '3.12') or (python_full_version >= '3.12.4' and python_version < '3.13')
+pdfplumber==0.11.4 ; python_version >= '3.13' or (python_full_version < '3.12.4' and python_version < '3.12') or (python_full_version < '3.12.4' and python_version < '3.13' and python_version >= '3.12') or (python_full_version >= '3.12.4' and python_version < '3.13')
     # via layoutparser
     # via megaparse
 pikepdf==9.1.1 ; python_version >= '3.13' or (python_full_version < '3.12.4' and python_version < '3.12') or (python_full_version < '3.12.4' and python_version < '3.13' and python_version >= '3.12') or (python_full_version >= '3.12.4' and python_version < '3.13')

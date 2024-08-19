@@ -10,7 +10,7 @@ services:
       - .env
     build:
       context: backend
-      dockerfile: api/Dockerfile.dev
+      dockerfile: Dockerfile.dev
       cache_from:
         - backend-api:latest
       args:
@@ -19,7 +19,7 @@ services:
     volumes:
       - ./backend/:/code/
     command: >
-      /bin/bash -c "poetry install -q && poetry run uvicorn quivr_api.main:app --host 0.0.0.0 --log-level info --reload --port 5050"
+      /bin/bash -c "python -m uvicorn quivr_api.main:app --host 0.0.0.0 --log-level info --reload --port 5050"
     restart: always
     ports:
       - 5050:5050
@@ -27,7 +27,7 @@ services:
 
   notifier:
     pull_policy: never
-    image: backend-worker:latest
+    image: backend-api:latest
     extra_hosts:
       - "host.docker.internal:host-gateway"
     env_file:
@@ -36,7 +36,7 @@ services:
     volumes:
       - ./backend/:/code/
     command: >
-      /bin/bash -c "poetry install -q && poetry run python /code/worker/quivr_worker/celery_monitor.py"
+      /bin/bash -c "python /code/worker/quivr_worker/celery_monitor.py"
     restart: always
     depends_on:
       - redis
@@ -44,14 +44,7 @@ services:
 
   worker:
     pull_policy: never
-    image: backend-worker:latest
-    build:
-      context: backend
-      dockerfile: worker/Dockerfile.dev
-      cache_from:
-        - backend-worker:latest
-      args:
-        - DEV_MODE=true
+    image: backend-api:latest
     extra_hosts:
       - "host.docker.internal:host-gateway"
     env_file:
@@ -60,7 +53,7 @@ services:
     volumes:
       - ./backend/:/code/
     command: >
-      /bin/bash -c "poetry install -q && poetry run celery -A quivr_worker.celery_worker worker -l info"
+      /bin/bash -c "python -m celery -A quivr_worker.celery_worker worker -l info"
     restart: always
     depends_on:
       - redis
@@ -75,7 +68,7 @@ services:
       - 6379:6379
 
   beat:
-    image: backend-worker:latest
+    image: backend-api:latest
     pull_policy: never
     extra_hosts:
       - "host.docker.internal:host-gateway"
@@ -83,7 +76,7 @@ services:
       - .env
     container_name: beat
     command: >
-      /bin/bash -c  "poetry install -q && poetry run celery -A quivr_worker.celery_worker beat -l info"
+      /bin/bash -c "python -m celery -A quivr_worker.celery_worker beat -l info"
     volumes:
       - ./backend/:/code/
     restart: always
@@ -99,7 +92,7 @@ services:
       - .env
     container_name: flower
     command: >
-      /bin/bash -c "poetry install -q && poetry run celery -A quivr_worker.celery_worker flower -l info --port=5555"
+      /bin/bash -c "python -m celery -A quivr_worker.celery_worker flower -l info --port=5555"
     volumes:
       - ./backend/:/code/
     restart: always

@@ -7,7 +7,6 @@ authors = [
 ]
 dependencies = [
     "quivr-core",
-    "quivr-api",
     "celery[redis]>=5.0.0",
     "python-dotenv>=1.0.0",
     "playwright>=1.0.0",

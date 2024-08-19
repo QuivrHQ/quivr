@@ -19,7 +19,7 @@ build-backend = "hatchling.build"
 
 [tool.rye]
 managed = true
-virtual = true
+virtual = false
 universal = true
 dev-dependencies = [
     "mypy>=1.11.1",
