@@ -8,7 +8,6 @@ import { useBrainCreationContext } from "@/lib/components/AddBrainModal/brainCre
 import { OnboardingModal } from "@/lib/components/OnboardingModal/OnboardingModal";
 import { PageHeader } from "@/lib/components/PageHeader/PageHeader";
 import { UploadDocumentModal } from "@/lib/components/UploadDocumentModal/UploadDocumentModal";
-import { ColorSelector } from "@/lib/components/ui/ColorSelector/ColorSelector";
 import { SearchBar } from "@/lib/components/ui/SearchBar/SearchBar";
 import { SmallTabs } from "@/lib/components/ui/SmallTabs/SmallTabs";
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
@@ -133,7 +132,6 @@ const Search = (): JSX.Element => {
       <UploadDocumentModal />
       <AddBrainModal />
       <OnboardingModal />
-      <ColorSelector />
     </div>
   );
 };
