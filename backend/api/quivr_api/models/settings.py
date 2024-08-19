@@ -1,4 +1,3 @@
-import os
 from typing import Optional
 from uuid import UUID
 
@@ -121,7 +120,7 @@ class BrainSettings(BaseSettings):
     langfuse_secret_key: str | None = None
     pg_database_url: str
     pg_database_async_url: str
-    embedding_dim: int = int(os.getenv("EMBEDDING_DIM", 1536))
+    embedding_dim: int
 
 
 class ResendSettings(BaseSettings):
