@@ -449,7 +449,7 @@ mccabe==0.7.0 ; python_version >= '3.13' or (python_full_version < '3.12.4' and 
     # via flake8
 mdurl==0.1.2 ; python_version >= '3.13' or (python_full_version < '3.12.4' and python_version < '3.12') or (python_full_version < '3.12.4' and python_version < '3.13' and python_version >= '3.12') or (python_full_version >= '3.12.4' and python_version < '3.13')
     # via markdown-it-py
-megaparse==0.0.28 ; python_version >= '3.13' or (python_full_version < '3.12.4' and python_version < '3.12') or (python_full_version < '3.12.4' and python_version < '3.13' and python_version >= '3.12') or (python_full_version >= '3.12.4' and python_version < '3.13')
+megaparse==0.0.29 ; python_version >= '3.13' or (python_full_version < '3.12.4' and python_version < '3.12') or (python_full_version < '3.12.4' and python_version < '3.13' and python_version >= '3.12') or (python_full_version >= '3.12.4' and python_version < '3.13')
     # via quivr-core
 monotonic==1.6 ; python_version >= '3.13' or (python_full_version < '3.12.4' and python_version < '3.12') or (python_full_version < '3.12.4' and python_version < '3.13' and python_version >= '3.12') or (python_full_version >= '3.12.4' and python_version < '3.13')
     # via posthog

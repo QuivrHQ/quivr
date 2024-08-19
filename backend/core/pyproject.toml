@@ -16,8 +16,8 @@ dependencies = [
     "langchain-community>=0.2.12",
     "unstructured[epub,docx,odt,doc,pptx,ppt,xlsx,md]>=0.15.5",
     "faiss-cpu>=1.8.0.post1",
-    "megaparse>=0.0.28",
     "docx2txt>=0.8",
+    "megaparse>=0.0.29",
 ]
 readme = "README.md"
 requires-python = ">= 3.11"
