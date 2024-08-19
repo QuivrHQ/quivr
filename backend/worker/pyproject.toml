@@ -36,7 +36,7 @@ packages = ["quivr_worker"]
 
 [[tool.rye.sources]]
 name = "pytorch"
-find_links = "https://download.pytorch.org/whl/torch_stable.html"
+url = "https://download.pytorch.org/whl/cpu"
 
 [[tool.rye.sources]]
 name = "quivr-core"
