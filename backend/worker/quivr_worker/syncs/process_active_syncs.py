@@ -1,3 +1,4 @@
+from datetime import datetime, timedelta
 from uuid import UUID
 
 from notion_client import Client
@@ -119,8 +120,10 @@ async def process_notion_sync(
             user_id = notion_sync["user_id"]
             notion_client = Client(auth=notion_sync["credentials"]["access_token"])
 
+            # TODO: fetch last_sync_time from table
             pages_to_update = fetch_limit_notion_pages(
-                notion_client, notion_sync=notion_sync
+                notion_client,
+                datetime.now() - timedelta(hours=6),
             )
             logger.debug("Number of pages to update: %s", len(pages_to_update))
             if not pages_to_update:

@@ -1,5 +1,5 @@
-from datetime import datetime, timedelta, timezone
-from typing import Any, List, Sequence
+from datetime import datetime, timezone
+from typing import List, Sequence
 from uuid import UUID
 
 from notion_client import Client
@@ -35,50 +35,33 @@ class SyncNotionService(BaseService[NotionRepository]):
         return pages_to_add
 
     async def update_notion_files(
-        self, notion_raw_files: List[dict[str, Any]], user_id: UUID, client: Client
+        self, notion_pages: List[NotionPage], user_id: UUID, client: Client
     ) -> bool:
+        # 1. For each page we check if it is already in the db, if it is we modify it, if it isn't we create it.
+        # 2. If the page was modified, we check all direct children of the page and check if they stil exist in notion, if they don't, we delete it
+        # 3. We check if the root folder was deleted, if so we delete the root page & all children
         try:
             pages_to_delete: list[str] = []
-
-            # 1. For each page we check if it is already in the db, if it is we modify it, if it isn't we create it.
-            # 2. If the page was modified, we check all direct children of the page and check if they stil exist in notion, if they don't, we delete it
-            # 3. We check if the root folder was deleted, if so we delete the root page & all children
-
-            for page in notion_raw_files:
-                parent_type = page["parent"]["type"]
+            for page in notion_pages:
                 if (
-                    not page["in_trash"]
-                    and not page["archived"]
-                    and page["parent"]["type"] != "database_id"
+                    not page.in_trash
+                    and not page.archived
+                    and page.parent.type != "database_id"
                 ):
                     logger.debug(
                         "Updating notion file %s ",
-                        page["properties"]["title"]["title"][0]["text"]["content"],
+                        page.id,
                     )
-                    file = NotionSyncFile(
-                        notion_id=page["id"],
-                        parent_id=page["parent"][parent_type],
-                        name=f'{page["properties"]["title"]["title"][0]["text"]["content"]}.md',
-                        icon=page["icon"]["emoji"]
-                        if "icon" in page and "emoji" in page["icon"]
-                        else None,
-                        mime_type="md",
-                        web_view_link=page["url"],
-                        is_folder=True,
-                        last_modified=datetime.strptime(
-                            page["last_edited_time"], "%Y-%m-%dT%H:%M:%S.%fZ"
-                        ),
-                        type="page",
-                        user_id=user_id,
+                    is_update = await self.repository.update_notion_file(
+                        page.to_syncfile(user_id)
                     )
-                    is_update = await self.repository.update_notion_file(file)
 
                     if is_update:
                         logger.info(
-                            f"Updated notion file {file.notion_id}, we need to check if children were deleted"
+                            f"Updated notion file {page.id}, we need to check if children were deleted"
                         )
                         children = await self.get_notion_files_by_parent_id(
-                            file.notion_id
+                            str(page.id)
                         )
                         for child in children:
                             try:
@@ -97,9 +80,7 @@ class SyncNotionService(BaseService[NotionRepository]):
                                 pages_to_delete.append(child.notion_id)
 
                 else:
-                    logger.info(
-                        f"Page {page['id']} is in trash or archived, skipping i guess"
-                    )
+                    logger.info(f"Page {page.id} is in trash or archived, skipping ")
 
             root_pages = await self.get_root_notion_files()
 
@@ -154,7 +135,7 @@ class SyncNotionService(BaseService[NotionRepository]):
 
 async def update_notion_pages(
     notion_service: SyncNotionService,
-    pages_to_update: list[dict[str, Any]],
+    pages_to_update: list[NotionPage],
     user_id: UUID,
     client: Client,
 ):
@@ -183,7 +164,7 @@ def fetch_notion_pages(
 
 def fetch_limit_notion_pages(
     notion_client: Client,
-    last_sync_time: datetime = datetime.now() - timedelta(hours=6),
+    last_sync_time: datetime,
 ) -> List[NotionPage]:
     all_search_result = []
     last_sync_time = last_sync_time.astimezone(timezone.utc)
@@ -197,7 +178,7 @@ def fetch_limit_notion_pages(
         return all_search_result
 
     while search_result.has_more:
-        logger.debug("Next cursor: %s", search_result["next_cursor"])  # type: ignore
+        logger.debug("next page cursor: %s", search_result.next_cursor)  # type: ignore
         search_result = fetch_notion_pages(notion_client)
 
         for page in search_result.results:
