@@ -10,7 +10,7 @@ from quivr_api.modules.sync.entity.sync_models import SyncsActive
 from quivr_api.modules.sync.repository.sync_repository import NotionRepository
 from quivr_api.modules.sync.service.sync_notion import (
     SyncNotionService,
-    fetch_notion_pages,
+    fetch_limit_notion_pages,
     update_notion_pages,
 )
 from quivr_api.modules.sync.service.sync_service import SyncService, SyncUserService
@@ -119,7 +119,9 @@ async def process_notion_sync(
             user_id = notion_sync["user_id"]
             notion_client = Client(auth=notion_sync["credentials"]["access_token"])
 
-            pages_to_update = fetch_notion_pages(notion_client, notion_sync=notion_sync)
+            pages_to_update = fetch_limit_notion_pages(
+                notion_client, notion_sync=notion_sync
+            )
             logger.debug("Number of pages to update: %s", len(pages_to_update))
             if not pages_to_update:
                 logger.info("No pages to update")

@@ -4,6 +4,8 @@ from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
+from quivr_api.modules.sync.entity.sync_models import NotionSyncFile
+
 
 class TextContent(BaseModel):
     content: str | None
@@ -37,7 +39,7 @@ class Status(BaseModel):
 
 class Icon(BaseModel):
     type: Literal["emoji"]
-    emoji: str | None
+    emoji: str
 
 
 class ExternalCoverData(BaseModel):
@@ -71,8 +73,7 @@ class WorkspaceParent(BaseModel):
 
 
 class PageProps(BaseModel):
-    title: Title | None = Field(alias="Title")
-    status: Status | None = Field(alias="Status")
+    title: Title | None
 
 
 class NotionPage(BaseModel):
@@ -84,10 +85,43 @@ class NotionPage(BaseModel):
     archived: bool
     in_trash: bool
     url: str
-    public_url: str
+    public_url: str | None
     parent: Union[PageParent, DatabaseParent, WorkspaceParent] = Field(
         discriminator="type"
     )
     cover: Cover | None
     icon: Icon | None
     properties: PageProps
+
+    def _get_parent_id(self) -> UUID | None:
+        match self.parent:
+            case PageParent(page_id=page_id):
+                return page_id
+            case DatabaseParent():
+                return None
+            case WorkspaceParent():
+                return None
+
+    def to_syncfile(self, user_id: UUID):
+        name = (
+            self.properties.title.title[0].text.content if self.properties.title else ""
+        )
+        return NotionSyncFile(
+            notion_id=str(self.id),  # TODO: store as UUID
+            parent_id=str(self._get_parent_id()),
+            name=f"{name}.md",
+            icon=self.icon.emoji if self.icon else "",
+            mime_type="md",
+            web_view_link=self.url,
+            is_folder=True,
+            last_modified=self.last_edited_time,
+            type="page",
+            user_id=user_id,
+        )
+
+
+class NotionSearchResult(BaseModel):
+    model_config = ConfigDict(extra="allow")
+    results: list[NotionPage]
+    has_more: bool
+    next_cursor: str | None

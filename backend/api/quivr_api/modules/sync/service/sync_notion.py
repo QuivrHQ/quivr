@@ -6,6 +6,7 @@ from notion_client import Client
 
 from quivr_api.logger import get_logger
 from quivr_api.modules.dependencies import BaseService
+from quivr_api.modules.sync.entity.notion_page import NotionPage, NotionSearchResult
 from quivr_api.modules.sync.entity.sync_models import NotionSyncFile
 from quivr_api.modules.sync.repository.sync_repository import NotionRepository
 
@@ -19,37 +20,16 @@ class SyncNotionService(BaseService[NotionRepository]):
         self.repository = repository
 
     async def create_notion_files(
-        self, notion_raw_files: List[dict[str, Any]], user_id: UUID
+        self, notion_raw_files: List[NotionPage], user_id: UUID
     ) -> list[NotionSyncFile]:
         pages_to_add: List[NotionSyncFile] = []
         for page in notion_raw_files:
-            parent_type = page["parent"]["type"]
             if (
-                not page["in_trash"]
-                and not page["archived"]
-                and page["parent"]["type"] != "database_id"
+                not page.in_trash
+                and not page.archived
+                and page.parent.type != "database_id"
             ):
-                file = NotionSyncFile(
-                    notion_id=page["id"],
-                    parent_id=(
-                        page["parent"][parent_type]
-                        if not parent_type == "workspace"
-                        else None
-                    ),
-                    name=f'{page["properties"]["title"]["title"][0]["text"]["content"]}.md',
-                    icon=page["icon"]["emoji"]
-                    if "icon" in page and "emoji" in page["icon"]
-                    else None,
-                    mime_type="md",
-                    web_view_link=page["url"],
-                    is_folder=True,
-                    last_modified=datetime.strptime(
-                        page["last_edited_time"], "%Y-%m-%dT%H:%M:%S.%fZ"
-                    ),
-                    type="page",
-                    user_id=user_id,
-                )
-                pages_to_add.append(file)
+                pages_to_add.append(page.to_syncfile(user_id))
         inserted_notion_files = await self.repository.create_notion_files(pages_to_add)
         logger.info(f"Insert response {inserted_notion_files}")
         return pages_to_add
@@ -182,7 +162,7 @@ async def update_notion_pages(
 
 
 async def store_notion_pages(
-    all_search_result: list[dict[str, Any]],
+    all_search_result: list[NotionPage],
     notion_service: SyncNotionService,
     user_id: UUID,
 ):
@@ -190,47 +170,43 @@ async def store_notion_pages(
 
 
 def fetch_notion_pages(
-    notion_client: Client,
-    last_sync_time: datetime = datetime.now() - timedelta(hours=6),
-) -> List[dict[str, Any]]:
-    all_search_result = []
-
+    notion_client: Client, start_cursor: str | None = None
+) -> NotionSearchResult:
     search_result = notion_client.search(
         query="",
         filter={"property": "object", "value": "page"},
         sort={"direction": "descending", "timestamp": "last_edited_time"},
+        start_cursor=start_cursor,
     )
-    last_edited_time: datetime | None = None
+    return NotionSearchResult.model_validate(search_result)
 
-    for page in search_result["results"]:
-        last_edited_time = datetime.strptime(
-            page["last_edited_time"], "%Y-%m-%dT%H:%M:%S.%fZ"
-        )
-        if last_edited_time > last_sync_time:
+
+def fetch_limit_notion_pages(
+    notion_client: Client,
+    last_sync_time: datetime = datetime.now() - timedelta(hours=6),
+) -> List[NotionPage]:
+    all_search_result = []
+
+    from celery.contrib import rdb
+
+    rdb.set_trace()
+    search_result = fetch_notion_pages(notion_client)
+    for page in search_result.results:
+        if page.last_edited_time > last_sync_time:
             all_search_result.append(page)
 
-    if last_edited_time and last_sync_time > last_edited_time:
-        # We check if the last element of the search result is older than 6 hours, if it is, we stop the search
+    if last_sync_time > page.last_edited_time:
         return all_search_result
 
-    while search_result["has_more"]:  # type: ignore
+    while search_result.has_more:
         logger.debug("Next cursor: %s", search_result["next_cursor"])  # type: ignore
+        search_result = fetch_notion_pages(notion_client)
 
-        search_result = notion_client.search(
-            query="",
-            filter={"property": "object", "value": "page"},
-            sort={"direction": "descending", "timestamp": "last_edited_time"},
-            start_cursor=search_result["next_cursor"],  # type: ignore
-        )
-        for page in search_result["results"]:
-            last_edited_time = datetime.strptime(
-                page["last_edited_time"], "%Y-%m-%dT%H:%M:%S.%fZ"
-            )
-            if last_edited_time > last_sync_time:
+        for page in search_result.results:
+            if page.last_edited_time > last_sync_time:
                 all_search_result.append(page)
 
-        if last_edited_time and last_edited_time < last_sync_time:
-            # We check if the last element of the search result is older than 6 hours, if it is, we stop the search
+        if last_sync_time > page.last_edited_time:
             return all_search_result
 
     return all_search_result

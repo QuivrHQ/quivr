@@ -16,6 +16,7 @@
     "type": "emoji",
     "emoji": "🐞"
   },
+
   "parent": {
     "type": "database_id",
     "database_id": "a1d8501e-1ac1-43e9-a6bd-ea9fe6c8822b"
@@ -24,8 +25,8 @@
   "in_trash": true,
   "properties": {
     "Due date": {
-      "type": "date",
       "id": "M%3BBw",
+      "type": "date",
       "date": {
         "start": "2023-02-23",
         "end": null,
