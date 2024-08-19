@@ -1,5 +1,6 @@
 import json
 import os
+from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Any
 
@@ -8,7 +9,10 @@ import pytest
 from notion_client.client import Client
 
 from quivr_api.modules.sync.entity.notion_page import NotionPage
-from quivr_api.modules.sync.service.sync_notion import fetch_notion_pages
+from quivr_api.modules.sync.service.sync_notion import (
+    fetch_limit_notion_pages,
+    fetch_notion_pages,
+)
 
 
 @pytest.fixture(scope="function")
@@ -136,6 +140,19 @@ def test_fetch_notion_pages(fetch_response):
     assert result.next_cursor is None
 
 
-def test_fetch_limit_notion_pages():
-    # TODO: Test fetching and limits
-    pass
+# TODO(@aminediro): test more cases: noresponse, error, no  has_more ..
+def test_fetch_limit_notion_pages(fetch_response):
+    def handler(request):
+        return httpx.Response(
+            200,
+            json={"results": fetch_response, "has_more": False, "next_cursor": None},
+        )
+
+    _client = httpx.Client(transport=httpx.MockTransport(handler))
+    notion_client = Client(client=_client)
+
+    result = fetch_limit_notion_pages(
+        notion_client, datetime.now() - timedelta(hours=6)
+    )
+
+    assert len(result) > 0

@@ -52,8 +52,13 @@ class Cover(BaseModel):
 
 
 class PageParent(BaseModel):
-    type: Literal["parent_id"]
+    type: Literal["page_id"]
     page_id: UUID
+
+
+class BlockParent(BaseModel):
+    type: Literal["block_id"]
+    block_id: UUID
 
 
 class DatabaseParent(BaseModel):
@@ -73,7 +78,7 @@ class WorkspaceParent(BaseModel):
 
 
 class PageProps(BaseModel):
-    title: Title | None
+    title: Title | None = None
 
 
 class NotionPage(BaseModel):
@@ -86,7 +91,7 @@ class NotionPage(BaseModel):
     in_trash: bool
     url: str
     public_url: str | None
-    parent: Union[PageParent, DatabaseParent, WorkspaceParent] = Field(
+    parent: Union[PageParent, DatabaseParent, WorkspaceParent, BlockParent] = Field(
         discriminator="type"
     )
     cover: Cover | None

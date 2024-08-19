@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import Any, List, Sequence
 from uuid import UUID
 
@@ -186,10 +186,8 @@ def fetch_limit_notion_pages(
     last_sync_time: datetime = datetime.now() - timedelta(hours=6),
 ) -> List[NotionPage]:
     all_search_result = []
+    last_sync_time = last_sync_time.astimezone(timezone.utc)
 
-    from celery.contrib import rdb
-
-    rdb.set_trace()
     search_result = fetch_notion_pages(notion_client)
     for page in search_result.results:
         if page.last_edited_time > last_sync_time:
