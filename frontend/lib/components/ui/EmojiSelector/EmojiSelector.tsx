@@ -1,17 +1,21 @@
-import { Picker } from "emoji-mart";
-import { SetStateAction, useState } from "react";
+// components/EmojiSelector.tsx
+import { EmojiClickData } from "emoji-picker-react";
+import dynamic from "next/dynamic";
 
-export const EmojiSelector = (): JSX.Element => {
-  const [selectedEmoji, setSelectedEmoji] = useState(null);
+const EmojiPicker = dynamic(() => import("emoji-picker-react"), { ssr: false });
 
-  const addEmoji = (emoji: { native: SetStateAction<null> }) => {
-    setSelectedEmoji(emoji.native);
+const EmojiSelector = ({
+  onSelectEmoji,
+}: {
+  onSelectEmoji?: (emoji: string) => void;
+}): JSX.Element => {
+  const onEmojiClick = (emojiObject: EmojiClickData) => {
+    if (onSelectEmoji) {
+      onSelectEmoji(emojiObject.emoji);
+    }
   };
 
-  return (
-    <div>
-      {selectedEmoji ? <span>{selectedEmoji}</span> : null}
-      <Picker onSelect={addEmoji} />
-    </div>
-  );
+  return <EmojiPicker onEmojiClick={onEmojiClick} />;
 };
+
+export default EmojiSelector;

@@ -67,6 +67,7 @@
     "class-variance-authority": "0.7.0",
     "clsx": "1.2.1",
     "date-fns": "2.30.0",
+    "emoji-picker-react": "^4.11.1",
     "encoding": "0.1.13",
     "eslint": "8.46.0",
     "eslint-config-next": "^14.1.0",

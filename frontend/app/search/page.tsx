@@ -8,7 +8,7 @@ import { useBrainCreationContext } from "@/lib/components/AddBrainModal/brainCre
 import { OnboardingModal } from "@/lib/components/OnboardingModal/OnboardingModal";
 import { PageHeader } from "@/lib/components/PageHeader/PageHeader";
 import { UploadDocumentModal } from "@/lib/components/UploadDocumentModal/UploadDocumentModal";
-import { EmojiSelector } from "@/lib/components/ui/EmojiSelector/EmojiSelector";
+import EmojiSelector from "@/lib/components/ui/EmojiSelector/EmojiSelector";
 import { SearchBar } from "@/lib/components/ui/SearchBar/SearchBar";
 import { SmallTabs } from "@/lib/components/ui/SmallTabs/SmallTabs";
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
@@ -25,6 +25,7 @@ import styles from "./page.module.scss";
 const Search = (): JSX.Element => {
   const [selectedTab, setSelectedTab] = useState("Models");
   const [isNewBrain, setIsNewBrain] = useState(false);
+  const [emoji, setEmoji] = useState("");
   const brainsPerPage = 6;
 
   const pathname = usePathname();
@@ -133,7 +134,10 @@ const Search = (): JSX.Element => {
       <UploadDocumentModal />
       <AddBrainModal />
       <OnboardingModal />
-      <EmojiSelector />
+      <EmojiSelector
+        onSelectEmoji={(selectedEmoji) => setEmoji(selectedEmoji)}
+      />
+      <span>{emoji}</span>
     </div>
   );
 };
