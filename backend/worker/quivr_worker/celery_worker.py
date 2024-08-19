@@ -2,7 +2,7 @@ import asyncio
 import os
 from uuid import UUID
 
-# from celery.schedules import crontab
+from celery.schedules import crontab
 from celery.signals import worker_process_init
 from dotenv import load_dotenv
 from quivr_api.celery_config import celery
@@ -235,21 +235,21 @@ def fetch_and_store_notion_files_task(access_token: str, user_id: UUID):
     )
 
 
-# celery.conf.beat_schedule = {
-#     "ping_telemetry": {
-#         "task": f"{__name__}.ping_telemetry",
-#         "schedule": crontab(minute="*/30", hour="*"),
-#     },
-#     "process_active_syncs": {
-#         "task": "process_active_syncs_task",
-#         "schedule": crontab(minute="*/1", hour="*"),
-#     },
-#     "process_premium_users": {
-#         "task": "check_is_premium_task",
-#         "schedule": crontab(minute="*/1", hour="*"),
-#     },
-#     "process_notion_sync": {
-#         "task": "process_notion_sync_task",
-#         "schedule": crontab(minute="0", hour="*/6"),
-#     },
-# }
+celery.conf.beat_schedule = {
+    "ping_telemetry": {
+        "task": f"{__name__}.ping_telemetry",
+        "schedule": crontab(minute="*/30", hour="*"),
+    },
+    "process_active_syncs": {
+        "task": "process_active_syncs_task",
+        "schedule": crontab(minute="*/1", hour="*"),
+    },
+    "process_premium_users": {
+        "task": "check_is_premium_task",
+        "schedule": crontab(minute="*/1", hour="*"),
+    },
+    "process_notion_sync": {
+        "task": "process_notion_sync_task",
+        "schedule": crontab(minute="0", hour="*/6"),
+    },
+}

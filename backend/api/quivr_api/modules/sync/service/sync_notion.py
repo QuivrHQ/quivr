@@ -179,7 +179,9 @@ def fetch_limit_notion_pages(
 
     while search_result.has_more:
         logger.debug("next page cursor: %s", search_result.next_cursor)  # type: ignore
-        search_result = fetch_notion_pages(notion_client)
+        search_result = fetch_notion_pages(
+            notion_client, start_cursor=search_result.next_cursor
+        )
 
         for page in search_result.results:
             if page.last_edited_time > last_sync_time:

@@ -121,5 +121,5 @@ section-order = [
 known-first-party = []
 
 [tool.pytest.ini_options]
-addopts = "--tb=short -ra "
+addopts = "--tb=short -ra -v "
 filterwarnings = ["ignore::DeprecationWarning"]

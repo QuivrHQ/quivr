@@ -120,7 +120,7 @@ def fetch_response():
 
 
 def test_deserialize_notion_page(fetch_response):
-    page = NotionPage.model_validate(fetch_response[0])
+    page = NotionPage.model_validate(fetch_response[0])  # type: ignore
     assert page
 
 
@@ -155,4 +155,19 @@ def test_fetch_limit_notion_pages(fetch_response):
         notion_client, datetime.now() - timedelta(hours=6)
     )
 
-    assert len(result) > 0
+    assert len(result) == len(fetch_response)
+
+
+def test_fetch_limit_notion_pages_now(fetch_response):
+    def handler(request):
+        return httpx.Response(
+            200,
+            json={"results": fetch_response, "has_more": False, "next_cursor": None},
+        )
+
+    _client = httpx.Client(transport=httpx.MockTransport(handler))
+    notion_client = Client(client=_client)
+
+    result = fetch_limit_notion_pages(notion_client, datetime.now())
+
+    assert len(result) == 0

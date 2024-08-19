@@ -52,3 +52,7 @@ build-backend = "poetry.core.masonry.api"
 name = "pytorch-cpu-src"
 url = "https://download.pytorch.org/whl/cpu"
 priority = "explicit"
+
+[tool.pytest.ini_options]
+addopts = "--tb=short -ra "
+filterwarnings = ["ignore::DeprecationWarning"]

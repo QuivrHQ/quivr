@@ -98,10 +98,11 @@ class NotionPage(BaseModel):
     icon: Icon | None
     properties: PageProps
 
-    def _get_parent_id(self) -> UUID | None:
+    # TODO: Fix  UUID in table NOTION
+    def _get_parent_id(self) -> str | None:
         match self.parent:
             case PageParent(page_id=page_id):
-                return page_id
+                return str(page_id)
             case DatabaseParent():
                 return None
             case WorkspaceParent():
@@ -113,7 +114,7 @@ class NotionPage(BaseModel):
         )
         return NotionSyncFile(
             notion_id=str(self.id),  # TODO: store as UUID
-            parent_id=str(self._get_parent_id()),
+            parent_id=self._get_parent_id(),
             name=f"{name}.md",
             icon=self.icon.emoji if self.icon else "",
             mime_type="md",
