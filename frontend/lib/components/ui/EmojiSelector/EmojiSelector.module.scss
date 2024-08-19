@@ -1,0 +1,20 @@
+@use "styles/Typography.module.scss";
+
+.emoji_picker_wrapper {
+  ul {
+    li[data-name="suggested"] {
+      display: none;
+    }
+  }
+
+  h2 {
+    @include Typography.H3;
+    color: var(--text-4);
+  }
+
+  input {
+    &:focus {
+      border-color: var(--primary-0);
+    }
+  }
+}

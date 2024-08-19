@@ -195,3 +195,15 @@ body.dark_mode {
 .token.entity {
   cursor: help;
 }
+
+.EmojiPickerReact {
+  --epr-emoji-size: 20px !important;
+  --epr-hover-bg-color: var(--primary-1) !important;
+  --epr-category-navigation-button-size: 24px !important;
+}
+
+.EmojiPickerReact.epr-dark-theme {
+  --epr-emoji-size: 20px !important; 
+  --epr-hover-bg-color: var(--primary-1) !important;
+  --epr-category-navigation-button-size: 24px !important;
+}
