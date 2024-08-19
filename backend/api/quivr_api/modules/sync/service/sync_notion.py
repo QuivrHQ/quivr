@@ -41,7 +41,7 @@ class SyncNotionService(BaseService[NotionRepository]):
         # 2. If the page was modified, we check all direct children of the page and check if they stil exist in notion, if they don't, we delete it
         # 3. We check if the root folder was deleted, if so we delete the root page & all children
         try:
-            pages_to_delete: list[str] = []
+            pages_to_delete: list[UUID] = []
             for page in notion_pages:
                 if (
                     not page.in_trash
@@ -66,7 +66,7 @@ class SyncNotionService(BaseService[NotionRepository]):
                         for child in children:
                             try:
                                 child_notion_page = client.pages.retrieve(
-                                    child.notion_id
+                                    str(child.notion_id)
                                 )
                                 if (
                                     child_notion_page["archived"]
@@ -129,8 +129,8 @@ class SyncNotionService(BaseService[NotionRepository]):
         is_folder = await self.repository.is_folder_page(page_id)
         return is_folder
 
-    async def delete_notion_pages(self, page_id: str):
-        await self.repository.delete_notion_file(page_id)
+    async def delete_notion_pages(self, page_id: UUID):
+        await self.repository.delete_notion_page(page_id)
 
 
 async def update_notion_pages(

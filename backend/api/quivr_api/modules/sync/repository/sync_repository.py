@@ -291,7 +291,7 @@ class NotionRepository(BaseRepository):
         response = await self.session.exec(query)
         return response.first() is not None
 
-    async def delete_notion_page(self, notion_id: str):
+    async def delete_notion_page(self, notion_id: UUID):
         query = select(NotionSyncFile).where(NotionSyncFile.notion_id == notion_id)
         response = await self.session.exec(query)
         notion_file = response.first()
@@ -301,7 +301,7 @@ class NotionRepository(BaseRepository):
             return notion_file
         return None
 
-    async def delete_notion_pages(self, notion_ids: List[str]):
+    async def delete_notion_pages(self, notion_ids: List[UUID]):
         query = select(NotionSyncFile).where(
             or_(
                 col(NotionSyncFile.notion_id).in_(notion_ids),
