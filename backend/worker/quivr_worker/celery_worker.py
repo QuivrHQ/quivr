@@ -8,35 +8,36 @@ from dotenv import load_dotenv
 from quivr_api.celery_config import celery
 from quivr_api.logger import get_logger
 from quivr_api.models.settings import settings
-from quivr_api.modules.brain.integrations.Notion.Notion_connector import \
-    NotionConnector
+from quivr_api.modules.brain.integrations.Notion.Notion_connector import NotionConnector
 from quivr_api.modules.brain.repository.brains_vectors import BrainsVectors
 from quivr_api.modules.brain.service.brain_service import BrainService
-from quivr_api.modules.brain.service.brain_vector_service import \
-    BrainVectorService
+from quivr_api.modules.brain.service.brain_vector_service import BrainVectorService
 from quivr_api.modules.dependencies import get_supabase_client
 from quivr_api.modules.knowledge.repository.storage import Storage
-from quivr_api.modules.notification.service.notification_service import \
-    NotificationService
+from quivr_api.modules.notification.service.notification_service import (
+    NotificationService,
+)
 from quivr_api.modules.sync.repository.sync_files import SyncFilesRepository
 from quivr_api.modules.sync.service.sync_notion import SyncNotionService
-from quivr_api.modules.sync.service.sync_service import (SyncService,
-                                                         SyncUserService)
+from quivr_api.modules.sync.service.sync_service import SyncService, SyncUserService
 from quivr_api.utils.telemetry import maybe_send_telemetry
 from quivr_api.vector.repository.vectors_repository import VectorRepository
 from quivr_api.vector.service.vector_service import VectorService
-from quivr_worker.check_premium import check_is_premium
-from quivr_worker.process.process_s3_file import process_uploaded_file
-from quivr_worker.process.process_url import process_url_func
-from quivr_worker.syncs.process_active_syncs import (SyncServices,
-                                                     process_all_active_syncs,
-                                                     process_notion_sync,
-                                                     process_sync)
-from quivr_worker.syncs.store_notion import fetch_and_store_notion_files_async
-from quivr_worker.utils import _patch_json
 from sqlalchemy import Engine, create_engine
 from sqlalchemy.ext.asyncio import AsyncEngine, create_async_engine
 from sqlmodel import Session
+
+from quivr_worker.check_premium import check_is_premium
+from quivr_worker.process.process_s3_file import process_uploaded_file
+from quivr_worker.process.process_url import process_url_func
+from quivr_worker.syncs.process_active_syncs import (
+    SyncServices,
+    process_all_active_syncs,
+    process_notion_sync,
+    process_sync,
+)
+from quivr_worker.syncs.store_notion import fetch_and_store_notion_files_async
+from quivr_worker.utils import _patch_json
 
 load_dotenv()
 

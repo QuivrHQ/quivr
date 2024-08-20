@@ -3,10 +3,11 @@ from uuid import UUID
 
 from posthog import Posthog
 from pydantic_settings import BaseSettings, SettingsConfigDict
-from quivr_api.logger import get_logger
-from quivr_api.models.databases.supabase.supabase import SupabaseDB
 from sqlalchemy import Engine
 from supabase.client import AsyncClient, Client
+
+from quivr_api.logger import get_logger
+from quivr_api.models.databases.supabase.supabase import SupabaseDB
 
 logger = get_logger(__name__)
 
