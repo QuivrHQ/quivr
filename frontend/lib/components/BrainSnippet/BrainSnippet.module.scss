@@ -1,0 +1,21 @@
+@use "styles/Radius.module.scss";
+@use "styles/Spacings.module.scss";
+
+.brain_snippet_wrapper {
+  display: flex;
+  width: 348px;
+  flex-direction: column;
+  gap: Spacings.$spacing05;
+  justify-content: center;
+  align-items: center;
+  padding: Spacings.$spacing10;
+
+  .sample_wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: Radius.$normal;
+    width: 44px;
+    height: 44px;
+  }
+}

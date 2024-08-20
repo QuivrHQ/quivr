@@ -17,4 +17,10 @@
       border-color: var(--primary-0);
     }
   }
+
+  aside {
+    border: none;
+    background-color: var(--background-0);
+    border-radius: 0;
+  }
 }

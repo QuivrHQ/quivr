@@ -24,6 +24,8 @@ const EmojiSelector = ({
   return (
     <div className={styles.emoji_picker_wrapper}>
       <EmojiPicker
+        width={300}
+        height={400}
         onEmojiClick={onEmojiClick}
         lazyLoadEmojis={true}
         previewConfig={{
