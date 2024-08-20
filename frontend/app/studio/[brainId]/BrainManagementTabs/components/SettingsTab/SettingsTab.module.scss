@@ -27,6 +27,35 @@
       gap: Spacings.$spacing08;
       justify-content: space-between;
       width: 100%;
+      align-items: stretch;
+      height: 100%;
+
+      .brain_snippet_wrapper {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: Spacings.$spacing03;
+        align-self: center;
+
+        .brain_snippet {
+          width: 64px;
+          height: 64px;
+          border-radius: Radius.$normal;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          cursor: pointer;
+          font-size: Typography.$very_large;
+        }
+
+        .button_wrapper {
+          display: flex;
+          align-items: center;
+          gap: Spacings.$spacing02;
+          font-size: Typography.$small;
+          gap: Spacings.$spacing03;
+        }
+      }
 
       .general_information {
         width: 65%;
@@ -40,6 +69,10 @@
       @media (max-width: ScreenSizes.$small) {
         flex-direction: column;
         gap: Spacings.$spacing05;
+
+        .brain_snippet_wrapper {
+          align-self: flex-start;
+        }
 
         .general_information {
           width: 100%;

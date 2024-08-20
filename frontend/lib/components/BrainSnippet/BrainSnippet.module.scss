@@ -20,9 +20,9 @@
     justify-content: center;
     align-items: center;
     border-radius: Radius.$normal;
-    width: 62px;
-    height: 62px;
-    @include Typography.H1;
+    width: 64px;
+    height: 64px;
+    font-size: Typography.$very_large;
   }
 
   .selector_wrapper {

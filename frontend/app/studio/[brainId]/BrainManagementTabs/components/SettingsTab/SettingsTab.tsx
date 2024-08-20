@@ -43,6 +43,10 @@ export const SettingsTabContent = ({
     brainId,
   });
 
+  if (!brain) {
+    return <></>;
+  }
+
   return (
     <>
       <form
@@ -56,11 +60,26 @@ export const SettingsTabContent = ({
           <div className={styles.main_infos_wrapper}>
             <span className={styles.section_title}>General Information</span>
             <div className={styles.inputs_wrapper}>
+              <div className={styles.brain_snippet_wrapper}>
+                <div
+                  className={styles.brain_snippet}
+                  style={{ backgroundColor: brain.snippet_color }}
+                >
+                  <span>{brain.snippet_emoji}</span>
+                </div>
+                <QuivrButton
+                  label="Edit"
+                  iconName="edit"
+                  color="primary"
+                  onClick={() => handleSubmit()}
+                  small={true}
+                />
+              </div>
               <div className={styles.general_information}>
                 <GeneralInformation hasEditRights={hasEditRights} />
               </div>
-              {(!!brain?.integration_description?.allow_model_change ||
-                brain?.brain_type === "doc") && (
+              {(!!brain.integration_description?.allow_model_change ||
+                brain.brain_type === "doc") && (
                 <div className={styles.model_information}>
                   <ModelSelection
                     accessibleModels={accessibleModels}
