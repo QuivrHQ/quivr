@@ -41,8 +41,8 @@
 
         .edit_snippet {
           position: absolute;
-          left: 0;
-          top: 0;
+          left: -(Spacings.$spacing06);
+          top: calc(Spacings.$spacing10 + Spacings.$spacing03);
           z-index: ZIndexes.$modal;
         }
 

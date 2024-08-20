@@ -5,15 +5,16 @@
 
 .brain_snippet_wrapper {
   display: flex;
-  width: 348px;
+  width: 300px;
   flex-direction: column;
   gap: Spacings.$spacing05;
   justify-content: center;
   align-items: center;
   padding-top: Spacings.$spacing06;
-  box-shadow: BoxShadow.$medium;
+  box-shadow: BoxShadow.$large;
   border-radius: Radius.$normal;
   background-color: var(--background-0);
+  border: 1px solid var(--border-1);
 
   .sample_wrapper {
     display: flex;
