@@ -17,4 +17,6 @@ export const mapBackendMinimalBrainToMinimalBrain = (
   allow_model_change: backendMinimalBrain.allow_model_change,
   image_url: backendMinimalBrain.image_url,
   display_name: backendMinimalBrain.display_name,
+  emoji_snippet: backendMinimalBrain.emoji_snippet,
+  color_snippet: backendMinimalBrain.color_snippet,
 });
