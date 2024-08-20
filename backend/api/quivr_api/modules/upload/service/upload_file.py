@@ -5,7 +5,10 @@ from uuid import UUID
 from supabase.client import Client
 
 from quivr_api.logger import get_logger
-from quivr_api.models.settings import get_supabase_async_client, get_supabase_client
+from quivr_api.modules.dependencies import (
+    get_supabase_async_client,
+    get_supabase_client,
+)
 from quivr_api.modules.knowledge.service.knowledge_service import KnowledgeService
 
 logger = get_logger(__name__)

@@ -1,7 +1,6 @@
 from uuid import UUID
 
 from quivr_api.logger import get_logger
-from quivr_api.models.settings import get_embedding_client, get_supabase_client
 from quivr_api.modules.brain.entity.brain_entity import (
     BrainUser,
     MinimalUserBrainEntity,
@@ -9,6 +8,7 @@ from quivr_api.modules.brain.entity.brain_entity import (
 from quivr_api.modules.brain.repository.interfaces.brains_users_interface import (
     BrainsUsersInterface,
 )
+from quivr_api.modules.dependencies import get_embedding_client, get_supabase_client
 
 logger = get_logger(__name__)
 

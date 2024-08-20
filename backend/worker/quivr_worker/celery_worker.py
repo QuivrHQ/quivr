@@ -7,15 +7,12 @@ from celery.signals import worker_process_init
 from dotenv import load_dotenv
 from quivr_api.celery_config import celery
 from quivr_api.logger import get_logger
-from quivr_api.models.settings import (
-    get_documents_vector_store,
-    get_supabase_client,
-    settings,
-)
+from quivr_api.models.settings import settings
 from quivr_api.modules.brain.integrations.Notion.Notion_connector import NotionConnector
 from quivr_api.modules.brain.repository.brains_vectors import BrainsVectors
 from quivr_api.modules.brain.service.brain_service import BrainService
 from quivr_api.modules.brain.service.brain_vector_service import BrainVectorService
+from quivr_api.modules.dependencies import get_supabase_client
 from quivr_api.modules.knowledge.repository.storage import Storage
 from quivr_api.modules.notification.service.notification_service import (
     NotificationService,
@@ -24,7 +21,11 @@ from quivr_api.modules.sync.repository.sync_files import SyncFilesRepository
 from quivr_api.modules.sync.service.sync_notion import SyncNotionService
 from quivr_api.modules.sync.service.sync_service import SyncService, SyncUserService
 from quivr_api.utils.telemetry import maybe_send_telemetry
+from quivr_api.vector.repository.vectors_repository import VectorRepository
+from quivr_api.vector.service.vector_service import VectorService
+from sqlalchemy import Engine, create_engine
 from sqlalchemy.ext.asyncio import AsyncEngine, create_async_engine
+from sqlmodel import Session
 
 from quivr_worker.check_premium import check_is_premium
 from quivr_worker.process.process_s3_file import process_uploaded_file
@@ -48,7 +49,7 @@ _patch_json()
 # FIXME: load at init time
 # Services
 supabase_client = get_supabase_client()
-document_vector_store = get_documents_vector_store()
+# document_vector_store = get_documents_vector_store()
 notification_service = NotificationService()
 sync_active_service = SyncService()
 sync_user_service = SyncUserService()
@@ -58,14 +59,27 @@ brain_vectors = BrainsVectors()
 storage = Storage()
 notion_service: SyncNotionService | None = None
 async_engine: AsyncEngine | None = None
+engine: Engine | None = None
 
 
 @worker_process_init.connect
 def init_worker(**kwargs):
     global async_engine
+    global engine
     if not async_engine:
         async_engine = create_async_engine(
             settings.pg_database_async_url,
+            echo=True if os.getenv("ORM_DEBUG") else False,
+            future=True,
+            # NOTE: pessimistic bound on
+            pool_pre_ping=True,
+            pool_size=10,  # NOTE: no bouncer for now, if 6 process workers => 6
+            pool_recycle=1800,
+        )
+
+    if not engine:
+        engine = create_engine(
+            settings.pg_database_url,
             echo=True if os.getenv("ORM_DEBUG") else False,
             future=True,
             # NOTE: pessimistic bound on
@@ -91,18 +105,50 @@ def process_file_task(
     source_link: str | None = None,
     delete_file: bool = False,
 ):
+    if async_engine is None:
+        init_worker()
+
     logger.info(
         f"Task process_file started for file_name={file_name}, knowledge_id={knowledge_id}, brain_id={brain_id}, notification_id={notification_id}"
     )
 
-    brain_vector_service = BrainVectorService(brain_id)
     loop = asyncio.get_event_loop()
     loop.run_until_complete(
-        process_uploaded_file(
+        aprocess_file_task(
+            file_name=file_name,
+            file_original_name=file_original_name,
+            brain_id=brain_id,
+            notification_id=notification_id,
+            knowledge_id=knowledge_id,
+            source=source,
+            source_link=source_link,
+            delete_file=delete_file,
+        )
+    )
+
+
+async def aprocess_file_task(
+    file_name: str,
+    file_original_name: str,
+    brain_id: UUID,
+    notification_id: UUID,
+    knowledge_id: UUID,
+    source: str | None = None,
+    source_link: str | None = None,
+    delete_file: bool = False,
+):
+    global engine
+    assert engine
+    with Session(engine, expire_on_commit=False, autoflush=False) as session:
+        vector_repository = VectorRepository(session)
+        vector_service = VectorService(vector_repository)
+        brain_vector_service = BrainVectorService(brain_id)
+
+        await process_uploaded_file(
             supabase_client=supabase_client,
             brain_service=brain_service,
             brain_vector_service=brain_vector_service,
-            document_vector_store=document_vector_store,
+            vector_service=vector_service,
             file_name=file_name,
             brain_id=brain_id,
             file_original_name=file_original_name,
@@ -111,7 +157,6 @@ def process_file_task(
             integration_link=source_link,
             delete_file=delete_file,
         )
-    )
 
 
 @celery.task(
@@ -129,19 +174,23 @@ async def process_crawl_task(
     logger.info(
         f"Task process_crawl_task started for url={crawl_website_url}, knowledge_id={knowledge_id}, brain_id={brain_id}, notification_id={notification_id}"
     )
-
-    brain_vector_service = BrainVectorService(brain_id)
-    loop = asyncio.get_event_loop()
-    loop.run_until_complete(
-        process_url_func(
-            url=crawl_website_url,
-            brain_id=brain_id,
-            knowledge_id=knowledge_id,
-            brain_service=brain_service,
-            brain_vector_service=brain_vector_service,
-            document_vector_store=document_vector_store,
+    global engine
+    assert engine
+    with Session(engine, expire_on_commit=False, autoflush=False) as session:
+        brain_vector_service = BrainVectorService(brain_id)
+        vector_repository = VectorRepository(session)
+        vector_service = VectorService(vector_repository)
+        loop = asyncio.get_event_loop()
+        loop.run_until_complete(
+            process_url_func(
+                url=crawl_website_url,
+                brain_id=brain_id,
+                knowledge_id=knowledge_id,
+                brain_service=brain_service,
+                brain_vector_service=brain_vector_service,
+                vector_service=vector_service,
+            )
         )
-    )
 
 
 @celery.task(name="NotionConnectorLoad")

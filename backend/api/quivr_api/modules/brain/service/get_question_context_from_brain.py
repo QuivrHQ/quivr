@@ -1,8 +1,9 @@
 from uuid import UUID
 
 from attr import dataclass
+
 from quivr_api.logger import get_logger
-from quivr_api.models.settings import get_embedding_client, get_supabase_client
+from quivr_api.modules.dependencies import get_embedding_client, get_supabase_client
 from quivr_api.modules.upload.service.generate_file_signed_url import (
     generate_file_signed_url,
 )
