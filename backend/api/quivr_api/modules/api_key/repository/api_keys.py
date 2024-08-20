@@ -2,9 +2,9 @@ from datetime import datetime
 from typing import Optional
 from uuid import UUID
 
-from quivr_api.models.settings import get_supabase_client
 from quivr_api.modules.api_key.entity.api_key import ApiKey
 from quivr_api.modules.api_key.repository.api_key_interface import ApiKeysInterface
+from quivr_api.modules.dependencies import get_supabase_client
 
 
 class ApiKeys(ApiKeysInterface):
