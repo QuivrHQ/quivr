@@ -3,7 +3,6 @@ from typing import Any, List, Literal, Union
 from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
-
 from quivr_api.modules.sync.entity.sync_models import NotionSyncFile
 
 
@@ -87,9 +86,9 @@ class NotionPage(BaseModel):
     id: UUID
     created_time: datetime
     last_edited_time: datetime
-    archived: bool
-    in_trash: bool
     url: str
+    archived: bool
+    in_trash: bool | None
     public_url: str | None
     parent: Union[PageParent, DatabaseParent, WorkspaceParent, BlockParent] = Field(
         discriminator="type"
