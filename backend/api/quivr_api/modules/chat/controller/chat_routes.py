@@ -3,26 +3,23 @@ from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from fastapi.responses import StreamingResponse
-
 from quivr_api.logger import get_logger
 from quivr_api.middlewares.auth import AuthBearer, get_current_user
 from quivr_api.modules.brain.entity.brain_entity import RoleEnum
-from quivr_api.modules.brain.service.brain_authorization_service import (
-    validate_brain_authorization,
-)
+from quivr_api.modules.brain.service.brain_authorization_service import \
+    validate_brain_authorization
 from quivr_api.modules.brain.service.brain_service import BrainService
 from quivr_api.modules.chat.dto.chats import ChatItem, ChatQuestion
-from quivr_api.modules.chat.dto.inputs import (
-    ChatMessageProperties,
-    ChatUpdatableProperties,
-    CreateChatProperties,
-    QuestionAndAnswer,
-)
+from quivr_api.modules.chat.dto.inputs import (ChatMessageProperties,
+                                               ChatUpdatableProperties,
+                                               CreateChatProperties,
+                                               QuestionAndAnswer)
 from quivr_api.modules.chat.entity.chat import Chat
 from quivr_api.modules.chat.service.chat_service import ChatService
 from quivr_api.modules.chat_llm_service.chat_llm_service import ChatLLMService
 from quivr_api.modules.dependencies import get_service
-from quivr_api.modules.knowledge.repository.knowledges import KnowledgeRepository
+from quivr_api.modules.knowledge.service.knowledge_service import \
+    KnowledgeService
 from quivr_api.modules.models.service.model_service import ModelService
 from quivr_api.modules.prompt.service.prompt_service import PromptService
 from quivr_api.modules.rag_service import RAGService
@@ -34,7 +31,9 @@ logger = get_logger(__name__)
 
 chat_router = APIRouter()
 brain_service = BrainService()
-knowledge_service = KnowledgeRepository()
+KnowledgeServiceDep = Annotated[
+    KnowledgeService, Depends(get_service(KnowledgeService))
+]
 prompt_service = PromptService()
 
 
@@ -166,6 +165,7 @@ async def create_question_handler(
     chat_id: UUID,
     current_user: UserIdentityDep,
     chat_service: ChatServiceDep,
+    knowledge_service: KnowledgeServiceDep,
     model_service: ModelServiceDep,
     brain_id: Annotated[UUID | None, Query()] = None,
 ):
@@ -231,6 +231,7 @@ async def create_stream_question_handler(
     chat_id: UUID,
     chat_service: ChatServiceDep,
     current_user: UserIdentityDep,
+    knowledge_service: KnowledgeServiceDep,
     model_service: ModelServiceDep,
     brain_id: Annotated[UUID | None, Query()] = None,
 ) -> StreamingResponse:

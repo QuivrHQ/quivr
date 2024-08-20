@@ -2,6 +2,7 @@ from typing import Optional
 from uuid import UUID
 
 from fastapi import HTTPException
+
 from quivr_api.celery_config import celery
 from quivr_api.logger import get_logger
 from quivr_api.modules.brain.dto.inputs import (
@@ -17,12 +18,9 @@ from quivr_api.modules.brain.repository import (
     IntegrationBrain,
     IntegrationDescription,
 )
-from quivr_api.modules.knowledge.service.knowledge_service import KnowledgeService
 from quivr_api.vectorstore.supabase import CustomSupabaseVectorStore
 
 logger = get_logger(__name__)
-
-knowledge_service = KnowledgeService()
 
 
 class BrainService:
@@ -151,7 +149,7 @@ class BrainService:
         if brain_to_delete is None:
             raise HTTPException(status_code=404, detail="Brain not found.")
 
-            knowledge_service.remove_brain_all_knowledge(brain_id)
+        # knowledge_service.remove_brain_all_knowledge(brain_id) #FIXME we don't really want to delete the knowledge @amine if a knowledge can be in multiple brain
 
         self.brain_vector.delete_brain_vector(str(brain_id))
         self.brain_user_repository.delete_brain_users(str(brain_id))

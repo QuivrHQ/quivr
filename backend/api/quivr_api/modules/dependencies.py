@@ -31,7 +31,6 @@ class BaseService(Generic[R]):
 
 S = TypeVar("S", bound=BaseService)
 
-# TODO: env variable debug sql_alchemy
 sync_engine = create_engine(
     settings.pg_database_url,
     echo=True if os.getenv("ORM_DEBUG") else False,

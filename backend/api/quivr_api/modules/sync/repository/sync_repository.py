@@ -10,16 +10,14 @@ from sqlmodel.ext.asyncio.session import AsyncSession
 from quivr_api.logger import get_logger
 from quivr_api.models.settings import get_supabase_client
 from quivr_api.modules.dependencies import BaseRepository
-from quivr_api.modules.knowledge.service.knowledge_service import KnowledgeService
 from quivr_api.modules.notification.service.notification_service import (
     NotificationService,
 )
 from quivr_api.modules.sync.dto.inputs import SyncsActiveInput, SyncsActiveUpdateInput
-from quivr_api.modules.sync.entity.sync import NotionSyncFile, SyncsActive
+from quivr_api.modules.sync.entity.sync_models import NotionSyncFile, SyncsActive
 from quivr_api.modules.sync.repository.sync_interfaces import SyncInterface
 
 notification_service = NotificationService()
-knowledge_service = KnowledgeService()
 logger = get_logger(__name__)
 
 
@@ -58,8 +56,8 @@ class Sync(SyncInterface):
         if response.data:
             logger.info("Active sync created successfully: %s", response.data[0])
             return SyncsActive(**response.data[0])
-        logger.warning("Failed to create active sync for user_id: %s", user_id)
-        return None
+
+        logger.error("Failed to create active sync for user_id: %s", user_id)
 
     def get_syncs_active(self, user_id: UUID | str) -> List[SyncsActive]:
         """
@@ -86,7 +84,7 @@ class Sync(SyncInterface):
 
     def update_sync_active(
         self, sync_id: int | str, sync_active_input: SyncsActiveUpdateInput
-    ):
+    ) -> SyncsActive | None:
         """
         Update an active sync in the database.
 
@@ -109,11 +107,12 @@ class Sync(SyncInterface):
             .eq("id", sync_id)
             .execute()
         )
+
         if response.data:
             logger.info("Active sync updated successfully: %s", response.data[0])
-            return response.data[0]
-        logger.warning("Failed to update active sync with sync_id: %s", sync_id)
-        return None
+            return SyncsActive.model_validate(response.data[0])
+
+        logger.error("Failed to update active sync with sync_id: %s", sync_id)
 
     def delete_sync_active(self, sync_active_id: int, user_id: UUID):
         """
