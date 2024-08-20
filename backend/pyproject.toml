@@ -33,8 +33,6 @@ ruff = "^0.4.8"
 flake8 = "*"
 flake8-black = "*"
 
-celery = { extras = ["redis", "sqs"], version = "*" }
-
 [tool.poetry.group.test.dependencies]
 pytest-dotenv = "*"
 pytest-mock = "*"

@@ -1,7 +1,7 @@
 from typing import List
 from uuid import UUID
 
-from quivr_api.models.settings import get_supabase_client
+from quivr_api.modules.dependencies import get_supabase_client
 from quivr_api.modules.prompt.entity.prompt import (
     CreatePromptProperties,
     DeletePromptResponse,

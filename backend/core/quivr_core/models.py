@@ -37,6 +37,10 @@ class ChatMessage(BaseModelV1):
     message_time: datetime
     metadata: dict[str, Any]
 
+class KnowledgeStatus(str, Enum):
+    PROCESSING = "PROCESSING"
+    UPLOADED = "UPLOADED"
+    ERROR = "ERROR"
 
 class Source(BaseModel):
     name: str
@@ -81,12 +85,6 @@ class ParsedRAGChunkResponse(BaseModel):
     answer: str
     metadata: RAGResponseMetadata
     last_chunk: bool = False
-
-
-class KnowledgeStatus(str, Enum):
-    PROCESSING = "PROCESSING"
-    UPLOADED = "UPLOADED"
-    ERROR = "ERROR"
 
 
 class QuivrKnowledge(BaseModel):

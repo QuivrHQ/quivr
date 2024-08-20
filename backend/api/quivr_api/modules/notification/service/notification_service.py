@@ -1,4 +1,4 @@
-from quivr_api.models.settings import get_supabase_client
+from quivr_api.modules.dependencies import get_supabase_client
 from quivr_api.modules.notification.dto.inputs import (
     CreateNotification,
     NotificationUpdatableProperties,
