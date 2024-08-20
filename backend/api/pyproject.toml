@@ -43,6 +43,7 @@ dependencies = [
     "langchain-community>=0.2.12",
     "langchain-cohere>=0.2.2",
     "llama-parse>=0.4.9",
+    "pgvector>=0.3.2",
 ]
 readme = "README.md"
 requires-python = "< 3.12"
