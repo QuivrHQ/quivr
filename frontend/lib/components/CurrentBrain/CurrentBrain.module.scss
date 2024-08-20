@@ -57,6 +57,16 @@
           }
         }
 
+        .brain_snippet {
+          width: 18px;
+          height: 18px;
+          border-radius: Radius.$normal;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          font-size: Typography.$very_tiny;
+        }
+
         .warning {
           color: var(--warning);
           display: flex;

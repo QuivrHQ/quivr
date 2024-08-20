@@ -1,7 +1,5 @@
 import Image from "next/image";
 
-import { Icon } from "@/lib/components/ui/Icon/Icon";
-
 import styles from "./MentionItem.module.scss";
 
 import { SuggestionItem } from "../../types";
@@ -34,11 +32,12 @@ export const MentionItem = ({
           height={18}
         />
       ) : (
-        <Icon
-          name="brain"
-          size="normal"
-          color={selected ? "primary" : "black"}
-        />
+        <div
+          className={styles.brain_snippet}
+          style={{ backgroundColor: item.snippet_color }}
+        >
+          <span>{item.snippet_emoji}</span>
+        </div>
       )}
       <span className={styles.brain_name}>{item.label}</span>
     </span>
