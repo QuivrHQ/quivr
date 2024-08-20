@@ -48,7 +48,10 @@ const BrainButton = ({
             height={24}
           />
         ) : (
-          <div className={styles.brain_snippet}>
+          <div
+            className={styles.brain_snippet}
+            style={{ backgroundColor: brainOrModel.snippet_color }}
+          >
             <span>{brainOrModel.snippet_emoji}</span>
           </div>
         )}
