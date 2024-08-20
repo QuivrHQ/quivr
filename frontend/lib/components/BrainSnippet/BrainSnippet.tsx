@@ -34,7 +34,9 @@ export const BrainSnippet = (): JSX.Element => {
         <span>{emoji}</span>
       </div>
       <div className={styles.selector_wrapper}>
-        <Tabs tabList={tabs} />
+        <div className={styles.tabs}>
+          <Tabs tabList={tabs} />
+        </div>
         {selectedTab === "Emoji" && <EmojiSelector onSelectEmoji={setEmoji} />}
         {selectedTab === "Colors" && (
           <ColorSelector onSelectColor={setColor} color={color} />

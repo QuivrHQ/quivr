@@ -1,5 +1,7 @@
+@use "styles/BoxShadow.module.scss";
 @use "styles/Radius.module.scss";
 @use "styles/Spacings.module.scss";
+@use "styles/Typography.module.scss";
 
 .brain_snippet_wrapper {
   display: flex;
@@ -8,14 +10,30 @@
   gap: Spacings.$spacing05;
   justify-content: center;
   align-items: center;
-  padding: Spacings.$spacing10;
+  padding-top: Spacings.$spacing06;
+  box-shadow: BoxShadow.$medium;
+  border-radius: Radius.$normal;
+  margin: 100px;
 
   .sample_wrapper {
     display: flex;
     justify-content: center;
     align-items: center;
     border-radius: Radius.$normal;
-    width: 44px;
-    height: 44px;
+    width: 62px;
+    height: 62px;
+    @include Typography.H1;
+  }
+
+  .selector_wrapper {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    .tabs {
+      width: 100%;
+    }
   }
 }
