@@ -1,9 +1,7 @@
 # Using a slim version for a smaller base image
 FROM python:3.11.6-slim-bullseye
 
-ARG DEV_MODE
-ENV DEV_MODE=$DEV_MODE
-
+WORKDIR /app
 # Install GEOS library, Rust, and other dependencies, then clean up
 RUN apt-get clean && apt-get update && apt-get install -y \
     libgeos-dev \
@@ -30,9 +28,16 @@ RUN apt-get clean && apt-get update && apt-get install -y \
 
 COPY requirements.lock  pyproject.toml README.md ./
 COPY api/pyproject.toml api/README.md ./api/
+COPY api/quivr_api/__init__.py ./api/quivr_api/__init__.py
 COPY core/pyproject.toml core/README.md ./core/
+COPY core/quivr_core/__init__.py ./core/quivr_core/__init__.py
 COPY worker/pyproject.toml worker/README.md ./worker/
+COPY worker/quivr_worker/__init__.py ./worker/quivr_worker/__init__.py
+
+# RUN PYTHONDONTWRITEBYTECODE=1 pip install --no-cache-dir -r requirements.lock
 RUN PYTHONDONTWRITEBYTECODE=1 pip install --no-cache-dir -r requirements.lock
+
+RUN playwright install --with-deps
 
 COPY . .
 

@@ -29,80 +29,72 @@ services:
       - .env
     build:
       context: backend
-      dockerfile: api/Dockerfile
+      dockerfile: Dockerfile
     container_name: backend-api
     extra_hosts:
       - "host.docker.internal:host-gateway"
     healthcheck:
       test: [ "CMD", "curl", "http://localhost:5050/healthz" ]
-    command:
-      - "poetry"
-      - "run"
-      - "uvicorn"
-      - "quivr_api.main:app"
-      - "--host"
-      - "0.0.0.0"
-      - "--port"
-      - "5050"
-      - "--loop"
-      - "uvloop"
+    command: >
+      /bin/bash -c "python -m uvicorn quivr_api.main:app --host 0.0.0.0 --log-level info --reload --port 5050"
     restart: always
     ports:
       - 5050:5050
 
   worker:
     pull_policy: if_not_present
-    image: quivr-backend-worker:latest
+    image: quivr-backend-api:latest
     env_file:
       - .env
-    build:
-      context: backend
-      dockerfile: worker/Dockerfile
     container_name: worker
     extra_hosts:
       - "host.docker.internal:host-gateway"
-    command: poetry run celery -A quivr_worker.celery_worker worker -l info
+    command: >
+      /bin/bash -c "python -m celery -A quivr_worker.celery_worker worker -l info"
     restart: always
     depends_on:
       - redis
 
   notifier:
     pull_policy: never
-    image: quivr-backend-worker:latest
+    image: quivr-backend-api:latest
     extra_hosts:
       - "host.docker.internal:host-gateway"
     env_file:
       - .env
     container_name: notifier
-    command: poetry run python /code/worker/quivr_worker/celery_monitor.py
+    command: >
+      /bin/bash -c "python /app/worker/quivr_worker/celery_monitor.py"
     restart: always
     depends_on:
       - redis
       - worker
 
   beat:
-    image: quivr-backend-worker:latest
+    image: quivr-backend-api:latest
     pull_policy: if_not_present
     env_file:
       - .env
     container_name: beat
     extra_hosts:
       - "host.docker.internal:host-gateway"
-    command: poetry run celery -A quivr_worker.celery_worker beat -l info
+    command: >
+      /bin/bash -c "python -m celery -A quivr_worker.celery_worker beat -l info"
     restart: always
     depends_on:
 
       - redis
 
   flower:
-    image: quivr-backend-worker:latest
+    image: quivr-backend-api:latest
     pull_policy: if_not_present
     env_file:
       - .env
     container_name: flower
     extra_hosts:
       - "host.docker.internal:host-gateway"
-    command: poetry run celery -A quivr_worker.celery_worker flower -l info --port=5555
+    command: >
+      /bin/bash -c "python -m celery -A quivr_worker.celery_worker flower -l info --port=5555"
     restart: always
     depends_on:
       - redis

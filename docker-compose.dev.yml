@@ -84,7 +84,7 @@ services:
       - redis
 
   flower:
-    image: backend-worker:latest
+    image: backend-api:latest
     pull_policy: never
     extra_hosts:
       - "host.docker.internal:host-gateway"
