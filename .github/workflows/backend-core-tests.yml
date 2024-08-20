@@ -29,7 +29,9 @@ jobs:
           enable-cache: true
           working-directory: backend/
       - name: 🔄 Sync dependencies
-        run: rye sync --no-lock
+        run: |
+          cd backend
+          rye sync --no-lock
 
       - name: Run tests
         env:
