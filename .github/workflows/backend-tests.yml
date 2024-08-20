@@ -57,6 +57,7 @@ jobs:
             CELEBRY_BROKER_QUEUE_NAME: quivr-preview.fifo
             QUIVR_DOMAIN: http://localhost:3000/
             BACKEND_URL: http://localhost:5050
+            EMBEDDING_DIM: 1536
         run: |
           cd backend
           supabase db start
