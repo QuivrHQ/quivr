@@ -23,7 +23,7 @@ jobs:
       - name: 🔄 Sync dependencies
         run: |
           cd backend
-          rye sync --no-lock
+          UV_INDEX_STRATEGY=unsafe-first-match rye sync --no-lock
 
 
       - name: 🚤 Install Supabase CLI
