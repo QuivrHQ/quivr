@@ -1,12 +1,12 @@
 import datetime
 import os
+from pathlib import Path
 from uuid import uuid4
 
 import pytest
 from quivr_api.modules.brain.entity.brain_entity import BrainEntity, BrainType
 from quivr_core.files.file import FileExtension
-
-from quivr_worker.files import build_file
+from quivr_worker.files import File, build_file
 from quivr_worker.parsers.crawler import URL, slugify
 from quivr_worker.process.process_file import parse_file
 
@@ -55,6 +55,31 @@ async def test_parse_file(file_instance):
     )
     assert len(chunks) > 0
 
+@pytest.mark.asyncio
+async def test_parse_file_pdf():
+    file_instance = File(
+        knowledge_id=uuid4(),
+        file_sha1="124",
+        file_extension=".pdf",
+        file_name="test",
+        original_file_name="test",
+        file_size=1000,
+        tmp_file_path=Path("./tests/kloe.pdf"),
+    )
+    brain = BrainEntity(
+        brain_id=uuid4(),
+        name="test",
+        brain_type=BrainType.doc,
+        last_update=datetime.datetime.now(),
+    )
+    chunks = await parse_file(
+        file=file_instance,
+        brain=brain,
+    )
+    breakpoint()
+
+    assert len(chunks[0].page_content) > 0
+    assert len(chunks) > 0
 
 @pytest.mark.asyncio
 async def test_parse_audio(monkeypatch, audio_file):

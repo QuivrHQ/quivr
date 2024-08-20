@@ -47,7 +47,8 @@ COPY worker/pyproject.toml worker/poetry.lock* /code/worker/
 
 # Cache playwright dependency
 RUN poetry run pip install playwright && playwright install --with-deps
-
 # Run install
 RUN poetry install --no-directory --no-root --with dev,test && \
     rm -rf $POETRY_CACHE_DIR
+
+RUN poetry run python -c "from unstructured.nlp.tokenize import download_nltk_packages; download_nltk_packages()"

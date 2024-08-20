@@ -42,10 +42,14 @@ ENV PATH="/root/.cargo/bin:${PATH}" \
 
 COPY . /code/
 
+
+
 # Cache playwright dependency
 RUN poetry run pip install playwright && playwright install --with-deps
 
 # Run install
 RUN poetry install  && rm -rf $POETRY_CACHE_DIR
+
+RUN poetry run python -c "from unstructured.nlp.tokenize import download_nltk_packages; download_nltk_packages()"
 
 ENV PYTHONPATH=/code/worker
