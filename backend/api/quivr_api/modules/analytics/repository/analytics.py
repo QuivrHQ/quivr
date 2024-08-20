@@ -3,9 +3,9 @@ from datetime import datetime, timedelta
 from typing import Optional
 from uuid import UUID
 
-from quivr_api.models.settings import get_supabase_client
 from quivr_api.modules.analytics.entity.analytics import BrainsUsages, Range, Usage
 from quivr_api.modules.brain.service.brain_user_service import BrainUserService
+from quivr_api.modules.dependencies import get_supabase_client
 
 brain_user_service = BrainUserService()
 

@@ -1,11 +1,12 @@
 from uuid import UUID
 
+from sqlalchemy import text
+
 from quivr_api.logger import get_logger
-from quivr_api.models.settings import get_pg_database_engine, get_supabase_client
 from quivr_api.modules.brain.repository.interfaces.brains_vectors_interface import (
     BrainsVectorsInterface,
 )
-from sqlalchemy import text
+from quivr_api.modules.dependencies import get_pg_database_engine, get_supabase_client
 
 logger = get_logger(__name__)
 
