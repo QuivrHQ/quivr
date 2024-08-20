@@ -1,8 +1,10 @@
 import { UUID } from "crypto";
+import { useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import { FaSpinner } from "react-icons/fa";
 
+import { BrainSnippet } from "@/lib/components/BrainSnippet/BrainSnippet";
 import { MessageInfoBox } from "@/lib/components/ui/MessageInfoBox/MessageInfoBox";
 import { QuivrButton } from "@/lib/components/ui/QuivrButton/QuivrButton";
 import { Brain } from "@/lib/context/BrainProvider/types";
@@ -28,6 +30,7 @@ export const SettingsTabContent = ({
   const { t } = useTranslation(["translation", "brain", "config"]);
   const { handleSubmit, isUpdating, formRef, accessibleModels, setIsUpdating } =
     useSettingsTab({ brainId });
+  const [editSnippet, setEditSnippet] = useState<boolean>(false);
 
   const promptProps: UsePromptProps = {
     setIsUpdating,
@@ -61,6 +64,11 @@ export const SettingsTabContent = ({
             <span className={styles.section_title}>General Information</span>
             <div className={styles.inputs_wrapper}>
               <div className={styles.brain_snippet_wrapper}>
+                {editSnippet && (
+                  <div className={styles.edit_snippet}>
+                    <BrainSnippet setVisible={setEditSnippet} />
+                  </div>
+                )}
                 <div
                   className={styles.brain_snippet}
                   style={{ backgroundColor: brain.snippet_color }}
@@ -71,7 +79,7 @@ export const SettingsTabContent = ({
                   label="Edit"
                   iconName="edit"
                   color="primary"
-                  onClick={() => handleSubmit()}
+                  onClick={() => setEditSnippet(true)}
                   small={true}
                 />
               </div>

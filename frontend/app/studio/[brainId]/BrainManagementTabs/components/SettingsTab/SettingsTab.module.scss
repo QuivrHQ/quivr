@@ -3,6 +3,7 @@
 @use "styles/ScreenSizes.module.scss";
 @use "styles/Spacings.module.scss";
 @use "styles/Typography.module.scss";
+@use "styles/ZIndexes.module.scss";
 
 .main_container {
   display: flex;
@@ -35,7 +36,23 @@
         flex-direction: column;
         align-items: center;
         gap: Spacings.$spacing03;
-        align-self: center;
+        align-self: top;
+        position: relative;
+
+        .edit_snippet {
+          position: absolute;
+          left: 0;
+          top: 0;
+          z-index: ZIndexes.$modal;
+        }
+
+        @media screen and (max-width: ScreenSizes.$small) {
+          position: relative;
+
+          .edit_snippet {
+            width: 100%;
+          }
+        }
 
         .brain_snippet {
           width: 64px;

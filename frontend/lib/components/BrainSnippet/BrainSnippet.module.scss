@@ -13,7 +13,7 @@
   padding-top: Spacings.$spacing06;
   box-shadow: BoxShadow.$medium;
   border-radius: Radius.$normal;
-  margin: 100px;
+  background-color: var(--background-0);
 
   .sample_wrapper {
     display: flex;
@@ -35,5 +35,11 @@
     .tabs {
       width: 100%;
     }
+  }
+
+  .button {
+    align-self: flex-end;
+    padding: Spacings.$spacing05;
+    padding-top: 0;
   }
 }
