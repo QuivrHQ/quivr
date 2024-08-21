@@ -1,3 +1,5 @@
+@use "styles/Radius.module.scss";
+@use "styles/Spacings.module.scss";
 @use "styles/Typography.module.scss";
 
 .emoji_picker_wrapper {
@@ -16,5 +18,11 @@
     &:focus {
       border-color: var(--primary-0);
     }
+  }
+
+  aside {
+    border: none;
+    background-color: var(--background-0);
+    border-radius: 0;
   }
 }

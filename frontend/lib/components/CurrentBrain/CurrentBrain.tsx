@@ -33,7 +33,12 @@ const BrainNameAndImage = ({
           height={18}
         />
       ) : (
-        <Icon name="brain" size="normal" color="black" />
+        <div
+          className={styles.brain_snippet}
+          style={{ backgroundColor: currentBrain.snippet_color }}
+        >
+          <span>{currentBrain.snippet_emoji}</span>
+        </div>
       )}
       <span className={`${styles.brain_name} ${isNewBrain ? styles.new : ""}`}>
         {currentBrain.display_name ?? currentBrain.name}

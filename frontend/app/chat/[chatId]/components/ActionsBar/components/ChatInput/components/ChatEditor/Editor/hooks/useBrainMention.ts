@@ -13,6 +13,8 @@ export const useBrainMention = () => {
     label: brain.display_name ?? brain.name,
     type: "brain",
     iconUrl: brain.image_url,
+    snippet_emoji: brain.snippet_emoji,
+    snippet_color: brain.snippet_color,
   }));
 
   const { Mention: BrainMention } = useMentionConfig({

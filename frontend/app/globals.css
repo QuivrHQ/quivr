@@ -200,10 +200,34 @@ body.dark_mode {
   --epr-emoji-size: 20px !important;
   --epr-hover-bg-color: var(--primary-1) !important;
   --epr-category-navigation-button-size: 24px !important;
+  --epr-category-label-bg-color: var(--background-0) !important;
+  --epr-header-padding: 8px 16px !important;
 }
 
 .EmojiPickerReact.epr-dark-theme {
   --epr-emoji-size: 20px !important; 
   --epr-hover-bg-color: var(--primary-1) !important;
   --epr-category-navigation-button-size: 24px !important;
+  --epr-category-label-bg-color: var(--background-0) !important;
+  --epr-header-padding: 8px 16px !important;
+}
+
+.react-colorful {
+  width: 250px !important;
+  height: 300px !important;
+  border: none !important;
+}
+
+@media (min-width: 768px) {
+  .react-colorful {
+    width: 375px !important;
+  }
+}
+
+.react-colorful__last-control {
+  border-radius: 0 !important;
+}
+
+.react-colorful__saturation {
+  border-radius: 0 !important;
 }

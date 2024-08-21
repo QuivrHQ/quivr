@@ -39,7 +39,7 @@ class BrainsUsers(BrainsUsersInterface):
         response = (
             self.db.from_("brains_users")
             .select(
-                "id:brain_id, rights, brains (brain_id, name, status, brain_type, model, description, meaning, integrations_user (brain_id, integration_id, integrations (id, integration_name, integration_logo_url, max_files)))"
+                "id:brain_id, rights, brains (brain_id, name, status, brain_type, model, description, meaning, snippet_color, snippet_emoji, integrations_user (brain_id, integration_id, integrations (id, integration_name, integration_logo_url, max_files)))"
             )
             .filter("user_id", "eq", user_id)
             .execute()
@@ -72,6 +72,8 @@ class BrainsUsers(BrainsUsersInterface):
                     ),
                     integration_logo_url=str(integration_logo_url),
                     max_files=max_files,
+                    snippet_color=item["brains"]["snippet_color"],
+                    snippet_emoji=item["brains"]["snippet_emoji"],
                 )
             )
             user_brains[-1].rights = item["rights"]

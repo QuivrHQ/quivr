@@ -1,8 +1,17 @@
-import { useState } from "react";
 import { HexColorPicker } from "react-colorful";
 
-export const ColorSelector = (): JSX.Element => {
-  const [color, setColor] = useState("#aabbcc");
+import styles from "./ColorSelector.module.scss";
 
-  return <HexColorPicker color={color} onChange={setColor} />;
+export const ColorSelector = ({
+  onSelectColor,
+  color,
+}: {
+  onSelectColor?: (emoji: string) => void;
+  color: string;
+}): JSX.Element => {
+  return (
+    <div className={styles.color_picker_wrapper}>
+      <HexColorPicker color={color} onChange={onSelectColor} />
+    </div>
+  );
 };

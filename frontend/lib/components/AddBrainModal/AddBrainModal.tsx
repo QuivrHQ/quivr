@@ -21,6 +21,7 @@ export const AddBrainModal = (): JSX.Element => {
   const { t } = useTranslation(["translation", "brain", "config"]);
   const { currentStep, steps } = useBrainCreationSteps();
   const { setCurrentBrainId } = useBrainContext();
+  const { setSnippetColor, setSnippetEmoji } = useBrainCreationContext();
   const {
     isBrainCreationModalOpened,
     setIsBrainCreationModalOpened,
@@ -50,6 +51,8 @@ export const AddBrainModal = (): JSX.Element => {
     removeAllKnowledgeToFeed();
     if (isBrainCreationModalOpened) {
       setCurrentBrainId(null);
+      setSnippetColor("#d0c6f2");
+      setSnippetEmoji("🧠");
     }
   }, [isBrainCreationModalOpened]);
 

@@ -3,7 +3,6 @@
 import { UUID } from "crypto";
 import Image from "next/image";
 
-import { Icon } from "@/lib/components/ui/Icon/Icon";
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
 import { BrainType } from "@/lib/types/BrainConfig";
 
@@ -17,6 +16,8 @@ export interface BrainOrModel {
   image_url?: string;
   price?: number;
   display_name?: string;
+  snippet_emoji?: string;
+  snippet_color?: string;
 }
 interface BrainButtonProps {
   brainOrModel: BrainOrModel;
@@ -47,7 +48,12 @@ const BrainButton = ({
             height={24}
           />
         ) : (
-          <Icon name="brain" size="large" color="black" />
+          <div
+            className={styles.brain_snippet}
+            style={{ backgroundColor: brainOrModel.snippet_color }}
+          >
+            <span>{brainOrModel.snippet_emoji}</span>
+          </div>
         )}
         <span className={styles.name}>
           {brainOrModel.display_name ?? brainOrModel.name}

@@ -64,7 +64,13 @@ const BrainsManagement = (): JSX.Element => {
   return (
     <>
       <div className={styles.brain_management_wrapper}>
-        <PageHeader iconName="brain" label={brain.name} buttons={buttons} />
+        <PageHeader
+          iconName="brain"
+          label={brain.name}
+          buttons={buttons}
+          snippetEmoji={brain.snippet_emoji}
+          snippetColor={brain.snippet_color}
+        />
         <div className={styles.content_wrapper}>
           <BrainManagementTabs />
         </div>

@@ -7,6 +7,7 @@ from quivr_core.config import LLMEndpointConfig, RAGConfig
 from quivr_core.llm.llm_endpoint import LLMEndpoint
 from quivr_core.models import ParsedRAGResponse, RAGResponseMetadata
 from quivr_core.quivr_rag import QuivrQARAG
+from .utils import generate_source
 
 from quivr_api.logger import get_logger
 from quivr_api.models.settings import (
@@ -28,7 +29,6 @@ from quivr_api.modules.prompt.service.prompt_service import PromptService
 from quivr_api.modules.user.entity.user_identity import UserIdentity
 from quivr_api.vectorstore.supabase import CustomSupabaseVectorStore
 
-from .utils import generate_source
 
 logger = get_logger(__name__)
 
@@ -115,6 +115,10 @@ class RAGService:
         )
 
     def save_answer(self, question: str, answer: ParsedRAGResponse):
+        metadata = answer.metadata.model_dump() if answer.metadata else {}
+        metadata["snippet_color"] = self.brain.snippet_color if self.brain else None
+        metadata["snippet_emoji"] = self.brain.snippet_emoji if self.brain else None
+        logger.info(f"Saving answer with metadata: {metadata}")
         return self.chat_service.update_chat_history(
             CreateChatHistory(
                 **{
@@ -124,7 +128,7 @@ class RAGService:
                     "brain_id": self.brain.brain_id,
                     # TODO: prompt_id should always be not None
                     "prompt_id": self.prompt.id if self.prompt else None,
-                    "metadata": answer.metadata.model_dump() if answer.metadata else {},
+                    "metadata": metadata,
                 }
             )
         )
@@ -161,6 +165,9 @@ class RAGService:
         new_chat_entry = self.save_answer(question, parsed_response)
 
         # Format output to be correct
+        metadata = parsed_response.metadata.model_dump() if parsed_response.metadata else {}
+        metadata["snippet_color"] = self.brain.snippet_color if self.brain else None
+        metadata["snippet_emoji"] = self.brain.snippet_emoji if self.brain else None
         return GetChatHistoryOutput(
             **{
                 "chat_id": self.chat_id,
@@ -171,11 +178,7 @@ class RAGService:
                 "brain_name": self.brain.name if self.brain else None,
                 "message_id": new_chat_entry.message_id,
                 "brain_id": str(self.brain.brain_id) if self.brain else None,
-                "metadata": (
-                    parsed_response.metadata.model_dump()
-                    if parsed_response.metadata
-                    else {}
-                ),
+                "metadata": metadata,
             }
         )
 
@@ -209,6 +212,9 @@ class RAGService:
 
         full_answer = ""
 
+        metadata = {}
+        metadata["snippet_color"] = self.brain.snippet_color if self.brain else None
+        metadata["snippet_emoji"] = self.brain.snippet_emoji if self.brain else None
         message_metadata = {
             "chat_id": self.chat_id,
             "message_id": uuid4(),  # do we need it ?,
@@ -229,6 +235,9 @@ class RAGService:
                     metadata=response.metadata.model_dump(),
                     **message_metadata,
                 )
+                if streamed_chat_history.metadata:
+                    streamed_chat_history.metadata["snippet_color"] = self.brain.snippet_color if self.brain else None
+                    streamed_chat_history.metadata["snippet_emoji"] = self.brain.snippet_emoji if self.brain else None
                 full_answer += response.answer
                 yield f"data: {streamed_chat_history.model_dump_json()}"
 
@@ -238,6 +247,9 @@ class RAGService:
             metadata=response.metadata.model_dump(),
             **message_metadata,
         )
+        if streamed_chat_history.metadata:
+            streamed_chat_history.metadata["snippet_color"] = self.brain.snippet_color if self.brain else None
+            streamed_chat_history.metadata["snippet_emoji"] = self.brain.snippet_emoji if self.brain else None
 
         sources_urls = generate_source(
             response.metadata.sources,

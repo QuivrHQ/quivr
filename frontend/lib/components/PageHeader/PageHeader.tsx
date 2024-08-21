@@ -11,12 +11,16 @@ type Props = {
   iconName: string;
   label: string;
   buttons: ButtonType[];
+  snippetEmoji?: string;
+  snippetColor?: string;
 };
 
 export const PageHeader = ({
   iconName,
   label,
   buttons,
+  snippetColor,
+  snippetEmoji,
 }: Props): JSX.Element => {
   const { isOpened } = useMenuContext();
   const { isVisible, setIsVisible } = useHelpContext();
@@ -27,7 +31,16 @@ export const PageHeader = ({
         <div
           className={`${styles.left} ${!isOpened ? styles.menu_closed : ""}`}
         >
-          <Icon name={iconName} size="large" color="primary" />
+          {snippetEmoji && snippetColor ? (
+            <div
+              className={styles.brain_snippet}
+              style={{ backgroundColor: snippetColor }}
+            >
+              <span>{snippetEmoji}</span>
+            </div>
+          ) : (
+            <Icon name={iconName} size="large" color="primary" />
+          )}
           <span>{label}</span>
         </div>
         <div className={styles.buttons_wrapper}>
