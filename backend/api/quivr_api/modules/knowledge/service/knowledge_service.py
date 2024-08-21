@@ -124,8 +124,7 @@ class KnowledgeService(BaseService[KnowledgeRepository]):
             )
 
             return knowledge
-        except IntegrityError as e:
-            logger.error(f"IntegrityError: {e}")
+        except IntegrityError:
             raise FileExistsError(
                 f"File {knowledge_id} already exists maybe under another file_name"
             )

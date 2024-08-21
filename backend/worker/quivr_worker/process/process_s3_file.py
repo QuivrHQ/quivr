@@ -48,7 +48,9 @@ async def process_uploaded_file(
         await knowledge_service.update_status_knowledge(
             brain_id=brain_id, knowledge_id=knowledge_id, status=KnowledgeStatus.ERROR
         )
-        raise Exception("The content of the knowledge already exists in the brain.")
+        raise FileExistsError(
+            "The content of the knowledge already exists in the brain."
+        )
 
     with build_file(file_data, knowledge_id, file_name) as file_instance:
         # TODO(@StanGirard): fix bug
