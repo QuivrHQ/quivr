@@ -62,6 +62,7 @@ export const QuivrButton = ({
       <div className={styles.icon_label}>
         {!isLoading ? (
           <Icon
+            classname={styles.icon}
             name={iconName}
             size={small ? "small" : "normal"}
             color={iconColor}

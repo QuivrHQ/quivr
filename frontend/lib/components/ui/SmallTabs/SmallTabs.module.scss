@@ -37,12 +37,6 @@
     color: var(--text-1);
   }
 
-  @media (max-width: ScreenSizes.$small) {
-    .label {
-      display: none;
-    }
-  }
-
   .label_wrapper {
     display: flex;
     position: relative;

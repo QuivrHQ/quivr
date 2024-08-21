@@ -34,8 +34,14 @@
     }
 
     @media (max-width: ScreenSizes.$small) {
-      .label {
+      .icon {
         display: none;
+      }
+
+      .label_wrapper {
+        .label {
+          font-size: Typography.$very-tiny;
+        }
       }
     }
 
