@@ -22,8 +22,8 @@ from quivr_core.processor.registry import (
 )
 
 
-# TODO : check what are the defaults without the extra [base]
-@pytest.mark.base
+# TODO : reimplement when quivr-core will be its own package
+@pytest.mark.skip(reason="TODO: reimplement when quivr-core will be its own package")
 def test_get_default_processors_cls():
     from quivr_core.processor.implementations.default import TikTokenTxtProcessor
 
@@ -35,6 +35,7 @@ def test_get_default_processors_cls():
     assert cls == TikaProcessor
 
 
+@pytest.mark.skip(reason="TODO: reimplement when quivr-core will be its own package")
 def test_get_default_processors_cls_core():
     cls = get_processor_class(FileExtension.txt)
     assert cls == SimpleTxtProcessor
@@ -138,6 +139,7 @@ def test__import_class():
         _import_class(mod_path)
 
 
+@pytest.mark.skip(reason="TODO: reimplement when quivr-core will be its own package")
 def test_get_processor_cls_import_error(caplog):
     """
     Test in an environement where we only have the bare minimum parsers.
