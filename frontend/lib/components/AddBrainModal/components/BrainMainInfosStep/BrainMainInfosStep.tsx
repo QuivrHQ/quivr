@@ -38,18 +38,40 @@ export const BrainMainInfosStep = (): JSX.Element => {
       <div className={styles.brain_main_infos_wrapper}>
         <div className={styles.inputs_wrapper}>
           <span className={styles.title}>Define brain identity</span>
-          <div className={styles.name_field}>
-            <FieldHeader iconName="brain" label="Name" mandatory={true} />
-            <Controller
-              name="name"
-              render={({ field }) => (
-                <TextInput
-                  label="Enter your brain name"
-                  inputValue={field.value as string}
-                  setInputValue={field.onChange}
-                />
-              )}
-            />
+          <div className={styles.first_line_wrapper}>
+            <div className={styles.name_field}>
+              <FieldHeader iconName="brain" label="Name" mandatory={true} />
+              <Controller
+                name="name"
+                render={({ field }) => (
+                  <TextInput
+                    label="Enter your brain name"
+                    inputValue={field.value as string}
+                    setInputValue={field.onChange}
+                  />
+                )}
+              />
+            </div>
+            <div className={styles.brain_snippet_wrapper}>
+              <div
+                className={styles.brain_snippet}
+                style={{ backgroundColor: snippetColor }}
+                onClick={() => {
+                  if (!editSnippet) {
+                    setEditSnippet(true);
+                  }
+                }}
+              >
+                <span>{snippetEmoji}</span>
+              </div>
+              <QuivrButton
+                label="Edit"
+                iconName="edit"
+                color="primary"
+                onClick={() => setEditSnippet(true)}
+                small={true}
+              />
+            </div>
           </div>
           <div>
             <FieldHeader
@@ -66,26 +88,6 @@ export const BrainMainInfosStep = (): JSX.Element => {
                   setInputValue={field.onChange}
                 />
               )}
-            />
-          </div>
-          <div className={styles.brain_snippet_wrapper}>
-            <div
-              className={styles.brain_snippet}
-              style={{ backgroundColor: snippetColor }}
-              onClick={() => {
-                if (!editSnippet) {
-                  setEditSnippet(true);
-                }
-              }}
-            >
-              <span>{snippetEmoji}</span>
-            </div>
-            <QuivrButton
-              label="Edit"
-              iconName="edit"
-              color="primary"
-              onClick={() => setEditSnippet(true)}
-              small={true}
             />
           </div>
         </div>
