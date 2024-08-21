@@ -15,6 +15,7 @@ dependencies = [
     "tiktoken>=0.7.0",
     "aiofiles>=23.1.0",
     "langchain-community>=0.2.12",
+    "langchain-anthropic>=0.1.23",
 ]
 readme = "README.md"
 requires-python = ">= 3.11"
