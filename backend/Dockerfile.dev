@@ -34,7 +34,6 @@ COPY core/quivr_core/__init__.py ./core/quivr_core/__init__.py
 COPY worker/pyproject.toml worker/README.md ./worker/
 COPY worker/quivr_worker/__init__.py ./worker/quivr_worker/__init__.py
 
-# RUN PYTHONDONTWRITEBYTECODE=1 pip install --no-cache-dir -r requirements.lock
 RUN PYTHONDONTWRITEBYTECODE=1 pip install --no-cache-dir -r requirements.lock
 
 RUN playwright install --with-deps

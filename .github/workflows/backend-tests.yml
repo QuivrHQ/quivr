@@ -61,8 +61,4 @@ jobs:
         run: |
           cd backend
           supabase db start
-          cd api
-          rye test
-          cd ..
-          cd worker
-          rye test
+          rye test -p quivr-api -p quivr-worker
