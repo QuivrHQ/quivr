@@ -28,13 +28,7 @@ export const SettingsTabContent = ({
   brainId,
 }: SettingsTabProps): JSX.Element => {
   const { t } = useTranslation(["translation", "brain", "config"]);
-  const { handleSubmit, isUpdating, formRef, accessibleModels, setIsUpdating } =
-    useSettingsTab({ brainId });
   const [editSnippet, setEditSnippet] = useState<boolean>(false);
-
-  const promptProps: UsePromptProps = {
-    setIsUpdating,
-  };
 
   useBrainFormState();
 
@@ -45,6 +39,18 @@ export const SettingsTabContent = ({
   const { brain } = useBrainFetcher({
     brainId,
   });
+
+  const settingsTabProps = {
+    brainId,
+    initialColor: brain?.snippet_color,
+    initialEmoji: brain?.snippet_emoji,
+  };
+  const { handleSubmit, isUpdating, formRef, accessibleModels, setIsUpdating } =
+    useSettingsTab(settingsTabProps);
+
+  const promptProps: UsePromptProps = {
+    setIsUpdating,
+  };
 
   if (!brain) {
     return <></>;
@@ -66,7 +72,14 @@ export const SettingsTabContent = ({
               <div className={styles.brain_snippet_wrapper}>
                 {editSnippet && (
                   <div className={styles.edit_snippet}>
-                    <BrainSnippet setVisible={setEditSnippet} />
+                    <BrainSnippet
+                      setVisible={setEditSnippet}
+                      initialColor={brain.snippet_color}
+                      initialEmoji={brain.snippet_emoji}
+                      onSave={(color: string, emoji: string) => {
+                        void handleSubmit(color, emoji);
+                      }}
+                    />
                   </div>
                 )}
                 <div
@@ -93,7 +106,7 @@ export const SettingsTabContent = ({
                     accessibleModels={accessibleModels}
                     hasEditRights={hasEditRights}
                     brainId={brainId}
-                    handleSubmit={handleSubmit}
+                    handleSubmit={() => handleSubmit()}
                   />
                 </div>
               )}

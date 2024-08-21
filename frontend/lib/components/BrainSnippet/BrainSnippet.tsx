@@ -6,16 +6,22 @@ import styles from "./BrainSnippet.module.scss";
 
 import { ColorSelector } from "../ui/ColorSelector/ColorSelector";
 import EmojiSelector from "../ui/EmojiSelector/EmojiSelector";
-import QuivrButton from "../ui/QuivrButton/QuivrButton";
+import { QuivrButton } from "../ui/QuivrButton/QuivrButton";
 import { Tabs } from "../ui/Tabs/Tabs";
 
 export const BrainSnippet = ({
   setVisible,
+  initialColor,
+  initialEmoji,
+  onSave,
 }: {
   setVisible: React.Dispatch<React.SetStateAction<boolean>>;
+  initialColor?: string;
+  initialEmoji?: string;
+  onSave: (color: string, emoji: string) => void;
 }): JSX.Element => {
-  const [color, setColor] = useState("#aabbcc");
-  const [emoji, setEmoji] = useState("🧠");
+  const [color, setColor] = useState(initialColor ?? "");
+  const [emoji, setEmoji] = useState(initialEmoji ?? "");
   const [selectedTab, setSelectedTab] = useState("Emoji");
 
   const wrapperRef = useRef<HTMLDivElement>(null);
@@ -69,7 +75,10 @@ export const BrainSnippet = ({
       <div className={styles.button}>
         <QuivrButton
           label="Save"
-          onClick={() => setVisible(false)}
+          onClick={() => {
+            setVisible(false);
+            onSave(color, emoji);
+          }}
           iconName="upload"
           color="primary"
         />

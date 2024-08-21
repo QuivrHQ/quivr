@@ -17,10 +17,16 @@ import { isBrainNameValid } from "../utils/isBrainNameValid";
 
 type UseSettingsTabProps = {
   brainId: UUID;
+  initialColor?: string;
+  initialEmoji?: string;
 };
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-export const useSettingsTab = ({ brainId }: UseSettingsTabProps) => {
+export const useSettingsTab = ({
+  brainId,
+  initialColor,
+  initialEmoji,
+}: UseSettingsTabProps) => {
   const { t } = useTranslation(["translation", "brain", "config"]);
   const [isUpdating, setIsUpdating] = useState(false);
   const { publish } = useToast();
@@ -56,7 +62,7 @@ export const useSettingsTab = ({ brainId }: UseSettingsTabProps) => {
     };
   }, [formRef.current]);
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (color?: string, emoji?: string) => {
     const { name, description } = getValues();
 
     if (
@@ -77,6 +83,8 @@ export const useSettingsTab = ({ brainId }: UseSettingsTabProps) => {
           otherConfigs["prompt_id"] !== ""
             ? otherConfigs["prompt_id"]
             : undefined,
+        snippet_color: color ?? initialColor,
+        snippet_emoji: emoji ?? initialEmoji,
       });
 
       publish({
