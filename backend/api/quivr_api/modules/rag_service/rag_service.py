@@ -247,6 +247,9 @@ class RAGService:
             metadata=response.metadata.model_dump(),
             **message_metadata,
         )
+        if streamed_chat_history.metadata:
+            streamed_chat_history.metadata["snippet_color"] = self.brain.snippet_color if self.brain else None
+            streamed_chat_history.metadata["snippet_emoji"] = self.brain.snippet_emoji if self.brain else None
 
         sources_urls = generate_source(
             response.metadata.sources,
