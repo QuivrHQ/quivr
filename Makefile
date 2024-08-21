@@ -19,13 +19,12 @@ dev-build:
 ## prod: Build and start production environment
 .PHONY: prod
 prod:
-	docker compose build backend-core
 	docker compose -f docker-compose.yml up --build
 
 ## front: Build and start frontend
 .PHONY: front
 front:
-	cd frontend  && yarn build && yarn start
+	cd frontend  && yarn && yarn build && yarn start
 
 ## test: Run tests
 .PHONY: test
