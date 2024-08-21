@@ -23,6 +23,8 @@ export type ChatMessage = {
     sources?: Source[];
     thoughts?: string;
     followup_questions?: string[];
+    snippet_color?: string;
+    snippet_emoji?: string;
     metadata_model?: {
       display_name: string;
       image_url: string;

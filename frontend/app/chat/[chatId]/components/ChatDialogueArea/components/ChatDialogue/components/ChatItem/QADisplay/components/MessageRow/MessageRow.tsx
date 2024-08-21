@@ -25,6 +25,8 @@ type MessageRowProps = {
     sources?: Source[];
     thoughts?: string;
     followup_questions?: string[];
+    snippet_color?: string;
+    snippet_emoji?: string;
     metadata_model?: {
       display_name: string;
       image_url: string;
@@ -116,6 +118,8 @@ export const MessageRow = ({
             <QuestionBrain
               brainName={brainName}
               imageUrl={metadata?.metadata_model?.image_url ?? ""}
+              snippetColor={metadata?.snippet_color}
+              snippetEmoji={metadata?.snippet_emoji}
             />
           </div>
         </div>
