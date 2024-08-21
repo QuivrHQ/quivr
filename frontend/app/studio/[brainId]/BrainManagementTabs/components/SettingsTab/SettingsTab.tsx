@@ -1,5 +1,5 @@
 import { UUID } from "crypto";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import { FaSpinner } from "react-icons/fa";
@@ -29,8 +29,8 @@ export const SettingsTabContent = ({
 }: SettingsTabProps): JSX.Element => {
   const { t } = useTranslation(["translation", "brain", "config"]);
   const [editSnippet, setEditSnippet] = useState<boolean>(false);
-
-  useBrainFormState();
+  const [snippetColor, setSnippetColor] = useState<string>("");
+  const [snippetEmoji, setSnippetEmoji] = useState<string>("");
 
   const { hasEditRights } = usePermissionsController({
     brainId,
@@ -51,6 +51,16 @@ export const SettingsTabContent = ({
   const promptProps: UsePromptProps = {
     setIsUpdating,
   };
+
+  useBrainFormState();
+
+  useEffect(() => {
+    if (brain && !snippetColor && !snippetEmoji) {
+      setSnippetColor(brain.snippet_color ?? "");
+      setSnippetEmoji(brain.snippet_emoji ?? "");
+    }
+  }),
+    [brain];
 
   if (!brain) {
     return <></>;
@@ -76,17 +86,19 @@ export const SettingsTabContent = ({
                       setVisible={setEditSnippet}
                       initialColor={brain.snippet_color}
                       initialEmoji={brain.snippet_emoji}
-                      onSave={(color: string, emoji: string) => {
-                        void handleSubmit(color, emoji);
+                      onSave={async (color: string, emoji: string) => {
+                        await handleSubmit(color, emoji);
+                        setSnippetColor(color);
+                        setSnippetEmoji(emoji);
                       }}
                     />
                   </div>
                 )}
                 <div
                   className={styles.brain_snippet}
-                  style={{ backgroundColor: brain.snippet_color }}
+                  style={{ backgroundColor: snippetColor }}
                 >
-                  <span>{brain.snippet_emoji}</span>
+                  <span>{snippetEmoji}</span>
                 </div>
                 <QuivrButton
                   label="Edit"

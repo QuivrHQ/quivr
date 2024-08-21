@@ -18,10 +18,10 @@ export const BrainSnippet = ({
   setVisible: React.Dispatch<React.SetStateAction<boolean>>;
   initialColor?: string;
   initialEmoji?: string;
-  onSave: (color: string, emoji: string) => void;
+  onSave: (color: string, emoji: string) => Promise<void>;
 }): JSX.Element => {
-  const [color, setColor] = useState(initialColor ?? "");
-  const [emoji, setEmoji] = useState(initialEmoji ?? "");
+  const [color, setColor] = useState(initialColor);
+  const [emoji, setEmoji] = useState(initialEmoji);
   const [selectedTab, setSelectedTab] = useState("Emoji");
 
   const wrapperRef = useRef<HTMLDivElement>(null);
@@ -69,15 +69,15 @@ export const BrainSnippet = ({
         </div>
         {selectedTab === "Emoji" && <EmojiSelector onSelectEmoji={setEmoji} />}
         {selectedTab === "Colors" && (
-          <ColorSelector onSelectColor={setColor} color={color} />
+          <ColorSelector onSelectColor={setColor} color={color ?? ""} />
         )}
       </div>
       <div className={styles.button}>
         <QuivrButton
           label="Save"
-          onClick={() => {
+          onClick={async () => {
             setVisible(false);
-            onSave(color, emoji);
+            await onSave(color ?? "", emoji ?? "");
           }}
           iconName="upload"
           color="primary"
