@@ -1,3 +1,4 @@
+import "katex/dist/katex.min.css";
 import Prism from "prismjs";
 import "prismjs/components/prism-bash";
 import "prismjs/components/prism-basic";
@@ -18,6 +19,7 @@ import "prismjs/components/prism-sql";
 import "prismjs/components/prism-swift";
 import "prismjs/components/prism-typescript";
 import { useEffect, useState } from "react";
+import { BlockMath, InlineMath } from "react-katex";
 import ReactMarkdown from "react-markdown";
 import gfm from "remark-gfm";
 
@@ -84,6 +86,17 @@ export const MessageContent = ({
             if (match) {
               const language = match[1];
               const code = String(children).trim();
+
+              if (
+                language === "math" ||
+                language === "latex" ||
+                language === "katex" ||
+                language === "katex-error"
+              ) {
+                return <BlockMath math={code} />;
+              } else if (language === "inline-math") {
+                return <InlineMath math={code} />;
+              }
 
               if (Prism.languages[language]) {
                 const html = Prism.highlight(
