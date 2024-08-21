@@ -96,7 +96,8 @@ def init_worker(**kwargs):
     retries=3,
     default_retry_delay=1,
     name="process_file_task",
-    # autoretry_for=(Exception,),
+    autoretry_for=(Exception,),
+    dont_autoretry_for=(FileExistsError,),
 )
 def process_file_task(
     file_name: str,
@@ -108,31 +109,26 @@ def process_file_task(
     source_link: str | None = None,
     delete_file: bool = False,
 ):
-    try:
-        if async_engine is None:
-            init_worker()
+    if async_engine is None:
+        init_worker()
 
-        logger.info(
-            f"Task process_file started for file_name={file_name}, knowledge_id={knowledge_id}, brain_id={brain_id}, notification_id={notification_id}"
-        )
+    logger.info(
+        f"Task process_file started for file_name={file_name}, knowledge_id={knowledge_id}, brain_id={brain_id}, notification_id={notification_id}"
+    )
 
-        loop = asyncio.get_event_loop()
-        loop.run_until_complete(
-            aprocess_file_task(
-                file_name=file_name,
-                file_original_name=file_original_name,
-                brain_id=brain_id,
-                notification_id=notification_id,
-                knowledge_id=knowledge_id,
-                source=source,
-                source_link=source_link,
-                delete_file=delete_file,
-            )
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(
+        aprocess_file_task(
+            file_name=file_name,
+            file_original_name=file_original_name,
+            brain_id=brain_id,
+            notification_id=notification_id,
+            knowledge_id=knowledge_id,
+            source=source,
+            source_link=source_link,
+            delete_file=delete_file,
         )
-    except FileExistsError:
-        raise
-    except Exception as e:
-        raise process_file_task.retry(exc=e)
+    )
 
 
 async def aprocess_file_task(
