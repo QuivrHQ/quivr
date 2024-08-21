@@ -15,6 +15,10 @@ interface BrainCreationContextProps {
   >;
   currentStep: StepValue;
   setCurrentStep: React.Dispatch<React.SetStateAction<StepValue>>;
+  snippetColor: string;
+  setSnippetColor: React.Dispatch<React.SetStateAction<string>>;
+  snippetEmoji: string;
+  setSnippetEmoji: React.Dispatch<React.SetStateAction<string>>;
 }
 
 export const BrainCreationContext = createContext<
@@ -32,6 +36,8 @@ export const BrainCreationProvider = ({
     useState<IntegrationBrains>();
   const [creating, setCreating] = useState<boolean>(false);
   const [currentStep, setCurrentStep] = useState<StepValue>("FIRST_STEP");
+  const [snippetColor, setSnippetColor] = useState<string>("#d0c6f2");
+  const [snippetEmoji, setSnippetEmoji] = useState<string>("🧠");
 
   return (
     <BrainCreationContext.Provider
@@ -44,6 +50,10 @@ export const BrainCreationProvider = ({
         setCurrentSelectedBrain,
         currentStep,
         setCurrentStep,
+        snippetColor,
+        setSnippetColor,
+        snippetEmoji,
+        setSnippetEmoji,
       }}
     >
       {children}

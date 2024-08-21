@@ -1,6 +1,8 @@
+import { useState } from "react";
 import { Controller, useFormContext } from "react-hook-form";
 
 import { CreateBrainProps } from "@/lib/components/AddBrainModal/types/types";
+import { BrainSnippet } from "@/lib/components/BrainSnippet/BrainSnippet";
 import { FieldHeader } from "@/lib/components/ui/FieldHeader/FieldHeader";
 import { QuivrButton } from "@/lib/components/ui/QuivrButton/QuivrButton";
 import { TextAreaInput } from "@/lib/components/ui/TextAreaInput/TextAreaInput";
@@ -8,10 +10,14 @@ import { TextInput } from "@/lib/components/ui/TextInput/TextInput";
 
 import styles from "./BrainMainInfosStep.module.scss";
 
+import { useBrainCreationContext } from "../../brainCreation-provider";
 import { useBrainCreationSteps } from "../../hooks/useBrainCreationSteps";
 
 export const BrainMainInfosStep = (): JSX.Element => {
+  const [editSnippet, setEditSnippet] = useState<boolean>(false);
   const { currentStepIndex, goToNextStep } = useBrainCreationSteps();
+  const { snippetColor, setSnippetColor, snippetEmoji, setSnippetEmoji } =
+    useBrainCreationContext();
 
   const { watch } = useFormContext<CreateBrainProps>();
   const name = watch("name");
@@ -59,6 +65,34 @@ export const BrainMainInfosStep = (): JSX.Element => {
                 setInputValue={field.onChange}
               />
             )}
+          />
+        </div>
+        <div className={styles.brain_snippet_wrapper}>
+          {editSnippet && (
+            <div className={styles.edit_snippet}>
+              <BrainSnippet
+                setVisible={setEditSnippet}
+                initialColor="#d0c6f2"
+                initialEmoji=""
+                onSave={(color: string, emoji: string) => {
+                  setSnippetColor(color);
+                  setSnippetEmoji(emoji);
+                }}
+              />
+            </div>
+          )}
+          <div
+            className={styles.brain_snippet}
+            style={{ backgroundColor: snippetColor }}
+          >
+            <span>{snippetEmoji}</span>
+          </div>
+          <QuivrButton
+            label="Edit"
+            iconName="edit"
+            color="primary"
+            onClick={() => setEditSnippet(true)}
+            small={true}
           />
         </div>
       </div>

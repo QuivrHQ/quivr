@@ -18,7 +18,7 @@ export const BrainSnippet = ({
   setVisible: React.Dispatch<React.SetStateAction<boolean>>;
   initialColor?: string;
   initialEmoji?: string;
-  onSave: (color: string, emoji: string) => Promise<void>;
+  onSave: (color: string, emoji: string) => Promise<void> | void;
 }): JSX.Element => {
   const [color, setColor] = useState(initialColor);
   const [emoji, setEmoji] = useState(initialEmoji);
