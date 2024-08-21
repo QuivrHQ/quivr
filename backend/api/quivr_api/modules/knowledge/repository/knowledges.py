@@ -51,7 +51,6 @@ class KnowledgeRepository(BaseRepository):
         except Exception as e:
             await self.session.rollback()
             raise e
-
         return knowledge
 
     async def remove_knowledge_by_id(

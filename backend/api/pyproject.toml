@@ -2,10 +2,7 @@
 name = "quivr-api"
 version = "0.1.0"
 description = "quivr backend API"
-authors = [
-    { name = "Stan Girard", email = "stan@quivr.app" }
-    
-]
+authors = [{ name = "Stan Girard", email = "stan@quivr.app" }]
 dependencies = [
     "quivr-core",
     "supabase>=2.0.0",

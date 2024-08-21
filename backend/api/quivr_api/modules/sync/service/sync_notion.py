@@ -1,11 +1,12 @@
-from datetime import datetime, timedelta
-from typing import Any, List, Sequence
+from datetime import datetime, timezone
+from typing import List, Sequence
 from uuid import UUID
 
 from notion_client import Client
 
 from quivr_api.logger import get_logger
 from quivr_api.modules.dependencies import BaseService
+from quivr_api.modules.sync.entity.notion_page import NotionPage, NotionSearchResult
 from quivr_api.modules.sync.entity.sync_models import NotionSyncFile
 from quivr_api.modules.sync.repository.sync_repository import NotionRepository
 
@@ -19,103 +20,67 @@ class SyncNotionService(BaseService[NotionRepository]):
         self.repository = repository
 
     async def create_notion_files(
-        self, notion_raw_files: List[dict[str, Any]], user_id: UUID
+        self, notion_raw_files: List[NotionPage], user_id: UUID
     ) -> list[NotionSyncFile]:
         pages_to_add: List[NotionSyncFile] = []
         for page in notion_raw_files:
-            parent_type = page["parent"]["type"]
             if (
-                not page["in_trash"]
-                and not page["archived"]
-                and page["parent"]["type"] != "database_id"
+                (page.in_trash is None or not page.in_trash)
+                and not page.archived
+                and page.parent.type in ("page_id", "workspace")
             ):
-                file = NotionSyncFile(
-                    notion_id=page["id"],
-                    parent_id=(
-                        page["parent"][parent_type]
-                        if not parent_type == "workspace"
-                        else None
-                    ),
-                    name=f'{page["properties"]["title"]["title"][0]["text"]["content"]}.md',
-                    icon=page["icon"]["emoji"] if page["icon"] else None,
-                    mime_type="md",
-                    web_view_link=page["url"],
-                    is_folder=True,
-                    last_modified=datetime.strptime(
-                        page["last_edited_time"], "%Y-%m-%dT%H:%M:%S.%fZ"
-                    ),
-                    type="page",
-                    user_id=user_id,
-                )
-                pages_to_add.append(file)
+                pages_to_add.append(page.to_syncfile(user_id))
         inserted_notion_files = await self.repository.create_notion_files(pages_to_add)
         logger.info(f"Insert response {inserted_notion_files}")
         return pages_to_add
 
     async def update_notion_files(
-        self, notion_raw_files: List[dict[str, Any]], user_id: UUID, client: Client
+        self, notion_pages: List[NotionPage], user_id: UUID, client: Client
     ) -> bool:
+        # 1. For each page we check if it is already in the db, if it is we modify it, if it isn't we create it.
+        # 2. If the page was modified, we check all direct children of the page and check if they stil exist in notion, if they don't, we delete it
+        # 3. We check if the root folder was deleted, if so we delete the root page & all children
         try:
-            pages_to_delete: list[str] = []
-
-            # 1. For each page we check if it is already in the db, if it is we modify it, if it isn't we create it.
-            # 2. If the page was modified, we check all direct children of the page and check if they stil exist in notion, if they don't, we delete it
-            # 3. We check if the root folder was deleted, if so we delete the root page & all children
-
-            for page in notion_raw_files:
-                parent_type = page["parent"]["type"]
+            pages_to_delete: list[UUID] = []
+            for page in notion_pages:
                 if (
-                    not page["in_trash"]
-                    and not page["archived"]
-                    and page["parent"]["type"] != "database_id"
+                    not page.in_trash
+                    and not page.archived
+                    and page.parent.type != "database_id"
                 ):
                     logger.debug(
                         "Updating notion file %s ",
-                        page["properties"]["title"]["title"][0]["text"]["content"],
+                        page.id,
                     )
-                    file = NotionSyncFile(
-                        notion_id=page["id"],
-                        parent_id=page["parent"][parent_type],
-                        name=f'{page["properties"]["title"]["title"][0]["text"]["content"]}.md',
-                        icon=page["icon"]["emoji"] if page["icon"] else None,
-                        mime_type="md",
-                        web_view_link=page["url"],
-                        is_folder=True,
-                        last_modified=datetime.strptime(
-                            page["last_edited_time"], "%Y-%m-%dT%H:%M:%S.%fZ"
-                        ),
-                        type="page",
-                        user_id=user_id,
+                    is_update = await self.repository.update_notion_file(
+                        page.to_syncfile(user_id)
                     )
-                    is_update = await self.repository.update_notion_file(file)
 
                     if is_update:
                         logger.info(
-                            f"Updated notion file {file.notion_id}, we need to check if children were deleted"
+                            f"Updated notion file {page.id}, we need to check if children were deleted"
                         )
                         children = await self.get_notion_files_by_parent_id(
-                            file.notion_id
+                            str(page.id)
                         )
                         for child in children:
                             try:
                                 child_notion_page = client.pages.retrieve(
-                                    child.notion_id
+                                    str(child.notion_id)
                                 )
                                 if (
                                     child_notion_page["archived"]
                                     or child_notion_page["in_trash"]
                                 ):
                                     pages_to_delete.append(child.notion_id)
-                            except:
-                                logger.info(
-                                    f"Page {child.notion_id} is in trash or archived, we are deleting it"
+                            except Exception:
+                                logger.error(
+                                    f"Page {child.notion_id} is in trash or archived, we are deleting it."
                                 )
                                 pages_to_delete.append(child.notion_id)
 
                 else:
-                    logger.info(
-                        f"Page {page['id']} is in trash or archived, skipping i guess"
-                    )
+                    logger.info(f"Page {page.id} is in trash or archived, skipping ")
 
             root_pages = await self.get_root_notion_files()
 
@@ -164,13 +129,13 @@ class SyncNotionService(BaseService[NotionRepository]):
         is_folder = await self.repository.is_folder_page(page_id)
         return is_folder
 
-    async def delete_notion_pages(self, page_id: str):
-        await self.repository.delete_notion_file(page_id)
+    async def delete_notion_pages(self, page_id: UUID):
+        await self.repository.delete_notion_page(page_id)
 
 
 async def update_notion_pages(
     notion_service: SyncNotionService,
-    pages_to_update: list[dict[str, Any]],
+    pages_to_update: list[NotionPage],
     user_id: UUID,
     client: Client,
 ):
@@ -178,7 +143,7 @@ async def update_notion_pages(
 
 
 async def store_notion_pages(
-    all_search_result: list[dict[str, Any]],
+    all_search_result: list[NotionPage],
     notion_service: SyncNotionService,
     user_id: UUID,
 ):
@@ -186,51 +151,43 @@ async def store_notion_pages(
 
 
 def fetch_notion_pages(
-    notion_client: Client, notion_sync: dict[str, Any] | None = None
-) -> List[dict[str, Any]]:
-    all_search_result = []
-    last_sync_time = datetime.now() - timedelta(hours=6)
+    notion_client: Client, start_cursor: str | None = None
+) -> NotionSearchResult:
     search_result = notion_client.search(
         query="",
         filter={"property": "object", "value": "page"},
         sort={"direction": "descending", "timestamp": "last_edited_time"},
+        start_cursor=start_cursor,
     )
-    last_edited_time: datetime | None = None
-    if notion_sync:
-        for page in search_result["results"]:
-            last_edited_time = datetime.strptime(
-                page["last_edited_time"], "%Y-%m-%dT%H:%M:%S.%fZ"
-            )
-            if last_edited_time > last_sync_time:
+    return NotionSearchResult.model_validate(search_result)
+
+
+def fetch_limit_notion_pages(
+    notion_client: Client,
+    last_sync_time: datetime,
+) -> List[NotionPage]:
+    all_search_result = []
+    last_sync_time = last_sync_time.astimezone(timezone.utc)
+
+    search_result = fetch_notion_pages(notion_client)
+    for page in search_result.results:
+        if page.last_edited_time > last_sync_time:
+            all_search_result.append(page)
+
+    if last_sync_time > page.last_edited_time:
+        return all_search_result
+
+    while search_result.has_more:
+        logger.debug("next page cursor: %s", search_result.next_cursor)  # type: ignore
+        search_result = fetch_notion_pages(
+            notion_client, start_cursor=search_result.next_cursor
+        )
+
+        for page in search_result.results:
+            if page.last_edited_time > last_sync_time:
                 all_search_result.append(page)
 
-        if last_edited_time and last_edited_time < last_sync_time:
-            # We check if the last element of the search result is older than 6 hours, if it is, we stop the search
+        if last_sync_time > page.last_edited_time:
             return all_search_result
-
-    while search_result["has_more"]:  # type: ignore
-        logger.debug("Next cursor: %s", search_result["next_cursor"])  # type: ignore
-
-        search_result = notion_client.search(
-            query="",
-            filter={"property": "object", "value": "page"},
-            sort={"direction": "descending", "timestamp": "last_edited_time"},
-            start_cursor=search_result["next_cursor"],  # type: ignore
-        )
-        end_sync_time = datetime.strptime(
-            search_result["results"][-1]["last_edited_time"],
-            "%Y-%m-%dT%H:%M:%S.%fZ",  # type: ignore
-        )
-        if notion_sync:
-            for page in search_result["results"]:
-                last_edited_time = datetime.strptime(
-                    page["last_edited_time"], "%Y-%m-%dT%H:%M:%S.%fZ"
-                )
-                if last_edited_time > last_sync_time:
-                    all_search_result.append(page)
-
-            if last_edited_time and last_edited_time < last_sync_time:
-                # We check if the last element of the search result is older than 6 hours, if it is, we stop the search
-                return all_search_result
 
     return all_search_result

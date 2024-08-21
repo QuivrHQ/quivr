@@ -120,11 +120,11 @@ class SyncUtils:
             res.append(file)
         return res
 
-    def download_file(
+    async def download_file(
         self, file: SyncFile, credentials: dict[str, Any]
     ) -> DownloadedSyncFile:
         logger.info(f"Downloading {file} using {self.sync_cloud}")
-        file_response = self.sync_cloud.download_file(credentials, file)
+        file_response = await self.sync_cloud.adownload_file(credentials, file)
         logger.debug(f"Fetch sync file response: {file_response}")
         file_name = str(file_response["file_name"])
         raw_data = file_response["content"]
@@ -152,7 +152,7 @@ class SyncUtils:
         logger.info("Processing file: %s", file.name)
         brain_id = sync_active.brain_id
         integration, integration_link = self.sync_cloud.name, file.web_view_link
-        downloaded_file = self.download_file(file, current_user.credentials)
+        downloaded_file = await self.download_file(file, current_user.credentials)
         storage_path = str(brain_id) + "/" + downloaded_file.file_name
 
         if downloaded_file.extension not in [
@@ -209,8 +209,8 @@ class SyncUtils:
                 "knowledge_id": added_knowledge.id,
                 "file_name": storage_path,
                 "file_original_name": file.name,
-                "integration": integration,
-                "integration_link": integration_link,
+                "source": integration,
+                "source_link": integration_link,
                 "notification_id": file.notification_id,
             },
         )
