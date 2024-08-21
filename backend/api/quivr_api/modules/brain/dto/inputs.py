@@ -57,7 +57,7 @@ class BrainUpdatableProperties(BaseModel, extra="ignore"):
     prompt_id: Optional[UUID] = None
     integration: Optional[BrainIntegrationUpdateSettings] = None
     snippet_color: Optional[str] = None
-    snippet_emjoi: Optional[str] = None
+    snippet_emoji: Optional[str] = None
 
     def dict(self, *args, **kwargs):
         brain_dict = super().dict(*args, **kwargs)
