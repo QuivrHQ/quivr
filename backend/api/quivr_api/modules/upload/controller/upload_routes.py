@@ -1,4 +1,3 @@
-import hashlib
 import io
 import os
 from typing import Annotated, Optional
@@ -33,7 +32,6 @@ from quivr_api.modules.notification.service.notification_service import (
     NotificationService,
 )
 from quivr_api.modules.upload.service.upload_file import (
-    check_file_exists,
     upload_file_storage,
 )
 from quivr_api.modules.user.entity.user_identity import UserIdentity
@@ -95,34 +93,11 @@ async def upload_file(
     )
 
     filename_with_brain_id = str(brain_id) + "/" + str(uploadFile.filename)
-    file_content = await uploadFile.read()
-    file_sha1 = hashlib.sha1(file_content).hexdigest()
+
+    buff_reader = io.BufferedReader(uploadFile.file)  # type: ignore
     try:
-        # NOTE(@aminediro) : This should redone. The supabase storage client interface is badly designed
-        # It specifically checks for BufferedReader | bytes before sending
-        # TODO: We bypass this to write to S3 Storage directly
-        logger.debug("FILE SHA1 : %s", file_sha1)
-        file_exists = await check_file_exists(
-            str(brain_id), file_sha1, knowledge_service=knowledge_service
-        )
-        if file_exists:
-            raise FileExistsError
-
-        buff_reader = io.BufferedReader(uploadFile.file)  # type: ignore
-
         await upload_file_storage(buff_reader, filename_with_brain_id)
-    except FileExistsError:
-        notification_service.update_notification_by_id(
-            upload_notification.id if upload_notification else None,
-            NotificationUpdatableProperties(
-                status=NotificationsStatusEnum.ERROR,
-                description=f"File {uploadFile.filename} already exists in storage.",
-            ),
-        )
-        raise HTTPException(
-            status_code=403,
-            detail=f"File {uploadFile.filename} already exists in storage.",
-        )
+
     except Exception as e:
         logger.exception(f"Exception in upload_route {e}")
         notification_service.update_notification_by_id(
@@ -145,7 +120,7 @@ async def upload_file(
         source=integration if integration else "local",
         source_link=integration_link,  # FIXME: Should return the s3 link @chloedia
         file_size=uploadFile.size,
-        file_sha1=file_sha1,
+        file_sha1=None,
     )
     knowledge = await knowledge_service.add_knowledge(knowledge_to_add)  # type: ignore
 

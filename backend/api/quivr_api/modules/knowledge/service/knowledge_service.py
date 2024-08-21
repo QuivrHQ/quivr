@@ -1,17 +1,17 @@
 from typing import List
 from uuid import UUID
 
+from quivr_core.models import KnowledgeStatus
 from quivr_core.models import QuivrKnowledge as Knowledge
+from sqlalchemy.exc import IntegrityError
 
 from quivr_api.logger import get_logger
 from quivr_api.modules.dependencies import BaseService
-from quivr_api.modules.knowledge.dto.inputs import (
-    CreateKnowledgeProperties,
-    KnowledgeStatus,
-)
+from quivr_api.modules.knowledge.dto.inputs import CreateKnowledgeProperties
 from quivr_api.modules.knowledge.dto.outputs import DeleteKnowledgeResponse
 from quivr_api.modules.knowledge.entity.knowledge import KnowledgeDB
 from quivr_api.modules.knowledge.repository.knowledges import KnowledgeRepository
+from quivr_api.modules.knowledge.repository.storage import Storage
 
 logger = get_logger(__name__)
 
@@ -21,6 +21,7 @@ class KnowledgeService(BaseService[KnowledgeRepository]):
 
     def __init__(self, repository: KnowledgeRepository):
         self.repository = repository
+        self.storage = Storage()
 
     async def add_knowledge(
         self, knowledge_to_add: CreateKnowledgeProperties
@@ -58,7 +59,9 @@ class KnowledgeService(BaseService[KnowledgeRepository]):
         )
         return inserted_knowledge
 
-    async def get_all_knowledge(self, brain_id: UUID) -> List[Knowledge]:
+    async def get_all_knowledge(
+        self, brain_id: UUID
+    ) -> List[Knowledge]:  # FIXME : @chloe use mapping
         knowledges_models = await self.repository.get_all_knowledge_in_brain(brain_id)
 
         knowledges = [
@@ -87,11 +90,37 @@ class KnowledgeService(BaseService[KnowledgeRepository]):
         return knowledges
 
     async def update_status_knowledge(
-        self, knowledge_id: UUID, status: KnowledgeStatus
+        self,
+        knowledge_id: UUID,
+        status: KnowledgeStatus,
+        brain_id: UUID | None = None,
     ):
         knowledge = await self.repository.update_status_knowledge(knowledge_id, status)
+        assert knowledge, "Knowledge not found"
+        if status == KnowledgeStatus.ERROR and brain_id:
+            assert isinstance(knowledge.file_name, str), "file_name should be a string"
+            file_name_with_brain_id = f"{brain_id}/{knowledge.file_name}"
+            try:
+                self.storage.remove_file(file_name_with_brain_id)
+            except Exception as e:
+                logger.error(
+                    f"Error while removing file {file_name_with_brain_id}: {e}"
+                )
 
         return knowledge
+
+    async def update_file_sha1_knowledge(self, knowledge_id: UUID, file_sha1: str):
+        try:
+            knowledge = await self.repository.update_file_sha1_knowledge(
+                knowledge_id, file_sha1
+            )
+
+            return knowledge
+        except IntegrityError as e:
+            logger.error(f"IntegrityError: {e}")
+            raise FileExistsError(
+                f"File {knowledge_id} already exists maybe under another file_name"
+            )
 
     async def get_knowledge(self, knowledge_id: UUID) -> Knowledge:
         inserted_knowledge_db_instance = await self.repository.get_knowledge_by_id(
@@ -126,7 +155,16 @@ class KnowledgeService(BaseService[KnowledgeRepository]):
             f"All knowledge in brain {brain_id} removed successfully from table"
         )
 
-    async def remove_knowledge(self, knowledge_id: UUID) -> DeleteKnowledgeResponse:
+    async def remove_knowledge(
+        self,
+        brain_id: UUID,
+        knowledge_id: UUID,  # FIXME: @amine when name in storage change no need for brain id
+    ) -> DeleteKnowledgeResponse:
         message = await self.repository.remove_knowledge_by_id(knowledge_id)
+        file_name_with_brain_id = f"{brain_id}/{message.file_name}"
+        try:
+            self.storage.remove_file(file_name_with_brain_id)
+        except Exception as e:
+            logger.error(f"Error while removing file {file_name_with_brain_id}: {e}")
 
         return message

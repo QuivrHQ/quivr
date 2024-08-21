@@ -1,6 +1,5 @@
 import mimetypes
 from io import BufferedReader, FileIO
-from uuid import UUID
 
 from supabase.client import Client
 
@@ -9,29 +8,23 @@ from quivr_api.modules.dependencies import (
     get_supabase_async_client,
     get_supabase_client,
 )
-from quivr_api.modules.knowledge.service.knowledge_service import KnowledgeService
 
 logger = get_logger(__name__)
 
 
-async def check_file_exists(
-    brain_id: str, file_identifier: str, knowledge_service: KnowledgeService
-) -> bool:
-    """
-    brain_id : str
-    file_identifier: str = computed file sha1
-    Check if the file sha is already in storage;
-    """
+def check_file_exists(brain_id: str, file_identifier: str) -> bool:
     supabase_client: Client = get_supabase_client()
     try:
         # Check if the file exists
         logger.info(f"Checking if file {file_identifier} exists.")
-        # Get list of all knowledge
-        # response = supabase_client.storage.from_("quivr").list(brain_id)
-        response = await knowledge_service.get_all_knowledge(UUID(brain_id))
+        # This needs to be converted into a file_identifier that is safe for a URL
+        response = supabase_client.storage.from_("quivr").list(brain_id)
 
         # Check if the file_identifier is in the response
-        file_exists = any(file.file_sha1 == file_identifier for file in response)
+        file_exists = any(
+            file["name"].split(".")[0] == file_identifier.split(".")[0]
+            for file in response
+        )
         logger.debug(f"File identifier: {file_identifier} exists: {file_exists}")
         if file_exists:
             return True
