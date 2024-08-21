@@ -218,6 +218,12 @@ body.dark_mode {
   border: none !important;
 }
 
+@media (min-width: 768px) {
+  .react-colorful {
+    width: 375px !important;
+  }
+}
+
 .react-colorful__last-control {
   border-radius: 0 !important;
 }

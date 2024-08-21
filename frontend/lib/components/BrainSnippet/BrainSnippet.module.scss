@@ -1,11 +1,12 @@
 @use "styles/BoxShadow.module.scss";
 @use "styles/Radius.module.scss";
+@use "styles/ScreenSizes.module.scss";
 @use "styles/Spacings.module.scss";
 @use "styles/Typography.module.scss";
 
 .brain_snippet_wrapper {
   display: flex;
-  width: 250px;
+  width: 375px;
   flex-direction: column;
   gap: Spacings.$spacing05;
   justify-content: center;
@@ -15,6 +16,10 @@
   border-radius: Radius.$normal;
   background-color: var(--background-0);
   border: 1px solid var(--border-1);
+
+  @media screen and (max-width: ScreenSizes.$small) {
+    width: 250px;
+  }
 
   .sample_wrapper {
     display: flex;

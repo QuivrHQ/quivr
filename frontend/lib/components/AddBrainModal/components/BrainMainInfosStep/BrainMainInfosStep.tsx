@@ -99,8 +99,8 @@ export const BrainMainInfosStep = (): JSX.Element => {
         <div className={styles.edit_snippet}>
           <BrainSnippet
             setVisible={setEditSnippet}
-            initialColor="#d0c6f2"
-            initialEmoji=""
+            initialColor={snippetColor}
+            initialEmoji={snippetEmoji}
             onSave={(color: string, emoji: string) => {
               setSnippetColor(color);
               setSnippetEmoji(emoji);
