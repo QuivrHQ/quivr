@@ -34,78 +34,80 @@ export const BrainMainInfosStep = (): JSX.Element => {
   }
 
   return (
-    <div className={styles.brain_main_infos_wrapper}>
-      <div className={styles.inputs_wrapper}>
-        <span className={styles.title}>Define brain identity</span>
-        <div className={styles.name_field}>
-          <FieldHeader iconName="brain" label="Name" mandatory={true} />
-          <Controller
-            name="name"
-            render={({ field }) => (
-              <TextInput
-                label="Enter your brain name"
-                inputValue={field.value as string}
-                setInputValue={field.onChange}
-              />
-            )}
-          />
-        </div>
-        <div>
-          <FieldHeader
-            iconName="paragraph"
-            label="Description"
-            mandatory={true}
-          />
-          <Controller
-            name="description"
-            render={({ field }) => (
-              <TextAreaInput
-                label="Enter your brain description"
-                inputValue={field.value as string}
-                setInputValue={field.onChange}
-              />
-            )}
-          />
-        </div>
-        <div className={styles.brain_snippet_wrapper}>
-          {editSnippet && (
-            <div className={styles.edit_snippet}>
-              <BrainSnippet
-                setVisible={setEditSnippet}
-                initialColor="#d0c6f2"
-                initialEmoji=""
-                onSave={(color: string, emoji: string) => {
-                  setSnippetColor(color);
-                  setSnippetEmoji(emoji);
-                }}
-              />
-            </div>
-          )}
-          <div
-            className={styles.brain_snippet}
-            style={{ backgroundColor: snippetColor }}
-          >
-            <span>{snippetEmoji}</span>
+    <div className={styles.brain_main_infos_container}>
+      <div className={styles.brain_main_infos_wrapper}>
+        <div className={styles.inputs_wrapper}>
+          <span className={styles.title}>Define brain identity</span>
+          <div className={styles.name_field}>
+            <FieldHeader iconName="brain" label="Name" mandatory={true} />
+            <Controller
+              name="name"
+              render={({ field }) => (
+                <TextInput
+                  label="Enter your brain name"
+                  inputValue={field.value as string}
+                  setInputValue={field.onChange}
+                />
+              )}
+            />
           </div>
+          <div>
+            <FieldHeader
+              iconName="paragraph"
+              label="Description"
+              mandatory={true}
+            />
+            <Controller
+              name="description"
+              render={({ field }) => (
+                <TextAreaInput
+                  label="Enter your brain description"
+                  inputValue={field.value as string}
+                  setInputValue={field.onChange}
+                />
+              )}
+            />
+          </div>
+          <div className={styles.brain_snippet_wrapper}>
+            <div
+              className={styles.brain_snippet}
+              style={{ backgroundColor: snippetColor }}
+            >
+              <span>{snippetEmoji}</span>
+            </div>
+            <QuivrButton
+              label="Edit"
+              iconName="edit"
+              color="primary"
+              onClick={() => setEditSnippet(true)}
+              small={true}
+            />
+          </div>
+        </div>
+        <div className={styles.buttons_wrapper}>
           <QuivrButton
-            label="Edit"
-            iconName="edit"
             color="primary"
-            onClick={() => setEditSnippet(true)}
-            small={true}
+            label="Next Step"
+            onClick={() => next()}
+            iconName="chevronRight"
+            disabled={isDisabled}
+            important={true}
           />
         </div>
       </div>
-      <div className={styles.buttons_wrapper}>
-        <QuivrButton
-          color="primary"
-          label="Next Step"
-          onClick={() => next()}
-          iconName="chevronRight"
-          disabled={isDisabled}
-          important={true}
-        />
-      </div>
+      {editSnippet && (
+        <div className={styles.edit_snippet}>
+          <BrainSnippet
+            setVisible={setEditSnippet}
+            initialColor="#d0c6f2"
+            initialEmoji=""
+            onSave={(color: string, emoji: string) => {
+              setSnippetColor(color);
+              setSnippetEmoji(emoji);
+            }}
+          />
+        </div>
+      )}
     </div>
   );
 };
