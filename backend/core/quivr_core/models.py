@@ -37,10 +37,12 @@ class ChatMessage(BaseModelV1):
     message_time: datetime
     metadata: dict[str, Any]
 
+
 class KnowledgeStatus(str, Enum):
     PROCESSING = "PROCESSING"
     UPLOADED = "UPLOADED"
     ERROR = "ERROR"
+
 
 class Source(BaseModel):
     name: str
