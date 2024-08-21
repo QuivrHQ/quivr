@@ -14,6 +14,7 @@
 
 -e file:.
 -e file:api
+    # via quivr-worker
 -e file:core
     # via quivr-api
     # via quivr-worker
