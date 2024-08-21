@@ -11,6 +11,7 @@ from quivr_api.modules.knowledge.service.knowledge_service import KnowledgeServi
 logger = get_logger(__name__)
 
 
+# FIXME: @chloedia
 async def check_file_exists(
     brain_id: str, file_identifier: str, knowledge_service: KnowledgeService
 ) -> bool:
@@ -22,6 +23,8 @@ async def check_file_exists(
     try:
         # Check if the file exists
         logger.info(f"Checking if file {file_identifier} exists.")
+        # Get list of all knowledge
+        # response = supabase_client.storage.from_("quivr").list(brain_id)
         response = await knowledge_service.get_all_knowledge(UUID(brain_id))
 
         # Check if the file_identifier is in the response

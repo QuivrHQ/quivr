@@ -13,7 +13,9 @@ from quivr_api.modules.brain.repository.brains_vectors import BrainsVectors
 from quivr_api.modules.brain.service.brain_service import BrainService
 from quivr_api.modules.brain.service.brain_vector_service import BrainVectorService
 from quivr_api.modules.dependencies import get_supabase_client
+from quivr_api.modules.knowledge.repository.knowledges import KnowledgeRepository
 from quivr_api.modules.knowledge.repository.storage import Storage
+from quivr_api.modules.knowledge.service.knowledge_service import KnowledgeService
 from quivr_api.modules.notification.service.notification_service import (
     NotificationService,
 )
@@ -26,6 +28,7 @@ from quivr_api.vector.service.vector_service import VectorService
 from sqlalchemy import Engine, create_engine
 from sqlalchemy.ext.asyncio import AsyncEngine, create_async_engine
 from sqlmodel import Session
+from sqlmodel.ext.asyncio.session import AsyncSession
 
 from quivr_worker.check_premium import check_is_premium
 from quivr_worker.process.process_s3_file import process_uploaded_file
@@ -139,24 +142,32 @@ async def aprocess_file_task(
 ):
     global engine
     assert engine
-    with Session(engine, expire_on_commit=False, autoflush=False) as session:
-        vector_repository = VectorRepository(session)
-        vector_service = VectorService(vector_repository)
-        brain_vector_service = BrainVectorService(brain_id)
+    async with AsyncSession(
+        async_engine, expire_on_commit=False, autoflush=False
+    ) as async_session:
+        with Session(engine, expire_on_commit=False, autoflush=False) as session:
+            vector_repository = VectorRepository(session)
+            vector_service = VectorService(
+                vector_repository
+            )  # FIXME @amine: fix to need AsyncSession in vector Service
+            brain_vector_service = BrainVectorService(brain_id)
+            knowledge_repository = KnowledgeRepository(async_session)
+            knowledge_service = KnowledgeService(knowledge_repository)
 
-        await process_uploaded_file(
-            supabase_client=supabase_client,
-            brain_service=brain_service,
-            brain_vector_service=brain_vector_service,
-            vector_service=vector_service,
-            file_name=file_name,
-            brain_id=brain_id,
-            file_original_name=file_original_name,
-            knowledge_id=knowledge_id,
-            integration=source,
-            integration_link=source_link,
-            delete_file=delete_file,
-        )
+            await process_uploaded_file(
+                supabase_client=supabase_client,
+                brain_service=brain_service,
+                brain_vector_service=brain_vector_service,
+                vector_service=vector_service,
+                knowledge_service=knowledge_service,
+                file_name=file_name,
+                brain_id=brain_id,
+                file_original_name=file_original_name,
+                knowledge_id=knowledge_id,
+                integration=source,
+                integration_link=source_link,
+                delete_file=delete_file,
+            )
 
 
 @celery.task(

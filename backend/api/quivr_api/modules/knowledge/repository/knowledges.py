@@ -1,7 +1,9 @@
 from typing import Sequence
 from uuid import UUID
 
+from asyncpg.exceptions import UniqueViolationError
 from fastapi import HTTPException
+from quivr_core.models import KnowledgeStatus
 from sqlalchemy.exc import IntegrityError
 from sqlmodel import select
 from sqlmodel.ext.asyncio.session import AsyncSession
@@ -9,7 +11,6 @@ from sqlmodel.ext.asyncio.session import AsyncSession
 from quivr_api.logger import get_logger
 from quivr_api.modules.brain.entity.brain_entity import Brain
 from quivr_api.modules.dependencies import BaseRepository, get_supabase_client
-from quivr_api.modules.knowledge.dto.inputs import KnowledgeStatus
 from quivr_api.modules.knowledge.dto.outputs import DeleteKnowledgeResponse
 from quivr_api.modules.knowledge.entity.knowledge import KnowledgeDB
 
@@ -69,8 +70,9 @@ class KnowledgeRepository(BaseRepository):
 
         await self.session.delete(knowledge)
         await self.session.commit()
-
+        assert isinstance(knowledge.file_name, str), "file_name should be a string"
         return DeleteKnowledgeResponse(
+            file_name=knowledge.file_name,
             status="deleted",
             knowledge_id=knowledge_id,
         )
@@ -150,6 +152,28 @@ class KnowledgeRepository(BaseRepository):
         await self.session.refresh(knowledge)
 
         return knowledge
+
+    async def update_file_sha1_knowledge(
+        self, knowledge_id: UUID, file_sha1: str
+    ) -> KnowledgeDB | None:
+        query = select(KnowledgeDB).where(KnowledgeDB.id == knowledge_id)
+        result = await self.session.exec(query)
+        knowledge = result.first()
+
+        if not knowledge:
+            raise HTTPException(404, "Knowledge not found")
+
+        try:
+            knowledge.file_sha1 = file_sha1
+            self.session.add(knowledge)
+            await self.session.commit()
+            await self.session.refresh(knowledge)
+            return knowledge
+        except (UniqueViolationError, IntegrityError, Exception):
+            await self.session.rollback()
+            raise FileExistsError(
+                f"File {knowledge_id} already exists maybe under another file_name"
+            )
 
     async def get_all_knowledge(self) -> Sequence[KnowledgeDB]:
         query = select(KnowledgeDB)
