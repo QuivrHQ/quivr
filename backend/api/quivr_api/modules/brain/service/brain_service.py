@@ -18,9 +18,12 @@ from quivr_api.modules.brain.repository import (
     IntegrationBrain,
     IntegrationDescription,
 )
+from quivr_api.modules.dependencies import get_service
+from quivr_api.modules.knowledge.service.knowledge_service import KnowledgeService
 from quivr_api.vectorstore.supabase import CustomSupabaseVectorStore
 
 logger = get_logger(__name__)
+knowledge_service = get_service(KnowledgeService)()
 
 
 class BrainService:
@@ -201,7 +204,7 @@ class BrainService:
         self.brain_repository.update_brain_last_update_time(brain_id)
 
     def get_brain_details(
-        self, brain_id: UUID, user_id: UUID = None
+        self, brain_id: UUID, user_id: UUID | None = None
     ) -> BrainEntity | None:
         brain = self.brain_repository.get_brain_details(brain_id)
         if brain is None:

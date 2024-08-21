@@ -115,7 +115,7 @@ class MultiContractBrain(KnowledgeBrainQA):
 
     def get_chain(self):
         list_files_array = (
-            self.knowledge_qa.knowledge_service.get_all_knowledge_in_brain(
+            await self.knowledge_qa.knowledge_service.get_all_knowledge_in_brain(
                 self.brain_id
             )
         )  # pyright: ignore reportPrivateUsage=none

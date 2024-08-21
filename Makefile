@@ -12,16 +12,19 @@ help:
 dev:
 	DOCKER_BUILDKIT=1 docker compose -f docker-compose.dev.yml up --build
 
+dev-build:
+	DOCKER_BUILDKIT=1 docker compose -f docker-compose.dev.yml build --no-cache
+	DOCKER_BUILDKIT=1 docker compose -f docker-compose.dev.yml up
+
 ## prod: Build and start production environment
 .PHONY: prod
 prod:
-	docker compose build backend-core
 	docker compose -f docker-compose.yml up --build
 
 ## front: Build and start frontend
 .PHONY: front
 front:
-	cd frontend  && yarn build && yarn start
+	cd frontend  && yarn && yarn build && yarn start
 
 ## test: Run tests
 .PHONY: test

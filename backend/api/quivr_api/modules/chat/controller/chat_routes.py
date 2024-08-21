@@ -26,6 +26,7 @@ from quivr_api.modules.rag_service import RAGService
 from quivr_api.modules.user.entity.user_identity import UserIdentity
 from quivr_api.utils.telemetry import maybe_send_telemetry
 from quivr_api.utils.uuid_generator import generate_uuid_from_string
+from quivr_api.vector.service.vector_service import VectorService
 
 logger = get_logger(__name__)
 
@@ -40,6 +41,7 @@ prompt_service = PromptService()
 ChatServiceDep = Annotated[ChatService, Depends(get_service(ChatService))]
 UserIdentityDep = Annotated[UserIdentity, Depends(get_current_user)]
 ModelServiceDep = Annotated[ModelService, Depends(get_service(ModelService))]
+VectorServiceDep = Annotated[VectorService, Depends(get_service(VectorService, False))]
 
 
 def validate_authorization(user_id, brain_id):
@@ -167,6 +169,7 @@ async def create_question_handler(
     chat_service: ChatServiceDep,
     knowledge_service: KnowledgeServiceDep,
     model_service: ModelServiceDep,
+    vector_service: VectorServiceDep,  
     brain_id: Annotated[UUID | None, Query()] = None,
 ):
     models = await model_service.get_models()
@@ -192,6 +195,7 @@ async def create_question_handler(
                 prompt_service,
                 chat_service,
                 knowledge_service,
+                vector_service
             )
         else:
             service = ChatLLMService(
@@ -233,6 +237,7 @@ async def create_stream_question_handler(
     current_user: UserIdentityDep,
     knowledge_service: KnowledgeServiceDep,
     model_service: ModelServiceDep,
+    vector_service: VectorServiceDep,
     brain_id: Annotated[UUID | None, Query()] = None,
 ) -> StreamingResponse:
     logger.info(
@@ -262,6 +267,7 @@ async def create_stream_question_handler(
                 prompt_service,
                 chat_service,
                 knowledge_service,
+                vector_service
             )
         else:
             service = ChatLLMService(

@@ -1,17 +1,18 @@
 from uuid import UUID
 
+from sqlalchemy import text
+
 from quivr_api.logger import get_logger
-from quivr_api.models.settings import (
-    get_embedding_client,
-    get_pg_database_engine,
-    get_supabase_client,
-)
 from quivr_api.modules.brain.dto.inputs import BrainUpdatableProperties
 from quivr_api.modules.brain.entity.brain_entity import BrainEntity
 from quivr_api.modules.brain.repository.interfaces.brains_interface import (
     BrainsInterface,
 )
-from sqlalchemy import text
+from quivr_api.modules.dependencies import (
+    get_embedding_client,
+    get_pg_database_engine,
+    get_supabase_client,
+)
 
 logger = get_logger(__name__)
 

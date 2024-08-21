@@ -1,6 +1,6 @@
 import time
 
-from quivr_api.models.settings import get_supabase_client
+from quivr_api.modules.dependencies import get_supabase_client
 from quivr_api.modules.user.entity.user_identity import UserIdentity
 from quivr_api.modules.user.repository.users_interface import UsersInterface
 from quivr_api.modules.user.service import user_usage

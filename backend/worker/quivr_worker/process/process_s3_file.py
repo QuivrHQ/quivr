@@ -1,9 +1,9 @@
 from uuid import UUID
 
-from langchain_core.vectorstores import VectorStore
 from quivr_api.logger import get_logger
 from quivr_api.modules.brain.service.brain_service import BrainService
 from quivr_api.modules.brain.service.brain_vector_service import BrainVectorService
+from quivr_api.vector.service.vector_service import VectorService
 from supabase import Client
 
 from quivr_worker.files import build_file
@@ -16,7 +16,7 @@ async def process_uploaded_file(
     supabase_client: Client,
     brain_service: BrainService,
     brain_vector_service: BrainVectorService,
-    document_vector_store: VectorStore,
+    vector_service: VectorService,
     file_name: str,
     brain_id: UUID,
     file_original_name: str,
@@ -44,8 +44,8 @@ async def process_uploaded_file(
             file_instance=file_instance,
             brain=brain,
             brain_service=brain_service,
-            document_vector_store=document_vector_store,
             brain_vector_service=brain_vector_service,
+            vector_service=vector_service,
             integration=integration,
             integration_link=integration_link,
         )
