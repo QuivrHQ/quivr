@@ -72,6 +72,11 @@ export const BrainMainInfosStep = (): JSX.Element => {
             <div
               className={styles.brain_snippet}
               style={{ backgroundColor: snippetColor }}
+              onClick={() => {
+                if (!editSnippet) {
+                  setEditSnippet(true);
+                }
+              }}
             >
               <span>{snippetEmoji}</span>
             </div>
