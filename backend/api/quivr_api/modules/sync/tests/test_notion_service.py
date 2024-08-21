@@ -1,122 +1,22 @@
-import json
-import os
-from datetime import datetime, timedelta
-from pathlib import Path
-from typing import Any
+from datetime import datetime
 
 import httpx
 import pytest
 from notion_client.client import Client
+from sqlmodel.ext.asyncio.session import AsyncSession
 
-from quivr_api.modules.sync.entity.notion_page import NotionPage
+from quivr_api.modules.brain.integrations.Notion.Notion_connector import NotionPage
+from quivr_api.modules.sync.entity.notion_page import NotionSearchResult
+from quivr_api.modules.sync.repository.sync_repository import NotionRepository
 from quivr_api.modules.sync.service.sync_notion import (
+    SyncNotionService,
     fetch_limit_notion_pages,
     fetch_notion_pages,
+    store_notion_pages,
 )
+from quivr_api.modules.user.entity.user_identity import User
 
-
-@pytest.fixture(scope="function")
-def page_response() -> dict[str, Any]:
-    json_path = (
-        Path(os.getenv("PYTEST_CURRENT_TEST").split(":")[0])
-        .parent.absolute()
-        .joinpath("page.json")
-    )
-    with open(json_path, "r") as f:
-        page = json.load(f)
-    return page
-
-
-@pytest.fixture(scope="function")
-def fetch_response():
-    return [
-        {
-            "object": "page",
-            "id": "27b26c5a-e86f-470a-a5fc-27a3fc308850",
-            "created_time": "2024-05-02T09:03:00.000Z",
-            "last_edited_time": "2024-08-19T10:01:00.000Z",
-            "created_by": {
-                "object": "user",
-                "id": "e2f8bfda-3b98-466e-a2c1-39e5f0f64881",
-            },
-            "last_edited_by": {
-                "object": "user",
-                "id": "f87bcc4b-68ee-4d44-b518-3d2d19ffedc2",
-            },
-            "cover": None,
-            "icon": {"type": "emoji", "emoji": "🌇"},
-            "parent": {"type": "workspace", "workspace": True},
-            "archived": False,
-            "in_trash": False,
-            "properties": {
-                "title": {
-                    "id": "title",
-                    "type": "title",
-                    "title": [
-                        {
-                            "type": "text",
-                            "text": {"content": "Investors", "link": None},
-                            "annotations": {
-                                "bold": False,
-                                "italic": False,
-                                "strikethrough": False,
-                                "underline": False,
-                                "code": False,
-                                "color": "default",
-                            },
-                            "plain_text": "Investors",
-                            "href": None,
-                        }
-                    ],
-                }
-            },
-            "url": "https://www.notion.so/Investors-27b26c5ae86f470aa5fc27a3fc308850",
-            "public_url": None,
-        },
-        {
-            "object": "page",
-            "id": "ff799030-eae6-4c81-8631-ee2653f27af8",
-            "created_time": "2024-04-04T23:24:00.000Z",
-            "last_edited_time": "2024-08-19T10:01:00.000Z",
-            "created_by": {
-                "object": "user",
-                "id": "c8de6079-cc5a-4b46-8763-04f92b33fc18",
-            },
-            "last_edited_by": {
-                "object": "user",
-                "id": "f87bcc4b-68ee-4d44-b518-3d2d19ffedc2",
-            },
-            "cover": None,
-            "icon": {"type": "emoji", "emoji": "🎓"},
-            "parent": {"type": "workspace", "workspace": True},
-            "archived": False,
-            "in_trash": False,
-            "properties": {
-                "title": {
-                    "id": "title",
-                    "type": "title",
-                    "title": [
-                        {
-                            "type": "text",
-                            "text": {"content": "Academy", "link": None},
-                            "annotations": {
-                                "bold": False,
-                                "italic": False,
-                                "strikethrough": False,
-                                "underline": False,
-                                "code": False,
-                                "color": "default",
-                            },
-                            "plain_text": "Academy",
-                            "href": None,
-                        }
-                    ],
-                }
-            },
-            "url": "https://www.notion.so/Academy-ff799030eae64c818631ee2653f27af8",
-            "public_url": None,
-        },
-    ]
+pg_database_base_url = "postgres:postgres@localhost:54322/postgres"
 
 
 def test_deserialize_notion_page(fetch_response):
@@ -152,7 +52,8 @@ def test_fetch_limit_notion_pages(fetch_response):
     notion_client = Client(client=_client)
 
     result = fetch_limit_notion_pages(
-        notion_client, datetime.now() - timedelta(hours=6)
+        notion_client=notion_client,
+        last_sync_time=datetime(1970, 1, 1, 0, 0, 0),  # UNIX EPOCH
     )
 
     assert len(result) == len(fetch_response)
@@ -171,3 +72,35 @@ def test_fetch_limit_notion_pages_now(fetch_response):
     result = fetch_limit_notion_pages(notion_client, datetime.now())
 
     assert len(result) == 0
+
+
+@pytest.mark.asyncio
+async def test_store_notion_pages_success(
+    session: AsyncSession, notion_search_result: NotionSearchResult, user_1: User
+):
+    assert user_1.id
+    notion_repository = NotionRepository(session)
+    notion_service = SyncNotionService(notion_repository)
+    sync_files = await store_notion_pages(
+        notion_search_result.results, notion_service, user_1.id
+    )
+    assert sync_files
+    assert len(sync_files) == 1
+    assert sync_files[0].notion_id == notion_search_result.results[0].id
+    assert sync_files[0].mime_type == "md"
+    assert sync_files[0].notion_id == notion_search_result.results[0].id
+
+
+@pytest.mark.asyncio
+async def test_store_notion_pages_fail(
+    session: AsyncSession,
+    notion_search_result_bad_parent: NotionSearchResult,
+    user_1: User,
+):
+    assert user_1.id
+    notion_repository = NotionRepository(session)
+    notion_service = SyncNotionService(notion_repository)
+    sync_files = await store_notion_pages(
+        notion_search_result_bad_parent.results, notion_service, user_1.id
+    )
+    assert len(sync_files) == 0

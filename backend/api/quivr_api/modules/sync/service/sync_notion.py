@@ -3,10 +3,10 @@ from typing import List, Sequence
 from uuid import UUID
 
 from notion_client import Client
+
 from quivr_api.logger import get_logger
 from quivr_api.modules.dependencies import BaseService
-from quivr_api.modules.sync.entity.notion_page import (NotionPage,
-                                                       NotionSearchResult)
+from quivr_api.modules.sync.entity.notion_page import NotionPage, NotionSearchResult
 from quivr_api.modules.sync.entity.sync_models import NotionSyncFile
 from quivr_api.modules.sync.repository.sync_repository import NotionRepository
 
@@ -27,7 +27,7 @@ class SyncNotionService(BaseService[NotionRepository]):
             if (
                 (page.in_trash is None or not page.in_trash)
                 and not page.archived
-                and page.parent.type != "database_id"
+                and page.parent.type in ("page_id", "workspace")
             ):
                 pages_to_add.append(page.to_syncfile(user_id))
         inserted_notion_files = await self.repository.create_notion_files(pages_to_add)

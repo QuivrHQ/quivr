@@ -1,6 +1,7 @@
 docker-compose.override.yml
 secondbrain/
 .env
+env.sh
 .streamlit/secrets.toml
 **/*.pyc
 toto.txt
