@@ -132,6 +132,10 @@ class BrainSettings(BaseSettings):
 class ResendSettings(BaseSettings):
     model_config = SettingsConfigDict(validate_default=False)
     resend_api_key: str = "null"
+    quivr_smtp_server: str = ""
+    quivr_smtp_port: int = 587
+    quivr_smtp_username: str = ""
+    quivr_smtp_password: str = ""
 
 
 # Global variables to store the Supabase client and database instances
