@@ -174,10 +174,9 @@ class SyncUtils:
 
         # TODO: Check workflow is correct
         # FIXME(@aminediro, @chloedia): Checks should use file_sha1 in database
-        file_exists = await check_file_exists(
+        file_exists = check_file_exists(
             str(brain_id),
             downloaded_file.file_sha1,
-            knowledge_service=self.knowledge_service,
         )
         # if file_exists:
         #     self.brain_vectors.delete_file_from_brain(
