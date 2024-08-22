@@ -9,6 +9,8 @@ from quivr_api.vector.entity.vector import Vector
 from quivr_api.vector.repository.vectors_repository import VectorRepository
 
 logger = get_logger(__name__)
+
+
 class VectorService(BaseService[VectorRepository]):
     repository_cls = VectorRepository
     _embedding: Embeddings = get_embedding_client()
@@ -16,9 +18,7 @@ class VectorService(BaseService[VectorRepository]):
     def __init__(self, repository: VectorRepository):
         self.repository = repository
 
-    def create_vectors(
-        self, chunks: List[Document], knowledge_id: UUID
-    ) -> List[UUID]:
+    def create_vectors(self, chunks: List[Document], knowledge_id: UUID) -> List[UUID]:
         # Vector is created upon the user's first question asked
         logger.info(
             f"New vector entry in vectors table for knowledge_id {knowledge_id}"
@@ -31,7 +31,7 @@ class VectorService(BaseService[VectorRepository]):
             Vector(
                 content=chunk.page_content,
                 metadata_=chunk.metadata,
-                embedding=embeddings[i], #type: ignore
+                embedding=embeddings[i],  # type: ignore
                 knowledge_id=knowledge_id,
             )
             for i, chunk in enumerate(chunks)
@@ -40,10 +40,14 @@ class VectorService(BaseService[VectorRepository]):
 
         return [vector.id for vector in created_vector if vector.id]
 
-    def similarity_search(self, query: str, brain_id: UUID, k: int = 40):
+    def similarity_search(
+        self, query: str, brain_id: UUID, k: int = 40
+    ) -> list[Document]:
         vectors = self._embedding.embed_documents([query])
         query_embedding = vectors[0]
-        vectors = self.repository.similarity_search(query_embedding= query_embedding, brain_id=brain_id, k=k)
+        vectors = self.repository.similarity_search(
+            query_embedding=query_embedding, brain_id=brain_id, k=k
+        )
 
         match_result = [
             Document(
@@ -65,6 +69,5 @@ class VectorService(BaseService[VectorRepository]):
                 x.metadata.get("index", float("inf")),
             ),
         )
-
 
         return sorted_match_result_by_file_name_metadata

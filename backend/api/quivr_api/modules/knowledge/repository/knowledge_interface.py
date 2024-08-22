@@ -2,8 +2,11 @@ from abc import ABC, abstractmethod
 from typing import List
 from uuid import UUID
 
-from quivr_api.modules.knowledge.dto.inputs import (CreateKnowledgeProperties,
-                                                    KnowledgeStatus)
+from quivr_core.models import KnowledgeStatus
+
+from quivr_api.modules.knowledge.dto.inputs import (
+    CreateKnowledgeProperties,
+)
 from quivr_api.modules.knowledge.dto.outputs import DeleteKnowledgeResponse
 from quivr_api.modules.knowledge.entity.knowledge import KnowledgeDB
 

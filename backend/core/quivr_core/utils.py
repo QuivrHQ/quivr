@@ -73,7 +73,7 @@ def get_chunk_metadata(
                 followup_questions = gathered_args["followup_questions"]
                 metadata["followup_questions"] = followup_questions
 
-    return RAGResponseMetadata(**metadata)
+    return RAGResponseMetadata.model_validate(metadata)
 
 
 def get_prev_message_str(msg: AIMessageChunk) -> str:
@@ -138,7 +138,7 @@ def combine_documents(
     docs, document_prompt=DEFAULT_DOCUMENT_PROMPT, document_separator="\n\n"
 ):
     # for each docs, add an index in the metadata to be able to cite the sources
-    for doc, index in zip(docs, range(len(docs))):
+    for index, doc in enumerate(docs):
         doc.metadata["index"] = index
     doc_strings = [format_document(doc, document_prompt) for doc in docs]
     return document_separator.join(doc_strings)

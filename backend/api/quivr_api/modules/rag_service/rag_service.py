@@ -25,7 +25,6 @@ from quivr_api.modules.chat.service.chat_service import ChatService
 from quivr_api.modules.dependencies import (
     get_embedding_client,
     get_supabase_client,
-    settings,
 )
 from quivr_api.modules.knowledge.service.knowledge_service import KnowledgeService
 from quivr_api.modules.prompt.entity.prompt import Prompt
@@ -276,7 +275,7 @@ class RAGService:
         async for response in rag_pipeline.answer_astream(
             question, chat_history, list_files
         ):
-            # Format output to be correct servicedf;j
+            # Format output to be correct
             if not response.last_chunk:
                 streamed_chat_history = GetChatHistoryOutput(
                     assistant=response.answer,
@@ -294,9 +293,9 @@ class RAGService:
         )
 
         sources_urls = generate_source(
-            response.metadata.sources,
-            self.brain.brain_id,
-            (
+            source_documents=response.metadata.sources,
+            brain_id=self.brain.brain_id,
+            citations=(
                 streamed_chat_history.metadata["citations"]
                 if streamed_chat_history.metadata
                 else None
@@ -309,7 +308,9 @@ class RAGService:
             question,
             ParsedRAGResponse(
                 answer=full_answer,
-                metadata=RAGResponseMetadata(**streamed_chat_history.metadata),
+                metadata=RAGResponseMetadata.model_validate(
+                    streamed_chat_history.metadata
+                ),
             ),
         )
         yield f"data: {streamed_chat_history.model_dump_json()}"

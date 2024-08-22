@@ -13,6 +13,14 @@ from quivr_api.modules.sync.repository.sync_repository import NotionRepository
 logger = get_logger(__name__)
 
 
+def supported_notion_page(page: NotionPage) -> bool:
+    return (
+        (page.in_trash is None or not page.in_trash)
+        and not page.archived
+        and page.parent.type in ("page_id", "workspace")
+    )
+
+
 class SyncNotionService(BaseService[NotionRepository]):
     repository_cls = NotionRepository
 
@@ -24,11 +32,7 @@ class SyncNotionService(BaseService[NotionRepository]):
     ) -> list[NotionSyncFile]:
         pages_to_add: List[NotionSyncFile] = []
         for page in notion_raw_files:
-            if (
-                (page.in_trash is None or not page.in_trash)
-                and not page.archived
-                and page.parent.type in ("page_id", "workspace")
-            ):
+            if supported_notion_page(page):
                 pages_to_add.append(page.to_syncfile(user_id))
         inserted_notion_files = await self.repository.create_notion_files(pages_to_add)
         logger.info(f"Insert response {inserted_notion_files}")
@@ -43,11 +47,7 @@ class SyncNotionService(BaseService[NotionRepository]):
         try:
             pages_to_delete: list[UUID] = []
             for page in notion_pages:
-                if (
-                    not page.in_trash
-                    and not page.archived
-                    and page.parent.type != "database_id"
-                ):
+                if supported_notion_page(page):
                     logger.debug(
                         "Updating notion file %s ",
                         page.id,
@@ -69,6 +69,7 @@ class SyncNotionService(BaseService[NotionRepository]):
                                     str(child.notion_id)
                                 )
                                 if (
+                                    # TODO: fix this
                                     child_notion_page["archived"]
                                     or child_notion_page["in_trash"]
                                 ):
@@ -84,6 +85,7 @@ class SyncNotionService(BaseService[NotionRepository]):
 
             root_pages = await self.get_root_notion_files()
 
+            # TODO: Rewrite
             for root_page in root_pages:
                 root_notion_page = client.pages.retrieve(root_page.notion_id)
                 if root_notion_page["archived"] or root_notion_page["in_trash"]:
