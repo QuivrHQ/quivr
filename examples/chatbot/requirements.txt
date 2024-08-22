@@ -1,0 +1,2 @@
+quivr-core[base]==0.0.8
+chainlit==1.1.306
