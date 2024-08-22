@@ -84,6 +84,8 @@ ENV HOSTNAME "0.0.0.0"
 
 ARG NEXT_PUBLIC_AUTH_MODES
 ENV NEXT_PUBLIC_AUTH_MODES=$NEXT_PUBLIC_AUTH_MODES
+ARG NEXT_PUBLIC_SHOW_TOKENS
+ENV NEXT_PUBLIC_SHOW_TOKENS=$NEXT_PUBLIC_SHOW_TOKENS
 
 # server.js is created by next build from the standalone output
 # https://nextjs.org/docs/pages/api-reference/next-config-js/output
