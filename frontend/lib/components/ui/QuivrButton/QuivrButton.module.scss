@@ -81,8 +81,12 @@
     align-items: center;
 
     @media (max-width: ScreenSizes.$small) {
-      .label {
+      .icon {
         display: none;
+      }
+
+      .label {
+        font-size: Typography.$very_tiny;
       }
     }
   }

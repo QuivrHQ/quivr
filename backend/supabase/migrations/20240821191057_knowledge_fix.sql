@@ -4,7 +4,7 @@ ALTER TABLE "public"."knowledge" RENAME COLUMN "integration" TO "source";
 
 ALTER TABLE "public"."knowledge" RENAME COLUMN "integration_link" TO "source_link";
 
-ALTER TABLE "public"."knowledge" RENAME COLUMN "file_sha" TO "file_sha1";
+ALTER TABLE "public"."knowledge" add column "file_sha1" text;
 
 alter table "public"."knowledge" add column "created_at" timestamp with time zone default now();
 

@@ -4,6 +4,7 @@ from datetime import datetime, timedelta
 from postgrest.exceptions import APIError
 from pytz import timezone
 from quivr_api.logger import get_logger
+
 from supabase import Client
 
 logger = get_logger("celery_worker")

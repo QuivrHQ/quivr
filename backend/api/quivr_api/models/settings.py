@@ -4,10 +4,10 @@ from uuid import UUID
 from posthog import Posthog
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from sqlalchemy import Engine
-from supabase.client import AsyncClient, Client
 
 from quivr_api.logger import get_logger
 from quivr_api.models.databases.supabase.supabase import SupabaseDB
+from supabase.client import AsyncClient, Client
 
 logger = get_logger(__name__)
 
@@ -112,6 +112,7 @@ class PostHogSettings(BaseSettings):
 class BrainSettings(BaseSettings):
     model_config = SettingsConfigDict(validate_default=False)
     openai_api_key: str = ""
+    azure_openai_embeddings_url: str = ""
     supabase_url: str = ""
     supabase_service_key: str = ""
     resend_api_key: str = "null"
@@ -127,6 +128,10 @@ class BrainSettings(BaseSettings):
 class ResendSettings(BaseSettings):
     model_config = SettingsConfigDict(validate_default=False)
     resend_api_key: str = "null"
+    quivr_smtp_server: str = ""
+    quivr_smtp_port: int = 587
+    quivr_smtp_username: str = ""
+    quivr_smtp_password: str = ""
 
 
 # Global variables to store the Supabase client and database instances

@@ -7,7 +7,7 @@ export const useNotificationsContext = () => {
   const context = useContext(NotificationsContext);
   if (context === undefined) {
     throw new Error(
-      "useNotificationsContext must be used within a MenuProvider"
+      "useNotificationsContext must be used within a NotificationsProvider"
     );
   }
 

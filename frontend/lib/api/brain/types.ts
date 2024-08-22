@@ -69,6 +69,8 @@ export type CreateBrainInput = {
   brain_secrets_values?: Record<string, string>;
   connected_brains_ids?: UUID[];
   integration?: IntegrationSettings;
+  snippet_color?: string;
+  snippet_emoji?: string;
 };
 
 enum IntegrationBrainTag {

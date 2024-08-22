@@ -13,8 +13,6 @@ FROM knowledge,
 WHERE vectors.metadata->>'file_name' = knowledge.file_name
     AND brains_vectors.vector_id = vectors.id;
 
-ALTER TABLE vectors
-ADD CONSTRAINT fk_knowledge FOREIGN KEY (knowledge_id) REFERENCES knowledge(id);
 
 alter table "public"."vectors" add constraint "public_vectors_knowledge_id_fkey" FOREIGN KEY (knowledge_id) REFERENCES knowledge(id) ON UPDATE CASCADE ON DELETE CASCADE not valid;
 

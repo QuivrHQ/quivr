@@ -82,6 +82,8 @@ class BrainEntity(BaseModel):
     brain_type: BrainType
     integration: Optional[IntegrationEntity] = None
     integration_description: Optional[IntegrationDescriptionEntity] = None
+    snippet_emoji: Optional[str] = None
+    snippet_color: Optional[str] = None
 
     @property
     def id(self) -> UUID:
@@ -111,6 +113,7 @@ class BrainUser(BaseModel):
 class MinimalUserBrainEntity(BaseModel):
     id: UUID
     name: str
+    brain_model: Optional[str] = None
     rights: RoleEnum
     status: str
     brain_type: BrainType
@@ -123,3 +126,5 @@ class MinimalUserBrainEntity(BaseModel):
     display_name: Optional[str] = None
     image_url: Optional[str] = None
     model: bool = False
+    snippet_color: Optional[str] = None
+    snippet_emoji: Optional[str] = None

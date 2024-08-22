@@ -1,3 +1,4 @@
+import { UUID } from "crypto";
 import React, { useEffect, useState } from "react";
 
 import { useChatInput } from "@/app/chat/[chatId]/components/ActionsBar/components/ChatInput/hooks/useChatInput";
@@ -24,6 +25,13 @@ type MessageRowProps = {
     sources?: Source[];
     thoughts?: string;
     followup_questions?: string[];
+    snippet_color?: string;
+    snippet_emoji?: string;
+    metadata_model?: {
+      display_name: string;
+      image_url: string;
+      brain_id: UUID;
+    };
   };
   index?: number;
   messageId?: string;
@@ -51,6 +59,7 @@ export const MessageRow = ({
     initialThumbs
   );
   const [folded, setFolded] = useState<boolean>(false);
+  const [userMessageFolded, setUserMessageFolded] = useState<boolean>(true);
   const [sourceFiles, setSourceFiles] = useState<SourceFile[]>([]);
   const { submitQuestion } = useChatInput();
 
@@ -79,6 +88,10 @@ export const MessageRow = ({
 
   const messageContent = text ?? "";
 
+  const userMessageTooLong = (): boolean => {
+    return !!isUserSpeaker && !!messageContent && messageContent.length > 100;
+  };
+
   const thumbsUp = async () => {
     if (chatId && messageId) {
       await updateChatMessage(chatId, messageId, {
@@ -102,7 +115,12 @@ export const MessageRow = ({
       return (
         <div className={styles.message_header_wrapper}>
           <div className={styles.message_header}>
-            <QuestionBrain brainName={brainName} />
+            <QuestionBrain
+              brainName={brainName}
+              imageUrl={metadata?.metadata_model?.image_url ?? ""}
+              snippetColor={metadata?.snippet_color}
+              snippetEmoji={metadata?.snippet_emoji}
+            />
           </div>
         </div>
       );
@@ -202,7 +220,8 @@ export const MessageRow = ({
       className={`
       ${styles.message_row_container} 
       ${isUserSpeaker ? styles.user : styles.brain}
-      ${messageContent.length > 100 && isUserSpeaker ? styles.smaller : ""}
+      ${userMessageTooLong() ? styles.smaller : ""}
+      ${userMessageFolded ? styles.folded : ""}
       ${lastMessage ? styles.last : ""}
       `}
     >
@@ -222,13 +241,19 @@ export const MessageRow = ({
       {renderMessageHeader()}
       <div className={styles.message_row_content}>
         {children ?? (
-          <>
+          <div
+            onClick={() => {
+              if (isUserSpeaker) {
+                setUserMessageFolded(!userMessageFolded);
+              }
+            }}
+          >
             <MessageContent
               text={messageContent}
               isUser={isUserSpeaker}
               hide={folded}
             />
-          </>
+          </div>
         )}
       </div>
       {renderOtherSections()}

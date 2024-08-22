@@ -77,7 +77,7 @@
   background-color: var(--background-0);
 
   @media (max-width: ScreenSizes.$small) {
-    width: 100%;
+    width: 100vw;
     left: 0;
     min-height: 100vh;
     max-height: 100vh;

@@ -9,4 +9,5 @@ export type Color =
   | "dangerous"
   | "dangerous-dark"
   | "success"
-  | "warning";
+  | "warning"
+  | "static-white";
