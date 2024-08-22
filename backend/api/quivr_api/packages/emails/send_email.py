@@ -19,7 +19,8 @@ def send_email(params: Dict):
 
         try:
             with smtplib.SMTP(smtp_server, smtp_port) as server:
-                server.starttls()
+                if smtp_port == 587:
+                    server.starttls()
                 server.login(smtp_username, smtp_password)
 
                 from_address = params.get('from', 'mail@team.quivr.app')
