@@ -1,5 +1,24 @@
 # Changelog
 
+## 0.0.299 (2024-08-22)
+
+## What's Changed
+* fix: Update Supabase configuration by @StanGirard in https://github.com/QuivrHQ/quivr/pull/3014
+* Delete Porter Application theodo-backend by @porter-deployment-app in https://github.com/QuivrHQ/quivr/pull/3022
+* Delete Porter Application theodo-frontend by @porter-deployment-app in https://github.com/QuivrHQ/quivr/pull/3023
+* feat(frontend): emoji selector component by @Zewed in https://github.com/QuivrHQ/quivr/pull/3024
+* feat(frontend): show or hide tokens relative stuff by @Zewed in https://github.com/QuivrHQ/quivr/pull/3017
+* feat(frontend): color picker by @Zewed in https://github.com/QuivrHQ/quivr/pull/3027
+* fix(frontend): small stuff on mobile by @Zewed in https://github.com/QuivrHQ/quivr/pull/3039
+* feat(frontend): handle LaTeX in message thread by @Zewed in https://github.com/QuivrHQ/quivr/pull/3040
+* fix(frontend): fix docker build frontend new env by @StanGirard in https://github.com/QuivrHQ/quivr/pull/3041
+* feat(frontend): brain snippet selector by @Zewed in https://github.com/QuivrHQ/quivr/pull/3038
+* feat: Add environment variable for showing tokens in frontend by @StanGirard in https://github.com/QuivrHQ/quivr/pull/3048
+* fix(frontend): color icon for blocks by @Zewed in https://github.com/QuivrHQ/quivr/pull/3042
+
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.298...v0.0.299
+
 ## 0.0.298 (2024-08-16)
 
 ## What's Changed
