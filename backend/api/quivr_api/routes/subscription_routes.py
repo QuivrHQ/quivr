@@ -253,15 +253,7 @@ async def accept_invitation(
             is_default_brain=False,
         )
         shared_brain = brain_service.get_brain_by_id(brain_id)
-        integration_brain = integration_brains_repository.get_integration_brain(
-            brain_id=brain_id,
-        )
-        integration_brains_repository.add_integration_brain(
-            brain_id=brain_id,
-            user_id=current_user.id,
-            integration_id=integration_brain.integration_id,
-            settings=integration_brain.settings,
-        )
+        
     except Exception as e:
         logger.error(f"Error adding user to brain: {e}")
         raise HTTPException(status_code=400, detail=f"Error adding user to brain: {e}")
