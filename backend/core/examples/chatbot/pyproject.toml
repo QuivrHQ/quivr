@@ -1,0 +1,27 @@
+[project]
+name = "chatbot"
+version = "0.1.0"
+description = "Add your description here"
+authors = [
+    { name = "Stan Girard", email = "stan@quivr.app" }
+]
+dependencies = [
+    "chainlit>=1.1.402",
+    "quivr-core @ file:///home/stan/Dev/quivr/backend/core",
+]
+readme = "README.md"
+requires-python = ">= 3.11"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.rye]
+managed = true
+dev-dependencies = []
+
+[tool.hatch.metadata]
+allow-direct-references = true
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/chatbot"]
