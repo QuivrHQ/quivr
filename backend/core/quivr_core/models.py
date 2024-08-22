@@ -37,10 +37,12 @@ class ChatMessage(BaseModelV1):
     message_time: datetime
     metadata: dict[str, Any]
 
+
 class KnowledgeStatus(str, Enum):
     PROCESSING = "PROCESSING"
     UPLOADED = "UPLOADED"
     ERROR = "ERROR"
+
 
 class Source(BaseModel):
     name: str
@@ -89,7 +91,6 @@ class ParsedRAGChunkResponse(BaseModel):
 
 class QuivrKnowledge(BaseModel):
     id: UUID
-    brain_id: UUID
     file_name: Optional[str] = None
     url: Optional[str] = None
     mime_type: str = "txt"

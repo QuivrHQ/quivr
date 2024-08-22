@@ -17,7 +17,7 @@ class CreateKnowledgeProperties(BaseModel):
     url: Optional[str] = None
     mime_type: str = "application/txt"
     status: KnowledgeStatus = KnowledgeStatus.PROCESSING
-    source: Optional[str] = None
+    source: str = "local"
     source_link: Optional[str] = None
     file_size: Optional[int] = None
     file_sha1: Optional[str] = None

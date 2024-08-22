@@ -1,16 +1,17 @@
 from datetime import datetime
-from typing import Dict, Optional
+from typing import Dict, List, Optional
 from uuid import UUID
 
 from pydantic import BaseModel
 from sqlalchemy import JSON, TIMESTAMP, Column, text
 from sqlmodel import UUID as PGUUID
-from sqlmodel import Field, SQLModel
+from sqlmodel import Field, Relationship, SQLModel
+
+from quivr_api.modules.knowledge.entity.knowledge_brain import KnowledgeBrain
 
 
 class Knowledge(BaseModel):
     id: UUID
-    brain_id: UUID
     file_name: Optional[str] = None
     url: Optional[str] = None
     extension: str = "txt"
@@ -40,13 +41,12 @@ class KnowledgeDB(SQLModel, table=True):
             primary_key=True,
         ),
     )
-    brain_id: UUID = Field(nullable=False)
     file_name: Optional[str] = Field(default=None, max_length=255)
     url: Optional[str] = Field(default=None, max_length=2048)
     mime_type: str = Field(default="txt", max_length=100)
     status: str = Field(max_length=50)
     source: str = Field(max_length=255)
-    source_link: str = Field(max_length=2048)
+    source_link: Optional[str] = Field(max_length=2048)
     file_size: Optional[int] = Field(gt=0)  # FIXME: Should not be optional @chloedia
     file_sha1: Optional[str] = Field(
         max_length=40
@@ -68,3 +68,5 @@ class KnowledgeDB(SQLModel, table=True):
     metadata_: Optional[Dict[str, str]] = Field(
         default=None, sa_column=Column("metadata", JSON)
     )
+
+    knowledge_brain: List[KnowledgeBrain] = Relationship(back_populates="knowledge")
