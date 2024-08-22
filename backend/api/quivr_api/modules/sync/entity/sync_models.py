@@ -84,8 +84,8 @@ class NotionSyncFile(SQLModel, table=True):
             primary_key=True,
         ),
     )
-    notion_id: str = Field(unique=True, description="The ID of the file in Notion")
-    parent_id: str | None = Field(
+    notion_id: UUID = Field(unique=True, description="The ID of the file in Notion")
+    parent_id: UUID | None = Field(
         default=None, description="The ID of the parent file or directory"
     )
     name: str = Field(default=None, description="The name of the file")

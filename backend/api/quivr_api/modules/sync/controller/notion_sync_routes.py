@@ -137,7 +137,7 @@ def oauth2callback_notion(request: Request, background_tasks: BackgroundTasks):
         account_id = owner_info["id"]
 
         result: dict[str, str] = {
-            "access_token": oauth_result["access_token"],
+            "access_token": access_token,
             "refresh_token": oauth_result.get("refresh_token", ""),
             "account_id": account_id,
             "expires_in": oauth_result.get("expires_in", ""),

@@ -1,7 +1,7 @@
 create table "public"."notion_sync" (
     "id" UUID DEFAULT uuid_generate_v4() not null,
-    "notion_id" text not null,
-    "parent_id" text,
+    "notion_id" uuid not null,
+    "parent_id" uuid,
     "is_folder" boolean,
     "icon" text,
     "last_modified" timestamp with time zone,
