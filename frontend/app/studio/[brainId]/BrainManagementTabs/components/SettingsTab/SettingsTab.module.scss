@@ -61,7 +61,6 @@
           display: flex;
           justify-content: center;
           align-items: center;
-          cursor: pointer;
           font-size: Typography.$very_large;
         }
 
@@ -71,6 +70,12 @@
           gap: Spacings.$spacing02;
           font-size: Typography.$small;
           gap: Spacings.$spacing03;
+        }
+
+        &.clickable {
+          .brain_snippet {
+            cursor: pointer;
+          }
         }
       }
 

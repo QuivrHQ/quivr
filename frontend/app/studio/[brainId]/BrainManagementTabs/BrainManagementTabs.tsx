@@ -42,7 +42,6 @@ export const BrainManagementTabs = (): JSX.Element => {
       isSelected: selectedTab === "Knowledge",
       onClick: () => setSelectedTab("Knowledge"),
       iconName: "file",
-      disabled: knowledgeTabDisabled(),
     },
     {
       label: "Settings",
@@ -89,7 +88,9 @@ export const BrainManagementTabs = (): JSX.Element => {
           <Tabs tabList={brainManagementTabs} />
         </div>
       </div>
-      {selectedTab === "Settings" && <SettingsTab brainId={brainId} />}
+      {selectedTab === "Settings" && (
+        <SettingsTab brainId={brainId} hasEditRights={hasEditRights} />
+      )}
       {selectedTab === "People" && <PeopleTab brainId={brainId} />}
       {selectedTab === "Knowledge" && (
         <KnowledgeTab
