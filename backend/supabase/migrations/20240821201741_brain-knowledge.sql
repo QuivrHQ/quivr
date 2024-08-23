@@ -11,7 +11,8 @@ SET knowledge_id = knowledge.id
 FROM knowledge,
     brains_vectors
 WHERE vectors.metadata->>'file_name' = knowledge.file_name
-AND brains_vectors.vector_id = vectors.id;
+AND brains_vectors.vector_id = vectors.id
+AND knowledge.brain_id = brains_vectors.brain_id;
 
 
 alter table "public"."vectors" add constraint "public_vectors_knowledge_id_fkey" FOREIGN KEY (knowledge_id) REFERENCES knowledge(id) ON UPDATE CASCADE ON DELETE CASCADE not valid;
@@ -32,11 +33,9 @@ create table "public"."knowledge_brain" (
 
 -- Backfill from existing knowledge
 INSERT INTO "public"."knowledge_brain" (knowledge_id, brain_id)
-SELECT DISTINCT k.id, bv.brain_id
-FROM knowledge k
-JOIN vectors v ON v.knowledge_id = k.id
-JOIN brains_vectors bv ON bv.vector_id = v.id
-WHERE k.brain_id = bv.brain_id;
+SELECT k.id, k.brain_id
+FROM knowledge k;
+
 
 CREATE INDEX knowledge_brain_brain_id_idx ON public.knowledge_brain USING btree (brain_id);
 
