@@ -4,8 +4,6 @@ from typing import List, Optional
 from uuid import UUID
 
 from pydantic import BaseModel
-
-# from sqlmodel import Enum as PGEnum
 from sqlalchemy.dialects.postgresql import ENUM as PGEnum
 from sqlalchemy.ext.asyncio import AsyncAttrs
 from sqlmodel import TIMESTAMP, Column, Field, Relationship, SQLModel, text
@@ -15,6 +13,10 @@ from quivr_api.modules.brain.entity.integration_brain import (
     IntegrationDescriptionEntity,
     IntegrationEntity,
 )
+from quivr_api.modules.knowledge.entity.knowledge import KnowledgeDB
+from quivr_api.modules.knowledge.entity.knowledge_brain import KnowledgeBrain
+
+# from sqlmodel import Enum as PGEnum
 from quivr_api.modules.prompt.entity.prompt import Prompt
 
 
@@ -62,6 +64,9 @@ class Brain(AsyncAttrs, SQLModel, table=True):
     prompt_id: UUID | None = Field(default=None, foreign_key="prompts.id")
     prompt: Prompt | None = Relationship(  # noqa: f821
         back_populates="brain", sa_relationship_kwargs={"lazy": "joined"}
+    )
+    knowledges: List[KnowledgeDB] = Relationship(
+        back_populates="brains", link_model=KnowledgeBrain
     )
 
     # TODO : add
