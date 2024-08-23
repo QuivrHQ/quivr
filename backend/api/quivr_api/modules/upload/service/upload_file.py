@@ -58,6 +58,7 @@ async def upload_file_storage(
         )
         return response
     else:
+        # check if file sha1 is already in storage
         try:
             response = await supabase_client.storage.from_("quivr").upload(
                 storage_path,

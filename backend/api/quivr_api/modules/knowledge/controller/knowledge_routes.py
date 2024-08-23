@@ -2,18 +2,20 @@ from typing import Annotated
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Query
+
 from quivr_api.logger import get_logger
 from quivr_api.middlewares.auth import AuthBearer, get_current_user
 from quivr_api.modules.brain.entity.brain_entity import RoleEnum
 from quivr_api.modules.brain.service.brain_authorization_service import (
-    has_brain_authorization, validate_brain_authorization)
-from quivr_api.modules.brain.service.brain_vector_service import \
-    BrainVectorService
+    has_brain_authorization,
+    validate_brain_authorization,
+)
+from quivr_api.modules.brain.service.brain_vector_service import BrainVectorService
 from quivr_api.modules.dependencies import get_service
-from quivr_api.modules.knowledge.service.knowledge_service import \
-    KnowledgeService
-from quivr_api.modules.upload.service.generate_file_signed_url import \
-    generate_file_signed_url
+from quivr_api.modules.knowledge.service.knowledge_service import KnowledgeService
+from quivr_api.modules.upload.service.generate_file_signed_url import (
+    generate_file_signed_url,
+)
 from quivr_api.modules.user.entity.user_identity import UserIdentity
 
 knowledge_router = APIRouter()
@@ -63,7 +65,7 @@ async def delete_endpoint(
 
     knowledge = await knowledge_service.get_knowledge(knowledge_id)
     file_name = knowledge.file_name if knowledge.file_name else knowledge.url
-    await knowledge_service.remove_knowledge(knowledge_id)
+    await knowledge_service.remove_knowledge(brain_id, knowledge_id)
 
     brain_vector_service = BrainVectorService(brain_id)
     if knowledge.file_name:
