@@ -122,3 +122,112 @@ body.dark_mode {
   /* Box Shadow */
   --box-shadow: rgba(255, 255, 255, 0.25);
 }
+
+.token.comment,
+.token.block-comment,
+.token.prolog,
+.token.doctype,
+.token.cdata {
+  color: var(--code-very-dark-grey);
+  font-style: italic;
+}
+
+.token.punctuation {
+  color: var(--code-dark-grey);
+}
+
+.token.property,
+.token.tag,
+.token.constant,
+.token.symbol,
+.token.deleted {
+  color: var(--code-red); 
+}
+
+.token.boolean,
+.token.number {
+  color: var(--code-purple);
+}
+
+.token.selector,
+.token.attr-name,
+.token.string,
+.token.char,
+.token.builtin,
+.token.inserted {
+  color: var(--code-green); 
+}
+
+.token.operator,
+.token.entity,
+.token.url,
+.language-css .token.string,
+.style .token.string,
+.token.variable {
+  color: var(--code-grey); 
+}
+
+.token.atrule,
+.token.attr-value,
+.token.function,
+.token.class-name {
+  color: var(--code-yellow);
+}
+
+.token.keyword {
+  color: var(--code-blue); 
+}
+
+.token.regex,
+.token.important {
+  color: var(--code-orange);
+}
+
+.token.important,
+.token.bold {
+  font-weight: bold;
+}
+
+.token.italic {
+  font-style: italic;
+}
+
+.token.entity {
+  cursor: help;
+}
+
+.EmojiPickerReact {
+  --epr-emoji-size: 20px !important;
+  --epr-hover-bg-color: var(--primary-1) !important;
+  --epr-category-navigation-button-size: 24px !important;
+  --epr-category-label-bg-color: var(--background-0) !important;
+  --epr-header-padding: 8px 16px !important;
+}
+
+.EmojiPickerReact.epr-dark-theme {
+  --epr-emoji-size: 20px !important; 
+  --epr-hover-bg-color: var(--primary-1) !important;
+  --epr-category-navigation-button-size: 24px !important;
+  --epr-category-label-bg-color: var(--background-0) !important;
+  --epr-header-padding: 8px 16px !important;
+}
+
+.react-colorful {
+  width: 250px !important;
+  height: 300px !important;
+  border: none !important;
+}
+
+@media (min-width: 768px) {
+  .react-colorful {
+    width: 375px !important;
+  }
+}
+
+.react-colorful__last-control {
+  border-radius: 0 !important;
+}
+
+.react-colorful__saturation {
+  border-radius: 0 !important;
+}

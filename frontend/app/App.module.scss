@@ -18,6 +18,11 @@
     }
   }
 
+  &.blur {
+    filter: opacity(0.1);
+    transition: filter 0.2s ease-in-out;
+  }
+
   .content_container {
     overflow: scroll;
     flex: 1 1 0%;

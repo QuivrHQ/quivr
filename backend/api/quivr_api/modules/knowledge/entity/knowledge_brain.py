@@ -24,8 +24,9 @@ class KnowledgeBrain(SQLModel, table=True):
             server_default=text("CURRENT_TIMESTAMP"),
         ),
     )
-    brain_id: UUID = Field(nullable=False, foreign_key="brains.brain_id")
-    knowledge_id: UUID = Field(nullable=False, foreign_key="knowledge.id")
-
-    # knowledge: KnowledgeDB| None = Relationship(back_populates="knowledge_brain")  # type: ignore
-    # brain: Brain | None = Relationship(back_populates="knowledge_brain")  # type: ignore
+    brain_id: UUID = Field(
+        nullable=False, foreign_key="brains.brain_id", primary_key=True
+    )
+    knowledge_id: UUID = Field(
+        nullable=False, foreign_key="knowledge.id", primary_key=True
+    )

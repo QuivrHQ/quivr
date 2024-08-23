@@ -115,7 +115,7 @@ class ChatRepository(BaseRepository):
     ):
         response = (
             self.db.table("chat_history")
-            .update(chat_message_properties)
+            .update(chat_message_properties.model_dump())
             .match({"message_id": message_id, "chat_id": chat_id})
             .execute()
         )

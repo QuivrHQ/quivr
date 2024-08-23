@@ -10,6 +10,8 @@ import { useUserData } from "@/lib/hooks/useUserData";
 
 import styles from "./ProfileButton.module.scss";
 
+const showTokens = process.env.NEXT_PUBLIC_SHOW_TOKENS === "true";
+
 export const ProfileButton = (): JSX.Element => {
   const [isHovered, setIsHovered] = useState<boolean>(false);
   const pathname = usePathname() ?? "";
@@ -46,7 +48,7 @@ export const ProfileButton = (): JSX.Element => {
         color="primary"
         parentHovered={isHovered}
       />
-      {remainingCredits !== null && (
+      {remainingCredits !== null && !!showTokens && (
         <div className={styles.credits}>
           <span className={styles.number}>{remainingCredits}</span>
           <Icon name="coin" color="gold" size="normal"></Icon>

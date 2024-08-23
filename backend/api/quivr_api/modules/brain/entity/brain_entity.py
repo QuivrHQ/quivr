@@ -4,8 +4,6 @@ from typing import List, Optional
 from uuid import UUID
 
 from pydantic import BaseModel
-
-# from sqlmodel import Enum as PGEnum
 from sqlalchemy.dialects.postgresql import ENUM as PGEnum
 from sqlalchemy.ext.asyncio import AsyncAttrs
 from sqlmodel import TIMESTAMP, Column, Field, Relationship, SQLModel, text
@@ -15,6 +13,10 @@ from quivr_api.modules.brain.entity.integration_brain import (
     IntegrationDescriptionEntity,
     IntegrationEntity,
 )
+from quivr_api.modules.knowledge.entity.knowledge import KnowledgeDB
+from quivr_api.modules.knowledge.entity.knowledge_brain import KnowledgeBrain
+
+# from sqlmodel import Enum as PGEnum
 from quivr_api.modules.prompt.entity.prompt import Prompt
 
 
@@ -63,6 +65,9 @@ class Brain(AsyncAttrs, SQLModel, table=True):
     prompt: Prompt | None = Relationship(  # noqa: f821
         back_populates="brain", sa_relationship_kwargs={"lazy": "joined"}
     )
+    knowledges: List[KnowledgeDB] = Relationship(
+        back_populates="brains", link_model=KnowledgeBrain
+    )
 
     # TODO : add
     # "meaning" "public"."vector",
@@ -82,6 +87,8 @@ class BrainEntity(BaseModel):
     brain_type: BrainType
     integration: Optional[IntegrationEntity] = None
     integration_description: Optional[IntegrationDescriptionEntity] = None
+    snippet_emoji: Optional[str] = None
+    snippet_color: Optional[str] = None
 
     @property
     def id(self) -> UUID:
@@ -111,6 +118,7 @@ class BrainUser(BaseModel):
 class MinimalUserBrainEntity(BaseModel):
     id: UUID
     name: str
+    brain_model: Optional[str] = None
     rights: RoleEnum
     status: str
     brain_type: BrainType
@@ -123,3 +131,5 @@ class MinimalUserBrainEntity(BaseModel):
     display_name: Optional[str] = None
     image_url: Optional[str] = None
     model: bool = False
+    snippet_color: Optional[str] = None
+    snippet_emoji: Optional[str] = None

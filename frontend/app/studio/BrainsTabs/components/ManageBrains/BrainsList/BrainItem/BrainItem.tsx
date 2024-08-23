@@ -82,7 +82,12 @@ export const BrainItem = ({ brain, even }: BrainItemProps): JSX.Element => {
       >
         <div className={styles.brain_header}>
           <div className={styles.left}>
-            <Icon name="brain" color="primary" size="large" />
+            <div
+              className={styles.brain_snippet}
+              style={{ backgroundColor: brain.snippet_color }}
+            >
+              <span>{brain.snippet_emoji}</span>
+            </div>
             <span className={styles.name}>{brain.name}</span>
           </div>
           <div

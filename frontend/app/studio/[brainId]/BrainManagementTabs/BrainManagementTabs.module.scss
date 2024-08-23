@@ -10,7 +10,7 @@
 
 .header_wrapper {
   display: flex;
-  width: 100%;
+  width: calc(100% + (Spacings.$spacing05 + Spacings.$spacing03));
   margin-left: -(Spacings.$spacing05 + Spacings.$spacing03);
   gap: Spacings.$spacing03;
   align-items: center;

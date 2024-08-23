@@ -1,3 +1,4 @@
+@use "styles/Radius.module.scss";
 @use "styles/Spacings.module.scss";
 @use "styles/Typography.module.scss";
 
@@ -43,6 +44,10 @@
           filter: invert(100%);
         }
 
+        .brain_image {
+          border-radius: Radius.$normal;
+        }
+
         .brain_name {
           @include textColor(text-3);
           @include Typography.EllipsisOverflow;
@@ -50,6 +55,16 @@
           &.new {
             color: var(--primary-0);
           }
+        }
+
+        .brain_snippet {
+          width: 18px;
+          height: 18px;
+          border-radius: Radius.$normal;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          font-size: Typography.$very_tiny;
         }
 
         .warning {

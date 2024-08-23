@@ -27,7 +27,9 @@ export const ManageBrains = (): JSX.Element => {
         />
       </div>
 
-      <BrainsList brains={brains} />
+      <BrainsList
+        brains={brains.filter((brain) => brain.brain_type === "doc")}
+      />
     </div>
   );
 };

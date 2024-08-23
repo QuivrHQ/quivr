@@ -1,5 +1,70 @@
 # Changelog
 
+## 0.0.299 (2024-08-22)
+
+## What's Changed
+* fix: Update Supabase configuration by @StanGirard in https://github.com/QuivrHQ/quivr/pull/3014
+* Delete Porter Application theodo-backend by @porter-deployment-app in https://github.com/QuivrHQ/quivr/pull/3022
+* Delete Porter Application theodo-frontend by @porter-deployment-app in https://github.com/QuivrHQ/quivr/pull/3023
+* feat(frontend): emoji selector component by @Zewed in https://github.com/QuivrHQ/quivr/pull/3024
+* feat(frontend): show or hide tokens relative stuff by @Zewed in https://github.com/QuivrHQ/quivr/pull/3017
+* feat(frontend): color picker by @Zewed in https://github.com/QuivrHQ/quivr/pull/3027
+* fix(frontend): small stuff on mobile by @Zewed in https://github.com/QuivrHQ/quivr/pull/3039
+* feat(frontend): handle LaTeX in message thread by @Zewed in https://github.com/QuivrHQ/quivr/pull/3040
+* fix(frontend): fix docker build frontend new env by @StanGirard in https://github.com/QuivrHQ/quivr/pull/3041
+* feat(frontend): brain snippet selector by @Zewed in https://github.com/QuivrHQ/quivr/pull/3038
+* feat: Add environment variable for showing tokens in frontend by @StanGirard in https://github.com/QuivrHQ/quivr/pull/3048
+* fix(frontend): color icon for blocks by @Zewed in https://github.com/QuivrHQ/quivr/pull/3042
+
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.298...v0.0.299
+
+## 0.0.298 (2024-08-16)
+
+## What's Changed
+* feat(azure): quivr compatible with it by @StanGirard in https://github.com/QuivrHQ/quivr/pull/3005
+* feat(frontend): helpbox by @Zewed in https://github.com/QuivrHQ/quivr/pull/3007
+* feat(frontend): order models and brain by name by @Zewed in https://github.com/QuivrHQ/quivr/pull/3009
+* fix(frontend): help window by @Zewed in https://github.com/QuivrHQ/quivr/pull/3013
+
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.297...v0.0.298
+
+## 0.0.297 (2024-08-14)
+
+## What's Changed
+* fix(frontend): remove onboarding modal by @Zewed in https://github.com/QuivrHQ/quivr/pull/3001
+* fix(frontend): max height for user message by @Zewed in https://github.com/QuivrHQ/quivr/pull/3000
+* fix: commit on try sqlalchemy by @AmineDiro in https://github.com/QuivrHQ/quivr/pull/3004
+
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.296...v0.0.297
+
+## 0.0.296 (2024-08-13)
+
+## What's Changed
+* fix(frontend): color of copy icon for code blocks by @Zewed in https://github.com/QuivrHQ/quivr/pull/2993
+* fix(frontend): search bar height by @Zewed in https://github.com/QuivrHQ/quivr/pull/2998
+* fix: autocommit isolation level by @AmineDiro in https://github.com/QuivrHQ/quivr/pull/2999
+
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.295...v0.0.296
+
+## 0.0.295 (2024-08-12)
+
+## What's Changed
+* chore: Update frontend README.md with yarn dev command (#2931) by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2958
+* feat: Add brain_id and brain_name to ChatLLMMetadata model by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2968
+* feat(frontend): talk with models and handle code markdown by @Zewed in https://github.com/QuivrHQ/quivr/pull/2980
+* fix(frontend): talk with models by @Zewed in https://github.com/QuivrHQ/quivr/pull/2981
+* feat(models): all models by default by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2983
+* chore(env): add deactivate stripe env variable by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2986
+* fix(frontend): handling unimported languages in Prism js by @Zewed in https://github.com/QuivrHQ/quivr/pull/2990
+* fix(frontend): logo design of models by @Zewed in https://github.com/QuivrHQ/quivr/pull/2992
+
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.294...v0.0.295
+
 ## 0.0.294 (2024-08-07)
 
 ## What's Changed

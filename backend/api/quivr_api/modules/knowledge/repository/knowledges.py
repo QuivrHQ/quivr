@@ -9,10 +9,10 @@ from sqlmodel import select
 from sqlmodel.ext.asyncio.session import AsyncSession
 
 from quivr_api.logger import get_logger
+from quivr_api.modules.brain.entity.brain_entity import Brain
 from quivr_api.modules.dependencies import BaseRepository, get_supabase_client
 from quivr_api.modules.knowledge.dto.outputs import DeleteKnowledgeResponse
 from quivr_api.modules.knowledge.entity.knowledge import KnowledgeDB
-from quivr_api.modules.knowledge.entity.knowledge_brain import KnowledgeBrain
 
 logger = get_logger(__name__)
 
@@ -23,35 +23,39 @@ class KnowledgeRepository(BaseRepository):
         supabase_client = get_supabase_client()
         self.db = supabase_client
 
-    async def insert_knowledge(self, knowledge: KnowledgeDB) -> KnowledgeDB:
+    async def insert_knowledge(
+        self, knowledge: KnowledgeDB, brain_id: UUID
+    ) -> KnowledgeDB:
         logger.debug(f"Inserting knowledge {knowledge}")
-        query = select(KnowledgeDB).where(
-            KnowledgeDB.brain_id == knowledge.brain_id,
-            KnowledgeDB.file_name == knowledge.file_name,
-        )
+        query = select(Brain).where(Brain.brain_id == brain_id)
         result = await self.session.exec(query)
-        existing_knowledge = result.first()
-
+        brain = result.first()
+        if not brain:
+            raise HTTPException(404, "Brain not found")
         try:
-            if existing_knowledge:
-                existing_knowledge.source_link = knowledge.source_link
-                self.session.add(existing_knowledge)
-                # create link
-                assert existing_knowledge.id, "Knowledge ID not generated"
-                knowledge_brain = KnowledgeBrain(
-                    brain_id=existing_knowledge.brain_id,
-                    knowledge_id=existing_knowledge.id,
-                )
-                self.session.add(knowledge_brain)
-            else:
-                self.session.add(knowledge)
+            knowledge.brains.append(brain)
+            self.session.add(knowledge)
             await self.session.commit()
+            await self.session.refresh(knowledge)
         except IntegrityError:
             await self.session.rollback()
-            raise Exception("Integrity error while creating notion files.")
+            raise Exception("Integrity error while creating knowledge.")
         except Exception as e:
             await self.session.rollback()
             raise e
+        return knowledge
+
+    async def link_to_brain(
+        self, knowledge_id: UUID, brain_id: UUID
+    ) -> (
+        KnowledgeDB
+    ):  # FIXME : @amine @chloe Unused but to use later for fixing sha1 issues
+        knowledge = await self.get_knowledge_by_id(knowledge_id)
+        brain = await self.get_brain_by_id(brain_id)
+        knowledge.brains.append(brain)
+        self.session.add(knowledge)
+        await self.session.commit()
+        await self.session.refresh(knowledge)
         return knowledge
 
     async def remove_knowledge_by_id(
@@ -83,10 +87,14 @@ class KnowledgeRepository(BaseRepository):
 
         return knowledge
 
-    async def get_all_knowledge_in_brain(self, brain_id: UUID) -> Sequence[KnowledgeDB]:
-        query = select(KnowledgeDB).where(KnowledgeDB.brain_id == brain_id)
+    async def get_brain_by_id(self, brain_id: UUID) -> Brain:
+        # Get all knowledge_id in a brain
+        query = select(Brain).where(Brain.brain_id == brain_id)
         result = await self.session.exec(query)
-        return result.all()
+        brain = result.first()
+        if not brain:
+            raise HTTPException(404, "Knowledge not found")
+        return brain
 
     async def remove_brain_all_knowledge(self, brain_id) -> int:
         """
@@ -94,9 +102,10 @@ class KnowledgeRepository(BaseRepository):
         Args:
             brain_id (UUID): The id of the brain
         """
-        all_knowledge = await self.get_all_knowledge_in_brain(brain_id)
+        brain = await self.get_brain_by_id(brain_id)
+        all_knowledge = await brain.awaitable_attrs.knowledges
         knowledge_to_delete_list = [
-            knowledge.source_link
+            knowledge.knowledge.source_link
             for knowledge in all_knowledge
             if knowledge.source == "local"
         ]
@@ -105,9 +114,7 @@ class KnowledgeRepository(BaseRepository):
             # FIXME: Can we bypass db ? @Amine
             self.db.storage.from_("quivr").remove(knowledge_to_delete_list)
 
-        select_query = select(KnowledgeDB).where(KnowledgeDB.brain_id == brain_id)
-        items_to_delete = await self.session.exec(select_query)
-        for item in items_to_delete:
+        for item in all_knowledge:
             await self.session.delete(item)
         await self.session.commit()
         return len(knowledge_to_delete_list)
@@ -123,6 +130,23 @@ class KnowledgeRepository(BaseRepository):
             return None
 
         knowledge.status = status
+        self.session.add(knowledge)
+        await self.session.commit()
+        await self.session.refresh(knowledge)
+
+        return knowledge
+
+    async def update_source_link_knowledge(
+        self, knowledge_id: UUID, source_link: str
+    ) -> KnowledgeDB:
+        query = select(KnowledgeDB).where(KnowledgeDB.id == knowledge_id)
+        result = await self.session.exec(query)
+        knowledge = result.first()
+
+        if not knowledge:
+            raise HTTPException(404, "Knowledge not found")
+
+        knowledge.source_link = source_link
         self.session.add(knowledge)
         await self.session.commit()
         await self.session.refresh(knowledge)

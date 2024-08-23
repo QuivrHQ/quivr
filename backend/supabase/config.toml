@@ -7,13 +7,16 @@ enabled = true
 # Port to use for the API URL.
 port = 54321
 # Schemas to expose in your API. Tables, views and stored procedures in this schema will get API
-# endpoints. public and storage are always included.
+# endpoints. `public` is always included.
 schemas = ["public", "storage", "graphql_public", "vault"]
-# Extra schemas to add to the search_path of every request. public is always included.
+# Extra schemas to add to the search_path of every request. `public` is always included.
 extra_search_path = ["public", "extensions", "stripe", "vault"]
 # The maximum number of rows returns from a view, table, or stored procedure. Limits payload size
 # for accidental or malicious requests.
 max_rows = 1000
+
+[api.tls]
+enabled = false
 
 [db]
 # Port to use for the local database URL.
@@ -38,7 +41,7 @@ max_client_conn = 100
 
 [realtime]
 enabled = true
-# Bind realtime via either IPv4 or IPv6. (default: IPv6)
+# Bind realtime via either IPv4 or IPv6. (default: IPv4)
 # ip_version = "IPv6"
 # The maximum length in bytes of HTTP request headers. (default: 4096)
 # max_header_length = 4096
@@ -48,7 +51,7 @@ enabled = true
 # Port to use for Supabase Studio.
 port = 54323
 # External URL of the API server that frontend connects to.
-api_url = "http://localhost"
+api_url = "http://127.0.0.1"
 # OpenAI API Key to use for Supabase AI in the Supabase Studio.
 openai_api_key = "env(OPENAI_API_KEY)"
 
@@ -67,13 +70,23 @@ enabled = true
 # The maximum file size allowed (e.g. "5MB", "500KB").
 file_size_limit = "50MiB"
 
+[storage.image_transformation]
+enabled = false
+
+# Uncomment to configure local storage buckets
+# [storage.buckets.images]
+# public = false
+# file_size_limit = "50MiB"
+# allowed_mime_types = ["image/png", "image/jpeg"]
+# objects_path = "./images"
+
 [auth]
 enabled = true
 # The base URL of your website. Used as an allow-list for redirects and for constructing URLs used
 # in emails.
-site_url = "http://localhost:3000"
+site_url = "http://127.0.0.1:3000"
 # A list of *exact* URLs that auth providers are permitted to redirect to post authentication.
-additional_redirect_urls = ["https://localhost:3000"]
+additional_redirect_urls = ["https://127.0.0.1:3000"]
 # How long tokens are valid for, in seconds. Defaults to 3600 (1 hour), maximum 604,800 (1 week).
 jwt_expiry = 3600
 # If disabled, the refresh token will never expire.
@@ -83,6 +96,8 @@ enable_refresh_token_rotation = true
 refresh_token_reuse_interval = 10
 # Allow/disallow new user signups to your project.
 enable_signup = true
+# Allow/disallow anonymous sign-ins to your project.
+enable_anonymous_sign_ins = false
 # Allow/disallow testing manual linking of accounts
 enable_manual_linking = false
 
@@ -94,6 +109,17 @@ enable_signup = true
 double_confirm_changes = true
 # If enabled, users need to confirm their email address before signing in.
 enable_confirmations = false
+# Controls the minimum amount of time that must pass before sending another signup confirmation or password reset email.
+max_frequency = "1s"
+
+# Use a production-ready SMTP server
+# [auth.email.smtp]
+# host = "smtp.sendgrid.net"
+# port = 587
+# user = "apikey"
+# pass = "env(SENDGRID_API_KEY)"
+# admin_email = "admin@email.com"
+# sender_name = "Admin"
 
 # Uncomment to customize email template
 # [auth.email.template.invite]
@@ -106,17 +132,25 @@ enable_signup = true
 # If enabled, users need to confirm their phone number before signing in.
 enable_confirmations = false
 # Template for sending OTP to users
-template = "Your code is {{ `{{ .Code }}` }} ."
+template = "Your code is {{ .Code }} ."
+# Controls the minimum amount of time that must pass before sending another sms otp.
+max_frequency = "5s"
 
 # Use pre-defined map of phone number to OTP for testing.
-[auth.sms.test_otp]
+# [auth.sms.test_otp]
 # 4152127777 = "123456"
 
+# Configure logged in session timeouts.
+# [auth.sessions]
+# Force log out after the specified duration.
+# timebox = "24h"
+# Force log out if the user has been inactive longer than the specified duration.
+# inactivity_timeout = "8h"
+
 # This hook runs before a token is issued and allows you to add additional claims based on the authentication method used.
-[auth.hook.custom_access_token]
+# [auth.hook.custom_access_token]
 # enabled = true
 # uri = "pg-functions://<database>/<schema>/<hook_name>"
-
 
 # Configure one of the supported SMS providers: `twilio`, `twilio_verify`, `messagebird`, `textlocal`, `vonage`.
 [auth.sms.twilio]
@@ -139,11 +173,19 @@ redirect_uri = ""
 # Overrides the default auth provider URL. Used to support self-hosted gitlab, single-tenant Azure,
 # or any other third-party OIDC providers.
 url = ""
+# If enabled, the nonce check will be skipped. Required for local sign in with Google auth.
+skip_nonce_check = false
+
+[edge_runtime]
+enabled = true
+# Configure one of the supported request policies: `oneshot`, `per_worker`.
+# Use `oneshot` for hot reload, or `per_worker` for load testing.
+policy = "oneshot"
+inspector_port = 8083
 
 [analytics]
-enabled = false
+enabled = true
 port = 54327
-vector_port = 54328
 # Configure one of the supported backends: `postgres`, `bigquery`.
 backend = "postgres"
 
