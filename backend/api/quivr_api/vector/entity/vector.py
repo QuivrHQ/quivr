@@ -3,11 +3,11 @@ from uuid import UUID
 
 from pgvector.sqlalchemy import Vector as PGVector
 from pydantic import BaseModel
-from sqlalchemy import Column
-from sqlmodel import JSON, Column, Field, SQLModel, text
-from sqlmodel import UUID as PGUUID
-
 from quivr_api.models.settings import settings
+from sqlalchemy import Column
+from sqlmodel import JSON
+from sqlmodel import UUID as PGUUID
+from sqlmodel import Column, Field, SQLModel, text
 
 
 class Vector(SQLModel, table=True):
@@ -36,7 +36,6 @@ class VectorType(BaseModel):
     content: str
     metadata_: dict
     knowledge_id: UUID
-
 
 class SimilaritySearchOutput(BaseModel):
     id: UUID
