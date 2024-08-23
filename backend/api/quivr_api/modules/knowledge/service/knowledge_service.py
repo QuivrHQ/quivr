@@ -1,16 +1,15 @@
 from typing import List
 from uuid import UUID
 
-from quivr_core.models import QuivrKnowledge as Knowledge
+from quivr_core.models import KnowledgeStatus
 
 from quivr_api.logger import get_logger
 from quivr_api.modules.dependencies import BaseService
 from quivr_api.modules.knowledge.dto.inputs import (
     CreateKnowledgeProperties,
-    KnowledgeStatus,
 )
 from quivr_api.modules.knowledge.dto.outputs import DeleteKnowledgeResponse
-from quivr_api.modules.knowledge.entity.knowledge import KnowledgeDB
+from quivr_api.modules.knowledge.entity.knowledge import Knowledge, KnowledgeDB
 from quivr_api.modules.knowledge.repository.knowledges import KnowledgeRepository
 
 logger = get_logger(__name__)
@@ -23,27 +22,35 @@ class KnowledgeService(BaseService[KnowledgeRepository]):
         self.repository = repository
 
     async def add_knowledge(
-        self, knowledge_to_add: CreateKnowledgeProperties
+        self,
+        knowledge_to_add: CreateKnowledgeProperties,  # FIXME: (later) @Amine brain id should not be in CreateKnowledgeProperties but since storage is brain_id/file_name
     ) -> Knowledge:
-        knowledge_data = knowledge_to_add.dict()
-        knowledge = KnowledgeDB(**knowledge_data)
+        knowledge = KnowledgeDB(
+            file_name=knowledge_to_add.file_name,
+            url=knowledge_to_add.url,
+            mime_type=knowledge_to_add.mime_type,
+            status=knowledge_to_add.status.value,
+            source=knowledge_to_add.source,
+            source_link=knowledge_to_add.source_link,
+            file_size=knowledge_to_add.file_size,
+            file_sha1=knowledge_to_add.file_sha1,
+            metadata_=knowledge_to_add.metadata,  # type: ignore
+        )
 
         inserted_knowledge_db_instance = await self.repository.insert_knowledge(
-            knowledge
+            knowledge, brain_id=knowledge_to_add.brain_id
         )
 
         assert inserted_knowledge_db_instance.id, "Knowledge ID not generated"
         if inserted_knowledge_db_instance.source == "local":
-            source_link = f"s3://quivr/{inserted_knowledge_db_instance.brain_id}/{inserted_knowledge_db_instance.id}"
-            inserted_knowledge_db_instance.source_link = source_link
+            source_link = f"s3://quivr/{knowledge_to_add.brain_id}/{inserted_knowledge_db_instance.id}"
 
-        inserted_knowledge = await self.repository.insert_knowledge(
-            inserted_knowledge_db_instance
+        inserted_knowledge = await self.repository.update_source_link_knowledge(
+            knowledge_id=inserted_knowledge_db_instance.id, source_link=source_link
         )
 
         inserted_knowledge = Knowledge(
             id=inserted_knowledge_db_instance.id,
-            brain_id=inserted_knowledge_db_instance.brain_id,
             file_name=inserted_knowledge_db_instance.file_name,
             url=inserted_knowledge_db_instance.url,
             mime_type=inserted_knowledge_db_instance.mime_type,
@@ -59,12 +66,13 @@ class KnowledgeService(BaseService[KnowledgeRepository]):
         return inserted_knowledge
 
     async def get_all_knowledge(self, brain_id: UUID) -> List[Knowledge]:
-        knowledges_models = await self.repository.get_all_knowledge_in_brain(brain_id)
+        brain = await self.repository.get_brain_by_id(brain_id)
+
+        all_knowledges = await brain.awaitable_attrs.knowledges
 
         knowledges = [
             Knowledge(
                 id=knowledge.id,  # type: ignore
-                brain_id=knowledge.brain_id,
                 file_name=knowledge.file_name,
                 url=knowledge.url,
                 mime_type=knowledge.mime_type,
@@ -81,7 +89,7 @@ class KnowledgeService(BaseService[KnowledgeRepository]):
                 created_at=knowledge.created_at,
                 metadata=knowledge.metadata_,  # type: ignore
             )
-            for knowledge in knowledges_models
+            for knowledge in all_knowledges
         ]
 
         return knowledges
@@ -102,7 +110,6 @@ class KnowledgeService(BaseService[KnowledgeRepository]):
 
         inserted_knowledge = Knowledge(
             id=inserted_knowledge_db_instance.id,
-            brain_id=inserted_knowledge_db_instance.brain_id,
             file_name=inserted_knowledge_db_instance.file_name,
             url=inserted_knowledge_db_instance.url,
             mime_type=inserted_knowledge_db_instance.mime_type,
