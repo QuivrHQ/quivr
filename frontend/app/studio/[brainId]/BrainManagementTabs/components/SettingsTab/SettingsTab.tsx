@@ -73,15 +73,11 @@ export const SettingsTabContent = ({
       >
         <div className={styles.main_container}>
           <div className={styles.main_infos_wrapper}>
-            <span className={styles.section_title}>General Information</span>
+            <span className={styles.section_title}>{brain.name} Settings</span>
             <div className={styles.inputs_wrapper}>
               <div className={styles.brain_snippet_wrapper}>
                 {editSnippet && (
-                  <div
-                    className={`${styles.edit_snippet} ${
-                      hasEditRights ? styles.clickable : ""
-                    }`}
-                  >
+                  <div className={styles.edit_snippet}>
                     <BrainSnippet
                       setVisible={setEditSnippet}
                       initialColor={brain.snippet_color}
@@ -95,7 +91,9 @@ export const SettingsTabContent = ({
                   </div>
                 )}
                 <div
-                  className={styles.brain_snippet}
+                  className={`${styles.brain_snippet} ${
+                    hasEditRights ? styles.clickable : ""
+                  }`}
                   style={{ backgroundColor: snippetColor }}
                   onClick={() => {
                     if (!editSnippet && hasEditRights) {

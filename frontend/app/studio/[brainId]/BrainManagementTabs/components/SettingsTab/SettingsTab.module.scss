@@ -52,6 +52,10 @@
           justify-content: center;
           align-items: center;
           font-size: 68px;
+
+          &.clickable {
+            cursor: pointer;
+          }
         }
 
         @media screen and (max-width: ScreenSizes.$small) {
@@ -77,12 +81,6 @@
           gap: Spacings.$spacing02;
           font-size: Typography.$small;
           gap: Spacings.$spacing03;
-        }
-
-        &.clickable {
-          .brain_snippet {
-            cursor: pointer;
-          }
         }
       }
 
