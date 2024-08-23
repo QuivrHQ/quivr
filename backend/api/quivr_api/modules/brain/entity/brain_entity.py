@@ -13,9 +13,10 @@ from quivr_api.modules.brain.entity.integration_brain import (
     IntegrationDescriptionEntity,
     IntegrationEntity,
 )
+from quivr_api.modules.knowledge.entity.knowledge import KnowledgeDB
+from quivr_api.modules.knowledge.entity.knowledge_brain import KnowledgeBrain
 
 # from sqlmodel import Enum as PGEnum
-from quivr_api.modules.knowledge.entity.knowledge_brain import KnowledgeBrain
 from quivr_api.modules.prompt.entity.prompt import Prompt
 
 
@@ -64,7 +65,9 @@ class Brain(AsyncAttrs, SQLModel, table=True):
     prompt: Prompt | None = Relationship(  # noqa: f821
         back_populates="brain", sa_relationship_kwargs={"lazy": "joined"}
     )
-    knowledge_brain: list[KnowledgeBrain] = Relationship(back_populates="brain")
+    knowledges: List[KnowledgeDB] = Relationship(
+        back_populates="brains", link_model=KnowledgeBrain
+    )
 
     # TODO : add
     # "meaning" "public"."vector",

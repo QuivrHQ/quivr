@@ -2,7 +2,7 @@ from datetime import datetime
 from uuid import UUID
 
 from sqlalchemy import TIMESTAMP, Column, text
-from sqlmodel import TIMESTAMP, Column, Field, Relationship, SQLModel, text
+from sqlmodel import TIMESTAMP, Column, Field, SQLModel, text
 from sqlmodel import UUID as PGUUID
 
 
@@ -24,12 +24,9 @@ class KnowledgeBrain(SQLModel, table=True):
             server_default=text("CURRENT_TIMESTAMP"),
         ),
     )
-    brain_id: UUID = Field(nullable=False, foreign_key="brains.brain_id")
-    knowledge_id: UUID = Field(nullable=False, foreign_key="knowledge.id")
-
-    knowledge: "KnowledgeDB" = Relationship(back_populates="knowledge_brain")
-
-    brain: "Brain" = Relationship(back_populates="knowledge_brain")
-
-    # knowledge: KnowledgeDB| None = Relationship(back_populates="knowledge_brain")  # type: ignore
-    # brain: Brain | None = Relationship(back_populates="knowledge_brain")  # type: ignore
+    brain_id: UUID = Field(
+        nullable=False, foreign_key="brains.brain_id", primary_key=True
+    )
+    knowledge_id: UUID = Field(
+        nullable=False, foreign_key="knowledge.id", primary_key=True
+    )

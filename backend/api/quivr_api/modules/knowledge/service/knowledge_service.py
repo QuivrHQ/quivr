@@ -1,17 +1,15 @@
 from typing import List
 from uuid import UUID
 
-from quivr_core.models import QuivrKnowledge as Knowledge
+from quivr_core.models import KnowledgeStatus
 
 from quivr_api.logger import get_logger
 from quivr_api.modules.dependencies import BaseService
 from quivr_api.modules.knowledge.dto.inputs import (
     CreateKnowledgeProperties,
-    KnowledgeStatus,
 )
 from quivr_api.modules.knowledge.dto.outputs import DeleteKnowledgeResponse
-from quivr_api.modules.knowledge.entity.knowledge import KnowledgeDB
-from quivr_api.modules.knowledge.entity.knowledge_brain import KnowledgeBrain
+from quivr_api.modules.knowledge.entity.knowledge import Knowledge, KnowledgeDB
 from quivr_api.modules.knowledge.repository.knowledges import KnowledgeRepository
 
 logger = get_logger(__name__)
@@ -40,7 +38,7 @@ class KnowledgeService(BaseService[KnowledgeRepository]):
         )
 
         inserted_knowledge_db_instance = await self.repository.insert_knowledge(
-            knowledge
+            knowledge, brain_id=knowledge_to_add.brain_id
         )
 
         assert inserted_knowledge_db_instance.id, "Knowledge ID not generated"
@@ -50,11 +48,6 @@ class KnowledgeService(BaseService[KnowledgeRepository]):
         inserted_knowledge = await self.repository.update_source_link_knowledge(
             knowledge_id=inserted_knowledge_db_instance.id, source_link=source_link
         )
-        new_knowledge_brain = KnowledgeBrain(
-            brain_id=knowledge_to_add.brain_id,
-            knowledge_id=inserted_knowledge_db_instance.id,
-        )
-        await self.repository.insert_knowledge_brain(new_knowledge_brain)
 
         inserted_knowledge = Knowledge(
             id=inserted_knowledge_db_instance.id,
@@ -73,30 +66,30 @@ class KnowledgeService(BaseService[KnowledgeRepository]):
         return inserted_knowledge
 
     async def get_all_knowledge(self, brain_id: UUID) -> List[Knowledge]:
-        all_knowledges_brain = await self.repository.get_all_knowledge_in_brain(
-            brain_id
-        )
+        brain = await self.repository.get_brain_by_id(brain_id)
+
+        all_knowledges = await brain.awaitable_attrs.knowledges
 
         knowledges = [
             Knowledge(
-                id=knowledge_brain.knowledge.id,  # type: ignore
-                file_name=knowledge_brain.knowledge.file_name,
-                url=knowledge_brain.knowledge.url,
-                mime_type=knowledge_brain.knowledge.mime_type,
-                status=KnowledgeStatus(knowledge_brain.knowledge.status),
-                source=knowledge_brain.knowledge.source,
-                source_link=knowledge_brain.knowledge.source_link,
-                file_size=knowledge_brain.knowledge.file_size
-                if knowledge_brain.knowledge.file_size
+                id=knowledge.id,  # type: ignore
+                file_name=knowledge.file_name,
+                url=knowledge.url,
+                mime_type=knowledge.mime_type,
+                status=KnowledgeStatus(knowledge.status),
+                source=knowledge.source,
+                source_link=knowledge.source_link,
+                file_size=knowledge.file_size
+                if knowledge.file_size
                 else 0,  # FIXME: Should not be optional @chloedia
-                file_sha1=knowledge_brain.knowledge.file_sha1
-                if knowledge_brain.knowledge.file_sha1
+                file_sha1=knowledge.file_sha1
+                if knowledge.file_sha1
                 else "",  # FIXME: Should not be optional @chloedia
-                updated_at=knowledge_brain.knowledge.updated_at,
-                created_at=knowledge_brain.knowledge.created_at,
-                metadata=knowledge_brain.knowledge.metadata_,  # type: ignore
+                updated_at=knowledge.updated_at,
+                created_at=knowledge.created_at,
+                metadata=knowledge.metadata_,  # type: ignore
             )
-            for knowledge_brain in all_knowledges_brain
+            for knowledge in all_knowledges
         ]
 
         return knowledges

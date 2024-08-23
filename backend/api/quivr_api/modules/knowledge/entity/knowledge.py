@@ -4,17 +4,18 @@ from uuid import UUID
 
 from pydantic import BaseModel
 from sqlalchemy import JSON, TIMESTAMP, Column, text
+from sqlalchemy.ext.asyncio import AsyncAttrs
 from sqlmodel import UUID as PGUUID
 from sqlmodel import Field, Relationship, SQLModel
 
 from quivr_api.modules.knowledge.entity.knowledge_brain import KnowledgeBrain
 
 
-class Knowledge(BaseModel):
+class Knowledge(AsyncAttrs, BaseModel):
     id: UUID
     file_name: Optional[str] = None
     url: Optional[str] = None
-    extension: str = "txt"
+    mime_type: str = "txt"
     status: str
     source: Optional[str] = None
     source_link: Optional[str] = None
@@ -68,5 +69,6 @@ class KnowledgeDB(SQLModel, table=True):
     metadata_: Optional[Dict[str, str]] = Field(
         default=None, sa_column=Column("metadata", JSON)
     )
-
-    knowledge_brain: List[KnowledgeBrain] = Relationship(back_populates="knowledge")
+    brains: List["Brain"] = Relationship(
+        back_populates="knowledges", link_model=KnowledgeBrain
+    )
