@@ -27,7 +27,7 @@ export const KnowledgeTab = ({
   });
   const { setShouldDisplayFeedCard } = useKnowledgeToFeedContext();
 
-  if (hasEditRights) {
+  if (!hasEditRights) {
     return (
       <div className={styles.knowledge_tab_container}>
         <div className={styles.knowledge_tab_wrapper}>
