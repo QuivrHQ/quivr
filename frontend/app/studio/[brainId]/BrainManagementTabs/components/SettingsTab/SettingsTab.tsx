@@ -14,7 +14,6 @@ import { GeneralInformation } from "./components/GeneralInformation/GeneralInfor
 import { ModelSelection } from "./components/ModelSelection/ModelSelection";
 import { Prompt } from "./components/Prompt/Prompt";
 import { useBrainFormState } from "./hooks/useBrainFormState";
-import { usePermissionsController } from "./hooks/usePermissionsController";
 import { UsePromptProps } from "./hooks/usePrompt";
 import { useSettingsTab } from "./hooks/useSettingsTab";
 
@@ -22,19 +21,17 @@ import { useBrainFetcher } from "../../hooks/useBrainFetcher";
 
 type SettingsTabProps = {
   brainId: UUID;
+  hasEditRights: boolean;
 };
 
 export const SettingsTabContent = ({
   brainId,
+  hasEditRights,
 }: SettingsTabProps): JSX.Element => {
   const { t } = useTranslation(["translation", "brain", "config"]);
   const [editSnippet, setEditSnippet] = useState<boolean>(false);
   const [snippetColor, setSnippetColor] = useState<string>("");
   const [snippetEmoji, setSnippetEmoji] = useState<string>("");
-
-  const { hasEditRights } = usePermissionsController({
-    brainId,
-  });
 
   const { brain } = useBrainFetcher({
     brainId,
@@ -81,7 +78,11 @@ export const SettingsTabContent = ({
             <div className={styles.inputs_wrapper}>
               <div className={styles.brain_snippet_wrapper}>
                 {editSnippet && (
-                  <div className={styles.edit_snippet}>
+                  <div
+                    className={`${styles.edit_snippet} ${
+                      hasEditRights ? styles.clickable : ""
+                    }`}
+                  >
                     <BrainSnippet
                       setVisible={setEditSnippet}
                       initialColor={brain.snippet_color}
@@ -98,26 +99,27 @@ export const SettingsTabContent = ({
                   className={styles.brain_snippet}
                   style={{ backgroundColor: snippetColor }}
                   onClick={() => {
-                    if (!editSnippet) {
+                    if (!editSnippet && hasEditRights) {
                       setEditSnippet(true);
                     }
                   }}
                 >
                   <span>{snippetEmoji}</span>
                 </div>
-                <QuivrButton
-                  label="Edit"
-                  iconName="edit"
-                  color="primary"
-                  onClick={() => setEditSnippet(true)}
-                  small={true}
-                />
+                {hasEditRights && (
+                  <QuivrButton
+                    label="Edit"
+                    iconName="edit"
+                    color="primary"
+                    onClick={() => setEditSnippet(true)}
+                    small={true}
+                  />
+                )}
               </div>
               <div className={styles.general_information}>
                 <GeneralInformation hasEditRights={hasEditRights} />
               </div>
-              {(!!brain.integration_description?.allow_model_change ||
-                brain.brain_type === "doc") && (
+              {brain.brain_type === "doc" && (
                 <div className={styles.model_information}>
                   <ModelSelection
                     accessibleModels={accessibleModels}
@@ -164,12 +166,15 @@ export const SettingsTabContent = ({
   );
 };
 
-export const SettingsTab = ({ brainId }: SettingsTabProps): JSX.Element => {
+export const SettingsTab = ({
+  brainId,
+  hasEditRights,
+}: SettingsTabProps): JSX.Element => {
   const methods = useForm<Brain>();
 
   return (
     <FormProvider {...methods}>
-      <SettingsTabContent brainId={brainId} />
+      <SettingsTabContent brainId={brainId} hasEditRights={hasEditRights} />
     </FormProvider>
   );
 };
