@@ -39,6 +39,7 @@ def build_file(
             suffix="_" + tmp_name,  # pyright: ignore reportPrivateUsage=none
         )
 
+        file_sha1 = compute_sha1(file_data)
         tmp_file.write(file_data)
         tmp_file.flush()
 
@@ -51,7 +52,7 @@ def build_file(
             tmp_file_path=Path(tmp_file.name),
             file_size=len(file_data),
             file_extension=file_extension,
-            file_sha1=None,
+            file_sha1=file_sha1,
         )
         yield file_instance
     finally:
@@ -77,14 +78,14 @@ class File:
         tmp_file_path: Path,
         file_size: int,
         file_extension: str,
-        file_sha1: str | None,
+        file_sha1: str,
         original_file_name: str,
     ):
         self.id = knowledge_id
         self.file_name = file_name
         self.tmp_file_path = tmp_file_path
         self.file_size = file_size
-        self.file_sha1: str | None = file_sha1
+        self.file_sha1 = file_sha1
         self.file_extension = FileExtension(file_extension)
         self.original_file_name = original_file_name
 

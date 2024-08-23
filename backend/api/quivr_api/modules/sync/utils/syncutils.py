@@ -1,4 +1,3 @@
-import hashlib
 import io
 import os
 from datetime import datetime, timezone
@@ -130,7 +129,6 @@ class SyncUtils:
         file_name = str(file_response["file_name"])
         raw_data = file_response["content"]
         assert isinstance(raw_data, io.BytesIO)
-        file_sha1 = hashlib.sha1(raw_data.read()).hexdigest()
         file_data = (
             io.BufferedReader(raw_data)  # type: ignore
             if isinstance(raw_data, io.BytesIO)
@@ -139,10 +137,7 @@ class SyncUtils:
 
         extension = os.path.splitext(file_name)[-1].lower()
         dfile = DownloadedSyncFile(
-            file_name=file_name,
-            file_data=file_data,
-            file_sha1=file_sha1,
-            extension=extension,
+            file_name=file_name, file_data=file_data, extension=extension
         )
         logger.debug(f"Successfully downloded sync file : {dfile}")
         return dfile
@@ -174,15 +169,14 @@ class SyncUtils:
 
         # TODO: Check workflow is correct
         # FIXME(@aminediro, @chloedia): Checks should use file_sha1 in database
-        file_exists = check_file_exists(
-            str(brain_id),
-            downloaded_file.file_sha1,
-        )
+        file_exists = check_file_exists(str(brain_id), downloaded_file.file_name)
         # if file_exists:
         #     self.brain_vectors.delete_file_from_brain(
         #             brain_id, downloaded_file.file_name
         #         )
         # FIXME(@aminediro):  check_user_limits()
+        # FIXME(@chloedia) : change with knowledge_id
+        # FILE Extension should be field
         # Upload File to S3 Storage
         response = await upload_file_storage(
             downloaded_file.file_data,
