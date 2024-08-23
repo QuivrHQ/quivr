@@ -74,10 +74,6 @@ export const usePrompt = (props: UsePromptProps) => {
       });
       reset();
       refetchBrain();
-      publish({
-        variant: "success",
-        text: t("promptRemoved", { ns: "config" }),
-      });
       setCurrentPromptId(undefined);
     } catch (err) {
       publish({

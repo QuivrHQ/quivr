@@ -1,11 +1,8 @@
 import { UUID } from "crypto";
 import { useEffect, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
-import { useTranslation } from "react-i18next";
-import { FaSpinner } from "react-icons/fa";
 
 import { BrainSnippet } from "@/lib/components/BrainSnippet/BrainSnippet";
-import { MessageInfoBox } from "@/lib/components/ui/MessageInfoBox/MessageInfoBox";
 import { QuivrButton } from "@/lib/components/ui/QuivrButton/QuivrButton";
 import { Brain } from "@/lib/context/BrainProvider/types";
 
@@ -14,7 +11,8 @@ import { GeneralInformation } from "./components/GeneralInformation/GeneralInfor
 import { ModelSelection } from "./components/ModelSelection/ModelSelection";
 import { Prompt } from "./components/Prompt/Prompt";
 import { useBrainFormState } from "./hooks/useBrainFormState";
-import { UsePromptProps } from "./hooks/usePrompt";
+// eslint-disable-next-line sort-imports
+import { UsePromptProps, usePrompt } from "./hooks/usePrompt";
 import { useSettingsTab } from "./hooks/useSettingsTab";
 
 import { useBrainFetcher } from "../../hooks/useBrainFetcher";
@@ -28,7 +26,6 @@ export const SettingsTabContent = ({
   brainId,
   hasEditRights,
 }: SettingsTabProps): JSX.Element => {
-  const { t } = useTranslation(["translation", "brain", "config"]);
   const [editSnippet, setEditSnippet] = useState<boolean>(false);
   const [snippetColor, setSnippetColor] = useState<string>("");
   const [snippetEmoji, setSnippetEmoji] = useState<string>("");
@@ -42,12 +39,14 @@ export const SettingsTabContent = ({
     initialColor: brain?.snippet_color,
     initialEmoji: brain?.snippet_emoji,
   };
-  const { handleSubmit, isUpdating, formRef, accessibleModels, setIsUpdating } =
+  const { handleSubmit, formRef, accessibleModels, setIsUpdating } =
     useSettingsTab(settingsTabProps);
 
   const promptProps: UsePromptProps = {
     setIsUpdating,
   };
+
+  const { submitPrompt } = usePrompt(promptProps);
 
   useBrainFormState();
 
@@ -118,6 +117,7 @@ export const SettingsTabContent = ({
               </div>
               <div className={styles.general_information}>
                 <GeneralInformation hasEditRights={hasEditRights} />
+                <Prompt />
               </div>
               {brain.brain_type === "doc" && (
                 <div className={styles.model_information}>
@@ -136,30 +136,14 @@ export const SettingsTabContent = ({
                   label="Save"
                   iconName="upload"
                   color="primary"
-                  onClick={() => handleSubmit()}
+                  onClick={async () => {
+                    await handleSubmit();
+                    await submitPrompt();
+                  }}
                 />
               </div>
             )}
           </div>
-          {hasEditRights && (
-            <div className={styles.prompt_wrapper}>
-              <span className={styles.section_title}>Prompt</span>
-              <MessageInfoBox type="info">
-                Select a suggested prompt or create your own for tailored
-                interactions
-              </MessageInfoBox>
-              <Prompt
-                usePromptProps={promptProps}
-                isUpdatingBrain={isUpdating}
-              />
-              <div>
-                {isUpdating && <FaSpinner className="animate-spin" />}
-                {isUpdating && (
-                  <span>{t("updatingBrainSettings", { ns: "config" })}</span>
-                )}
-              </div>
-            </div>
-          )}
         </div>
       </form>
     </>

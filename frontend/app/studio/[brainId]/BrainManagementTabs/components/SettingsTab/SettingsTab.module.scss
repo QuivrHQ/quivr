@@ -16,7 +16,6 @@
     flex-direction: column;
     width: 100%;
     gap: Spacings.$spacing05;
-    border-bottom: 1px solid var(--border-2);
     padding-block: Spacings.$spacing05;
 
     .section_title {
@@ -81,6 +80,9 @@
 
       .general_information {
         width: 65%;
+        display: flex;
+        flex-direction: column;
+        gap: Spacings.$spacing05;
       }
 
       .model_information {
