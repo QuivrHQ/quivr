@@ -36,16 +36,18 @@ export const ModelSelection = (props: ModelSelectionProps): JSX.Element => {
           iconName="robot"
           help="Changing the model could make this brain smarter, understanding you better and giving you more helpful answers."
         />
-        <SingleSelector
-          options={accessibleModelOptions}
-          onChange={(option) => {
-            setModel(option as Model);
-            void handleSubmit(false);
-          }}
-          selectedOption={{ value: model, label: model }}
-          placeholder="Select a model"
-          iconName="robot"
-        />
+        <div className={styles.model}>
+          <SingleSelector
+            options={accessibleModelOptions}
+            onChange={(option) => {
+              setModel(option as Model);
+              void handleSubmit(false);
+            }}
+            selectedOption={{ value: model, label: model }}
+            placeholder="Select a model"
+            iconName="robot"
+          />
+        </div>
       </fieldset>
       <fieldset>
         <FieldHeader

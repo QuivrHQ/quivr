@@ -115,34 +115,36 @@ export const SettingsTabContent = ({
                   />
                 )}
               </div>
-              <div className={styles.general_information}>
-                <GeneralInformation hasEditRights={hasEditRights} />
-                <Prompt />
-              </div>
-              {brain.brain_type === "doc" && (
-                <div className={styles.model_information}>
-                  <ModelSelection
-                    accessibleModels={accessibleModels}
-                    hasEditRights={hasEditRights}
-                    brainId={brainId}
-                    handleSubmit={() => handleSubmit()}
-                  />
+              <div className={styles.second_column}>
+                <div className={styles.general_information}>
+                  <GeneralInformation hasEditRights={hasEditRights} />
+                  <Prompt />
                 </div>
-              )}
-            </div>
-            {hasEditRights && (
-              <div className={styles.save_button}>
-                <QuivrButton
-                  label="Save"
-                  iconName="upload"
-                  color="primary"
-                  onClick={async () => {
-                    await handleSubmit();
-                    await submitPrompt();
-                  }}
-                />
+                {brain.brain_type === "doc" && (
+                  <div className={styles.model_information}>
+                    <ModelSelection
+                      accessibleModels={accessibleModels}
+                      hasEditRights={hasEditRights}
+                      brainId={brainId}
+                      handleSubmit={() => handleSubmit()}
+                    />
+                  </div>
+                )}
+                {hasEditRights && (
+                  <div className={styles.save_button}>
+                    <QuivrButton
+                      label="Save"
+                      iconName="upload"
+                      color="primary"
+                      onClick={async () => {
+                        await handleSubmit();
+                        await submitPrompt();
+                      }}
+                    />
+                  </div>
+                )}
               </div>
-            )}
+            </div>
           </div>
         </div>
       </form>
