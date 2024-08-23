@@ -1,25 +1,29 @@
 from typing import Annotated, List, Optional
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, HTTPException, Query, Request
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Query, Request
 from fastapi.responses import StreamingResponse
+
 from quivr_api.logger import get_logger
 from quivr_api.middlewares.auth import AuthBearer, get_current_user
 from quivr_api.modules.brain.entity.brain_entity import RoleEnum
-from quivr_api.modules.brain.service.brain_authorization_service import \
-    validate_brain_authorization
+from quivr_api.modules.brain.service.brain_authorization_service import (
+    validate_brain_authorization,
+)
 from quivr_api.modules.brain.service.brain_service import BrainService
+from quivr_api.modules.chat.controller.chat.utils import check_and_update_user_usage
 from quivr_api.modules.chat.dto.chats import ChatItem, ChatQuestion
-from quivr_api.modules.chat.dto.inputs import (ChatMessageProperties,
-                                               ChatUpdatableProperties,
-                                               CreateChatProperties,
-                                               QuestionAndAnswer)
+from quivr_api.modules.chat.dto.inputs import (
+    ChatMessageProperties,
+    ChatUpdatableProperties,
+    CreateChatProperties,
+    QuestionAndAnswer,
+)
 from quivr_api.modules.chat.entity.chat import Chat
 from quivr_api.modules.chat.service.chat_service import ChatService
 from quivr_api.modules.chat_llm_service.chat_llm_service import ChatLLMService
 from quivr_api.modules.dependencies import get_service
-from quivr_api.modules.knowledge.service.knowledge_service import \
-    KnowledgeService
+from quivr_api.modules.knowledge.service.knowledge_service import KnowledgeService
 from quivr_api.modules.models.service.model_service import ModelService
 from quivr_api.modules.prompt.service.prompt_service import PromptService
 from quivr_api.modules.rag_service import RAGService
@@ -131,7 +135,7 @@ async def update_chat_message(
     return chat_service.update_chat_message(
         chat_id=chat_id,
         message_id=message_id,
-        chat_message_properties=chat_message_properties.dict(),
+        chat_message_properties=chat_message_properties,
     )
 
 
@@ -169,7 +173,7 @@ async def create_question_handler(
     chat_service: ChatServiceDep,
     knowledge_service: KnowledgeServiceDep,
     model_service: ModelServiceDep,
-    vector_service: VectorServiceDep,  
+    vector_service: VectorServiceDep,
     brain_id: Annotated[UUID | None, Query()] = None,
 ):
     models = await model_service.get_models()
@@ -182,32 +186,44 @@ async def create_question_handler(
         if brain_id == generate_uuid_from_string(model.name):
             model_to_use = model
             break
+
     try:
-        service = None
+        service = None | RAGService | ChatLLMService
         if not model_to_use:
-            # TODO: check logic into middleware
+            brain = brain_service.get_brain_details(brain_id, current_user.id)  # type: ignore
+            model = await check_and_update_user_usage(
+                current_user, str(brain.model), model_service
+            )  # type: ignore
+            assert model is not None  # type: ignore
+            assert brain is not None  # type: ignore
+
+            brain.model = model.name
             validate_authorization(user_id=current_user.id, brain_id=brain_id)
             service = RAGService(
                 current_user,
-                brain_id,
+                brain,
                 chat_id,
                 brain_service,
                 prompt_service,
                 chat_service,
                 knowledge_service,
-                vector_service
+                vector_service,
             )
         else:
+            await check_and_update_user_usage(
+                current_user, model_to_use.name, model_service
+            )  # type: ignore
             service = ChatLLMService(
                 current_user,
                 model_to_use.name,
                 chat_id,
                 chat_service,
                 model_service,
-            )
+            )  # type: ignore
+        assert service is not None  # type: ignore
+        maybe_send_telemetry("question_asked", {"streaming": True}, request)
         chat_answer = await service.generate_answer(chat_question.question)
 
-        maybe_send_telemetry("question_asked", {"streaming": False}, request)
         return chat_answer
 
     except AssertionError:
@@ -238,6 +254,7 @@ async def create_stream_question_handler(
     knowledge_service: KnowledgeServiceDep,
     model_service: ModelServiceDep,
     vector_service: VectorServiceDep,
+    background_tasks: BackgroundTasks,
     brain_id: Annotated[UUID | None, Query()] = None,
 ) -> StreamingResponse:
     logger.info(
@@ -245,39 +262,50 @@ async def create_stream_question_handler(
     )
 
     models = await model_service.get_models()
-
-    model_to_use = None
     # Check if the brain_id is a model name hashed to a uuid and then returns the model name
     # if chat_question.brain_id in [generate_uuid_from_string(model.name) for model in models]:
     #     mode
+    model_to_use = None
     for model in models:
         if brain_id == generate_uuid_from_string(model.name):
             model_to_use = model
             break
-
     try:
-        service = None
-        if not model_to_use:
+        if model_to_use is None:
+            assert brain_id
+            brain = brain_service.get_brain_details(brain_id, current_user.id)
+            assert brain is not None
+            model = await check_and_update_user_usage(
+                current_user, str(brain.model), model_service
+            )
+            assert model is not None
+            brain.model = model.name
             validate_authorization(user_id=current_user.id, brain_id=brain_id)
             service = RAGService(
                 current_user,
-                brain_id,
+                brain,
                 chat_id,
                 brain_service,
                 prompt_service,
                 chat_service,
                 knowledge_service,
-                vector_service
+                vector_service,
             )
         else:
+            await check_and_update_user_usage(
+                current_user, model_to_use.name, model_service
+            )  # type: ignore
             service = ChatLLMService(
                 current_user,
                 model_to_use.name,
                 chat_id,
                 chat_service,
                 model_service,
-            )
-        maybe_send_telemetry("question_asked", {"streaming": True}, request)
+            )  # type: ignore
+
+        background_tasks.add_task(
+            maybe_send_telemetry, "question_asked", {"streaming": True}, request
+        )
 
         return StreamingResponse(
             service.generate_answer_stream(chat_question.question),

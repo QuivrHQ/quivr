@@ -1,3 +1,4 @@
+@use "styles/Radius.module.scss";
 @use "styles/Spacings.module.scss";
 @use "styles/Typography.module.scss";
 
@@ -9,6 +10,7 @@
   p {
     margin: 0;
     padding: 0;
+    align-items: center;
   }
 
   ul {
@@ -69,6 +71,47 @@
 
   th {
     font-weight: bold;
+  }
+
+  pre[class*="language-"] {
+    background: var(--background-5);
+    color: var(--white-0);
+    padding: Spacings.$spacing05;
+    border-radius: Radius.$normal;
+    overflow: auto;
+    margin: 0 0 Spacings.$spacing05 0;
+    white-space: pre-wrap;
+    font-size: Typography.$small;
+    font-family: "Courier New", Courier, monospace;
+  }
+
+  code[class*="language-"] {
+    background: none;
+    color: inherit;
+    border-radius: Radius.$normal;
+    font-family: "Courier New", Courier, monospace;
+    font-size: Typography.$small;
+    white-space: pre-wrap;
+  }
+
+  code {
+    background: var(--background-5);
+    color: var(--white-0);
+    padding: Spacings.$spacing01;
+    border-radius: Radius.$normal;
+    font-family: "Courier New", Courier, monospace;
+    font-size: Typography.$medium;
+  }
+
+  .code_block {
+    .icon {
+      position: absolute;
+      right: 0;
+      padding: Spacings.$spacing05;
+    }
+    code {
+      white-space: pre-wrap;
+    }
   }
 }
 

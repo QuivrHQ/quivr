@@ -4,6 +4,7 @@ import "./styles.css";
 
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
 
+import styles from "./Editor.module.scss";
 import { useChatStateUpdater } from "./hooks/useChatStateUpdater";
 import { useCreateEditorState } from "./hooks/useCreateEditorState";
 import { useEditor } from "./hooks/useEditor";
@@ -62,7 +63,7 @@ export const Editor = ({
 
   return (
     <EditorContent
-      className="w-full caret-accent"
+      className={styles.editor_wrapper}
       onKeyDown={(event) => {
         if (event.key === "Enter" && !event.shiftKey && !currentBrain) {
           event.preventDefault();

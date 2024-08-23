@@ -29,8 +29,13 @@ export const useBrainCreationApi = () => {
   const { setKnowledgeToFeed } = useKnowledgeToFeedContext();
   const { createBrain: createBrainApi, setCurrentBrainId } = useBrainContext();
   const { crawlWebsiteHandler, uploadFileHandler } = useKnowledgeToFeedInput();
-  const { setIsBrainCreationModalOpened, setCreating, currentSelectedBrain } =
-    useBrainCreationContext();
+  const {
+    setIsBrainCreationModalOpened,
+    setCreating,
+    currentSelectedBrain,
+    snippetColor,
+    snippetEmoji,
+  } = useBrainCreationContext();
   const { setOpenedConnections } = useFromConnectionsContext();
   const [fields, setFields] = useState<
     { name: string; type: string; value: string }[]
@@ -81,6 +86,8 @@ export const useBrainCreationApi = () => {
       name,
       description,
       integration: integrationSettings,
+      snippet_color: snippetColor,
+      snippet_emoji: snippetEmoji,
     });
 
     if (createdBrainId === undefined) {

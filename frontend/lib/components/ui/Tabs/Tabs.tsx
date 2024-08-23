@@ -28,6 +28,7 @@ export const Tabs = ({ tabList }: TabsProps): JSX.Element => {
           onMouseLeave={() => setTabHoveredIndex(null)}
         >
           <Icon
+            classname={styles.icon}
             name={tab.iconName}
             size="normal"
             color={

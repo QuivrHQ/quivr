@@ -1,37 +1,100 @@
+@use "styles/Radius.module.scss";
 @use "styles/ScreenSizes.module.scss";
 @use "styles/Spacings.module.scss";
 @use "styles/Typography.module.scss";
+@use "styles/ZIndexes.module.scss";
 
-.brain_main_infos_wrapper {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
+.brain_main_infos_container {
+  position: relative;
   height: 100%;
-  gap: Spacings.$spacing05;
 
-  .title {
-    @include Typography.H3;
-  }
-
-  .inputs_wrapper {
+  .brain_main_infos_wrapper {
     display: flex;
     flex-direction: column;
+    justify-content: space-between;
+    height: 100%;
     gap: Spacings.$spacing05;
-    overflow: scroll;
+    position: relative;
 
-    .name_field {
-      width: 300px;
+    .title {
+      @include Typography.H3;
     }
 
-    @media (max-width: ScreenSizes.$small) {
-      .name_field {
-        width: 100%;
+    .inputs_wrapper {
+      display: flex;
+      flex-direction: column;
+      overflow: scroll;
+      position: relative;
+
+      .first_line_wrapper {
+        display: flex;
+        align-items: bottom;
+        gap: Spacings.$spacing08;
+        justify-content: space-between;
+        padding-top: Spacings.$spacing05;
+
+        .name_field {
+          width: 300px;
+          align-self: flex-start;
+        }
+
+        @media (max-width: ScreenSizes.$small) {
+          .name_field {
+            width: 100%;
+          }
+        }
+
+        .brain_snippet_wrapper {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: Spacings.$spacing03;
+          align-self: top;
+          position: relative;
+
+          @media screen and (max-width: ScreenSizes.$small) {
+            position: relative;
+
+            .edit_snippet {
+              width: 100%;
+            }
+          }
+
+          .brain_snippet {
+            width: 64px;
+            height: 64px;
+            border-radius: Radius.$normal;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            font-size: Typography.$very_large;
+          }
+
+          .button_wrapper {
+            display: flex;
+            align-items: center;
+            gap: Spacings.$spacing02;
+            font-size: Typography.$small;
+            gap: Spacings.$spacing03;
+          }
+        }
       }
+    }
+
+    .buttons_wrapper {
+      display: flex;
+      justify-content: flex-end;
     }
   }
 
-  .buttons_wrapper {
+  .edit_snippet {
+    position: absolute;
+    width: 100%;
     display: flex;
-    justify-content: flex-end;
+    align-items: center;
+    justify-content: center;
+    top: 0;
+    z-index: ZIndexes.$modal;
   }
 }

@@ -15,7 +15,7 @@ from quivr_core.models import (
     ParsedRAGResponse,
     RAGResponseMetadata,
 )
-from quivr_core.utils import get_chunk_metadata, parse_chunk_response, parse_response
+from quivr_core.utils import get_chunk_metadata, parse_response
 
 logger = logging.getLogger("quivr_core")
 
@@ -39,12 +39,16 @@ class ChatLLM:
         filtered_chat_history: list[AIMessage | HumanMessage] = []
         if chat_history is None:
             return filtered_chat_history
-        for human_message, ai_message in chat_history.iter_pairs():
+
+        # Convert generator to list to allow reversing
+        pairs = list(chat_history.iter_pairs())
+        # Iterate in reverse to prioritize the last messages
+        for human_message, ai_message in reversed(pairs):
             # TODO: replace with tiktoken
             message_tokens = (len(human_message.content) + len(ai_message.content)) // 4
             if (
                 total_tokens + message_tokens > self.llm_endpoint._config.max_input
-                or total_pairs >= 10
+                or total_pairs >= 20
             ):
                 break
             filtered_chat_history.append(human_message)
@@ -52,7 +56,7 @@ class ChatLLM:
             total_tokens += message_tokens
             total_pairs += 1
 
-        return filtered_chat_history[::-1]
+        return filtered_chat_history[::-1]  # Reverse back to original order
 
     def build_chain(self):
         loaded_memory = RunnablePassthrough.assign(
@@ -104,34 +108,19 @@ class ChatLLM:
             {"question": question, "chat_history": history}
         ):
             if "answer" in chunk:
-                rolling_message, answer_str = parse_chunk_response(
-                    rolling_message,
-                    chunk,
-                    self.llm_endpoint.supports_func_calling(),
-                )
+                answer_str = chunk["answer"].content
+                rolling_message += chunk["answer"]
                 if len(answer_str) > 0:
-                    if self.llm_endpoint.supports_func_calling():
-                        diff_answer = answer_str[len(prev_answer) :]
-                        if len(diff_answer) > 0:
-                            parsed_chunk = ParsedRAGChunkResponse(
-                                answer=diff_answer,
-                                metadata=RAGResponseMetadata(),
-                            )
-                            prev_answer += diff_answer
+                    parsed_chunk = ParsedRAGChunkResponse(
+                        answer=answer_str,
+                        metadata=RAGResponseMetadata(),
+                    )
+                    prev_answer += answer_str
 
-                            logger.debug(
-                                f"answer_astream func_calling=True question={question} rolling_msg={rolling_message} chunk_id={chunk_id}, chunk={parsed_chunk}"
-                            )
-                            yield parsed_chunk
-                    else:
-                        parsed_chunk = ParsedRAGChunkResponse(
-                            answer=answer_str,
-                            metadata=RAGResponseMetadata(),
-                        )
-                        logger.debug(
-                            f"answer_astream func_calling=False question={question} rolling_msg={rolling_message} chunk_id={chunk_id}, chunk={parsed_chunk}"
-                        )
-                        yield parsed_chunk
+                    logger.debug(
+                        f"answer_astream func_calling=True question={question} rolling_msg={rolling_message} chunk_id={chunk_id}, chunk={parsed_chunk}"
+                    )
+                    yield parsed_chunk
 
                     chunk_id += 1
         # Last chunk provides metadata

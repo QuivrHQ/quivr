@@ -14,7 +14,9 @@ create table "public"."notion_sync" (
 alter table "public"."notion_sync" enable row level security;
 alter table "public"."syncs_active"
 add column if not exists "notification_id" uuid;
+
 CREATE UNIQUE INDEX notion_sync_pkey ON public.notion_sync USING btree (id, notion_id);
+
 alter table "public"."notion_sync"
 add constraint "notion_sync_pkey" PRIMARY KEY using index "notion_sync_pkey";
 grant delete on table "public"."notion_sync" to "anon";
@@ -38,3 +40,7 @@ grant select on table "public"."notion_sync" to "service_role";
 grant trigger on table "public"."notion_sync" to "service_role";
 grant truncate on table "public"."notion_sync" to "service_role";
 grant update on table "public"."notion_sync" to "service_role";
+
+CREATE UNIQUE INDEX notion_sync_notion_id_key ON public.notion_sync USING btree (notion_id);
+
+alter table "public"."notion_sync" add constraint "notion_sync_notion_id_key" UNIQUE using index "notion_sync_notion_id_key";

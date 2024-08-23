@@ -42,6 +42,16 @@
       align-items: center;
       overflow: hidden;
 
+      .brain_snippet {
+        width: 24px;
+        height: 24px;
+        border-radius: Radius.$normal;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: Typography.$tiny;
+      }
+
       .name {
         @include Typography.EllipsisOverflow;
       }

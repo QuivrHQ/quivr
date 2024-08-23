@@ -22,15 +22,15 @@ export const QADisplay = ({
         key={`user-${message_id}`}
         speaker={"user"}
         text={user_message}
-        metadata={metadata} // eslint-disable-line @typescript-eslint/no-unsafe-assignment
+        metadata={metadata}
       />
       <MessageRow
         key={`assistant-${message_id}`}
         speaker={"assistant"}
         text={assistant}
-        brainName={brain_name}
+        brainName={brain_name ?? metadata?.metadata_model?.display_name}
         index={index}
-        metadata={metadata} // eslint-disable-line @typescript-eslint/no-unsafe-assignment
+        metadata={metadata}
         messageId={message_id}
         thumbs={thumbs}
         lastMessage={lastMessage}

@@ -36,6 +36,10 @@ export type Brain = {
   brain_definition?: ApiBrainDefinition;
   integration_description?: IntegrationDescription;
   max_files?: number;
+  image_url?: string;
+  display_name?: string;
+  snippet_emoji?: string;
+  snippet_color?: string;
 };
 
 export type MinimalBrainForUser = {
@@ -48,6 +52,10 @@ export type MinimalBrainForUser = {
   integration_logo_url?: string;
   max_files: number;
   allow_model_change: boolean;
+  image_url?: string;
+  display_name?: string;
+  snippet_color?: string;
+  snippet_emoji?: string;
 };
 
 //TODO: rename rights to role in Backend and use MinimalBrainForUser instead of BackendMinimalBrainForUser
@@ -63,6 +71,8 @@ export type PublicBrain = {
   last_update: string;
   brain_type?: BrainType;
   brain_definition?: ApiBrainDefinition;
+  snippet_emoji?: string;
+  snippet_color?: string;
 };
 
 export type BrainContextType = ReturnType<typeof useBrainProvider>;

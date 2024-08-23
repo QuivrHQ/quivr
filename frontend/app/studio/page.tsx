@@ -67,7 +67,9 @@ const Studio = (): JSX.Element => {
           if (button.label === "Create brain") {
             return {
               ...button,
-              disabled: userData.max_brains <= allBrains.length,
+              disabled:
+                userData.max_brains <=
+                allBrains.filter((brain) => brain.brain_type === "doc").length,
             };
           }
 

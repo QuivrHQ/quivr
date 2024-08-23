@@ -36,7 +36,7 @@ services:
     healthcheck:
       test: [ "CMD", "curl", "http://localhost:5050/healthz" ]
     command: >
-      /bin/bash -c "python -m uvicorn quivr_api.main:app --host 0.0.0.0 --log-level info --reload --port 5050 --loop uvloop" 
+      /bin/bash -c "python -m uvicorn quivr_api.main:app --host 0.0.0.0 --log-level info --reload --port 5050 --loop uvloop"
     restart: always
     ports:
       - 5050:5050

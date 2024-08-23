@@ -1,4 +1,4 @@
-import { Icon } from "@/lib/components/ui/Icon/Icon";
+import Image from "next/image";
 
 import styles from "./MentionItem.module.scss";
 
@@ -23,7 +23,22 @@ export const MentionItem = ({
       key={item.id}
       onClick={onClick}
     >
-      <Icon name="brain" size="normal" color={selected ? "primary" : "black"} />
+      {item.iconUrl ? (
+        <Image
+          className={styles.brain_image}
+          src={item.iconUrl}
+          alt="Brain or Model"
+          width={18}
+          height={18}
+        />
+      ) : (
+        <div
+          className={styles.brain_snippet}
+          style={{ backgroundColor: item.snippet_color }}
+        >
+          <span>{item.snippet_emoji}</span>
+        </div>
+      )}
       <span className={styles.brain_name}>{item.label}</span>
     </span>
   );
