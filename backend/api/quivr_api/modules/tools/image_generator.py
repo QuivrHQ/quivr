@@ -16,7 +16,7 @@ class ImageGenerationInput(BaseModelV1):
     query: str = FieldV1(
         ...,
         title="description",
-        description="A detailled prompt to generate the image from. Takes into account the history of the chat.",
+        description="A detailed prompt to generate the image from. Takes into account the history of the chat.",
     )
 
 
