@@ -19,6 +19,7 @@ export const FromConnections = (): JSX.Element => {
     setCurrentSyncElements,
     currentSyncId,
     loadingFirstList,
+    setCurrentSyncId,
   } = useFromConnectionsContext();
   const [currentFiles, setCurrentFiles] = useState<SyncElement[]>([]);
   const [currentFolders, setCurrentFolders] = useState<SyncElement[]>([]);
@@ -85,10 +86,14 @@ export const FromConnections = (): JSX.Element => {
               iconName="chevronLeft"
               color="black"
               onClick={() => {
-                void handleBackClick();
+                if (folderStack.length) {
+                  void handleBackClick();
+                } else {
+                  setCurrentSyncId(undefined);
+                }
               }}
               small={true}
-              disabled={!folderStack.length}
+              disabled={loading || loadingFirstList}
             />
           </div>
           <div className={styles.connection_content}>
