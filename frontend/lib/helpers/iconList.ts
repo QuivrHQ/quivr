@@ -68,6 +68,7 @@ import { LiaFileVideo, LiaRobotSolid } from "react-icons/lia";
 import { IconType } from "react-icons/lib";
 import {
   LuArrowLeftFromLine,
+  LuBook,
   LuBrain,
   LuBrainCircuit,
   LuChevronDown,
@@ -160,6 +161,7 @@ export const iconList: { [name: string]: IconType } = {
   invite: IoIosSend,
   ipynb: BsFiletypePy,
   key: MdOutlineVpnKey,
+  knowledge: LuBook,
   link: MdLink,
   linkedin: FaLinkedin,
   loader: AiOutlineLoading3Quarters,

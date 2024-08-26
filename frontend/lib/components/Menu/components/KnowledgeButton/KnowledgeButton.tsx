@@ -12,7 +12,7 @@ export const KnowledgeButton = (): JSX.Element => {
       <MenuButton
         label="My Knowledge"
         isSelected={isSelected}
-        iconName="home"
+        iconName="knowledge"
         type="open"
         color="primary"
       />

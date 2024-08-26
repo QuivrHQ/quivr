@@ -35,7 +35,7 @@ export const BrainManagementTabs = (): JSX.Element => {
         : "Knowledge",
       isSelected: selectedTab === "Knowledge",
       onClick: () => setSelectedTab("Knowledge"),
-      iconName: "file",
+      iconName: "knowledge",
     },
     {
       label: "Settings",
