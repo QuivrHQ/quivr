@@ -22,7 +22,11 @@ const Tooltip = ({
 
   return (
     <TooltipPrimitive.Provider>
-      <TooltipPrimitive.Root onOpenChange={setOpen} open={open}>
+      <TooltipPrimitive.Root
+        onOpenChange={setOpen}
+        open={open}
+        delayDuration={0}
+      >
         <TooltipPrimitive.Trigger asChild>{children}</TooltipPrimitive.Trigger>
         <AnimatePresence>
           {open && (
