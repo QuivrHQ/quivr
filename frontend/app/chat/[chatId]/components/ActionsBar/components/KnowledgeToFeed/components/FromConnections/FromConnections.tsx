@@ -14,8 +14,12 @@ import { useFromConnectionsContext } from "./FromConnectionsProvider/hooks/useFr
 
 export const FromConnections = (): JSX.Element => {
   const [folderStack, setFolderStack] = useState<(string | null)[]>([]);
-  const { currentSyncElements, setCurrentSyncElements, currentSyncId } =
-    useFromConnectionsContext();
+  const {
+    currentSyncElements,
+    setCurrentSyncElements,
+    currentSyncId,
+    loadingFirstList,
+  } = useFromConnectionsContext();
   const [currentFiles, setCurrentFiles] = useState<SyncElement[]>([]);
   const [currentFolders, setCurrentFolders] = useState<SyncElement[]>([]);
   const { getSyncFiles } = useSync();
@@ -71,7 +75,7 @@ export const FromConnections = (): JSX.Element => {
 
   return (
     <div className={styles.from_connection_container}>
-      {!currentSyncId ? (
+      {!currentSyncId && !loadingFirstList ? (
         <ConnectionCards fromAddKnowledge={true} />
       ) : (
         <div className={styles.from_connection_wrapper}>
@@ -88,7 +92,7 @@ export const FromConnections = (): JSX.Element => {
             />
           </div>
           <div className={styles.connection_content}>
-            {loading ? (
+            {loading || loadingFirstList ? (
               <div className={styles.loader_icon}>
                 <LoaderIcon size="big" color="primary" />
               </div>
@@ -98,7 +102,9 @@ export const FromConnections = (): JSX.Element => {
                   <div
                     key={folder.id}
                     onClick={() => {
-                      void handleFolderClick(currentSyncId, folder.id);
+                      if (currentSyncId) {
+                        void handleFolderClick(currentSyncId, folder.id);
+                      }
                     }}
                   >
                     <FolderLine
