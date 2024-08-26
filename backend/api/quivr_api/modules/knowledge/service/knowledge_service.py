@@ -46,6 +46,7 @@ class KnowledgeService(BaseService[KnowledgeRepository]):
 
         assert inserted_knowledge_db_instance.id, "Knowledge ID not generated"
         if inserted_knowledge_db_instance.source == "local":
+            # TODO: Insert in database base on local
             source_link = f"s3://quivr/{knowledge_to_add.brain_id}/{inserted_knowledge_db_instance.id}"
 
         inserted_knowledge = await self.repository.update_source_link_knowledge(

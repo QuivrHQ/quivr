@@ -143,9 +143,7 @@ async def aprocess_file_task(
 ):
     global engine
     assert engine
-    async with AsyncSession(
-        async_engine, expire_on_commit=False, autoflush=False
-    ) as async_session:
+    async with AsyncSession(async_engine) as async_session:
         with Session(engine, expire_on_commit=False, autoflush=False) as session:
             vector_repository = VectorRepository(session)
             vector_service = VectorService(

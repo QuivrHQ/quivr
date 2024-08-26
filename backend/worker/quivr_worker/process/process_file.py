@@ -5,10 +5,10 @@ from langchain_core.documents import Document
 from quivr_api.logger import get_logger
 from quivr_api.modules.brain.entity.brain_entity import BrainEntity
 from quivr_api.modules.brain.service.brain_service import BrainService
-from quivr_api.modules.brain.service.brain_vector_service import \
-    BrainVectorService
+from quivr_api.modules.brain.service.brain_vector_service import BrainVectorService
 from quivr_api.vector.service.vector_service import VectorService
 from quivr_core.processor.registry import get_processor_class
+
 from quivr_worker.files import File
 from quivr_worker.parsers.audio import process_audio
 

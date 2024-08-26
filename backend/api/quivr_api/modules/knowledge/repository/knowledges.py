@@ -169,7 +169,7 @@ class KnowledgeRepository(BaseRepository):
             await self.session.commit()
             await self.session.refresh(knowledge)
             return knowledge
-        except (UniqueViolationError, IntegrityError, Exception):
+        except (UniqueViolationError, IntegrityError):
             await self.session.rollback()
             raise FileExistsError(
                 f"File {knowledge_id} already exists maybe under another file_name"
