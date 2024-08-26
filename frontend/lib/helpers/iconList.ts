@@ -76,6 +76,7 @@ import {
   LuCopy,
   LuExternalLink,
   LuGoal,
+  LuPen,
   LuPlusCircle,
   LuSearch,
 } from "react-icons/lu";
@@ -177,6 +178,7 @@ export const iconList: { [name: string]: IconType } = {
   odt: BsFiletypeDocx,
   options: SlOptions,
   paragraph: BsTextParagraph,
+  pen: LuPen,
   pptx: BsFiletypePptx,
   prompt: FaRegKeyboard,
   py: BsFiletypePy,
