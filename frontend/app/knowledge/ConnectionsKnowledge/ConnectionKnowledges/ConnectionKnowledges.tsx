@@ -1,0 +1,57 @@
+import Image from "next/image";
+import { useState } from "react";
+
+import { SyncsByProvider } from "@/lib/api/sync/types";
+import { useSync } from "@/lib/api/sync/useSync";
+import Icon from "@/lib/components/ui/Icon/Icon";
+
+import styles from "./ConnectionKnowledge.module.scss";
+
+interface ConnectionKnowledgeProps {
+  providerGroup: SyncsByProvider;
+}
+
+const ConnectionKnowledge = ({
+  providerGroup,
+}: ConnectionKnowledgeProps): JSX.Element => {
+  const [folded, setFolded] = useState(true);
+  const { providerIconUrls } = useSync();
+
+  const transformConnectionLabel = (label: string): string => {
+    switch (label) {
+      case "Google":
+        return "Google Drive";
+      case "Azure":
+        return "Sharepoint";
+      case "DropBox":
+        return "Dropbox";
+      default:
+        return label;
+    }
+  };
+
+  return (
+    <div
+      className={styles.provider_line_wrapper}
+      onClick={() => setFolded(!folded)}
+    >
+      <Icon
+        name={folded ? "chevronRight" : "chevronDown"}
+        size="normal"
+        color="black"
+        handleHover={true}
+      />
+      <Image
+        src={providerIconUrls[providerGroup.provider]}
+        alt={providerGroup.provider}
+        width={18}
+        height={18}
+      />
+      <span className={styles.provider_title}>
+        {transformConnectionLabel(providerGroup.provider)}
+      </span>
+    </div>
+  );
+};
+
+export default ConnectionKnowledge;

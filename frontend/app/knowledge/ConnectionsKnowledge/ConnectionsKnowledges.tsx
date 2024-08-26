@@ -1,10 +1,9 @@
-"use client";
-
 import { useEffect, useState } from "react";
 
 import { Provider, Sync, SyncsByProvider } from "@/lib/api/sync/types";
 import { useSync } from "@/lib/api/sync/useSync";
 
+import ConnectionKnowledge from "./ConnectionKnowledges/ConnectionKnowledges";
 import styles from "./ConnectionsKnowledge.module.scss";
 
 const ConnectionsKnowledges = (): JSX.Element => {
@@ -44,12 +43,7 @@ const ConnectionsKnowledges = (): JSX.Element => {
     <div className={styles.connections_knowledge_container}>
       {syncsByProvider.map((providerGroup) => (
         <div key={providerGroup.provider}>
-          <h3>{providerGroup.provider}</h3>
-          <ul>
-            {providerGroup.syncs.map((sync) => (
-              <li key={sync.id}>{sync.name}</li>
-            ))}
-          </ul>
+          <ConnectionKnowledge providerGroup={providerGroup} />
         </div>
       ))}
     </div>

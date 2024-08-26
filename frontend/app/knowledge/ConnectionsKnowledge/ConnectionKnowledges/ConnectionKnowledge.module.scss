@@ -1,0 +1,11 @@
+@use "styles/Spacings.module.scss";
+
+.provider_line_wrapper {
+  display: flex;
+  align-items: center;
+  gap: Spacings.$spacing03;
+
+  .provider_title {
+    font-weight: 500;
+  }
+}
