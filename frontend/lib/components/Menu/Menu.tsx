@@ -14,6 +14,7 @@ import styles from "./Menu.module.scss";
 import { AnimatedDiv } from "./components/AnimationDiv";
 import { DiscussionButton } from "./components/DiscussionButton/DiscussionButton";
 import { HomeButton } from "./components/HomeButton/HomeButton";
+import { KnowledgeButton } from "./components/KnowledgeButton/KnowledgeButton";
 import { Notifications } from "./components/Notifications/Notifications";
 import { NotificationsButton } from "./components/NotificationsButton/NotificationsButton";
 import { ProfileButton } from "./components/ProfileButton/ProfileButton";
@@ -41,9 +42,10 @@ export const Menu = (): JSX.Element => {
   const displayedOnPages = [
     "/assistants",
     "/chat",
+    "/knowledge",
     "/library",
     "/search",
-    "studio",
+    "/studio",
     "/user",
   ];
 
@@ -84,6 +86,7 @@ export const Menu = (): JSX.Element => {
                   <DiscussionButton />
                   <HomeButton />
                   <StudioButton />
+                  <KnowledgeButton />
                   <NotificationsButton />
                   <ThreadsButton />
                 </div>
