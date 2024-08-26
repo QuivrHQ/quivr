@@ -209,7 +209,6 @@ class SyncUtils:
             else len(downloaded_file_bytes),  # FIXME @chloedia
             file_sha1=hashlib.sha1(downloaded_file_bytes).hexdigest(),
         )
-        logger.debug("Adding knowledge to brain HERE")
 
         added_knowledge = await self.knowledge_service.insert_knowledge(
             knowledge_to_add
