@@ -48,6 +48,7 @@ export const Menu = (): JSX.Element => {
     "/search",
     "studio",
     "/user",
+    "/note",
   ];
 
   const isMenuDisplayed = displayedOnPages.some((page) =>
@@ -90,6 +91,7 @@ export const Menu = (): JSX.Element => {
                   <NoteButton />
                   <NotificationsButton />
                   <ThreadsButton />
+                  <NoteButton />
                 </div>
                 <div className={styles.block}>
                   {!!showUpgradeButton && <UpgradeToPlusButton />}
