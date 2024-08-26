@@ -151,7 +151,7 @@ class SyncUtils:
     ):
         logger.info("Processing file: %s", file.name)
         brain_id = sync_active.brain_id
-        integration, integration_link = self.sync_cloud.name, file.web_view_link
+        source, source_link = self.sync_cloud.name, file.web_view_link
         downloaded_file = await self.download_file(file, current_user.credentials)
         storage_path = str(brain_id) + "/" + downloaded_file.file_name
 
@@ -196,11 +196,17 @@ class SyncUtils:
             brain_id=brain_id,
             file_name=file.name,
             mime_type=downloaded_file.extension,
-            source=integration,
-            source_link=integration_link,
+            source=source,
+            source_link=source_link,
         )
 
         added_knowledge = await self.knowledge_service.add_knowledge(knowledge_to_add)
+        self.sync_files_repo.update_or_create_sync_file(
+            file=file,
+            previous_file=previous_file,
+            sync_active=sync_active,
+            supported=True,
+        )
         # Send file for processing
         celery.send_task(
             "process_file_task",
@@ -209,16 +215,10 @@ class SyncUtils:
                 "knowledge_id": added_knowledge.id,
                 "file_name": storage_path,
                 "file_original_name": file.name,
-                "source": integration,
-                "source_link": integration_link,
+                "source": source,
+                "source_link": source_link,
                 "notification_id": file.notification_id,
             },
-        )
-        self.sync_files_repo.update_or_create_sync_file(
-            file=file,
-            previous_file=previous_file,
-            sync_active=sync_active,
-            supported=True,
         )
         return file
 
@@ -269,6 +269,7 @@ class SyncUtils:
                     self.sync_cloud.name,
                     e,
                 )
+                # FIXME: SET knowledge to error
                 # NOTE: Supported is  True
                 self.sync_files_repo.update_or_create_sync_file(
                     file=file,

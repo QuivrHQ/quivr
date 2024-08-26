@@ -29,6 +29,7 @@ class KnowledgeRepository(BaseRepository):
         query = select(Brain).where(Brain.brain_id == brain_id)
         result = await self.session.exec(query)
         brain = result.first()
+        logger.debug(f"Found associated brain: {brain}")
         if not brain:
             raise HTTPException(404, "Brain not found")
         try:
