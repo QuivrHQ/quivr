@@ -79,7 +79,6 @@ import {
   LuPen,
   LuPlusCircle,
   LuSearch,
-  LuStickyNote,
 } from "react-icons/lu";
 import {
   MdDarkMode,
@@ -174,7 +173,6 @@ export const iconList: { [name: string]: IconType } = {
   mp4: BsFiletypeMp4,
   mpga: FaRegFileAudio,
   mpeg: LiaFileVideo,
-  note: LuStickyNote,
   notifications: RiNotification2Line,
   office: HiBuildingOffice,
   odt: BsFiletypeDocx,
