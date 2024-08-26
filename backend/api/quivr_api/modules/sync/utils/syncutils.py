@@ -195,14 +195,18 @@ class SyncUtils:
                 description="File downloaded successfully",
             ),
         )
+        downloaded_file.file_data.seek(0)
         downloaded_file_bytes = downloaded_file.file_data.read()
+
         knowledge_to_add = CreateKnowledgeProperties(
             brain_id=brain_id,
             file_name=file.name,
             mime_type=downloaded_file.extension,
             source=integration,
             source_link=integration_link,
-            file_size=file.size,  # FIXME @chloedia
+            file_size=file.size
+            if file.size
+            else len(downloaded_file_bytes),  # FIXME @chloedia
             file_sha1=hashlib.sha1(downloaded_file_bytes).hexdigest(),
         )
         logger.debug("Adding knowledge to brain HERE")
@@ -210,7 +214,6 @@ class SyncUtils:
         added_knowledge = await self.knowledge_service.insert_knowledge(
             knowledge_to_add
         )
-        logger.debug("YASSSSSSSSS")
         # Send file for processing
         celery.send_task(
             "process_file_task",
