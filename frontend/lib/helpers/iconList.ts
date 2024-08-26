@@ -48,6 +48,7 @@ import { HiBuildingOffice } from "react-icons/hi2";
 import {
   IoIosAdd,
   IoIosRadio,
+  IoIosSend,
   IoMdClose,
   IoMdLogOut,
   IoMdSettings,
@@ -156,6 +157,7 @@ export const iconList: { [name: string]: IconType } = {
   home: IoHomeOutline,
   html: BsFiletypeHtml,
   info: FaInfo,
+  invite: IoIosSend,
   ipynb: BsFiletypePy,
   key: MdOutlineVpnKey,
   link: MdLink,
