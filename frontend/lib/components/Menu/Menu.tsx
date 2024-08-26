@@ -1,3 +1,4 @@
+"use client";
 import { MotionConfig } from "framer-motion";
 import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
@@ -14,6 +15,7 @@ import styles from "./Menu.module.scss";
 import { AnimatedDiv } from "./components/AnimationDiv";
 import { DiscussionButton } from "./components/DiscussionButton/DiscussionButton";
 import { HomeButton } from "./components/HomeButton/HomeButton";
+import { NoteButton } from "./components/NoteButton/NoteButton";
 import { Notifications } from "./components/Notifications/Notifications";
 import { NotificationsButton } from "./components/NotificationsButton/NotificationsButton";
 import { ProfileButton } from "./components/ProfileButton/ProfileButton";
@@ -45,6 +47,7 @@ export const Menu = (): JSX.Element => {
     "/search",
     "studio",
     "/user",
+    "/note",
   ];
 
   const isMenuDisplayed = displayedOnPages.some((page) =>
@@ -86,6 +89,7 @@ export const Menu = (): JSX.Element => {
                   <StudioButton />
                   <NotificationsButton />
                   <ThreadsButton />
+                  <NoteButton />
                 </div>
                 <div className={styles.block}>
                   {!!showUpgradeButton && <UpgradeToPlusButton />}
@@ -100,7 +104,7 @@ export const Menu = (): JSX.Element => {
         </div>
         <div
           className={`
-        ${styles.menu_control_button_wrapper} 
+        ${styles.menu_control_button_wrapper}
         ${isOpened ? styles.shifted : ""}
         `}
         >
