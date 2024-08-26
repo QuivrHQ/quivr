@@ -87,7 +87,7 @@ async def crawl_endpoint(
             source_link=crawl_website.url,
         )
 
-        added_knowledge = await knowledge_service.add_knowledge(knowledge_to_add)
+        added_knowledge = await knowledge_service.insert_knowledge(knowledge_to_add)
         logger.info(f"Knowledge {added_knowledge} added successfully")
 
         celery.send_task(

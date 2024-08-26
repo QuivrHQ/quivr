@@ -1,3 +1,4 @@
+import hashlib
 import io
 import os
 from datetime import datetime, timezone
@@ -129,6 +130,8 @@ class SyncUtils:
         file_name = str(file_response["file_name"])
         raw_data = file_response["content"]
         assert isinstance(raw_data, io.BytesIO)
+        ##FIXME @chloe ADD FILE SHA1
+
         file_data = (
             io.BufferedReader(raw_data)  # type: ignore
             if isinstance(raw_data, io.BytesIO)
@@ -139,7 +142,7 @@ class SyncUtils:
         dfile = DownloadedSyncFile(
             file_name=file_name, file_data=file_data, extension=extension
         )
-        logger.debug(f"Successfully downloded sync file : {dfile}")
+        logger.debug(f"Successfully downloaded sync file : {dfile}")
         return dfile
 
     async def process_sync_file(
@@ -192,15 +195,22 @@ class SyncUtils:
                 description="File downloaded successfully",
             ),
         )
+        downloaded_file_bytes = downloaded_file.file_data.read()
         knowledge_to_add = CreateKnowledgeProperties(
             brain_id=brain_id,
             file_name=file.name,
             mime_type=downloaded_file.extension,
             source=integration,
             source_link=integration_link,
+            file_size=file.size,  # FIXME @chloedia
+            file_sha1=hashlib.sha1(downloaded_file_bytes).hexdigest(),
         )
+        logger.debug("Adding knowledge to brain HERE")
 
-        added_knowledge = await self.knowledge_service.add_knowledge(knowledge_to_add)
+        added_knowledge = await self.knowledge_service.insert_knowledge(
+            knowledge_to_add
+        )
+        logger.debug("YASSSSSSSSS")
         # Send file for processing
         celery.send_task(
             "process_file_task",
