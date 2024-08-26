@@ -12,7 +12,6 @@ from fastapi import (
     Query,
     UploadFile,
 )
-from supabase.client import AsyncClient
 
 from quivr_api.celery_config import celery
 from quivr_api.logger import get_logger
@@ -37,6 +36,7 @@ from quivr_api.modules.user.entity.user_identity import UserIdentity
 from quivr_api.modules.user.service.user_usage import UserUsage
 from quivr_api.utils.byte_size import convert_bytes
 from quivr_api.utils.telemetry import maybe_send_telemetry
+from supabase.client import AsyncClient
 
 logger = get_logger(__name__)
 upload_router = APIRouter()
@@ -135,7 +135,7 @@ async def upload_file(
         file_size=uploadFile.size,
         file_sha1=hashlib.sha1(file_content).hexdigest(),
     )
-    knowledge = await knowledge_service.add_knowledge(knowledge_to_add)  # type: ignore
+    knowledge = await knowledge_service.insert_knowledge(knowledge_to_add)  # type: ignore
 
     celery.send_task(
         "process_file_task",

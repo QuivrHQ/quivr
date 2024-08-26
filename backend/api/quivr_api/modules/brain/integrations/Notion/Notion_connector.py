@@ -309,7 +309,9 @@ class NotionConnector(IntegrationBrain, Integration):
                     integration_link=page_url,
                 )
 
-                added_knowledge = self.knowledge_service.add_knowledge(knowledge_to_add)
+                added_knowledge = self.knowledge_service.insert_knowledge(
+                    knowledge_to_add
+                )
                 logger.info(f"Knowledge {added_knowledge} added successfully")
 
                 celery.send_task(

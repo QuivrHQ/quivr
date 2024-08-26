@@ -34,6 +34,7 @@ class SyncFile(BaseModel):
     last_modified: str
     mime_type: str
     web_view_link: str
+    size: Optional[int] = None
     notification_id: UUID | None = None
     icon: Optional[str] = None
     parent_id: Optional[str] = None
