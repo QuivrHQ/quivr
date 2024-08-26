@@ -208,6 +208,7 @@ async def create_question_handler(
                 chat_service,
                 knowledge_service,
                 vector_service,
+                model_service,
             )
         else:
             await check_and_update_user_usage(
@@ -290,6 +291,7 @@ async def create_stream_question_handler(
                 chat_service,
                 knowledge_service,
                 vector_service,
+                model_service,
             )
         else:
             await check_and_update_user_usage(

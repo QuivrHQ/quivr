@@ -22,6 +22,7 @@ from quivr_api.modules.dependencies import (
     get_supabase_client,
 )
 from quivr_api.modules.knowledge.service.knowledge_service import KnowledgeService
+from quivr_api.modules.models.service.model_service import ModelService
 from quivr_api.modules.prompt.entity.prompt import Prompt
 from quivr_api.modules.prompt.service.prompt_service import PromptService
 from quivr_api.modules.user.entity.user_identity import UserIdentity
@@ -44,6 +45,7 @@ class RAGService:
         chat_service: ChatService,
         knowledge_service: KnowledgeService,
         vector_service: VectorService,
+        model_service: ModelService,
     ):
         # Services
         self.brain_service = brain_service
@@ -51,6 +53,7 @@ class RAGService:
         self.chat_service = chat_service
         self.knowledge_service = knowledge_service
         self.vector_service = vector_service
+        self.model_service = model_service
 
         # Base models
         self.current_user = current_user
