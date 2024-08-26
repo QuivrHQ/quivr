@@ -1,4 +1,5 @@
 @use "styles/Spacings.module.scss";
+@use "styles/Typography.module.scss";
 
 .main_container {
   display: flex;
@@ -12,5 +13,18 @@
     padding-inline: Spacings.$spacing09;
     padding-block: Spacings.$spacing05;
     overflow-y: scroll;
+    display: flex;
+    flex-direction: column;
+    gap: Spacings.$spacing06;
+
+    .section {
+      display: flex;
+      flex-direction: column;
+      gap: Spacings.$spacing04;
+
+      .section_title {
+        @include Typography.H2;
+      }
+    }
   }
 }
