@@ -11,7 +11,7 @@ export const NoteButton = (): JSX.Element => {
   return (
     <Link href={`/note`}>
       <MenuButton
-        label="My Notebook"
+        label="My Notes"
         isSelected={isSelected}
         iconName="note"
         type="open"
