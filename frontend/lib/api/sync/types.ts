@@ -24,6 +24,11 @@ export interface Sync {
   email: string;
 }
 
+export interface SyncsByProvider {
+  provider: Provider;
+  syncs: Sync[];
+}
+
 export interface SyncSettings {
   folders?: string[];
   files?: string[];
