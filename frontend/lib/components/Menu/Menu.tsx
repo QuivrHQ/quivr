@@ -44,10 +44,10 @@ export const Menu = (): JSX.Element => {
     "/assistants",
     "/chat",
     "/library",
+    "/note",
     "/search",
     "studio",
     "/user",
-    "/note",
   ];
 
   const isMenuDisplayed = displayedOnPages.some((page) =>
@@ -87,9 +87,9 @@ export const Menu = (): JSX.Element => {
                   <DiscussionButton />
                   <HomeButton />
                   <StudioButton />
+                  <NoteButton />
                   <NotificationsButton />
                   <ThreadsButton />
-                  <NoteButton />
                 </div>
                 <div className={styles.block}>
                   {!!showUpgradeButton && <UpgradeToPlusButton />}

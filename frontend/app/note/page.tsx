@@ -7,7 +7,7 @@ const Note = (): JSX.Element => {
   return (
     <div className={styles.main_container}>
       <div className={styles.page_header}>
-        <PageHeader iconName="note" label="My Notes" buttons={[]} />
+        <PageHeader iconName="pen" label="Notetaker" buttons={[]} />
       </div>
     </div>
   );
