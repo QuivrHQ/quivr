@@ -1,5 +1,5 @@
 "use client";
-import PageHeader from "@/lib/components/PageHeader/PageHeader";
+import { PageHeader } from "@/lib/components/PageHeader/PageHeader";
 
 import styles from "./page.module.scss";
 
