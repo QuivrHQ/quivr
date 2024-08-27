@@ -6,16 +6,15 @@ from uuid import uuid4
 import pytest
 import pytest_asyncio
 import sqlalchemy
-from sqlalchemy.ext.asyncio import create_async_engine
-from sqlmodel import select
-from sqlmodel.ext.asyncio.session import AsyncSession
-
 from quivr_api.modules.brain.entity.brain_entity import Brain, BrainType
 from quivr_api.modules.chat.dto.inputs import QuestionAndAnswer
 from quivr_api.modules.chat.entity.chat import Chat, ChatHistory
 from quivr_api.modules.chat.repository.chats import ChatRepository
 from quivr_api.modules.chat.service.chat_service import ChatService
 from quivr_api.modules.user.entity.user_identity import User
+from sqlalchemy.ext.asyncio import create_async_engine
+from sqlmodel import select
+from sqlmodel.ext.asyncio.session import AsyncSession
 
 pg_database_base_url = "postgres:postgres@localhost:54322/postgres"
 

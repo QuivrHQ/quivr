@@ -2,18 +2,20 @@ from typing import Annotated
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Query
+
 from quivr_api.logger import get_logger
 from quivr_api.middlewares.auth import AuthBearer, get_current_user
 from quivr_api.modules.brain.entity.brain_entity import RoleEnum
 from quivr_api.modules.brain.service.brain_authorization_service import (
-    has_brain_authorization, validate_brain_authorization)
-from quivr_api.modules.brain.service.brain_vector_service import \
-    BrainVectorService
+    has_brain_authorization,
+    validate_brain_authorization,
+)
+from quivr_api.modules.brain.service.brain_vector_service import BrainVectorService
 from quivr_api.modules.dependencies import get_service
-from quivr_api.modules.knowledge.service.knowledge_service import \
-    KnowledgeService
-from quivr_api.modules.upload.service.generate_file_signed_url import \
-    generate_file_signed_url
+from quivr_api.modules.knowledge.service.knowledge_service import KnowledgeService
+from quivr_api.modules.upload.service.generate_file_signed_url import (
+    generate_file_signed_url,
+)
 from quivr_api.modules.user.entity.user_identity import UserIdentity
 
 knowledge_router = APIRouter()
@@ -38,7 +40,7 @@ async def list_knowledge_in_brain_endpoint(
 
     validate_brain_authorization(brain_id=brain_id, user_id=current_user.id)
 
-    knowledges = await knowledge_service.get_all_knowledge(brain_id)
+    knowledges = await knowledge_service.get_all_knowledge_from_brain(brain_id)
 
     return {"knowledges": knowledges}
 

@@ -145,7 +145,9 @@ class RAGService:
         logger.debug(f"generate_answer with config : {rag_config.model_dump()}")
         history = await self.chat_service.get_chat_history(self.chat_id)
         # Get list of files
-        list_files = await self.knowledge_service.get_all_knowledge(self.brain.brain_id)
+        list_files = await self.knowledge_service.get_all_knowledge_in_brain(
+            self.brain.brain_id
+        )
         # Build RAG dependencies to inject
         vector_store = self.create_vector_store(
             self.brain.brain_id, rag_config.llm_config.max_input
@@ -198,7 +200,9 @@ class RAGService:
         chat_history = self._build_chat_history(history)
 
         # Get list of files urls
-        list_files = await self.knowledge_service.get_all_knowledge(self.brain.brain_id)
+        list_files = await self.knowledge_service.get_all_knowledge_in_brain(
+            self.brain.brain_id
+        )
         llm = self.get_llm(rag_config)
         vector_store = self.create_vector_store(
             self.brain.brain_id, rag_config.llm_config.max_input

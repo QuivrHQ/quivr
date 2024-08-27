@@ -2,7 +2,7 @@ from typing import Sequence
 from uuid import UUID
 
 from fastapi import HTTPException
-from sqlalchemy.exc import IntegrityError
+from sqlalchemy.exc import IntegrityError, NoResultFound
 from sqlmodel import select
 from sqlmodel.ext.asyncio.session import AsyncSession
 
@@ -38,7 +38,7 @@ class KnowledgeRepository(BaseRepository):
             await self.session.refresh(knowledge)
         except IntegrityError:
             await self.session.rollback()
-            raise Exception("Integrity error while creating knowledge.")
+            raise
         except Exception as e:
             await self.session.rollback()
             raise e
@@ -57,6 +57,17 @@ class KnowledgeRepository(BaseRepository):
         await self.session.refresh(knowledge)
         return knowledge
 
+    async def remove_knowledge_from_brain(
+        self, knowledge_id: UUID, brain_id: UUID
+    ) -> KnowledgeDB:
+        knowledge = await self.get_knowledge_by_id(knowledge_id)
+        brain = await self.get_brain_by_id(brain_id)
+        knowledge.brains.remove(brain)
+        self.session.add(knowledge)
+        await self.session.commit()
+        await self.session.refresh(knowledge)
+        return knowledge
+
     async def remove_knowledge_by_id(
         self, knowledge_id: UUID
     ) -> DeleteKnowledgeResponse:
@@ -65,7 +76,7 @@ class KnowledgeRepository(BaseRepository):
         knowledge = result.first()
 
         if not knowledge:
-            raise HTTPException(404, "Knowledge not found")
+            raise NoResultFound("Knowledge not found")
 
         await self.session.delete(knowledge)
         await self.session.commit()
@@ -81,20 +92,19 @@ class KnowledgeRepository(BaseRepository):
         knowledge = result.first()
 
         if not knowledge:
-            raise HTTPException(404, "Knowledge not found")
+            raise NoResultFound("Knowledge not found")
 
         return knowledge
 
     async def get_brain_by_id(self, brain_id: UUID) -> Brain:
-        # Get all knowledge_id in a brain
         query = select(Brain).where(Brain.brain_id == brain_id)
         result = await self.session.exec(query)
         brain = result.first()
         if not brain:
-            raise HTTPException(404, "Knowledge not found")
+            raise NoResultFound("Brain not found")
         return brain
 
-    async def remove_brain_all_knowledge(self, brain_id) -> int:
+    async def remove_all_knowledges_from_brain(self, brain_id) -> int:
         """
         Remove all knowledge in a brain
         Args:
@@ -115,6 +125,7 @@ class KnowledgeRepository(BaseRepository):
         for item in all_knowledge:
             await self.session.delete(item)
         await self.session.commit()
+        await self.session.refresh(brain)
         return len(knowledge_to_delete_list)
 
     async def update_status_knowledge(
@@ -125,7 +136,7 @@ class KnowledgeRepository(BaseRepository):
         knowledge = result.first()
 
         if not knowledge:
-            return None
+            raise NoResultFound("Knowledge not found")
 
         knowledge.status = status
         self.session.add(knowledge)
@@ -142,7 +153,7 @@ class KnowledgeRepository(BaseRepository):
         knowledge = result.first()
 
         if not knowledge:
-            raise HTTPException(404, "Knowledge not found")
+            raise NoResultFound("Knowledge not found")
 
         knowledge.source_link = source_link
         self.session.add(knowledge)
