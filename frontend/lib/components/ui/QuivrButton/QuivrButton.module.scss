@@ -20,6 +20,17 @@
     text-transform: uppercase;
   }
 
+  &.dark {
+    background-color: var(--background-1);
+
+    &:hover,
+    &.important {
+      .label {
+        color: var(--white-0);
+      }
+    }
+  }
+
   &.hidden {
     display: none;
   }

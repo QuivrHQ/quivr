@@ -8,20 +8,20 @@
   display: flex;
   flex-direction: column;
   position: relative;
-  background-color: var(--background-0);
   font-size: Typography.$small;
 
   .first_line_wrapper {
     display: flex;
     justify-content: space-between;
     border: 1px solid var(--border-2);
-    border-radius: Radius.$normal;
+    border-radius: Radius.$big;
     align-items: center;
+    background-color: var(--background-1);
     cursor: pointer;
     display: flex;
 
     &.unfolded {
-      border-radius: Radius.$normal Radius.$normal 0 0;
+      border-radius: Radius.$big Radius.$big 0 0;
     }
 
     .left {
