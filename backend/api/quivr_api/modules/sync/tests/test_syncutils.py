@@ -59,7 +59,6 @@ def test_filter_on_supported_files_prev_not_supported():
 
 
 def test_should_download_file_no_sync_time_not_folder():
-    braind_id = uuid4()
     datetime_format: str = "%Y-%m-%dT%H:%M:%S.%fZ"
     file_not_folder = SyncFile(
         id="1",
@@ -74,12 +73,10 @@ def test_should_download_file_no_sync_time_not_folder():
         last_updated_sync_active=None,
         provider_name="google",
         datetime_format=datetime_format,
-        brain_id=braind_id,
     )
 
 
 def test_should_download_file_no_sync_time_folder():
-    braind_id = uuid4()
     datetime_format: str = "%Y-%m-%dT%H:%M:%S.%fZ"
     file_not_folder = SyncFile(
         id="1",
@@ -94,42 +91,10 @@ def test_should_download_file_no_sync_time_folder():
         last_updated_sync_active=None,
         provider_name="google",
         datetime_format=datetime_format,
-        brain_id=braind_id,
-    )
-
-
-def test_should_download_file_nosync_time_checkexists(monkeypatch):
-    def check_file_patch(*args, **kwargs):
-        return True
-
-    # TODO (@aminediro) : This is why we need dependency injection
-    monkeypatch.setattr(
-        "quivr_api.modules.sync.utils.syncutils.check_file_exists",
-        check_file_patch,
-    )
-
-    brain_id = uuid4()
-    datetime_format: str = "%Y-%m-%dT%H:%M:%S.%fZ"
-    file_not_folder = SyncFile(
-        id="1",
-        name="file_name",
-        is_folder=False,
-        last_modified=datetime.now().strftime(datetime_format),
-        mime_type="txt",
-        web_view_link="link",
-    )
-
-    assert not should_download_file(
-        file=file_not_folder,
-        last_updated_sync_active=None,
-        provider_name="google",
-        datetime_format=datetime_format,
-        brain_id=brain_id,
     )
 
 
 def test_should_download_file_notiondb():
-    brain_id = uuid4()
     datetime_format: str = "%Y-%m-%dT%H:%M:%S.%fZ"
     file_not_folder = SyncFile(
         id="1",
@@ -147,12 +112,10 @@ def test_should_download_file_notiondb():
         ),
         provider_name="notion",
         datetime_format=datetime_format,
-        brain_id=brain_id,
     )
 
 
 def test_should_download_file_not_notiondb():
-    brain_id = uuid4()
     datetime_format: str = "%Y-%m-%dT%H:%M:%S.%fZ"
     file_not_folder = SyncFile(
         id="1",
@@ -168,12 +131,10 @@ def test_should_download_file_not_notiondb():
         last_updated_sync_active=None,
         provider_name="notion",
         datetime_format=datetime_format,
-        brain_id=brain_id,
     )
 
 
 def test_should_download_file_lastsynctime_before():
-    brain_id = uuid4()
     datetime_format: str = "%Y-%m-%dT%H:%M:%S.%fZ"
     file_not_folder = SyncFile(
         id="1",
@@ -190,12 +151,10 @@ def test_should_download_file_lastsynctime_before():
         last_updated_sync_active=last_sync_time,
         provider_name="google",
         datetime_format=datetime_format,
-        brain_id=brain_id,
     )
 
 
 def test_should_download_file_lastsynctime_after():
-    brain_id = uuid4()
     datetime_format: str = "%Y-%m-%dT%H:%M:%S.%fZ"
     file_not_folder = SyncFile(
         id="1",
@@ -212,5 +171,4 @@ def test_should_download_file_lastsynctime_after():
         last_updated_sync_active=last_sync_time,
         provider_name="google",
         datetime_format=datetime_format,
-        brain_id=brain_id,
     )

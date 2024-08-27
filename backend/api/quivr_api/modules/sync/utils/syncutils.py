@@ -59,7 +59,6 @@ def should_download_file(
     file: SyncFile,
     last_updated_sync_active: datetime | None,
     provider_name: str,
-    brain_id: UUID,
     datetime_format: str,
 ) -> bool:
     file_last_modified_utc = datetime.strptime(
@@ -67,10 +66,9 @@ def should_download_file(
     ).replace(tzinfo=timezone.utc)
 
     should_download = (
-        not last_updated_sync_active
+        last_updated_sync_active is None
         or file_last_modified_utc > last_updated_sync_active
     )
-    should_download |= not check_file_exists(str(brain_id), file.name)
 
     # TODO: Handle notion database
     if provider_name == "notion":
@@ -346,7 +344,6 @@ class SyncUtils:
                 last_updated_sync_active=last_synced_time,
                 provider_name=self.sync_cloud.lower_name,
                 datetime_format=self.sync_cloud.datetime_format,
-                brain_id=sync_active.brain_id,
             )
         ]
 
