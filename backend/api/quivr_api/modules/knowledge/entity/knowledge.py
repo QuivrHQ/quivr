@@ -3,6 +3,7 @@ from typing import Dict, List, Optional
 from uuid import UUID
 
 from pydantic import BaseModel
+from quivr_core.models import KnowledgeStatus
 from sqlalchemy import JSON, TIMESTAMP, Column, text
 from sqlalchemy.ext.asyncio import AsyncAttrs
 from sqlmodel import UUID as PGUUID
@@ -24,11 +25,7 @@ class Knowledge(BaseModel):
     updated_at: Optional[datetime] = None
     created_at: Optional[datetime] = None
     metadata: Optional[Dict[str, str]] = None
-
-    def dict(self, *args, **kwargs):
-        knowledge_dict = super().dict(*args, **kwargs)
-        knowledge_dict["brain_id"] = str(knowledge_dict.get("brain_id"))
-        return knowledge_dict
+    brain_ids: list[UUID]
 
 
 class KnowledgeDB(AsyncAttrs, SQLModel, table=True):
@@ -70,5 +67,27 @@ class KnowledgeDB(AsyncAttrs, SQLModel, table=True):
         default=None, sa_column=Column("metadata", JSON)
     )
     brains: List["Brain"] = Relationship(
-        back_populates="knowledges", link_model=KnowledgeBrain
+        back_populates="knowledges",
+        link_model=KnowledgeBrain,
+        sa_relationship_kwargs={"lazy": "select"},
     )
+
+    async def to_dto(self) -> Knowledge:
+        brains = await self.awaitable_attrs.brains
+        size = self.file_size if self.file_size else 0
+        sha1 = self.file_sha1 if self.file_sha1 else ""
+        return Knowledge(
+            id=self.id,  # type: ignore
+            file_name=self.file_name,
+            url=self.url,
+            mime_type=self.mime_type,
+            status=KnowledgeStatus(self.status),
+            source=self.source,
+            source_link=self.source_link,
+            file_size=size,
+            file_sha1=sha1,
+            updated_at=self.updated_at,
+            created_at=self.created_at,
+            metadata=self.metadata_,  # type: ignore
+            brain_ids=[brain.brain_id for brain in brains],
+        )

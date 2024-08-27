@@ -191,6 +191,7 @@ async def create_question_handler(
         service = None | RAGService | ChatLLMService
         if not model_to_use:
             brain = brain_service.get_brain_details(brain_id, current_user.id)  # type: ignore
+            assert brain
             model = await check_and_update_user_usage(
                 current_user, str(brain.model), model_service
             )  # type: ignore
@@ -208,6 +209,7 @@ async def create_question_handler(
                 chat_service,
                 knowledge_service,
                 vector_service,
+                model_service,
             )
         else:
             await check_and_update_user_usage(
@@ -290,6 +292,7 @@ async def create_stream_question_handler(
                 chat_service,
                 knowledge_service,
                 vector_service,
+                model_service,
             )
         else:
             await check_and_update_user_usage(

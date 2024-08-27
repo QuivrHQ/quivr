@@ -5,6 +5,7 @@ from typing import Optional
 from uuid import UUID
 
 from pydantic import BaseModel
+from quivr_worker.files import compute_sha1
 from sqlmodel import TIMESTAMP, Column, Field, Relationship, SQLModel, text
 from sqlmodel import UUID as PGUUID
 
@@ -16,6 +17,12 @@ class DownloadedSyncFile:
     file_name: str
     extension: str
     file_data: io.BufferedReader
+
+    def file_sha1(self) -> str:
+        self.file_data.seek(0)
+        data = self.file_data.read()
+        self.file_data.seek(0)
+        return compute_sha1(data)
 
 
 class DBSyncFile(BaseModel):
@@ -34,6 +41,7 @@ class SyncFile(BaseModel):
     last_modified: str
     mime_type: str
     web_view_link: str
+    size: Optional[int] = None
     notification_id: UUID | None = None
     icon: Optional[str] = None
     parent_id: Optional[str] = None

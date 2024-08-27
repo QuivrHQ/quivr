@@ -184,7 +184,6 @@ async def create_sync_active(
         )
     )
     sync_active_input.notification_id = str(notification.id)
-
     sync_active = sync_service.create_sync_active(
         sync_active_input, str(current_user.id)
     )

@@ -14,9 +14,10 @@ from quivr_worker.utils import get_tmp_name
 logger = get_logger("celery_worker")
 
 
-def compute_sha1(content: bytes):
-    readable_hash = hashlib.sha1(content).hexdigest()
-    return readable_hash
+def compute_sha1(content: bytes) -> str:
+    m = hashlib.sha1()
+    m.update(content)
+    return m.hexdigest()
 
 
 @contextmanager
@@ -27,21 +28,15 @@ def build_file(
     original_file_name: str | None = None,
 ):
     try:
-        # FIXME: @chloedia @AmineDiro
-        # We should decide if these checks should happen at API level or Worker level
-        # These checks should use Knowledge table (where we should store knowledge sha1)
-        # file_exists = file_already_exists()
-        # file_exists_in_brain = file_already_exists_in_brain(brain.brain_id)
         # TODO(@aminediro) : Maybe use fsspec file to be agnostic to where files are stored :?
         # We are reading the whole file to memory, which doesn't scale
         tmp_name, base_file_name, file_extension = get_tmp_name(file_name)
         tmp_file = NamedTemporaryFile(
             suffix="_" + tmp_name,  # pyright: ignore reportPrivateUsage=none
         )
-
-        file_sha1 = compute_sha1(file_data)
         tmp_file.write(file_data)
         tmp_file.flush()
+        file_sha1 = compute_sha1(file_data)
 
         file_instance = File(
             knowledge_id=knowledge_id,

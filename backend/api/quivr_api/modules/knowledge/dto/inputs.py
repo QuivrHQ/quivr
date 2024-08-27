@@ -1,14 +1,8 @@
-from enum import Enum
 from typing import Dict, Optional
 from uuid import UUID
 
 from pydantic import BaseModel
-
-
-class KnowledgeStatus(str, Enum):
-    PROCESSING = "PROCESSING"
-    UPLOADED = "UPLOADED"
-    ERROR = "ERROR"
+from quivr_core.models import KnowledgeStatus
 
 
 class CreateKnowledgeProperties(BaseModel):

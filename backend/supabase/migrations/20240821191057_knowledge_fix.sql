@@ -6,6 +6,8 @@ ALTER TABLE "public"."knowledge" RENAME COLUMN "integration_link" TO "source_lin
 
 ALTER TABLE "public"."knowledge" add column "file_sha1" text;
 
+ALTER TABLE "public"."knowledge" add CONSTRAINT "unique_file_sha1" unique ("file_sha1");
+
 alter table "public"."knowledge" add column "created_at" timestamp with time zone default now();
 
 alter table "public"."knowledge" add column "file_size" bigint;

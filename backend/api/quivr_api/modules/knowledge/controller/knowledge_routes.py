@@ -1,3 +1,4 @@
+from http import HTTPStatus
 from typing import Annotated
 from uuid import UUID
 
@@ -65,7 +66,7 @@ async def delete_endpoint(
 
     knowledge = await knowledge_service.get_knowledge(knowledge_id)
     file_name = knowledge.file_name if knowledge.file_name else knowledge.url
-    await knowledge_service.remove_knowledge(knowledge_id)
+    await knowledge_service.remove_knowledge(brain_id, knowledge_id)
 
     brain_vector_service = BrainVectorService(brain_id)
     if knowledge.file_name:
@@ -94,16 +95,23 @@ async def generate_signed_url_endpoint(
 
     knowledge = await knowledge_service.get_knowledge(knowledge_id)
 
-    validate_brain_authorization(brain_id=knowledge.brain_id, user_id=current_user.id)
-
-    if knowledge.file_name == None:
+    if len(knowledge.brains_ids) == 0:
         raise HTTPException(
-            status_code=404,
+            status_code=HTTPStatus.NOT_FOUND,
+            detail="knowledge not associated with brains yet.",
+        )
+
+    brain_id = knowledge.brains_ids[0]
+
+    validate_brain_authorization(brain_id=brain_id, user_id=current_user.id)
+
+    if knowledge.file_name is None:
+        raise HTTPException(
+            status_code=HTTPStatus.NOT_FOUND,
             detail=f"Knowledge with id {knowledge_id} is not a file.",
         )
 
-    file_path_in_storage = f"{knowledge.brain_id}/{knowledge.file_name}"
-
+    file_path_in_storage = f"{brain_id}/{knowledge.file_name}"
     file_signed_url = generate_file_signed_url(file_path_in_storage)
 
     return file_signed_url
