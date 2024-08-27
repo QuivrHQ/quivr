@@ -56,7 +56,7 @@
   display: flex;
   padding: Spacings.$spacing02;
   position: absolute;
-  top: Spacings.$spacing04;
+  top: calc(Spacings.$spacing03 + Spacings.$spacing01);
   right: Spacings.$spacing03;
   border-radius: Radius.$circle;
   cursor: pointer;

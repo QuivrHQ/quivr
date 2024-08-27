@@ -49,14 +49,16 @@ export const KnowledgeTab = ({
       <div className={styles.knowledge_tab_container}>
         <div className={styles.knowledge_tab_wrapper}>
           <MessageInfoBox type="warning">
-            This brain is empty! You can add knowledge by clicking on
-            <QuivrButton
-              label="Add knowledge"
-              color="primary"
-              iconName="add"
-              onClick={() => setShouldDisplayFeedCard(true)}
-            />
-            .
+            <div className={styles.message}>
+              This brain is empty! You can add knowledge by clicking on
+              <QuivrButton
+                label="Add knowledge"
+                color="primary"
+                iconName="add"
+                onClick={() => setShouldDisplayFeedCard(true)}
+              />
+              .
+            </div>
           </MessageInfoBox>
         </div>
       </div>

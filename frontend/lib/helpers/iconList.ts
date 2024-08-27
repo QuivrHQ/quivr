@@ -2,7 +2,6 @@ import { AiOutlineLoading3Quarters } from "react-icons/ai";
 import { BiCoin } from "react-icons/bi";
 import {
   BsArrowRightShort,
-  BsChatLeftText,
   BsFiletypeCsv,
   BsFiletypeDocx,
   BsFiletypeHtml,
@@ -57,6 +56,7 @@ import {
 import {
   IoArrowUpCircleOutline,
   IoBookOutline,
+  IoChatbubbleEllipsesOutline,
   IoCloudDownloadOutline,
   IoFootsteps,
   IoHelp,
@@ -118,7 +118,7 @@ export const iconList: { [name: string]: IconType } = {
   brainCircuit: LuBrainCircuit,
   calendar: FaCalendar,
   chair: PiOfficeChairFill,
-  chat: BsChatLeftText,
+  chat: IoChatbubbleEllipsesOutline,
   check: FaCheck,
   checkCircle: FaCheckCircle,
   chevronDown: LuChevronDown,

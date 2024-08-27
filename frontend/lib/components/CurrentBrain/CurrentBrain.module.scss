@@ -58,8 +58,10 @@
         }
 
         .brain_snippet {
-          width: 18px;
-          height: 18px;
+          min-width: 18px;
+          min-height: 18px;
+          max-width: 18px;
+          max-height: 18px;
           border-radius: Radius.$normal;
           display: flex;
           justify-content: center;

@@ -39,6 +39,10 @@ export const SearchModal = (): JSX.Element => {
   };
 
   useEffect(() => {
+    console.info(isVisible);
+  }, [isVisible]);
+
+  useEffect(() => {
     document.addEventListener("keydown", keydownHandler);
     document.addEventListener("click", clickHandler);
 
