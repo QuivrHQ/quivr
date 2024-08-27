@@ -38,10 +38,9 @@ const BrainsManagement = (): JSX.Element => {
       label: "Talk to Brain",
       color: "primary",
       onClick: () => {
-        console.info("1");
         if (brain) {
           setIsVisible(true);
-          setCurrentBrainId(brain.id);
+          setTimeout(() => setCurrentBrainId(brain.id));
         }
       },
       iconName: "chat",

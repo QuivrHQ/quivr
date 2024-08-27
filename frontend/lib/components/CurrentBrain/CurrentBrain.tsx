@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { useEffect } from "react";
 
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
 import { MinimalBrainForUser } from "@/lib/context/BrainProvider/types";
@@ -22,6 +23,10 @@ const BrainNameAndImage = ({
   currentBrain: MinimalBrainForUser;
   isNewBrain: boolean;
 }) => {
+  useEffect(() => {
+    console.info(currentBrain);
+  }, [currentBrain]);
+
   return (
     <>
       {currentBrain.image_url ? (
