@@ -2,8 +2,9 @@ import asyncio
 import json
 import os
 from datetime import datetime
+from io import BytesIO
 from pathlib import Path
-from typing import Any
+from typing import Any, Dict, List, Union
 from uuid import uuid4
 
 import pytest
@@ -13,6 +14,13 @@ from sqlalchemy.ext.asyncio import create_async_engine
 from sqlmodel import Session, create_engine, select
 from sqlmodel.ext.asyncio.session import AsyncSession
 
+from quivr_api.modules.brain.repository.brains_vectors import BrainsVectors
+from quivr_api.modules.knowledge.repository.knowledges import KnowledgeRepository
+from quivr_api.modules.knowledge.repository.storage import Storage
+from quivr_api.modules.knowledge.service.knowledge_service import KnowledgeService
+from quivr_api.modules.notification.service.notification_service import (
+    NotificationService,
+)
 from quivr_api.modules.sync.entity.notion_page import (
     BlockParent,
     DatabaseParent,
@@ -24,6 +32,17 @@ from quivr_api.modules.sync.entity.notion_page import (
     Title,
     TitleItem,
     WorkspaceParent,
+)
+from quivr_api.modules.sync.entity.sync_models import (
+    SyncFile,
+)
+from quivr_api.modules.sync.repository.sync_files import SyncFilesRepository
+from quivr_api.modules.sync.service.sync_service import SyncService, SyncUserService
+from quivr_api.modules.sync.utils.sync import (
+    BaseSync,
+)
+from quivr_api.modules.sync.utils.syncutils import (
+    SyncUtils,
 )
 from quivr_api.modules.user.entity.user_identity import User
 
@@ -349,3 +368,120 @@ def notion_search_result_bad_parent(request) -> NotionSearchResult:
         has_more=False,
         next_cursor=None,
     )
+
+
+class MockSyncCloud(BaseSync):
+    # TODO: Mock notion
+    name = "mockcloud"
+    lower_name = "mockcloud"
+    datetime_format: str = "%Y-%m-%d %H:%M:%S"
+
+    def get_files_by_id(self, credentials: Dict, file_ids: List[str]) -> List[SyncFile]:
+        raise NotImplementedError
+
+    def get_files(
+        self, credentials: Dict, folder_id: str | None = None, recursive: bool = False
+    ) -> List[SyncFile]:
+        raise NotImplementedError()
+
+    def download_file(
+        self, credentials: Dict, file: SyncFile
+    ) -> Dict[str, Union[str, BytesIO]]:
+        raise NotImplementedError
+
+    # Implement async only
+    async def aget_files_by_id(
+        self, credentials: Dict, file_ids: List[str]
+    ) -> List[SyncFile]:
+        return [
+            SyncFile(
+                id=fid,
+                name=f"file_{fid}",
+                is_folder=False,
+                last_modified=datetime.now().strftime(self.datetime_format),
+                mime_type="txt",
+                web_view_link=f"{self.name}/{fid}",
+            )
+            for fid in file_ids
+        ]
+
+    async def aget_files(
+        self, credentials: Dict, folder_id: str | None = None, recursive: bool = False
+    ) -> List[SyncFile]:
+        n_files = 1
+        return [
+            SyncFile(
+                id=str(uuid4()),
+                name=f"file_in_{folder_id}",
+                is_folder=False,
+                last_modified=datetime.now().strftime(self.datetime_format),
+                mime_type="txt",
+                web_view_link=f"{self.name}/{fid}",
+            )
+            for fid in range(n_files)
+        ]
+
+    async def adownload_file(
+        self, credentials: Dict, file: SyncFile
+    ) -> Dict[str, Union[str, BytesIO]]:
+        return {"file_name": file.name, "content": BytesIO(os.urandom(128))}
+
+    def check_and_refresh_access_token(self, credentials: dict) -> Dict:
+        return credentials
+
+
+class MockSyncCloudNotion(MockSyncCloud):
+    # TODO: Mock notion
+    name = "notion"
+    lower_name = "notion"
+    datetime_format: str = "%Y-%m-%d %H:%M:%S"
+
+
+@pytest.fixture
+def syncutils(session) -> SyncUtils:
+    knowledge_service = KnowledgeService(KnowledgeRepository(session))
+    sync_active_service = SyncService()
+    sync_user_service = SyncUserService()
+    sync_files_repo_service = SyncFilesRepository()
+    notification_service = NotificationService()
+    brain_vectors = BrainsVectors()
+    storage = Storage()
+    sync_cloud = MockSyncCloud()
+
+    sync_util = SyncUtils(
+        sync_user_service=sync_user_service,
+        sync_active_service=sync_active_service,
+        sync_files_repo=sync_files_repo_service,
+        storage=storage,
+        sync_cloud=sync_cloud,
+        notification_service=notification_service,
+        brain_vectors=brain_vectors,
+        knowledge_service=knowledge_service,
+    )
+
+    return sync_util
+
+
+@pytest.fixture
+def syncutils_notion(session) -> SyncUtils:
+    knowledge_service = KnowledgeService(KnowledgeRepository(session))
+    sync_active_service = SyncService()
+    sync_user_service = SyncUserService()
+    sync_files_repo_service = SyncFilesRepository()
+    notification_service = NotificationService()
+    brain_vectors = BrainsVectors()
+    storage = Storage()
+    sync_cloud = MockSyncCloudNotion()
+
+    sync_util = SyncUtils(
+        sync_user_service=sync_user_service,
+        sync_active_service=sync_active_service,
+        sync_files_repo=sync_files_repo_service,
+        storage=storage,
+        sync_cloud=sync_cloud,
+        notification_service=notification_service,
+        brain_vectors=brain_vectors,
+        knowledge_service=knowledge_service,
+    )
+
+    return sync_util

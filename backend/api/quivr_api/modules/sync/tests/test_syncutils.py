@@ -1,11 +1,14 @@
 from datetime import datetime, timedelta, timezone
 from uuid import uuid4
 
+import pytest
+
 from quivr_api.modules.sync.entity.sync_models import (
     DBSyncFile,
     SyncFile,
 )
 from quivr_api.modules.sync.utils.syncutils import (
+    SyncUtils,
     filter_on_supported_files,
     should_download_file,
 )
@@ -172,3 +175,26 @@ def test_should_download_file_lastsynctime_after():
         provider_name="google",
         datetime_format=datetime_format,
     )
+
+
+class TestSyncUtils:
+    @pytest.mark.asyncio
+    async def test_get_syncfiles_from_ids_nofolder(self, syncutils: SyncUtils):
+        files = await syncutils.get_syncfiles_from_ids(
+            credentials={}, files_ids=[str(uuid4())], folder_ids=[]
+        )
+        assert len(files) == 1
+
+    @pytest.mark.asyncio
+    async def test_get_syncfiles_from_ids_folder(self, syncutils: SyncUtils):
+        files = await syncutils.get_syncfiles_from_ids(
+            credentials={}, files_ids=[str(uuid4())], folder_ids=[str(uuid4())]
+        )
+        assert len(files) == 2
+
+    @pytest.mark.asyncio
+    async def test_get_syncfiles_from_ids_notion(self, syncutils_notion: SyncUtils):
+        files = await syncutils_notion.get_syncfiles_from_ids(
+            credentials={}, files_ids=[str(uuid4())], folder_ids=[str(uuid4())]
+        )
+        assert len(files) == 3
