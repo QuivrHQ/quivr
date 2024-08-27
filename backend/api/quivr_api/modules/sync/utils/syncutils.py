@@ -4,10 +4,13 @@ from datetime import datetime, timezone
 from typing import Any, List, Tuple
 from uuid import UUID, uuid4
 
+from quivr_core.models import KnowledgeStatus
+
 from quivr_api.celery_config import celery
 from quivr_api.logger import get_logger
 from quivr_api.modules.brain.repository.brains_vectors import BrainsVectors
 from quivr_api.modules.knowledge.dto.inputs import CreateKnowledgeProperties
+from quivr_api.modules.knowledge.entity.knowledge import Knowledge
 from quivr_api.modules.knowledge.repository.storage import Storage
 from quivr_api.modules.knowledge.service.knowledge_service import KnowledgeService
 from quivr_api.modules.notification.dto.inputs import (
@@ -67,8 +70,7 @@ def should_download_file(
         not last_updated_sync_active
         or file_last_modified_utc > last_updated_sync_active
     )
-    # FIXME(@chloedia @AmineDiro): File should already have its path or be None if new file
-    should_download &= not check_file_exists(str(brain_id), file.name)
+    should_download |= not check_file_exists(str(brain_id), file.name)
 
     # TODO: Handle notion database
     if provider_name == "notion":
@@ -128,19 +130,59 @@ class SyncUtils:
         logger.debug(f"Fetch sync file response: {file_response}")
         file_name = str(file_response["file_name"])
         raw_data = file_response["content"]
-        assert isinstance(raw_data, io.BytesIO)
         file_data = (
             io.BufferedReader(raw_data)  # type: ignore
             if isinstance(raw_data, io.BytesIO)
             else io.BufferedReader(raw_data.encode("utf-8"))  # type: ignore
         )
-
         extension = os.path.splitext(file_name)[-1].lower()
         dfile = DownloadedSyncFile(
-            file_name=file_name, file_data=file_data, extension=extension
+            file_name=file_name,
+            file_data=file_data,
+            extension=extension,
         )
-        logger.debug(f"Successfully downloded sync file : {dfile}")
+        logger.debug(f"Successfully downloaded sync file : {dfile}")
         return dfile
+
+    # TODO: REDO THIS MESS !!!!
+    # REMOVE ALL SYNC TABLES and start from scratch
+    async def create_or_update_knowledge(
+        self,
+        brain_id: UUID,
+        file: SyncFile,
+        new_sync_file: DBSyncFile | None,
+        prev_sync_file: DBSyncFile | None,
+        downloaded_file: DownloadedSyncFile,
+        source: str,
+        source_link: str,
+    ) -> Knowledge:
+        sync_id = None
+        if prev_sync_file:
+            prev_knowledge = await self.knowledge_service.get_knowledge_sync(
+                sync_id=prev_sync_file.id
+            )
+            await self.knowledge_service.remove_knowledge(
+                brain_id, knowledge_id=prev_knowledge.id
+            )
+            sync_id = prev_sync_file.id
+
+        sync_id = new_sync_file.id if new_sync_file else sync_id
+        knowledge_to_add = CreateKnowledgeProperties(
+            brain_id=brain_id,
+            file_name=file.name,
+            mime_type=downloaded_file.extension,
+            source=source,
+            status=KnowledgeStatus.PROCESSING,
+            source_link=source_link,
+            file_size=file.size if file.size else 0,
+            file_sha1=downloaded_file.file_sha1(),
+            # FIXME (@aminediro): This is a temporary fix, redo in KMS
+            metadata={"sync_file_id": str(sync_id)},
+        )
+        added_knowledge = await self.knowledge_service.insert_knowledge(
+            knowledge_to_add
+        )
+        return added_knowledge
 
     async def process_sync_file(
         self,
@@ -153,7 +195,8 @@ class SyncUtils:
         brain_id = sync_active.brain_id
         source, source_link = self.sync_cloud.name, file.web_view_link
         downloaded_file = await self.download_file(file, current_user.credentials)
-        storage_path = str(brain_id) + "/" + downloaded_file.file_name
+        storage_path = f"{brain_id}/{downloaded_file.file_name}"
+        exists_in_storage = check_file_exists(str(brain_id), file.name)
 
         if downloaded_file.extension not in [
             ".pdf",
@@ -167,23 +210,11 @@ class SyncUtils:
         ]:
             raise ValueError(f"Incompatible file extension for {downloaded_file}")
 
-        # TODO: Check workflow is correct
-        # FIXME(@aminediro, @chloedia): Checks should use file_sha1 in database
-        file_exists = check_file_exists(str(brain_id), downloaded_file.file_name)
-        # if file_exists:
-        #     self.brain_vectors.delete_file_from_brain(
-        #             brain_id, downloaded_file.file_name
-        #         )
-        # FIXME(@aminediro):  check_user_limits()
-        # FIXME(@chloedia) : change with knowledge_id
-        # FILE Extension should be field
-        # Upload File to S3 Storage
         response = await upload_file_storage(
             downloaded_file.file_data,
             storage_path,
-            upsert=file_exists,
+            upsert=exists_in_storage,
         )
-
         assert response, f"Error uploading {downloaded_file} to  {storage_path}"
         self.notification_service.update_notification_by_id(
             file.notification_id,
@@ -192,27 +223,28 @@ class SyncUtils:
                 description="File downloaded successfully",
             ),
         )
-        knowledge_to_add = CreateKnowledgeProperties(
-            brain_id=brain_id,
-            file_name=file.name,
-            mime_type=downloaded_file.extension,
-            source=source,
-            source_link=source_link,
-        )
-
-        added_knowledge = await self.knowledge_service.add_knowledge(knowledge_to_add)
-        self.sync_files_repo.update_or_create_sync_file(
+        sync_file_db = self.sync_files_repo.update_or_create_sync_file(
             file=file,
             previous_file=previous_file,
             sync_active=sync_active,
             supported=True,
         )
+        knowledge = await self.create_or_update_knowledge(
+            brain_id=brain_id,
+            file=file,
+            new_sync_file=sync_file_db,
+            prev_sync_file=previous_file,
+            downloaded_file=downloaded_file,
+            source=source,
+            source_link=source_link,
+        )
+
         # Send file for processing
         celery.send_task(
             "process_file_task",
             kwargs={
                 "brain_id": brain_id,
-                "knowledge_id": added_knowledge.id,
+                "knowledge_id": knowledge.id,
                 "file_name": storage_path,
                 "file_original_name": file.name,
                 "source": source,
@@ -269,8 +301,8 @@ class SyncUtils:
                     self.sync_cloud.name,
                     e,
                 )
-                # FIXME: SET knowledge to error
-                # NOTE: Supported is  True
+                # TODO: this process_sync_file could fail for a LOT of reason redo this logic
+                # File isn't supported so we set it as so ?
                 self.sync_files_repo.update_or_create_sync_file(
                     file=file,
                     sync_active=sync_active,

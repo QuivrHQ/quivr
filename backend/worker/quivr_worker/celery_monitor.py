@@ -9,16 +9,13 @@ from celery.result import AsyncResult
 from quivr_api.celery_config import celery
 from quivr_api.logger import get_logger
 from quivr_api.modules.dependencies import async_engine
-from quivr_api.modules.knowledge.repository.knowledges import \
-    KnowledgeRepository
-from quivr_api.modules.knowledge.service.knowledge_service import \
-    KnowledgeService
-from quivr_api.modules.notification.dto.inputs import \
-    NotificationUpdatableProperties
-from quivr_api.modules.notification.entity.notification import \
-    NotificationsStatusEnum
-from quivr_api.modules.notification.service.notification_service import \
-    NotificationService
+from quivr_api.modules.knowledge.repository.knowledges import KnowledgeRepository
+from quivr_api.modules.knowledge.service.knowledge_service import KnowledgeService
+from quivr_api.modules.notification.dto.inputs import NotificationUpdatableProperties
+from quivr_api.modules.notification.entity.notification import NotificationsStatusEnum
+from quivr_api.modules.notification.service.notification_service import (
+    NotificationService,
+)
 from quivr_core.models import KnowledgeStatus
 from sqlmodel.ext.asyncio.session import AsyncSession
 
@@ -40,6 +37,7 @@ class TaskIdentifier(str, Enum):
 @dataclass
 class TaskEvent:
     task_id: str
+    brain_id: UUID
     task_name: TaskIdentifier
     notification_id: str
     knowledge_id: UUID
@@ -96,7 +94,9 @@ async def handler_loop():
             )
             if event.knowledge_id:
                 await knowledge_service.update_status_knowledge(
-                    event.knowledge_id, KnowledgeStatus.UPLOADED
+                    knowledge_id=event.knowledge_id,
+                    status=KnowledgeStatus.UPLOADED,
+                    brain_id=event.brain_id,
                 )
             logger.info(
                 f"task {event.task_id} process_file_task failed. Updating knowledge {event.knowledge_id} to UPLOADED"
@@ -120,10 +120,12 @@ def notifier(app):
                 logger.debug(f"Received Event : {task} - {task_name} {task_kwargs} ")
                 notification_id = task_kwargs["notification_id"]
                 knowledge_id = task_kwargs.get("knowledge_id", None)
+                brain_id = task_kwargs.get("brain_id", None)
                 event = TaskEvent(
                     task_id=task,
                     task_name=TaskIdentifier(task_name),
                     knowledge_id=knowledge_id,
+                    brain_id=brain_id,
                     notification_id=notification_id,
                     status=TaskStatus(event["type"]),
                 )
