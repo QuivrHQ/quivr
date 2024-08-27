@@ -4,13 +4,9 @@ from datetime import datetime, timezone
 from typing import Any, List, Tuple
 from uuid import UUID, uuid4
 
-from quivr_core.models import KnowledgeStatus
-
 from quivr_api.celery_config import celery
 from quivr_api.logger import get_logger
 from quivr_api.modules.brain.repository.brains_vectors import BrainsVectors
-from quivr_api.modules.knowledge.dto.inputs import CreateKnowledgeProperties
-from quivr_api.modules.knowledge.entity.knowledge import Knowledge
 from quivr_api.modules.knowledge.repository.storage import Storage
 from quivr_api.modules.knowledge.service.knowledge_service import KnowledgeService
 from quivr_api.modules.notification.dto.inputs import (
@@ -29,8 +25,11 @@ from quivr_api.modules.sync.entity.sync_models import (
     SyncsActive,
     SyncsUser,
 )
-from quivr_api.modules.sync.repository.sync_files import SyncFilesRepository
-from quivr_api.modules.sync.service.sync_service import SyncService, SyncUserService
+from quivr_api.modules.sync.repository.sync_interfaces import SyncFileInterface
+from quivr_api.modules.sync.service.sync_service import (
+    ISyncService,
+    ISyncUserService,
+)
 from quivr_api.modules.sync.utils.sync import BaseSync
 from quivr_api.modules.upload.service.upload_file import (
     check_file_exists,
@@ -82,10 +81,10 @@ def should_download_file(
 class SyncUtils:
     def __init__(
         self,
-        sync_user_service: SyncUserService,
-        sync_active_service: SyncService,
+        sync_user_service: ISyncUserService,
+        sync_active_service: ISyncService,
         knowledge_service: KnowledgeService,
-        sync_files_repo: SyncFilesRepository,
+        sync_files_repo: SyncFileInterface,
         storage: Storage,
         sync_cloud: BaseSync,
         notification_service: NotificationService,
@@ -100,6 +99,7 @@ class SyncUtils:
         self.notification_service = notification_service
         self.brain_vectors = brain_vectors
 
+    # TODO: This modifies the file, we should treat it as such
     def create_sync_bulk_notification(
         self, files: list[SyncFile], current_user: UUID, brain_id: UUID, bulk_id: UUID
     ) -> list[SyncFile]:
@@ -144,43 +144,6 @@ class SyncUtils:
 
     # TODO: REDO THIS MESS !!!!
     # REMOVE ALL SYNC TABLES and start from scratch
-    async def create_or_update_knowledge(
-        self,
-        brain_id: UUID,
-        file: SyncFile,
-        new_sync_file: DBSyncFile | None,
-        prev_sync_file: DBSyncFile | None,
-        downloaded_file: DownloadedSyncFile,
-        source: str,
-        source_link: str,
-    ) -> Knowledge:
-        sync_id = None
-        if prev_sync_file:
-            prev_knowledge = await self.knowledge_service.get_knowledge_sync(
-                sync_id=prev_sync_file.id
-            )
-            await self.knowledge_service.remove_knowledge(
-                brain_id, knowledge_id=prev_knowledge.id
-            )
-            sync_id = prev_sync_file.id
-
-        sync_id = new_sync_file.id if new_sync_file else sync_id
-        knowledge_to_add = CreateKnowledgeProperties(
-            brain_id=brain_id,
-            file_name=file.name,
-            mime_type=downloaded_file.extension,
-            source=source,
-            status=KnowledgeStatus.PROCESSING,
-            source_link=source_link,
-            file_size=file.size if file.size else 0,
-            file_sha1=downloaded_file.file_sha1(),
-            # FIXME (@aminediro): This is a temporary fix, redo in KMS
-            metadata={"sync_file_id": str(sync_id)},
-        )
-        added_knowledge = await self.knowledge_service.insert_knowledge(
-            knowledge_to_add
-        )
-        return added_knowledge
 
     async def process_sync_file(
         self,
@@ -227,7 +190,7 @@ class SyncUtils:
             sync_active=sync_active,
             supported=True,
         )
-        knowledge = await self.create_or_update_knowledge(
+        knowledge = await self.knowledge_service.update_or_create_knowledge_sync(
             brain_id=brain_id,
             file=file,
             new_sync_file=sync_file_db,

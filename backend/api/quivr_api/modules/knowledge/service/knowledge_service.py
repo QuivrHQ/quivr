@@ -13,6 +13,11 @@ from quivr_api.modules.knowledge.dto.outputs import DeleteKnowledgeResponse
 from quivr_api.modules.knowledge.entity.knowledge import Knowledge, KnowledgeDB
 from quivr_api.modules.knowledge.repository.knowledges import KnowledgeRepository
 from quivr_api.modules.knowledge.repository.storage import Storage
+from quivr_api.modules.sync.entity.sync_models import (
+    DBSyncFile,
+    DownloadedSyncFile,
+    SyncFile,
+)
 
 logger = get_logger(__name__)
 
@@ -122,3 +127,35 @@ class KnowledgeService(BaseService[KnowledgeRepository]):
         logger.info(
             f"All knowledge in brain {brain_id} removed successfully from table"
         )
+
+    async def update_or_create_knowledge_sync(
+        self,
+        brain_id: UUID,
+        file: SyncFile,
+        new_sync_file: DBSyncFile | None,
+        prev_sync_file: DBSyncFile | None,
+        downloaded_file: DownloadedSyncFile,
+        source: str,
+        source_link: str,
+    ) -> Knowledge:
+        sync_id = None
+        if prev_sync_file:
+            prev_knowledge = await self.get_knowledge_sync(sync_id=prev_sync_file.id)
+            await self.remove_knowledge(brain_id, knowledge_id=prev_knowledge.id)
+            sync_id = prev_sync_file.id
+
+        sync_id = new_sync_file.id if new_sync_file else sync_id
+        knowledge_to_add = CreateKnowledgeProperties(
+            brain_id=brain_id,
+            file_name=file.name,
+            mime_type=downloaded_file.extension,
+            source=source,
+            status=KnowledgeStatus.PROCESSING,
+            source_link=source_link,
+            file_size=file.size if file.size else 0,
+            file_sha1=downloaded_file.file_sha1(),
+            # FIXME (@aminediro): This is a temporary fix, redo in KMS
+            metadata={"sync_file_id": str(sync_id)},
+        )
+        added_knowledge = await self.insert_knowledge(knowledge_to_add)
+        return added_knowledge

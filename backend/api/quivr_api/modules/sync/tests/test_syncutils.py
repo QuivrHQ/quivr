@@ -6,6 +6,8 @@ import pytest
 from quivr_api.modules.sync.entity.sync_models import (
     DBSyncFile,
     SyncFile,
+    SyncsActive,
+    SyncsUser,
 )
 from quivr_api.modules.sync.utils.syncutils import (
     SyncUtils,
@@ -198,3 +200,76 @@ class TestSyncUtils:
             credentials={}, files_ids=[str(uuid4())], folder_ids=[str(uuid4())]
         )
         assert len(files) == 3
+
+    @pytest.mark.asyncio
+    async def test_download_file(self, syncutils: SyncUtils):
+        file = SyncFile(
+            id=str(uuid4()),
+            name="test_file.txt",
+            is_folder=False,
+            last_modified=datetime.now().strftime(syncutils.sync_cloud.datetime_format),
+            mime_type="txt",
+            web_view_link="",
+        )
+        dfile = await syncutils.download_file(file, {})
+        assert dfile.extension == ".txt"
+        assert dfile.file_name == file.name
+        assert len(dfile.file_data.read()) > 0
+
+    @pytest.mark.asyncio
+    async def test_process_sync_file_not_supported(self, syncutils: SyncUtils):
+        file = SyncFile(
+            id=str(uuid4()),
+            name="test_file.asldkjfalsdkjf",
+            is_folder=False,
+            last_modified=datetime.now().strftime(syncutils.sync_cloud.datetime_format),
+            mime_type="txt",
+            web_view_link="",
+            notification_id=uuid4(),  #
+        )
+        brain_id = uuid4()
+        sync_user = SyncsUser(
+            id=1,
+            user_id=uuid4(),
+            name="c8xfz3g566b8xa1ajiesdh",
+            provider="mock",
+            credentials={},
+            state={},
+            additional_data={},
+        )
+        sync_active = SyncsActive(
+            id=1,
+            name="test",
+            syncs_user_id=1,
+            user_id=sync_user.user_id,
+            settings={},
+            last_synced=str(datetime.now() - timedelta(hours=5)),
+            sync_interval_minutes=1,
+            brain_id=brain_id,
+        )
+
+        with pytest.raises(ValueError):
+            await syncutils.process_sync_file(
+                file=file,
+                previous_file=None,
+                current_user=sync_user,
+                sync_active=sync_active,
+            )
+
+    @pytest.mark.asyncio
+    async def test_process_sync_file_noprev(
+        self, setup_syncs_data, syncutils: SyncUtils, sync_file: SyncFile
+    ):
+        (sync_user, sync_active) = setup_syncs_data
+        await syncutils.process_sync_file(
+            file=sync_file,
+            previous_file=None,
+            current_user=sync_user,
+            sync_active=sync_active,
+        )
+
+        # Check notification inserted
+        assert (
+            sync_file.notification_id
+            in syncutils.notification_service.repository.received  # type: ignore
+        )

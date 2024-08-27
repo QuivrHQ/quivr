@@ -111,3 +111,13 @@ class SyncFileInterface(ABC):
     @abstractmethod
     def delete_sync_file(self, sync_file_id: int):
         pass
+
+    @abstractmethod
+    def update_or_create_sync_file(
+        self,
+        file: SyncFile,
+        sync_active: SyncsActive,
+        previous_file: DBSyncFile | None,
+        supported: bool,
+    ) -> DBSyncFile | None:
+        pass
