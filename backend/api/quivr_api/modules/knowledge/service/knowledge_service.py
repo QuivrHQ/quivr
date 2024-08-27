@@ -40,55 +40,19 @@ class KnowledgeService(BaseService[KnowledgeRepository]):
             metadata_=knowledge_to_add.metadata,  # type: ignore
         )
 
-        inserted_knowledge_db_instance = await self.repository.insert_knowledge(
+        knowledge_db = await self.repository.insert_knowledge(
             knowledge, brain_id=knowledge_to_add.brain_id
         )
 
-        assert inserted_knowledge_db_instance.id, "Knowledge ID not generated"
-
-        inserted_knowledge = Knowledge(
-            id=inserted_knowledge_db_instance.id,
-            file_name=inserted_knowledge_db_instance.file_name,
-            url=inserted_knowledge_db_instance.url,
-            mime_type=inserted_knowledge_db_instance.mime_type,
-            status=KnowledgeStatus(inserted_knowledge_db_instance.status),
-            source=inserted_knowledge_db_instance.source,
-            source_link=inserted_knowledge_db_instance.source_link,
-            file_size=inserted_knowledge_db_instance.file_size,
-            file_sha1=inserted_knowledge_db_instance.file_sha1,
-            updated_at=inserted_knowledge_db_instance.updated_at,
-            created_at=inserted_knowledge_db_instance.created_at,
-            metadata=inserted_knowledge_db_instance.metadata_,  # type: ignore
-        )
+        assert knowledge_db.id, "Knowledge ID not generated"
+        inserted_knowledge = await knowledge_db.to_dto()
         return inserted_knowledge
 
     async def get_all_knowledge(self, brain_id: UUID) -> List[Knowledge]:
         brain = await self.repository.get_brain_by_id(brain_id)
 
         all_knowledges = await brain.awaitable_attrs.knowledges
-
-        knowledges = [
-            Knowledge(
-                id=knowledge.id,  # type: ignore
-                file_name=knowledge.file_name,
-                url=knowledge.url,
-                mime_type=knowledge.mime_type,
-                status=KnowledgeStatus(knowledge.status),
-                source=knowledge.source,
-                source_link=knowledge.source_link,
-                file_size=knowledge.file_size
-                if knowledge.file_size
-                else 0,  # FIXME: Should not be optional @chloedia
-                file_sha1=knowledge.file_sha1
-                if knowledge.file_sha1
-                else "",  # FIXME: Should not be optional @chloedia
-                updated_at=knowledge.updated_at,
-                created_at=knowledge.created_at,
-                metadata=knowledge.metadata_,  # type: ignore
-                brain_ids=[brain.brain_id for brain in await knowledge.brains],
-            )
-            for knowledge in all_knowledges
-        ]
+        knowledges = [await knowledge.to_dto() for knowledge in all_knowledges]
 
         return knowledges
 
@@ -128,29 +92,9 @@ class KnowledgeService(BaseService[KnowledgeRepository]):
         inserted_knowledge_db_instance = await self.repository.get_knowledge_by_id(
             knowledge_id
         )
-
-        brains = await inserted_knowledge_db_instance.brains
-
         assert inserted_knowledge_db_instance.id, "Knowledge ID not generated"
-
-        inserted_knowledge = Knowledge(
-            id=inserted_knowledge_db_instance.id,
-            file_name=inserted_knowledge_db_instance.file_name,
-            url=inserted_knowledge_db_instance.url,
-            mime_type=inserted_knowledge_db_instance.mime_type,
-            status=KnowledgeStatus(inserted_knowledge_db_instance.status),
-            source=inserted_knowledge_db_instance.source,
-            source_link=inserted_knowledge_db_instance.source_link,
-            file_size=inserted_knowledge_db_instance.file_size,
-            file_sha1=inserted_knowledge_db_instance.file_sha1
-            if inserted_knowledge_db_instance.file_sha1
-            else None,  # FIXME: Should not be optional @chloedia
-            updated_at=inserted_knowledge_db_instance.updated_at,
-            created_at=inserted_knowledge_db_instance.created_at,
-            metadata=inserted_knowledge_db_instance.metadata_,  # type: ignore
-            brain_ids=[brain.brain_id for brain in brains],
-        )
-        return inserted_knowledge
+        km = await inserted_knowledge_db_instance.to_dto()
+        return km
 
     async def remove_brain_all_knowledge(self, brain_id: UUID) -> None:
         await self.repository.remove_brain_all_knowledge(brain_id)

@@ -37,7 +37,6 @@ def build_file(
         tmp_file.write(file_data)
         tmp_file.flush()
         file_sha1 = compute_sha1(file_data)
-        print(f"\n\n file sha1 : {file_sha1}")
 
         file_instance = File(
             knowledge_id=knowledge_id,
