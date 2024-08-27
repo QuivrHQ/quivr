@@ -35,7 +35,7 @@ export const QuivrButton = ({
 
   const useIconColor = () => {
     if ((hovered && !disabled) || (important && !disabled)) {
-      return "white";
+      return isDarkMode ? "black" : "white";
     }
     if (disabled) {
       return "grey";
