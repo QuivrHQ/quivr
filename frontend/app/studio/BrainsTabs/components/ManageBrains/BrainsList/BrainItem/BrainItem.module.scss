@@ -47,8 +47,10 @@
       overflow: hidden;
 
       .brain_snippet {
-        width: 24px;
-        height: 24px;
+        min-width: 24px;
+        min-height: 24px;
+        max-width: 24px;
+        max-height: 24px;
         border-radius: Radius.$normal;
         display: flex;
         justify-content: center;
