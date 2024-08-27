@@ -37,20 +37,32 @@ export const Icon = ({
     }
   }, [hovered, handleHover]);
 
+  const handleMouseEnter = (event: React.MouseEvent) => {
+    if (handleHover) {
+      event.stopPropagation();
+      event.nativeEvent.stopImmediatePropagation();
+      setIconHovered(true);
+    }
+  };
+
+  const handleMouseLeave = () => {
+    if (handleHover) {
+      setIconHovered(false);
+    }
+  };
+
   return (
     <IconComponent
       className={`
-      ${classname} 
-      ${styles[size]} 
-      ${styles[color]}
-      ${disabled ? styles.disabled : ""}
-      ${iconHovered || hovered ? styles.hovered : ""}
+        ${classname} 
+        ${styles[size]} 
+        ${styles[color]}
+        ${disabled ? styles.disabled : ""}
+        ${iconHovered || hovered ? styles.hovered : ""}
       `}
-      onMouseEnter={() => handleHover && setIconHovered(true)}
-      onMouseLeave={() => handleHover && setIconHovered(false)}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
       onClick={onClick}
     />
   );
 };
-
-export default Icon;

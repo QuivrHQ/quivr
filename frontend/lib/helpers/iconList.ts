@@ -104,7 +104,7 @@ import {
   RiHashtag,
   RiNotification2Line,
 } from "react-icons/ri";
-import { SlOptions } from "react-icons/sl";
+import { SlOptionsVertical } from "react-icons/sl";
 import { TbNetwork, TbRobot } from "react-icons/tb";
 import { VscGraph } from "react-icons/vsc";
 
@@ -175,7 +175,7 @@ export const iconList: { [name: string]: IconType } = {
   notifications: RiNotification2Line,
   office: HiBuildingOffice,
   odt: BsFiletypeDocx,
-  options: SlOptions,
+  options: SlOptionsVertical,
   paragraph: BsTextParagraph,
   pptx: BsFiletypePptx,
   prompt: FaRegKeyboard,
