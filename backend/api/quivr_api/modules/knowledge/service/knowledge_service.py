@@ -128,6 +128,8 @@ class KnowledgeService(BaseService[KnowledgeRepository]):
             f"All knowledge in brain {brain_id} removed successfully from table"
         )
 
+    # TODO: REDO THIS MESS !!!!
+    # REMOVE ALL SYNC TABLES and start from scratch
     async def update_or_create_knowledge_sync(
         self,
         brain_id: UUID,
