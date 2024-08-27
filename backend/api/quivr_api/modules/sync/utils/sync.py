@@ -179,7 +179,7 @@ class GoogleDriveSync(BaseSync):
                     service.files()
                     .get(
                         fileId=file_id,
-                        fields="id, name, mimeType, modifiedTime, webViewLink",
+                        fields="id, name, mimeType, modifiedTime, webViewLink, size",
                     )
                     .execute()
                 )
@@ -194,6 +194,7 @@ class GoogleDriveSync(BaseSync):
                         last_modified=result["modifiedTime"],
                         mime_type=result["mimeType"],
                         web_view_link=result["webViewLink"],
+                        size=result.get("size", None),
                     )
                 )
 
@@ -247,7 +248,7 @@ class GoogleDriveSync(BaseSync):
                     .list(
                         q=query,
                         pageSize=100,
-                        fields="nextPageToken, files(id, name, mimeType, modifiedTime, webViewLink)",
+                        fields="nextPageToken, files(id, name, mimeType, modifiedTime, webViewLink, size)",
                         pageToken=page_token,
                     )
                     .execute()
@@ -269,6 +270,7 @@ class GoogleDriveSync(BaseSync):
                             last_modified=item["modifiedTime"],
                             mime_type=item["mimeType"],
                             web_view_link=item["webViewLink"],
+                            size=item.get("size", None),
                         )
                     )
 
@@ -442,6 +444,7 @@ class AzureDriveSync(BaseSync):
                 last_modified=item.get("lastModifiedDateTime"),
                 mime_type=item.get("file", {}).get("mimeType", "folder"),
                 web_view_link=item.get("webUrl"),
+                size=item.get("size", None),
             )
             files.append(file_data)
 
@@ -520,6 +523,7 @@ class AzureDriveSync(BaseSync):
                     last_modified=result.get("lastModifiedDateTime"),
                     mime_type=result.get("file", {}).get("mimeType", "folder"),
                     web_view_link=result.get("webUrl"),
+                    size=result.get("size", None),
                 )
             )
 
@@ -709,6 +713,7 @@ class DropboxSync(BaseSync):
                             metadata.path_lower.split(".")[-1] if not is_folder else ""
                         ),
                         web_view_link=shared_link,
+                        size=metadata.size,
                     )
 
                     files.append(file_info)
@@ -1047,6 +1052,7 @@ class GitHubSync(BaseSync):
                     last_modified=datetime.now().strftime(self.datetime_format),
                     mime_type=result.get("type"),
                     web_view_link=result.get("html_url"),
+                    size=result.get("size", None),
                 )
             )
 
@@ -1120,6 +1126,7 @@ class GitHubSync(BaseSync):
                 last_modified=str(item.get("updated_at")),
                 mime_type="repository",
                 web_view_link=item.get("html_url"),
+                size=item.get("size", None),
             )
             repos.append(repo_data)
 
@@ -1166,6 +1173,7 @@ class GitHubSync(BaseSync):
                 last_modified=str(item.get("updated_at")),
                 mime_type=item.get("type"),
                 web_view_link=item.get("html_url"),
+                size=item.get("size", None),
             )
             files.append(file_data)
 

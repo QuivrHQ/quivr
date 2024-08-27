@@ -122,7 +122,7 @@ async def upload_file(
         file_size=uploadFile.size,
         file_sha1=None,
     )
-    knowledge = await knowledge_service.add_knowledge(knowledge_to_add)  # type: ignore
+    knowledge = await knowledge_service.insert_knowledge(knowledge_to_add)  # type: ignore
 
     celery.send_task(
         "process_file_task",

@@ -1,4 +1,3 @@
-import hashlib
 import io
 import os
 from datetime import datetime, timezone
@@ -129,22 +128,18 @@ class SyncUtils:
         logger.debug(f"Fetch sync file response: {file_response}")
         file_name = str(file_response["file_name"])
         raw_data = file_response["content"]
-        assert isinstance(raw_data, io.BytesIO)
-        file_sha1 = hashlib.sha1(raw_data.read()).hexdigest()
         file_data = (
             io.BufferedReader(raw_data)  # type: ignore
             if isinstance(raw_data, io.BytesIO)
             else io.BufferedReader(raw_data.encode("utf-8"))  # type: ignore
         )
-
         extension = os.path.splitext(file_name)[-1].lower()
         dfile = DownloadedSyncFile(
             file_name=file_name,
             file_data=file_data,
-            file_sha1=file_sha1,
             extension=extension,
         )
-        logger.debug(f"Successfully downloded sync file : {dfile}")
+        logger.debug(f"Successfully downloaded sync file : {dfile}")
         return dfile
 
     async def process_sync_file(
@@ -172,24 +167,29 @@ class SyncUtils:
         ]:
             raise ValueError(f"Incompatible file extension for {downloaded_file}")
 
-        # TODO: Check workflow is correct
-        # FIXME(@aminediro, @chloedia): Checks should use file_sha1 in database
-        file_exists = check_file_exists(
-            str(brain_id),
-            downloaded_file.file_sha1,
+        # FIXME : Check workflow is correct
+        # FIXME: if prev_file not None
+        knowledge_to_add = CreateKnowledgeProperties(
+            brain_id=brain_id,
+            file_name=file.name,
+            mime_type=downloaded_file.extension,
+            source=integration,
+            source_link=integration_link,
+            file_size=file.size if file.size else 0,
+            file_sha1=downloaded_file.file_sha1(),
         )
-        # if file_exists:
-        #     self.brain_vectors.delete_file_from_brain(
-        #             brain_id, downloaded_file.file_name
-        #         )
-        # FIXME(@aminediro):  check_user_limits()
-        # Upload File to S3 Storage
+        added_knowledge = await self.knowledge_service.insert_knowledge(
+            knowledge_to_add
+        )
+        # TODO:
+        # Based on file.sha1 do we send fle for parsing?
+        # We update the knowledge status in the table so the worker
+
         response = await upload_file_storage(
             downloaded_file.file_data,
             storage_path,
-            upsert=file_exists,
+            upsert=check_file_exists(str(brain_id), downloaded_file.file_name),
         )
-
         assert response, f"Error uploading {downloaded_file} to  {storage_path}"
         self.notification_service.update_notification_by_id(
             file.notification_id,
@@ -198,15 +198,7 @@ class SyncUtils:
                 description="File downloaded successfully",
             ),
         )
-        knowledge_to_add = CreateKnowledgeProperties(
-            brain_id=brain_id,
-            file_name=file.name,
-            mime_type=downloaded_file.extension,
-            source=integration,
-            source_link=integration_link,
-        )
 
-        added_knowledge = await self.knowledge_service.add_knowledge(knowledge_to_add)
         # Send file for processing
         celery.send_task(
             "process_file_task",

@@ -24,7 +24,7 @@ class KnowledgeService(BaseService[KnowledgeRepository]):
         self.repository = repository
         self.storage = Storage()
 
-    async def add_knowledge(
+    async def insert_knowledge(
         self,
         knowledge_to_add: CreateKnowledgeProperties,  # FIXME: (later) @Amine brain id should not be in CreateKnowledgeProperties but since storage is brain_id/file_name
     ) -> Knowledge:
@@ -49,9 +49,13 @@ class KnowledgeService(BaseService[KnowledgeRepository]):
             # TODO: Insert in database base on local
             source_link = f"s3://quivr/{knowledge_to_add.brain_id}/{inserted_knowledge_db_instance.id}"
 
-        inserted_knowledge = await self.repository.update_source_link_knowledge(
-            knowledge_id=inserted_knowledge_db_instance.id, source_link=source_link
-        )
+            inserted_knowledge_db_instance = (
+                await self.repository.update_source_link_knowledge(
+                    knowledge_id=inserted_knowledge_db_instance.id,
+                    source_link=source_link,
+                )
+            )
+            assert inserted_knowledge_db_instance.id, "Knowledge ID not generated"
 
         inserted_knowledge = Knowledge(
             id=inserted_knowledge_db_instance.id,
