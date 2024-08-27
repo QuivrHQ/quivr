@@ -24,6 +24,20 @@ class KnowledgeService(BaseService[KnowledgeRepository]):
         self.repository = repository
         self.storage = Storage()
 
+    async def get_knowledge_sync(self, sync_id: int) -> Knowledge:
+        km = await self.repository.get_knowledge_by_sync_id(sync_id)
+        assert km.id, "Knowledge ID not generated"
+        km = await km.to_dto()
+        return km
+
+    async def get_knowledge(self, knowledge_id: UUID) -> Knowledge:
+        inserted_knowledge_db_instance = await self.repository.get_knowledge_by_id(
+            knowledge_id
+        )
+        assert inserted_knowledge_db_instance.id, "Knowledge ID not generated"
+        km = await inserted_knowledge_db_instance.to_dto()
+        return km
+
     async def insert_knowledge(
         self,
         knowledge_to_add: CreateKnowledgeProperties,  # FIXME: (later) @Amine brain id should not be in CreateKnowledgeProperties but since storage is brain_id/file_name
@@ -88,21 +102,6 @@ class KnowledgeService(BaseService[KnowledgeRepository]):
                 f"File {knowledge_id} already exists maybe under another file_name"
             )
 
-    async def get_knowledge(self, knowledge_id: UUID) -> Knowledge:
-        inserted_knowledge_db_instance = await self.repository.get_knowledge_by_id(
-            knowledge_id
-        )
-        assert inserted_knowledge_db_instance.id, "Knowledge ID not generated"
-        km = await inserted_knowledge_db_instance.to_dto()
-        return km
-
-    async def remove_brain_all_knowledge(self, brain_id: UUID) -> None:
-        await self.repository.remove_brain_all_knowledge(brain_id)
-
-        logger.info(
-            f"All knowledge in brain {brain_id} removed successfully from table"
-        )
-
     async def remove_knowledge(
         self,
         brain_id: UUID,
@@ -116,3 +115,10 @@ class KnowledgeService(BaseService[KnowledgeRepository]):
             logger.error(f"Error while removing file {file_name_with_brain_id}: {e}")
 
         return message
+
+    async def remove_brain_all_knowledge(self, brain_id: UUID) -> None:
+        await self.repository.remove_brain_all_knowledge(brain_id)
+
+        logger.info(
+            f"All knowledge in brain {brain_id} removed successfully from table"
+        )

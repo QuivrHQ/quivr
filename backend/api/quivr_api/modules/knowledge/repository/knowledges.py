@@ -5,7 +5,7 @@ from asyncpg.exceptions import UniqueViolationError
 from fastapi import HTTPException
 from quivr_core.models import KnowledgeStatus
 from sqlalchemy.exc import IntegrityError
-from sqlmodel import select
+from sqlmodel import select, text
 from sqlmodel.ext.asyncio.session import AsyncSession
 
 from quivr_api.logger import get_logger
@@ -76,6 +76,18 @@ class KnowledgeRepository(BaseRepository):
             status="deleted",
             knowledge_id=knowledge_id,
         )
+
+    async def get_knowledge_by_sync_id(self, sync_id: int) -> KnowledgeDB:
+        query = select(KnowledgeDB).where(
+            text(f"metadata->>'sync_file_id' =  {sync_id}")
+        )
+        result = await self.session.exec(query)
+        knowledge = result.first()
+
+        if not knowledge:
+            raise HTTPException(404, "Knowledge not found")
+
+        return knowledge
 
     async def get_knowledge_by_id(self, knowledge_id: UUID) -> KnowledgeDB:
         query = select(KnowledgeDB).where(KnowledgeDB.id == knowledge_id)

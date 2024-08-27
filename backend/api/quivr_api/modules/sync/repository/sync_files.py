@@ -91,10 +91,10 @@ class SyncFilesRepository(SyncFileInterface):
         sync_active: SyncsActive,
         previous_file: DBSyncFile | None,
         supported: bool,
-    ):
+    ) -> DBSyncFile | None:
         if previous_file:
             logger.debug(f"Upserting file {previous_file} in database.")
-            self.update_sync_file(
+            sync_file = self.update_sync_file(
                 previous_file.id,
                 SyncFileUpdateInput(
                     last_modified=file.last_modified,
@@ -102,7 +102,8 @@ class SyncFilesRepository(SyncFileInterface):
                 ),
             )
         else:
-            self.create_sync_file(
+            logger.debug("Creating new file in database.")
+            sync_file = self.create_sync_file(
                 SyncFileInput(
                     path=file.name,
                     syncs_active_id=sync_active.id,
@@ -111,6 +112,7 @@ class SyncFilesRepository(SyncFileInterface):
                     supported=supported,
                 )
             )
+        return sync_file
 
     def delete_sync_file(self, sync_file_id: int):
         """
