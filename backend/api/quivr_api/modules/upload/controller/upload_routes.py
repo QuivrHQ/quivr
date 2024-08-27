@@ -1,4 +1,3 @@
-import hashlib
 import io
 import os
 from typing import Annotated, Optional
@@ -31,7 +30,9 @@ from quivr_api.modules.notification.entity.notification import NotificationsStat
 from quivr_api.modules.notification.service.notification_service import (
     NotificationService,
 )
-from quivr_api.modules.upload.service.upload_file import upload_file_storage
+from quivr_api.modules.upload.service.upload_file import (
+    upload_file_storage,
+)
 from quivr_api.modules.user.entity.user_identity import UserIdentity
 from quivr_api.modules.user.service.user_usage import UserUsage
 from quivr_api.utils.byte_size import convert_bytes
@@ -92,24 +93,11 @@ async def upload_file(
     )
 
     filename_with_brain_id = str(brain_id) + "/" + str(uploadFile.filename)
+
+    buff_reader = io.BufferedReader(uploadFile.file)  # type: ignore
     try:
-        # NOTE(@aminediro) : This should redone. The supabase storage client interface is badly designed
-        # It specifically checks for BufferedReader | bytes before sending
-        # TODO: We bypass this to write to S3 Storage directly
-        buff_reader = io.BufferedReader(uploadFile.file)  # type: ignore
         await upload_file_storage(buff_reader, filename_with_brain_id)
-    except FileExistsError:
-        notification_service.update_notification_by_id(
-            upload_notification.id if upload_notification else None,
-            NotificationUpdatableProperties(
-                status=NotificationsStatusEnum.ERROR,
-                description=f"File {uploadFile.filename} already exists in storage.",
-            ),
-        )
-        raise HTTPException(
-            status_code=403,
-            detail=f"File {uploadFile.filename} already exists in storage.",
-        )
+
     except Exception as e:
         logger.exception(f"Exception in upload_route {e}")
         notification_service.update_notification_by_id(
@@ -122,7 +110,6 @@ async def upload_file(
         raise HTTPException(
             status_code=500, detail=f"Failed to upload file to storage. {e}"
         )
-    file_content = await uploadFile.read()
     # FIXME: @chloedia check if these are the correct properties
     knowledge_to_add = CreateKnowledgeProperties(
         brain_id=brain_id,
@@ -133,7 +120,7 @@ async def upload_file(
         source=integration if integration else "local",
         source_link=integration_link,  # FIXME: Should return the s3 link @chloedia
         file_size=uploadFile.size,
-        file_sha1=hashlib.sha1(file_content).hexdigest(),
+        file_sha1=None,
     )
     knowledge = await knowledge_service.insert_knowledge(knowledge_to_add)  # type: ignore
 
