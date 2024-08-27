@@ -8,6 +8,7 @@ from quivr_api.celery_config import celery
 from quivr_api.logger import get_logger
 from quivr_api.modules.brain.repository.brains_vectors import BrainsVectors
 from quivr_api.modules.knowledge.dto.inputs import CreateKnowledgeProperties
+from quivr_api.modules.knowledge.entity.knowledge import Knowledge
 from quivr_api.modules.knowledge.repository.storage import Storage
 from quivr_api.modules.knowledge.service.knowledge_service import KnowledgeService
 from quivr_api.modules.notification.dto.inputs import (
@@ -142,6 +143,33 @@ class SyncUtils:
         logger.debug(f"Successfully downloaded sync file : {dfile}")
         return dfile
 
+    async def create_or_update_knowledge(
+        self,
+        brain_id: UUID,
+        file: SyncFile,
+        downloaded_file: DownloadedSyncFile,
+        integration: str,
+        integration_link: str,
+        create: bool = True,
+    ) -> Knowledge:
+        # TODO:
+        # Based on file.sha1 do we send fle for parsing?
+        # We update the knowledge status in the table so the worker
+        # FIXME: if prev_file not None, then we should update it NOT
+        knowledge_to_add = CreateKnowledgeProperties(
+            brain_id=brain_id,
+            file_name=file.name,
+            mime_type=downloaded_file.extension,
+            source=integration,
+            source_link=integration_link,
+            file_size=file.size if file.size else 0,
+            file_sha1=downloaded_file.file_sha1(),
+        )
+        added_knowledge = await self.knowledge_service.insert_knowledge(
+            knowledge_to_add
+        )
+        return added_knowledge
+
     async def process_sync_file(
         self,
         file: SyncFile,
@@ -153,7 +181,7 @@ class SyncUtils:
         brain_id = sync_active.brain_id
         integration, integration_link = self.sync_cloud.name, file.web_view_link
         downloaded_file = await self.download_file(file, current_user.credentials)
-        storage_path = str(brain_id) + "/" + downloaded_file.file_name
+        storage_path = f"{brain_id}/{downloaded_file.file_name}"
 
         if downloaded_file.extension not in [
             ".pdf",
@@ -167,23 +195,14 @@ class SyncUtils:
         ]:
             raise ValueError(f"Incompatible file extension for {downloaded_file}")
 
-        # FIXME : Check workflow is correct
-        # FIXME: if prev_file not None
-        knowledge_to_add = CreateKnowledgeProperties(
+        knowledge = await self.create_or_update_knowledge(
             brain_id=brain_id,
-            file_name=file.name,
-            mime_type=downloaded_file.extension,
-            source=integration,
-            source_link=integration_link,
-            file_size=file.size if file.size else 0,
-            file_sha1=downloaded_file.file_sha1(),
+            file=file,
+            downloaded_file=downloaded_file,
+            integration=integration,
+            integration_link=integration_link,
+            create=previous_file is None,
         )
-        added_knowledge = await self.knowledge_service.insert_knowledge(
-            knowledge_to_add
-        )
-        # TODO:
-        # Based on file.sha1 do we send fle for parsing?
-        # We update the knowledge status in the table so the worker
 
         response = await upload_file_storage(
             downloaded_file.file_data,
@@ -198,13 +217,12 @@ class SyncUtils:
                 description="File downloaded successfully",
             ),
         )
-
         # Send file for processing
         celery.send_task(
             "process_file_task",
             kwargs={
                 "brain_id": brain_id,
-                "knowledge_id": added_knowledge.id,
+                "knowledge_id": knowledge.id,
                 "file_name": storage_path,
                 "file_original_name": file.name,
                 "source": integration,
@@ -267,7 +285,8 @@ class SyncUtils:
                     self.sync_cloud.name,
                     e,
                 )
-                # NOTE: Supported is  True
+                # TODO: this process_sync_file could fail for a LOT of reason redo this logic
+                # File isn't supported so we set it as so ?
                 self.sync_files_repo.update_or_create_sync_file(
                     file=file,
                     sync_active=sync_active,

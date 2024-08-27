@@ -11,7 +11,7 @@ from sqlmodel import Field, Relationship, SQLModel
 from quivr_api.modules.knowledge.entity.knowledge_brain import KnowledgeBrain
 
 
-class Knowledge(AsyncAttrs, BaseModel):
+class Knowledge(BaseModel):
     id: UUID
     file_name: Optional[str] = None
     url: Optional[str] = None
@@ -24,6 +24,7 @@ class Knowledge(AsyncAttrs, BaseModel):
     updated_at: Optional[datetime] = None
     created_at: Optional[datetime] = None
     metadata: Optional[Dict[str, str]] = None
+    brain_ids: list[UUID]
 
     def dict(self, *args, **kwargs):
         knowledge_dict = super().dict(*args, **kwargs)
@@ -31,7 +32,7 @@ class Knowledge(AsyncAttrs, BaseModel):
         return knowledge_dict
 
 
-class KnowledgeDB(SQLModel, table=True):
+class KnowledgeDB(AsyncAttrs, SQLModel, table=True):
     __tablename__ = "knowledge"  # type: ignore
 
     id: UUID | None = Field(

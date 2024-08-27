@@ -45,17 +45,6 @@ class KnowledgeService(BaseService[KnowledgeRepository]):
         )
 
         assert inserted_knowledge_db_instance.id, "Knowledge ID not generated"
-        if inserted_knowledge_db_instance.source == "local":
-            # TODO: Insert in database base on local
-            source_link = f"s3://quivr/{knowledge_to_add.brain_id}/{inserted_knowledge_db_instance.id}"
-
-            inserted_knowledge_db_instance = (
-                await self.repository.update_source_link_knowledge(
-                    knowledge_id=inserted_knowledge_db_instance.id,
-                    source_link=source_link,
-                )
-            )
-            assert inserted_knowledge_db_instance.id, "Knowledge ID not generated"
 
         inserted_knowledge = Knowledge(
             id=inserted_knowledge_db_instance.id,
@@ -96,6 +85,7 @@ class KnowledgeService(BaseService[KnowledgeRepository]):
                 updated_at=knowledge.updated_at,
                 created_at=knowledge.created_at,
                 metadata=knowledge.metadata_,  # type: ignore
+                brain_ids=[brain.brain_id for brain in await knowledge.brains],
             )
             for knowledge in all_knowledges
         ]
@@ -139,6 +129,8 @@ class KnowledgeService(BaseService[KnowledgeRepository]):
             knowledge_id
         )
 
+        brains = await inserted_knowledge_db_instance.brains
+
         assert inserted_knowledge_db_instance.id, "Knowledge ID not generated"
 
         inserted_knowledge = Knowledge(
@@ -152,10 +144,11 @@ class KnowledgeService(BaseService[KnowledgeRepository]):
             file_size=inserted_knowledge_db_instance.file_size,
             file_sha1=inserted_knowledge_db_instance.file_sha1
             if inserted_knowledge_db_instance.file_sha1
-            else "",  # FIXME: Should not be optional @chloedia
+            else None,  # FIXME: Should not be optional @chloedia
             updated_at=inserted_knowledge_db_instance.updated_at,
             created_at=inserted_knowledge_db_instance.created_at,
             metadata=inserted_knowledge_db_instance.metadata_,  # type: ignore
+            brain_ids=[brain.brain_id for brain in brains],
         )
         return inserted_knowledge
 

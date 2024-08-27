@@ -36,6 +36,14 @@ async def process_uploaded_file(
         return True
     file_data = supabase_client.storage.from_(bucket_name).download(file_name)
 
+    knowledge = await knowledge_service.get_knowledge(knowledge_id=knowledge_id)
+    # TODO: Have the whole logic on do we process file or not
+    # Don't process a file that already exists (file_sha1 in the table with STATUS=UPLOADED)
+    #
+    # - Check on file_sha1 and status
+    # - sha1 should be updated at the end
+    #
+
     with build_file(file_data, knowledge_id, file_name) as file_instance:
         try:
             await knowledge_service.update_file_sha1_knowledge(
