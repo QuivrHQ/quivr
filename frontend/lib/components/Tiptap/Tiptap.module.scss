@@ -1,0 +1,65 @@
+@use "styles/Spacings.module.scss";
+@use "styles/Typography.module.scss";
+@use "styles/Radius.module.scss";
+@use "styles/ScreenSizes.module.scss";
+
+.editor_wrapper {
+  .content_wrapper {
+    padding: Spacings.$spacing07;
+    color: var(--text-3);
+    max-width: ScreenSizes.$small;
+    margin: 0 auto;
+
+    h1 {
+      @include Typography.Big;
+      font-weight: 700;
+    }
+
+    h2 {
+      @include Typography.H1;
+    }
+
+    h3 {
+      @include Typography.H2;
+    }
+
+    p {
+      margin-bottom: Spacings.$spacing02;
+    }
+
+    ul > li {
+      list-style: disc;
+    }
+
+    quote {
+    }
+
+    code {
+      display: block;
+      margin: Spacings.$spacing05 0;
+      padding: Spacings.$spacing04 Spacings.$spacing05;
+      background-color: var(--background-2);
+      border-radius: Radius.$normal;
+    }
+  }
+
+  .toolbar {
+    display: flex;
+  }
+
+  .floating_menu_wrapper {
+    background-color: var(--background-3);
+    padding: Spacings.$spacing02 Spacings.$spacing04;
+    position: relative;
+
+    &::after {
+      content: "";
+      position: absolute;
+      width: 32px;
+      background-color: red;
+      right: 100%;
+      top: 0;
+      bottom: 0;
+    }
+  }
+}
