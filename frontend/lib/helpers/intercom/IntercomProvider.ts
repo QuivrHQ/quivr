@@ -27,7 +27,6 @@ export const IntercomProvider = ({
     if (isMobile && pathname?.includes("/chat")) {
       shutdownIntercom();
     } else {
-      console.info("load");
       loadIntercom();
       bootIntercom(userData?.email ?? "");
     }
