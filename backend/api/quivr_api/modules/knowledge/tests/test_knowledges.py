@@ -179,7 +179,7 @@ async def test_remove_all_knowledges_from_brain(
 
     # response = storage.list(path=f"{brain.brain_id}")
     # assert response == []
-    # FIXME raise an error I don't understand @amine  UnboundLocalError: cannot access local variable 'response' where it is not associated with a value
+    # FIXME @aminediro &chloedia raise an error when trying to interact with storage UnboundLocalError: cannot access local variable 'response' where it is not associated with a value
 
 
 @pytest.mark.asyncio
