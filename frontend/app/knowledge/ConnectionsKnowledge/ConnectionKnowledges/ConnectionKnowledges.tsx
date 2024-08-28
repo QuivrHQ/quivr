@@ -3,7 +3,7 @@ import { useState } from "react";
 
 import { SyncsByProvider } from "@/lib/api/sync/types";
 import { useSync } from "@/lib/api/sync/useSync";
-import Icon from "@/lib/components/ui/Icon/Icon";
+import { Icon } from "@/lib/components/ui/Icon/Icon";
 
 import styles from "./ConnectionKnowledge.module.scss";
 
@@ -11,7 +11,7 @@ interface ConnectionKnowledgeProps {
   providerGroup: SyncsByProvider;
 }
 
-const ConnectionKnowledge = ({
+const ConnectionKnowledges = ({
   providerGroup,
 }: ConnectionKnowledgeProps): JSX.Element => {
   const [folded, setFolded] = useState(true);
@@ -54,4 +54,4 @@ const ConnectionKnowledge = ({
   );
 };
 
-export default ConnectionKnowledge;
+export default ConnectionKnowledges;

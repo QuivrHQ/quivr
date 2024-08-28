@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { Provider, Sync, SyncsByProvider } from "@/lib/api/sync/types";
 import { useSync } from "@/lib/api/sync/useSync";
 
-import ConnectionKnowledge from "./ConnectionKnowledges/ConnectionKnowledges";
+import ConnectionKnowledges from "./ConnectionKnowledges/ConnectionKnowledges";
 import styles from "./ConnectionsKnowledge.module.scss";
 
 const ConnectionsKnowledges = (): JSX.Element => {
@@ -43,7 +43,7 @@ const ConnectionsKnowledges = (): JSX.Element => {
     <div className={styles.connections_knowledge_container}>
       {syncsByProvider.map((providerGroup) => (
         <div key={providerGroup.provider}>
-          <ConnectionKnowledge providerGroup={providerGroup} />
+          <ConnectionKnowledges providerGroup={providerGroup} />
         </div>
       ))}
     </div>
