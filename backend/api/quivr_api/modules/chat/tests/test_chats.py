@@ -20,6 +20,9 @@ pg_database_base_url = "postgres:postgres@localhost:54322/postgres"
 
 TestData = Tuple[Brain, User, List[Chat], List[ChatHistory]]
 
+N_SEED_CHATS = 3
+n_seed_chats_history = 3
+
 
 @pytest.fixture(scope="session")
 def event_loop(request: pytest.FixtureRequest):
@@ -114,7 +117,7 @@ async def test_get_user_chats(session: AsyncSession, test_data: TestData):
     repo = ChatRepository(session)
     assert local_user.id is not None
     query_chats = await repo.get_user_chats(local_user.id)
-    assert len(query_chats) == len(chats)
+    assert len(query_chats) == len(chats) + N_SEED_CHATS
 
 
 @pytest.mark.asyncio
