@@ -62,7 +62,7 @@ class KnowledgeService(BaseService[KnowledgeRepository]):
         inserted_knowledge = await knowledge_db.to_dto()
         return inserted_knowledge
 
-    async def get_all_knowledge(self, brain_id: UUID) -> List[Knowledge]:
+    async def get_all_knowledge_in_brain(self, brain_id: UUID) -> List[Knowledge]:
         brain = await self.repository.get_brain_by_id(brain_id)
 
         all_knowledges = await brain.awaitable_attrs.knowledges
@@ -116,8 +116,8 @@ class KnowledgeService(BaseService[KnowledgeRepository]):
 
         return message
 
-    async def remove_brain_all_knowledge(self, brain_id: UUID) -> None:
-        await self.repository.remove_brain_all_knowledge(brain_id)
+    async def remove_all_knowledges_from_brain(self, brain_id: UUID) -> None:
+        await self.repository.remove_all_knowledges_from_brain(brain_id)
 
         logger.info(
             f"All knowledge in brain {brain_id} removed successfully from table"
