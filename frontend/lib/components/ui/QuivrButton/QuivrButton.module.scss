@@ -35,6 +35,12 @@
     display: none;
   }
 
+  @media (max-width: ScreenSizes.$small) {
+    padding-inline: Spacings.$spacing03;
+    padding-block: Spacings.$spacing01;
+    font-size: Typography.$tiny;
+  }
+
   &.small {
     padding-inline: Spacings.$spacing03;
     padding-block: Spacings.$spacing01;
