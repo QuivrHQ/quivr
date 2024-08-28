@@ -310,7 +310,9 @@ class TestSyncUtils:
         assert dbfiles[0].supported
 
         # Check knowledge created
-        all_km = await syncutils.knowledge_service.get_all_knowledge(brain_1.brain_id)
+        all_km = await syncutils.knowledge_service.get_all_knowledge_in_brain(
+            brain_1.brain_id
+        )
         assert len(all_km) == 1
         created_km = all_km[0]
         assert created_km.file_name == sync_file.name
@@ -405,7 +407,9 @@ class TestSyncUtils:
         assert dbfiles[0].supported
 
         # Check prev file was deleted and replaced with the new
-        all_km = await syncutils.knowledge_service.get_all_knowledge(brain_1.brain_id)
+        all_km = await syncutils.knowledge_service.get_all_knowledge_in_brain(
+            brain_1.brain_id
+        )
         assert len(all_km) == 1
         created_km = all_km[0]
         assert created_km.file_name == sync_file.name
