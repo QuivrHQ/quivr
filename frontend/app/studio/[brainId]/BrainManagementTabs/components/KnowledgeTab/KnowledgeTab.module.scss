@@ -11,5 +11,12 @@
     width: 100%;
     gap: Spacings.$spacing05;
     padding-block: Spacings.$spacing05;
+
+    .message {
+      display: inline-flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: Spacings.$spacing03;
+    }
   }
 }

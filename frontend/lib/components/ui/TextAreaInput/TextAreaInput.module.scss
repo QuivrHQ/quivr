@@ -6,10 +6,10 @@
   display: flex;
   border: 1px solid var(--border-0);
   gap: Spacings.$spacing03;
-  border-radius: Radius.$normal;
+  border-radius: Radius.$big;
   align-items: center;
   width: 100%;
-  background-color: var(--background-0);
+  background-color: var(--background-1);
 
   &.simple {
     border: none;
@@ -34,8 +34,8 @@
     resize: none;
     background-color: transparent;
     font-size: Typography.$small;
-    padding-block: Spacings.$spacing02;
-    padding-inline: Spacings.$spacing03;
+    padding-block: calc(Spacings.$spacing02 + Spacings.$spacing01);
+    padding-inline: Spacings.$spacing05;
 
     &:focus {
       box-shadow: none;

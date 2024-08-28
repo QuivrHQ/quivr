@@ -6,6 +6,7 @@ import { PageHeader } from "@/lib/components/PageHeader/PageHeader";
 import { UploadDocumentModal } from "@/lib/components/UploadDocumentModal/UploadDocumentModal";
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
 import { useKnowledgeToFeedContext } from "@/lib/context/KnowledgeToFeedProvider/hooks/useKnowledgeToFeedContext";
+import { useSearchModalContext } from "@/lib/context/SearchModalProvider/hooks/useSearchModalContext";
 import { ButtonType } from "@/lib/types/QuivrButton";
 
 import { BrainManagementTabs } from "./BrainManagementTabs/BrainManagementTabs";
@@ -17,6 +18,7 @@ import styles from "./page.module.scss";
 
 const BrainsManagement = (): JSX.Element => {
   const { brain } = useBrainManagement();
+  const { setIsVisible } = useSearchModalContext();
   const {
     handleUnsubscribeOrDeleteBrain,
     isDeleteOrUnsubscribeModalOpened,
@@ -32,6 +34,17 @@ const BrainsManagement = (): JSX.Element => {
   const { setCurrentBrainId } = useBrainContext();
 
   const buttons: ButtonType[] = [
+    {
+      label: "Talk to Brain",
+      color: "primary",
+      onClick: () => {
+        if (brain) {
+          setIsVisible(true);
+          setTimeout(() => setCurrentBrainId(brain.id));
+        }
+      },
+      iconName: "chat",
+    },
     {
       label: "Add knowledge",
       color: "primary",
