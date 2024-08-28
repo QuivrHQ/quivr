@@ -100,6 +100,28 @@ async def test_data(session: AsyncSession) -> TestData:
 
 
 @pytest.mark.asyncio
+async def test_insert_knowledge(session: AsyncSession, test_data: TestData):
+    brain, knowledges = test_data
+    assert brain.brain_id
+
+    new_knowledge = KnowledgeDB(
+        file_name="test_file_3",
+        mime_type="txt",
+        status="UPLOADED",
+        source="test_source",
+        source_link="test_source_link",
+        file_size=100,
+        file_sha1="test_sha3",
+        brains=[brain],
+    )
+    repo = KnowledgeRepository(session)
+    created_knowledge = await repo.insert_knowledge(new_knowledge, brain.brain_id)
+    assert created_knowledge.id
+    knowledge = await repo.get_knowledge_by_id(created_knowledge.id)
+    assert knowledge.file_name == new_knowledge.file_name
+
+
+@pytest.mark.asyncio
 async def test_updates_knowledge_status(session: AsyncSession, test_data: TestData):
     brain, knowledges = test_data
     assert brain.brain_id
