@@ -71,7 +71,6 @@ async def build_syncs_utils(
                 sync_user_service=deps.sync_user_service,
                 sync_active_service=deps.sync_active_service,
                 sync_files_repo=deps.sync_files_repo_service,
-                storage=deps.storage,
                 sync_cloud=sync_cloud,
                 notification_service=deps.notification_service,
                 brain_vectors=deps.brain_vectors,

@@ -1,3 +1,4 @@
+import hashlib
 import io
 from dataclasses import dataclass
 from datetime import datetime
@@ -5,7 +6,6 @@ from typing import Optional
 from uuid import UUID
 
 from pydantic import BaseModel
-from quivr_worker.files import compute_sha1
 from sqlmodel import TIMESTAMP, Column, Field, Relationship, SQLModel, text
 from sqlmodel import UUID as PGUUID
 
@@ -19,10 +19,12 @@ class DownloadedSyncFile:
     file_data: io.BufferedReader
 
     def file_sha1(self) -> str:
+        m = hashlib.sha1()
         self.file_data.seek(0)
         data = self.file_data.read()
+        m.update(data)
         self.file_data.seek(0)
-        return compute_sha1(data)
+        return m.hexdigest()
 
 
 class DBSyncFile(BaseModel):

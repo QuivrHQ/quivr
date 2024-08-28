@@ -1,4 +1,5 @@
-from typing import List
+from abc import ABC, abstractmethod
+from typing import Dict, List, Union
 from uuid import UUID
 
 from quivr_api.logger import get_logger
@@ -12,15 +13,54 @@ from quivr_api.modules.sync.entity.sync_models import SyncsActive, SyncsUser
 from quivr_api.modules.sync.repository.sync_repository import Sync
 from quivr_api.modules.sync.repository.sync_user import SyncUserRepository
 from quivr_api.modules.sync.service.sync_notion import SyncNotionService
-from quivr_api.modules.user.service.user_service import UserService
 
 logger = get_logger(__name__)
 
 
-user_service = UserService()
+class ISyncUserService(ABC):
+    @abstractmethod
+    def get_syncs_user(self, user_id: UUID, sync_user_id: Union[int, None] = None):
+        pass
+
+    @abstractmethod
+    def create_sync_user(self, sync_user_input: SyncsUserInput):
+        pass
+
+    @abstractmethod
+    def delete_sync_user(self, sync_id: int, user_id: str):
+        pass
+
+    @abstractmethod
+    def get_sync_user_by_state(self, state: Dict) -> Union["SyncsUser", None]:
+        pass
+
+    @abstractmethod
+    def get_sync_user_by_id(self, sync_id: int):
+        pass
+
+    @abstractmethod
+    def update_sync_user(
+        self, sync_user_id: UUID, state: Dict, sync_user_input: SyncUserUpdateInput
+    ):
+        pass
+
+    @abstractmethod
+    def get_all_notion_user_syncs(self):
+        pass
+
+    @abstractmethod
+    async def get_files_folder_user_sync(
+        self,
+        sync_active_id: int,
+        user_id: UUID,
+        folder_id: Union[str, None] = None,
+        recursive: bool = False,
+        notion_service: Union["SyncNotionService", None] = None,
+    ):
+        pass
 
 
-class SyncUserService:
+class SyncUserService(ISyncUserService):
     def __init__(self):
         self.repository = SyncUserRepository()
 
@@ -64,7 +104,37 @@ class SyncUserService:
         )
 
 
-class SyncService:
+class ISyncService(ABC):
+    @abstractmethod
+    def create_sync_active(
+        self, sync_active_input: SyncsActiveInput, user_id: str
+    ) -> Union["SyncsActive", None]:
+        pass
+
+    @abstractmethod
+    def get_syncs_active(self, user_id: str) -> List[SyncsActive]:
+        pass
+
+    @abstractmethod
+    def update_sync_active(
+        self, sync_id: int, sync_active_input: SyncsActiveUpdateInput
+    ):
+        pass
+
+    @abstractmethod
+    def delete_sync_active(self, sync_active_id: int, user_id: UUID):
+        pass
+
+    @abstractmethod
+    async def get_syncs_active_in_interval(self) -> List[SyncsActive]:
+        pass
+
+    @abstractmethod
+    def get_details_sync_active(self, sync_active_id: int):
+        pass
+
+
+class SyncService(ISyncService):
     def __init__(self):
         self.repository = Sync()
 

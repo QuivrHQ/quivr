@@ -4,14 +4,9 @@ from datetime import datetime, timezone
 from typing import Any, List, Tuple
 from uuid import UUID, uuid4
 
-from quivr_core.models import KnowledgeStatus
-
 from quivr_api.celery_config import celery
 from quivr_api.logger import get_logger
 from quivr_api.modules.brain.repository.brains_vectors import BrainsVectors
-from quivr_api.modules.knowledge.dto.inputs import CreateKnowledgeProperties
-from quivr_api.modules.knowledge.entity.knowledge import Knowledge
-from quivr_api.modules.knowledge.repository.storage import Storage
 from quivr_api.modules.knowledge.service.knowledge_service import KnowledgeService
 from quivr_api.modules.notification.dto.inputs import (
     CreateNotification,
@@ -29,8 +24,11 @@ from quivr_api.modules.sync.entity.sync_models import (
     SyncsActive,
     SyncsUser,
 )
-from quivr_api.modules.sync.repository.sync_files import SyncFilesRepository
-from quivr_api.modules.sync.service.sync_service import SyncService, SyncUserService
+from quivr_api.modules.sync.repository.sync_interfaces import SyncFileInterface
+from quivr_api.modules.sync.service.sync_service import (
+    ISyncService,
+    ISyncUserService,
+)
 from quivr_api.modules.sync.utils.sync import BaseSync
 from quivr_api.modules.upload.service.upload_file import (
     check_file_exists,
@@ -59,7 +57,6 @@ def should_download_file(
     file: SyncFile,
     last_updated_sync_active: datetime | None,
     provider_name: str,
-    brain_id: UUID,
     datetime_format: str,
 ) -> bool:
     file_last_modified_utc = datetime.strptime(
@@ -67,10 +64,9 @@ def should_download_file(
     ).replace(tzinfo=timezone.utc)
 
     should_download = (
-        not last_updated_sync_active
+        last_updated_sync_active is None
         or file_last_modified_utc > last_updated_sync_active
     )
-    should_download |= not check_file_exists(str(brain_id), file.name)
 
     # TODO: Handle notion database
     if provider_name == "notion":
@@ -84,11 +80,10 @@ def should_download_file(
 class SyncUtils:
     def __init__(
         self,
-        sync_user_service: SyncUserService,
-        sync_active_service: SyncService,
+        sync_user_service: ISyncUserService,
+        sync_active_service: ISyncService,
         knowledge_service: KnowledgeService,
-        sync_files_repo: SyncFilesRepository,
-        storage: Storage,
+        sync_files_repo: SyncFileInterface,
         sync_cloud: BaseSync,
         notification_service: NotificationService,
         brain_vectors: BrainsVectors,
@@ -97,11 +92,11 @@ class SyncUtils:
         self.sync_active_service = sync_active_service
         self.knowledge_service = knowledge_service
         self.sync_files_repo = sync_files_repo
-        self.storage = storage
         self.sync_cloud = sync_cloud
         self.notification_service = notification_service
         self.brain_vectors = brain_vectors
 
+    # TODO: This modifies the file, we should treat it as such
     def create_sync_bulk_notification(
         self, files: list[SyncFile], current_user: UUID, brain_id: UUID, bulk_id: UUID
     ) -> list[SyncFile]:
@@ -146,43 +141,6 @@ class SyncUtils:
 
     # TODO: REDO THIS MESS !!!!
     # REMOVE ALL SYNC TABLES and start from scratch
-    async def create_or_update_knowledge(
-        self,
-        brain_id: UUID,
-        file: SyncFile,
-        new_sync_file: DBSyncFile | None,
-        prev_sync_file: DBSyncFile | None,
-        downloaded_file: DownloadedSyncFile,
-        integration: str,
-        integration_link: str,
-    ) -> Knowledge:
-        sync_id = None
-        if prev_sync_file:
-            prev_knowledge = await self.knowledge_service.get_knowledge_sync(
-                sync_id=prev_sync_file.id
-            )
-            await self.knowledge_service.remove_knowledge(
-                brain_id, knowledge_id=prev_knowledge.id
-            )
-            sync_id = prev_sync_file.id
-
-        sync_id = new_sync_file.id if new_sync_file else sync_id
-        knowledge_to_add = CreateKnowledgeProperties(
-            brain_id=brain_id,
-            file_name=file.name,
-            mime_type=downloaded_file.extension,
-            source=integration,
-            status=KnowledgeStatus.PROCESSING,
-            source_link=integration_link,
-            file_size=file.size if file.size else 0,
-            file_sha1=downloaded_file.file_sha1(),
-            # FIXME (@aminediro): This is a temporary fix, redo in KMS
-            metadata={"sync_file_id": str(sync_id)},
-        )
-        added_knowledge = await self.knowledge_service.insert_knowledge(
-            knowledge_to_add
-        )
-        return added_knowledge
 
     async def process_sync_file(
         self,
@@ -193,7 +151,7 @@ class SyncUtils:
     ):
         logger.info("Processing file: %s", file.name)
         brain_id = sync_active.brain_id
-        integration, integration_link = self.sync_cloud.name, file.web_view_link
+        source, source_link = self.sync_cloud.name, file.web_view_link
         downloaded_file = await self.download_file(file, current_user.credentials)
         storage_path = f"{brain_id}/{downloaded_file.file_name}"
         exists_in_storage = check_file_exists(str(brain_id), file.name)
@@ -223,20 +181,21 @@ class SyncUtils:
                 description="File downloaded successfully",
             ),
         )
+        # TODO : why knowledge + syncfile, drop syncfile ...
         sync_file_db = self.sync_files_repo.update_or_create_sync_file(
             file=file,
             previous_file=previous_file,
             sync_active=sync_active,
             supported=True,
         )
-        knowledge = await self.create_or_update_knowledge(
+        knowledge = await self.knowledge_service.update_or_create_knowledge_sync(
             brain_id=brain_id,
             file=file,
             new_sync_file=sync_file_db,
             prev_sync_file=previous_file,
             downloaded_file=downloaded_file,
-            integration=integration,
-            integration_link=integration_link,
+            source=source,
+            source_link=source_link,
         )
 
         # Send file for processing
@@ -247,8 +206,8 @@ class SyncUtils:
                 "knowledge_id": knowledge.id,
                 "file_name": storage_path,
                 "file_original_name": file.name,
-                "source": integration,
-                "source_link": integration_link,
+                "source": source,
+                "source_link": source_link,
                 "notification_id": file.notification_id,
             },
         )
@@ -346,7 +305,6 @@ class SyncUtils:
                 last_updated_sync_active=last_synced_time,
                 provider_name=self.sync_cloud.lower_name,
                 datetime_format=self.sync_cloud.datetime_format,
-                brain_id=sync_active.brain_id,
             )
         ]
 
