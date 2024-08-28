@@ -59,6 +59,7 @@ jobs:
           EMBEDDING_DIM: 1536
         run: |
           cd backend
+          supabase start -x gotrue,imgproxy,realtime,studio,inbucket,auth,edge_runtime,analytics
           supabase db start
           rye run python -c "from unstructured.nlp.tokenize import download_nltk_packages; download_nltk_packages()"
           rye run python -c "import nltk;nltk.download('punkt_tab'); nltk.download('averaged_perceptron_tagger_eng')"
