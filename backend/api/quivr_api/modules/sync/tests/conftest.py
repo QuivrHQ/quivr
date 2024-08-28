@@ -5,7 +5,7 @@ from collections import defaultdict
 from datetime import datetime, timedelta
 from io import BytesIO
 from pathlib import Path
-from typing import Any, AsyncGenerator, Dict, List, Optional, Tuple, Union
+from typing import Any, Dict, List, Optional, Tuple, Union
 from uuid import UUID, uuid4
 
 import pytest
@@ -687,9 +687,9 @@ def sync_file():
 
 
 @pytest_asyncio.fixture
-async def setup_syncs_data(
+async def brain_user_setup(
     session,
-) -> AsyncGenerator[Tuple[SyncsUser, SyncsActive], None]:
+) -> Tuple[Brain, User]:
     user_1 = (
         await session.exec(select(User).where(User.email == "admin@quivr.app"))
     ).one()
@@ -705,6 +705,14 @@ async def setup_syncs_data(
     await session.commit()
     assert user_1
     assert brain_1.brain_id
+    return brain_1, user_1
+
+
+@pytest_asyncio.fixture
+async def setup_syncs_data(
+    brain_user_setup,
+) -> Tuple[SyncsUser, SyncsActive]:
+    brain_1, user_1 = brain_user_setup
 
     sync_user = SyncsUser(
         id=0,
@@ -726,7 +734,7 @@ async def setup_syncs_data(
         brain_id=brain_1.brain_id,
     )
 
-    yield (sync_user, sync_active)
+    return (sync_user, sync_active)
 
 
 @pytest.fixture
@@ -780,7 +788,6 @@ def syncutils_notion(sync_file, setup_syncs_data, session) -> SyncUtils:
     brain_vectors = BrainsVectors()
     storage = Storage()
     sync_cloud = MockSyncCloudNotion()
-
     sync_util = SyncUtils(
         sync_user_service=sync_user_service,
         sync_active_service=sync_active_service,

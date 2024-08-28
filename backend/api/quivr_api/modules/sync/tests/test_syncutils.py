@@ -1,8 +1,11 @@
 from datetime import datetime, timedelta, timezone
+from typing import Tuple
 from uuid import uuid4
 
 import pytest
 
+from quivr_api.modules.brain.entity.brain_entity import Brain
+from quivr_api.modules.notification.entity.notification import NotificationsStatusEnum
 from quivr_api.modules.sync.entity.sync_models import (
     DBSyncFile,
     SyncFile,
@@ -14,6 +17,7 @@ from quivr_api.modules.sync.utils.syncutils import (
     filter_on_supported_files,
     should_download_file,
 )
+from quivr_api.modules.user.entity.user_identity import User
 
 
 def test_filter_on_supported_files_empty_existing():
@@ -258,8 +262,23 @@ class TestSyncUtils:
 
     @pytest.mark.asyncio
     async def test_process_sync_file_noprev(
-        self, setup_syncs_data, syncutils: SyncUtils, sync_file: SyncFile
+        self,
+        monkeypatch,
+        brain_user_setup: Tuple[Brain, User],
+        setup_syncs_data: Tuple[SyncsUser, SyncsActive],
+        syncutils: SyncUtils,
+        sync_file: SyncFile,
     ):
+        task = {}
+
+        def _send_task(*args, **kwargs):
+            task["args"] = args
+            task["kwargs"] = {**kwargs["kwargs"]}
+
+        monkeypatch.setattr("quivr_api.celery_config.celery.send_task", _send_task)
+
+        brain_1, _ = brain_user_setup
+        assert brain_1.brain_id
         (sync_user, sync_active) = setup_syncs_data
         await syncutils.process_sync_file(
             file=sync_file,
@@ -272,4 +291,44 @@ class TestSyncUtils:
         assert (
             sync_file.notification_id
             in syncutils.notification_service.repository.received  # type: ignore
+        )
+        assert (
+            syncutils.notification_service.repository.received[  # type: ignore
+                sync_file.notification_id  # type: ignore
+            ].status
+            == NotificationsStatusEnum.SUCCESS
+        )
+
+        # Check Syncfile created
+        dbfiles: list[DBSyncFile] = syncutils.sync_files_repo.get_sync_files(
+            sync_active.id
+        )
+        assert len(dbfiles) == 1
+        assert dbfiles[0].brain_id == str(brain_1.brain_id)
+        assert dbfiles[0].syncs_active_id == sync_active.id
+        assert dbfiles[0].supported
+
+        # Check knowledge created
+        all_km = await syncutils.knowledge_service.get_all_knowledge(brain_1.brain_id)
+        assert len(all_km) == 1
+        created_km = all_km[0]
+        assert created_km.file_name == sync_file.name
+        assert created_km.mime_type == ".txt"
+        assert created_km.file_sha1 is not None
+        assert created_km.created_at is not None
+        assert created_km.metadata == {"sync_file_id": "1"}
+        assert created_km.brain_ids == [brain_1.brain_id]
+
+        # Assert celery task in correct
+        assert task["args"] == ("process_file_task",)
+        minimal_task_kwargs = {
+            "brain_id": brain_1.brain_id,
+            "knowledge_id": created_km.id,
+            "file_original_name": sync_file.name,
+            "source": syncutils.sync_cloud.name,
+            "notification_id": sync_file.notification_id,
+        }
+        all(
+            minimal_task_kwargs[key] == task["kwargs"][key]  # type: ignore
+            for key in minimal_task_kwargs
         )
