@@ -80,7 +80,7 @@ class KnowledgeRepository(BaseRepository):
 
     async def get_knowledge_by_sync_id(self, sync_id: int) -> KnowledgeDB:
         query = select(KnowledgeDB).where(
-            text(f"metadata->>'sync_file_id' =  {sync_id}")
+            text(f"metadata->>'sync_file_id' =  '{str(sync_id)}'")
         )
         result = await self.session.exec(query)
         knowledge = result.first()

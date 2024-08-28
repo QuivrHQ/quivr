@@ -17,6 +17,7 @@ from quivr_api.modules.sync.utils.syncutils import (
     filter_on_supported_files,
     should_download_file,
 )
+from quivr_api.modules.upload.service.upload_file import check_file_exists
 from quivr_api.modules.user.entity.user_identity import User
 
 
@@ -318,6 +319,110 @@ class TestSyncUtils:
         assert created_km.created_at is not None
         assert created_km.metadata == {"sync_file_id": "1"}
         assert created_km.brain_ids == [brain_1.brain_id]
+
+        # Assert celery task in correct
+        assert task["args"] == ("process_file_task",)
+        minimal_task_kwargs = {
+            "brain_id": brain_1.brain_id,
+            "knowledge_id": created_km.id,
+            "file_original_name": sync_file.name,
+            "source": syncutils.sync_cloud.name,
+            "notification_id": sync_file.notification_id,
+        }
+        all(
+            minimal_task_kwargs[key] == task["kwargs"][key]  # type: ignore
+            for key in minimal_task_kwargs
+        )
+
+    @pytest.mark.asyncio
+    async def test_process_sync_file_with_prev(
+        self,
+        monkeypatch,
+        supabase_client,
+        brain_user_setup: Tuple[Brain, User],
+        setup_syncs_data: Tuple[SyncsUser, SyncsActive],
+        syncutils: SyncUtils,
+        sync_file: SyncFile,
+        prev_file: SyncFile,
+    ):
+        task = {}
+
+        def _send_task(*args, **kwargs):
+            task["args"] = args
+            task["kwargs"] = {**kwargs["kwargs"]}
+
+        monkeypatch.setattr("quivr_api.celery_config.celery.send_task", _send_task)
+        brain_1, _ = brain_user_setup
+        assert brain_1.brain_id
+        (sync_user, sync_active) = setup_syncs_data
+
+        # Run process_file on prev_file first
+        await syncutils.process_sync_file(
+            file=prev_file,
+            previous_file=None,
+            current_user=sync_user,
+            sync_active=sync_active,
+        )
+        dbfiles: list[DBSyncFile] = syncutils.sync_files_repo.get_sync_files(
+            sync_active.id
+        )
+        assert len(dbfiles) == 1
+        prev_dbfile = dbfiles[0]
+
+        assert check_file_exists(str(brain_1.brain_id), prev_file.name)
+        prev_file_data = supabase_client.storage.from_("quivr").download(
+            f"{brain_1.brain_id}/{prev_file.name}"
+        )
+
+        #####
+        # Run process_file on newer file
+        await syncutils.process_sync_file(
+            file=sync_file,
+            previous_file=prev_dbfile,
+            current_user=sync_user,
+            sync_active=sync_active,
+        )
+
+        # Check notification inserted
+        assert (
+            sync_file.notification_id
+            in syncutils.notification_service.repository.received  # type: ignore
+        )
+        assert (
+            syncutils.notification_service.repository.received[  # type: ignore
+                sync_file.notification_id  # type: ignore
+            ].status
+            == NotificationsStatusEnum.SUCCESS
+        )
+
+        # Check Syncfile created
+        dbfiles: list[DBSyncFile] = syncutils.sync_files_repo.get_sync_files(
+            sync_active.id
+        )
+        assert len(dbfiles) == 1
+        assert dbfiles[0].brain_id == str(brain_1.brain_id)
+        assert dbfiles[0].syncs_active_id == sync_active.id
+        assert dbfiles[0].supported
+
+        # Check prev file was deleted and replaced with the new
+        all_km = await syncutils.knowledge_service.get_all_knowledge(brain_1.brain_id)
+        assert len(all_km) == 1
+        created_km = all_km[0]
+        assert created_km.file_name == sync_file.name
+        assert created_km.mime_type == ".txt"
+        assert created_km.file_sha1 is not None
+        assert created_km.updated_at
+        assert created_km.created_at
+        assert created_km.updated_at == created_km.created_at  # new line
+        assert created_km.metadata == {"sync_file_id": str(dbfiles[0].id)}
+        assert created_km.brain_ids == [brain_1.brain_id]
+
+        # Check file content changed
+        assert check_file_exists(str(brain_1.brain_id), sync_file.name)
+        new_file_data = supabase_client.storage.from_("quivr").download(
+            f"{brain_1.brain_id}/{sync_file.name}"
+        )
+        assert new_file_data != prev_file_data, "Same file in prev_file and new file"
 
         # Assert celery task in correct
         assert task["args"] == ("process_file_task",)

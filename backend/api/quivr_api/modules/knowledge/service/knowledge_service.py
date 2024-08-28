@@ -141,9 +141,10 @@ class KnowledgeService(BaseService[KnowledgeRepository]):
         source_link: str,
     ) -> Knowledge:
         sync_id = None
+        # TODO: THIS IS A HACK!! Remove all of this
         if prev_sync_file:
             prev_knowledge = await self.get_knowledge_sync(sync_id=prev_sync_file.id)
-            await self.remove_knowledge(brain_id, knowledge_id=prev_knowledge.id)
+            await self.repository.remove_knowledge_by_id(prev_knowledge.id)
             sync_id = prev_sync_file.id
 
         sync_id = new_sync_file.id if new_sync_file else sync_id

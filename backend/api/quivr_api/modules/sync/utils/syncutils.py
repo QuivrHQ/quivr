@@ -7,7 +7,6 @@ from uuid import UUID, uuid4
 from quivr_api.celery_config import celery
 from quivr_api.logger import get_logger
 from quivr_api.modules.brain.repository.brains_vectors import BrainsVectors
-from quivr_api.modules.knowledge.repository.storage import Storage
 from quivr_api.modules.knowledge.service.knowledge_service import KnowledgeService
 from quivr_api.modules.notification.dto.inputs import (
     CreateNotification,
@@ -85,7 +84,6 @@ class SyncUtils:
         sync_active_service: ISyncService,
         knowledge_service: KnowledgeService,
         sync_files_repo: SyncFileInterface,
-        storage: Storage,
         sync_cloud: BaseSync,
         notification_service: NotificationService,
         brain_vectors: BrainsVectors,
@@ -94,7 +92,6 @@ class SyncUtils:
         self.sync_active_service = sync_active_service
         self.knowledge_service = knowledge_service
         self.sync_files_repo = sync_files_repo
-        self.storage = storage
         self.sync_cloud = sync_cloud
         self.notification_service = notification_service
         self.brain_vectors = brain_vectors
@@ -184,6 +181,7 @@ class SyncUtils:
                 description="File downloaded successfully",
             ),
         )
+        # TODO : why knowledge + syncfile, drop syncfile ...
         sync_file_db = self.sync_files_repo.update_or_create_sync_file(
             file=file,
             previous_file=previous_file,

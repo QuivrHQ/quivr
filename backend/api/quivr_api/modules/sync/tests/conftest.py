@@ -17,8 +17,8 @@ from sqlmodel.ext.asyncio.session import AsyncSession
 
 from quivr_api.modules.brain.entity.brain_entity import Brain, BrainType
 from quivr_api.modules.brain.repository.brains_vectors import BrainsVectors
+from quivr_api.modules.dependencies import get_supabase_client
 from quivr_api.modules.knowledge.repository.knowledges import KnowledgeRepository
-from quivr_api.modules.knowledge.repository.storage import Storage
 from quivr_api.modules.knowledge.service.knowledge_service import KnowledgeService
 from quivr_api.modules.notification.dto.inputs import (
     CreateNotification,
@@ -468,21 +468,22 @@ class MockSyncCloudNotion(MockSyncCloud):
 class MockNotification(NotificationInterface):
     def __init__(
         self,
-        notification_id: UUID,
+        notification_ids: list[UUID],
         user_id: UUID,
         brain_id: UUID,
     ):
         self.received: dict[UUID, Notification] = {}
-        self.received[notification_id] = Notification(
-            id=notification_id,
-            user_id=user_id,
-            status=NotificationsStatusEnum.INFO,
-            category="sync",
-            title="test",
-            description="",
-            datetime=datetime.now(),
-            brain_id=str(brain_id),
-        )
+        for notification_id in notification_ids:
+            self.received[notification_id] = Notification(
+                id=notification_id,
+                user_id=user_id,
+                status=NotificationsStatusEnum.INFO,
+                category="sync",
+                title="test",
+                description="",
+                datetime=datetime.now(),
+                brain_id=str(brain_id),
+            )
 
     def add_notification(self, notification: CreateNotification) -> Notification:
         notif = Notification(
@@ -686,6 +687,22 @@ def sync_file():
     return file
 
 
+@pytest.fixture
+def prev_file():
+    file = SyncFile(
+        id=str(uuid4()),
+        name="test_file.txt",
+        is_folder=False,
+        last_modified=(datetime.now() - timedelta(hours=1)).strftime(
+            "%Y-%m-%d %H:%M:%S"
+        ),
+        mime_type="txt",
+        web_view_link="",
+        notification_id=uuid4(),  #
+    )
+    return file
+
+
 @pytest_asyncio.fixture
 async def brain_user_setup(
     session,
@@ -740,6 +757,7 @@ async def setup_syncs_data(
 @pytest.fixture
 def syncutils(
     sync_file: SyncFile,
+    prev_file: SyncFile,
     setup_syncs_data: Tuple[SyncsUser, SyncsActive],
     session,
 ) -> SyncUtils:
@@ -751,18 +769,18 @@ def syncutils(
     knowledge_service = KnowledgeService(KnowledgeRepository(session))
     notification_service = NotificationService(
         repository=MockNotification(
-            sync_file.notification_id, sync_user.user_id, sync_active.brain_id
+            [sync_file.notification_id, prev_file.notification_id],  # type: ignore
+            sync_user.user_id,
+            sync_active.brain_id,
         )
     )
     brain_vectors = BrainsVectors()
-    storage = Storage()
     sync_cloud = MockSyncCloud()
 
     sync_util = SyncUtils(
         sync_user_service=sync_user_service,
         sync_active_service=sync_active_service,
         sync_files_repo=sync_files_repo_service,
-        storage=storage,
         sync_cloud=sync_cloud,
         notification_service=notification_service,
         brain_vectors=brain_vectors,
@@ -773,7 +791,12 @@ def syncutils(
 
 
 @pytest.fixture
-def syncutils_notion(sync_file, setup_syncs_data, session) -> SyncUtils:
+def syncutils_notion(
+    sync_file: SyncFile,
+    prev_file: SyncFile,
+    setup_syncs_data: Tuple[SyncsUser, SyncsActive],
+    session,
+) -> SyncUtils:
     (sync_user, sync_active) = setup_syncs_data
     assert sync_file.notification_id
     sync_active_service = MockSyncService(sync_active)
@@ -782,17 +805,17 @@ def syncutils_notion(sync_file, setup_syncs_data, session) -> SyncUtils:
     knowledge_service = KnowledgeService(KnowledgeRepository(session))
     notification_service = NotificationService(
         repository=MockNotification(
-            sync_file.notification_id, sync_user.user_id, sync_active.brain_id
+            [sync_file.notification_id, prev_file.notification_id],  # type: ignore
+            sync_user.user_id,
+            sync_active.brain_id,
         )
     )
     brain_vectors = BrainsVectors()
-    storage = Storage()
     sync_cloud = MockSyncCloudNotion()
     sync_util = SyncUtils(
         sync_user_service=sync_user_service,
         sync_active_service=sync_active_service,
         sync_files_repo=sync_files_repo_service,
-        storage=storage,
         sync_cloud=sync_cloud,
         notification_service=notification_service,
         brain_vectors=brain_vectors,
@@ -800,3 +823,8 @@ def syncutils_notion(sync_file, setup_syncs_data, session) -> SyncUtils:
     )
 
     return sync_util
+
+
+@pytest.fixture(scope="session")
+def supabase_client():
+    return get_supabase_client()
