@@ -5,6 +5,7 @@ import { SyncsByProvider } from "@/lib/api/sync/types";
 import { useSync } from "@/lib/api/sync/useSync";
 import { Icon } from "@/lib/components/ui/Icon/Icon";
 
+import ConnectionAccount from "./ConnectionAccount/ConnectionAccount";
 import styles from "./ConnectionKnowledge.module.scss";
 
 interface ConnectionKnowledgeProps {
@@ -31,25 +32,34 @@ const ConnectionKnowledges = ({
   };
 
   return (
-    <div
-      className={styles.provider_line_wrapper}
-      onClick={() => setFolded(!folded)}
-    >
-      <Icon
-        name={folded ? "chevronRight" : "chevronDown"}
-        size="normal"
-        color="black"
-        handleHover={true}
-      />
-      <Image
-        src={providerIconUrls[providerGroup.provider]}
-        alt={providerGroup.provider}
-        width={18}
-        height={18}
-      />
-      <span className={styles.provider_title}>
-        {transformConnectionLabel(providerGroup.provider)}
-      </span>
+    <div className={styles.connection_knowledges_wrapper}>
+      <div
+        className={styles.provider_line_wrapper}
+        onClick={() => setFolded(!folded)}
+      >
+        <Icon
+          name={folded ? "chevronRight" : "chevronDown"}
+          size="normal"
+          color="black"
+          handleHover={true}
+        />
+        <Image
+          src={providerIconUrls[providerGroup.provider]}
+          alt={providerGroup.provider}
+          width={18}
+          height={18}
+        />
+        <span className={styles.provider_title}>
+          {transformConnectionLabel(providerGroup.provider)}
+        </span>
+      </div>
+      {!folded && providerGroup.syncs.length > 1 && (
+        <div className={styles.accounts}>
+          {providerGroup.syncs.map((sync, index) => (
+            <ConnectionAccount key={sync.id} sync={sync} index={index} />
+          ))}
+        </div>
+      )}
     </div>
   );
 };

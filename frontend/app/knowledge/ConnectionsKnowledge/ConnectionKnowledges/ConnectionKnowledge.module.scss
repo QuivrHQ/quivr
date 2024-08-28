@@ -1,11 +1,23 @@
 @use "styles/Spacings.module.scss";
 
-.provider_line_wrapper {
+.connection_knowledges_wrapper {
   display: flex;
-  align-items: center;
+  flex-direction: column;
   gap: Spacings.$spacing03;
 
-  .provider_title {
-    font-weight: 500;
+  .provider_line_wrapper {
+    display: flex;
+    align-items: center;
+    gap: Spacings.$spacing03;
+
+    .provider_title {
+      font-weight: 500;
+    }
+  }
+
+  .accounts {
+    display: flex;
+    flex-direction: column;
+    gap: Spacings.$spacing03;
   }
 }
