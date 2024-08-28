@@ -40,7 +40,10 @@ def session(engine):
 def test_data(session: Session) -> TestData:
     embedding = get_embedding_client()
     vectors = embedding.embed_documents(
-        ["I love paste a la vongole", "I rather play chess than watch football"]
+        [
+            "I love pasta alla vongole because it reminds me of summer evenings by the sea. The combination of garlic, olive oil, white wine, and fresh clams creates a symphony of flavors that transports me to the Italian coast. The al dente pasta soaks up the briny, aromatic sauce, making each bite a delightful journey. It's a dish that embodies simplicity and elegance, perfect for sharing with loved ones over a glass of chilled Pinot Grigio.",
+            "I'd rather play chess than watch football because chess offers a unique blend of strategy, creativity, and intellectual challenge. Each move requires careful thought and planning, engaging my mind in a way that's both stimulating and satisfying. The quiet intensity of a chess match provides a stark contrast to the loud, fast-paced action of football. Plus, chess allows me to enjoy quality time with friends and family, fostering meaningful connections over a timeless game.",
+        ]
     )
 
     nested = session.begin_nested()  # Start a savepoint
@@ -66,14 +69,14 @@ def test_data(session: Session) -> TestData:
 
     vector_1 = Vector(
         content="vector_1",
-        metadata_={"chunk_size": 16},
+        metadata_={"chunk_size": 96},
         embedding=vectors[0],  # type: ignore
         knowledge_id=knowledge_1.id,
     )
 
     vector_2 = Vector(
         content="vector_2",
-        metadata_={"chunk_size": 16},
+        metadata_={"chunk_size": 96},
         embedding=vectors[1],  # type: ignore
         knowledge_id=knowledge_1.id,
     )
@@ -120,3 +123,31 @@ def test_similarity_search(session: Session, test_data: TestData):
     results = repo.similarity_search(vectors[1].embedding, brain.brain_id, k=k)  # type: ignore
 
     assert results[0].content == vectors[1].content
+
+    k = 1
+    results = repo.similarity_search(vectors[0].embedding, brain.brain_id, k=k)  # type: ignore
+    assert len(results) == k
+    assert results[0].content == vectors[0].content
+
+    results = repo.similarity_search(vectors[1].embedding, brain.brain_id, k=k)  # type: ignore
+
+    assert results[0].content == vectors[1].content
+
+
+def test_similarity_with_oversized_chunk(session: Session, test_data: TestData):
+    vectors, knowledge, brain = test_data
+    assert knowledge.id
+    assert brain.brain_id
+
+    repo = VectorRepository(session)
+
+    k = 2
+    results = repo.similarity_search(
+        vectors[0].embedding,  # type: ignore
+        brain.brain_id,
+        k=k,
+        max_chunk_sum=100,
+    )
+
+    assert len(results) == 1
+    assert results[0].content == vectors[0].content

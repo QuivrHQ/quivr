@@ -4,7 +4,9 @@ from uuid import UUID
 from langchain.docstore.document import Document
 from langchain.embeddings.base import Embeddings
 from langchain_community.vectorstores import SupabaseVectorStore
+
 from quivr_api.logger import get_logger
+
 # from quivr_api.modules.dependencies import get_pg_database_engine
 from quivr_api.vector.service.vector_service import VectorService
 from supabase.client import Client
