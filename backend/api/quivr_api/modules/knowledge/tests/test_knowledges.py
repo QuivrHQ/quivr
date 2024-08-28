@@ -123,7 +123,7 @@ async def test_update_knowledge_source_link(session: AsyncSession, test_data: Te
 
 
 @pytest.mark.asyncio
-async def remove_knowledge_from_brain(session: AsyncSession, test_data: TestData):
+async def test_remove_knowledge_from_brain(session: AsyncSession, test_data: TestData):
     brain, knowledges = test_data
     assert brain.brain_id
     assert knowledges[0].id
@@ -174,6 +174,7 @@ async def test_remove_all_knowledges_from_brain(
     supabase_client = get_supabase_client()
     db = supabase_client
     storage = db.storage.from_("quivr")
+
     response = storage.list(path=f"{brain.brain_id}")
     assert response == []
     # FIXME raise an error I don't understand @amine  UnboundLocalError: cannot access local variable 'response' where it is not associated with a value

@@ -41,7 +41,7 @@ async def list_knowledge_in_brain_endpoint(
 
     validate_brain_authorization(brain_id=brain_id, user_id=current_user.id)
 
-    knowledges = await knowledge_service.get_all_knowledge_from_brain(brain_id)
+    knowledges = await knowledge_service.get_all_knowledge_in_brain(brain_id)
 
     return {"knowledges": knowledges}
 
