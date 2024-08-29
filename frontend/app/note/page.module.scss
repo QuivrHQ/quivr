@@ -1,3 +1,5 @@
+@use "styles/Spacings.module.scss";
+
 .main_container {
   position: relative;
   width: 100%;
@@ -6,5 +8,15 @@
   .page_header {
     position: absolute;
     width: 100%;
+  }
+
+  .note_page_container {
+    background-color: var(--background-0);
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    padding-top: Spacings.$spacing07;
+    flex-direction: column;
   }
 }
