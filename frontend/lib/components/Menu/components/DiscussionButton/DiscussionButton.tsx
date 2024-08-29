@@ -22,7 +22,7 @@ export const DiscussionButton = (): JSX.Element => {
       onClick={handleClick}
     >
       <div className={styles.left_wrapper}>
-        <span>New Search</span>
+        <span>New Thread</span>
         <div className={styles.shortcuts_wrapper}>
           <div className={styles.shortcut}>⌘</div>
           <div className={styles.shortcut}>K</div>

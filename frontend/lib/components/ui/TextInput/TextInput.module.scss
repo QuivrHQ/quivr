@@ -6,12 +6,12 @@
   display: flex;
   border: 1px solid var(--border-2);
   gap: Spacings.$spacing02;
-  padding-block: Spacings.$spacing02;
-  padding-inline: Spacings.$spacing03;
-  border-radius: Radius.$normal;
+  padding-block: calc(Spacings.$spacing02 + Spacings.$spacing01);
+  padding-inline: Spacings.$spacing05;
+  border-radius: Radius.$big;
   align-items: center;
   width: 100%;
-  background-color: var(--background-0);
+  background-color: var(--background-1);
 
   &.simple {
     border: none;

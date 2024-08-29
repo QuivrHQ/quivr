@@ -7,10 +7,9 @@
 .message_row_container {
   display: flex;
   flex-direction: column;
-  padding-right: Spacings.$spacing05;
   gap: Spacings.$spacing03;
   border-bottom: 1px solid var(--border-0);
-  padding-bottom: Spacings.$spacing05;
+  padding-bottom: Spacings.$spacing01;
   position: relative;
 
   &.user {

@@ -1,23 +1,30 @@
 @use "styles/Radius.module.scss";
+@use "styles/ScreenSizes.module.scss";
 @use "styles/Spacings.module.scss";
 
 .model_selection_wrapper {
   display: flex;
-  flex-direction: column;
+  justify-content: space-between;
   gap: Spacings.$spacing05;
+
+  .model {
+    width: 300px;
+  }
 
   .max_tokens {
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: Spacings.$spacing03;
+    width: 300px;
+    padding-top: Spacings.$spacing02;
 
     .slider {
       -webkit-appearance: none;
       width: 80%;
       height: 15px;
       border-radius: Radius.$normal;
-      background: var(--primary-1);
+      background: var(--background-primary-1);
       outline: none;
       -webkit-transition: 0.2s;
       transition: opacity 0.2s;
@@ -35,6 +42,18 @@
       border-radius: Radius.$big;
       background: var(--primary-0);
       cursor: pointer;
+    }
+  }
+  @media screen and (max-width: ScreenSizes.$medium) {
+    flex-direction: column;
+    gap: Spacings.$spacing05;
+
+    .model {
+      width: 100%;
+    }
+
+    .max_tokens {
+      width: 100%;
     }
   }
 }

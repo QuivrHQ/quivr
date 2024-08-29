@@ -8,6 +8,7 @@ import { Icon } from "@/lib/components/ui/Icon/Icon";
 import { OptionsModal } from "@/lib/components/ui/OptionsModal/OptionsModal";
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
 import { MinimalBrainForUser } from "@/lib/context/BrainProvider/types";
+import { useSearchModalContext } from "@/lib/context/SearchModalProvider/hooks/useSearchModalContext";
 import { useUserSettingsContext } from "@/lib/context/UserSettingsProvider/hooks/useUserSettingsContext";
 import { Option } from "@/lib/types/Options";
 
@@ -20,6 +21,7 @@ type BrainItemProps = {
 
 export const BrainItem = ({ brain, even }: BrainItemProps): JSX.Element => {
   const [optionsOpened, setOptionsOpened] = useState<boolean>(false);
+  const [optionsHovered, setOptionsHovered] = useState<boolean>(false);
 
   const {
     handleUnsubscribeOrDeleteBrain,
@@ -27,13 +29,14 @@ export const BrainItem = ({ brain, even }: BrainItemProps): JSX.Element => {
     setIsDeleteOrUnsubscribeModalOpened,
     isDeleteOrUnsubscribeRequestPending,
   } = useBrainManagementTabs(brain.id);
-  const { allBrains } = useBrainContext();
+  const { allBrains, setCurrentBrainId } = useBrainContext();
   const { isOwnedByCurrentUser } = getBrainPermissions({
     brainId: brain.id,
     userAccessibleBrains: allBrains,
   });
   const { brain: fetchedBrain } = useBrainFetcher({ brainId: brain.id });
   const { isDarkMode } = useUserSettingsContext();
+  const { setIsVisible } = useSearchModalContext();
 
   const iconRef = useRef<HTMLDivElement | null>(null);
   const optionsRef = useRef<HTMLDivElement | null>(null);
@@ -43,6 +46,16 @@ export const BrainItem = ({ brain, even }: BrainItemProps): JSX.Element => {
       label: "Edit",
       onClick: () => (window.location.href = `/studio/${brain.id}`),
       iconName: "edit",
+      iconColor: "primary",
+    },
+    {
+      label: "Talk to Brain",
+      onClick: () => {
+        setOptionsOpened(false);
+        setIsVisible(true);
+        setTimeout(() => setCurrentBrainId(brain.id));
+      },
+      iconName: "chat",
       iconColor: "primary",
     },
     {
@@ -76,7 +89,7 @@ export const BrainItem = ({ brain, even }: BrainItemProps): JSX.Element => {
       <a
         className={`
       ${even ? styles.even : styles.odd}
-      ${styles.brain_item_wrapper}
+      ${styles.brain_item_wrapper} ${optionsHovered ? styles.not_hovered : ""}
       `}
         href={`/studio/${brain.id}`}
       >
@@ -100,12 +113,17 @@ export const BrainItem = ({ brain, even }: BrainItemProps): JSX.Element => {
             }}
             className={styles.icon}
           >
-            <Icon
-              name="options"
-              size="small"
-              color="black"
-              handleHover={true}
-            />
+            <div
+              onMouseEnter={() => setOptionsHovered(true)}
+              onMouseLeave={() => setOptionsHovered(false)}
+            >
+              <Icon
+                name="options"
+                size="small"
+                color="black"
+                handleHover={true}
+              />
+            </div>
           </div>
         </div>
         <div className={styles.model}>
@@ -127,7 +145,12 @@ export const BrainItem = ({ brain, even }: BrainItemProps): JSX.Element => {
             }
           />
         </div>
-        <div ref={optionsRef} className={styles.options_modal}>
+        <div
+          ref={optionsRef}
+          className={styles.options_modal}
+          onMouseEnter={() => setOptionsHovered(true)}
+          onMouseLeave={() => setOptionsHovered(false)}
+        >
           {optionsOpened && <OptionsModal options={options} />}
         </div>
       </a>

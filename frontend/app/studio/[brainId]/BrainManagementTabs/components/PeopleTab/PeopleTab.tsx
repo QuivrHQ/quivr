@@ -52,10 +52,14 @@ export const PeopleTab = ({ brainId }: ShareBrainModalProps): JSX.Element => {
             ></QuivrButton>
             <QuivrButton
               isLoading={sendingInvitation}
-              disabled={roleAssignations.length === 0}
-              label="Invite"
+              disabled={
+                !roleAssignations.some(
+                  (roleAssignation) => roleAssignation.email !== ""
+                )
+              }
+              label="Send invitation"
               color="primary"
-              iconName="share"
+              iconName="invite"
               onClick={inviteUsers}
             ></QuivrButton>
           </div>

@@ -123,6 +123,7 @@ export const ConnectionSection = ({
     openedConnections,
     hasToReload,
     setHasToReload,
+    setLoadingFirstList,
   } = useFromConnectionsContext();
   const [existingConnections, setExistingConnections] = useState<Sync[]>([]);
   const [folded, setFolded] = useState<boolean>(!fromAddKnowledge);
@@ -191,7 +192,9 @@ export const ConnectionSection = ({
 
   const handleGetSyncFiles = async (userSyncId: number) => {
     try {
+      setLoadingFirstList(true);
       const res = await getSyncFiles(userSyncId);
+      setLoadingFirstList(false);
       setCurrentSyncElements(res);
       setCurrentSyncId(userSyncId);
       handleOpenedConnections(userSyncId);
