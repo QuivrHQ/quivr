@@ -31,9 +31,6 @@
       list-style: disc;
     }
 
-    quote {
-    }
-
     code {
       display: block;
       margin: Spacings.$spacing05 0;
@@ -45,21 +42,5 @@
 
   .toolbar {
     display: flex;
-  }
-
-  .floating_menu_wrapper {
-    background-color: var(--background-3);
-    padding: Spacings.$spacing02 Spacings.$spacing04;
-    position: relative;
-
-    &::after {
-      content: "";
-      position: absolute;
-      width: 32px;
-      background-color: red;
-      right: 100%;
-      top: 0;
-      bottom: 0;
-    }
   }
 }
