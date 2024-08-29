@@ -34,13 +34,7 @@ export const CitationModal = ({
             <span className={styles.filename}>{sourceFile.filename}</span>
           </a>
         </div>
-        <span className={styles.citation}>
-          {citation
-            .split("Content:")
-            .slice(1)
-            .join("")
-            .replace(/\n{3,}/g, "\n\n")}
-        </span>
+        <span className={styles.citation}>{citation}</span>
       </div>
     </Modal>
   );
