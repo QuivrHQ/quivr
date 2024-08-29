@@ -6,6 +6,7 @@ authors = [
     { name = "Stan Girard", email = "stan@quivr.app" },
     { name = "Amine Diro", email = "amine@quivr.app" },
     { name = "Chloé Daems", email = "chloe@quivr.app" },
+    { name = "Jacopo Chevallard", email = "jacopo@quivr.app" }
 ]
 dependencies = ["packaging>=22.0"]
 readme = "README.md"
@@ -32,11 +33,12 @@ dev-dependencies = [
     "pytest>=8.3.2",
     "pytest-xdist>=3.6.1",
     "pytest-cov>=5.0.0",
-    "tox>=4.18.0",
+    "tox>=4.0.0",
+    "chainlit>=1.1.306"
 ]
 
 [tool.rye.workspace]
-members = [".", "core", "worker", "api"]
+members = [".", "core", "worker", "api", "core/examples/chatbot"]
 
 [tool.hatch.metadata]
 allow-direct-references = true
