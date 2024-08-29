@@ -9,6 +9,8 @@ const Note = (): JSX.Element => {
     <div className={styles.main_container}>
       <div className={styles.page_header}>
         <PageHeader iconName="pen" label="Notetaker" buttons={[]} />
+      </div>
+      <div className={styles.note_page_container}>
         <Tiptap />
       </div>
     </div>
