@@ -4,11 +4,14 @@
 @use "styles/ScreenSizes.module.scss";
 
 .editor_wrapper {
+  max-width: ScreenSizes.$medium;
+  width: 100%;
+  margin: 0 auto;
+  padding: Spacings.$spacing07;
+
   .content_wrapper {
-    padding: Spacings.$spacing07;
     color: var(--text-3);
-    max-width: ScreenSizes.$small;
-    margin: 0 auto;
+    width: 100%;
 
     h1 {
       @include Typography.Big;
@@ -27,8 +30,69 @@
       margin-bottom: Spacings.$spacing02;
     }
 
-    ul > li {
-      list-style: disc;
+    ul,
+    ol {
+      margin-bottom: Spacings.$spacing02;
+
+      li {
+        margin-bottom: Spacings.$spacing02;
+        margin-left: Spacings.$spacing07;
+        padding-left: Spacings.$spacing03;
+      }
+    }
+
+    ol {
+      list-style-type: decimal;
+    }
+
+    ul {
+      list-style-type: disc;
+    }
+
+    blockquote {
+      margin: Spacings.$spacing05 0;
+      padding: Spacings.$spacing04 Spacings.$spacing06;
+      border-left: 4px solid var(--border-1);
+      background-color: var(--background-1);
+      font-style: italic;
+    }
+
+    hr {
+      margin: Spacings.$spacing06 0;
+      border: 0;
+      border-top: 1px solid var(--border-2);
+    }
+
+    a {
+      color: var(--link-color);
+      text-decoration: underline;
+
+      &:hover {
+        text-decoration: none;
+      }
+    }
+
+    img {
+      max-width: 100%;
+      height: auto;
+      margin: Spacings.$spacing04 0;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: Spacings.$spacing04 0;
+
+      th,
+      td {
+        border: 1px solid var(--border-2);
+        padding: Spacings.$spacing03;
+        text-align: left;
+      }
+
+      th {
+        background-color: var(--background-3);
+      }
     }
 
     code {
@@ -36,11 +100,8 @@
       margin: Spacings.$spacing05 0;
       padding: Spacings.$spacing04 Spacings.$spacing05;
       background-color: var(--background-2);
-      border-radius: Radius.$normal;
+      border-radius: 4px;
+      font-family: monospace;
     }
-  }
-
-  .toolbar {
-    display: flex;
   }
 }

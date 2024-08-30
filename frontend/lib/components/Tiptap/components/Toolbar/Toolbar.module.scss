@@ -1,0 +1,23 @@
+@use "styles/Spacings.module.scss";
+@use "styles/IconSizes.module.scss";
+@use "styles/Radius.module.scss";
+@use "styles/ZIndexes.module.scss";
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: Spacings.$spacing02;
+  padding: Spacings.$spacing02;
+  border: solid 1px var(--border-0);
+  border-radius: Radius.$normal;
+  position: sticky;
+  top: Spacings.$spacing05;
+  z-index: ZIndexes.$base;
+  background-color: var(--background-3);
+  margin-bottom: Spacings.$spacing07;
+}
+
+.separator {
+  border-right: solid 1px var(--border-1);
+  height: IconSizes.$big;
+}
