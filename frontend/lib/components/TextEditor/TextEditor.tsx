@@ -5,7 +5,7 @@ import { Link } from "@tiptap/extension-link";
 import { EditorContent, useEditor } from "@tiptap/react";
 import { StarterKit } from "@tiptap/starter-kit";
 
-import styles from "./Tiptap.module.scss";
+import styles from "./TextEditor.module.scss";
 import { Toolbar } from "./components";
 
 const defaultContent = `
@@ -39,7 +39,7 @@ const defaultContent = `
     </blockquote>
 `;
 
-export const Tiptap = (): JSX.Element => {
+export const TextEditor = (): JSX.Element => {
   const editor = useEditor({
     extensions: [StarterKit, Dropcursor, Gapcursor, Link],
     content: defaultContent,

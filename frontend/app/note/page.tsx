@@ -1,6 +1,6 @@
 "use client";
 import { PageHeader } from "@/lib/components/PageHeader/PageHeader";
-import { Tiptap } from "@/lib/components/Tiptap";
+import { TextEditor } from "@/lib/components/TextEditor";
 
 import styles from "./page.module.scss";
 
@@ -11,7 +11,7 @@ const Note = (): JSX.Element => {
         <PageHeader iconName="pen" label="Notetaker" buttons={[]} />
       </div>
       <div className={styles.note_page_container}>
-        <Tiptap />
+        <TextEditor />
       </div>
     </div>
   );
