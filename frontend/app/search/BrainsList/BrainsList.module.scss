@@ -14,7 +14,7 @@
     gap: Spacings.$spacing03;
     overflow: hidden;
     width: 100%;
-    overflow-y: scroll;
+    overflow-y: auto;
 
     @media screen and (min-width: ScreenSizes.$large) {
       grid-template-columns: repeat(3, minmax(200px, 1fr));

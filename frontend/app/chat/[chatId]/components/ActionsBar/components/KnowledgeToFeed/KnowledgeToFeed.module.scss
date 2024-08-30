@@ -23,7 +23,7 @@
   .tabs_content_wrapper {
     width: 100%;
     height: 80%;
-    overflow: scroll;
+    overflow: auto;
     padding: Spacings.$spacing01;
   }
 }

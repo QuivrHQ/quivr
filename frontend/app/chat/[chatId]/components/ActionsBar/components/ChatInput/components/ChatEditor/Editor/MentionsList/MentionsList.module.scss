@@ -13,9 +13,9 @@
   gap: Spacings.$spacing02;
   max-width: 300px;
   min-width: 200px;
-  overflow: scroll;
+  overflow: auto;
   max-height: 300px;
-  overflow-y: scroll;
+  overflow-y: auto;
 
   .mentions_list {
     display: flex;
