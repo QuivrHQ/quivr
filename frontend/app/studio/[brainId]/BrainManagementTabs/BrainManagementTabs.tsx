@@ -1,7 +1,7 @@
 /* eslint-disable max-lines */
 
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 import { Icon } from "@/lib/components/ui/Icon/Icon";
 import { LoaderIcon } from "@/lib/components/ui/LoaderIcon/LoaderIcon";
@@ -22,27 +22,20 @@ export const BrainManagementTabs = (): JSX.Element => {
   const { allKnowledge } = useAddedKnowledge({ brainId: brainId ?? undefined });
   const router = useRouter();
 
-  const { brain, isLoading } = useBrainFetcher({
+  const { isLoading } = useBrainFetcher({
     brainId,
   });
 
-  const knowledgeTabDisabled = (): boolean => {
-    return (
-      !hasEditRights ||
-      (brain?.integration_description?.max_files === 0 &&
-        brain.brain_type !== "doc")
-    );
-  };
-
   const brainManagementTabs: Tab[] = [
     {
-      label: `Knowledge${allKnowledge.length > 1 ? "s" : ""} (${
-        allKnowledge.length
-      })`,
+      label: hasEditRights
+        ? `Knowledge${allKnowledge.length > 1 ? "s" : ""} (${
+            allKnowledge.length
+          })`
+        : "Knowledge",
       isSelected: selectedTab === "Knowledge",
       onClick: () => setSelectedTab("Knowledge"),
       iconName: "file",
-      disabled: knowledgeTabDisabled(),
     },
     {
       label: "Settings",
@@ -58,10 +51,6 @@ export const BrainManagementTabs = (): JSX.Element => {
       disabled: !hasEditRights,
     },
   ];
-
-  useEffect(() => {
-    brainManagementTabs[2].disabled = knowledgeTabDisabled();
-  }, [hasEditRights]);
 
   if (!brainId) {
     return <div />;
@@ -89,7 +78,9 @@ export const BrainManagementTabs = (): JSX.Element => {
           <Tabs tabList={brainManagementTabs} />
         </div>
       </div>
-      {selectedTab === "Settings" && <SettingsTab brainId={brainId} />}
+      {selectedTab === "Settings" && (
+        <SettingsTab brainId={brainId} hasEditRights={hasEditRights} />
+      )}
       {selectedTab === "People" && <PeopleTab brainId={brainId} />}
       {selectedTab === "Knowledge" && (
         <KnowledgeTab

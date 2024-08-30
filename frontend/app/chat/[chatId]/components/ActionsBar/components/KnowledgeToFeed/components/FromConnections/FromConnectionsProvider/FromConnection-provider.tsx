@@ -15,6 +15,8 @@ export type FromConnectionsContextType = {
   >;
   hasToReload: boolean;
   setHasToReload: React.Dispatch<React.SetStateAction<boolean>>;
+  loadingFirstList: boolean;
+  setLoadingFirstList: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
 export const FromConnectionsContext = createContext<
@@ -36,6 +38,7 @@ export const FromConnectionsProvider = ({
     OpenedConnection[]
   >([]);
   const [hasToReload, setHasToReload] = useState<boolean>(false);
+  const [loadingFirstList, setLoadingFirstList] = useState<boolean>(false);
 
   return (
     <FromConnectionsContext.Provider
@@ -49,6 +52,9 @@ export const FromConnectionsProvider = ({
 
         hasToReload,
         setHasToReload,
+
+        loadingFirstList,
+        setLoadingFirstList,
       }}
     >
       {children}

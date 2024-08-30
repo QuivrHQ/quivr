@@ -20,11 +20,25 @@ type KnowledgeTabProps = {
 export const KnowledgeTab = ({
   brainId,
   allKnowledge,
+  hasEditRights,
 }: KnowledgeTabProps): JSX.Element => {
   const { isPending } = useAddedKnowledge({
     brainId,
   });
   const { setShouldDisplayFeedCard } = useKnowledgeToFeedContext();
+
+  if (!hasEditRights) {
+    return (
+      <div className={styles.knowledge_tab_container}>
+        <div className={styles.knowledge_tab_wrapper}>
+          <MessageInfoBox type="warning">
+            You don&apos;t have permission to access the knowledge in this
+            brain.
+          </MessageInfoBox>
+        </div>
+      </div>
+    );
+  }
 
   if (isPending) {
     return <LoaderIcon size="big" color="accent" />;
@@ -35,14 +49,16 @@ export const KnowledgeTab = ({
       <div className={styles.knowledge_tab_container}>
         <div className={styles.knowledge_tab_wrapper}>
           <MessageInfoBox type="warning">
-            This brain is empty! You can add knowledge by clicking on
-            <QuivrButton
-              label="Add knowledge"
-              color="primary"
-              iconName="add"
-              onClick={() => setShouldDisplayFeedCard(true)}
-            />
-            .
+            <div className={styles.message}>
+              This brain is empty! You can add knowledge by clicking on
+              <QuivrButton
+                label="Add knowledge"
+                color="primary"
+                iconName="add"
+                onClick={() => setShouldDisplayFeedCard(true)}
+              />
+              .
+            </div>
           </MessageInfoBox>
         </div>
       </div>

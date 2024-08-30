@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.0.300 (2024-08-22)
+
+## What's Changed
+* feat(smtp&share): implemented smtp support and fixed share brain by @StanGirard in https://github.com/QuivrHQ/quivr/pull/3049
+
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.299...v0.0.300
+
 ## 0.0.299 (2024-08-22)
 
 ## What's Changed

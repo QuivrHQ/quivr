@@ -13,6 +13,11 @@ from quivr_api.modules.knowledge.dto.outputs import DeleteKnowledgeResponse
 from quivr_api.modules.knowledge.entity.knowledge import Knowledge, KnowledgeDB
 from quivr_api.modules.knowledge.repository.knowledges import KnowledgeRepository
 from quivr_api.modules.knowledge.repository.storage import Storage
+from quivr_api.modules.sync.entity.sync_models import (
+    DBSyncFile,
+    DownloadedSyncFile,
+    SyncFile,
+)
 
 logger = get_logger(__name__)
 
@@ -62,7 +67,7 @@ class KnowledgeService(BaseService[KnowledgeRepository]):
         inserted_knowledge = await knowledge_db.to_dto()
         return inserted_knowledge
 
-    async def get_all_knowledge(self, brain_id: UUID) -> List[Knowledge]:
+    async def get_all_knowledge_in_brain(self, brain_id: UUID) -> List[Knowledge]:
         brain = await self.repository.get_brain_by_id(brain_id)
 
         all_knowledges = await brain.awaitable_attrs.knowledges
@@ -116,9 +121,44 @@ class KnowledgeService(BaseService[KnowledgeRepository]):
 
         return message
 
-    async def remove_brain_all_knowledge(self, brain_id: UUID) -> None:
-        await self.repository.remove_brain_all_knowledge(brain_id)
+    async def remove_all_knowledges_from_brain(self, brain_id: UUID) -> None:
+        await self.repository.remove_all_knowledges_from_brain(brain_id)
 
         logger.info(
             f"All knowledge in brain {brain_id} removed successfully from table"
         )
+
+    # TODO: REDO THIS MESS !!!!
+    # REMOVE ALL SYNC TABLES and start from scratch
+    async def update_or_create_knowledge_sync(
+        self,
+        brain_id: UUID,
+        file: SyncFile,
+        new_sync_file: DBSyncFile | None,
+        prev_sync_file: DBSyncFile | None,
+        downloaded_file: DownloadedSyncFile,
+        source: str,
+        source_link: str,
+    ) -> Knowledge:
+        sync_id = None
+        # TODO: THIS IS A HACK!! Remove all of this
+        if prev_sync_file:
+            prev_knowledge = await self.get_knowledge_sync(sync_id=prev_sync_file.id)
+            await self.repository.remove_knowledge_by_id(prev_knowledge.id)
+            sync_id = prev_sync_file.id
+
+        sync_id = new_sync_file.id if new_sync_file else sync_id
+        knowledge_to_add = CreateKnowledgeProperties(
+            brain_id=brain_id,
+            file_name=file.name,
+            mime_type=downloaded_file.extension,
+            source=source,
+            status=KnowledgeStatus.PROCESSING,
+            source_link=source_link,
+            file_size=file.size if file.size else 0,
+            file_sha1=downloaded_file.file_sha1(),
+            # FIXME (@aminediro): This is a temporary fix, redo in KMS
+            metadata={"sync_file_id": str(sync_id)},
+        )
+        added_knowledge = await self.insert_knowledge(knowledge_to_add)
+        return added_knowledge

@@ -44,6 +44,7 @@ export const OptionsModal = ({ options }: OptionsModalProps): JSX.Element => {
           onClick={(event) => {
             event.preventDefault();
             event.stopPropagation();
+            event.nativeEvent.stopImmediatePropagation();
             option.onClick();
           }}
           onMouseEnter={() => handleMouseEnter(index)}

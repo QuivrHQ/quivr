@@ -1,7 +1,6 @@
 from uuid import uuid4
 
 import pytest
-
 from quivr_core.storage.file import FileExtension, QuivrFile
 
 
@@ -29,8 +28,6 @@ async def test_process_txt(txt_qfile):
     doc = await tparser.process_file(txt_qfile)
     assert len(doc) > 0
     assert doc[0].page_content == "This is some test data."
-
-    print(doc[0].metadata)
     assert (
         doc[0].metadata.items()
         >= {

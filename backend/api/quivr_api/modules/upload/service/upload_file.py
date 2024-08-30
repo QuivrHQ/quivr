@@ -70,7 +70,6 @@ async def upload_file_storage(
             )
             return response
         except Exception as e:
-            # FIXME: Supabase client to return the correct error
             if "The resource already exists" in str(e) and not upsert:
                 raise FileExistsError(f"File {storage_path} already exists")
             raise e
