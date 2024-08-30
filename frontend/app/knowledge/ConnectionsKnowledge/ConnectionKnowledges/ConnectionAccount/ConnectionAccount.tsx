@@ -7,7 +7,6 @@ import { Icon } from "@/lib/components/ui/Icon/Icon";
 
 import styles from "./ConnectionAccount.module.scss";
 
-import SyncFile from "../SyncFile/SyncFile";
 import SyncFolder from "../SyncFolder/SyncFolder";
 
 interface ConnectionAccountProps {
@@ -29,7 +28,7 @@ const ConnectionAccount = ({
       try {
         const res = await getSyncFiles(sync.id);
         console.info(res);
-        setSyncElements(res); // Supposons que res est déjà un tableau de SyncElement
+        setSyncElements(res);
       } catch (error) {
         console.error("Failed to get sync files:", error);
       }
@@ -37,7 +36,7 @@ const ConnectionAccount = ({
   }, [sync.id]);
 
   return (
-    <div>
+    <div className={styles.account_section_wrapper}>
       <div className={styles.account_line_wrapper}>
         <Icon
           name="chevronRight"
@@ -51,15 +50,13 @@ const ConnectionAccount = ({
       </div>
       {!folded && (
         <div className={styles.sync_elements_wrapper}>
-          {syncElements?.files.map((element, id) => (
-            <div key={id}>
-              {element.is_folder ? (
+          {syncElements?.files
+            .filter((file) => file.is_folder)
+            .map((element, id) => (
+              <div key={id}>
                 <SyncFolder element={element} indent={2} />
-              ) : (
-                <SyncFile element={element} />
-              )}
-            </div>
-          ))}
+              </div>
+            ))}
         </div>
       )}
     </div>
