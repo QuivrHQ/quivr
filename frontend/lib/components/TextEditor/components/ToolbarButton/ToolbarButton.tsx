@@ -43,7 +43,11 @@ export const ToolbarButton = forwardRef(
         }}
         {...props}
       >
-        <Icon name={iconName} color={"black"} size={"normal"} />
+        <Icon
+          name={iconName}
+          color={active ? "primary" : "black"}
+          size={"normal"}
+        />
       </Button>
     );
   }
