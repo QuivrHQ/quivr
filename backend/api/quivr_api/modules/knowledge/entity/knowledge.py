@@ -16,7 +16,7 @@ class Knowledge(BaseModel):
     id: UUID
     file_name: Optional[str] = None
     url: Optional[str] = None
-    mime_type: str = "txt"
+    extension: str = ".txt"
     status: str
     source: Optional[str] = None
     source_link: Optional[str] = None
@@ -41,7 +41,7 @@ class KnowledgeDB(AsyncAttrs, SQLModel, table=True):
     )
     file_name: Optional[str] = Field(default=None, max_length=255)
     url: Optional[str] = Field(default=None, max_length=2048)
-    mime_type: str = Field(default="txt", max_length=100)
+    extension: str = Field(default=".txt", max_length=100)
     status: str = Field(max_length=50)
     source: str = Field(max_length=255)
     source_link: Optional[str] = Field(max_length=2048)
@@ -80,7 +80,7 @@ class KnowledgeDB(AsyncAttrs, SQLModel, table=True):
             id=self.id,  # type: ignore
             file_name=self.file_name,
             url=self.url,
-            mime_type=self.mime_type,
+            extension=self.extension,
             status=KnowledgeStatus(self.status),
             source=self.source,
             source_link=self.source_link,

@@ -2,9 +2,8 @@ from uuid import UUID
 
 from quivr_api.logger import get_logger
 from quivr_api.modules.brain.service.brain_service import BrainService
-from quivr_api.modules.brain.service.brain_vector_service import \
-    BrainVectorService
 from quivr_api.vector.service.vector_service import VectorService
+
 from quivr_worker.files import build_file
 from quivr_worker.parsers.crawler import URL, extract_from_url, slugify
 from quivr_worker.process.process_file import process_file
@@ -17,11 +16,10 @@ async def process_url_func(
     brain_id: UUID,
     knowledge_id: UUID,
     brain_service: BrainService,
-    brain_vector_service: BrainVectorService,
     vector_service: VectorService,
 ):
     crawl_website = URL(url=url)
-    extracted_content = extract_from_url(crawl_website)
+    extracted_content = await extract_from_url(crawl_website)
     extracted_content_bytes = extracted_content.encode("utf-8")
     file_name = slugify(crawl_website.url) + ".txt"
 
@@ -37,7 +35,6 @@ async def process_url_func(
             file_instance=file_instance,
             brain=brain,
             brain_service=brain_service,
-            brain_vector_service=brain_vector_service,
             integration=None,
             integration_link=None,
             vector_service=vector_service,

@@ -97,7 +97,6 @@ async def upload_file(
     buff_reader = io.BufferedReader(uploadFile.file)  # type: ignore
     try:
         await upload_file_storage(buff_reader, filename_with_brain_id)
-
     except Exception as e:
         logger.exception(f"Exception in upload_route {e}")
         notification_service.update_notification_by_id(
@@ -110,11 +109,11 @@ async def upload_file(
         raise HTTPException(
             status_code=500, detail=f"Failed to upload file to storage. {e}"
         )
-    # FIXME: @chloedia check if these are the correct properties
+
     knowledge_to_add = CreateKnowledgeProperties(
         brain_id=brain_id,
         file_name=uploadFile.filename,
-        mime_type=os.path.splitext(
+        extension=os.path.splitext(
             uploadFile.filename  # pyright: ignore reportPrivateUsage=none
         )[-1].lower(),
         source=integration if integration else "local",

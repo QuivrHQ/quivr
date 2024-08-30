@@ -17,11 +17,11 @@ class URL(BaseModel):
     max_time: int = 60
 
 
-def extract_from_url(url: URL) -> str:
+async def extract_from_url(url: URL) -> str:
     # Extract and combine content recursively
     loader = PlaywrightURLLoader(urls=[url.url], remove_selectors=["header", "footer"])
 
-    data = loader.load()
+    data = await loader.aload()
     # Now turn the data into a string
     logger.info(f"Extracted content from {len(data)} pages")
     extracted_content = ""

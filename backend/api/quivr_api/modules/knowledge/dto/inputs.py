@@ -9,7 +9,7 @@ class CreateKnowledgeProperties(BaseModel):
     brain_id: UUID
     file_name: Optional[str] = None
     url: Optional[str] = None
-    mime_type: str = "application/txt"
+    extension: str = ".txt"
     status: KnowledgeStatus = KnowledgeStatus.PROCESSING
     source: str = "local"
     source_link: Optional[str] = None

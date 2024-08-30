@@ -11,7 +11,6 @@ from quivr_api.models.settings import settings
 from quivr_api.modules.brain.integrations.Notion.Notion_connector import NotionConnector
 from quivr_api.modules.brain.repository.brains_vectors import BrainsVectors
 from quivr_api.modules.brain.service.brain_service import BrainService
-from quivr_api.modules.brain.service.brain_vector_service import BrainVectorService
 from quivr_api.modules.dependencies import get_supabase_client
 from quivr_api.modules.knowledge.repository.knowledges import KnowledgeRepository
 from quivr_api.modules.knowledge.repository.storage import Storage
@@ -149,14 +148,11 @@ async def aprocess_file_task(
             vector_service = VectorService(
                 vector_repository
             )  # FIXME @amine: fix to need AsyncSession in vector Service
-            brain_vector_service = BrainVectorService(brain_id)
             knowledge_repository = KnowledgeRepository(async_session)
             knowledge_service = KnowledgeService(knowledge_repository)
-
             await process_uploaded_file(
                 supabase_client=supabase_client,
                 brain_service=brain_service,
-                brain_vector_service=brain_vector_service,
                 vector_service=vector_service,
                 knowledge_service=knowledge_service,
                 file_name=file_name,
@@ -172,10 +168,10 @@ async def aprocess_file_task(
 @celery.task(
     retries=3,
     default_retry_delay=1,
-    name="process_crawl_and_notify",
+    name="process_crawl_task",
     autoretry_for=(Exception,),
 )
-async def process_crawl_task(
+def process_crawl_task(
     crawl_website_url: str,
     brain_id: UUID,
     knowledge_id: UUID,
@@ -187,7 +183,6 @@ async def process_crawl_task(
     global engine
     assert engine
     with Session(engine, expire_on_commit=False, autoflush=False) as session:
-        brain_vector_service = BrainVectorService(brain_id)
         vector_repository = VectorRepository(session)
         vector_service = VectorService(vector_repository)
         loop = asyncio.get_event_loop()
@@ -197,7 +192,6 @@ async def process_crawl_task(
                 brain_id=brain_id,
                 knowledge_id=knowledge_id,
                 brain_service=brain_service,
-                brain_vector_service=brain_vector_service,
                 vector_service=vector_service,
             )
         )

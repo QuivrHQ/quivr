@@ -50,7 +50,7 @@ class KnowledgeService(BaseService[KnowledgeRepository]):
         knowledge = KnowledgeDB(
             file_name=knowledge_to_add.file_name,
             url=knowledge_to_add.url,
-            mime_type=knowledge_to_add.mime_type,
+            extension=knowledge_to_add.extension,
             status=knowledge_to_add.status.value,
             source=knowledge_to_add.source,
             source_link=knowledge_to_add.source_link,
@@ -151,7 +151,7 @@ class KnowledgeService(BaseService[KnowledgeRepository]):
         knowledge_to_add = CreateKnowledgeProperties(
             brain_id=brain_id,
             file_name=file.name,
-            mime_type=downloaded_file.extension,
+            extension=downloaded_file.extension,
             source=source,
             status=KnowledgeStatus.PROCESSING,
             source_link=source_link,
