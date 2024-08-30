@@ -4,11 +4,14 @@
 @use "styles/ScreenSizes.module.scss";
 
 .editor_wrapper {
+  max-width: ScreenSizes.$medium;
+  width: 100%;
+  margin: 0 auto;
+  padding: Spacings.$spacing07;
+
   .content_wrapper {
-    padding: Spacings.$spacing07;
     color: var(--text-3);
-    max-width: ScreenSizes.$small;
-    margin: 0 auto;
+    width: 100%;
 
     h1 {
       @include Typography.Big;
@@ -100,9 +103,5 @@
       border-radius: 4px;
       font-family: monospace;
     }
-  }
-
-  .toolbar {
-    display: flex;
   }
 }

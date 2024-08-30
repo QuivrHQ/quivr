@@ -1,10 +1,12 @@
 "use client";
 import { Dropcursor } from "@tiptap/extension-dropcursor";
 import { Gapcursor } from "@tiptap/extension-gapcursor";
+import { Link } from "@tiptap/extension-link";
 import { EditorContent, useEditor } from "@tiptap/react";
 import { StarterKit } from "@tiptap/starter-kit";
 
 import styles from "./Tiptap.module.scss";
+import { Toolbar } from "./components";
 
 const defaultContent = `
     <h1>
@@ -39,7 +41,7 @@ const defaultContent = `
 
 export const Tiptap = (): JSX.Element => {
   const editor = useEditor({
-    extensions: [StarterKit, Dropcursor, Gapcursor],
+    extensions: [StarterKit, Dropcursor, Gapcursor, Link],
     content: defaultContent,
     immediatelyRender: false,
   });
@@ -50,6 +52,7 @@ export const Tiptap = (): JSX.Element => {
 
   return (
     <div className={styles.editor_wrapper}>
+      <Toolbar editor={editor} />
       <EditorContent className={styles.content_wrapper} editor={editor} />
     </div>
   );

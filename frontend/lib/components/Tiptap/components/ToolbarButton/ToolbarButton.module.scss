@@ -1,0 +1,21 @@
+@use "styles/IconSizes.module.scss";
+
+.toolbar_button {
+  width: IconSizes.$big + 4px;
+  height: IconSizes.$big + 4px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: transparent;
+  border: none;
+
+  &:hover {
+    background-color: var(--background-3);
+  }
+
+  &.active {
+    background-color: var(--background-3);
+    border: 1px solid var(--text-4);
+  }
+}
