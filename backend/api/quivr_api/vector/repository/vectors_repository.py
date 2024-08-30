@@ -1,12 +1,11 @@
 from typing import Any, List, Sequence
 from uuid import UUID
 
-from sqlalchemy import exc, text
-from sqlmodel import Session
-
 from quivr_api.logger import get_logger
 from quivr_api.modules.dependencies import BaseRepository
 from quivr_api.vector.entity.vector import SimilaritySearchOutput, Vector
+from sqlalchemy import exc, text
+from sqlmodel import Session, select
 
 logger = get_logger(__name__)
 
@@ -35,6 +34,11 @@ class VectorRepository(BaseRepository):
             self.session.refresh(vector)
 
         return new_vectors
+
+    def get_vectors_by_knowledge_id(self, knowledge_id: UUID) -> Sequence[Vector]:
+        query = select(Vector).where(Vector.knowledge_id == knowledge_id)
+        results = self.session.execute(query)
+        return results.scalars().all()
 
     def similarity_search(
         self,

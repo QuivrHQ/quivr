@@ -80,6 +80,16 @@ class CustomSupabaseVectorStore(SupabaseVectorStore):
         logger.debug(f"Similarity search for query: {query}")
         assert self.brain_id, "Brain ID is required for similarity search"
 
-        res = self.vector_service.similarity_search(query, brain_id=self.brain_id, k=k)
+        match_result = self.vector_service.similarity_search(
+            query, brain_id=self.brain_id, k=k
+        )
 
-        return res
+        sorted_match_result_by_file_name_metadata = sorted(
+            match_result,
+            key=lambda x: (
+                x.metadata.get("file_name", ""),
+                x.metadata.get("index", float("inf")),
+            ),
+        )
+
+        return sorted_match_result_by_file_name_metadata
