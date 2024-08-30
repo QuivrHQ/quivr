@@ -82,7 +82,7 @@ async def crawl_endpoint(
         knowledge_to_add = CreateKnowledgeProperties(
             brain_id=brain_id,
             url=crawl_website.url,
-            mime_type="application/html",
+            extension=".html",
             source="web",
             source_link=crawl_website.url,
         )

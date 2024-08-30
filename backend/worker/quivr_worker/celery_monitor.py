@@ -31,7 +31,7 @@ class TaskStatus(str, Enum):
 
 class TaskIdentifier(str, Enum):
     PROCESS_FILE_TASK = "process_file_task"
-    PROCESS_CRAWL_TASK = "process_crawl_and_notify"
+    PROCESS_CRAWL_TASK = "process_crawl_task"
 
 
 @dataclass
@@ -113,10 +113,7 @@ def notifier(app):
             task_result = AsyncResult(task.id, app=app)
             task_name, task_kwargs = task_result.name, task_result.kwargs
 
-            if (
-                task_name == "process_file_task"
-                or task_name == "process_crawl_and_notify"
-            ):
+            if task_name == "process_file_task" or task_name == "process_crawl_task":
                 logger.debug(f"Received Event : {task} - {task_name} {task_kwargs} ")
                 notification_id = task_kwargs["notification_id"]
                 knowledge_id = task_kwargs.get("knowledge_id", None)

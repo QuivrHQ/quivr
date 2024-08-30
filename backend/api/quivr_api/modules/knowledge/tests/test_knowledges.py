@@ -72,7 +72,7 @@ async def test_data(session: AsyncSession) -> TestData:
 
     knowledge_brain_1 = KnowledgeDB(
         file_name="test_file_1",
-        mime_type="txt",
+        extension="txt",
         status="UPLOADED",
         source="test_source",
         source_link="test_source_link",
@@ -83,7 +83,7 @@ async def test_data(session: AsyncSession) -> TestData:
 
     knowledge_brain_2 = KnowledgeDB(
         file_name="test_file_2",
-        mime_type="txt",
+        extension="txt",
         status="UPLOADED",
         source="test_source",
         source_link="test_source_link",
@@ -190,7 +190,7 @@ async def test_duplicate_sha1_knowledge(session: AsyncSession, test_data: TestDa
     repo = KnowledgeRepository(session)
     knowledge = KnowledgeDB(
         file_name="test_file_2",
-        mime_type="txt",
+        extension="txt",
         status="UPLOADED",
         source="test_source",
         source_link="test_source_link",

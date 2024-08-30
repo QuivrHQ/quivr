@@ -5,7 +5,6 @@ from langchain_core.documents import Document
 from quivr_api.logger import get_logger
 from quivr_api.modules.brain.entity.brain_entity import BrainEntity
 from quivr_api.modules.brain.service.brain_service import BrainService
-from quivr_api.modules.brain.service.brain_vector_service import BrainVectorService
 from quivr_api.vector.service.vector_service import VectorService
 from quivr_core.processor.registry import get_processor_class
 
@@ -30,7 +29,6 @@ async def process_file(
     file_instance: File,
     brain: BrainEntity,
     brain_service: BrainService,
-    brain_vector_service: BrainVectorService,
     vector_service: VectorService,
     integration: str | None,
     integration_link: str | None,
@@ -46,7 +44,6 @@ async def process_file(
         brain_id=brain.brain_id,
         chunks=chunks,
         brain_service=brain_service,
-        brain_vector_service=brain_vector_service,
         vector_service=vector_service,
     )
 
@@ -57,7 +54,6 @@ def store_chunks(
     brain_id: UUID,
     chunks: list[Document],
     brain_service: BrainService,
-    brain_vector_service: BrainVectorService,
     vector_service: VectorService,
 ):
     # vector_ids = document_vector_store.add_documents(chunks)

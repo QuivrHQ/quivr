@@ -316,7 +316,7 @@ class TestSyncUtils:
         assert len(all_km) == 1
         created_km = all_km[0]
         assert created_km.file_name == sync_file.name
-        assert created_km.mime_type == ".txt"
+        assert created_km.extension == ".txt"
         assert created_km.file_sha1 is not None
         assert created_km.created_at is not None
         assert created_km.metadata == {"sync_file_id": "1"}
@@ -413,7 +413,7 @@ class TestSyncUtils:
         assert len(all_km) == 1
         created_km = all_km[0]
         assert created_km.file_name == sync_file.name
-        assert created_km.mime_type == ".txt"
+        assert created_km.extension == ".txt"
         assert created_km.file_sha1 is not None
         assert created_km.updated_at
         assert created_km.created_at

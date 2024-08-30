@@ -2,7 +2,6 @@ from uuid import UUID
 
 from quivr_api.logger import get_logger
 from quivr_api.modules.brain.service.brain_service import BrainService
-from quivr_api.modules.brain.service.brain_vector_service import BrainVectorService
 from quivr_api.modules.knowledge.service.knowledge_service import KnowledgeService
 from quivr_api.vector.service.vector_service import VectorService
 
@@ -16,7 +15,6 @@ logger = get_logger("celery_worker")
 async def process_uploaded_file(
     supabase_client: Client,
     brain_service: BrainService,
-    brain_vector_service: BrainVectorService,
     vector_service: VectorService,
     knowledge_service: KnowledgeService,
     file_name: str,
@@ -54,7 +52,6 @@ async def process_uploaded_file(
                 file_instance=file_instance,
                 brain=brain,
                 brain_service=brain_service,
-                brain_vector_service=brain_vector_service,
                 vector_service=vector_service,
                 integration=integration,
                 integration_link=integration_link,
