@@ -5,21 +5,23 @@ from typing import Tuple
 import pytest
 import pytest_asyncio
 import sqlalchemy
+from quivr_api.modules.models.entity.model import Model
+from quivr_api.modules.user.entity.user_identity import User
 from sqlalchemy.ext.asyncio import create_async_engine
 from sqlmodel import select
 from sqlmodel.ext.asyncio.session import AsyncSession
-
-from quivr_api.modules.models.entity.model import Model
-from quivr_api.modules.user.entity.user_identity import User
 
 pg_database_base_url = "postgres:postgres@localhost:54322/postgres"
 
 TestData = Tuple[Model, Model, User]
 
 
-@pytest.fixture(scope="session")
-def event_loop(request: pytest.FixtureRequest):
-    loop = asyncio.get_event_loop_policy().new_event_loop()
+@pytest.fixture(scope="session", autouse=True)
+def event_loop():
+    try:
+        loop = asyncio.get_running_loop()
+    except RuntimeError:
+        loop = asyncio.new_event_loop()
     yield loop
     loop.close()
 
