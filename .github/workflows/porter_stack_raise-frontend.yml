@@ -1,7 +1,7 @@
 on:
   push:
-    tags:
-      - "v*"
+    branches:
+      - main
 name: Deploy to raise-frontend
 jobs:
   porter-deploy:
