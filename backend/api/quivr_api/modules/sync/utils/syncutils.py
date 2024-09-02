@@ -196,6 +196,7 @@ class SyncUtils:
             downloaded_file=downloaded_file,
             source=source,
             source_link=source_link,
+            user_id=current_user.user_id,
         )
 
         # Send file for processing

@@ -64,7 +64,7 @@ def test_data(session: Session, embedder) -> TestData:
     )
     knowledge_1 = KnowledgeDB(
         file_name="test_file_1",
-        mime_type="txt",
+        extension=".txt",
         status="UPLOADED",
         source="test_source",
         source_link="test_source_link",

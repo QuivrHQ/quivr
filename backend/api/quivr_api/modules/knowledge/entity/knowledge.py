@@ -66,6 +66,7 @@ class KnowledgeDB(AsyncAttrs, SQLModel, table=True):
     metadata_: Optional[Dict[str, str]] = Field(
         default=None, sa_column=Column("metadata", JSON)
     )
+    user_id: UUID = Field(foreign_key="users.id", nullable=False)
     brains: List["Brain"] = Relationship(
         back_populates="knowledges",
         link_model=KnowledgeBrain,

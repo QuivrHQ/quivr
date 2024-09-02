@@ -45,6 +45,7 @@ class KnowledgeService(BaseService[KnowledgeRepository]):
 
     async def insert_knowledge(
         self,
+        user_id: UUID,
         knowledge_to_add: CreateKnowledgeProperties,  # FIXME: (later) @Amine brain id should not be in CreateKnowledgeProperties but since storage is brain_id/file_name
     ) -> Knowledge:
         knowledge = KnowledgeDB(
@@ -57,6 +58,7 @@ class KnowledgeService(BaseService[KnowledgeRepository]):
             file_size=knowledge_to_add.file_size,
             file_sha1=knowledge_to_add.file_sha1,
             metadata_=knowledge_to_add.metadata,  # type: ignore
+            user_id=user_id,
         )
 
         knowledge_db = await self.repository.insert_knowledge(
@@ -133,6 +135,7 @@ class KnowledgeService(BaseService[KnowledgeRepository]):
     async def update_or_create_knowledge_sync(
         self,
         brain_id: UUID,
+        user_id: UUID,
         file: SyncFile,
         new_sync_file: DBSyncFile | None,
         prev_sync_file: DBSyncFile | None,
@@ -160,5 +163,7 @@ class KnowledgeService(BaseService[KnowledgeRepository]):
             # FIXME (@aminediro): This is a temporary fix, redo in KMS
             metadata={"sync_file_id": str(sync_id)},
         )
-        added_knowledge = await self.insert_knowledge(knowledge_to_add)
+        added_knowledge = await self.insert_knowledge(
+            knowledge_to_add=knowledge_to_add, user_id=user_id
+        )
         return added_knowledge
