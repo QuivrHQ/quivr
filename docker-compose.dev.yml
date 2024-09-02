@@ -17,7 +17,7 @@ services:
         - DEV_MODE=true
     container_name: backend-api
     volumes:
-      - ./backend/:/code/
+      - ./backend/:/app/
     command: >
       /bin/bash -c "python -m uvicorn quivr_api.main:app --host 0.0.0.0 --log-level info --reload --port 5050"
     restart: always
@@ -34,9 +34,9 @@ services:
       - .env
     container_name: notifier
     volumes:
-      - ./backend/:/code/
+      - ./backend/:/app/
     command: >
-      /bin/bash -c "python /code/worker/quivr_worker/celery_monitor.py"
+      /bin/bash -c "python /app/worker/quivr_worker/celery_monitor.py"
     restart: always
     depends_on:
       - redis
@@ -51,9 +51,9 @@ services:
       - .env
     container_name: worker
     volumes:
-      - ./backend/:/code/
+      - ./backend/:/app/
     command: >
-      /bin/bash -c "python -m celery -A quivr_worker.celery_worker worker -l info"
+      /bin/bash -c "python -m celery -A quivr_worker.celery_worker worker -l info -E"
     restart: always
     depends_on:
       - redis
@@ -78,7 +78,7 @@ services:
     command: >
       /bin/bash -c "python -m celery -A quivr_worker.celery_worker beat -l info"
     volumes:
-      - ./backend/:/code/
+      - ./backend/:/app/
     restart: always
     depends_on:
       - redis
@@ -94,7 +94,7 @@ services:
     command: >
       /bin/bash -c "python -m celery -A quivr_worker.celery_worker flower -l info --port=5555"
     volumes:
-      - ./backend/:/code/
+      - ./backend/:/app/
     restart: always
     depends_on:
       - redis
