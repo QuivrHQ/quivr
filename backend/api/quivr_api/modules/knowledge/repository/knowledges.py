@@ -1,10 +1,9 @@
 from typing import Sequence
 from uuid import UUID
 
-from asyncpg.exceptions import UniqueViolationError
 from fastapi import HTTPException
 from quivr_core.models import KnowledgeStatus
-from sqlalchemy.exc import IntegrityError, NoResultFound
+from sqlalchemy.exc import IntegrityError, NoResultFound, SQLAlchemyError
 from sqlmodel import select, text
 from sqlmodel.ext.asyncio.session import AsyncSession
 
@@ -40,10 +39,8 @@ class KnowledgeRepository(BaseRepository):
             await self.session.refresh(knowledge)
         except IntegrityError:
             await self.session.rollback()
-            raise
-        except Exception as e:
+        except Exception:
             await self.session.rollback()
-            raise e
         return knowledge
 
     async def link_to_brain(
@@ -98,6 +95,16 @@ class KnowledgeRepository(BaseRepository):
 
         if not knowledge:
             raise HTTPException(404, "Knowledge not found")
+
+        return knowledge
+
+    async def get_knowledge_by_sha1(self, sha1: str) -> KnowledgeDB:
+        query = select(KnowledgeDB).where(KnowledgeDB.file_sha1 == sha1)
+        result = await self.session.exec(query)
+        knowledge = result.first()
+
+        if not knowledge:
+            raise NoResultFound("Knowledge not found")
 
         return knowledge
 
@@ -193,7 +200,7 @@ class KnowledgeRepository(BaseRepository):
             await self.session.commit()
             await self.session.refresh(knowledge)
             return knowledge
-        except (UniqueViolationError, IntegrityError):
+        except SQLAlchemyError:
             await self.session.rollback()
             raise FileExistsError(
                 f"File {knowledge_id} already exists maybe under another file_name"

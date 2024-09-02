@@ -293,3 +293,81 @@ async def test_get_knowledge_in_brain(session: AsyncSession, test_data: TestData
     assert list_knowledge[0].id == knowledges[0].id
     assert list_knowledge[0].file_name == knowledges[0].file_name
     assert brain.brain_id in brains_of_knowledge
+
+
+@pytest.mark.asyncio
+async def test_should_process_knowledge_exists(
+    session: AsyncSession, test_data: TestData
+):
+    brain, [existing_knowledge, _] = test_data
+    assert brain.brain_id
+    new = KnowledgeDB(
+        file_name="new",
+        extension="txt",
+        status="PROCESSING",
+        source="test_source",
+        source_link="test_source_link",
+        file_size=100,
+        file_sha1=None,
+        brains=[brain],
+        user_id=existing_knowledge.user_id,
+    )
+    session.add(new)
+    await session.commit()
+    await session.refresh(new)
+    incoming_knowledge = await new.to_dto()
+    incoming_knowledge.file_sha1 = existing_knowledge.file_sha1
+    repo = KnowledgeRepository(session)
+    service = KnowledgeService(repo)
+
+    with pytest.raises(FileExistsError):
+        await service.should_process_knowledge(incoming_knowledge, brain.brain_id)
+
+
+@pytest.mark.asyncio
+async def test_should_process_knowledge_prev_error(
+    session: AsyncSession, test_data: TestData
+):
+    repo = KnowledgeRepository(session)
+    service = KnowledgeService(repo)
+    brain, [existing_knowledge, _] = test_data
+    user_id = existing_knowledge.user_id
+    assert brain.brain_id
+    prev = KnowledgeDB(
+        file_name="prev",
+        extension="txt",
+        status=KnowledgeStatus.ERROR,
+        source="test_source",
+        source_link="test_source_link",
+        file_size=100,
+        file_sha1="test1",
+        brains=[brain],
+        user_id=user_id,
+    )
+    session.add(prev)
+    await session.commit()
+    await session.refresh(prev)
+
+    new = KnowledgeDB(
+        file_name="new",
+        extension="txt",
+        status="PROCESSING",
+        source="test_source",
+        source_link="test_source_link",
+        file_size=100,
+        file_sha1=None,
+        brains=[brain],
+        user_id=user_id,
+    )
+    session.add(new)
+    await session.commit()
+    await session.refresh(new)
+
+    incoming_knowledge = await new.to_dto()
+    incoming_knowledge.file_sha1 = prev.file_sha1
+
+    should_process = await service.should_process_knowledge(
+        incoming_knowledge, brain.brain_id
+    )
+
+    assert should_process
