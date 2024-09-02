@@ -24,7 +24,7 @@
   }
 
   .content_container {
-    overflow: scroll;
+    overflow: auto;
     flex: 1 1 0%;
 
     @media (max-width: ScreenSizes.$small) {

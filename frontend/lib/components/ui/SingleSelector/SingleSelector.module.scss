@@ -86,7 +86,7 @@
     border-radius: 0 0 Radius.$normal Radius.$normal;
     overflow: hidden;
     max-height: 180px;
-    overflow: scroll;
+    overflow: auto;
     z-index: ZIndexes.$overlay;
     padding-block: Spacings.$spacing02;
 
