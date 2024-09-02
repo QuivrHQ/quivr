@@ -36,9 +36,7 @@ export const ToolbarButton = forwardRef(
           className
         )}
         onClick={(e) => {
-          console.log("HELLO");
           setActive?.((t) => !t);
-          // Run the onClick callback from the prop
           onClick?.(e);
         }}
         {...props}

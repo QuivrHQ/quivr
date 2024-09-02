@@ -6,7 +6,7 @@ import { EditorContent, useEditor } from "@tiptap/react";
 import { StarterKit } from "@tiptap/starter-kit";
 
 import styles from "./TextEditor.module.scss";
-import { Toolbar } from "./components";
+import { Toolbar } from "./components/Toolbar/Toolbar";
 
 const defaultContent = `
     <h1>

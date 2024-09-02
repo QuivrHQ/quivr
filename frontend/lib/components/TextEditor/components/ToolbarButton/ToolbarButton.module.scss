@@ -1,9 +1,8 @@
 @use "styles/IconSizes.module.scss";
+@use "styles/Spacings.module.scss";
 
 .toolbar_button {
-  width: IconSizes.$big + 4px;
-  height: IconSizes.$big + 4px;
-  padding: 0;
+  padding: Spacings.$spacing03;
   display: flex;
   align-items: center;
   justify-content: center;

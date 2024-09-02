@@ -6,13 +6,23 @@ import { Modal } from "@/lib/components/ui/Modal/Modal";
 
 import styles from "./Toolbar.module.scss";
 
-import { ToolbarButton } from "../ToolbarButton";
+import { ToolbarButton } from "../ToolbarButton/ToolbarButton";
 
-type Props = {
+export const ToolbarSectionSeparator = (): JSX.Element => {
+  return (
+    <div
+      role="separator"
+      aria-orientation="vertical"
+      className={styles.separator}
+    ></div>
+  );
+};
+
+type ToolbarProps = {
   editor: Editor;
 };
 
-export const Toolbar = ({ editor }: Props): JSX.Element => {
+export const Toolbar = ({ editor }: ToolbarProps): JSX.Element => {
   const [linkModalOpen, setLinkModalOpen] = useState(false);
 
   const setLink = useCallback(() => {
@@ -24,15 +34,11 @@ export const Toolbar = ({ editor }: Props): JSX.Element => {
       return;
     }
 
-    // empty
-    if (url === "") {
-      editor.chain().focus().extendMarkRange("link").unsetLink().run();
+    const editorChain = editor.chain().focus().extendMarkRange("link");
 
-      return;
-    }
-
-    // update link
-    editor.chain().focus().extendMarkRange("link").setLink({ href: url }).run();
+    url === ""
+      ? editorChain.unsetLink().run()
+      : editorChain.setLink({ href: url }).run();
   }, [editor]);
 
   return (
@@ -140,15 +146,5 @@ export const Toolbar = ({ editor }: Props): JSX.Element => {
         setActive={editor.chain().focus().toggleHeading({ level: 6 }).run}
       />
     </div>
-  );
-};
-
-export const ToolbarSectionSeparator = (): JSX.Element => {
-  return (
-    <div
-      role="separator"
-      aria-orientation="vertical"
-      className={styles.separator}
-    ></div>
   );
 };
