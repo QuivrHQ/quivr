@@ -1,6 +1,5 @@
 import logging
-from typing import AsyncGenerator, Optional, Sequence, List, Annotated, Sequence, TypedDict
-
+from typing import AsyncGenerator, Optional, Sequence, Annotated, Sequence, TypedDict
 # TODO(@aminediro): this is the only dependency to langchain package, we should remove it
 from langchain.retrievers import ContextualCompressionRetriever
 from langchain_core.callbacks import Callbacks
@@ -294,7 +293,6 @@ class QuivrQARAGLangGraph:
             inputs,
             config={"metadata": metadata},
         )
-        
         response = parse_response(raw_llm_response["final_response"], self.rag_config.llm_config.model)
         return response
 
@@ -338,11 +336,12 @@ class QuivrQARAGLangGraph:
             config={"metadata": metadata},
         ):
             kind = event["event"]
+
+            if not sources and "output" in event["data"] and "docs" in event["data"]["output"]:
+                sources = event["data"]["output"]["docs"]
+
             if kind == "on_chat_model_stream" and event["metadata"]["langgraph_node"] == "generate":
                 chunk = event["data"]["chunk"]
-                # Could receive this anywhere so we need to save it for the last chunk
-                if "docs" in chunk:
-                    sources = chunk["docs"] if "docs" in chunk else []
 
                 rolling_message, answer_str = parse_chunk_response(
                     rolling_message,
