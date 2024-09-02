@@ -6,20 +6,22 @@ from uuid import uuid4
 import pytest
 import pytest_asyncio
 import sqlalchemy
-from sqlalchemy.ext.asyncio import create_async_engine
-from sqlmodel import select
-from sqlmodel.ext.asyncio.session import AsyncSession
-
 from quivr_api.modules.brain.entity.brain_entity import Brain, BrainType
 from quivr_api.modules.chat.dto.inputs import QuestionAndAnswer
 from quivr_api.modules.chat.entity.chat import Chat, ChatHistory
 from quivr_api.modules.chat.repository.chats import ChatRepository
 from quivr_api.modules.chat.service.chat_service import ChatService
 from quivr_api.modules.user.entity.user_identity import User
+from sqlalchemy.ext.asyncio import create_async_engine
+from sqlmodel import select
+from sqlmodel.ext.asyncio.session import AsyncSession
 
 pg_database_base_url = "postgres:postgres@localhost:54322/postgres"
 
 TestData = Tuple[Brain, User, List[Chat], List[ChatHistory]]
+
+N_SEED_CHATS = 3
+n_seed_chats_history = 3
 
 
 @pytest.fixture(scope="session")
@@ -39,7 +41,6 @@ async def async_engine():
         pool_size=10,
         pool_recycle=0.1,
     )
-
     yield engine
 
 
@@ -116,7 +117,7 @@ async def test_get_user_chats(session: AsyncSession, test_data: TestData):
     repo = ChatRepository(session)
     assert local_user.id is not None
     query_chats = await repo.get_user_chats(local_user.id)
-    assert len(query_chats) == len(chats)
+    assert len(query_chats) == len(chats) + N_SEED_CHATS
 
 
 @pytest.mark.asyncio

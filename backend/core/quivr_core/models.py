@@ -1,5 +1,6 @@
 from datetime import datetime
-from typing import Any
+from enum import Enum
+from typing import Any, Dict, Optional
 from uuid import UUID
 
 from langchain_core.documents import Document
@@ -35,6 +36,12 @@ class ChatMessage(BaseModelV1):
     msg: AIMessage | HumanMessage
     message_time: datetime
     metadata: dict[str, Any]
+
+
+class KnowledgeStatus(str, Enum):
+    PROCESSING = "PROCESSING"
+    UPLOADED = "UPLOADED"
+    ERROR = "ERROR"
 
 
 class Source(BaseModel):
@@ -85,12 +92,17 @@ class ParsedRAGChunkResponse(BaseModel):
 class QuivrKnowledge(BaseModel):
     id: UUID
     brain_id: UUID
-    file_name: str | None = None
-    url: str | None = None
-    extension: str = "txt"
-    status: str = "PROCESSING"
-    integration: str | None = None
-    integration_link: str | None = None
+    file_name: Optional[str] = None
+    url: Optional[str] = None
+    mime_type: str = "txt"
+    status: KnowledgeStatus = KnowledgeStatus.PROCESSING
+    source: Optional[str] = None
+    source_link: str | None = None
+    file_size: int | None = None  # FIXME: Should not be optional @chloedia
+    file_sha1: Optional[str] = None  # FIXME: Should not be optional @chloedia
+    updated_at: Optional[datetime] = None
+    created_at: Optional[datetime] = None
+    metadata: Optional[Dict[str, str]] = None
 
 
 # NOTE: for compatibility issues with langchain <-> PydanticV1

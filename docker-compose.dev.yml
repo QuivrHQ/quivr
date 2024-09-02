@@ -1,8 +1,8 @@
 version: "3.8"
 
 services:
-  backend-core:
-    image: backend-base:latest
+  backend-api:
+    image: backend-api:latest
     extra_hosts:
       - "host.docker.internal:host-gateway"
     pull_policy: never
@@ -12,26 +12,51 @@ services:
       context: backend
       dockerfile: Dockerfile.dev
       cache_from:
-        - backend-base:latest
+        - backend-api:latest
       args:
         - DEV_MODE=true
-    container_name: backend-core
+    container_name: backend-api
     volumes:
       - ./backend/:/code/
-    command:
-      - "uvicorn"
-      - "quivr_api.main:app"
-      - "--reload"
-      - "--host"
-      - "0.0.0.0"
-      - "--port"
-      - "5050"
-      - "--log-level"
-      - "info"
+    command: >
+      /bin/bash -c "python -m uvicorn quivr_api.main:app --host 0.0.0.0 --log-level info --reload --port 5050"
     restart: always
     ports:
       - 5050:5050
       - 5678:5678 # debug port
+
+  notifier:
+    pull_policy: never
+    image: backend-api:latest
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    env_file:
+      - .env
+    container_name: notifier
+    volumes:
+      - ./backend/:/code/
+    command: >
+      /bin/bash -c "python /code/worker/quivr_worker/celery_monitor.py"
+    restart: always
+    depends_on:
+      - redis
+      - worker
+
+  worker:
+    pull_policy: never
+    image: backend-api:latest
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    env_file:
+      - .env
+    container_name: worker
+    volumes:
+      - ./backend/:/code/
+    command: >
+      /bin/bash -c "python -m celery -A quivr_worker.celery_worker worker -l info"
+    restart: always
+    depends_on:
+      - redis
 
   redis:
     image: redis:latest
@@ -42,48 +67,16 @@ services:
     ports:
       - 6379:6379
 
-  notifier:
-    pull_policy: never
-    image: backend-base:latest
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
-    env_file:
-      - .env
-    container_name: notifier
-    volumes:
-      - ./backend/:/code/
-    command:
-      - "python"
-      - "/code/api/quivr_api/celery_monitor.py"
-    restart: always
-    depends_on:
-      - redis
-      - worker
-
-  worker:
-    pull_policy: never
-    image: backend-base:latest
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
-    env_file:
-      - .env
-    container_name: worker
-    volumes:
-      - ./backend/:/code/
-    command: "celery -A quivr_api.celery_worker worker -l info"
-    restart: always
-    depends_on:
-      - redis
-
   beat:
-    image: backend-base:latest
+    image: backend-api:latest
     pull_policy: never
     extra_hosts:
       - "host.docker.internal:host-gateway"
     env_file:
       - .env
     container_name: beat
-    command: celery -A quivr_api.celery_worker beat -l info
+    command: >
+      /bin/bash -c "python -m celery -A quivr_worker.celery_worker beat -l info"
     volumes:
       - ./backend/:/code/
     restart: always
@@ -91,14 +84,15 @@ services:
       - redis
 
   flower:
-    image: backend-base:latest
+    image: backend-api:latest
     pull_policy: never
     extra_hosts:
       - "host.docker.internal:host-gateway"
     env_file:
       - .env
     container_name: flower
-    command: celery -A quivr_api.celery_worker flower -l info --port=5555
+    command: >
+      /bin/bash -c "python -m celery -A quivr_worker.celery_worker flower -l info --port=5555"
     volumes:
       - ./backend/:/code/
     restart: always

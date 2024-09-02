@@ -5,10 +5,9 @@ from sqlalchemy import exc
 from sqlmodel import select
 from sqlmodel.ext.asyncio.session import AsyncSession
 
-from quivr_api.models.settings import get_supabase_client
 from quivr_api.modules.chat.dto.inputs import ChatMessageProperties, QuestionAndAnswer
 from quivr_api.modules.chat.entity.chat import Chat, ChatHistory
-from quivr_api.modules.dependencies import BaseRepository
+from quivr_api.modules.dependencies import BaseRepository, get_supabase_client
 
 
 class ChatRepository(BaseRepository):
@@ -116,7 +115,7 @@ class ChatRepository(BaseRepository):
     ):
         response = (
             self.db.table("chat_history")
-            .update(chat_message_properties)
+            .update(chat_message_properties.model_dump())
             .match({"message_id": message_id, "chat_id": chat_id})
             .execute()
         )

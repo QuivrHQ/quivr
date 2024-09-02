@@ -4,10 +4,16 @@ from uuid import UUID
 from langchain.docstore.document import Document
 from langchain.embeddings.base import Embeddings
 from langchain_community.vectorstores import SupabaseVectorStore
+
 from quivr_api.logger import get_logger
+
+# from quivr_api.modules.dependencies import get_pg_database_engine
+from quivr_api.vector.service.vector_service import VectorService
 from supabase.client import Client
 
 logger = get_logger(__name__)
+# engine = get_pg_database_engine()
+# Session = sessionmaker(bind=engine)
 
 
 class CustomSupabaseVectorStore(SupabaseVectorStore):
@@ -18,6 +24,7 @@ class CustomSupabaseVectorStore(SupabaseVectorStore):
         client: Client,
         embedding: Embeddings,
         table_name: str,
+        vector_service: VectorService,
         brain_id: UUID | None = None,
         user_id: UUID | None = None,
         number_docs: int = 35,
@@ -28,6 +35,7 @@ class CustomSupabaseVectorStore(SupabaseVectorStore):
         self.user_id = user_id
         self.number_docs = number_docs
         self.max_input = max_input
+        self.vector_service = vector_service
 
     def find_brain_closest_query(
         self,
@@ -69,29 +77,12 @@ class CustomSupabaseVectorStore(SupabaseVectorStore):
         threshold: float = 0.5,
         **kwargs: Any,
     ) -> List[Document]:
-        vectors = self._embedding.embed_documents([query])
-        query_embedding = vectors[0]
-        res = self._client.rpc(
-            table,
-            {
-                "query_embedding": query_embedding,
-                "max_chunk_sum": self.max_input,
-                "p_brain_id": str(self.brain_id),
-            },
-        ).execute()
+        logger.debug(f"Similarity search for query: {query}")
+        assert self.brain_id, "Brain ID is required for similarity search"
 
-        match_result = [
-            Document(
-                metadata={
-                    **search.get("metadata", {}),
-                    "id": search.get("id", ""),
-                    "similarity": search.get("similarity", 0.0),
-                },
-                page_content=search.get("content", ""),
-            )
-            for search in res.data
-            if search.get("content")
-        ]
+        match_result = self.vector_service.similarity_search(
+            query, brain_id=self.brain_id, k=k
+        )
 
         sorted_match_result_by_file_name_metadata = sorted(
             match_result,

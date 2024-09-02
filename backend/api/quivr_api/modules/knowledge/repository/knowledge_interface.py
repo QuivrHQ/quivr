@@ -7,12 +7,12 @@ from quivr_api.modules.knowledge.dto.inputs import (
     KnowledgeStatus,
 )
 from quivr_api.modules.knowledge.dto.outputs import DeleteKnowledgeResponse
-from quivr_core.models import QuivrKnowledge as Knowledge
+from quivr_api.modules.knowledge.entity.knowledge import KnowledgeDB
 
 
 class KnowledgeInterface(ABC):
     @abstractmethod
-    def insert_knowledge(self, knowledge: CreateKnowledgeProperties) -> Knowledge:
+    def insert_knowledge(self, knowledge: CreateKnowledgeProperties) -> KnowledgeDB:
         """
         Add a knowledge
         """
@@ -34,7 +34,7 @@ class KnowledgeInterface(ABC):
         pass
 
     @abstractmethod
-    def get_knowledge_by_id(self, knowledge_id: UUID) -> Knowledge:
+    def get_knowledge_by_id(self, knowledge_id: UUID) -> KnowledgeDB:
         """
         Get a knowledge by its id
         Args:
@@ -43,7 +43,7 @@ class KnowledgeInterface(ABC):
         pass
 
     @abstractmethod
-    def get_all_knowledge_in_brain(self, brain_id: UUID) -> List[Knowledge]:
+    def get_all_knowledge_in_brain(self, brain_id: UUID) -> List[KnowledgeDB]:
         """
         Get all the knowledge in a brain
         Args:

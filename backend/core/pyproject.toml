@@ -1,136 +1,56 @@
-[tool.poetry]
+[project]
 name = "quivr-core"
 version = "0.0.13"
 description = "Quivr core RAG package"
-authors = []
+authors = [
+    { name = "Stan Girard", email = "stan@quivr.app" }
+]
+dependencies = [
+    "pydantic>=2.8.2",
+    "langchain-core>=0.2.32",
+    "langchain>=0.2.14",
+    "httpx>=0.27.0",
+    "rich>=13.7.1",
+    "tiktoken>=0.7.0",
+    "aiofiles>=24.1.0",
+    "langchain-community>=0.2.12"
+]
 readme = "README.md"
-repository = "https://github.com/QuivrHQ/quivr"
+requires-python = ">= 3.11"
 
-[tool.poetry.dependencies]
-python = "^3.11,<3.13"
-pydantic = "^2.7.4"
-langchain-core = "^0.2.10"
-langchain = "^0.2.9"
-httpx = "^0.27.0"
-rich = "^13.7.1"
-tiktoken = "^0.7.0"
-aiofiles = ">=23.0.0,<25.0.0"
-faiss-cpu = { version = "^1.8.0.post1", optional = true }
-langchain-community = { version = "^0.2.6", optional = true }
-langchain-openai = { version = "^0.1.14", optional = true }
-# To install unstructured, you’ll also need to install the following system dependencies:
-# libmagic, poppler, libreoffice, pandoc, and tesseract.
-# NOTE: for now poetry doesn't support groups as extra:
-# see : https://github.com/pythofeat: async load  n-poetry/poetry/issues/4842
-
-torch = [
-    { version = "2.3.1", source = "pypi", platform = "darwin", optional = true },
-    { version = "2.3.1", source = "pypi", platform = "linux", markers = "platform_machine != 'x86_64'", optional = true },
-    { version = "2.3.1+cpu", source = "pytorch-cpu-src", platform = "linux", markers = "platform_machine == 'x86_64'", optional = true },
-    { version = "2.3.1+cpu", source = "pytorch-cpu-src", platform = "win32", optional = true },
-]
-torchvision = [
-    { version = "0.18.1", source = "pypi", platform = "darwin", optional = true },
-    { version = "0.18.1", source = "pypi", platform = "linux", markers = "platform_machine != 'x86_64'", optional = true },
-    { version = "0.18.1+cpu", source = "pytorch-cpu-src", platform = "linux", markers = "platform_machine == 'x86_64'", optional = true },
-    { version = "0.18.1+cpu", source = "pytorch-cpu-src", platform = "win32", optional = true },
-]
-megaparse = { version = "0.0.24", optional = true, source = "pypi" }
-
-docx2txt = { version = "^0.8", optional = true }
-unstructured = { version = "^0.15.0", optional = true, extras = [
-    "epub",
-    "odt",
-    "docx",
-    "doc",
-    "pptx",
-    "ppt",
-    "xlsx",
-] }
-
-[tool.poetry.extras]
-base = ["langchain-community", "faiss-cpu", "langchain-openai"]
-csv = ["langchain-community"]
-md = ["langchain-community"]
-ipynb = ["langchain-community"]
-epub = ["unstructured", "langchain-community"]
-odt = ["unstructured", "langchain-community", "docx2txt"]
-docx = ["unstructured", "langchain-community", "docx2txt"]
-pptx = ["unstructured", "langchain-community"]
-xlsx = ["unstructured", "langchain-community"]
-pdf = ["langchain-community", "megaparse"]
+[project.optional-dependencies]
 all = [
-    "langchain-community",
-    "faiss-cpu",
-    "langchain-openai",
-    "unstructured",
-    "docx2txt",
-    "megaparse",
+    "unstructured[epub,docx,odt,doc,pptx,ppt,xlsx,md]>=0.15.5",
+    "faiss-cpu>=1.8.0.post1",
+    "docx2txt>=0.8",
+    "megaparse>=0.0.29",
 ]
 
-[tool.poetry.group.dev]
-optional = true
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
 
-[tool.poetry.group.dev.dependencies]
-mypy = "^1.10.0"
-pre-commit = "^3.7.1"
-ipykernel = "*"
-ruff = "^0.4.8"
-flake8 = "*"
-flake8-black = "*"
-
-[tool.poetry.group.test]
-optional = true
-
-[tool.poetry.group.test.dependencies]
-pytest-asyncio = "^0.23.7"
-pytest = "^8.2.2"
-pytest-xdist = "^3.6.1"
-pytest-cov = "^5.0.0"
-tox = "^4.16.0"
-
-
-[tool.mypy]
-disallow_untyped_defs = true
-# Remove venv skip when integrated with pre-commit
-exclude = ["_static", "build", "examples", "notebooks", "venv", ".venv"]
-ignore_missing_imports = true
-python_version = "3.11"
-
-[tool.ruff]
-line-length = 88
-exclude = [".git", "__pycache__", ".mypy_cache", ".pytest_cache"]
-
-[tool.ruff.lint]
-select = [
-    "E", # pycodestyle errors
-    "W", # pycodestyle warnings
-    "F", # pyflakes
-    "I", # isort
-    "C", # flake8-comprehensions
-    "B", # flake8-bugbear
-]
-ignore = [
-    "B904",
-    "B006",
-    "E501", # line too long, handled by black
-    "B008", # do not perform function calls in argument defaults
-    "C901", # too complex
+[tool.rye]
+managed = true
+dev-dependencies = [
+    "mypy>=1.11.1",
+    "pre-commit>=3.8.0",
+    "ipykernel>=6.29.5",
+    "ruff>=0.6.1",
+    "flake8>=7.1.1",
+    "flake8-black>=0.3.6",
+    "pytest-asyncio>=0.23.8",
+    "pytest>=8.3.2",
+    "pytest-xdist>=3.6.1",
+    "tox>=4.18.0",
+    "pytest-benchmark>=4.0.0",
 ]
 
+[tool.hatch.metadata]
+allow-direct-references = true
 
-[tool.ruff.lint.isort]
-order-by-type = true
-relative-imports-order = "closest-to-furthest"
-extra-standard-library = ["typing"]
-section-order = [
-    "future",
-    "standard-library",
-    "third-party",
-    "first-party",
-    "local-folder",
-]
-known-first-party = []
+[tool.hatch.build.targets.wheel]
+packages = ["quivr_core"]
 
 [tool.pytest.ini_options]
 addopts = "--tb=short -ra -v"
@@ -141,12 +61,3 @@ markers = [
     "tika: these tests require a tika server to be running",
     "unstructured: these tests require `unstructured` dependency",
 ]
-
-[build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
-
-[[tool.poetry.source]]
-name = "pytorch-cpu-src"
-url = "https://download.pytorch.org/whl/cpu"
-priority = "explicit"

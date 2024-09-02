@@ -1,8 +1,12 @@
+from uuid import UUID
+
+from sqlalchemy import text
+
 from quivr_api.logger import get_logger
-from quivr_api.models.settings import get_supabase_client
 from quivr_api.modules.brain.repository.interfaces.brains_vectors_interface import (
     BrainsVectorsInterface,
 )
+from quivr_api.modules.dependencies import get_pg_database_engine, get_supabase_client
 
 logger = get_logger(__name__)
 
@@ -11,6 +15,8 @@ class BrainsVectors(BrainsVectorsInterface):
     def __init__(self):
         supabase_client = get_supabase_client()
         self.db = supabase_client
+        # FIXME(@aminediro) : refactor this to use session injected by Like other service
+        self.pg_engine = get_pg_database_engine()
 
     def create_brain_vector(self, brain_id, vector_id, file_sha1):
         response = (
@@ -36,7 +42,35 @@ class BrainsVectors(BrainsVectorsInterface):
         )
         return vectorsResponse.data
 
-    def get_brain_vector_ids(self, brain_id):
+    def get_unique_files_from_vector_ids(self, vectors_ids: list[UUID]):
+        pass
+
+    def get_brain_size(self, brain_id: UUID) -> int:
+        query = """
+            with
+            tmp_table as (
+                select distinct
+                v.metadata ->> 'file_name' as file_name,
+                NULLIF(v.metadata ->> 'file_size', '')::int as file_size
+                from
+                vectors v,
+                brains_vectors bv
+                where
+                bv.brain_id = '{brain_id}'::uuid
+                and bv.vector_id = v.id
+            )
+            select
+            sum(file_size)
+            from
+            tmp_table;
+        """
+        with self.pg_engine.begin() as connection:
+            result = connection.execute(text(query.format(brain_id=brain_id)))
+            total_size = result.scalar()
+
+        return int(total_size) if total_size is not None else -1
+
+    def get_brain_vector_ids(self, brain_id: UUID) -> list[UUID]:
         """
         Retrieve unique brain data (i.e. uploaded files and crawled websites).
         """
@@ -44,11 +78,11 @@ class BrainsVectors(BrainsVectorsInterface):
         response = (
             self.db.from_("brains_vectors")
             .select("vector_id")
-            .filter("brain_id", "eq", brain_id)
+            .filter("brain_id", "eq", str(brain_id))
             .execute()
         )
 
-        vector_ids = [item["vector_id"] for item in response.data]
+        vector_ids = [UUID(item["vector_id"]) for item in response.data]
 
         if len(vector_ids) == 0:
             return []
