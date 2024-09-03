@@ -321,7 +321,7 @@ async def test_should_process_knowledge_exists(
     service = KnowledgeService(repo)
     assert existing_knowledge.file_sha1
     with pytest.raises(FileExistsError):
-        await service.update_should_process(
+        await service.update_sha1_conflict(
             incoming_knowledge, brain.brain_id, file_sha1=existing_knowledge.file_sha1
         )
 
@@ -378,7 +378,7 @@ async def test_should_process_knowledge_link_brain(
     incoming_knowledge = await new.to_dto()
     assert prev.file_sha1
 
-    should_process = await service.update_should_process(
+    should_process = await service.update_sha1_conflict(
         incoming_knowledge, brain_2.brain_id, file_sha1=prev.file_sha1
     )
     assert not should_process
@@ -440,7 +440,7 @@ async def test_should_process_knowledge_prev_error(
 
     incoming_knowledge = await new.to_dto()
     assert prev.file_sha1
-    should_process = await service.update_should_process(
+    should_process = await service.update_sha1_conflict(
         incoming_knowledge, brain.brain_id, file_sha1=prev.file_sha1
     )
 

@@ -43,7 +43,7 @@ class KnowledgeService(BaseService[KnowledgeRepository]):
         return km
 
     # TODO (@aminediro): Replace with ON CONFLICT smarter query...
-    async def update_should_process(
+    async def update_sha1_conflict(
         self, knowledge: Knowledge, brain_id: UUID, file_sha1: str
     ) -> bool:
         assert knowledge.id

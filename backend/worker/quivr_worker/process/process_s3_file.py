@@ -43,7 +43,7 @@ async def process_uploaded_file(
 
     with build_file(file_data, knowledge_id, file_name) as file_instance:
         knowledge = await knowledge_service.get_knowledge(knowledge_id=knowledge_id)
-        should_process = knowledge_service.update_should_process(
+        should_process = knowledge_service.update_sha1_conflict(
             knowledge=knowledge,
             brain_id=brain.brain_id,
             file_sha1=file_instance.file_sha1,
