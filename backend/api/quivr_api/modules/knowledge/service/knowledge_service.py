@@ -191,9 +191,12 @@ class KnowledgeService(BaseService[KnowledgeRepository]):
         # TODO: THIS IS A HACK!! Remove all of this
         if prev_sync_file:
             prev_knowledge = await self.get_knowledge_sync(sync_id=prev_sync_file.id)
-            # FIXME: Shouldn't be dependent on a brain
-            # We should just update the knowledge
-            await self.remove_knowledge(brain_id, prev_knowledge.id)
+            if len(prev_knowledge.brain_ids) > 1:
+                await self.repository.remove_knowledge_from_brain(
+                    prev_knowledge.id, brain_id
+                )
+            else:
+                await self.repository.remove_knowledge_by_id(prev_knowledge.id)
             sync_id = prev_sync_file.id
 
         sync_id = new_sync_file.id if new_sync_file else sync_id
