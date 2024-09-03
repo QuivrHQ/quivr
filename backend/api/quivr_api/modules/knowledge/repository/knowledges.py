@@ -48,6 +48,7 @@ class KnowledgeRepository(BaseRepository):
     async def link_to_brain(
         self, knowledge: KnowledgeDB, brain_id: UUID
     ) -> KnowledgeDB:
+        logger.debug(f"Linking knowledge {knowledge.id} to {brain_id}")
         brain = await self.get_brain_by_id(brain_id)
         knowledge.brains.append(brain)
         self.session.add(knowledge)
@@ -60,7 +61,9 @@ class KnowledgeRepository(BaseRepository):
     ) -> KnowledgeDB:
         knowledge = await self.get_knowledge_by_id(knowledge_id)
         brain = await self.get_brain_by_id(brain_id)
-        knowledge.brains.remove(brain)
+        existing_brains = await knowledge.awaitable_attrs.brains
+        existing_brains.remove(brain)
+        knowledge.brains = existing_brains
         self.session.add(knowledge)
         await self.session.commit()
         await self.session.refresh(knowledge)
