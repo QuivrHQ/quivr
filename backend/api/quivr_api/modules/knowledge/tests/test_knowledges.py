@@ -213,9 +213,10 @@ async def test_remove_all_knowledges_from_brain(
 async def test_duplicate_sha1_knowledge_same_user(
     session: AsyncSession, test_data: TestData
 ):
-    brain, knowledges = test_data
+    brain, [existing_knowledge, _] = test_data
     assert brain.brain_id
-    assert knowledges[0].id
+    assert existing_knowledge.id
+    assert existing_knowledge.file_sha1
     repo = KnowledgeRepository(session)
     knowledge = KnowledgeDB(
         file_name="test_file_2",
@@ -224,9 +225,9 @@ async def test_duplicate_sha1_knowledge_same_user(
         source="test_source",
         source_link="test_source_link",
         file_size=100,
-        file_sha1="test_sha1",
+        file_sha1=existing_knowledge.file_sha1,
         brains=[brain],
-        user_id=knowledges[0].user_id,
+        user_id=existing_knowledge.user_id,
     )
 
     with pytest.raises(IntegrityError):  # FIXME: Should raise IntegrityError
@@ -264,7 +265,7 @@ async def test_add_knowledge_to_brain(session: AsyncSession, test_data: TestData
     assert brain.brain_id
     assert knowledges[1].id
     repo = KnowledgeRepository(session)
-    await repo.link_to_brain(knowledges[1].id, brain.brain_id)
+    await repo.link_to_brain(knowledges[1], brain.brain_id)
     knowledge = await repo.get_knowledge_by_id(knowledges[1].id)
     brains_of_knowledge = [b.brain_id for b in await knowledge.awaitable_attrs.brains]
     assert brain.brain_id in brains_of_knowledge
@@ -293,3 +294,162 @@ async def test_get_knowledge_in_brain(session: AsyncSession, test_data: TestData
     assert list_knowledge[0].id == knowledges[0].id
     assert list_knowledge[0].file_name == knowledges[0].file_name
     assert brain.brain_id in brains_of_knowledge
+
+
+@pytest.mark.asyncio
+async def test_should_process_knowledge_exists(
+    session: AsyncSession, test_data: TestData
+):
+    brain, [existing_knowledge, _] = test_data
+    assert brain.brain_id
+    new = KnowledgeDB(
+        file_name="new",
+        extension="txt",
+        status="PROCESSING",
+        source="test_source",
+        source_link="test_source_link",
+        file_size=100,
+        file_sha1=None,
+        brains=[brain],
+        user_id=existing_knowledge.user_id,
+    )
+    session.add(new)
+    await session.commit()
+    await session.refresh(new)
+    incoming_knowledge = await new.to_dto()
+    repo = KnowledgeRepository(session)
+    service = KnowledgeService(repo)
+    assert existing_knowledge.file_sha1
+    with pytest.raises(FileExistsError):
+        await service.update_sha1_conflict(
+            incoming_knowledge, brain.brain_id, file_sha1=existing_knowledge.file_sha1
+        )
+
+
+@pytest.mark.asyncio
+async def test_should_process_knowledge_link_brain(
+    session: AsyncSession, test_data: TestData
+):
+    repo = KnowledgeRepository(session)
+    service = KnowledgeService(repo)
+    brain, [existing_knowledge, _] = test_data
+    user_id = existing_knowledge.user_id
+    assert brain.brain_id
+    prev = KnowledgeDB(
+        file_name="prev",
+        extension="txt",
+        status=KnowledgeStatus.UPLOADED,
+        source="test_source",
+        source_link="test_source_link",
+        file_size=100,
+        file_sha1="test1",
+        brains=[brain],
+        user_id=user_id,
+    )
+    brain_2 = Brain(
+        name="test_brain",
+        description="this is a test brain",
+        brain_type=BrainType.integration,
+    )
+    session.add(brain_2)
+    session.add(prev)
+    await session.commit()
+    await session.refresh(prev)
+    await session.refresh(brain_2)
+
+    assert prev.id
+    assert brain_2.brain_id
+
+    new = KnowledgeDB(
+        file_name="new",
+        extension="txt",
+        status="PROCESSING",
+        source="test_source",
+        source_link="test_source_link",
+        file_size=100,
+        file_sha1=None,
+        brains=[brain_2],
+        user_id=user_id,
+    )
+    session.add(new)
+    await session.commit()
+    await session.refresh(new)
+
+    incoming_knowledge = await new.to_dto()
+    assert prev.file_sha1
+
+    should_process = await service.update_sha1_conflict(
+        incoming_knowledge, brain_2.brain_id, file_sha1=prev.file_sha1
+    )
+    assert not should_process
+
+    # Check prev knowledge was linked
+    assert incoming_knowledge.file_sha1
+    prev_knowledge = await service.repository.get_knowledge_by_id(prev.id)
+    prev_brains = await prev_knowledge.awaitable_attrs.brains
+    assert {b.brain_id for b in prev_brains} == {
+        brain.brain_id,
+        brain_2.brain_id,
+    }
+    # Check new knowledge was removed
+    assert new.id
+    with pytest.raises(NoResultFound):
+        await service.repository.get_knowledge_by_id(new.id)
+
+
+@pytest.mark.asyncio
+async def test_should_process_knowledge_prev_error(
+    session: AsyncSession, test_data: TestData
+):
+    repo = KnowledgeRepository(session)
+    service = KnowledgeService(repo)
+    brain, [existing_knowledge, _] = test_data
+    user_id = existing_knowledge.user_id
+    assert brain.brain_id
+    prev = KnowledgeDB(
+        file_name="prev",
+        extension="txt",
+        status=KnowledgeStatus.ERROR,
+        source="test_source",
+        source_link="test_source_link",
+        file_size=100,
+        file_sha1="test1",
+        brains=[brain],
+        user_id=user_id,
+    )
+    session.add(prev)
+    await session.commit()
+    await session.refresh(prev)
+
+    assert prev.id
+
+    new = KnowledgeDB(
+        file_name="new",
+        extension="txt",
+        status="PROCESSING",
+        source="test_source",
+        source_link="test_source_link",
+        file_size=100,
+        file_sha1=None,
+        brains=[brain],
+        user_id=user_id,
+    )
+    session.add(new)
+    await session.commit()
+    await session.refresh(new)
+
+    incoming_knowledge = await new.to_dto()
+    assert prev.file_sha1
+    should_process = await service.update_sha1_conflict(
+        incoming_knowledge, brain.brain_id, file_sha1=prev.file_sha1
+    )
+
+    # Checks we should process this file
+    assert should_process
+    # Previous errored file is cleaned up
+    with pytest.raises(NoResultFound):
+        await service.repository.get_knowledge_by_id(prev.id)
+
+    assert new.id
+    new = await service.repository.get_knowledge_by_id(new.id)
+    assert new.file_sha1

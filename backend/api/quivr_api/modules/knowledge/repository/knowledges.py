@@ -1,7 +1,6 @@
 from typing import Sequence
 from uuid import UUID
 
-from asyncpg.exceptions import UniqueViolationError
 from fastapi import HTTPException
 from quivr_core.models import KnowledgeStatus
 from sqlalchemy.exc import IntegrityError, NoResultFound
@@ -41,17 +40,15 @@ class KnowledgeRepository(BaseRepository):
         except IntegrityError:
             await self.session.rollback()
             raise
-        except Exception as e:
+        except Exception:
             await self.session.rollback()
-            raise e
+            raise
         return knowledge
 
     async def link_to_brain(
-        self, knowledge_id: UUID, brain_id: UUID
-    ) -> (
-        KnowledgeDB
-    ):  # FIXME : @amine @chloe Unused but to use later for fixing sha1 issues
-        knowledge = await self.get_knowledge_by_id(knowledge_id)
+        self, knowledge: KnowledgeDB, brain_id: UUID
+    ) -> KnowledgeDB:
+        logger.debug(f"Linking knowledge {knowledge.id} to {brain_id}")
         brain = await self.get_brain_by_id(brain_id)
         knowledge.brains.append(brain)
         self.session.add(knowledge)
@@ -64,7 +61,9 @@ class KnowledgeRepository(BaseRepository):
     ) -> KnowledgeDB:
         knowledge = await self.get_knowledge_by_id(knowledge_id)
         brain = await self.get_brain_by_id(brain_id)
-        knowledge.brains.remove(brain)
+        existing_brains = await knowledge.awaitable_attrs.brains
+        existing_brains.remove(brain)
+        knowledge.brains = existing_brains
         self.session.add(knowledge)
         await self.session.commit()
         await self.session.refresh(knowledge)
@@ -98,6 +97,16 @@ class KnowledgeRepository(BaseRepository):
 
         if not knowledge:
             raise HTTPException(404, "Knowledge not found")
+
+        return knowledge
+
+    async def get_knowledge_by_sha1(self, sha1: str) -> KnowledgeDB:
+        query = select(KnowledgeDB).where(KnowledgeDB.file_sha1 == sha1)
+        result = await self.session.exec(query)
+        knowledge = result.first()
+
+        if not knowledge:
+            raise NoResultFound("Knowledge not found")
 
         return knowledge
 
@@ -185,7 +194,7 @@ class KnowledgeRepository(BaseRepository):
         knowledge = result.first()
 
         if not knowledge:
-            raise HTTPException(404, "Knowledge not found")
+            raise ValueError("Knowledge not found")
 
         try:
             knowledge.file_sha1 = file_sha1
@@ -193,7 +202,7 @@ class KnowledgeRepository(BaseRepository):
             await self.session.commit()
             await self.session.refresh(knowledge)
             return knowledge
-        except (UniqueViolationError, IntegrityError):
+        except IntegrityError:
             await self.session.rollback()
             raise FileExistsError(
                 f"File {knowledge_id} already exists maybe under another file_name"

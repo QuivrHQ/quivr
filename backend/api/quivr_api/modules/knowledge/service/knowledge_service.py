@@ -2,7 +2,7 @@ from typing import List
 from uuid import UUID
 
 from quivr_core.models import KnowledgeStatus
-from sqlalchemy.exc import IntegrityError
+from sqlalchemy.exc import NoResultFound
 
 from quivr_api.logger import get_logger
 from quivr_api.modules.dependencies import BaseService
@@ -42,6 +42,48 @@ class KnowledgeService(BaseService[KnowledgeRepository]):
         assert inserted_knowledge_db_instance.id, "Knowledge ID not generated"
         km = await inserted_knowledge_db_instance.to_dto()
         return km
+
+    # TODO (@aminediro): Replace with ON CONFLICT smarter query...
+    # there is a chance of race condition but for now we let it crash in worker
+    # the tasks will be dealt with on retry
+    async def update_sha1_conflict(
+        self, knowledge: Knowledge, brain_id: UUID, file_sha1: str
+    ) -> bool:
+        assert knowledge.id
+        knowledge.file_sha1 = file_sha1
+
+        try:
+            existing_knowledge = await self.repository.get_knowledge_by_sha1(
+                knowledge.file_sha1
+            )
+            logger.debug("The content of the knowledge already exists in the brain. ")
+            # Get existing knowledge sha1 and brains
+            if (
+                existing_knowledge.status == KnowledgeStatus.UPLOADED
+                or existing_knowledge.status == KnowledgeStatus.PROCESSING
+            ):
+                existing_brains = await existing_knowledge.awaitable_attrs.brains
+                if brain_id in [b.brain_id for b in existing_brains]:
+                    logger.debug("Added file to brain that already has the knowledge")
+                    raise FileExistsError(
+                        f"Existing file in brain {brain_id} with name {existing_knowledge.file_name}"
+                    )
+                else:
+                    await self.repository.link_to_brain(existing_knowledge, brain_id)
+                    await self.remove_knowledge(brain_id, knowledge.id)
+                    return False
+            else:
+                logger.debug(f"Removing previous errored file {existing_knowledge.id}")
+                assert existing_knowledge.id
+                await self.remove_knowledge(brain_id, existing_knowledge.id)
+                await self.update_file_sha1_knowledge(knowledge.id, knowledge.file_sha1)
+                return True
+        except NoResultFound:
+            logger.debug(
+                f"First knowledge with sha1. Updating file_sha1 of  {knowledge.id}"
+            )
+            await self.update_file_sha1_knowledge(knowledge.id, knowledge.file_sha1)
+            return True
 
     async def insert_knowledge(
         self,
@@ -98,30 +140,32 @@ class KnowledgeService(BaseService[KnowledgeRepository]):
         return knowledge
 
     async def update_file_sha1_knowledge(self, knowledge_id: UUID, file_sha1: str):
-        try:
-            knowledge = await self.repository.update_file_sha1_knowledge(
-                knowledge_id, file_sha1
-            )
-
-            return knowledge
-        except IntegrityError:
-            raise FileExistsError(
-                f"File {knowledge_id} already exists maybe under another file_name"
-            )
+        return await self.repository.update_file_sha1_knowledge(knowledge_id, file_sha1)
 
     async def remove_knowledge(
         self,
         brain_id: UUID,
         knowledge_id: UUID,  # FIXME: @amine when name in storage change no need for brain id
     ) -> DeleteKnowledgeResponse:
-        message = await self.repository.remove_knowledge_by_id(knowledge_id)
-        file_name_with_brain_id = f"{brain_id}/{message.file_name}"
-        try:
-            self.storage.remove_file(file_name_with_brain_id)
-        except Exception as e:
-            logger.error(f"Error while removing file {file_name_with_brain_id}: {e}")
+        # TODO: fix KMS
+        # REDO ALL THIS
+        knowledge = await self.get_knowledge(knowledge_id)
+        if len(knowledge.brain_ids) > 1:
+            km = await self.repository.remove_knowledge_from_brain(
+                knowledge_id, brain_id
+            )
+            return DeleteKnowledgeResponse(file_name=km.file_name, knowledge_id=km.id)
+        else:
+            message = await self.repository.remove_knowledge_by_id(knowledge_id)
+            file_name_with_brain_id = f"{brain_id}/{message.file_name}"
+            try:
+                self.storage.remove_file(file_name_with_brain_id)
+            except Exception as e:
+                logger.error(
+                    f"Error while removing file {file_name_with_brain_id}: {e}"
+                )
 
-        return message
+            return message
 
     async def remove_all_knowledges_from_brain(self, brain_id: UUID) -> None:
         await self.repository.remove_all_knowledges_from_brain(brain_id)
@@ -147,7 +191,12 @@ class KnowledgeService(BaseService[KnowledgeRepository]):
         # TODO: THIS IS A HACK!! Remove all of this
         if prev_sync_file:
             prev_knowledge = await self.get_knowledge_sync(sync_id=prev_sync_file.id)
-            await self.repository.remove_knowledge_by_id(prev_knowledge.id)
+            if len(prev_knowledge.brain_ids) > 1:
+                await self.repository.remove_knowledge_from_brain(
+                    prev_knowledge.id, brain_id
+                )
+            else:
+                await self.repository.remove_knowledge_by_id(prev_knowledge.id)
             sync_id = prev_sync_file.id
 
         sync_id = new_sync_file.id if new_sync_file else sync_id
@@ -159,8 +208,8 @@ class KnowledgeService(BaseService[KnowledgeRepository]):
             status=KnowledgeStatus.PROCESSING,
             source_link=source_link,
             file_size=file.size if file.size else 0,
-            file_sha1=downloaded_file.file_sha1(),
             # FIXME (@aminediro): This is a temporary fix, redo in KMS
+            file_sha1=None,
             metadata={"sync_file_id": str(sync_id)},
         )
         added_knowledge = await self.insert_knowledge(

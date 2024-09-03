@@ -683,7 +683,7 @@ def sync_file():
         name="test_file.txt",
         is_folder=False,
         last_modified=datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-        mime_type="txt",
+        mime_type=".txt",
         web_view_link="",
         notification_id=uuid4(),  #
     )

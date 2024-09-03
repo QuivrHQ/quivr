@@ -182,6 +182,7 @@ class SyncUtils:
             ),
         )
         # TODO : why knowledge + syncfile, drop syncfile ...
+        # FIXME : Simplify this logic in KMS plzzz
         sync_file_db = self.sync_files_repo.update_or_create_sync_file(
             file=file,
             previous_file=previous_file,
