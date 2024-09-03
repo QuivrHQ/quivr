@@ -16,7 +16,7 @@ Quivr, your second brain, utilizes the power of GenerativeAI to be your personal
 
 - **Fast and Efficient**: Designed with speed and efficiency at its core. Quivr ensures rapid access to your data.
 - **Secure**: Your data, your control. Always.
-- **OS Compatible**: Ubuntu 22 or newer.
+- **OS Compatible**: Ubuntu 20 or newer.
 - **File Compatibility**: Text, Markdown, PDF, Powerpoint, Excel, CSV, Word, Audio, Video
 - **Open Source**: Freedom is beautiful, and so is Quivr. Open source and free to use.
 - **Public/Private**: Share your brains with your users via a public link, or keep them private.
