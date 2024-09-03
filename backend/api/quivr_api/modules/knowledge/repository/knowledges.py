@@ -155,19 +155,21 @@ class KnowledgeRepository(BaseRepository):
     async def update_status_knowledge(
         self, knowledge_id: UUID, status: KnowledgeStatus
     ) -> KnowledgeDB | None:
-        query = select(KnowledgeDB).where(KnowledgeDB.id == knowledge_id)
-        result = await self.session.exec(query)
-        knowledge = result.first()
+        try:
+            query = select(KnowledgeDB).where(KnowledgeDB.id == knowledge_id)
+            result = await self.session.exec(query)
+            knowledge = result.first()
+            if not knowledge:
+                raise NoResultFound("Knowledge not found")
 
-        if not knowledge:
+            knowledge.status = status
+            self.session.add(knowledge)
+            await self.session.commit()
+            await self.session.refresh(knowledge)
+            return knowledge
+        except Exception:
+            await self.session.rollback()
             raise NoResultFound("Knowledge not found")
-
-        knowledge.status = status
-        self.session.add(knowledge)
-        await self.session.commit()
-        await self.session.refresh(knowledge)
-
-        return knowledge
 
     async def update_source_link_knowledge(
         self, knowledge_id: UUID, source_link: str
