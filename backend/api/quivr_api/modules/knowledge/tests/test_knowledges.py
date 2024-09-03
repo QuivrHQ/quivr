@@ -138,6 +138,18 @@ async def test_updates_knowledge_status(session: AsyncSession, test_data: TestDa
 
 
 @pytest.mark.asyncio
+async def test_updates_knowledge_status_no_knowledge(
+    session: AsyncSession, test_data: TestData
+):
+    brain, knowledges = test_data
+    assert brain.brain_id
+    assert knowledges[0].id
+    repo = KnowledgeRepository(session)
+    with pytest.raises(NoResultFound):
+        await repo.update_status_knowledge(uuid4(), KnowledgeStatus.UPLOADED)
+
+
+@pytest.mark.asyncio
 async def test_update_knowledge_source_link(session: AsyncSession, test_data: TestData):
     brain, knowledges = test_data
     assert brain.brain_id
