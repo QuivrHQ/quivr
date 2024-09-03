@@ -191,6 +191,8 @@ class KnowledgeService(BaseService[KnowledgeRepository]):
         # TODO: THIS IS A HACK!! Remove all of this
         if prev_sync_file:
             prev_knowledge = await self.get_knowledge_sync(sync_id=prev_sync_file.id)
+            # FIXME
+            # THIS REMOVES FROM ALL BRAINS
             await self.repository.remove_knowledge_by_id(prev_knowledge.id)
             sync_id = prev_sync_file.id
 
