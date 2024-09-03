@@ -47,3 +47,12 @@ theme:
 plugins:
 - mkdocstrings:
     default_handler: python
+
+
+nav:
+  - Home: index.md
+  - Features:
+    - Parsers:
+      - parsers/index.md
+      - parsers/megaparse.md
+      - parsers/simple.md
