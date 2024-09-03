@@ -1,4 +1,4 @@
-site_name: Quivr Core
+site_name: Quivr
 extra_css:
   - css/style.css
 
@@ -50,9 +50,17 @@ plugins:
 
 
 nav:
-  - Home: index.md
+  - Home: 
+    - index.md
+  
   - Features:
     - Parsers:
       - parsers/index.md
       - parsers/megaparse.md
       - parsers/simple.md
+
+  - Enterprise:
+    - enterprise/index.md
+    - Configuring:
+      - enterprise/configuring/authentication.md
+
