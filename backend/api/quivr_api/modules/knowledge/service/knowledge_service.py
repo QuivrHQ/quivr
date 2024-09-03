@@ -64,7 +64,7 @@ class KnowledgeService(BaseService[KnowledgeRepository]):
             ):
                 existing_brains = await existing_knowledge.awaitable_attrs.brains
                 if brain_id in [b.brain_id for b in existing_brains]:
-                    logger.debug("Added same file to brain with existing knowledge")
+                    logger.debug("Added file to brain that already has the knowledge")
                     raise FileExistsError(
                         f"Existing file in brain {brain_id} with name {existing_knowledge.file_name}"
                     )
@@ -203,8 +203,8 @@ class KnowledgeService(BaseService[KnowledgeRepository]):
             status=KnowledgeStatus.PROCESSING,
             source_link=source_link,
             file_size=file.size if file.size else 0,
-            file_sha1=downloaded_file.file_sha1(),
             # FIXME (@aminediro): This is a temporary fix, redo in KMS
+            file_sha1=None,
             metadata={"sync_file_id": str(sync_id)},
         )
         added_knowledge = await self.insert_knowledge(
