@@ -1,8 +1,10 @@
 "use client";
 import { Editor } from "@tiptap/core";
-import { useCallback, useState } from "react";
+import { useState } from "react";
 
+import Button from "@/lib/components/ui/Button";
 import { Modal } from "@/lib/components/ui/Modal/Modal";
+import { TextInput } from "@/lib/components/ui/TextInput/TextInput";
 
 import styles from "./Toolbar.module.scss";
 
@@ -24,22 +26,23 @@ type ToolbarProps = {
 
 export const Toolbar = ({ editor }: ToolbarProps): JSX.Element => {
   const [linkModalOpen, setLinkModalOpen] = useState(false);
+  const [urlInp, setUrlInp] = useState("");
 
-  const setLink = useCallback(() => {
-    const previousUrl = editor.getAttributes("link").href as string;
-    const url = window.prompt("URL", previousUrl);
-
-    // cancelled
-    if (url === null) {
-      return;
-    }
-
+  const setLink = () => {
     const editorChain = editor.chain().extendMarkRange("link").focus();
 
-    url === ""
+    urlInp === ""
       ? editorChain.unsetLink().run()
-      : editorChain.setLink({ href: url }).run();
-  }, [editor]);
+      : editorChain.setLink({ href: urlInp }).run();
+
+    setLinkModalOpen(false);
+  };
+
+  const openLinkModal = () => {
+    const prevUrl = editor.getAttributes("link").href as string;
+    setUrlInp(prevUrl || "");
+    setLinkModalOpen(true);
+  };
 
   return (
     <div className={styles.toolbar}>
@@ -65,16 +68,27 @@ export const Toolbar = ({ editor }: ToolbarProps): JSX.Element => {
         aria-label="Toggle link"
         iconName="link"
         active={editor.isActive("link")}
-        onClick={() => setLinkModalOpen(true)}
-        setActive={setLink}
+        onClick={openLinkModal}
       />
       <Modal
         title="Add link"
         desc=""
+        size="auto"
         isOpen={linkModalOpen}
         setOpen={setLinkModalOpen}
+        CloseTrigger={
+          <div className={styles.modal_close_trigger_wrapper}>
+            <Button variant={"danger"}>Cancel</Button>
+            <Button onClick={() => setLink()}>Done</Button>
+          </div>
+        }
       >
-        <div>Hello world</div>
+        <TextInput
+          inputValue={urlInp}
+          label="Url"
+          onSubmit={setLink}
+          setInputValue={setUrlInp}
+        />
       </Modal>
       <ToolbarSectionSeparator />
       <ToolbarButton

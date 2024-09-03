@@ -21,3 +21,10 @@
   border-right: solid 1px var(--border-1);
   height: IconSizes.$big;
 }
+
+.modal_close_trigger_wrapper {
+  display: flex;
+  gap: Spacings.$spacing04;
+  justify-content: end;
+  margin-top: Spacings.$spacing04;
+}

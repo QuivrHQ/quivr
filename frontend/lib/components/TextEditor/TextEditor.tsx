@@ -102,7 +102,9 @@ export const TextEditor = (): JSX.Element => {
         className: styles.has_focus,
         mode: "shallowest",
       }),
-      Link,
+      Link.configure({
+        openOnClick: false,
+      }),
     ],
     content: defaultContent,
     immediatelyRender: false,
