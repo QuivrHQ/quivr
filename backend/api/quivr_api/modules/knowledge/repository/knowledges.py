@@ -3,7 +3,7 @@ from uuid import UUID
 
 from fastapi import HTTPException
 from quivr_core.models import KnowledgeStatus
-from sqlalchemy.exc import IntegrityError, NoResultFound, SQLAlchemyError
+from sqlalchemy.exc import IntegrityError, NoResultFound
 from sqlmodel import select, text
 from sqlmodel.ext.asyncio.session import AsyncSession
 
@@ -39,16 +39,15 @@ class KnowledgeRepository(BaseRepository):
             await self.session.refresh(knowledge)
         except IntegrityError:
             await self.session.rollback()
+            raise
         except Exception:
             await self.session.rollback()
+            raise
         return knowledge
 
     async def link_to_brain(
-        self, knowledge_id: UUID, brain_id: UUID
-    ) -> (
-        KnowledgeDB
-    ):  # FIXME : @amine @chloe Unused but to use later for fixing sha1 issues
-        knowledge = await self.get_knowledge_by_id(knowledge_id)
+        self, knowledge: KnowledgeDB, brain_id: UUID
+    ) -> KnowledgeDB:
         brain = await self.get_brain_by_id(brain_id)
         knowledge.brains.append(brain)
         self.session.add(knowledge)
@@ -192,7 +191,7 @@ class KnowledgeRepository(BaseRepository):
         knowledge = result.first()
 
         if not knowledge:
-            raise HTTPException(404, "Knowledge not found")
+            raise ValueError("Knowledge not found")
 
         try:
             knowledge.file_sha1 = file_sha1
@@ -200,7 +199,7 @@ class KnowledgeRepository(BaseRepository):
             await self.session.commit()
             await self.session.refresh(knowledge)
             return knowledge
-        except SQLAlchemyError:
+        except IntegrityError:
             await self.session.rollback()
             raise FileExistsError(
                 f"File {knowledge_id} already exists maybe under another file_name"

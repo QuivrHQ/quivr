@@ -28,20 +28,10 @@ class KnowledgeService(BaseService[KnowledgeRepository]):
         self.repository = repository
         self.storage = Storage()
 
-    async def link_to_brain(self, knowledge_id: UUID, brain_id: UUID) -> KnowledgeDB:
-        return await self.repository.link_to_brain(knowledge_id, brain_id)
-
     async def get_knowledge_sync(self, sync_id: int) -> Knowledge:
         km = await self.repository.get_knowledge_by_sync_id(sync_id)
         assert km.id, "Knowledge ID not generated"
         km = await km.to_dto()
-        return km
-
-    async def get_knowledge_by_sha1(self, sha1: str) -> Knowledge:
-        inserted_knowledge_db_instance = await self.repository.get_knowledge_by_sha1(
-            sha1
-        )
-        km = await inserted_knowledge_db_instance.to_dto()
         return km
 
     async def get_knowledge(self, knowledge_id: UUID) -> Knowledge:
@@ -52,44 +42,42 @@ class KnowledgeService(BaseService[KnowledgeRepository]):
         km = await inserted_knowledge_db_instance.to_dto()
         return km
 
-    # TODO: Replace with ONCONFLICT smarter query...
-    async def should_process_knowledge(
-        self, knowledge: Knowledge, brain_id: UUID
+    # TODO (@aminediro): Replace with ON CONFLICT smarter query...
+    async def update_should_process(
+        self, knowledge: Knowledge, brain_id: UUID, file_sha1: str
     ) -> bool:
         assert knowledge.id
-        assert knowledge.file_sha1
-        try:
-            await self.update_file_sha1_knowledge(knowledge.id, knowledge.file_sha1)
-            return True
-        except FileExistsError:
+        knowledge.file_sha1 = file_sha1
+        existing_knowledge = await self.repository.get_knowledge_by_sha1(
+            knowledge.file_sha1
+        )
+        if existing_knowledge is not None:
             logger.error("The content of the knowledge already exists in the brain. ")
             # Get existing knowledge sha1 and brains
-            existing_km = await self.get_knowledge_by_sha1(knowledge.file_sha1)
             if (
-                existing_km.status == KnowledgeStatus.UPLOADED
-                or existing_km.status == KnowledgeStatus.PROCESSING
+                existing_knowledge.status == KnowledgeStatus.UPLOADED
+                or existing_knowledge.status == KnowledgeStatus.PROCESSING
             ):
-                if brain_id in existing_km.brain_ids:
+                existing_brains = await existing_knowledge.awaitable_attrs.brains
+                if brain_id in [b.brain_id for b in existing_brains]:
                     logger.debug("Added same file to brain with existing knowledge")
                     raise FileExistsError(
-                        f"Existing file in brain {brain_id} with name {existing_km.file_name}"
+                        f"Existing file in brain {brain_id} with name {existing_knowledge.file_name}"
                     )
                 else:
                     logger.debug(
                         "The content of the knowledge already exists in the brain. "
                     )
-                    await self.link_to_brain(existing_km.id, brain_id=brain_id)
-                    # Remove the previous knowledge
+                    await self.repository.link_to_brain(existing_knowledge, brain_id)
                     await self.remove_knowledge(brain_id, knowledge.id)
                 return False
             else:
-                logger.debug(f"Removing previous errored file {existing_km.id}")
-                [
-                    self.remove_knowledge(brain_id, existing_km.id)
-                    for brain_id in existing_km.brain_ids
-                ]
-                await self.update_file_sha1_knowledge(knowledge.id, knowledge.file_sha1)
-                return True
+                logger.debug(f"Removing previous errored file {existing_knowledge.id}")
+                assert existing_knowledge.id
+                await self.remove_knowledge(brain_id, existing_knowledge.id)
+
+        await self.update_file_sha1_knowledge(knowledge.id, knowledge.file_sha1)
+        return True
 
     async def insert_knowledge(
         self,
@@ -146,12 +134,7 @@ class KnowledgeService(BaseService[KnowledgeRepository]):
         return knowledge
 
     async def update_file_sha1_knowledge(self, knowledge_id: UUID, file_sha1: str):
-        knowledge = await self.repository.update_file_sha1_knowledge(
-            knowledge_id, file_sha1
-        )
-        if knowledge is None:
-            breakpoint()
-            raise FileExistsError("existing knowledge with same file sha1")
+        return await self.repository.update_file_sha1_knowledge(knowledge_id, file_sha1)
 
     async def remove_knowledge(
         self,
