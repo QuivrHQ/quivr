@@ -6,7 +6,7 @@ from quivr_core.chat import ChatHistory as ChatHistoryCore
 from quivr_core.config import LLMEndpointConfig, RAGConfig
 from quivr_core.llm.llm_endpoint import LLMEndpoint
 from quivr_core.models import ParsedRAGResponse, RAGResponseMetadata
-from quivr_core.quivr_rag import QuivrQARAG
+from quivr_core.quivr_rag_langgraph import QuivrQARAGLangGraph
 
 from quivr_api.logger import get_logger
 from quivr_api.modules.brain.entity.brain_entity import BrainEntity
@@ -157,7 +157,7 @@ class RAGService:
         )
         llm = self.get_llm(rag_config)
         # Initialize the RAG pipline
-        rag_pipeline = QuivrQARAG(
+        rag_pipeline = QuivrQARAGLangGraph(
             rag_config=rag_config, llm=llm, vector_store=vector_store
         )
         #  Format the history, sanitize the input
@@ -211,7 +211,7 @@ class RAGService:
             self.brain.brain_id, rag_config.llm_config.max_input
         )
         # Initialize the rag pipline
-        rag_pipeline = QuivrQARAG(
+        rag_pipeline = QuivrQARAGLangGraph(
             rag_config=rag_config, llm=llm, vector_store=vector_store
         )
 
@@ -263,7 +263,6 @@ class RAGService:
             streamed_chat_history.metadata["snippet_emoji"] = (
                 self.brain.snippet_emoji if self.brain else None
             )
-
         sources_urls = generate_source(
             response.metadata.sources,
             self.brain.brain_id,
