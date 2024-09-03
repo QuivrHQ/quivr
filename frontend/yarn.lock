@@ -2505,6 +2505,11 @@
   dependencies:
     tippy.js "^6.3.7"
 
+"@tiptap/extension-focus@^2.6.6":
+  version "2.6.6"
+  resolved "https://registry.yarnpkg.com/@tiptap/extension-focus/-/extension-focus-2.6.6.tgz#9beb19dc08c3f7b806ba31abc8b9a0c8e042e98f"
+  integrity sha512-1RnqOOZeJRc3snt1dDu4+Jo9swMMK0HkDNOOe8Z1uSQUMKzd6Cn50Rl/yxfSA1zOzyvCxqV1V0udp3C7HmrAig==
+
 "@tiptap/extension-gapcursor@^2.6.6":
   version "2.6.6"
   resolved "https://registry.yarnpkg.com/@tiptap/extension-gapcursor/-/extension-gapcursor-2.6.6.tgz#343e0f66bb8961c537289ddc2052afb9b30e587d"

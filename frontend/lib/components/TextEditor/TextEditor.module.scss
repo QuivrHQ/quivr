@@ -3,15 +3,37 @@
 @use "styles/Radius.module.scss";
 @use "styles/ScreenSizes.module.scss";
 
+.search_bar_wrapper {
+  position: sticky;
+  bottom: Spacings.$spacing06;
+  // width: 50%;
+}
+
 .editor_wrapper {
   max-width: ScreenSizes.$medium;
   width: 100%;
   margin: 0 auto;
   padding: Spacings.$spacing07;
+  min-height: 100vh;
 
   .content_wrapper {
     color: var(--text-3);
     width: 100%;
+    position: relative;
+
+    .has_focus {
+      position: relative;
+
+      &::after {
+        content: "";
+        position: absolute;
+        top: 0;
+        right: calc(100% + Spacings.$spacing04);
+        width: Spacings.$spacing02;
+        background-color: var(--primary-0);
+        height: 100%;
+      }
+    }
 
     h1 {
       @include Typography.Big;

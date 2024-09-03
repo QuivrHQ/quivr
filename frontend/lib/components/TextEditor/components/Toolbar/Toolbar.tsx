@@ -34,7 +34,7 @@ export const Toolbar = ({ editor }: ToolbarProps): JSX.Element => {
       return;
     }
 
-    const editorChain = editor.chain().focus().extendMarkRange("link");
+    const editorChain = editor.chain().extendMarkRange("link").focus();
 
     url === ""
       ? editorChain.unsetLink().run()
@@ -47,25 +47,25 @@ export const Toolbar = ({ editor }: ToolbarProps): JSX.Element => {
         aria-label="Toggle bold"
         iconName="bold"
         active={editor.isActive("bold")}
-        setActive={editor.chain().focus().toggleBold().run}
+        setActive={() => editor.chain().toggleBold().focus().run()}
       />
       <ToolbarButton
         aria-label="Toggle italic"
         iconName="italic"
         active={editor.isActive("italic")}
-        setActive={editor.chain().focus().toggleItalic().run}
+        setActive={() => editor.chain().toggleItalic().focus().run()}
       />
       <ToolbarButton
         aria-label="Toggle strike"
         iconName="strikethrough"
         active={editor.isActive("strike")}
-        setActive={editor.chain().focus().toggleStrike().run}
+        setActive={() => editor.chain().toggleStrike().focus().run()}
       />
       <ToolbarButton
         aria-label="Toggle link"
         iconName="link"
         active={editor.isActive("link")}
-        // onClick={() => setLinkModalOpen(true)}
+        onClick={() => setLinkModalOpen(true)}
         setActive={setLink}
       />
       <Modal
@@ -81,69 +81,81 @@ export const Toolbar = ({ editor }: ToolbarProps): JSX.Element => {
         aria-label="Toggle ordered list"
         iconName="orderedList"
         active={editor.isActive("orderedList")}
-        setActive={editor.chain().focus().toggleOrderedList().run}
+        setActive={() => editor.chain().toggleOrderedList().focus().run()}
       />
       <ToolbarButton
         aria-label="Toggle unordered list"
         iconName="unorderedList"
         active={editor.isActive("bulletList")}
-        setActive={editor.chain().focus().toggleBulletList().run}
+        setActive={() => editor.chain().toggleBulletList().focus().run()}
       />
       <ToolbarSectionSeparator />
       <ToolbarButton
         aria-label="Toggle blockquote"
         iconName="blockquote"
         active={editor.isActive("blockquote")}
-        setActive={editor.chain().focus().toggleBlockquote().run}
+        setActive={() => editor.chain().toggleBlockquote().focus().run()}
       />
       <ToolbarButton
         aria-label="Toggle code"
         iconName="code"
         active={editor.isActive("code")}
-        setActive={editor.chain().focus().toggleCode().run}
+        setActive={() => editor.chain().toggleCode().focus().run()}
       />
       <ToolbarButton
         aria-label="Toggle code block"
         iconName="codeblock"
         active={editor.isActive("codeBlock")}
-        setActive={editor.chain().focus().toggleCodeBlock().run}
+        setActive={() => editor.chain().toggleCodeBlock().focus().run()}
       />
       <ToolbarSectionSeparator />
       <ToolbarButton
         aria-label="Toggle heading 1"
         iconName="heading1"
         active={editor.isActive("heading", { level: 1 })}
-        setActive={editor.chain().focus().toggleHeading({ level: 1 }).run}
+        setActive={() =>
+          editor.chain().toggleHeading({ level: 1 }).focus().run()
+        }
       />
       <ToolbarButton
         aria-label="Toggle heading 2"
         iconName="heading2"
         active={editor.isActive("heading", { level: 2 })}
-        setActive={editor.chain().focus().toggleHeading({ level: 2 }).run}
+        setActive={() =>
+          editor.chain().toggleHeading({ level: 2 }).focus().run()
+        }
       />
       <ToolbarButton
         aria-label="Toggle heading 3"
         iconName="heading3"
         active={editor.isActive("heading", { level: 3 })}
-        setActive={editor.chain().focus().toggleHeading({ level: 3 }).run}
+        setActive={() =>
+          editor.chain().toggleHeading({ level: 3 }).focus().run()
+        }
       />
       <ToolbarButton
         aria-label="Toggle heading 4"
         iconName="heading4"
         active={editor.isActive("heading", { level: 4 })}
-        setActive={editor.chain().focus().toggleHeading({ level: 4 }).run}
+        setActive={() =>
+          editor.chain().toggleHeading({ level: 4 }).focus().run()
+        }
       />
       <ToolbarButton
         aria-label="Toggle heading 5"
         iconName="heading5"
         active={editor.isActive("heading", { level: 5 })}
-        setActive={editor.chain().focus().toggleHeading({ level: 5 }).run}
+        setActive={() =>
+          editor.chain().toggleHeading({ level: 5 }).focus().run()
+        }
       />
       <ToolbarButton
         aria-label="Toggle heading 6"
         iconName="heading6"
         active={editor.isActive("heading", { level: 6 })}
-        setActive={editor.chain().focus().toggleHeading({ level: 6 }).run}
+        setActive={() =>
+          editor.chain().toggleHeading({ level: 6 }).focus().run()
+        }
       />
     </div>
   );
