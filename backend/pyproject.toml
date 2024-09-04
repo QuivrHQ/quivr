@@ -8,7 +8,9 @@ authors = [
     { name = "Chloé Daems", email = "chloe@quivr.app" },
     { name = "Jacopo Chevallard", email = "jacopo@quivr.app" }
 ]
-dependencies = ["packaging>=22.0"]
+dependencies = [
+    "packaging>=22.0"
+]
 readme = "README.md"
 requires-python = ">= 3.11"
 
