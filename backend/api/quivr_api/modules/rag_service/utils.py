@@ -1,8 +1,8 @@
 import logging
 from typing import Any, List
-from uuid import UUID
 
 from quivr_api.modules.chat.dto.chats import Sources
+from quivr_api.modules.knowledge.service.knowledge_service import KnowledgeService
 from quivr_api.modules.upload.service.generate_file_signed_url import (
     generate_file_signed_url,
 )
@@ -11,9 +11,9 @@ logger = logging.getLogger(__name__)
 
 
 # TODO: REFACTOR THIS, it does call the DB , so maybe in a service
-def generate_source(
+async def generate_source(
+    knowledge_service: KnowledgeService,
     source_documents: List[Any] | None,
-    brain_id: UUID,
     citations: List[int] | None = None,
 ) -> List[Sources]:
     """
@@ -62,8 +62,11 @@ def generate_source(
             if is_url:
                 source_url = doc.metadata["original_file_name"]
             else:
-                file_path = f"{brain_id}/{doc.metadata['file_name']}"
                 # Check if the URL has already been generated
+                file_name = doc.metadata["file_name"]
+                file_path = await knowledge_service.get_knowledge_storage_path(
+                    file_name
+                )
                 if file_path in generated_urls:
                     source_url = generated_urls[file_path]
                 else:

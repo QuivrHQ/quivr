@@ -100,6 +100,15 @@ class KnowledgeRepository(BaseRepository):
 
         return knowledge
 
+    async def get_knowledge_by_file_name(self, file_name: str) -> KnowledgeDB:
+        query = select(KnowledgeDB).where(KnowledgeDB.file_name == file_name)
+        result = await self.session.exec(query)
+        knowledge = result.first()
+        if not knowledge:
+            raise NoResultFound("Knowledge not found")
+
+        return knowledge
+
     async def get_knowledge_by_sha1(self, sha1: str) -> KnowledgeDB:
         query = select(KnowledgeDB).where(KnowledgeDB.file_sha1 == sha1)
         result = await self.session.exec(query)

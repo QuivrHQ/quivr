@@ -95,13 +95,13 @@ async def generate_signed_url_endpoint(
 
     knowledge = await knowledge_service.get_knowledge(knowledge_id)
 
-    if len(knowledge.brains_ids) == 0:
+    if len(knowledge.brain_ids) == 0:
         raise HTTPException(
             status_code=HTTPStatus.NOT_FOUND,
             detail="knowledge not associated with brains yet.",
         )
 
-    brain_id = knowledge.brains_ids[0]
+    brain_id = knowledge.brain_ids[0]
 
     validate_brain_authorization(brain_id=brain_id, user_id=current_user.id)
 
