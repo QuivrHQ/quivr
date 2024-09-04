@@ -298,7 +298,6 @@ langchain==0.2.14
     # via quivr-core
 langchain-anthropic==0.1.23
     # via quivr-core
-    # via quivr-monorepo
 langchain-cohere==0.2.2
     # via quivr-api
 langchain-community==0.2.12
@@ -318,7 +317,6 @@ langchain-core==0.2.38
     # via langgraph-checkpoint
     # via megaparse
     # via quivr-core
-    # via quivr-monorepo
 langchain-experimental==0.0.64
     # via langchain-cohere
 langchain-openai==0.1.22

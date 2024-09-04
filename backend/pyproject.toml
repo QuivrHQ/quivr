@@ -9,9 +9,7 @@ authors = [
     { name = "Jacopo Chevallard", email = "jacopo@quivr.app" }
 ]
 dependencies = [
-    "packaging>=22.0",
-    "langchain-core>=0.2.38",
-    "langchain-anthropic>=0.1.23",
+    "packaging>=22.0"
 ]
 readme = "README.md"
 requires-python = ">= 3.11"
