@@ -77,6 +77,16 @@ from quivr_api.modules.user.entity.user_identity import User
 pg_database_base_url = "postgres:postgres@localhost:54322/postgres"
 
 
+@pytest.fixture(scope="module")
+def event_loop():
+    try:
+        loop = asyncio.get_running_loop()
+    except RuntimeError:
+        loop = asyncio.new_event_loop()
+    yield loop
+    loop.close()
+
+
 @pytest.fixture(scope="function")
 def page_response() -> dict[str, Any]:
     json_path = (
@@ -182,17 +192,7 @@ def fetch_response():
 
 
 @pytest.fixture(scope="session")
-def event_loop():
-    try:
-        loop = asyncio.get_running_loop()
-    except RuntimeError:
-        loop = asyncio.new_event_loop()
-    yield loop
-    loop.close()
-
-
-@pytest_asyncio.fixture(scope="session")
-async def sync_engine():
+def sync_engine():
     engine = create_engine(
         "postgresql://" + pg_database_base_url,
         echo=True if os.getenv("ORM_DEBUG") else False,
@@ -204,8 +204,8 @@ async def sync_engine():
     yield engine
 
 
-@pytest_asyncio.fixture()
-async def sync_session(sync_engine):
+@pytest.fixture
+def sync_session(sync_engine):
     with sync_engine.connect() as conn:
         conn.begin()
         conn.begin_nested()
@@ -273,7 +273,9 @@ def search_result():
     ]
 
 
-@pytest_asyncio.fixture(scope="session")
+@pytest_asyncio.fixture(
+    scope="session",
+)
 async def async_engine():
     engine = create_async_engine(
         "postgresql+asyncpg://" + pg_database_base_url,

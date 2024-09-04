@@ -265,6 +265,7 @@ class RAGService:
             )
         sources_urls = await generate_source(
             knowledge_service=self.knowledge_service,
+            brain_id=self.brain.brain_id,
             source_documents=response.metadata.sources,
             citations=(
                 streamed_chat_history.metadata["citations"]

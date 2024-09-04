@@ -38,9 +38,13 @@ class KnowledgeService(BaseService[KnowledgeRepository]):
 
     # TODO: this is temporary fix for getting knowledge path.
     # KM storage path should be unrelated to brain
-    async def get_knowledge_storage_path(self, file_name: str) -> str | None:
+    async def get_knowledge_storage_path(
+        self, file_name: str, brain_id: UUID
+    ) -> str | None:
         try:
-            km = await self.repository.get_knowledge_by_file_name(file_name)
+            km = await self.repository.get_knowledge_by_file_name_brain_id(
+                file_name, brain_id
+            )
             brains = await km.awaitable_attrs.brains
             return next(
                 f"{b.brain_id}/{file_name}"

@@ -1,5 +1,6 @@
 import logging
 from typing import Any, List
+from uuid import UUID
 
 from quivr_api.modules.chat.dto.chats import Sources
 from quivr_api.modules.knowledge.service.knowledge_service import KnowledgeService
@@ -13,6 +14,7 @@ logger = logging.getLogger(__name__)
 # TODO: REFACTOR THIS, it does call the DB , so maybe in a service
 async def generate_source(
     knowledge_service: KnowledgeService,
+    brain_id: UUID,
     source_documents: List[Any] | None,
     citations: List[int] | None = None,
 ) -> List[Sources]:
@@ -65,7 +67,7 @@ async def generate_source(
                 # Check if the URL has already been generated
                 file_name = doc.metadata["file_name"]
                 file_path = await knowledge_service.get_knowledge_storage_path(
-                    file_name
+                    file_name=file_name, brain_id=brain_id
                 )
                 if file_path in generated_urls:
                     source_url = generated_urls[file_path]

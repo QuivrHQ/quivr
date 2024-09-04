@@ -488,5 +488,7 @@ async def test_get_knowledge_storage_path(session: AsyncSession, test_data: Test
     await upload_file_storage(km_data, km_path)
     # Link knowledge to two brains
     await repository.link_to_brain(knowledge, brain_2.brain_id)
-    storage_path = await service.get_knowledge_storage_path(knowledge.file_name)
+    storage_path = await service.get_knowledge_storage_path(
+        knowledge.file_name, brain_2.brain_id
+    )
     assert storage_path == km_path
