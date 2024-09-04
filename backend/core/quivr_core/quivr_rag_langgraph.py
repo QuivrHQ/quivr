@@ -116,7 +116,7 @@ class QuivrQARAGLangGraph:
         total_tokens = 0
         total_pairs = 0
         filtered_chat_history: list[AIMessage | HumanMessage] = []
-        for human_message, ai_message in chat_history.iter_pairs():
+        for human_message, ai_message in reversed(list(chat_history.iter_pairs())):
             # TODO: replace with tiktoken
             message_tokens = (len(human_message.content) + len(ai_message.content)) // 4
             if (
@@ -129,7 +129,7 @@ class QuivrQARAGLangGraph:
             total_tokens += message_tokens
             total_pairs += 1
 
-        return {"filtered_chat_history": filtered_chat_history[::-1]}
+        return {"filtered_chat_history": filtered_chat_history}
 
 
     ### Nodes
