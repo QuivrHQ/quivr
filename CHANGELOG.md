@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.0.303 (2024-09-04)
+
+## What's Changed
+* fix(chat): order of chat history was reversed by @StanGirard in https://github.com/QuivrHQ/quivr/pull/3148
+
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.302...v0.0.303
+
 ## 0.0.302 (2024-09-04)
 
 ## What's Changed
