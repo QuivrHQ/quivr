@@ -41,6 +41,16 @@ class LLMEndpoint:
                     else None,
                     azure_endpoint=azure_endpoint,
                 )
+            elif config.model.startswith("claude"):
+                from langchain_anthropic import ChatAnthropic
+
+                _llm = ChatAnthropic(
+                    model=config.model,
+                    api_key=SecretStr(config.llm_api_key)
+                    if config.llm_api_key
+                    else None,
+                    base_url=config.llm_base_url,
+                )
             else:
                 _llm = ChatOpenAI(
                     model=config.model,
