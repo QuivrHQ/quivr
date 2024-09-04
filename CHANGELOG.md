@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.0.302 (2024-09-04)
+
+## What's Changed
+* feat(anthropic): add llm by @StanGirard in https://github.com/QuivrHQ/quivr/pull/3146
+
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.301...v0.0.302
+
 ## 0.0.301 (2024-09-03)
 
 ## What's Changed
