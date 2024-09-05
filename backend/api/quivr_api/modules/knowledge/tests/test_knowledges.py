@@ -1,11 +1,13 @@
-import asyncio
 import os
 from typing import List, Tuple
 from uuid import uuid4
 
 import pytest
 import pytest_asyncio
-import sqlalchemy
+from sqlalchemy.exc import IntegrityError, NoResultFound
+from sqlmodel import select, text
+from sqlmodel.ext.asyncio.session import AsyncSession
+
 from quivr_api.modules.brain.entity.brain_entity import Brain, BrainType
 from quivr_api.modules.knowledge.dto.inputs import KnowledgeStatus
 from quivr_api.modules.knowledge.entity.knowledge import KnowledgeDB
@@ -14,60 +16,14 @@ from quivr_api.modules.knowledge.repository.knowledges import KnowledgeRepositor
 from quivr_api.modules.knowledge.service.knowledge_service import KnowledgeService
 from quivr_api.modules.upload.service.upload_file import upload_file_storage
 from quivr_api.modules.user.entity.user_identity import User
-from quivr_api.vector.entity.vector import Vector
-from sqlalchemy.exc import IntegrityError, NoResultFound
-from sqlalchemy.ext.asyncio import create_async_engine
-from sqlmodel import select, text
-from sqlmodel.ext.asyncio.session import AsyncSession
+from quivr_api.modules.vector.entity.vector import Vector
 
 pg_database_base_url = "postgres:postgres@localhost:54322/postgres"
 
 TestData = Tuple[Brain, List[KnowledgeDB]]
 
 
-@pytest.fixture(scope="session")
-def event_loop():
-    try:
-        loop = asyncio.get_running_loop()
-    except RuntimeError:
-        loop = asyncio.new_event_loop()
-    yield loop
-    loop.close()
-
-
-@pytest_asyncio.fixture(scope="session")
-async def async_engine():
-    engine = create_async_engine(
-        "postgresql+asyncpg://" + pg_database_base_url,
-        echo=True if os.getenv("ORM_DEBUG") else False,
-        future=True,
-        pool_pre_ping=True,
-        pool_size=10,
-        pool_recycle=0.1,
-    )
-    yield engine
-
-
-@pytest_asyncio.fixture()
-async def session(async_engine):
-    async with async_engine.connect() as conn:
-        await conn.begin()
-        await conn.begin_nested()
-        async_session = AsyncSession(conn, expire_on_commit=False)
-
-        @sqlalchemy.event.listens_for(
-            async_session.sync_session, "after_transaction_end"
-        )
-        def end_savepoint(session, transaction):
-            if conn.closed:
-                return
-            if not conn.in_nested_transaction():
-                conn.sync_connection.begin_nested()
-
-        yield async_session
-
-
-@pytest_asyncio.fixture
+@pytest_asyncio.fixture(scope="function")
 async def other_user(session: AsyncSession):
     sql = text(
         """
@@ -83,7 +39,7 @@ async def other_user(session: AsyncSession):
     return other_user
 
 
-@pytest_asyncio.fixture()
+@pytest_asyncio.fixture(scope="function")
 async def test_data(session: AsyncSession) -> TestData:
     user_1 = (
         await session.exec(select(User).where(User.email == "admin@quivr.app"))
@@ -127,7 +83,7 @@ async def test_data(session: AsyncSession) -> TestData:
     return brain_1, [knowledge_brain_1, knowledge_brain_2]
 
 
-@pytest.mark.asyncio
+@pytest.mark.asyncio(loop_scope="session")
 async def test_updates_knowledge_status(session: AsyncSession, test_data: TestData):
     brain, knowledges = test_data
     assert brain.brain_id
@@ -138,7 +94,7 @@ async def test_updates_knowledge_status(session: AsyncSession, test_data: TestDa
     assert knowledge.status == KnowledgeStatus.ERROR
 
 
-@pytest.mark.asyncio
+@pytest.mark.asyncio(loop_scope="session")
 async def test_updates_knowledge_status_no_knowledge(
     session: AsyncSession, test_data: TestData
 ):
@@ -150,7 +106,7 @@ async def test_updates_knowledge_status_no_knowledge(
         await repo.update_status_knowledge(uuid4(), KnowledgeStatus.UPLOADED)
 
 
-@pytest.mark.asyncio
+@pytest.mark.asyncio(loop_scope="session")
 async def test_update_knowledge_source_link(session: AsyncSession, test_data: TestData):
     brain, knowledges = test_data
     assert brain.brain_id
@@ -161,7 +117,7 @@ async def test_update_knowledge_source_link(session: AsyncSession, test_data: Te
     assert knowledge.source_link == "new_source_link"
 
 
-@pytest.mark.asyncio
+@pytest.mark.asyncio(loop_scope="session")
 async def test_remove_knowledge_from_brain(session: AsyncSession, test_data: TestData):
     brain, knowledges = test_data
     assert brain.brain_id
@@ -173,7 +129,7 @@ async def test_remove_knowledge_from_brain(session: AsyncSession, test_data: Tes
     ]
 
 
-@pytest.mark.asyncio
+@pytest.mark.asyncio(loop_scope="session")
 async def test_cascade_remove_knowledge_by_id(
     session: AsyncSession, test_data: TestData
 ):
@@ -198,7 +154,7 @@ async def test_cascade_remove_knowledge_by_id(
     assert vector is None
 
 
-@pytest.mark.asyncio
+@pytest.mark.asyncio(loop_scope="session")
 async def test_remove_all_knowledges_from_brain(
     session: AsyncSession, test_data: TestData
 ):
@@ -222,7 +178,7 @@ async def test_remove_all_knowledges_from_brain(
     # FIXME @aminediro &chloedia raise an error when trying to interact with storage UnboundLocalError: cannot access local variable 'response' where it is not associated with a value
 
 
-@pytest.mark.asyncio
+@pytest.mark.asyncio(loop_scope="session")
 async def test_duplicate_sha1_knowledge_same_user(
     session: AsyncSession, test_data: TestData
 ):
@@ -247,7 +203,7 @@ async def test_duplicate_sha1_knowledge_same_user(
         await repo.insert_knowledge(knowledge, brain.brain_id)
 
 
-@pytest.mark.asyncio
+@pytest.mark.asyncio(loop_scope="session")
 async def test_duplicate_sha1_knowledge_diff_user(
     session: AsyncSession, test_data: TestData, other_user: User
 ):
@@ -272,7 +228,7 @@ async def test_duplicate_sha1_knowledge_diff_user(
     assert result
 
 
-@pytest.mark.asyncio
+@pytest.mark.asyncio(loop_scope="session")
 async def test_add_knowledge_to_brain(session: AsyncSession, test_data: TestData):
     brain, knowledges = test_data
     assert brain.brain_id
@@ -293,7 +249,7 @@ async def test_add_knowledge_to_brain(session: AsyncSession, test_data: TestData
 
 
 # Knowledge Service
-@pytest.mark.asyncio
+@pytest.mark.asyncio(loop_scope="session")
 async def test_get_knowledge_in_brain(session: AsyncSession, test_data: TestData):
     brain, knowledges = test_data
     assert brain.brain_id
@@ -309,7 +265,7 @@ async def test_get_knowledge_in_brain(session: AsyncSession, test_data: TestData
     assert brain.brain_id in brains_of_knowledge
 
 
-@pytest.mark.asyncio
+@pytest.mark.asyncio(loop_scope="session")
 async def test_should_process_knowledge_exists(
     session: AsyncSession, test_data: TestData
 ):
@@ -339,7 +295,7 @@ async def test_should_process_knowledge_exists(
         )
 
 
-@pytest.mark.asyncio
+@pytest.mark.asyncio(loop_scope="session")
 async def test_should_process_knowledge_link_brain(
     session: AsyncSession, test_data: TestData
 ):
@@ -410,7 +366,7 @@ async def test_should_process_knowledge_link_brain(
         await service.repository.get_knowledge_by_id(new.id)
 
 
-@pytest.mark.asyncio
+@pytest.mark.asyncio(loop_scope="session")
 async def test_should_process_knowledge_prev_error(
     session: AsyncSession, test_data: TestData
 ):
@@ -468,7 +424,7 @@ async def test_should_process_knowledge_prev_error(
     assert new.file_sha1
 
 
-@pytest.mark.asyncio
+@pytest.mark.asyncio(loop_scope="session")
 async def test_get_knowledge_storage_path(session: AsyncSession, test_data: TestData):
     brain, [knowledge, _] = test_data
     assert knowledge.file_name

@@ -26,7 +26,7 @@ from quivr_api.modules.models.service.model_service import ModelService
 from quivr_api.modules.prompt.entity.prompt import Prompt
 from quivr_api.modules.prompt.service.prompt_service import PromptService
 from quivr_api.modules.user.entity.user_identity import UserIdentity
-from quivr_api.vector.service.vector_service import VectorService
+from quivr_api.modules.vector.service.vector_service import VectorService
 from quivr_api.vectorstore.supabase import CustomSupabaseVectorStore
 
 from .utils import generate_source

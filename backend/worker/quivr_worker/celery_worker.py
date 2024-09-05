@@ -21,9 +21,9 @@ from quivr_api.modules.notification.service.notification_service import (
 from quivr_api.modules.sync.repository.sync_files import SyncFilesRepository
 from quivr_api.modules.sync.service.sync_notion import SyncNotionService
 from quivr_api.modules.sync.service.sync_service import SyncService, SyncUserService
+from quivr_api.modules.vector.repository.vectors_repository import VectorRepository
+from quivr_api.modules.vector.service.vector_service import VectorService
 from quivr_api.utils.telemetry import maybe_send_telemetry
-from quivr_api.vector.repository.vectors_repository import VectorRepository
-from quivr_api.vector.service.vector_service import VectorService
 from sqlalchemy import Engine, create_engine
 from sqlalchemy.ext.asyncio import AsyncEngine, create_async_engine
 from sqlmodel import Session

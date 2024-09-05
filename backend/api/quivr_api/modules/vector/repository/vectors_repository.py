@@ -3,7 +3,7 @@ from uuid import UUID
 
 from quivr_api.logger import get_logger
 from quivr_api.modules.dependencies import BaseRepository
-from quivr_api.vector.entity.vector import SimilaritySearchOutput, Vector
+from quivr_api.modules.vector.entity.vector import SimilaritySearchOutput, Vector
 from sqlalchemy import exc, text
 from sqlmodel import Session, select
 

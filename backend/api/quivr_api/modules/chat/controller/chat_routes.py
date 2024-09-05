@@ -28,9 +28,9 @@ from quivr_api.modules.models.service.model_service import ModelService
 from quivr_api.modules.prompt.service.prompt_service import PromptService
 from quivr_api.modules.rag_service import RAGService
 from quivr_api.modules.user.entity.user_identity import UserIdentity
+from quivr_api.modules.vector.service.vector_service import VectorService
 from quivr_api.utils.telemetry import maybe_send_telemetry
 from quivr_api.utils.uuid_generator import generate_uuid_from_string
-from quivr_api.vector.service.vector_service import VectorService
 
 logger = get_logger(__name__)
 
