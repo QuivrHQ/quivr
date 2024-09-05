@@ -18,8 +18,6 @@ from quivr_api.modules.upload.service.upload_file import upload_file_storage
 from quivr_api.modules.user.entity.user_identity import User
 from quivr_api.modules.vector.entity.vector import Vector
 
-pg_database_base_url = "postgres:postgres@localhost:54322/postgres"
-
 TestData = Tuple[Brain, List[KnowledgeDB]]
 
 

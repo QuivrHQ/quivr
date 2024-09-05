@@ -73,6 +73,21 @@ class KnowledgeDB(AsyncAttrs, SQLModel, table=True):
         sa_relationship_kwargs={"lazy": "select"},
     )
 
+    is_folder: bool | None = Field(default=False)
+    parent_id: UUID | None = Field(
+        default=None, foreign_key="knowledge.id", ondelete="CASCADE"
+    )
+    parent: Optional["KnowledgeDB"] = Relationship(
+        back_populates="children",
+        sa_relationship_kwargs={
+            "remote_side": "KnowledgeDB.id",
+        },
+    )
+    children: list["KnowledgeDB"] = Relationship(
+        back_populates="parent",
+        sa_relationship_kwargs={"cascade": "all, delete-orphan"},
+    )
+
     async def to_dto(self) -> Knowledge:
         brains = await self.awaitable_attrs.brains
         size = self.file_size if self.file_size else 0
