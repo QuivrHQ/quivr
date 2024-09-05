@@ -1,7 +1,7 @@
 {
   "password": "Password",
   "googleLogin": "Continue with Google",
-  "azureLogin": "Continue with Azure",
+  "azureLogin": "Continue with Microsoft",
   "errorPasswordMissed": "Please enter your password",
   "magicLink": "Continue with email",
   "errorMailMissed": "Please enter your email address",

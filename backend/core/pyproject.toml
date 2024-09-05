@@ -7,7 +7,7 @@ authors = [
 ]
 dependencies = [
     "pydantic>=2.8.2",
-    "langchain-core>=0.2.32",
+    "langchain-core>=0.2.38",
     "langchain>=0.2.14",
     "langgraph>=0.2.14",
     "httpx>=0.27.0",
@@ -15,6 +15,7 @@ dependencies = [
     "tiktoken>=0.7.0",
     "aiofiles>=23.1.0",
     "langchain-community>=0.2.12",
+    "langchain-anthropic>=0.1.23",
 ]
 readme = "README.md"
 requires-python = ">= 3.11"
