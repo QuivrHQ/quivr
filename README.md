@@ -22,7 +22,7 @@ Quivr, your second brain, utilizes the power of GenerativeAI to be your personal
 - **Public/Private**: Share your brains with your users via a public link, or keep them private.
 - **Offline Mode**: Quivr works offline, so you can access your data anytime, anywhere.
 
-## Demo Highlights 🎥
+## Demo Highlight 🎥
 
 https://github.com/quivrhq/quivr/assets/19614572/a6463b73-76c7-4bc0-978d-70562dca71f5
 
