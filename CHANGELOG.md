@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.0.306 (2024-09-05)
+
+## What's Changed
+* feat(readme): trigger deploy by @StanGirard in https://github.com/QuivrHQ/quivr/pull/3159
+
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.305...v0.0.306
+
 ## 0.0.305 (2024-09-05)
 
 ## What's Changed
