@@ -12,6 +12,7 @@ from quivr_api.modules.knowledge.entity.knowledge import KnowledgeDB
 from quivr_api.modules.knowledge.entity.knowledge_brain import KnowledgeBrain
 from quivr_api.modules.knowledge.repository.knowledges import KnowledgeRepository
 from quivr_api.modules.knowledge.service.knowledge_service import KnowledgeService
+from quivr_api.modules.upload.service.upload_file import upload_file_storage
 from quivr_api.modules.user.entity.user_identity import User
 from quivr_api.vector.entity.vector import Vector
 from sqlalchemy.exc import IntegrityError, NoResultFound
@@ -96,8 +97,8 @@ async def test_data(session: AsyncSession) -> TestData:
     )
 
     knowledge_brain_1 = KnowledgeDB(
-        file_name="test_file_1",
-        extension="txt",
+        file_name="test_file_1.txt",
+        extension=".txt",
         status="UPLOADED",
         source="test_source",
         source_link="test_source_link",
@@ -108,8 +109,8 @@ async def test_data(session: AsyncSession) -> TestData:
     )
 
     knowledge_brain_2 = KnowledgeDB(
-        file_name="test_file_2",
-        extension="txt",
+        file_name="test_file_2.txt",
+        extension=".txt",
         status="UPLOADED",
         source="test_source",
         source_link="test_source_link",
@@ -349,7 +350,7 @@ async def test_should_process_knowledge_link_brain(
     assert brain.brain_id
     prev = KnowledgeDB(
         file_name="prev",
-        extension="txt",
+        extension=".txt",
         status=KnowledgeStatus.UPLOADED,
         source="test_source",
         source_link="test_source_link",
@@ -465,3 +466,29 @@ async def test_should_process_knowledge_prev_error(
     assert new.id
     new = await service.repository.get_knowledge_by_id(new.id)
     assert new.file_sha1
+
+
+@pytest.mark.asyncio
+async def test_get_knowledge_storage_path(session: AsyncSession, test_data: TestData):
+    brain, [knowledge, _] = test_data
+    assert knowledge.file_name
+    repository = KnowledgeRepository(session)
+    service = KnowledgeService(repository)
+    brain_2 = Brain(
+        name="test_brain",
+        description="this is a test brain",
+        brain_type=BrainType.integration,
+    )
+    session.add(brain_2)
+    await session.commit()
+    await session.refresh(brain_2)
+    assert brain_2.brain_id
+    km_data = os.urandom(128)
+    km_path = f"{str(knowledge.brains[0].brain_id)}/{knowledge.file_name}"
+    await upload_file_storage(km_data, km_path)
+    # Link knowledge to two brains
+    await repository.link_to_brain(knowledge, brain_2.brain_id)
+    storage_path = await service.get_knowledge_storage_path(
+        knowledge.file_name, brain_2.brain_id
+    )
+    assert storage_path == km_path

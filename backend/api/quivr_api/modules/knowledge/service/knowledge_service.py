@@ -18,6 +18,7 @@ from quivr_api.modules.sync.entity.sync_models import (
     DownloadedSyncFile,
     SyncFile,
 )
+from quivr_api.modules.upload.service.upload_file import check_file_exists
 
 logger = get_logger(__name__)
 
@@ -34,6 +35,24 @@ class KnowledgeService(BaseService[KnowledgeRepository]):
         assert km.id, "Knowledge ID not generated"
         km = await km.to_dto()
         return km
+
+    # TODO: this is temporary fix for getting knowledge path.
+    # KM storage path should be unrelated to brain
+    async def get_knowledge_storage_path(
+        self, file_name: str, brain_id: UUID
+    ) -> str | None:
+        try:
+            km = await self.repository.get_knowledge_by_file_name_brain_id(
+                file_name, brain_id
+            )
+            brains = await km.awaitable_attrs.brains
+            return next(
+                f"{b.brain_id}/{file_name}"
+                for b in brains
+                if check_file_exists(b.brain_id, file_name)
+            )
+        except NoResultFound:
+            raise FileNotFoundError(f"No knowledge for file_name: {file_name}")
 
     async def get_knowledge(self, knowledge_id: UUID) -> Knowledge:
         inserted_knowledge_db_instance = await self.repository.get_knowledge_by_id(
