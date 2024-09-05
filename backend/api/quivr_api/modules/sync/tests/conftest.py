@@ -1,4 +1,3 @@
-import asyncio
 import json
 import os
 from collections import defaultdict
@@ -10,14 +9,10 @@ from uuid import UUID, uuid4
 
 import pytest
 import pytest_asyncio
-import sqlalchemy
-from sqlalchemy.ext.asyncio import create_async_engine
-from sqlmodel import Session, create_engine, select
-from sqlmodel.ext.asyncio.session import AsyncSession
+from sqlmodel import select
 
 from quivr_api.modules.brain.entity.brain_entity import Brain, BrainType
 from quivr_api.modules.brain.repository.brains_vectors import BrainsVectors
-from quivr_api.modules.dependencies import get_supabase_client
 from quivr_api.modules.knowledge.repository.knowledges import KnowledgeRepository
 from quivr_api.modules.knowledge.service.knowledge_service import KnowledgeService
 from quivr_api.modules.notification.dto.inputs import (
@@ -75,16 +70,6 @@ from quivr_api.modules.sync.utils.syncutils import (
 from quivr_api.modules.user.entity.user_identity import User
 
 pg_database_base_url = "postgres:postgres@localhost:54322/postgres"
-
-
-@pytest.fixture(scope="module")
-def event_loop():
-    try:
-        loop = asyncio.get_running_loop()
-    except RuntimeError:
-        loop = asyncio.new_event_loop()
-    yield loop
-    loop.close()
 
 
 @pytest.fixture(scope="function")
@@ -191,36 +176,6 @@ def fetch_response():
     ]
 
 
-@pytest.fixture(scope="session")
-def sync_engine():
-    engine = create_engine(
-        "postgresql://" + pg_database_base_url,
-        echo=True if os.getenv("ORM_DEBUG") else False,
-        pool_pre_ping=True,
-        pool_size=10,
-        pool_recycle=0.1,
-    )
-
-    yield engine
-
-
-@pytest.fixture
-def sync_session(sync_engine):
-    with sync_engine.connect() as conn:
-        conn.begin()
-        conn.begin_nested()
-        sync_session = Session(conn, expire_on_commit=False)
-
-        @sqlalchemy.event.listens_for(sync_session, "after_transaction_end")
-        def end_savepoint(session, transaction):
-            if conn.closed:
-                return
-            if not conn.in_nested_transaction():
-                conn.sync_connection.begin_nested()
-
-        yield sync_session
-
-
 @pytest.fixture
 def search_result():
     return [
@@ -273,41 +228,7 @@ def search_result():
     ]
 
 
-@pytest_asyncio.fixture(
-    scope="session",
-)
-async def async_engine():
-    engine = create_async_engine(
-        "postgresql+asyncpg://" + pg_database_base_url,
-        echo=True if os.getenv("ORM_DEBUG") else False,
-        future=True,
-        pool_pre_ping=True,
-        pool_size=10,
-        pool_recycle=0.1,
-    )
-    yield engine
-
-
-@pytest_asyncio.fixture()
-async def session(async_engine):
-    async with async_engine.connect() as conn:
-        await conn.begin()
-        await conn.begin_nested()
-        async_session = AsyncSession(conn, expire_on_commit=False)
-
-        @sqlalchemy.event.listens_for(
-            async_session.sync_session, "after_transaction_end"
-        )
-        def end_savepoint(session, transaction):
-            if conn.closed:
-                return
-            if not conn.in_nested_transaction():
-                conn.sync_connection.begin_nested()
-
-        yield async_session
-
-
-@pytest.fixture
+@pytest.fixture(scope="function")
 def user_1(sync_session) -> User:
     user_1 = (
         sync_session.exec(select(User).where(User.email == "admin@quivr.app"))
@@ -708,7 +629,7 @@ def prev_file():
     return file
 
 
-@pytest_asyncio.fixture
+@pytest_asyncio.fixture(scope="function")
 async def brain_user_setup(
     session,
 ) -> Tuple[Brain, User]:
@@ -730,7 +651,7 @@ async def brain_user_setup(
     return brain_1, user_1
 
 
-@pytest_asyncio.fixture
+@pytest_asyncio.fixture(scope="function")
 async def setup_syncs_data(
     brain_user_setup,
 ) -> Tuple[SyncsUser, SyncsActive]:
@@ -828,8 +749,3 @@ def syncutils_notion(
     )
 
     return sync_util
-
-
-@pytest.fixture(scope="session")
-def supabase_client():
-    return get_supabase_client()

@@ -2,7 +2,7 @@ from uuid import UUID
 
 from quivr_api.logger import get_logger
 from quivr_api.modules.brain.service.brain_service import BrainService
-from quivr_api.vector.service.vector_service import VectorService
+from quivr_api.modules.vector.service.vector_service import VectorService
 
 from quivr_worker.files import build_file
 from quivr_worker.parsers.crawler import URL, extract_from_url, slugify

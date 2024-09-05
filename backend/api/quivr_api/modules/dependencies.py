@@ -8,8 +8,8 @@ from langchain_community.embeddings.ollama import OllamaEmbeddings
 # from langchain_community.vectorstores.supabase import SupabaseVectorStore
 from langchain_openai import OpenAIEmbeddings
 
-# from quivr_api.vector.service.vector_service import VectorService
-# from quivr_api.vectorstore.supabase import CustomSupabaseVectorStore
+# from quivr_api.modules.vector.service.vector_service import VectorService
+# from quivr_api.modules.vectorstore.supabase import CustomSupabaseVectorStore
 from sqlalchemy import Engine, create_engine
 from sqlalchemy.ext.asyncio import create_async_engine
 from sqlmodel import Session
