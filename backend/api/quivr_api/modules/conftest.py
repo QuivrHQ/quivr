@@ -1,4 +1,3 @@
-import asyncio
 import os
 
 import pytest
@@ -56,7 +55,6 @@ def sync_session():
 
 @pytest_asyncio.fixture(scope="function")
 async def session():
-    print("\nSESSION_EVEN_LOOP", id(asyncio.get_event_loop()))
     async with async_engine.connect() as conn:
         trans = await conn.begin()
         nested = await conn.begin_nested()
