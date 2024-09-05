@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.0.304 (2024-09-05)
+
+## What's Changed
+* feat: update Azure login button text by @StanGirard in https://github.com/QuivrHQ/quivr/pull/3152
+* fix: url knowledge multiple brain by @AmineDiro in https://github.com/QuivrHQ/quivr/pull/3145
+* chore: update Dockerfile with PostHog environment variables by @StanGirard in https://github.com/QuivrHQ/quivr/pull/3154
+
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.303...v0.0.304
+
 ## 0.0.303 (2024-09-04)
 
 ## What's Changed
