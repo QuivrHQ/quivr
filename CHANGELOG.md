@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.0.305 (2024-09-05)
+
+## What's Changed
+* chore: update next.config.js with PostHog domains by @StanGirard in https://github.com/QuivrHQ/quivr/pull/3155
+
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.304...v0.0.305
+
 ## 0.0.304 (2024-09-05)
 
 ## What's Changed
