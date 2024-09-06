@@ -12,7 +12,8 @@ from quivr_api.modules.knowledge.dto.inputs import (
 from quivr_api.modules.knowledge.dto.outputs import DeleteKnowledgeResponse
 from quivr_api.modules.knowledge.entity.knowledge import Knowledge, KnowledgeDB
 from quivr_api.modules.knowledge.repository.knowledges import KnowledgeRepository
-from quivr_api.modules.knowledge.repository.storage import Storage
+from quivr_api.modules.knowledge.repository.storage import SupabaseS3Storage
+from quivr_api.modules.knowledge.repository.storage_interface import StorageInterface
 from quivr_api.modules.sync.entity.sync_models import (
     DBSyncFile,
     DownloadedSyncFile,
@@ -26,9 +27,13 @@ logger = get_logger(__name__)
 class KnowledgeService(BaseService[KnowledgeRepository]):
     repository_cls = KnowledgeRepository
 
-    def __init__(self, repository: KnowledgeRepository):
+    def __init__(
+        self,
+        repository: KnowledgeRepository,
+        storage: StorageInterface = SupabaseS3Storage(),
+    ):
         self.repository = repository
-        self.storage = Storage()
+        self.storage = storage
 
     async def get_knowledge_sync(self, sync_id: int) -> Knowledge:
         km = await self.repository.get_knowledge_by_sync_id(sync_id)
@@ -150,7 +155,7 @@ class KnowledgeService(BaseService[KnowledgeRepository]):
             assert isinstance(knowledge.file_name, str), "file_name should be a string"
             file_name_with_brain_id = f"{brain_id}/{knowledge.file_name}"
             try:
-                self.storage.remove_file(file_name_with_brain_id)
+                await self.storage.remove_file(file_name_with_brain_id)
             except Exception as e:
                 logger.error(
                     f"Error while removing file {file_name_with_brain_id}: {e}"
@@ -178,7 +183,7 @@ class KnowledgeService(BaseService[KnowledgeRepository]):
             message = await self.repository.remove_knowledge_by_id(knowledge_id)
             file_name_with_brain_id = f"{brain_id}/{message.file_name}"
             try:
-                self.storage.remove_file(file_name_with_brain_id)
+                await self.storage.remove_file(file_name_with_brain_id)
             except Exception as e:
                 logger.error(
                     f"Error while removing file {file_name_with_brain_id}: {e}"

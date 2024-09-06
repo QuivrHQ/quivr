@@ -2,7 +2,7 @@ from http import HTTPStatus
 from typing import Annotated, Optional
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, File, HTTPException, Query, UploadFile
+from fastapi import APIRouter, Depends, HTTPException, Query, UploadFile
 
 from quivr_api.logger import get_logger
 from quivr_api.middlewares.auth import AuthBearer, get_current_user
@@ -11,7 +11,6 @@ from quivr_api.modules.brain.service.brain_authorization_service import (
     has_brain_authorization,
     validate_brain_authorization,
 )
-from quivr_api.modules.brain.service.brain_vector_service import BrainVectorService
 from quivr_api.modules.dependencies import get_service
 from quivr_api.modules.knowledge.dto.inputs import AddKnowledge
 from quivr_api.modules.knowledge.service.knowledge_service import KnowledgeService
@@ -55,7 +54,7 @@ async def list_knowledge_in_brain_endpoint(
     ],
     tags=["Knowledge"],
 )
-async def delete_endpoint(
+async def delete_knowledge(
     knowledge_id: UUID,
     knowledge_service: KnowledgeServiceDep,
     current_user: UserIdentity = Depends(get_current_user),
@@ -68,12 +67,6 @@ async def delete_endpoint(
     knowledge = await knowledge_service.get_knowledge(knowledge_id)
     file_name = knowledge.file_name if knowledge.file_name else knowledge.url
     await knowledge_service.remove_knowledge(brain_id, knowledge_id)
-
-    brain_vector_service = BrainVectorService(brain_id)
-    if knowledge.file_name:
-        brain_vector_service.delete_file_from_brain(knowledge.file_name)
-    elif knowledge.url:
-        brain_vector_service.delete_file_url_from_brain(knowledge.url)
 
     return {
         "message": f"{file_name} of brain {brain_id} has been deleted by user {current_user.email}."
@@ -126,11 +119,10 @@ async def generate_signed_url_endpoint(
 async def add_knowledge(
     knowledge: AddKnowledge,
     knowledge_service: KnowledgeServiceDep,
-    file: Optional[UploadFile] = File(None),
+    file: Optional[UploadFile] = None,
     current_user: UserIdentity = Depends(get_current_user),
 ):
     if not knowledge.file_name and not knowledge.url:
         raise HTTPException(
             status_code=400, detail="Either file_name or url must be provided"
         )
-    pass
