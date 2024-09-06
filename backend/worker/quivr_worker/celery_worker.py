@@ -26,7 +26,7 @@ from quivr_api.modules.vector.service.vector_service import VectorService
 from quivr_api.utils.telemetry import maybe_send_telemetry
 from sqlalchemy import Engine, create_engine
 from sqlalchemy.ext.asyncio import AsyncEngine, create_async_engine
-from sqlmodel import Session
+from sqlmodel import Session, text
 from sqlmodel.ext.asyncio.session import AsyncSession
 
 from quivr_worker.check_premium import check_is_premium
@@ -143,26 +143,40 @@ async def aprocess_file_task(
     global engine
     assert engine
     async with AsyncSession(async_engine) as async_session:
-        with Session(engine, expire_on_commit=False, autoflush=False) as session:
-            vector_repository = VectorRepository(session)
-            vector_service = VectorService(
-                vector_repository
-            )  # FIXME @amine: fix to need AsyncSession in vector Service
-            knowledge_repository = KnowledgeRepository(async_session)
-            knowledge_service = KnowledgeService(knowledge_repository)
-            await process_uploaded_file(
-                supabase_client=supabase_client,
-                brain_service=brain_service,
-                vector_service=vector_service,
-                knowledge_service=knowledge_service,
-                file_name=file_name,
-                brain_id=brain_id,
-                file_original_name=file_original_name,
-                knowledge_id=knowledge_id,
-                integration=source,
-                integration_link=source_link,
-                delete_file=delete_file,
+        try:
+            await async_session.execute(
+                text("SET SESSION idle_in_transaction_session_timeout = '5min';")
             )
+            with Session(engine, expire_on_commit=False, autoflush=False) as session:
+                session.execute(
+                    text("SET SESSION idle_in_transaction_session_timeout = '5min';")
+                )
+                vector_repository = VectorRepository(session)
+                vector_service = VectorService(
+                    vector_repository
+                )  # FIXME @amine: fix to need AsyncSession in vector Service
+                knowledge_repository = KnowledgeRepository(async_session)
+                knowledge_service = KnowledgeService(knowledge_repository)
+                await process_uploaded_file(
+                    supabase_client=supabase_client,
+                    brain_service=brain_service,
+                    vector_service=vector_service,
+                    knowledge_service=knowledge_service,
+                    file_name=file_name,
+                    brain_id=brain_id,
+                    file_original_name=file_original_name,
+                    knowledge_id=knowledge_id,
+                    integration=source,
+                    integration_link=source_link,
+                    delete_file=delete_file,
+                )
+        except Exception as e:
+            session.rollback()
+            await async_session.rollback()
+            raise e
+        finally:
+            session.close()
+            await async_session.close()
 
 
 @celery.task(

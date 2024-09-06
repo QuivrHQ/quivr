@@ -11,7 +11,6 @@ from quivr_api.modules.brain.service.brain_authorization_service import (
     has_brain_authorization,
     validate_brain_authorization,
 )
-from quivr_api.modules.brain.service.brain_vector_service import BrainVectorService
 from quivr_api.modules.dependencies import get_service
 from quivr_api.modules.knowledge.service.knowledge_service import KnowledgeService
 from quivr_api.modules.upload.service.generate_file_signed_url import (
@@ -67,12 +66,6 @@ async def delete_endpoint(
     knowledge = await knowledge_service.get_knowledge(knowledge_id)
     file_name = knowledge.file_name if knowledge.file_name else knowledge.url
     await knowledge_service.remove_knowledge(brain_id, knowledge_id)
-
-    brain_vector_service = BrainVectorService(brain_id)
-    if knowledge.file_name:
-        brain_vector_service.delete_file_from_brain(knowledge.file_name)
-    elif knowledge.url:
-        brain_vector_service.delete_file_url_from_brain(knowledge.url)
 
     return {
         "message": f"{file_name} of brain {brain_id} has been deleted by user {current_user.email}."
