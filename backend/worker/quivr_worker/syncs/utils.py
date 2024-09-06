@@ -26,6 +26,7 @@ from quivr_api.modules.sync.utils.sync import (
 )
 from quivr_api.modules.sync.utils.syncutils import SyncUtils
 from sqlalchemy.ext.asyncio import AsyncEngine
+from sqlmodel import text
 from sqlmodel.ext.asyncio.session import AsyncSession
 
 celery_inspector = celery.control.inspect()
@@ -48,34 +49,44 @@ class SyncServices:
 async def build_syncs_utils(
     deps: SyncServices,
 ) -> AsyncGenerator[dict[str, SyncUtils], None]:
-    async with AsyncSession(
-        deps.async_engine, expire_on_commit=False, autoflush=False
-    ) as session:
-        # TODO pass services from celery_worker
-        notion_repository = NotionRepository(session)
-        notion_service = SyncNotionService(notion_repository)
-        knowledge_service = KnowledgeService(KnowledgeRepository(session))
-
-        mapping_sync_utils = {}
-        for provider_name, sync_cloud in [
-            ("google", GoogleDriveSync()),
-            ("azure", AzureDriveSync()),
-            ("dropbox", DropboxSync()),
-            ("github", GitHubSync()),
-            (
-                "notion",
-                NotionSync(notion_service=notion_service),
-            ),  # Fixed duplicate "github" key
-        ]:
-            provider_sync_util = SyncUtils(
-                sync_user_service=deps.sync_user_service,
-                sync_active_service=deps.sync_active_service,
-                sync_files_repo=deps.sync_files_repo_service,
-                sync_cloud=sync_cloud,
-                notification_service=deps.notification_service,
-                brain_vectors=deps.brain_vectors,
-                knowledge_service=knowledge_service,
+    try:
+        async with AsyncSession(
+            deps.async_engine, expire_on_commit=False, autoflush=False
+        ) as session:
+            await session.execute(
+                text("SET SESSION idle_in_transaction_session_timeout = '5min';")
             )
-            mapping_sync_utils[provider_name] = provider_sync_util
+            # TODO pass services from celery_worker
+            notion_repository = NotionRepository(session)
+            notion_service = SyncNotionService(notion_repository)
+            knowledge_service = KnowledgeService(KnowledgeRepository(session))
 
-        yield mapping_sync_utils
+            mapping_sync_utils = {}
+            for provider_name, sync_cloud in [
+                ("google", GoogleDriveSync()),
+                ("azure", AzureDriveSync()),
+                ("dropbox", DropboxSync()),
+                ("github", GitHubSync()),
+                (
+                    "notion",
+                    NotionSync(notion_service=notion_service),
+                ),  # Fixed duplicate "github" key
+            ]:
+                provider_sync_util = SyncUtils(
+                    sync_user_service=deps.sync_user_service,
+                    sync_active_service=deps.sync_active_service,
+                    sync_files_repo=deps.sync_files_repo_service,
+                    sync_cloud=sync_cloud,
+                    notification_service=deps.notification_service,
+                    brain_vectors=deps.brain_vectors,
+                    knowledge_service=knowledge_service,
+                )
+                mapping_sync_utils[provider_name] = provider_sync_util
+
+            yield mapping_sync_utils
+
+    except Exception as e:
+        await session.rollback()
+        raise e
+    finally:
+        await session.close()

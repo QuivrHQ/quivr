@@ -12,7 +12,7 @@ from langchain_openai import OpenAIEmbeddings
 # from quivr_api.modules.vectorstore.supabase import CustomSupabaseVectorStore
 from sqlalchemy import Engine, create_engine
 from sqlalchemy.ext.asyncio import create_async_engine
-from sqlmodel import Session
+from sqlmodel import Session, text
 from sqlmodel.ext.asyncio.session import AsyncSession
 
 from quivr_api.logger import get_logger
@@ -77,16 +77,17 @@ async_engine = create_async_engine(
 
 def get_sync_session() -> Generator[Session, None, None]:
     with Session(sync_engine, expire_on_commit=False, autoflush=False) as session:
-        yield session
-
-
-# def get_documents_vector_store(vector_service: VectorService) -> SupabaseVectorStore:
-#     embeddings = get_embedding_client()
-#     supabase_client: Client = get_supabase_client()
-#     documents_vector_store = CustomSupabaseVectorStore(  # Modified by @chloe Check
-#         supabase_client, embeddings, table_name="vectors", vector_service=vector_service
-#     )
-#     return documents_vector_store
+        try:
+            session.execute(
+                text("SET SESSION idle_in_transaction_session_timeout = '5min';")
+            )
+            yield session
+            session.commit()
+        except Exception as e:
+            session.rollback()
+            raise e
+        finally:
+            session.close()
 
 
 async def get_async_session() -> AsyncGenerator[AsyncSession, None]:
@@ -94,6 +95,9 @@ async def get_async_session() -> AsyncGenerator[AsyncSession, None]:
         async_engine,
     ) as session:
         try:
+            await session.execute(
+                text("SET SESSION idle_in_transaction_session_timeout = '5min';")
+            )
             yield session
             await session.commit()
         except Exception as e:

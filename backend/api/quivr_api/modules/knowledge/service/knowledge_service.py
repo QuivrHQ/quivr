@@ -49,7 +49,7 @@ class KnowledgeService(BaseService[KnowledgeRepository]):
             return next(
                 f"{b.brain_id}/{file_name}"
                 for b in brains
-                if check_file_exists(b.brain_id, file_name)
+                if check_file_exists(str(b.brain_id), file_name)
             )
         except NoResultFound:
             raise FileNotFoundError(f"No knowledge for file_name: {file_name}")

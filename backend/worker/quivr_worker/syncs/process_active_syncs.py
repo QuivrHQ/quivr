@@ -17,6 +17,7 @@ from quivr_api.modules.sync.service.sync_notion import (
 from quivr_api.modules.sync.service.sync_service import SyncService, SyncUserService
 from quivr_api.modules.sync.utils.syncutils import SyncUtils
 from sqlalchemy.ext.asyncio import AsyncEngine
+from sqlmodel import text
 from sqlmodel.ext.asyncio.session import AsyncSession
 
 from quivr_worker.syncs.utils import SyncServices, build_syncs_utils
@@ -96,43 +97,53 @@ async def _process_all_active_syncs(
 async def process_notion_sync(
     async_engine: AsyncEngine,
 ):
-    async with AsyncSession(
-        async_engine, expire_on_commit=False, autoflush=False
-    ) as session:
-        sync_user_service = SyncUserService()
-        notion_repository = NotionRepository(session)
-        notion_service = SyncNotionService(notion_repository)
-
-        # TODO: Add state in sync_user to check if the same fetching is running
-        # Get active tasks for all workers
-        active_tasks = celery_inspector.active()
-        is_uploading_task_running = any(
-            "fetch_and_store_notion_files" in task
-            for worker_tasks in active_tasks.values()
-            for task in worker_tasks
-        )
-        if is_uploading_task_running:
-            return None
-
-        # Get all notion syncs
-        notion_syncs = sync_user_service.get_all_notion_user_syncs()
-        for notion_sync in notion_syncs:
-            user_id = notion_sync["user_id"]
-            notion_client = Client(auth=notion_sync["credentials"]["access_token"])
-
-            # TODO: fetch last_sync_time from table
-            pages_to_update = fetch_limit_notion_pages(
-                notion_client,
-                datetime.now() - timedelta(hours=6),
+    try:
+        async with AsyncSession(
+            async_engine, expire_on_commit=False, autoflush=False
+        ) as session:
+            await session.execute(
+                text("SET SESSION idle_in_transaction_session_timeout = '5min';")
             )
-            logger.debug("Number of pages to update: %s", len(pages_to_update))
-            if not pages_to_update:
-                logger.info("No pages to update")
-                continue
+            sync_user_service = SyncUserService()
+            notion_repository = NotionRepository(session)
+            notion_service = SyncNotionService(notion_repository)
 
-            await update_notion_pages(
-                notion_service,
-                pages_to_update,
-                UUID(user_id),
-                notion_client,  # type: ignore
+            # TODO: Add state in sync_user to check if the same fetching is running
+            # Get active tasks for all workers
+            active_tasks = celery_inspector.active()
+            is_uploading_task_running = any(
+                "fetch_and_store_notion_files" in task
+                for worker_tasks in active_tasks.values()
+                for task in worker_tasks
             )
+            if is_uploading_task_running:
+                return None
+
+            # Get all notion syncs
+            notion_syncs = sync_user_service.get_all_notion_user_syncs()
+            for notion_sync in notion_syncs:
+                user_id = notion_sync["user_id"]
+                notion_client = Client(auth=notion_sync["credentials"]["access_token"])
+
+                # TODO: fetch last_sync_time from table
+                pages_to_update = fetch_limit_notion_pages(
+                    notion_client,
+                    datetime.now() - timedelta(hours=6),
+                )
+                logger.debug("Number of pages to update: %s", len(pages_to_update))
+                if not pages_to_update:
+                    logger.info("No pages to update")
+                    continue
+
+                await update_notion_pages(
+                    notion_service,
+                    pages_to_update,
+                    UUID(user_id),
+                    notion_client,  # type: ignore
+                )
+
+    except Exception as e:
+        await session.rollback()
+        raise e
+    finally:
+        await session.close()
