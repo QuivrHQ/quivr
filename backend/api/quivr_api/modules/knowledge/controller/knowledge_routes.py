@@ -1,8 +1,8 @@
 from http import HTTPStatus
-from typing import Annotated
+from typing import Annotated, Optional
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, File, HTTPException, Query, UploadFile
 
 from quivr_api.logger import get_logger
 from quivr_api.middlewares.auth import AuthBearer, get_current_user
@@ -13,6 +13,7 @@ from quivr_api.modules.brain.service.brain_authorization_service import (
 )
 from quivr_api.modules.brain.service.brain_vector_service import BrainVectorService
 from quivr_api.modules.dependencies import get_service
+from quivr_api.modules.knowledge.dto.inputs import AddKnowledge
 from quivr_api.modules.knowledge.service.knowledge_service import KnowledgeService
 from quivr_api.modules.upload.service.generate_file_signed_url import (
     generate_file_signed_url,
@@ -115,3 +116,21 @@ async def generate_signed_url_endpoint(
     file_signed_url = generate_file_signed_url(file_path_in_storage)
 
     return file_signed_url
+
+
+@knowledge_router.post(
+    "/knowledge/",
+    dependencies=[Depends(AuthBearer())],
+    tags=["Knowledge"],
+)
+async def add_knowledge(
+    knowledge: AddKnowledge,
+    knowledge_service: KnowledgeServiceDep,
+    file: Optional[UploadFile] = File(None),
+    current_user: UserIdentity = Depends(get_current_user),
+):
+    if not knowledge.file_name and not knowledge.url:
+        raise HTTPException(
+            status_code=400, detail="Either file_name or url must be provided"
+        )
+    pass

@@ -424,7 +424,7 @@ async def test_should_process_knowledge_prev_error(
 
 @pytest.mark.asyncio(loop_scope="session")
 async def test_get_knowledge_storage_path(session: AsyncSession, test_data: TestData):
-    brain, [knowledge, _] = test_data
+    _, [knowledge, _] = test_data
     assert knowledge.file_name
     repository = KnowledgeRepository(session)
     service = KnowledgeService(repository)
