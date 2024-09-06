@@ -113,7 +113,6 @@ def check_is_premium(supabase_client: Client):
             "max_brain_size": product["max_brain_size"],
             "monthly_chat_credit": product["monthly_chat_credit"],
             "api_access": product["api_access"],
-            "models": product["models"],
             "is_premium": True,
             "last_stripe_check": current_time_str,
         }
