@@ -9,9 +9,14 @@ import styles from "./SyncFolder.module.scss";
 interface SyncFolderProps {
   element: SyncElement;
   indent: number;
+  syncId: number;
 }
 
-const SyncFolder = ({ element, indent }: SyncFolderProps): JSX.Element => {
+const SyncFolder = ({
+  element,
+  indent,
+  syncId,
+}: SyncFolderProps): JSX.Element => {
   const [folded, setFolded] = useState(true);
   const { getSyncFiles } = useSync();
   const [syncElements, setSyncElements] = useState<SyncElements>();
@@ -20,7 +25,7 @@ const SyncFolder = ({ element, indent }: SyncFolderProps): JSX.Element => {
   useEffect(() => {
     void (async () => {
       try {
-        const res = await getSyncFiles(element.id);
+        const res = await getSyncFiles(syncId, element.id);
         console.info(res);
         setSyncElements(res);
       } catch (error) {
@@ -47,7 +52,11 @@ const SyncFolder = ({ element, indent }: SyncFolderProps): JSX.Element => {
             .filter((file) => file.is_folder)
             .map((folder, id) => (
               <div key={id}>
-                <SyncFolder element={folder} indent={indent + 1} />
+                <SyncFolder
+                  element={folder}
+                  indent={indent + 1}
+                  syncId={syncId}
+                />
               </div>
             ))}
         </div>

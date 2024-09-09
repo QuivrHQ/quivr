@@ -25,17 +25,19 @@ const ConnectionAccount = ({
   const [folded, setFolded] = useState(true);
 
   useEffect(() => {
-    setLoading(true);
-    void (async () => {
-      try {
-        const res = await getSyncFiles(sync.id);
-        setSyncElements(res);
-        setLoading(false);
-      } catch (error) {
-        console.error("Failed to get sync files:", error);
-      }
-    })();
-  }, [sync.id]);
+    if (!folded) {
+      setLoading(true);
+      void (async () => {
+        try {
+          const res = await getSyncFiles(sync.id);
+          setSyncElements(res);
+          setLoading(false);
+        } catch (error) {
+          console.error("Failed to get sync files:", error);
+        }
+      })();
+    }
+  }, [folded]);
 
   return (
     <div className={styles.account_section_wrapper}>
@@ -67,7 +69,7 @@ const ConnectionAccount = ({
               .filter((file) => file.is_folder)
               .map((element, id) => (
                 <div key={id}>
-                  <SyncFolder element={element} indent={2} />
+                  <SyncFolder element={element} indent={2} syncId={sync.id} />
                 </div>
               ))}
           </div>
