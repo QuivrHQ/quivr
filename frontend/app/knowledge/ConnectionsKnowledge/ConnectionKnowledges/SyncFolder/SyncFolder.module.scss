@@ -4,7 +4,7 @@
 .folder_wrapper {
   display: flex;
   flex-direction: column;
-  gap: Spacings.$spacing03;
+  gap: Spacings.$spacing01;
 
   .folder_line_wrapper {
     display: flex;
@@ -12,6 +12,10 @@
     gap: Spacings.$spacing03;
     padding-left: Spacings.$spacing06;
     font-size: Typography.$small;
+  }
+
+  .loader_icon {
+    padding-left: Spacings.$spacing09 + Spacings.$spacing03;
   }
 
   .sync_elements_wrapper {
