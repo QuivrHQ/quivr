@@ -14,11 +14,18 @@
     font-size: Typography.$small;
   }
 
+  .loader_icon {
+    padding-left: Spacings.$spacing09 + Spacings.$spacing03;
+  }
+
   .sync_elements_wrapper {
     display: flex;
     flex-direction: column;
     gap: Spacings.$spacing01;
-
     font-size: Typography.$small;
+
+    &.empty {
+      height: 0;
+    }
   }
 }
