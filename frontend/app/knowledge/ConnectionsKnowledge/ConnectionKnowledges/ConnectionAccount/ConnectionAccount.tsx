@@ -23,7 +23,6 @@ const ConnectionAccount = ({
   const [folded, setFolded] = useState(true);
 
   useEffect(() => {
-    console.info("Getting sync files...");
     void (async () => {
       try {
         const res = await getSyncFiles(sync.id);
@@ -39,7 +38,7 @@ const ConnectionAccount = ({
     <div className={styles.account_section_wrapper}>
       <div className={styles.account_line_wrapper}>
         <Icon
-          name="chevronRight"
+          name={folded ? "chevronRight" : "chevronDown"}
           size="normal"
           color="black"
           handleHover={true}

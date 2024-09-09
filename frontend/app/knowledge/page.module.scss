@@ -21,10 +21,6 @@
       display: flex;
       flex-direction: column;
       gap: Spacings.$spacing04;
-
-      .section_title {
-        @include Typography.H2;
-      }
     }
   }
 }

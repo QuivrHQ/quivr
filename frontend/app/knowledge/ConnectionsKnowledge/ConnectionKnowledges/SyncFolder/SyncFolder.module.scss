@@ -1,0 +1,24 @@
+@use "styles/Spacings.module.scss";
+@use "styles/Typography.module.scss";
+
+.folder_wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: Spacings.$spacing03;
+
+  .folder_line_wrapper {
+    display: flex;
+    align-items: center;
+    gap: Spacings.$spacing03;
+    padding-left: Spacings.$spacing06;
+    font-size: Typography.$small;
+  }
+
+  .sync_elements_wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: Spacings.$spacing01;
+
+    font-size: Typography.$small;
+  }
+}
