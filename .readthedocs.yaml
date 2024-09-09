@@ -10,14 +10,12 @@ build:
   tools:
     python: "3.11"
   commands:
-    - cd backend
     - asdf plugin add uv
     - asdf install uv latest
     - asdf global uv latest
     - uv venv
-    - ls -la && pip install -r requirements.lock
-    - cd docs
-    - NO_COLOR=1 .venv/bin/mkdocs build --strict --site-dir $READTHEDOCS_OUTPUT/html
+    - cd backend && pip install -r requirements.lock
+    - cd backend/docs && NO_COLOR=1 .venv/bin/mkdocs build --strict --site-dir $READTHEDOCS_OUTPUT/html
 
   
 
