@@ -26,4 +26,12 @@
   @media screen and (max-width: ScreenSizes.$small) {
     column-count: 1;
   }
+
+  &.spaced {
+    column-count: 2;
+
+    @media screen and (max-width: ScreenSizes.$small) {
+      column-count: 1;
+    }
+  }
 }
