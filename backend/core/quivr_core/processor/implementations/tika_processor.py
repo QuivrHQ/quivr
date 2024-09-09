@@ -14,6 +14,16 @@ logger = logging.getLogger("quivr_core")
 
 
 class TikaProcessor(ProcessorBase):
+    """
+    TikaProcessor is a class that implements the ProcessorBase interface.
+    It is used to process the files with the Tika server.
+
+    To run it with docker you can do:
+    ```bash
+    docker run -d -p 9998:9998 apache/tika
+    ```
+    """
+
     supported_extensions = [FileExtension.pdf]
 
     def __init__(

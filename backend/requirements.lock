@@ -36,7 +36,7 @@ amqp==5.2.0
     # via kombu
 annotated-types==0.7.0
     # via pydantic
-anthropic==0.34.1
+anthropic==0.34.2
     # via langchain-anthropic
 antlr4-python3-runtime==4.9.3
     # via omegaconf
@@ -45,6 +45,10 @@ anyio==4.4.0
     # via httpx
     # via openai
     # via starlette
+appnope==0.1.4 ; platform_system == 'Darwin'
+    # via ipykernel
+asttokens==2.4.1
+    # via stack-data
 async-timeout==4.0.3 ; python_full_version < '3.12'
     # via asyncpg
 asyncpg==0.29.0
@@ -53,15 +57,20 @@ attrs==24.2.0
     # via aiohttp
     # via jsonschema
     # via referencing
+babel==2.16.0
+    # via mkdocs-material
 backoff==2.2.1
     # via posthog
     # via unstructured
 beautifulsoup4==4.12.3
     # via llama-index-readers-file
     # via markdownify
+    # via nbconvert
     # via unstructured
 billiard==4.2.0
     # via celery
+bleach==6.1.0
+    # via nbconvert
 boto3==1.35.2
     # via cohere
 botocore==1.35.2
@@ -79,8 +88,9 @@ certifi==2022.12.7
     # via requests
     # via sentry-sdk
     # via unstructured-client
-cffi==1.17.0 ; platform_python_implementation != 'PyPy'
+cffi==1.17.0 ; platform_python_implementation != 'PyPy' or implementation_name == 'pypy'
     # via cryptography
+    # via pyzmq
 chardet==5.2.0
     # via unstructured
 charset-normalizer==2.1.1
@@ -93,6 +103,8 @@ click==8.1.7
     # via click-plugins
     # via click-repl
     # via litellm
+    # via mkdocs
+    # via mkdocstrings
     # via nltk
     # via uvicorn
 click-didyoumean==0.3.1
@@ -105,14 +117,20 @@ cobble==0.1.4
     # via mammoth
 cohere==5.8.1
     # via langchain-cohere
-colorama==0.4.6 ; sys_platform == 'win32' or platform_system == 'Windows'
+colorama==0.4.6
     # via click
     # via colorlog
+    # via griffe
+    # via ipython
+    # via mkdocs
+    # via mkdocs-material
     # via tqdm
 coloredlogs==15.0.1
     # via onnxruntime
 colorlog==6.8.2
     # via quivr-api
+comm==0.2.2
+    # via ipykernel
 contourpy==1.2.1
     # via matplotlib
 cryptography==43.0.0
@@ -127,8 +145,13 @@ dataclasses-json==0.6.7
     # via llama-index-legacy
     # via unstructured
     # via unstructured-client
+debugpy==1.8.5
+    # via ipykernel
+decorator==5.1.1
+    # via ipython
 defusedxml==0.7.1
     # via langchain-anthropic
+    # via nbconvert
 deprecated==1.2.14
     # via llama-index-core
     # via llama-index-legacy
@@ -153,6 +176,8 @@ emoji==2.12.1
     # via unstructured
 et-xmlfile==1.1.0
     # via openpyxl
+executing==2.1.0
+    # via stack-data
 faiss-cpu==1.8.0.post1
     # via quivr-core
 fastapi==0.112.1
@@ -160,6 +185,8 @@ fastapi==0.112.1
     # via sentry-sdk
 fastavro==1.9.5
     # via cohere
+fastjsonschema==2.20.0
+    # via nbformat
 filelock==3.13.1
     # via huggingface-hub
     # via torch
@@ -185,6 +212,8 @@ fsspec==2024.2.0
     # via llama-index-core
     # via llama-index-legacy
     # via torch
+ghp-import==2.1.0
+    # via mkdocs
 google-api-core==2.19.1
     # via google-api-python-client
     # via google-cloud-vision
@@ -211,6 +240,8 @@ gotrue==2.7.0
 greenlet==3.0.3
     # via playwright
     # via sqlalchemy
+griffe==1.2.0
+    # via mkdocstrings-python
 grpcio==1.65.5
     # via google-api-core
     # via grpcio-status
@@ -266,8 +297,18 @@ importlib-metadata==8.4.0
     # via litellm
 iopath==0.1.10
     # via layoutparser
+ipykernel==6.29.5
+    # via mkdocs-jupyter
+ipython==8.27.0
+    # via ipykernel
+jedi==0.19.1
+    # via ipython
 jinja2==3.1.3
     # via litellm
+    # via mkdocs
+    # via mkdocs-material
+    # via mkdocstrings
+    # via nbconvert
     # via torch
 jiter==0.5.0
     # via anthropic
@@ -285,8 +326,22 @@ jsonpointer==3.0.0
     # via jsonpatch
 jsonschema==4.23.0
     # via litellm
+    # via nbformat
 jsonschema-specifications==2023.12.1
     # via jsonschema
+jupyter-client==8.6.2
+    # via ipykernel
+    # via nbclient
+jupyter-core==5.7.2
+    # via ipykernel
+    # via jupyter-client
+    # via nbclient
+    # via nbconvert
+    # via nbformat
+jupyterlab-pygments==0.3.0
+    # via nbconvert
+jupytext==1.16.4
+    # via mkdocs-jupyter
 kiwisolver==1.4.5
     # via matplotlib
 kombu==5.4.0
@@ -326,9 +381,9 @@ langchain-text-splitters==0.2.2
     # via langchain
 langdetect==1.0.9
     # via unstructured
-langgraph==0.2.14
+langgraph==0.2.19
     # via quivr-core
-langgraph-checkpoint==1.0.6
+langgraph-checkpoint==1.0.9
     # via langgraph
 langsmith==0.1.100
     # via langchain
@@ -397,13 +452,24 @@ lxml==5.3.0
 mammoth==1.8.0
     # via megaparse
 markdown==3.7
+    # via mkdocs
+    # via mkdocs-autorefs
+    # via mkdocs-material
+    # via mkdocstrings
+    # via pymdown-extensions
     # via unstructured
 markdown-it-py==3.0.0
+    # via jupytext
+    # via mdit-py-plugins
     # via rich
 markdownify==0.13.1
     # via quivr-api
 markupsafe==2.1.5
     # via jinja2
+    # via mkdocs
+    # via mkdocs-autorefs
+    # via mkdocstrings
+    # via nbconvert
 marshmallow==3.22.0
     # via dataclasses-json
     # via marshmallow-enum
@@ -413,10 +479,43 @@ marshmallow-enum==1.5.1
 matplotlib==3.9.2
     # via pycocotools
     # via unstructured-inference
+matplotlib-inline==0.1.7
+    # via ipykernel
+    # via ipython
+mdit-py-plugins==0.4.1
+    # via jupytext
 mdurl==0.1.2
     # via markdown-it-py
 megaparse==0.0.31
     # via quivr-core
+mergedeep==1.3.4
+    # via mkdocs
+    # via mkdocs-get-deps
+mistune==3.0.2
+    # via nbconvert
+mkdocs==1.6.1
+    # via mkdocs-autorefs
+    # via mkdocs-include-dir-to-nav
+    # via mkdocs-jupyter
+    # via mkdocs-material
+    # via mkdocs-redirects
+    # via mkdocstrings
+mkdocs-autorefs==1.2.0
+    # via mkdocstrings
+    # via mkdocstrings-python
+mkdocs-get-deps==0.2.0
+    # via mkdocs
+mkdocs-include-dir-to-nav==1.2.0
+mkdocs-jupyter==0.25.0
+mkdocs-material==9.5.34
+    # via mkdocs-jupyter
+mkdocs-material-extensions==1.3.1
+    # via mkdocs-material
+mkdocs-redirects==1.2.1
+mkdocstrings==0.26.1
+    # via mkdocstrings-python
+mkdocstrings-python==1.11.1
+    # via mkdocstrings
 monotonic==1.6
     # via posthog
 mpmath==1.3.0
@@ -429,7 +528,16 @@ multidict==6.0.5
 mypy-extensions==1.0.0
     # via typing-inspect
     # via unstructured-client
+nbclient==0.10.0
+    # via nbconvert
+nbconvert==7.16.4
+    # via mkdocs-jupyter
+nbformat==5.10.4
+    # via jupytext
+    # via nbclient
+    # via nbconvert
 nest-asyncio==1.6.0
+    # via ipykernel
     # via llama-index-core
     # via llama-index-legacy
 networkx==3.2.1
@@ -495,23 +603,35 @@ packaging==24.1
     # via deprecation
     # via faiss-cpu
     # via huggingface-hub
+    # via ipykernel
+    # via jupytext
     # via langchain-core
     # via marshmallow
     # via matplotlib
+    # via mkdocs
+    # via nbconvert
     # via onnxruntime
     # via pikepdf
     # via quivr-monorepo
     # via transformers
     # via unstructured-client
     # via unstructured-pytesseract
+paginate==0.5.7
+    # via mkdocs-material
 pandas==2.2.2
     # via langchain-cohere
     # via layoutparser
     # via llama-index-core
     # via llama-index-legacy
     # via unstructured
+pandocfilters==1.5.1
+    # via nbconvert
 parameterized==0.9.0
     # via cohere
+parso==0.8.4
+    # via jedi
+pathspec==0.12.1
+    # via mkdocs
 pdf2docx==0.5.8
     # via megaparse
 pdf2image==1.17.0
@@ -523,6 +643,8 @@ pdfminer-six==20231228
 pdfplumber==0.11.4
     # via layoutparser
     # via megaparse
+pexpect==4.9.0 ; sys_platform != 'emscripten' and sys_platform != 'win32'
+    # via ipython
 pgvector==0.3.2
     # via quivr-api
 pikepdf==9.1.1
@@ -540,6 +662,10 @@ pillow==10.2.0
     # via unstructured-pytesseract
 pillow-heif==0.18.0
     # via unstructured
+platformdirs==4.3.2
+    # via jupyter-core
+    # via mkdocs-get-deps
+    # via mkdocstrings
 playwright==1.46.0
     # via quivr-worker
 ply==3.11
@@ -554,6 +680,7 @@ prometheus-client==0.20.0
     # via flower
 prompt-toolkit==3.0.47
     # via click-repl
+    # via ipython
 proto-plus==1.24.0
     # via google-api-core
     # via google-cloud-vision
@@ -566,9 +693,14 @@ protobuf==5.27.3
     # via onnxruntime
     # via proto-plus
 psutil==6.0.0
+    # via ipykernel
     # via unstructured
 psycopg2-binary==2.9.9
     # via quivr-api
+ptyprocess==0.7.0 ; sys_platform != 'emscripten' and sys_platform != 'win32'
+    # via pexpect
+pure-eval==0.2.3
+    # via stack-data
 pyasn1==0.6.0
     # via pyasn1-modules
     # via python-jose
@@ -577,7 +709,7 @@ pyasn1-modules==0.4.0
     # via google-auth
 pycocotools==2.0.8
     # via effdet
-pycparser==2.22 ; platform_python_implementation != 'PyPy'
+pycparser==2.22 ; platform_python_implementation != 'PyPy' or implementation_name == 'pypy'
     # via cffi
 pycryptodome==3.20.0
     # via megaparse
@@ -604,11 +736,18 @@ pydantic-settings==2.4.0
 pyee==11.1.0
     # via playwright
 pygments==2.18.0
+    # via ipython
+    # via mkdocs-jupyter
+    # via mkdocs-material
+    # via nbconvert
     # via rich
 pyinstrument==4.7.2
     # via quivr-api
 pyjwt==2.9.0
     # via msal
+pymdown-extensions==10.9
+    # via mkdocs-material
+    # via mkdocstrings
 pymupdf==1.24.9
     # via pdf2docx
 pymupdfb==1.24.9
@@ -629,6 +768,8 @@ pyreadline3==3.4.1 ; sys_platform == 'win32'
 python-dateutil==2.9.0.post0
     # via botocore
     # via celery
+    # via ghp-import
+    # via jupyter-client
     # via matplotlib
     # via pandas
     # via posthog
@@ -660,18 +801,29 @@ python-pptx==1.0.2
 pytz==2024.1
     # via flower
     # via pandas
-pywin32==306 ; platform_system == 'Windows'
+pywin32==306 ; (platform_python_implementation != 'PyPy' and sys_platform == 'win32') or platform_system == 'Windows'
+    # via jupyter-core
     # via portalocker
 pyyaml==6.0.2
     # via huggingface-hub
+    # via jupytext
     # via langchain
     # via langchain-community
     # via langchain-core
     # via layoutparser
     # via llama-index-core
+    # via mkdocs
+    # via mkdocs-get-deps
     # via omegaconf
+    # via pymdown-extensions
+    # via pyyaml-env-tag
     # via timm
     # via transformers
+pyyaml-env-tag==0.1
+    # via mkdocs
+pyzmq==26.2.0
+    # via ipykernel
+    # via jupyter-client
 rapidfuzz==3.9.6
     # via unstructured
     # via unstructured-inference
@@ -684,6 +836,7 @@ referencing==0.35.1
     # via jsonschema
     # via jsonschema-specifications
 regex==2024.7.24
+    # via mkdocs-material
     # via nltk
     # via tiktoken
     # via transformers
@@ -698,6 +851,7 @@ requests==2.32.3
     # via litellm
     # via llama-index-core
     # via llama-index-legacy
+    # via mkdocs-material
     # via msal
     # via posthog
     # via requests-oauthlib
@@ -728,6 +882,8 @@ scipy==1.14.1
 sentry-sdk==2.13.0
     # via quivr-api
 six==1.16.0
+    # via asttokens
+    # via bleach
     # via dropbox
     # via ecdsa
     # via fire
@@ -752,6 +908,8 @@ sqlalchemy==2.0.32
     # via sqlmodel
 sqlmodel==0.0.21
     # via quivr-api
+stack-data==0.6.3
+    # via ipython
 starlette==0.38.2
     # via fastapi
 stone==3.3.1
@@ -790,6 +948,8 @@ tiktoken==0.7.0
 timm==1.0.8
     # via effdet
     # via unstructured-inference
+tinycss2==1.3.0
+    # via nbconvert
 tokenizers==0.19.1
     # via anthropic
     # via cohere
@@ -817,6 +977,8 @@ torchvision==0.19.0+cpu ; platform_machine == 'x86_64'
     # via timm
 tornado==6.4.1
     # via flower
+    # via ipykernel
+    # via jupyter-client
 tqdm==4.66.5
     # via huggingface-hub
     # via iopath
@@ -825,6 +987,16 @@ tqdm==4.66.5
     # via openai
     # via transformers
     # via unstructured
+traitlets==5.14.3
+    # via comm
+    # via ipykernel
+    # via ipython
+    # via jupyter-client
+    # via jupyter-core
+    # via matplotlib-inline
+    # via nbclient
+    # via nbconvert
+    # via nbformat
 transformers==4.44.1
     # via unstructured-inference
 types-requests==2.31.0.6
@@ -838,6 +1010,7 @@ typing-extensions==4.12.2
     # via fastapi
     # via huggingface-hub
     # via iopath
+    # via ipython
     # via langchain-core
     # via llama-index-core
     # via llama-index-legacy
@@ -889,8 +1062,13 @@ vine==5.1.0
     # via amqp
     # via celery
     # via kombu
+watchdog==5.0.2
+    # via mkdocs
 wcwidth==0.2.13
     # via prompt-toolkit
+webencodings==0.5.1
+    # via bleach
+    # via tinycss2
 websockets==12.0
     # via realtime
 wrapt==1.16.0
