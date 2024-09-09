@@ -9,15 +9,19 @@ build:
   os: ubuntu-22.04
   tools:
     python: "3.11"
+  commands:
+    - cd backend
+    - asdf plugin add uv
+    - asdf install uv latest
+    - asdf global uv latest
+    - uv venv
+    - pip install -r requirements.lock
+    - cd docs
+    - NO_COLOR=1 .venv/bin/mkdocs build --strict --site-dir $READTHEDOCS_OUTPUT/html
+
   
 
 
 mkdocs:
   configuration: backend/docs/mkdocs.yml
 
-# Optionally declare the Python requirements required to build your docs
-python:
-  install:
-  - requirements: backend/docs/requirements.lock
-  - method: pip
-    path: backend
