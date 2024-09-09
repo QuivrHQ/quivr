@@ -1,6 +1,6 @@
-@use "@/styles/ScreenSizes.module.scss";
-@use "@/styles/Spacings.module.scss";
-@use "@/styles/Typography.module.scss";
+@use "styles/ScreenSizes.module.scss";
+@use "styles/Spacings.module.scss";
+@use "styles/Typography.module.scss";
 
 .history_content_wrapper {
   position: relative;
@@ -9,7 +9,7 @@
   color: var(--text-2);
   font-size: Typography.$small;
   max-height: 300px;
-  overflow-y: scroll;
+  overflow-y: auto;
   display: flex;
   flex-direction: column;
 }

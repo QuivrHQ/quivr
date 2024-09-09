@@ -1,6 +1,7 @@
 docker-compose.override.yml
 secondbrain/
 .env
+env.sh
 .streamlit/secrets.toml
 **/*.pyc
 toto.txt
@@ -17,6 +18,8 @@ backend/.python-version
 **/node_modules
 **/.pnp
 .pnp.js
+
+Pipfile
 
 # testing
 **/coverage
@@ -59,7 +62,7 @@ backend/core/local_models/*
 
 ## scripts
 package-lock.json
-backend/celerybeat-schedule
+celerybeat-schedule
 frontend/public/robots.txt
 frontend/public/sitemap*
 
@@ -85,3 +88,17 @@ backend/score.json
 backend/modules/assistant/ito/utils/simple.pdf
 backend/modules/sync/controller/credentials.json
 backend/.env.test
+
+**/*.egg-info
+
+.coverage
+backend/core/examples/chatbot/.files/*
+backend/core/examples/chatbot/.python-version
+backend/core/examples/chatbot/.chainlit/config.toml
+backend/core/examples/chatbot/.chainlit/translations/en-US.json
+
+*.log
+
+# Tox
+.tox
+Pipfile

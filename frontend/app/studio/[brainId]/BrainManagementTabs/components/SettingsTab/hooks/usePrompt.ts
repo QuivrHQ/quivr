@@ -1,5 +1,5 @@
 /* eslint-disable max-lines */
-import axios from "axios";
+import { isAxiosError } from "axios";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 
@@ -74,10 +74,6 @@ export const usePrompt = (props: UsePromptProps) => {
       });
       reset();
       refetchBrain();
-      publish({
-        variant: "success",
-        text: t("promptRemoved", { ns: "config" }),
-      });
       setCurrentPromptId(undefined);
     } catch (err) {
       publish({
@@ -108,12 +104,11 @@ export const usePrompt = (props: UsePromptProps) => {
       return;
     }
 
-    if (prompt.content === "" || prompt.title === "") {
-      publish({
-        variant: "warning",
-        text: t("promptFieldsRequired", { ns: "config" }),
-      });
+    if (!prompt.title) {
+      prompt.title = "Untitled";
+    }
 
+    if (prompt.content === "") {
       return;
     }
 
@@ -145,13 +140,8 @@ export const usePrompt = (props: UsePromptProps) => {
         ]);
       }
       void fetchAllBrains();
-
-      publish({
-        variant: "success",
-        text: t("brainUpdated", { ns: "config" }),
-      });
     } catch (err) {
-      if (axios.isAxiosError(err) && err.response?.status === 429) {
+      if (isAxiosError(err) && err.response?.status === 429) {
         publish({
           variant: "danger",
           text: `${JSON.stringify(

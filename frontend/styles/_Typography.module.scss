@@ -9,7 +9,7 @@
 }
 
 @mixin H2 {
-  font-weight: 600;
+  font-weight: 500;
   font-size: $large;
 }
 
@@ -29,3 +29,5 @@ $tiny: 12px;
 $small: 14px;
 $medium: 16px;
 $large: 18px;
+$larger: 24px;
+$very_large: 28px;

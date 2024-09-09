@@ -7,5 +7,7 @@ export type Color =
   | "accent"
   | "white"
   | "dangerous"
+  | "dangerous-dark"
   | "success"
-  | "warning";
+  | "warning"
+  | "static-white";

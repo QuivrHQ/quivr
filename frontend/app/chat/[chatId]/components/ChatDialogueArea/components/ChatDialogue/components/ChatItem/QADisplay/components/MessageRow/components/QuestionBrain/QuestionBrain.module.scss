@@ -1,19 +1,29 @@
-@use "@/styles/Radius.module.scss";
-@use "@/styles/Spacings.module.scss";
-@use "@/styles/Typography.module.scss";
+@use "styles/Radius.module.scss";
+@use "styles/Spacings.module.scss";
+@use "styles/Typography.module.scss";
 
 .brain_name_wrapper {
   display: flex;
   align-items: center;
-  gap: Spacings.$spacing02;
+  gap: Spacings.$spacing03;
   color: var(--text-3);
   overflow: hidden;
 
-  .dark_image {
-    filter: invert(100%);
+  .brain_image {
+    border-radius: Radius.$normal;
   }
 
   .brain_name {
     @include Typography.EllipsisOverflow;
+  }
+
+  .brain_snippet {
+    width: 24px;
+    height: 24px;
+    border-radius: Radius.$normal;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: Typography.$tiny;
   }
 }

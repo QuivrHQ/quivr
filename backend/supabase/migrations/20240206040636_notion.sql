@@ -161,5 +161,3 @@ grant trigger on table "public"."integrations_user" to "service_role";
 grant truncate on table "public"."integrations_user" to "service_role";
 
 grant update on table "public"."integrations_user" to "service_role";
-
-

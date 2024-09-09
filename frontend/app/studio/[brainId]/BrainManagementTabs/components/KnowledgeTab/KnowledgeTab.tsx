@@ -4,7 +4,7 @@ import { AnimatePresence, motion } from "framer-motion";
 
 import { LoaderIcon } from "@/lib/components/ui/LoaderIcon/LoaderIcon";
 import { MessageInfoBox } from "@/lib/components/ui/MessageInfoBox/MessageInfoBox";
-import QuivrButton from "@/lib/components/ui/QuivrButton/QuivrButton";
+import { QuivrButton } from "@/lib/components/ui/QuivrButton/QuivrButton";
 import { useKnowledgeToFeedContext } from "@/lib/context/KnowledgeToFeedProvider/hooks/useKnowledgeToFeedContext";
 import { Knowledge } from "@/lib/types/Knowledge";
 
@@ -20,11 +20,25 @@ type KnowledgeTabProps = {
 export const KnowledgeTab = ({
   brainId,
   allKnowledge,
+  hasEditRights,
 }: KnowledgeTabProps): JSX.Element => {
   const { isPending } = useAddedKnowledge({
     brainId,
   });
   const { setShouldDisplayFeedCard } = useKnowledgeToFeedContext();
+
+  if (!hasEditRights) {
+    return (
+      <div className={styles.knowledge_tab_container}>
+        <div className={styles.knowledge_tab_wrapper}>
+          <MessageInfoBox type="warning">
+            You don&apos;t have permission to access the knowledge in this
+            brain.
+          </MessageInfoBox>
+        </div>
+      </div>
+    );
+  }
 
   if (isPending) {
     return <LoaderIcon size="big" color="accent" />;
@@ -32,28 +46,34 @@ export const KnowledgeTab = ({
 
   if (allKnowledge.length === 0) {
     return (
-      <div className={styles.knowledge_tab_wrapper}>
-        <MessageInfoBox type="warning">
-          This brain is empty! You can add knowledge by clicking on
-          <QuivrButton
-            label="Add knowledge"
-            color="primary"
-            iconName="add"
-            onClick={() => setShouldDisplayFeedCard(true)}
-          />
-          .
-        </MessageInfoBox>
+      <div className={styles.knowledge_tab_container}>
+        <div className={styles.knowledge_tab_wrapper}>
+          <MessageInfoBox type="warning">
+            <div className={styles.message}>
+              This brain is empty! You can add knowledge by clicking on
+              <QuivrButton
+                label="Add knowledge"
+                color="primary"
+                iconName="add"
+                onClick={() => setShouldDisplayFeedCard(true)}
+              />
+              .
+            </div>
+          </MessageInfoBox>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className={styles.knowledge_tab_wrapper}>
-      <motion.div layout className="w-full flex flex-col gap-5">
-        <AnimatePresence mode="popLayout">
-          <KnowledgeTable knowledgeList={allKnowledge} />
-        </AnimatePresence>
-      </motion.div>
+    <div className={styles.knowledge_tab_container}>
+      <div className={styles.knowledge_tab_wrapper}>
+        <motion.div layout className="w-full flex flex-col gap-5">
+          <AnimatePresence mode="popLayout">
+            <KnowledgeTable knowledgeList={allKnowledge} />
+          </AnimatePresence>
+        </motion.div>
+      </div>
     </div>
   );
 };

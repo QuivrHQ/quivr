@@ -50,19 +50,19 @@ export const KnowledgeToFeed = ({
       ).length,
     },
     {
-      label: "Websites",
-      isSelected: selectedTab === "Websites",
-      onClick: () => setSelectedTab("Websites"),
-      iconName: "website",
-      badge: knowledgeToFeed.filter((knowledge) => knowledge.source === "crawl")
-        .length,
-    },
-    {
       label: "Connections",
       isSelected: selectedTab === "Connections",
       onClick: () => setSelectedTab("Connections"),
       iconName: "sync",
       badge: openedConnections.filter((connection) => connection.submitted)
+        .length,
+    },
+    {
+      label: "Websites' page",
+      isSelected: selectedTab === "Websites",
+      onClick: () => setSelectedTab("Websites"),
+      iconName: "website",
+      badge: knowledgeToFeed.filter((knowledge) => knowledge.source === "crawl")
         .length,
     },
   ];
@@ -123,9 +123,9 @@ export const KnowledgeToFeed = ({
       )}
       <Tabs tabList={knowledgesTabs} />
       <div className={styles.tabs_content_wrapper}>
+        {selectedTab === "Connections" && <FromConnections />}
         {selectedTab === "Documents" && <FromDocuments />}
         {selectedTab === "Websites" && <FromWebsites />}
-        {selectedTab === "Connections" && <FromConnections />}
       </div>
     </div>
   );

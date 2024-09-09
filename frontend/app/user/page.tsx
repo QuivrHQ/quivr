@@ -1,14 +1,15 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import { useUserApi } from "@/lib/api/user/useUserApi";
-import PageHeader from "@/lib/components/PageHeader/PageHeader";
+import { PageHeader } from "@/lib/components/PageHeader/PageHeader";
 import { Modal } from "@/lib/components/ui/Modal/Modal";
-import QuivrButton from "@/lib/components/ui/QuivrButton/QuivrButton";
+import { QuivrButton } from "@/lib/components/ui/QuivrButton/QuivrButton";
 import { Tabs } from "@/lib/components/ui/Tabs/Tabs";
 import { useSupabase } from "@/lib/context/SupabaseProvider";
+import { useUserSettingsContext } from "@/lib/context/UserSettingsProvider/hooks/useUserSettingsContext";
 import { useUserData } from "@/lib/hooks/useUserData";
 import { redirectToLogin } from "@/lib/router/redirectToLogin";
 import { ButtonType } from "@/lib/types/QuivrButton";
@@ -22,8 +23,8 @@ import { useLogoutModal } from "../../lib/hooks/useLogoutModal";
 
 const UserPage = (): JSX.Element => {
   const { session } = useSupabase();
-  const { userData } = useUserData();
-  const { deleteUserData } = useUserApi();
+  const { userData, userIdentityData } = useUserData();
+  const { deleteUserData, getUserCredits } = useUserApi();
   const { t } = useTranslation(["translation", "logout"]);
   const [deleteAccountModalOpened, setDeleteAccountModalOpened] =
     useState(false);
@@ -33,7 +34,15 @@ const UserPage = (): JSX.Element => {
     isLogoutModalOpened,
     setIsLogoutModalOpened,
   } = useLogoutModal();
-  const [selectedTab, setSelectedTab] = useState("Connections");
+  const [selectedTab, setSelectedTab] = useState("General");
+  const { remainingCredits, setRemainingCredits } = useUserSettingsContext();
+
+  useEffect(() => {
+    void (async () => {
+      const res = await getUserCredits();
+      setRemainingCredits(res);
+    })();
+  }, []);
 
   const buttons: ButtonType[] = [
     {
@@ -56,16 +65,16 @@ const UserPage = (): JSX.Element => {
 
   const studioTabs: Tab[] = [
     {
-      label: "Connections",
-      isSelected: selectedTab === "Connections",
-      onClick: () => setSelectedTab("Connections"),
-      iconName: "sync",
-    },
-    {
       label: "General",
       isSelected: selectedTab === "General",
       onClick: () => setSelectedTab("General"),
       iconName: "user",
+    },
+    {
+      label: "Connections",
+      isSelected: selectedTab === "Connections",
+      onClick: () => setSelectedTab("Connections"),
+      iconName: "sync",
     },
   ];
 
@@ -82,7 +91,13 @@ const UserPage = (): JSX.Element => {
         <Tabs tabList={studioTabs} />
         <div className={styles.user_page_menu}></div>
         <div className={styles.content_wrapper}>
-          {selectedTab === "General" && <Settings email={userData.email} />}
+          {selectedTab === "General" && (
+            <Settings
+              email={userData.email}
+              username={userIdentityData?.username ?? ""}
+              remainingCredits={remainingCredits ?? 0}
+            />
+          )}
           {selectedTab === "Connections" && <Connections />}
         </div>
       </div>

@@ -29,9 +29,8 @@ export const MentionList = forwardRef<MentionListRef, MentionListProps>(
             <MentionItem
               key={item.id}
               item={item}
-              isSelected={index === selectedIndex}
               onClick={() => selectItem(index)}
-              type={props.suggestionData.type}
+              selected={selectedIndex === index}
             />
           ))}
         </div>

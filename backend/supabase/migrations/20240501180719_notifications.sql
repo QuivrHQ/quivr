@@ -30,6 +30,3 @@ as permissive
 for all
 to public
 using ((user_id = auth.uid()));
-
-
-

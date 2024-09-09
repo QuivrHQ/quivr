@@ -81,6 +81,3 @@ on "public"."syncs_user"
 as permissive
 for all
 to service_role;
-
-
-

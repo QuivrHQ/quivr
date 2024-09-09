@@ -6,6 +6,7 @@ import { useChatInput } from "@/app/chat/[chatId]/components/ActionsBar/componen
 import { useChat } from "@/app/chat/[chatId]/hooks/useChat";
 import { useChatContext } from "@/lib/context";
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
+import { useUserSettingsContext } from "@/lib/context/UserSettingsProvider/hooks/useUserSettingsContext";
 
 import styles from "./SearchBar.module.scss";
 
@@ -14,15 +15,19 @@ import { LoaderIcon } from "../LoaderIcon/LoaderIcon";
 
 export const SearchBar = ({
   onSearch,
+  newBrain,
 }: {
   onSearch?: () => void;
+  newBrain?: boolean;
 }): JSX.Element => {
   const [searching, setSearching] = useState(false);
   const [isDisabled, setIsDisabled] = useState(true);
+  const [placeholder, setPlaceholder] = useState("Select a @brain");
   const { message, setMessage } = useChatInput();
   const { setMessages } = useChatContext();
   const { addQuestion } = useChat();
   const { currentBrain, setCurrentBrainId } = useBrainContext();
+  const { remainingCredits } = useUserSettingsContext();
 
   useEffect(() => {
     setCurrentBrainId(null);
@@ -32,8 +37,12 @@ export const SearchBar = ({
     setIsDisabled(message === "");
   }, [message]);
 
+  useEffect(() => {
+    setPlaceholder(currentBrain ? "Ask a question..." : "Select a @brain");
+  }, [currentBrain]);
+
   const submit = async (): Promise<void> => {
-    if (!searching) {
+    if (!!remainingCredits && !!currentBrain && !searching) {
       setSearching(true);
       setMessages([]);
       try {
@@ -51,23 +60,25 @@ export const SearchBar = ({
 
   return (
     <div
-      className={`
-      ${styles.search_bar_wrapper}
-      ${currentBrain ? styles.with_brain : ""}
-      `}
+      className={`${styles.search_bar_wrapper} ${
+        newBrain ? styles.new_brain : ""
+      }`}
     >
-      <CurrentBrain allowingRemoveBrain={true} />
+      <CurrentBrain
+        allowingRemoveBrain={true}
+        remainingCredits={remainingCredits}
+        isNewBrain={newBrain}
+      />
       <div
-        className={`
-      ${styles.editor_wrapper}
-      ${currentBrain ? styles.with_brain : ""}
-      `}
+        className={`${styles.editor_wrapper} ${
+          !remainingCredits ? styles.disabled : ""
+        } ${currentBrain ? styles.current : ""}`}
       >
         <Editor
           message={message}
           setMessage={setMessage}
           onSubmit={() => void submit()}
-          placeholder="Ask a question..."
+          placeholder={placeholder}
         ></Editor>
         {searching ? (
           <LoaderIcon size="big" color="accent" />
@@ -75,7 +86,11 @@ export const SearchBar = ({
           <LuSearch
             className={`
           ${styles.search_icon} 
-          ${isDisabled ? styles.disabled : ""}
+          ${
+            isDisabled || !remainingCredits || !currentBrain
+              ? styles.disabled
+              : ""
+          }
           `}
             onClick={() => void submit()}
           />

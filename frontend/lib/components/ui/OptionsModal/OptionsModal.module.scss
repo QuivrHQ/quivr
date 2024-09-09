@@ -1,7 +1,8 @@
-@use "@/styles/BoxShadow.module.scss";
-@use "@/styles/Radius.module.scss";
-@use "@/styles/Spacings.module.scss";
-@use "@/styles/ZIndexes.module.scss";
+@use "styles/BoxShadow.module.scss";
+@use "styles/Radius.module.scss";
+@use "styles/Spacings.module.scss";
+@use "styles/Typography.module.scss";
+@use "styles/ZIndexes.module.scss";
 
 .options_modal_wrapper {
   background-color: var(--background-1);
@@ -11,7 +12,7 @@
   width: fit-content;
 
   .option {
-    padding: Spacings.$spacing03;
+    padding: Spacings.$spacing02;
     padding-inline: Spacings.$spacing05;
     display: flex;
     gap: Spacings.$spacing05;
@@ -19,13 +20,13 @@
     cursor: pointer;
     justify-content: space-between;
     overflow: hidden;
-
-    &:not(:first-child) {
-      border-top: 1px solid var(--border-2);
-    }
+    font-size: Typography.$small;
+    border: 1px solid transparent;
+    border-radius: Radius.$normal;
 
     &:hover {
-      background-color: var(--background-special-0);
+      border-color: var(--primary-0);
+      color: var(--primary-0);
     }
 
     &.disabled {

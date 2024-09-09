@@ -1,28 +1,28 @@
-@use "@/styles/ScreenSizes.module.scss";
-@use "@/styles/Spacings.module.scss";
-@use "@/styles/Typography.module.scss";
+@use "styles/ScreenSizes.module.scss";
+@use "styles/Spacings.module.scss";
+@use "styles/Typography.module.scss";
 
 .brain_recap_wrapper {
   display: flex;
   justify-content: space-between;
   flex-direction: column;
   height: 100%;
-  padding-inline: Spacings.$spacing08;
-  gap: Spacings.$spacing03;
+  gap: Spacings.$spacing05;
   overflow: hidden;
 
   .content_wrapper {
     display: flex;
     flex-direction: column;
     gap: Spacings.$spacing05;
-    overflow: scroll;
+    overflow: auto;
 
     .title {
-      @include Typography.H2;
+      @include Typography.H3;
     }
 
     .subtitle {
-      @include Typography.H3;
+      font-size: Typography.$small;
+      font-weight: 500;
     }
 
     .warning_message {

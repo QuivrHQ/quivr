@@ -1,3 +1,4 @@
+**/.mypy_cache
 **/__pycache__
 */.pytest_cache
 **/__pycache__
@@ -9,3 +10,5 @@
 **/.docusaurus/
 **/node_modules/
 **/.venv/
+**/.tox/
+**/.tox-docker/

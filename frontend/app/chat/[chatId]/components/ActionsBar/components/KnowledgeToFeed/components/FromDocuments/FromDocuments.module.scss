@@ -1,6 +1,6 @@
-@use "@/styles/Radius.module.scss";
-@use "@/styles/ScreenSizes.module.scss";
-@use "@/styles/Spacings.module.scss";
+@use "styles/Radius.module.scss";
+@use "styles/ScreenSizes.module.scss";
+@use "styles/Spacings.module.scss";
 
 .from_document_wrapper {
   width: 100%;
@@ -9,11 +9,16 @@
   box-sizing: border-box;
   cursor: pointer;
   height: 100%;
-  overflow: scroll;
+  overflow: auto;
+  transition: border-color 0.3s ease 0.2s, border-width 0.1s ease 0.1s;
 
   &.dragging {
     border: 3px dashed var(--accent);
     background-color: var(--background-3);
+  }
+
+  &:hover {
+    border: 3px dashed var(--accent);
   }
 
   .box_content {

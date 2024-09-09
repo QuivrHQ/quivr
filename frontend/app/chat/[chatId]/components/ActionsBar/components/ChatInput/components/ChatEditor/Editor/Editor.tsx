@@ -2,6 +2,9 @@ import { EditorContent } from "@tiptap/react";
 import { useEffect } from "react";
 import "./styles.css";
 
+import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
+
+import styles from "./Editor.module.scss";
 import { useChatStateUpdater } from "./hooks/useChatStateUpdater";
 import { useCreateEditorState } from "./hooks/useCreateEditorState";
 import { useEditor } from "./hooks/useEditor";
@@ -20,6 +23,7 @@ export const Editor = ({
   message,
 }: EditorProps): JSX.Element => {
   const { editor } = useCreateEditorState(placeholder);
+  const { currentBrain } = useBrainContext();
 
   useEffect(() => {
     const htmlString = editor?.getHTML();
@@ -33,6 +37,21 @@ export const Editor = ({
     }
   }, [message, editor]);
 
+  useEffect(() => {
+    editor?.commands.focus();
+  }, [currentBrain, editor]);
+
+  useEffect(() => {
+    if (editor && placeholder) {
+      (
+        editor.extensionManager.extensions.find(
+          (ext) => ext.name === "placeholder"
+        ) as { options: { placeholder: string } }
+      ).options.placeholder = placeholder;
+      editor.view.updateState(editor.state);
+    }
+  }, [placeholder, editor]);
+
   useChatStateUpdater({
     editor,
     setMessage,
@@ -44,8 +63,25 @@ export const Editor = ({
 
   return (
     <EditorContent
-      className="w-full caret-accent"
-      onKeyDown={(event) => void submitOnEnter(event)}
+      className={styles.editor_wrapper}
+      onKeyDown={(event) => {
+        if (event.key === "Enter" && !event.shiftKey && !currentBrain) {
+          event.preventDefault();
+          const lastChar = editor?.state.doc.textBetween(
+            editor.state.selection.$from.pos - 1,
+            editor.state.selection.$from.pos,
+            undefined,
+            "\ufffc"
+          );
+          if (lastChar === " ") {
+            editor?.chain().insertContent("@").focus().run();
+          } else {
+            editor?.chain().insertContent(" @").focus().run();
+          }
+        } else {
+          submitOnEnter(event);
+        }
+      }}
       editor={editor}
     />
   );

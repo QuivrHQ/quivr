@@ -35,5 +35,3 @@ BEGIN
 END;
 $function$
 ;
-
-

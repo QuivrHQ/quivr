@@ -6,9 +6,10 @@ import { PostHogProvider } from "posthog-js/react";
 import { PropsWithChildren, useEffect } from "react";
 
 import { BrainCreationProvider } from "@/lib/components/AddBrainModal/brainCreation-provider";
+import { HelpWindow } from "@/lib/components/HelpWindow/HelpWindow";
 import { Menu } from "@/lib/components/Menu/Menu";
 import { useOutsideClickListener } from "@/lib/components/Menu/hooks/useOutsideClickListener";
-import SearchModal from "@/lib/components/SearchModal/SearchModal";
+import { SearchModal } from "@/lib/components/SearchModal/SearchModal";
 import {
   BrainProvider,
   ChatProvider,
@@ -16,7 +17,11 @@ import {
 } from "@/lib/context";
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
 import { ChatsProvider } from "@/lib/context/ChatsProvider";
+import { HelpProvider } from "@/lib/context/HelpProvider/help-provider";
+import { useHelpContext } from "@/lib/context/HelpProvider/hooks/useHelpContext";
 import { MenuProvider } from "@/lib/context/MenuProvider/Menu-provider";
+import { useMenuContext } from "@/lib/context/MenuProvider/hooks/useMenuContext";
+import { NotificationsProvider } from "@/lib/context/NotificationsProvider/notifications-provider";
 import { OnboardingProvider } from "@/lib/context/OnboardingProvider/Onboarding-provider";
 import { SearchModalProvider } from "@/lib/context/SearchModalProvider/search-modal-provider";
 import { useSupabase } from "@/lib/context/SupabaseProvider";
@@ -26,6 +31,7 @@ import { UpdateMetadata } from "@/lib/helpers/updateMetadata";
 import { usePageTracking } from "@/services/analytics/june/usePageTracking";
 
 import "../lib/config/LocaleConfig/i18n";
+import styles from "./App.module.scss";
 import { FromConnectionsProvider } from "./chat/[chatId]/components/ActionsBar/components/KnowledgeToFeed/components/FromConnections/FromConnectionsProvider/FromConnection-provider";
 
 if (
@@ -44,6 +50,8 @@ const App = ({ children }: PropsWithChildren): JSX.Element => {
   const { fetchAllBrains } = useBrainContext();
   const { onClickOutside } = useOutsideClickListener();
   const { session } = useSupabase();
+  const { isOpened } = useMenuContext();
+  const { isVisible } = useHelpContext();
 
   usePageTracking();
 
@@ -62,12 +70,21 @@ const App = ({ children }: PropsWithChildren): JSX.Element => {
         <IntercomProvider>
           <div className="flex flex-1 flex-col overflow-auto">
             <SearchModalProvider>
+              <HelpWindow />
               <SearchModal />
-              <div className="relative h-full w-full flex justify-stretch items-stretch overflow-auto">
-                <Menu />
+              <div
+                className={`${styles.app_container} ${
+                  isVisible ? styles.blur : ""
+                }`}
+              >
+                <div className={styles.menu_container}>
+                  <Menu />
+                </div>
                 <div
                   onClick={onClickOutside}
-                  className="flex-1 overflow-scroll"
+                  className={`${styles.content_container} ${
+                    isOpened ? styles.blured : ""
+                  }`}
                 >
                   {children}
                 </div>
@@ -87,23 +104,27 @@ const AppWithQueryClient = ({ children }: PropsWithChildren): JSX.Element => {
   return (
     <QueryClientProvider client={queryClient}>
       <UserSettingsProvider>
-        <BrainProvider>
-          <KnowledgeToFeedProvider>
-            <BrainCreationProvider>
-              <MenuProvider>
-                <OnboardingProvider>
-                  <FromConnectionsProvider>
-                    <ChatsProvider>
-                      <ChatProvider>
-                        <App>{children}</App>
-                      </ChatProvider>
-                    </ChatsProvider>
-                  </FromConnectionsProvider>
-                </OnboardingProvider>
-              </MenuProvider>
-            </BrainCreationProvider>
-          </KnowledgeToFeedProvider>
-        </BrainProvider>
+        <HelpProvider>
+          <BrainProvider>
+            <KnowledgeToFeedProvider>
+              <BrainCreationProvider>
+                <NotificationsProvider>
+                  <MenuProvider>
+                    <OnboardingProvider>
+                      <FromConnectionsProvider>
+                        <ChatsProvider>
+                          <ChatProvider>
+                            <App>{children}</App>
+                          </ChatProvider>
+                        </ChatsProvider>
+                      </FromConnectionsProvider>
+                    </OnboardingProvider>
+                  </MenuProvider>
+                </NotificationsProvider>
+              </BrainCreationProvider>
+            </KnowledgeToFeedProvider>
+          </BrainProvider>
+        </HelpProvider>
       </UserSettingsProvider>
     </QueryClientProvider>
   );

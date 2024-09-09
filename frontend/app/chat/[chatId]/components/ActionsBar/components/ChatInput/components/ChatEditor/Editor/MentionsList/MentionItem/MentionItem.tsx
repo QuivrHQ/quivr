@@ -1,38 +1,43 @@
 import Image from "next/image";
 
-import Icon from "@/lib/components/ui/Icon/Icon";
-import { useUserSettingsContext } from "@/lib/context/UserSettingsProvider/hooks/useUserSettingsContext";
-
 import styles from "./MentionItem.module.scss";
 
-import { SuggestionDataType, SuggestionItem } from "../../types";
+import { SuggestionItem } from "../../types";
 
 type MentionItemProps = {
   item: SuggestionItem;
-  type: SuggestionDataType;
-  isSelected: boolean;
   onClick: () => void;
+  selected: boolean;
 };
 
 export const MentionItem = ({
   item,
   onClick,
-  isSelected,
+  selected,
 }: MentionItemProps): JSX.Element => {
-
-  const { isDarkMode } = useUserSettingsContext();
-
   return (
     <span
-      className={`${styles.mention_item_wrapper} ${isSelected ? styles.selected : ""
-        }`}
+      className={`${styles.mention_item_wrapper} ${
+        selected ? styles.selected : ""
+      }`}
       key={item.id}
       onClick={onClick}
     >
       {item.iconUrl ? (
-        <Image src={item.iconUrl} width={18} height={18} alt="logo_url" className={isDarkMode ? styles.dark_image : ""} />
+        <Image
+          className={styles.brain_image}
+          src={item.iconUrl}
+          alt="Brain or Model"
+          width={18}
+          height={18}
+        />
       ) : (
-        <Icon color="primary" size="normal" name="brain" />
+        <div
+          className={styles.brain_snippet}
+          style={{ backgroundColor: item.snippet_color }}
+        >
+          <span>{item.snippet_emoji}</span>
+        </div>
       )}
       <span className={styles.brain_name}>{item.label}</span>
     </span>

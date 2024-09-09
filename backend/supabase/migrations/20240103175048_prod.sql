@@ -145,7 +145,7 @@ BEGIN
         END IF;
 
         UPDATE user_settings
-        SET 
+        SET
             max_brains = 30,
             max_brain_size = 100000000,
             daily_chat_credit = 200,
@@ -201,5 +201,3 @@ grant truncate on table "public"."documents" to "service_role";
 grant update on table "public"."documents" to "service_role";
 
 CREATE TRIGGER update_max_brains_theodo_trigger AFTER INSERT ON public.user_settings FOR EACH ROW EXECUTE FUNCTION update_max_brains_theodo();
-
-

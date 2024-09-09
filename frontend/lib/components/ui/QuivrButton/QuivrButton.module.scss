@@ -1,7 +1,7 @@
-@use "@/styles/Radius.module.scss";
-@use "@/styles/ScreenSizes.module.scss";
-@use "@/styles/Spacings.module.scss";
-@use "@/styles/Typography.module.scss";
+@use "styles/Radius.module.scss";
+@use "styles/ScreenSizes.module.scss";
+@use "styles/Spacings.module.scss";
+@use "styles/Typography.module.scss";
 
 .button_wrapper {
   font-size: Typography.$small;
@@ -16,8 +16,29 @@
   background-color: var(--background-0);
   height: fit-content;
 
+  &.important {
+    text-transform: uppercase;
+  }
+
+  &.dark {
+    background-color: var(--background-1);
+
+    &:hover,
+    &.important {
+      .label {
+        color: var(--white-0);
+      }
+    }
+  }
+
   &.hidden {
     display: none;
+  }
+
+  @media (max-width: ScreenSizes.$small) {
+    padding-inline: Spacings.$spacing03;
+    padding-block: Spacings.$spacing01;
+    font-size: Typography.$tiny;
   }
 
   &.small {
@@ -28,7 +49,7 @@
 
   &.disabled {
     border-color: var(--border-2);
-    pointer-events: none;
+    cursor: default;
     color: var(--text-1);
     background-color: var(--background-0);
 
@@ -77,8 +98,12 @@
     align-items: center;
 
     @media (max-width: ScreenSizes.$small) {
-      .label {
+      .icon {
         display: none;
+      }
+
+      .label {
+        font-size: Typography.$very_tiny;
       }
     }
   }

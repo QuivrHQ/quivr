@@ -7,11 +7,15 @@ export const useChatInput = () => {
   const [message, setMessage] = useState<string>("");
   const { addQuestion, generatingAnswer, chatId } = useChat();
 
-  const submitQuestion = useCallback(() => {
-    if (!generatingAnswer) {
-      void addQuestion(message, () => setMessage(""));
-    }
-  }, [addQuestion, generatingAnswer, message]);
+  const submitQuestion = useCallback(
+    (question?: string) => {
+      const finalMessage = question ?? message;
+      if (!generatingAnswer) {
+        void addQuestion(finalMessage, () => setMessage(""));
+      }
+    },
+    [addQuestion, generatingAnswer, message]
+  );
 
   return {
     message,

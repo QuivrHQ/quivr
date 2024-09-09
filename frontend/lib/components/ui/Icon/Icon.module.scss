@@ -1,4 +1,4 @@
-@use "@/styles/IconSizes.module.scss";
+@use "styles/IconSizes.module.scss";
 
 .tiny {
   min-width: IconSizes.$tiny;
@@ -67,12 +67,24 @@
   color: var(--icon-0);
 }
 
+.static-white {
+  color: var(--white-0);
+
+  &:hover {
+    color: var(--primary-0);
+  }
+}
+
 .dangerous {
   color: var(--dangerous);
 
   &.hovered {
     color: var(--dangerous-dark);
   }
+}
+
+.dangerous-dark {
+  color: var(--dangerous-dark);
 }
 
 .warning {

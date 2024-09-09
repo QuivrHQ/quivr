@@ -1,4 +1,4 @@
-@use "@/styles/Spacings.module.scss";
+@use "styles/Spacings.module.scss";
 
 .page_wrapper {
   display: flex;
@@ -11,6 +11,6 @@
   .content_wrapper {
     padding-inline: Spacings.$spacing09;
     padding-block: Spacings.$spacing05;
-    overflow-y: scroll;
+    overflow-y: auto;
   }
 }

@@ -5,8 +5,8 @@ import { useTranslation } from "react-i18next";
 import { useFromConnectionsContext } from "@/app/chat/[chatId]/components/ActionsBar/components/KnowledgeToFeed/components/FromConnections/FromConnectionsProvider/hooks/useFromConnectionContext";
 import { Modal } from "@/lib/components/ui/Modal/Modal";
 import { addBrainDefaultValues } from "@/lib/config/defaultBrainConfig";
+import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
 import { useKnowledgeToFeedContext } from "@/lib/context/KnowledgeToFeedProvider/hooks/useKnowledgeToFeedContext";
-import { useUserData } from "@/lib/hooks/useUserData";
 
 import styles from "./AddBrainModal.module.scss";
 import { useBrainCreationContext } from "./brainCreation-provider";
@@ -19,12 +19,14 @@ import { CreateBrainProps } from "./types/types";
 
 export const AddBrainModal = (): JSX.Element => {
   const { t } = useTranslation(["translation", "brain", "config"]);
-  const { userIdentityData } = useUserData();
   const { currentStep, steps } = useBrainCreationSteps();
+  const { setCurrentBrainId } = useBrainContext();
+  const { setSnippetColor, setSnippetEmoji } = useBrainCreationContext();
   const {
     isBrainCreationModalOpened,
     setIsBrainCreationModalOpened,
     setCurrentSelectedBrain,
+    setCreating,
   } = useBrainCreationContext();
   const { setCurrentSyncId, setOpenedConnections } =
     useFromConnectionsContext();
@@ -43,9 +45,15 @@ export const AddBrainModal = (): JSX.Element => {
   useEffect(() => {
     setCurrentSelectedBrain(undefined);
     setCurrentSyncId(undefined);
+    setCreating(false);
     setOpenedConnections([]);
     methods.reset(defaultValues);
     removeAllKnowledgeToFeed();
+    if (isBrainCreationModalOpened) {
+      setCurrentBrainId(null);
+      setSnippetColor("#d0c6f2");
+      setSnippetEmoji("🧠");
+    }
   }, [isBrainCreationModalOpened]);
 
   return (
@@ -55,7 +63,6 @@ export const AddBrainModal = (): JSX.Element => {
         desc={t("newBrainSubtitle", { ns: "brain" })}
         isOpen={isBrainCreationModalOpened}
         setOpen={setIsBrainCreationModalOpened}
-        unclosable={!userIdentityData?.onboarded}
         size="big"
         CloseTrigger={<div />}
       >

@@ -1,11 +1,9 @@
-# Using a slim version for a smaller base image
-FROM python:3.11.6-slim-bullseye@sha256:0c1fbb294096d842ad795ee232d783cab436c90b034210fe894f2bb2f2be7626 AS base
+FROM python:3.11.6-slim-bullseye
 
-ARG DEV_MODE
-ENV DEV_MODE=$DEV_MODE
+WORKDIR /app
 
-# Install GEOS library, Rust, and other dependencies, then clean up
-RUN apt-get clean && apt-get update && apt-get install -y \
+# Install runtime dependencies
+RUN apt-get update && apt-get install -y \
     libgeos-dev \
     libcurl4-openssl-dev \
     libssl-dev \
@@ -15,25 +13,14 @@ RUN apt-get clean && apt-get update && apt-get install -y \
     git \
     poppler-utils \
     tesseract-ocr \
-    autoconf \
-    automake \
-    build-essential \
-    libtool \
-    python-dev \
-    wget \
-    # Additional dependencies for document handling
     libmagic-dev \
-    poppler-utils \
-    tesseract-ocr \
     libreoffice \
     libpq-dev \
     gcc \
-    pandoc && \
-    rm -rf /var/lib/apt/lists/*
+    wget \
+    && rm -rf /var/lib/apt/lists/*
 
-# Add Rust binaries to the PATH
-ENV PATH="/root/.cargo/bin:${PATH}"
-
+# Install Supabase CLI
 RUN ARCHITECTURE=$(uname -m) && \
     if [ "$ARCHITECTURE" = "x86_64" ]; then \
     wget https://github.com/supabase/cli/releases/download/v1.163.6/supabase_1.163.6_linux_amd64.deb && \
@@ -43,22 +30,17 @@ RUN ARCHITECTURE=$(uname -m) && \
     wget https://github.com/supabase/cli/releases/download/v1.163.6/supabase_1.163.6_linux_arm64.deb && \
     dpkg -i supabase_1.163.6_linux_arm64.deb && \
     rm supabase_1.163.6_linux_arm64.deb; \
-    fi && \
-    rm -rf /var/lib/apt/lists/*
+    fi
 
-WORKDIR /code
-
-# Copy just the requirements first
-COPY ./requirements.txt .
-
-# Upgrade pip and install dependencies
-RUN pip install --no-cache-dir --upgrade pip && \
-    pip install --no-cache-dir -r requirements.txt && \
-    playwright install --with-deps
-
-# Copy the rest of the application
 COPY . .
 
-EXPOSE 5050
+RUN PYTHONDONTWRITEBYTECODE=1 pip install --no-cache-dir -r requirements.lock
 
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "5050", "--workers", "6"]
+RUN playwright install --with-deps && \
+    python -c "from unstructured.nlp.tokenize import download_nltk_packages; download_nltk_packages()" && \
+    python -c "import nltk;nltk.download('punkt_tab'); nltk.download('averaged_perceptron_tagger_eng')"
+
+
+ENV PYTHONPATH=/app
+
+EXPOSE 5050

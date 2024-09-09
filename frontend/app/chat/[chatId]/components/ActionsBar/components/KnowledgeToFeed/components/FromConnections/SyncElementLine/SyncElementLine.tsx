@@ -1,7 +1,8 @@
 import { useState } from "react";
 
 import { Checkbox } from "@/lib/components/ui/Checkbox/Checkbox";
-import Icon from "@/lib/components/ui/Icon/Icon";
+import { Icon } from "@/lib/components/ui/Icon/Icon";
+import Tooltip from "@/lib/components/ui/Tooltip/Tooltip";
 
 import styles from "./SyncElementLine.module.scss";
 
@@ -12,6 +13,8 @@ interface SyncElementLineProps {
   selectable: boolean;
   id: string;
   isFolder: boolean;
+  icon?: string;
+  isAlsoFile?: boolean;
 }
 
 export const SyncElementLine = ({
@@ -19,6 +22,8 @@ export const SyncElementLine = ({
   selectable,
   id,
   isFolder,
+  icon,
+  isAlsoFile,
 }: SyncElementLineProps): JSX.Element => {
   const [isCheckboxHovered, setIsCheckboxHovered] = useState(false);
   const { currentSyncId, openedConnections, setOpenedConnections } =
@@ -35,6 +40,8 @@ export const SyncElementLine = ({
   };
 
   const [checked, setChecked] = useState<boolean>(initialChecked);
+
+  const showCheckbox: boolean = isAlsoFile ?? !isFolder;
 
   const handleSetChecked = () => {
     setOpenedConnections((prevState) => {
@@ -64,7 +71,7 @@ export const SyncElementLine = ({
     setChecked((prevChecked) => !prevChecked);
   };
 
-  return (
+  const content = (
     <div
       className={`${styles.sync_element_line_wrapper} ${
         isCheckboxHovered || !isFolder || checked ? styles.no_hover : ""
@@ -76,25 +83,50 @@ export const SyncElementLine = ({
       }}
     >
       <div
-        className={styles.checkbox_wrapper}
-        onMouseEnter={() => setIsCheckboxHovered(true)}
-        onMouseLeave={() => setIsCheckboxHovered(false)}
-        style={{ pointerEvents: "auto" }}
+        className={`${styles.left} ${
+          !isAlsoFile && isFolder ? styles.folder : ""
+        }`}
       >
-        <Checkbox
-          checked={checked}
-          setChecked={handleSetChecked}
-          disabled={!selectable}
-          tooltip={
-            !selectable
-              ? "Only premium members can sync folders. This feature automatically adds new files from your folders to your brain, keeping it up-to-date without manual effort."
-              : ""
-          }
-        />
+        {showCheckbox && (
+          <div
+            onMouseEnter={() => setIsCheckboxHovered(true)}
+            onMouseLeave={() => setIsCheckboxHovered(false)}
+            style={{ pointerEvents: "auto" }}
+          >
+            <Checkbox
+              checked={checked}
+              setChecked={handleSetChecked}
+              disabled={!selectable}
+            />
+          </div>
+        )}
+        {icon ? (
+          <div>{icon}</div>
+        ) : (
+          <Icon
+            name={isFolder ? "folder" : "file"}
+            color="black"
+            size="normal"
+          />
+        )}
+        <span className={styles.element_name}>{name}</span>
       </div>
-
-      <Icon name={isFolder ? "folder" : "file"} color="black" size="normal" />
-      <span className={styles.element_name}>{name}</span>
+      {isFolder && (
+        <Icon
+          name="chevronRight"
+          color="black"
+          size="normal"
+          handleHover={true}
+        />
+      )}
     </div>
+  );
+
+  return selectable ? (
+    content
+  ) : (
+    <Tooltip tooltip="Only premium members can sync folders. This feature automatically adds new files from your folders to your brain, keeping it up-to-date without manual effort.">
+      {content}
+    </Tooltip>
   );
 };

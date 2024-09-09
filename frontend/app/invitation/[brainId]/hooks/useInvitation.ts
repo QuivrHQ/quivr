@@ -1,6 +1,6 @@
 /* eslint-disable max-lines */
 "use client";
-import axios, { AxiosResponse } from "axios";
+import { AxiosResponse, isAxiosError } from "axios";
 import { UUID } from "crypto";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -9,6 +9,7 @@ import { useTranslation } from "react-i18next";
 import { BrainRoleType } from "@/app/studio/[brainId]/BrainManagementTabs/components/PeopleTab/BrainUsers/types";
 import { useSubscriptionApi } from "@/lib/api/subscription/useSubscriptionApi";
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
+import { useOnboardingContext } from "@/lib/context/OnboardingProvider/hooks/useOnboardingContext";
 import { useToast } from "@/lib/hooks";
 import { useEventTracking } from "@/services/analytics/june/useEventTracking";
 
@@ -21,6 +22,7 @@ export const useInvitation = () => {
   const [brainName, setBrainName] = useState<string>("");
   const [role, setRole] = useState<BrainRoleType | undefined>();
   const [isProcessingRequest, setIsProcessingRequest] = useState(false);
+  const { setIsBrainCreated } = useOnboardingContext();
 
   const { publish } = useToast();
   const { track } = useEventTracking();
@@ -43,7 +45,7 @@ export const useInvitation = () => {
         setBrainName(name);
         setRole(assignedRole);
       } catch (error) {
-        if (axios.isAxiosError(error) && error.response?.status === 404) {
+        if (isAxiosError(error) && error.response?.status === 404) {
           publish({
             variant: "warning",
             text: t("invitationNotFound", { ns: "invitation" }),
@@ -63,6 +65,7 @@ export const useInvitation = () => {
   }, [brainId]);
 
   const handleAccept = async () => {
+    setIsBrainCreated(true);
     setIsProcessingRequest(true);
     try {
       await acceptInvitation(brainId);
@@ -75,7 +78,7 @@ export const useInvitation = () => {
       });
       setCurrentBrainId(brainId);
     } catch (error) {
-      if (axios.isAxiosError(error) && error.response?.data !== undefined) {
+      if (isAxiosError(error) && error.response?.data !== undefined) {
         publish({
           variant: "danger",
           text: (
@@ -107,7 +110,7 @@ export const useInvitation = () => {
       });
       void track("INVITATION_DECLINED");
     } catch (error) {
-      if (axios.isAxiosError(error) && error.response?.data !== undefined) {
+      if (isAxiosError(error) && error.response?.data !== undefined) {
         publish({
           variant: "danger",
           text: (

@@ -7,9 +7,10 @@ export interface ButtonType {
   color: Color;
   isLoading?: boolean;
   iconName: keyof typeof iconList;
-  onClick?: () => void | Promise<void>;
+  onClick?: (event?: MouseEvent) => void | Promise<void>;
   disabled?: boolean;
   hidden?: boolean;
   important?: boolean;
   small?: boolean;
+  tooltip?: string;
 }

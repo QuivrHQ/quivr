@@ -26,7 +26,7 @@ export const FieldHeader = ({
       {help && (
         <Tooltip tooltip={help}>
           <div>
-            <Icon name="help" size="normal" color="black" handleHover={true} />
+            <Icon name="help" size="small" color="black" handleHover={true} />
           </div>
         </Tooltip>
       )}

@@ -1,11 +1,14 @@
 /* eslint-disable max-lines */
 
-import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 
-import Spinner from "@/lib/components/ui/Spinner";
+import { Icon } from "@/lib/components/ui/Icon/Icon";
+import { LoaderIcon } from "@/lib/components/ui/LoaderIcon/LoaderIcon";
 import { Tabs } from "@/lib/components/ui/Tabs/Tabs";
 import { Tab } from "@/lib/types/Tab";
 
+import styles from "./BrainManagementTabs.module.scss";
 import { KnowledgeTab } from "./components/KnowledgeTab/KnowledgeTab";
 import { useAddedKnowledge } from "./components/KnowledgeTab/hooks/useAddedKnowledge";
 import { PeopleTab } from "./components/PeopleTab/PeopleTab";
@@ -14,23 +17,26 @@ import { useBrainFetcher } from "./hooks/useBrainFetcher";
 import { useBrainManagementTabs } from "./hooks/useBrainManagementTabs";
 
 export const BrainManagementTabs = (): JSX.Element => {
-  const [selectedTab, setSelectedTab] = useState("Settings");
+  const [selectedTab, setSelectedTab] = useState("Knowledge");
   const { brainId, hasEditRights } = useBrainManagementTabs();
   const { allKnowledge } = useAddedKnowledge({ brainId: brainId ?? undefined });
+  const router = useRouter();
 
-  const { brain, isLoading } = useBrainFetcher({
+  const { isLoading } = useBrainFetcher({
     brainId,
   });
 
-  const knowledgeTabDisabled = (): boolean => {
-    return (
-      !hasEditRights ||
-      (brain?.integration_description?.max_files === 0 &&
-        brain.brain_type !== "doc")
-    );
-  };
-
   const brainManagementTabs: Tab[] = [
+    {
+      label: hasEditRights
+        ? `Knowledge${allKnowledge.length > 1 ? "s" : ""} (${
+            allKnowledge.length
+          })`
+        : "Knowledge",
+      isSelected: selectedTab === "Knowledge",
+      onClick: () => setSelectedTab("Knowledge"),
+      iconName: "file",
+    },
     {
       label: "Settings",
       isSelected: selectedTab === "Settings",
@@ -44,20 +50,7 @@ export const BrainManagementTabs = (): JSX.Element => {
       iconName: "user",
       disabled: !hasEditRights,
     },
-    {
-      label: `Knowledge${allKnowledge.length > 1 ? "s" : ""} (${
-        allKnowledge.length
-      })`,
-      isSelected: selectedTab === "Knowledge",
-      onClick: () => setSelectedTab("Knowledge"),
-      iconName: "file",
-      disabled: knowledgeTabDisabled(),
-    },
   ];
-
-  useEffect(() => {
-    brainManagementTabs[2].disabled = knowledgeTabDisabled();
-  }, [hasEditRights]);
 
   if (!brainId) {
     return <div />;
@@ -65,16 +58,29 @@ export const BrainManagementTabs = (): JSX.Element => {
 
   if (isLoading) {
     return (
-      <div className="flex w-full h-full justify-center items-center">
-        <Spinner />
+      <div className={styles.loader}>
+        <LoaderIcon size="big" color="primary" />
       </div>
     );
   }
 
   return (
-    <>
-      <Tabs tabList={brainManagementTabs} />
-      {selectedTab === "Settings" && <SettingsTab brainId={brainId} />}
+    <div>
+      <div className={styles.header_wrapper}>
+        <Icon
+          name="chevronLeft"
+          size="normal"
+          color="black"
+          handleHover={true}
+          onClick={() => router.push("/studio")}
+        />
+        <div className={styles.tabs}>
+          <Tabs tabList={brainManagementTabs} />
+        </div>
+      </div>
+      {selectedTab === "Settings" && (
+        <SettingsTab brainId={brainId} hasEditRights={hasEditRights} />
+      )}
       {selectedTab === "People" && <PeopleTab brainId={brainId} />}
       {selectedTab === "Knowledge" && (
         <KnowledgeTab
@@ -83,6 +89,6 @@ export const BrainManagementTabs = (): JSX.Element => {
           allKnowledge={allKnowledge}
         />
       )}
-    </>
+    </div>
   );
 };

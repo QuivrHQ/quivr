@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useFromConnectionsContext } from "@/app/chat/[chatId]/components/ActionsBar/components/KnowledgeToFeed/components/FromConnections/FromConnectionsProvider/hooks/useFromConnectionContext";
 import { OpenedConnection, Provider, Sync } from "@/lib/api/sync/types";
 import { useSync } from "@/lib/api/sync/useSync";
-import QuivrButton from "@/lib/components/ui/QuivrButton/QuivrButton";
+import { QuivrButton } from "@/lib/components/ui/QuivrButton/QuivrButton";
 
 import { ConnectionButton } from "./ConnectionButton/ConnectionButton";
 import { ConnectionLine } from "./ConnectionLine/ConnectionLine";
@@ -55,11 +55,13 @@ const renderExistingConnections = ({
   fromAddKnowledge,
   handleGetSyncFiles,
   openedConnections,
+  setCurrentProvider,
 }: {
   existingConnections: Sync[];
   folded: boolean;
   setFolded: (folded: boolean) => void;
   fromAddKnowledge: boolean;
+  setCurrentProvider: (provider: Provider) => void;
   handleGetSyncFiles: (
     userSyncId: number,
     currentProvider: Provider
@@ -96,9 +98,10 @@ const renderExistingConnections = ({
                   openedConnection.submitted
                 );
               })}
-              onClick={() =>
-                void handleGetSyncFiles(connection.id, connection.provider)
-              }
+              onClick={() => {
+                void handleGetSyncFiles(connection.id, connection.provider);
+                setCurrentProvider(connection.provider);
+              }}
             />
           </div>
         ))}
@@ -115,7 +118,7 @@ export const ConnectionSection = ({
   fromAddKnowledge,
   callback,
 }: ConnectionSectionProps): JSX.Element => {
-  const { iconUrls, getUserSyncs, getSyncFiles } = useSync();
+  const { providerIconUrls, getUserSyncs, getSyncFiles } = useSync();
   const {
     setCurrentSyncElements,
     setCurrentSyncId,
@@ -123,6 +126,8 @@ export const ConnectionSection = ({
     openedConnections,
     hasToReload,
     setHasToReload,
+    setLoadingFirstList,
+    setCurrentProvider,
   } = useFromConnectionsContext();
   const [existingConnections, setExistingConnections] = useState<Sync[]>([]);
   const [folded, setFolded] = useState<boolean>(!fromAddKnowledge);
@@ -191,7 +196,9 @@ export const ConnectionSection = ({
 
   const handleGetSyncFiles = async (userSyncId: number) => {
     try {
+      setLoadingFirstList(true);
       const res = await getSyncFiles(userSyncId);
+      setLoadingFirstList(false);
       setCurrentSyncElements(res);
       setCurrentSyncId(userSyncId);
       handleOpenedConnections(userSyncId);
@@ -216,7 +223,7 @@ export const ConnectionSection = ({
         <div className={styles.connection_section_header}>
           <div className={styles.left}>
             <Image
-              src={iconUrls[provider]}
+              src={providerIconUrls[provider]}
               alt={label}
               width={24}
               height={24}
@@ -248,6 +255,7 @@ export const ConnectionSection = ({
           fromAddKnowledge: !!fromAddKnowledge,
           handleGetSyncFiles,
           openedConnections,
+          setCurrentProvider,
         })}
       </div>
     </>

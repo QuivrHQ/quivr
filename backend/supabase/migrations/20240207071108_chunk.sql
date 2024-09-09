@@ -57,5 +57,3 @@ BEGIN
 END;
 $function$
 ;
-
-

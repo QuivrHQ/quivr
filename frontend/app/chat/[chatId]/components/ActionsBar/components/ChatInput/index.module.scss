@@ -1,5 +1,5 @@
-@use "@/styles/Radius.module.scss";
-@use "@/styles/Spacings.module.scss";
+@use "styles/Radius.module.scss";
+@use "styles/Spacings.module.scss";
 
 .chat_container {
   display: flex;
@@ -13,9 +13,12 @@
   .chat_wrapper {
     display: flex;
     padding: Spacings.$spacing05;
+    padding-top: 0;
+    gap: Spacings.$spacing05;
 
-    &.with_brain {
-      padding-top: 0;
+    &.disabled {
+      pointer-events: none;
+      opacity: 0.4;
     }
   }
 }

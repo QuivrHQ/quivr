@@ -1,0 +1,30 @@
+@use "styles/Spacings.module.scss";
+@use "styles/Typography.module.scss";
+
+.info_wrapper {
+  display: flex;
+  gap: Spacings.$spacing03;
+  border-bottom: 1px solid var(--border-2);
+  padding-block: Spacings.$spacing04;
+  position: relative;
+  font-size: Typography.$small;
+
+  &.without_border {
+    border-bottom: none;
+  }
+
+  .title_wrapper {
+    display: flex;
+    margin-top: 0;
+    gap: Spacings.$spacing03;
+    align-items: center;
+    align-self: flex-start;
+
+    .title {
+      min-width: 140px;
+      max-width: 140px;
+      color: var(--text-4);
+      font-size: Typography.$small;
+    }
+  }
+}

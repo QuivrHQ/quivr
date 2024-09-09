@@ -31,10 +31,7 @@ const RootLayout = async ({
 
   return (
     <html lang="en">
-      <body
-        className={styles.body}
-        // className={`bg-white text-black h-screen flex flex-col dark:bg-black dark:text-white w-full ${inter.className}`}
-      >
+      <body className={styles.body}>
         <ToastProvider>
           <SupabaseProvider session={session}>
             <App>{children}</App>

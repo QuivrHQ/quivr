@@ -1,9 +1,9 @@
-@use "@/styles/IconSizes.module.scss";
-@use "@/styles/Spacings.module.scss";
+@use "styles/IconSizes.module.scss";
+@use "styles/Spacings.module.scss";
 
 .menu_icon {
-  width: IconSizes.$large;
-  height: IconSizes.$large;
+  width: IconSizes.$normal;
+  height: IconSizes.$normal;
   cursor: pointer;
 
   &:hover {

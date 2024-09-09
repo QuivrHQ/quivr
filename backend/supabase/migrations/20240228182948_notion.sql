@@ -40,6 +40,3 @@ as permissive
 for all
 to service_role
 with check (true);
-
-
-

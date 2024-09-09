@@ -1,0 +1,15 @@
+@use "styles/ScreenSizes.module.scss";
+@use "styles/Spacings.module.scss";
+
+.color_picker_wrapper {
+  width: 375px;
+  height: 300px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  @media (max-width: ScreenSizes.$small) {
+    width: 250px;
+    height: 300px;
+  }
+}

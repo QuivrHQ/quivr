@@ -1,24 +1,101 @@
 import Image from "next/image";
 
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
-import { useUserSettingsContext } from "@/lib/context/UserSettingsProvider/hooks/useUserSettingsContext";
+import { MinimalBrainForUser } from "@/lib/context/BrainProvider/types";
+import { useNotificationsContext } from "@/lib/context/NotificationsProvider/hooks/useNotificationsContext";
 
 import styles from "./CurrentBrain.module.scss";
 
 import { Icon } from "../ui/Icon/Icon";
+import { LoaderIcon } from "../ui/LoaderIcon/LoaderIcon";
 
 interface CurrentBrainProps {
   allowingRemoveBrain: boolean;
+  remainingCredits: number | null;
+  isNewBrain?: boolean;
 }
+
+const BrainNameAndImage = ({
+  currentBrain,
+  isNewBrain,
+}: {
+  currentBrain: MinimalBrainForUser;
+  isNewBrain: boolean;
+}) => {
+  return (
+    <>
+      {currentBrain.image_url ? (
+        <Image
+          className={styles.brain_image}
+          src={currentBrain.image_url}
+          alt=""
+          width={18}
+          height={18}
+        />
+      ) : (
+        <div
+          className={styles.brain_snippet}
+          style={{ backgroundColor: currentBrain.snippet_color }}
+        >
+          <span>{currentBrain.snippet_emoji}</span>
+        </div>
+      )}
+      <span className={`${styles.brain_name} ${isNewBrain ? styles.new : ""}`}>
+        {currentBrain.display_name ?? currentBrain.name}
+      </span>
+    </>
+  );
+};
+
+const ProcessingNotification = ({
+  currentBrain,
+  bulkNotifications,
+}: {
+  currentBrain?: MinimalBrainForUser;
+  bulkNotifications: Array<{
+    brain_id: string;
+    notifications: Array<{ status: string }>;
+  }>;
+}) => {
+  const isProcessing =
+    currentBrain &&
+    bulkNotifications.some(
+      (bulkNotif) =>
+        bulkNotif.brain_id === currentBrain.id &&
+        bulkNotif.notifications.some((notif) => notif.status === "info")
+    );
+
+  return (
+    isProcessing && (
+      <div className={styles.warning}>
+        <LoaderIcon size="small" color="warning" />
+        <span>Processing knowledges</span>
+      </div>
+    )
+  );
+};
 
 export const CurrentBrain = ({
   allowingRemoveBrain,
+  remainingCredits,
+  isNewBrain,
 }: CurrentBrainProps): JSX.Element => {
   const { currentBrain, setCurrentBrainId } = useBrainContext();
-  const { isDarkMode } = useUserSettingsContext();
+  const { bulkNotifications } = useNotificationsContext();
+
   const removeCurrentBrain = (): void => {
     setCurrentBrainId(null);
   };
+
+  if (remainingCredits === 0) {
+    return (
+      <div className={styles.no_credits_left}>
+        <span>
+          You’ve run out of credits! Upgrade your plan now to continue chatting.
+        </span>
+      </div>
+    );
+  }
 
   if (!currentBrain) {
     return <></>;
@@ -30,18 +107,14 @@ export const CurrentBrain = ({
         <div className={styles.left}>
           <span className={styles.title}>Talking to</span>
           <div className={styles.brain_name_wrapper}>
-            <Image
-              className={isDarkMode ? styles.dark_image : ""}
-              src={
-                currentBrain.integration_logo_url
-                  ? currentBrain.integration_logo_url
-                  : "/default_brain_image.png"
-              }
-              alt="logo_image"
-              width={18}
-              height={18}
+            <BrainNameAndImage
+              currentBrain={currentBrain}
+              isNewBrain={!!isNewBrain}
             />
-            <span className={styles.brain_name}>{currentBrain.name}</span>
+            <ProcessingNotification
+              currentBrain={currentBrain}
+              bulkNotifications={bulkNotifications}
+            />
           </div>
         </div>
         {allowingRemoveBrain && (
@@ -51,7 +124,7 @@ export const CurrentBrain = ({
               removeCurrentBrain();
             }}
           >
-            <Icon size="normal" name="close" color="black" handleHover={true} />
+            <Icon size="normal" name="close" color="black" handleHover />
           </div>
         )}
       </div>

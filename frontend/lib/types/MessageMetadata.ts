@@ -5,4 +5,6 @@ export interface Source {
   source_url: string;
   type: string;
   thoughts: string;
+  integration?: string;
+  integration_link?: string;
 }

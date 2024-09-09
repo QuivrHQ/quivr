@@ -1,7 +1,7 @@
 import { capitalCase } from "change-case";
 import { useState } from "react";
 
-import Icon from "@/lib/components/ui/Icon/Icon";
+import { Icon } from "@/lib/components/ui/Icon/Icon";
 import { iconList } from "@/lib/helpers/iconList";
 
 import styles from "./MenuButton.module.scss";

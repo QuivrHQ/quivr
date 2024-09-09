@@ -1,7 +1,7 @@
 # Quivr - Your Second Brain, Empowered by Generative AI
 
 <div align="center">
-    <img src="./logo.png" alt="Quivr-logo" width="30%"  style="border-radius: 50%; padding-bottom: 20px"/>
+    <img src="./logo.png" alt="Quivr-logo" width="31%"  style="border-radius: 50%; padding-bottom: 20px"/>
 </div>
 
 [![Discord Follow](https://dcbadge.vercel.app/api/server/HUpRgp2HG8?style=flat)](https://discord.gg/HUpRgp2HG8)
@@ -17,20 +17,26 @@ Quivr, your second brain, utilizes the power of GenerativeAI to be your personal
 
 - **Fast and Efficient**: Designed with speed and efficiency at its core. Quivr ensures rapid access to your data.
 - **Secure**: Your data, your control. Always.
-- **OS Compatible**: Ubuntu 22 or newer.
+- **OS Compatible**: Ubuntu 20 or newer.
 - **File Compatibility**: Text, Markdown, PDF, Powerpoint, Excel, CSV, Word, Audio, Video
 - **Open Source**: Freedom is beautiful, and so is Quivr. Open source and free to use.
 - **Public/Private**: Share your brains with your users via a public link, or keep them private.
-- **Marketplace**: Share your brains with the world, or use other people's brains to boost your productivity.
 - **Offline Mode**: Quivr works offline, so you can access your data anytime, anywhere.
 
-## Demo Highlights 🎥
+## Demo Highlight 🎥
 
 https://github.com/quivrhq/quivr/assets/19614572/a6463b73-76c7-4bc0-978d-70562dca71f5
 
 ## Getting Started 🚀
 
-Follow these instructions to get a copy of the project up and running on your local machine for development and testing purposes.
+You can deploy Quivr to Porter Cloud with one-click:
+
+<a href="https://cloud.porter.run/addons/new?addon_name=quivr" target="_blank">
+  <img src="https://mintlify.s3-us-west-1.amazonaws.com/porter/images/deploying-applications/deploy-to-porter.svg" alt="Deploy to Porter" style="width: 150px;">
+</a>
+
+
+If you would like to deploy locally, follow these instructions to get a copy of the project up and running on your local machine for development and testing purposes.
 
 You can find everything on the [documentation](https://docs.quivr.app/).
 
