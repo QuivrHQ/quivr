@@ -1,19 +1,27 @@
+import io
 from typing import List
 from uuid import UUID
 
+from fastapi import UploadFile
 from quivr_core.models import KnowledgeStatus
 from sqlalchemy.exc import NoResultFound
 
 from quivr_api.logger import get_logger
 from quivr_api.modules.dependencies import BaseService
 from quivr_api.modules.knowledge.dto.inputs import (
+    AddKnowledge,
     CreateKnowledgeProperties,
 )
 from quivr_api.modules.knowledge.dto.outputs import DeleteKnowledgeResponse
-from quivr_api.modules.knowledge.entity.knowledge import Knowledge, KnowledgeDB
+from quivr_api.modules.knowledge.entity.knowledge import (
+    Knowledge,
+    KnowledgeDB,
+    KnowledgeSource,
+)
 from quivr_api.modules.knowledge.repository.knowledges import KnowledgeRepository
 from quivr_api.modules.knowledge.repository.storage import SupabaseS3Storage
 from quivr_api.modules.knowledge.repository.storage_interface import StorageInterface
+from quivr_api.modules.knowledge.service.knowledge_exceptions import UploadError
 from quivr_api.modules.sync.entity.sync_models import (
     DBSyncFile,
     DownloadedSyncFile,
@@ -109,7 +117,44 @@ class KnowledgeService(BaseService[KnowledgeRepository]):
             await self.update_file_sha1_knowledge(knowledge.id, knowledge.file_sha1)
             return True
 
-    async def insert_knowledge(
+    async def create_knowledge(
+        self,
+        user_id: UUID,
+        knowledge_to_add: AddKnowledge,
+        upload_file: UploadFile | None = None,
+    ) -> Knowledge:
+        knowledgedb = KnowledgeDB(
+            user_id=user_id,
+            file_name=knowledge_to_add.file_name,
+            url=knowledge_to_add.url,
+            extension=knowledge_to_add.extension,
+            source=knowledge_to_add.source,
+            source_link=knowledge_to_add.source_link,
+            file_size=upload_file.size if upload_file else 0,
+            metadata_=knowledge_to_add.metadata,  # type: ignore
+            status=KnowledgeStatus.RESERVED,
+        )
+        knowledge_db = await self.repository.create_knowledge(knowledgedb)
+        try:
+            if knowledgedb.source == KnowledgeSource.LOCAL and upload_file:
+                # NOTE(@aminediro): Unnecessary mem buffer because supabase doesnt accept FileIO..
+                buff_reader = io.BufferedReader(upload_file.file)  # type: ignore
+                storage_path = await self.storage.upload_file_storage(
+                    knowledgedb, buff_reader
+                )
+                knowledgedb.source_link = storage_path
+        except Exception as e:
+            logger.exception(
+                f"Error uploading knowledge {knowledgedb.id} to storage : {e}"
+            )
+            await self.repository.remove_knowledge(knowledge=knowledge_db)
+            raise UploadError()
+
+        # TODO(@aminediro): Update status after upload ?
+        inserted_knowledge = await knowledge_db.to_dto()
+        return inserted_knowledge
+
+    async def insert_knowledge_brain(
         self,
         user_id: UUID,
         knowledge_to_add: CreateKnowledgeProperties,  # FIXME: (later) @Amine brain id should not be in CreateKnowledgeProperties but since storage is brain_id/file_name
@@ -127,7 +172,7 @@ class KnowledgeService(BaseService[KnowledgeRepository]):
             user_id=user_id,
         )
 
-        knowledge_db = await self.repository.insert_knowledge(
+        knowledge_db = await self.repository.insert_knowledge_brain(
             knowledge, brain_id=knowledge_to_add.brain_id
         )
 
@@ -236,7 +281,7 @@ class KnowledgeService(BaseService[KnowledgeRepository]):
             file_sha1=None,
             metadata={"sync_file_id": str(sync_id)},
         )
-        added_knowledge = await self.insert_knowledge(
+        added_knowledge = await self.insert_knowledge_brain(
             knowledge_to_add=knowledge_to_add, user_id=user_id
         )
         return added_knowledge

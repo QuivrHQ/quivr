@@ -2,7 +2,7 @@ from http import HTTPStatus
 from typing import Annotated, Optional
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, HTTPException, Query, UploadFile
+from fastapi import APIRouter, Depends, File, HTTPException, Query, UploadFile
 
 from quivr_api.logger import get_logger
 from quivr_api.middlewares.auth import AuthBearer, get_current_user
@@ -113,16 +113,26 @@ async def generate_signed_url_endpoint(
 
 @knowledge_router.post(
     "/knowledge/",
-    dependencies=[Depends(AuthBearer())],
     tags=["Knowledge"],
 )
 async def add_knowledge(
-    knowledge: AddKnowledge,
-    knowledge_service: KnowledgeServiceDep,
+    knowledge_data: str = File(...),
     file: Optional[UploadFile] = None,
+    knowledge_service: KnowledgeService = Depends(get_service(KnowledgeService)),
     current_user: UserIdentity = Depends(get_current_user),
 ):
+    knowledge = AddKnowledge.model_validate_json(knowledge_data)
     if not knowledge.file_name and not knowledge.url:
         raise HTTPException(
             status_code=400, detail="Either file_name or url must be provided"
         )
+    try:
+        await knowledge_service.create_knowledge(
+            knowledge_to_add=knowledge, upload_file=file, user_id=current_user.id
+        )
+    except ValueError:
+        raise HTTPException(status_code=422, detail="Unprocessable knowledge ")
+    except FileExistsError:
+        raise HTTPException(status_code=409, detail="Existing knowledge")
+    except Exception:
+        raise HTTPException(status_code=500)

@@ -1,19 +1,23 @@
 import os
+from io import BytesIO
 from typing import List, Tuple
 from uuid import uuid4
 
 import pytest
 import pytest_asyncio
+from fastapi import UploadFile
 from sqlalchemy.exc import IntegrityError, NoResultFound
 from sqlmodel import select, text
 from sqlmodel.ext.asyncio.session import AsyncSession
 
 from quivr_api.modules.brain.entity.brain_entity import Brain, BrainType
-from quivr_api.modules.knowledge.dto.inputs import KnowledgeStatus
+from quivr_api.modules.knowledge.dto.inputs import AddKnowledge, KnowledgeStatus
 from quivr_api.modules.knowledge.entity.knowledge import KnowledgeDB
 from quivr_api.modules.knowledge.entity.knowledge_brain import KnowledgeBrain
 from quivr_api.modules.knowledge.repository.knowledges import KnowledgeRepository
+from quivr_api.modules.knowledge.service.knowledge_exceptions import UploadError
 from quivr_api.modules.knowledge.service.knowledge_service import KnowledgeService
+from quivr_api.modules.knowledge.tests.conftest import ErrorStorage, FakeStorage
 from quivr_api.modules.upload.service.upload_file import upload_file_storage
 from quivr_api.modules.user.entity.user_identity import User
 from quivr_api.modules.vector.entity.vector import Vector
@@ -35,6 +39,15 @@ async def other_user(session: AsyncSession):
         await session.exec(select(User).where(User.email == "other@quivr.app"))
     ).one()
     return other_user
+
+
+@pytest_asyncio.fixture(scope="function")
+async def user(session: AsyncSession) -> User:
+    user_1 = (
+        await session.exec(select(User).where(User.email == "admin@quivr.app"))
+    ).one()
+    assert user_1.id
+    return user_1
 
 
 @pytest_asyncio.fixture(scope="function")
@@ -198,7 +211,7 @@ async def test_duplicate_sha1_knowledge_same_user(
     )
 
     with pytest.raises(IntegrityError):  # FIXME: Should raise IntegrityError
-        await repo.insert_knowledge(knowledge, brain.brain_id)
+        await repo.insert_knowledge_brain(knowledge, brain.brain_id)
 
 
 @pytest.mark.asyncio(loop_scope="session")
@@ -222,7 +235,7 @@ async def test_duplicate_sha1_knowledge_diff_user(
         user_id=other_user.id,  # random user id
     )
 
-    result = await repo.insert_knowledge(knowledge, brain.brain_id)
+    result = await repo.insert_knowledge_brain(knowledge, brain.brain_id)
     assert result
 
 
@@ -446,3 +459,90 @@ async def test_get_knowledge_storage_path(session: AsyncSession, test_data: Test
         knowledge.file_name, brain_2.brain_id
     )
     assert storage_path == km_path
+
+
+@pytest.mark.asyncio(loop_scope="session")
+@pytest.mark.parametrize("is_folder", [True, False])
+async def test_create_knowledge_file(
+    session: AsyncSession, user: User, is_folder: bool
+):
+    assert user.id
+    storage = FakeStorage()
+    repository = KnowledgeRepository(session)
+    service = KnowledgeService(repository, storage)
+
+    km_to_add = AddKnowledge(
+        file_name="test",
+        source="local",
+        is_folder=is_folder,
+        parent_id=None,
+    )
+    km_data = BytesIO(os.urandom(128))
+
+    km = await service.create_knowledge(
+        user_id=user.id,
+        knowledge_to_add=km_to_add,
+        upload_file=UploadFile(file=km_data, size=128, filename=km_to_add.file_name),
+    )
+
+    assert km.file_name == km_to_add.file_name
+    assert km.id
+    assert km.status == KnowledgeStatus.RESERVED
+    # km in storage
+    storage.knowledge_exists(km)
+
+
+@pytest.mark.asyncio(loop_scope="session")
+async def test_create_knowledge_folder(session: AsyncSession, user: User):
+    assert user.id
+    storage = FakeStorage()
+    repository = KnowledgeRepository(session)
+    service = KnowledgeService(repository, storage)
+
+    km_to_add = AddKnowledge(
+        file_name="test",
+        source="local",
+        is_folder=True,
+        parent_id=None,
+    )
+    km_data = BytesIO(os.urandom(128))
+
+    km = await service.create_knowledge(
+        user_id=user.id,
+        knowledge_to_add=km_to_add,
+        upload_file=UploadFile(file=km_data, size=128, filename=km_to_add.file_name),
+    )
+
+    assert km.file_name == km_to_add.file_name
+    assert km.id
+    assert km.status == KnowledgeStatus.RESERVED
+    assert storage.knowledge_exists(km)
+
+
+@pytest.mark.asyncio(loop_scope="session")
+async def test_create_knowledge_upload_error(session: AsyncSession, user: User):
+    assert user.id
+    storage = ErrorStorage()
+    repository = KnowledgeRepository(session)
+    service = KnowledgeService(repository, storage)
+
+    km_to_add = AddKnowledge(
+        file_name="test",
+        source="local",
+        is_folder=True,
+        parent_id=None,
+    )
+    km_data = BytesIO(os.urandom(128))
+
+    with pytest.raises(UploadError):
+        await service.create_knowledge(
+            user_id=user.id,
+            knowledge_to_add=km_to_add,
+            upload_file=UploadFile(
+                file=km_data, size=128, filename=km_to_add.file_name
+            ),
+        )
+    # Check removed knowledge
+    statement = select(KnowledgeDB)
+    results = (await session.exec(statement)).all()
+    assert results == []

@@ -1,4 +1,5 @@
 from datetime import datetime
+from enum import Enum
 from typing import Dict, List, Optional
 from uuid import UUID
 
@@ -10,6 +11,14 @@ from sqlmodel import UUID as PGUUID
 from sqlmodel import Field, Relationship, SQLModel
 
 from quivr_api.modules.knowledge.entity.knowledge_brain import KnowledgeBrain
+
+
+class KnowledgeSource(str, Enum):
+    LOCAL = "local"
+    WEB = "WEB"
+    GDRIVE = "Google Drive"
+    DROPBOX = "Dropbox"
+    SHAREPOINT = "Sharepoint"
 
 
 class Knowledge(BaseModel):
@@ -49,18 +58,19 @@ class KnowledgeDB(AsyncAttrs, SQLModel, table=True):
     file_sha1: Optional[str] = Field(
         max_length=40
     )  # FIXME: Should not be optional @chloedia
-    updated_at: datetime | None = Field(
+    created_at: datetime | None = Field(
         default=None,
         sa_column=Column(
             TIMESTAMP(timezone=False),
             server_default=text("CURRENT_TIMESTAMP"),
         ),
     )
-    created_at: datetime | None = Field(
+    updated_at: datetime | None = Field(
         default=None,
         sa_column=Column(
             TIMESTAMP(timezone=False),
             server_default=text("CURRENT_TIMESTAMP"),
+            onupdate=datetime.utcnow,
         ),
     )
     metadata_: Optional[Dict[str, str]] = Field(

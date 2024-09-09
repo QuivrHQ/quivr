@@ -22,7 +22,20 @@ class KnowledgeRepository(BaseRepository):
         supabase_client = get_supabase_client()
         self.db = supabase_client
 
-    async def insert_knowledge(
+    async def create_knowledge(self, knowledge: KnowledgeDB) -> KnowledgeDB:
+        try:
+            self.session.add(knowledge)
+            await self.session.commit()
+            await self.session.refresh(knowledge)
+        except IntegrityError:
+            await self.session.rollback()
+            raise
+        except Exception:
+            await self.session.rollback()
+            raise
+        return knowledge
+
+    async def insert_knowledge_brain(
         self, knowledge: KnowledgeDB, brain_id: UUID
     ) -> KnowledgeDB:
         logger.debug(f"Inserting knowledge {knowledge}")
@@ -68,6 +81,14 @@ class KnowledgeRepository(BaseRepository):
         await self.session.commit()
         await self.session.refresh(knowledge)
         return knowledge
+
+    async def remove_knowledge(self, knowledge: KnowledgeDB) -> DeleteKnowledgeResponse:
+        assert knowledge.id
+        await self.session.delete(knowledge)
+        await self.session.commit()
+        return DeleteKnowledgeResponse(
+            status="deleted", knowledge_id=knowledge.id, file_name=knowledge.file_name
+        )
 
     async def remove_knowledge_by_id(
         self, knowledge_id: UUID

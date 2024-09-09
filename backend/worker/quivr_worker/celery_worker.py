@@ -13,7 +13,7 @@ from quivr_api.modules.brain.repository.brains_vectors import BrainsVectors
 from quivr_api.modules.brain.service.brain_service import BrainService
 from quivr_api.modules.dependencies import get_supabase_client
 from quivr_api.modules.knowledge.repository.knowledges import KnowledgeRepository
-from quivr_api.modules.knowledge.repository.storage import Storage
+from quivr_api.modules.knowledge.repository.storage import SupabaseS3Storage
 from quivr_api.modules.knowledge.service.knowledge_service import KnowledgeService
 from quivr_api.modules.notification.service.notification_service import (
     NotificationService,
@@ -58,7 +58,7 @@ sync_user_service = SyncUserService()
 sync_files_repo_service = SyncFilesRepository()
 brain_service = BrainService()
 brain_vectors = BrainsVectors()
-storage = Storage()
+storage = SupabaseS3Storage()
 notion_service: SyncNotionService | None = None
 async_engine: AsyncEngine | None = None
 engine: Engine | None = None

@@ -112,6 +112,7 @@ async def folder(session, user):
         brains=[],
         children=[],
         user_id=user.id,
+        is_folder=True,
     )
 
     session.add(folder)
@@ -164,7 +165,6 @@ async def test_knowledge_remove_folder_cascade(
     await session.refresh(km)
 
     # Check all removed
-    print("\n\n DELETING")
     await session.delete(folder)
     await session.commit()
 

@@ -24,11 +24,8 @@ class AddKnowledge(BaseModel):
     file_name: Optional[str] = None
     url: Optional[str] = None
     extension: str = ".txt"
-    status: KnowledgeStatus = KnowledgeStatus.UPLOADED
     source: str = "local"
     source_link: Optional[str] = None
-    file_size: Optional[int] = None
-    file_sha1: Optional[str] = None
     metadata: Optional[Dict[str, str]] = None
     is_folder: bool = False
     parent_id: Optional[UUID] = None

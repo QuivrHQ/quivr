@@ -6,7 +6,7 @@ from quivr_api.celery_config import celery
 from quivr_api.logger import get_logger
 from quivr_api.modules.brain.repository.brains_vectors import BrainsVectors
 from quivr_api.modules.knowledge.repository.knowledges import KnowledgeRepository
-from quivr_api.modules.knowledge.repository.storage import Storage
+from quivr_api.modules.knowledge.repository.storage import SupabaseS3Storage
 from quivr_api.modules.knowledge.service.knowledge_service import KnowledgeService
 from quivr_api.modules.notification.service.notification_service import (
     NotificationService,
@@ -42,7 +42,7 @@ class SyncServices:
     sync_files_repo_service: SyncFilesRepository
     notification_service: NotificationService
     brain_vectors: BrainsVectors
-    storage: Storage
+    storage: SupabaseS3Storage
 
 
 @asynccontextmanager
