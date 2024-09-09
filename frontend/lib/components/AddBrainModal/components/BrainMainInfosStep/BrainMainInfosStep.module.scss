@@ -23,7 +23,7 @@
     .inputs_wrapper {
       display: flex;
       flex-direction: column;
-      overflow: scroll;
+      overflow: auto;
       position: relative;
 
       .first_line_wrapper {

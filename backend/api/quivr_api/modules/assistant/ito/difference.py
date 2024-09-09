@@ -1,10 +1,7 @@
-import asyncio
 import os
 import tempfile
 from typing import List
 
-import nest_asyncio
-import uvloop
 from fastapi import UploadFile
 from langchain.prompts import HumanMessagePromptTemplate, SystemMessagePromptTemplate
 from langchain_community.chat_models import ChatLiteLLM
@@ -23,10 +20,6 @@ from quivr_api.modules.assistant.dto.outputs import (
 )
 from quivr_api.modules.assistant.ito.ito import ITO
 from quivr_api.modules.user.entity.user_identity import UserIdentity
-
-if not isinstance(asyncio.get_event_loop(), uvloop.Loop):
-    nest_asyncio.apply()
-
 
 logger = get_logger(__name__)
 

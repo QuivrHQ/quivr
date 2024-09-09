@@ -244,14 +244,6 @@ INSERT INTO "public"."users" ("id", "email", "onboarded") VALUES
 -- Data for Name: integrations_user; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-
-
---
--- Data for Name: knowledge; Type: TABLE DATA; Schema: public; Owner: postgres
---
-
-
-
 --
 -- Data for Name: models; Type: TABLE DATA; Schema: public; Owner: postgres
 --

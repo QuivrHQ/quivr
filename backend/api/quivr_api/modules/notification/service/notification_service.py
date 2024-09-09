@@ -1,4 +1,4 @@
-from quivr_api.models.settings import get_supabase_client
+from quivr_api.modules.dependencies import get_supabase_client
 from quivr_api.modules.notification.dto.inputs import (
     CreateNotification,
     NotificationUpdatableProperties,
@@ -12,9 +12,11 @@ from quivr_api.modules.notification.repository.notifications_interface import (
 class NotificationService:
     repository: NotificationInterface
 
-    def __init__(self):
-        supabase_client = get_supabase_client()
-        self.repository = Notifications(supabase_client)
+    def __init__(self, repository: NotificationInterface | None = None):
+        if repository is None:
+            supabase_client = get_supabase_client()
+            repository = Notifications(supabase_client)
+        self.repository = repository
 
     def add_notification(self, notification: CreateNotification):
         """

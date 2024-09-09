@@ -1,5 +1,6 @@
 from fastapi import HTTPException
-from quivr_api.models.settings import get_supabase_client
+
+from quivr_api.modules.dependencies import get_supabase_client
 from quivr_api.modules.prompt.entity.prompt import Prompt
 from quivr_api.modules.prompt.repository.prompts_interface import (
     DeletePromptResponse,

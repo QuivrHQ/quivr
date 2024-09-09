@@ -1,10 +1,12 @@
 import json
 import os
+from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Request
 from fastapi.responses import HTMLResponse
 from google_auth_oauthlib.flow import Flow
 from googleapiclient.discovery import build
+
 from quivr_api.logger import get_logger
 from quivr_api.middlewares.auth import AuthBearer, get_current_user
 from quivr_api.modules.sync.dto.inputs import SyncsUserInput, SyncUserUpdateInput
@@ -119,18 +121,18 @@ def oauth2callback_google(request: Request):
     state_dict = {"state": state}
     logger.info(f"State: {state}")
     state_split = state.split(",")
-    current_user = state_split[0].split("=")[1] if state else None
-    name = state_split[1].split("=")[1] if state else None
+    current_user = UUID(state_split[0].split("=")[1]) if state else None
+    assert current_user, f"oauth2callback_googl empty current_user in {request}"
     logger.debug(
         f"Handling OAuth2 callback for user: {current_user} with state: {state}"
     )
     sync_user_state = sync_user_service.get_sync_user_by_state(state_dict)
     logger.info(f"Retrieved sync user state: {sync_user_state}")
 
-    if not sync_user_state or state_dict != sync_user_state.get("state"):
+    if not sync_user_state or state_dict != sync_user_state.state:
         logger.error("Invalid state parameter")
         raise HTTPException(status_code=400, detail="Invalid state parameter")
-    if sync_user_state.get("user_id") != current_user:
+    if sync_user_state.user_id != current_user:
         logger.error("Invalid user")
         logger.info(f"Invalid user: {current_user}")
         raise HTTPException(status_code=400, detail="Invalid user")

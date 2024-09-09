@@ -2,7 +2,6 @@ from pathlib import Path
 from uuid import uuid4
 
 import pytest
-
 from quivr_core.files.file import FileExtension, QuivrFile
 from quivr_core.processor.implementations.megaparse_processor import MegaparseProcessor
 from quivr_core.processor.registry import get_processor_class
@@ -24,12 +23,12 @@ async def test_megaparse_pdf_processor():
         original_filename=p.stem,
         path=p,
         file_extension=FileExtension.pdf,
-        file_md5="123",
+        file_sha1="123",
     )
     processor = MegaparseProcessor()
     result = await processor.process_file(f)
-
     assert len(result) > 0
+    assert len(result[0].page_content) > 0
 
 
 @pytest.mark.parametrize("ext", all_but_pdf)
@@ -42,7 +41,7 @@ async def test_megaparse_fail(ext):
         original_filename=p.stem,
         path=p,
         file_extension=ext,
-        file_md5="123",
+        file_sha1="123",
     )
     processor = MegaparseProcessor()
     with pytest.raises(ValueError):

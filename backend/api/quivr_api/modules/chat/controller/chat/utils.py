@@ -1,8 +1,6 @@
 import time
-from uuid import UUID
 
 from fastapi import HTTPException
-
 from quivr_api.logger import get_logger
 from quivr_api.modules.models.entity.model import Model
 from quivr_api.modules.models.service.model_service import ModelService
@@ -10,22 +8,6 @@ from quivr_api.modules.user.entity.user_identity import UserIdentity
 from quivr_api.modules.user.service.user_usage import UserUsage
 
 logger = get_logger(__name__)
-
-
-class NullableUUID(UUID):
-    @classmethod
-    def __get_validators__(cls):
-        yield cls.validate
-
-    @classmethod
-    def validate(v, values, **kwargs):
-        logger.info(f"Validating UUID: {v}")
-        if v == "":
-            return None
-        try:
-            return UUID(v)
-        except ValueError:
-            return None
 
 
 # TODO: rewrite

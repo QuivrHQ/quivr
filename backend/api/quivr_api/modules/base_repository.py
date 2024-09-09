@@ -3,10 +3,11 @@ from uuid import UUID
 
 from fastapi import HTTPException
 from pydantic import BaseModel
-from quivr_api.modules.base_uuid_entity import BaseUUIDModel
 from sqlalchemy import exc
 from sqlmodel import SQLModel, col, select
 from sqlmodel.ext.asyncio.session import AsyncSession
+
+from quivr_api.modules.base_uuid_entity import BaseUUIDModel
 
 ModelType = TypeVar("ModelType", bound=BaseUUIDModel)
 CreateSchema = TypeVar("CreateSchema", bound=BaseModel)

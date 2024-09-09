@@ -1,7 +1,7 @@
 on:
   push:
     tags:
-      - "v*"
+      - 'v*'
 name: Deploy to raise
 jobs:
   porter-deploy:

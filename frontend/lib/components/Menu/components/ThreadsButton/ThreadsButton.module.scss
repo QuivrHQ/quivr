@@ -9,7 +9,7 @@
   color: var(--text-2);
   font-size: Typography.$small;
   max-height: 300px;
-  overflow-y: scroll;
+  overflow-y: auto;
   display: flex;
   flex-direction: column;
 }

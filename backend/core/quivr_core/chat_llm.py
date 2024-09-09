@@ -55,8 +55,8 @@ class ChatLLM:
             filtered_chat_history.append(ai_message)
             total_tokens += message_tokens
             total_pairs += 1
-
-        return filtered_chat_history[::-1]  # Reverse back to original order
+            
+        return filtered_chat_history
 
     def build_chain(self):
         loaded_memory = RunnablePassthrough.assign(

@@ -1,7 +1,7 @@
 from quivr_api.logger import get_logger
 from quivr_api.models.brains_subscription_invitations import BrainSubscription
-from quivr_api.models.settings import get_supabase_client
 from quivr_api.modules.brain.service.brain_user_service import BrainUserService
+from quivr_api.modules.dependencies import get_supabase_client
 from quivr_api.modules.user.service.user_service import UserService
 
 logger = get_logger(__name__)

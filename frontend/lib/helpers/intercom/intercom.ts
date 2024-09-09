@@ -15,3 +15,7 @@ export const boot = (email: string): void => {
 export const update = (): void => {
   window && (window as any).Intercom && (window as any).Intercom("update");
 };
+
+export const shutdown = (): void => {
+  window && (window as any).Intercom && (window as any).Intercom("shutdown");
+};

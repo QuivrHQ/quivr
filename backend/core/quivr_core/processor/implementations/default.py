@@ -77,7 +77,7 @@ def _build_processor(
         async def process_file_inner(self, file: QuivrFile) -> list[Document]:
             if hasattr(self.loader_cls, "__init__"):
                 # NOTE: mypy can't correctly type this as BaseLoader doesn't have a constructor method
-                loader = self.loader_cls(file_path=file.path, **self.loader_kwargs)  # type: ignore
+                loader = self.loader_cls(file_path=str(file.path), **self.loader_kwargs)  # type: ignore
             else:
                 loader = self.loader_cls()
 

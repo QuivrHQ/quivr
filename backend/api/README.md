@@ -1,1 +1,1 @@
-# Quivr backend
+# quivr-api 0.1

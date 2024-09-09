@@ -35,6 +35,12 @@ export const ConnectionCards = ({
         callback={(name) => syncDropbox(name)}
         fromAddKnowledge={fromAddKnowledge}
       />
+      {/* <ConnectionSection
+        label="Notion"
+        provider="Notion"
+        callback={(name) => syncNotion(name)}
+        fromAddKnowledge={fromAddKnowledge}
+      /> */}
     </div>
   );
 };

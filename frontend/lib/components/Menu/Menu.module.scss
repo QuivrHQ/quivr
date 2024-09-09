@@ -19,7 +19,8 @@
     display: flex;
     flex-direction: column;
     height: 100vh;
-    overflow-y: scroll;
+    overflow-y: auto;
+    overflow-x: hidden;
 
     .quivr_logo_wrapper {
       cursor: pointer;
@@ -69,7 +70,7 @@
   top: Variables.$pageHeaderHeight;
   min-height: calc(100% - Variables.$pageHeaderHeight);
   max-height: calc(100% - Variables.$pageHeaderHeight);
-  overflow: scroll;
+  overflow: auto;
   left: calc(Variables.$menuWidth);
   z-index: ZIndexes.$overlay;
   border-right: 1px solid var(--border-1);
