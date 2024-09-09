@@ -116,7 +116,7 @@ export const FromConnections = (): JSX.Element => {
                       name={folder.name ?? ""}
                       selectable={!!isPremium}
                       id={folder.id}
-                      icon= {folder.icon}
+                      icon={folder.icon}
                     />
                   </div>
                 ))}
@@ -126,15 +126,18 @@ export const FromConnections = (): JSX.Element => {
                       name={file.name ?? ""}
                       selectable={true}
                       id={file.id}
-                      icon= {file.icon}
+                      icon={file.icon}
                     />
                   </div>
                 ))}
               </>
             )}
-            {!currentFiles.length && !currentFolders.length && (
-              <span className={styles.empty_folder}>Empty folder</span>
-            )}
+            {!currentFiles.length &&
+              !currentFolders.length &&
+              !loading &&
+              !loadingFirstList && (
+                <span className={styles.empty_folder}>Empty folder</span>
+              )}
           </div>
         </div>
       )}
