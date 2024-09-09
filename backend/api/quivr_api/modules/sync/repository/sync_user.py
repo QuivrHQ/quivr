@@ -47,6 +47,7 @@ class SyncUserRepository:
             .insert(sync_user_input.model_dump(exclude_none=True, exclude_unset=True))
             .execute()
         )
+
         if response.data:
             logger.info("Sync user created successfully: %s", response.data[0])
             return response.data[0]

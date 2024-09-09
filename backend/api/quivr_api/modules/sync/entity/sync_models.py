@@ -115,6 +115,6 @@ class NotionSyncFile(SQLModel, table=True):
     )
     user: User = Relationship(back_populates="notion_syncs")
     sync_user_id: int = Field(
-        foreign_key="syncs_user.id",
+        # foreign_key="syncs_user.id",
         description="The ID of the sync user associated with the file",
     )
