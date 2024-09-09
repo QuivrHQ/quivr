@@ -2,12 +2,36 @@
 @use "styles/Spacings.module.scss";
 
 .connection_cards {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: Spacings.$spacing05;
-  width: 100%;
+  column-count: 3;
+  column-gap: Spacings.$spacing05;
+  padding-bottom: Spacings.$spacing05;
+  margin-bottom: -(Spacings.$spacing05);
+
+  > * {
+    margin-bottom: Spacings.$spacing05;
+  }
 
   &.spaced {
     justify-content: space-between;
+  }
+
+  @media screen and (min-width: ScreenSizes.$large) {
+    column-count: 4;
+  }
+
+  @media screen and (max-width: ScreenSizes.$medium) {
+    column-count: 2;
+  }
+
+  @media screen and (max-width: ScreenSizes.$small) {
+    column-count: 1;
+  }
+
+  &.spaced {
+    column-count: 2;
+
+    @media screen and (max-width: ScreenSizes.$small) {
+      column-count: 1;
+    }
   }
 }

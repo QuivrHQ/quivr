@@ -1,6 +1,6 @@
 import { createContext, useState } from "react";
 
-import { OpenedConnection, SyncElements } from "@/lib/api/sync/types";
+import { OpenedConnection, Provider, SyncElements } from "@/lib/api/sync/types";
 
 export type FromConnectionsContextType = {
   currentSyncElements: SyncElements | undefined;
@@ -17,6 +17,8 @@ export type FromConnectionsContextType = {
   setHasToReload: React.Dispatch<React.SetStateAction<boolean>>;
   loadingFirstList: boolean;
   setLoadingFirstList: React.Dispatch<React.SetStateAction<boolean>>;
+  currentProvider: Provider | null;
+  setCurrentProvider: React.Dispatch<React.SetStateAction<Provider | null>>;
 };
 
 export const FromConnectionsContext = createContext<
@@ -37,6 +39,7 @@ export const FromConnectionsProvider = ({
   const [openedConnections, setOpenedConnections] = useState<
     OpenedConnection[]
   >([]);
+  const [currentProvider, setCurrentProvider] = useState<Provider | null>(null);
   const [hasToReload, setHasToReload] = useState<boolean>(false);
   const [loadingFirstList, setLoadingFirstList] = useState<boolean>(false);
 
@@ -55,6 +58,9 @@ export const FromConnectionsProvider = ({
 
         loadingFirstList,
         setLoadingFirstList,
+
+        currentProvider,
+        setCurrentProvider,
       }}
     >
       {children}
