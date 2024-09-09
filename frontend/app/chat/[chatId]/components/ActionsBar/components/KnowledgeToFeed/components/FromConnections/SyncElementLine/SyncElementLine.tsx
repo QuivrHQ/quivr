@@ -14,6 +14,7 @@ interface SyncElementLineProps {
   id: string;
   isFolder: boolean;
   icon?: string;
+  isAlsoFile?: boolean;
 }
 
 export const SyncElementLine = ({
@@ -21,7 +22,8 @@ export const SyncElementLine = ({
   selectable,
   id,
   isFolder,
-  icon
+  icon,
+  isAlsoFile,
 }: SyncElementLineProps): JSX.Element => {
   const [isCheckboxHovered, setIsCheckboxHovered] = useState(false);
   const { currentSyncId, openedConnections, setOpenedConnections } =
@@ -38,6 +40,8 @@ export const SyncElementLine = ({
   };
 
   const [checked, setChecked] = useState<boolean>(initialChecked);
+
+  const showCheckbox: boolean = isAlsoFile ?? !isFolder;
 
   const handleSetChecked = () => {
     setOpenedConnections((prevState) => {
@@ -78,8 +82,12 @@ export const SyncElementLine = ({
         }
       }}
     >
-      <div className={`${styles.left} ${isFolder ? styles.folder : ""}`}>
-        {!isFolder && (
+      <div
+        className={`${styles.left} ${
+          !isAlsoFile && isFolder ? styles.folder : ""
+        }`}
+      >
+        {showCheckbox && (
           <div
             onMouseEnter={() => setIsCheckboxHovered(true)}
             onMouseLeave={() => setIsCheckboxHovered(false)}
@@ -92,13 +100,16 @@ export const SyncElementLine = ({
             />
           </div>
         )}
-      {
-        icon ?
-        <div>{icon}</div> :
-
-        <Icon name={isFolder? "folder" : "file"} color="black" size="normal" />
-      }
-      <span className={styles.element_name}>{name}</span>
+        {icon ? (
+          <div>{icon}</div>
+        ) : (
+          <Icon
+            name={isFolder ? "folder" : "file"}
+            color="black"
+            size="normal"
+          />
+        )}
+        <span className={styles.element_name}>{name}</span>
       </div>
       {isFolder && (
         <Icon

@@ -31,16 +31,17 @@ div:focus {
 
   .scrollbar::-webkit-scrollbar-track {
     border-radius: 10px;
-    background-color: var(--background-3);
+    background-color: var(--background-0);
   }
 
   .scrollbar::-webkit-scrollbar-thumb {
-    background-color: var(--text-4);
+    background-color: var(--background-3);
     border-radius: 4px;
+    max-height: 30px;
   }
 
   .scrollbar::-webkit-scrollbar-thumb:hover {
-    background-color: var(--text-3);
+    background-color: var(--background-2);
   }
 
   .h-fill-available {
