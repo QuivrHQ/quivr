@@ -13,11 +13,7 @@ const Knowledge = (): JSX.Element => {
       </div>
       <div className={styles.content_wrapper}>
         <div className={styles.section}>
-          <span className={styles.section_title}>Connections</span>
           <ConnectionsKnowledges />
-        </div>
-        <div className={styles.section}>
-          <span className={styles.section_title}>Folders</span>
         </div>
       </div>
     </div>
