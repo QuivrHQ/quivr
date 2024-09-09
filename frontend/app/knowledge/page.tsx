@@ -12,9 +12,12 @@ const Knowledge = (): JSX.Element => {
         <PageHeader iconName="knowledge" label="My Knowledge" buttons={[]} />
       </div>
       <div className={styles.content_wrapper}>
-        <div className={styles.section}>
-          <ConnectionsKnowledges />
+        <div className={styles.folders_wrapper}>
+          <div className={styles.folders}>
+            <ConnectionsKnowledges />
+          </div>
         </div>
+        <div>Other</div>
       </div>
     </div>
   );

@@ -10,17 +10,22 @@
   overflow: hidden;
 
   .content_wrapper {
-    padding-inline: Spacings.$spacing09;
-    padding-block: Spacings.$spacing05;
-    overflow-y: scroll;
     display: flex;
-    flex-direction: column;
-    gap: Spacings.$spacing06;
+    height: 100%;
 
-    .section {
+    .folders_wrapper {
+      padding-inline: Spacings.$spacing09;
+      padding-block: Spacings.$spacing05;
       display: flex;
       flex-direction: column;
-      gap: Spacings.$spacing04;
+      overflow: scroll;
+      gap: Spacings.$spacing06;
+
+      .folders {
+        display: flex;
+        flex-direction: column;
+        gap: Spacings.$spacing04;
+      }
     }
   }
 }
