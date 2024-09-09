@@ -5,7 +5,7 @@
 </div>
 
 [![Discord Follow](https://dcbadge.vercel.app/api/server/HUpRgp2HG8?style=flat)](https://discord.gg/HUpRgp2HG8)
-[![GHCR pulls](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fraw.githubusercontent.com%2Fipitio%2Fghcr-pulls%2Fmaster%2Findex.json&query=%24%5B%3F(%40.owner%3D%3D%22QuivrHQ%22%20%26%26%20%40.repo%3D%3D%22quivr%22%20%26%26%20%40.image%3D%3D%22quivr%22)%5D.raw_pulls&logo=github&label=Pulls)](https://github.com/QuivrHQ/quivr/pkgs/container/quivr)
+[![GHCR pulls](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fipitio.github.io%2Fbackage%2FQuivrHQ%2Fquivr%2Fquivr.json&query=%24.downloads&logo=github&label=Pulls)](https://github.com/QuivrHQ/quivr/pkgs/container/quivr)
 [![GitHub Repo stars](https://img.shields.io/github/stars/quivrhq/quivr?style=social)](https://github.com/quivrhq/quivr)
 [![Twitter Follow](https://img.shields.io/twitter/follow/StanGirard?style=social)](https://twitter.com/_StanGirard)
 
