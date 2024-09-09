@@ -20,6 +20,7 @@ export const FromConnections = (): JSX.Element => {
     currentSyncId,
     loadingFirstList,
     setCurrentSyncId,
+    currentProvider,
   } = useFromConnectionsContext();
   const [currentFiles, setCurrentFiles] = useState<SyncElement[]>([]);
   const [currentFolders, setCurrentFolders] = useState<SyncElement[]>([]);
@@ -114,9 +115,10 @@ export const FromConnections = (): JSX.Element => {
                   >
                     <FolderLine
                       name={folder.name ?? ""}
-                      selectable={!!isPremium}
+                      selectable={!!isPremium || currentProvider === "Notion"}
                       id={folder.id}
                       icon={folder.icon}
+                      isAlsoFile={currentProvider === "Notion"}
                     />
                   </div>
                 ))}
