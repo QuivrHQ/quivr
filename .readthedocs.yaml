@@ -15,7 +15,7 @@ build:
     - asdf install uv latest
     - asdf global uv latest
     - uv venv
-    - pip install -r requirements.lock
+    - ls -la && pip install -r requirements.lock
     - cd docs
     - NO_COLOR=1 .venv/bin/mkdocs build --strict --site-dir $READTHEDOCS_OUTPUT/html
 
