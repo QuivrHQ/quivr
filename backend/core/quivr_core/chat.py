@@ -7,6 +7,11 @@ from quivr_core.models import ChatMessage
 
 
 class ChatHistory:
+    """
+    Chat history is a list of ChatMessage.
+    It is used to store the chat history of a chat.
+    """
+
     def __init__(self, chat_id: UUID, brain_id: UUID | None) -> None:
         self.id = chat_id
         self.brain_id = brain_id
@@ -30,6 +35,9 @@ class ChatHistory:
     def append(
         self, langchain_msg: AIMessage | HumanMessage, metadata: dict[str, Any] = {}
     ):
+        """
+        Append a message to the chat history.
+        """
         chat_msg = ChatMessage(
             chat_id=self.id,
             message_id=uuid4(),
@@ -41,6 +49,9 @@ class ChatHistory:
         self._msgs.append(chat_msg)
 
     def iter_pairs(self) -> Generator[Tuple[HumanMessage, AIMessage], None, None]:
+        """
+        Iterate over the chat history as pairs of HumanMessage and AIMessage.
+        """
         # Reverse the chat_history, newest first
         it = iter(self.get_chat_history(newest_first=True))
         for ai_message, human_message in zip(it, it):
