@@ -13,47 +13,61 @@ import SyncFolder from "../SyncFolder/SyncFolder";
 interface ConnectionAccountProps {
   sync: Sync;
   index: number;
+  singleAccount?: boolean;
 }
 
 const ConnectionAccount = ({
   sync,
   index,
+  singleAccount,
 }: ConnectionAccountProps): JSX.Element => {
   const { getSyncFiles } = useSync();
   const [loading, setLoading] = useState(false);
   const [syncElements, setSyncElements] = useState<SyncElements>();
   const [folded, setFolded] = useState(true);
 
+  const getFiles = () => {
+    setLoading(true);
+    void (async () => {
+      try {
+        const res = await getSyncFiles(sync.id);
+        setSyncElements(res);
+        setLoading(false);
+      } catch (error) {
+        console.error("Failed to get sync files:", error);
+      }
+    })();
+  };
+
   useEffect(() => {
     if (!folded) {
-      setLoading(true);
-      void (async () => {
-        try {
-          const res = await getSyncFiles(sync.id);
-          setSyncElements(res);
-          setLoading(false);
-        } catch (error) {
-          console.error("Failed to get sync files:", error);
-        }
-      })();
+      getFiles();
     }
   }, [folded]);
 
+  useEffect(() => {
+    if (singleAccount) {
+      getFiles();
+    }
+  }, []);
+
   return (
     <div className={styles.account_section_wrapper}>
-      <div className={styles.account_line_wrapper}>
-        <Icon
-          name={folded ? "chevronRight" : "chevronDown"}
-          size="normal"
-          color="black"
-          handleHover={true}
-          onClick={() => setFolded(!folded)}
-        />
-        <ConnectionIcon letter={sync.email[0]} index={index} />
-        <span>{sync.email}</span>
-      </div>
-      {!folded &&
-        (loading ? (
+      {!singleAccount && (
+        <div className={styles.account_line_wrapper}>
+          <Icon
+            name={folded ? "chevronRight" : "chevronDown"}
+            size="normal"
+            color="black"
+            handleHover={true}
+            onClick={() => setFolded(!folded)}
+          />
+          <ConnectionIcon letter={sync.email[0]} index={index} />
+          <span>{sync.email}</span>
+        </div>
+      )}
+      {(!singleAccount && !folded) || singleAccount ? (
+        loading ? (
           <div className={styles.loader_icon}>
             <LoaderIcon color="primary" size="small" />
           </div>
@@ -69,11 +83,16 @@ const ConnectionAccount = ({
               .filter((file) => file.is_folder)
               .map((element, id) => (
                 <div key={id}>
-                  <SyncFolder element={element} indent={2} syncId={sync.id} />
+                  <SyncFolder
+                    element={element}
+                    singleAccount={!!singleAccount}
+                    syncId={sync.id}
+                  />
                 </div>
               ))}
           </div>
-        ))}
+        )
+      ) : null}
     </div>
   );
 };

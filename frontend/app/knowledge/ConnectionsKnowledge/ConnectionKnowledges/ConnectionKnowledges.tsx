@@ -53,10 +53,15 @@ const ConnectionKnowledges = ({
           {transformConnectionLabel(providerGroup.provider)}
         </span>
       </div>
-      {!folded && providerGroup.syncs.length > 1 && (
+      {!folded && providerGroup.syncs.length > 0 && (
         <div className={styles.accounts}>
           {providerGroup.syncs.map((sync, index) => (
-            <ConnectionAccount key={sync.id} sync={sync} index={index} />
+            <ConnectionAccount
+              key={sync.id}
+              sync={sync}
+              index={index}
+              singleAccount={providerGroup.syncs.length === 1}
+            />
           ))}
         </div>
       )}

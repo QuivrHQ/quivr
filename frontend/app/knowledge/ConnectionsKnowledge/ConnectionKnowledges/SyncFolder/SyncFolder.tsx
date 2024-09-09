@@ -9,20 +9,20 @@ import styles from "./SyncFolder.module.scss";
 
 interface SyncFolderProps {
   element: SyncElement;
-  indent: number;
+  singleAccount: boolean;
   syncId: number;
 }
 
 const SyncFolder = ({
   element,
-  indent,
+  singleAccount,
   syncId,
 }: SyncFolderProps): JSX.Element => {
   const [folded, setFolded] = useState(true);
   const [loading, setLoading] = useState(false);
   const { getSyncFiles } = useSync();
   const [syncElements, setSyncElements] = useState<SyncElements>();
-  const paddingLeft = `${16 * indent}px`;
+  const paddingLeft = `${singleAccount ? 0 : 16}px`;
 
   useEffect(() => {
     if (!folded) {
@@ -70,7 +70,7 @@ const SyncFolder = ({
                 <div key={id}>
                   <SyncFolder
                     element={folder}
-                    indent={indent}
+                    singleAccount={singleAccount}
                     syncId={syncId}
                   />
                 </div>
