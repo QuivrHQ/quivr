@@ -291,14 +291,18 @@ def process_notion_sync_task():
 
 
 @celery.task(name="fetch_and_store_notion_files_task")
-def fetch_and_store_notion_files_task(access_token: str, user_id: UUID):
+def fetch_and_store_notion_files_task(
+    access_token: str, user_id: UUID, sync_user_id: int
+):
     if async_engine is None:
         init_worker()
     assert async_engine
     logger.debug("Fetching and storing Notion files")
     loop = asyncio.get_event_loop()
     loop.run_until_complete(
-        fetch_and_store_notion_files_async(async_engine, access_token, user_id)
+        fetch_and_store_notion_files_async(
+            async_engine, access_token, user_id, sync_user_id
+        )
     )
 
 

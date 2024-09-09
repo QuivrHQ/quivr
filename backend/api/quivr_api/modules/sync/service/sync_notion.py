@@ -20,7 +20,7 @@ class SyncNotionService(BaseService[NotionRepository]):
         self.repository = repository
 
     async def create_notion_files(
-        self, notion_raw_files: List[NotionPage], user_id: UUID
+        self, notion_raw_files: List[NotionPage], user_id: UUID, sync_user_id: int
     ) -> list[NotionSyncFile]:
         pages_to_add: List[NotionSyncFile] = []
         for page in notion_raw_files:
@@ -29,7 +29,7 @@ class SyncNotionService(BaseService[NotionRepository]):
                 and not page.archived
                 and page.parent.type in ("page_id", "workspace")
             ):
-                pages_to_add.append(page.to_syncfile(user_id))
+                pages_to_add.append(page.to_syncfile(user_id, sync_user_id))
         inserted_notion_files = await self.repository.create_notion_files(pages_to_add)
         logger.info(f"Insert response {inserted_notion_files}")
         return pages_to_add
@@ -146,8 +146,11 @@ async def store_notion_pages(
     all_search_result: list[NotionPage],
     notion_service: SyncNotionService,
     user_id: UUID,
+    sync_user_id: int,
 ):
-    return await notion_service.create_notion_files(all_search_result, user_id)
+    return await notion_service.create_notion_files(
+        all_search_result, user_id, sync_user_id
+    )
 
 
 def fetch_notion_pages(

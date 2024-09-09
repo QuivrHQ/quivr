@@ -9,11 +9,15 @@ create table "public"."notion_sync" (
     "type" text,
     "name" text,
     "mime_type" text,
-    "user_id" text
+    "user_id" text,
+    "sync_user_id" bigint
 );
 alter table "public"."notion_sync" enable row level security;
 alter table "public"."syncs_active"
 add column if not exists "notification_id" uuid;
+
+
+
 
 CREATE UNIQUE INDEX notion_sync_pkey ON public.notion_sync USING btree (id, notion_id);
 
@@ -44,3 +48,7 @@ grant update on table "public"."notion_sync" to "service_role";
 CREATE UNIQUE INDEX notion_sync_notion_id_key ON public.notion_sync USING btree (notion_id);
 
 alter table "public"."notion_sync" add constraint "notion_sync_notion_id_key" UNIQUE using index "notion_sync_notion_id_key";
+
+alter table "public"."notion_sync" add constraint "public_notion_sync_syncs_user_id_fkey" FOREIGN KEY (sync_user_id) REFERENCES syncs_user(id) ON DELETE CASCADE not valid;
+
+alter table "public"."notion_sync" validate constraint "public_notion_sync_syncs_user_id_fkey";

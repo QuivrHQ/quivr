@@ -153,7 +153,11 @@ def oauth2callback_notion(request: Request, background_tasks: BackgroundTasks):
         # launch celery task to sync notion data
         celery.send_task(
             "fetch_and_store_notion_files_task",
-            kwargs={"access_token": access_token, "user_id": current_user},
+            kwargs={
+                "access_token": access_token,
+                "user_id": current_user,
+                "sync_user_id": sync_user_state.id,
+            },
         )
         return HTMLResponse(successfullConnectionPage)
 
