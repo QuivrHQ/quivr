@@ -16,4 +16,4 @@ mkdocs:
 # Optionally declare the Python requirements required to build your docs
 python:
   install:
-  - requirements: backend/requirements.lock
+  - requirements: backend/docs/requirements.lock

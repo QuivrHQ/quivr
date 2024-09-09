@@ -26,7 +26,20 @@ dev-dependencies = []
 virtual = true
 
 [tool.rye.scripts]
+venv_create = "uv venv ./.venv"
+venv_sync= "uv pip sync --python ./.venv/bin/python ./requirements.lock"
+venv_create_sync = {chain = ["venv_create", "venv_sync"]}
+check_deps = "basedpyright --project ./pyproject.toml"
 docs = "mkdocs serve"
+
+[tool.basedpyright]
+include = ["src/"]
+# Ensure that it uses the .venv that we created for this project with the lockfile
+venvPath="./"
+venv=".venv"
+# We really only care about some import issues, so we disable everything and report on missing imports:
+typeCheckingMode = "off"
+reportMissingImports = true
 
 
 [tool.hatch.metadata]
