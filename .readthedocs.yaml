@@ -9,6 +9,8 @@ build:
   os: ubuntu-22.04
   tools:
     python: "3.11"
+  
+
 
 mkdocs:
   configuration: backend/docs/mkdocs.yml
@@ -16,5 +18,6 @@ mkdocs:
 # Optionally declare the Python requirements required to build your docs
 python:
   install:
-  - requirements: backend/requirements.lock
-  - path: backend
+  - requirements: backend/docs/requirements.lock
+  - method: pip
+    path: backend
