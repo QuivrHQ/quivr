@@ -17,3 +17,4 @@ mkdocs:
 python:
   install:
   - requirements: backend/requirements.lock
+  - path: backend
