@@ -84,6 +84,9 @@ class SyncUserService(ISyncUserService):
     ):
         return self.repository.update_sync_user(sync_user_id, state, sync_user_input)
 
+    def update_sync_user_status(self, sync_user_id: int, status: str):
+        return self.repository.update_sync_user_status(sync_user_id, status)
+
     def get_all_notion_user_syncs(self):
         return self.repository.get_all_notion_user_syncs()
 

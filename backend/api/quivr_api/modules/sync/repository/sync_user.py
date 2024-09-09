@@ -4,7 +4,10 @@ from uuid import UUID
 
 from quivr_api.logger import get_logger
 from quivr_api.modules.dependencies import get_supabase_client
-from quivr_api.modules.sync.dto.inputs import SyncsUserInput, SyncUserUpdateInput
+from quivr_api.modules.sync.dto.inputs import (
+    SyncsUserInput,
+    SyncUserUpdateInput,
+)
 from quivr_api.modules.sync.entity.sync_models import SyncFile, SyncsUser
 from quivr_api.modules.sync.service.sync_notion import SyncNotionService
 from quivr_api.modules.sync.utils.sync import (
@@ -155,6 +158,25 @@ class SyncUserRepository:
             "user_id", str(sync_user_id)
         ).eq("state", state_str).execute()
         logger.info("Sync user updated successfully")
+
+    def update_sync_user_status(self, sync_user_id: int, status: str):
+        """
+        Update the status of a sync user in the database.
+
+        Args:
+            sync_user_id (str): The user ID of the sync user.
+            status (str): The new status of the sync user.
+        """
+        logger.info(
+            "Updating sync user status with user_id: %s, status: %s",
+            sync_user_id,
+            status,
+        )
+
+        self.db.from_("syncs_user").update({"status": status}).eq(
+            "id", str(sync_user_id)
+        ).execute()
+        logger.info("Sync user status updated successfully")
 
     def get_all_notion_user_syncs(self):
         """

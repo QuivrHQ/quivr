@@ -18,6 +18,7 @@ from quivr_api.modules.knowledge.service.knowledge_service import KnowledgeServi
 from quivr_api.modules.notification.service.notification_service import (
     NotificationService,
 )
+from quivr_api.modules.sync.dto.inputs import SyncsUserStatus
 from quivr_api.modules.sync.repository.sync_files import SyncFilesRepository
 from quivr_api.modules.sync.service.sync_notion import SyncNotionService
 from quivr_api.modules.sync.service.sync_service import SyncService, SyncUserService
@@ -267,7 +268,6 @@ def process_sync_task(
 def process_active_syncs_task():
     sync_already_running = is_being_executed("process_sync_task")
 
-    logger.debug(f"IS RUNNING: {sync_already_running}")
     if sync_already_running:
         logger.info("Sync already running, skipping")
         return
@@ -310,6 +310,9 @@ def fetch_and_store_notion_files_task(
         fetch_and_store_notion_files_async(
             async_engine, access_token, user_id, sync_user_id
         )
+    )
+    sync_user_service.update_sync_user_status(
+        sync_user_id=sync_user_id, status=str(SyncsUserStatus.SYNCED)
     )
 
 
