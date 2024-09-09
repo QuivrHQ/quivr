@@ -29,6 +29,7 @@ from sqlalchemy.ext.asyncio import AsyncEngine, create_async_engine
 from sqlmodel import Session, text
 from sqlmodel.ext.asyncio.session import AsyncSession
 
+from quivr_worker.celery_monitor import is_being_executed
 from quivr_worker.check_premium import check_is_premium
 from quivr_worker.process.process_s3_file import process_uploaded_file
 from quivr_worker.process.process_url import process_url_func
@@ -264,6 +265,12 @@ def process_sync_task(
 
 @celery.task(name="process_active_syncs_task")
 def process_active_syncs_task():
+    sync_already_running = is_being_executed("process_sync_task")
+
+    logger.debug(f"IS RUNNING: {sync_already_running}")
+    if sync_already_running:
+        logger.info("Sync already running, skipping")
+        return
     global async_engine
     assert async_engine
     loop = asyncio.get_event_loop()

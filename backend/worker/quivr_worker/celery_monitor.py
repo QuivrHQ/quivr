@@ -146,6 +146,23 @@ def notifier(app):
         recv.capture(limit=None, timeout=None, wakeup=True)
 
 
+def is_being_executed(task_name: str) -> bool:
+    """Returns whether the task with given task_name is already being executed.
+
+    Args:
+        task_name: Name of the task to check if it is running currently.
+    Returns: A boolean indicating whether the task with the given task name is
+        running currently.
+    """
+    active_tasks = celery.control.inspect().active()
+    for worker, running_tasks in active_tasks.items():
+        for task in running_tasks:
+            if task["name"] == task_name:  # type: ignore
+                return True
+
+    return False
+
+
 if __name__ == "__main__":
     logger.info("Started  quivr-notifier service...")
 
