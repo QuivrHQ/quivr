@@ -5,8 +5,8 @@ from langchain.docstore.document import Document
 from langchain.embeddings.base import Embeddings
 from quivr_api.logger import get_logger
 from quivr_api.modules.dependencies import BaseService, get_embedding_client
-from quivr_api.vector.entity.vector import Vector
-from quivr_api.vector.repository.vectors_repository import VectorRepository
+from quivr_api.modules.vector.entity.vector import Vector
+from quivr_api.modules.vector.repository.vectors_repository import VectorRepository
 
 logger = get_logger(__name__)
 

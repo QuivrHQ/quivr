@@ -3,6 +3,8 @@ from urllib.parse import parse_qs, urlparse
 
 from langchain_core.language_models.chat_models import BaseChatModel
 from pydantic.v1 import SecretStr
+from langchain_openai import AzureChatOpenAI, ChatOpenAI
+from langchain_anthropic import ChatAnthropic
 
 from quivr_core.brain.info import LLMInfo
 from quivr_core.config import LLMEndpointConfig
@@ -25,7 +27,7 @@ class LLMEndpoint:
     @classmethod
     def from_config(cls, config: LLMEndpointConfig = LLMEndpointConfig()):
         try:
-            from langchain_openai import AzureChatOpenAI, ChatOpenAI
+            
 
             if config.model.startswith("azure/"):
                 # Parse the URL
@@ -40,6 +42,14 @@ class LLMEndpoint:
                     if config.llm_api_key
                     else None,
                     azure_endpoint=azure_endpoint,
+                )
+            elif config.model.startswith("claude"):
+                _llm = ChatAnthropic(
+                    model_name=config.model,
+                    api_key=SecretStr(config.llm_api_key)
+                    if config.llm_api_key
+                    else None,
+                    base_url=config.llm_base_url,
                 )
             else:
                 _llm = ChatOpenAI(

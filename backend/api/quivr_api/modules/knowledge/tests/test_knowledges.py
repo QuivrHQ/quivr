@@ -1,72 +1,29 @@
-import asyncio
 import os
 from typing import List, Tuple
 from uuid import uuid4
 
 import pytest
 import pytest_asyncio
-import sqlalchemy
+from sqlalchemy.exc import IntegrityError, NoResultFound
+from sqlmodel import select, text
+from sqlmodel.ext.asyncio.session import AsyncSession
+
 from quivr_api.modules.brain.entity.brain_entity import Brain, BrainType
 from quivr_api.modules.knowledge.dto.inputs import KnowledgeStatus
 from quivr_api.modules.knowledge.entity.knowledge import KnowledgeDB
 from quivr_api.modules.knowledge.entity.knowledge_brain import KnowledgeBrain
 from quivr_api.modules.knowledge.repository.knowledges import KnowledgeRepository
 from quivr_api.modules.knowledge.service.knowledge_service import KnowledgeService
+from quivr_api.modules.upload.service.upload_file import upload_file_storage
 from quivr_api.modules.user.entity.user_identity import User
-from quivr_api.vector.entity.vector import Vector
-from sqlalchemy.exc import IntegrityError, NoResultFound
-from sqlalchemy.ext.asyncio import create_async_engine
-from sqlmodel import select, text
-from sqlmodel.ext.asyncio.session import AsyncSession
+from quivr_api.modules.vector.entity.vector import Vector
 
 pg_database_base_url = "postgres:postgres@localhost:54322/postgres"
 
 TestData = Tuple[Brain, List[KnowledgeDB]]
 
 
-@pytest.fixture(scope="session")
-def event_loop():
-    try:
-        loop = asyncio.get_running_loop()
-    except RuntimeError:
-        loop = asyncio.new_event_loop()
-    yield loop
-    loop.close()
-
-
-@pytest_asyncio.fixture(scope="session")
-async def async_engine():
-    engine = create_async_engine(
-        "postgresql+asyncpg://" + pg_database_base_url,
-        echo=True if os.getenv("ORM_DEBUG") else False,
-        future=True,
-        pool_pre_ping=True,
-        pool_size=10,
-        pool_recycle=0.1,
-    )
-    yield engine
-
-
-@pytest_asyncio.fixture()
-async def session(async_engine):
-    async with async_engine.connect() as conn:
-        await conn.begin()
-        await conn.begin_nested()
-        async_session = AsyncSession(conn, expire_on_commit=False)
-
-        @sqlalchemy.event.listens_for(
-            async_session.sync_session, "after_transaction_end"
-        )
-        def end_savepoint(session, transaction):
-            if conn.closed:
-                return
-            if not conn.in_nested_transaction():
-                conn.sync_connection.begin_nested()
-
-        yield async_session
-
-
-@pytest_asyncio.fixture
+@pytest_asyncio.fixture(scope="function")
 async def other_user(session: AsyncSession):
     sql = text(
         """
@@ -82,7 +39,7 @@ async def other_user(session: AsyncSession):
     return other_user
 
 
-@pytest_asyncio.fixture()
+@pytest_asyncio.fixture(scope="function")
 async def test_data(session: AsyncSession) -> TestData:
     user_1 = (
         await session.exec(select(User).where(User.email == "admin@quivr.app"))
@@ -96,8 +53,8 @@ async def test_data(session: AsyncSession) -> TestData:
     )
 
     knowledge_brain_1 = KnowledgeDB(
-        file_name="test_file_1",
-        extension="txt",
+        file_name="test_file_1.txt",
+        extension=".txt",
         status="UPLOADED",
         source="test_source",
         source_link="test_source_link",
@@ -108,8 +65,8 @@ async def test_data(session: AsyncSession) -> TestData:
     )
 
     knowledge_brain_2 = KnowledgeDB(
-        file_name="test_file_2",
-        extension="txt",
+        file_name="test_file_2.txt",
+        extension=".txt",
         status="UPLOADED",
         source="test_source",
         source_link="test_source_link",
@@ -126,7 +83,7 @@ async def test_data(session: AsyncSession) -> TestData:
     return brain_1, [knowledge_brain_1, knowledge_brain_2]
 
 
-@pytest.mark.asyncio
+@pytest.mark.asyncio(loop_scope="session")
 async def test_updates_knowledge_status(session: AsyncSession, test_data: TestData):
     brain, knowledges = test_data
     assert brain.brain_id
@@ -137,7 +94,19 @@ async def test_updates_knowledge_status(session: AsyncSession, test_data: TestDa
     assert knowledge.status == KnowledgeStatus.ERROR
 
 
-@pytest.mark.asyncio
+@pytest.mark.asyncio(loop_scope="session")
+async def test_updates_knowledge_status_no_knowledge(
+    session: AsyncSession, test_data: TestData
+):
+    brain, knowledges = test_data
+    assert brain.brain_id
+    assert knowledges[0].id
+    repo = KnowledgeRepository(session)
+    with pytest.raises(NoResultFound):
+        await repo.update_status_knowledge(uuid4(), KnowledgeStatus.UPLOADED)
+
+
+@pytest.mark.asyncio(loop_scope="session")
 async def test_update_knowledge_source_link(session: AsyncSession, test_data: TestData):
     brain, knowledges = test_data
     assert brain.brain_id
@@ -148,7 +117,7 @@ async def test_update_knowledge_source_link(session: AsyncSession, test_data: Te
     assert knowledge.source_link == "new_source_link"
 
 
-@pytest.mark.asyncio
+@pytest.mark.asyncio(loop_scope="session")
 async def test_remove_knowledge_from_brain(session: AsyncSession, test_data: TestData):
     brain, knowledges = test_data
     assert brain.brain_id
@@ -160,7 +129,7 @@ async def test_remove_knowledge_from_brain(session: AsyncSession, test_data: Tes
     ]
 
 
-@pytest.mark.asyncio
+@pytest.mark.asyncio(loop_scope="session")
 async def test_cascade_remove_knowledge_by_id(
     session: AsyncSession, test_data: TestData
 ):
@@ -185,7 +154,7 @@ async def test_cascade_remove_knowledge_by_id(
     assert vector is None
 
 
-@pytest.mark.asyncio
+@pytest.mark.asyncio(loop_scope="session")
 async def test_remove_all_knowledges_from_brain(
     session: AsyncSession, test_data: TestData
 ):
@@ -209,13 +178,14 @@ async def test_remove_all_knowledges_from_brain(
     # FIXME @aminediro &chloedia raise an error when trying to interact with storage UnboundLocalError: cannot access local variable 'response' where it is not associated with a value
 
 
-@pytest.mark.asyncio
+@pytest.mark.asyncio(loop_scope="session")
 async def test_duplicate_sha1_knowledge_same_user(
     session: AsyncSession, test_data: TestData
 ):
-    brain, knowledges = test_data
+    brain, [existing_knowledge, _] = test_data
     assert brain.brain_id
-    assert knowledges[0].id
+    assert existing_knowledge.id
+    assert existing_knowledge.file_sha1
     repo = KnowledgeRepository(session)
     knowledge = KnowledgeDB(
         file_name="test_file_2",
@@ -224,16 +194,16 @@ async def test_duplicate_sha1_knowledge_same_user(
         source="test_source",
         source_link="test_source_link",
         file_size=100,
-        file_sha1="test_sha1",
+        file_sha1=existing_knowledge.file_sha1,
         brains=[brain],
-        user_id=knowledges[0].user_id,
+        user_id=existing_knowledge.user_id,
     )
 
     with pytest.raises(IntegrityError):  # FIXME: Should raise IntegrityError
         await repo.insert_knowledge(knowledge, brain.brain_id)
 
 
-@pytest.mark.asyncio
+@pytest.mark.asyncio(loop_scope="session")
 async def test_duplicate_sha1_knowledge_diff_user(
     session: AsyncSession, test_data: TestData, other_user: User
 ):
@@ -258,13 +228,13 @@ async def test_duplicate_sha1_knowledge_diff_user(
     assert result
 
 
-@pytest.mark.asyncio
+@pytest.mark.asyncio(loop_scope="session")
 async def test_add_knowledge_to_brain(session: AsyncSession, test_data: TestData):
     brain, knowledges = test_data
     assert brain.brain_id
     assert knowledges[1].id
     repo = KnowledgeRepository(session)
-    await repo.link_to_brain(knowledges[1].id, brain.brain_id)
+    await repo.link_to_brain(knowledges[1], brain.brain_id)
     knowledge = await repo.get_knowledge_by_id(knowledges[1].id)
     brains_of_knowledge = [b.brain_id for b in await knowledge.awaitable_attrs.brains]
     assert brain.brain_id in brains_of_knowledge
@@ -279,7 +249,7 @@ async def test_add_knowledge_to_brain(session: AsyncSession, test_data: TestData
 
 
 # Knowledge Service
-@pytest.mark.asyncio
+@pytest.mark.asyncio(loop_scope="session")
 async def test_get_knowledge_in_brain(session: AsyncSession, test_data: TestData):
     brain, knowledges = test_data
     assert brain.brain_id
@@ -293,3 +263,188 @@ async def test_get_knowledge_in_brain(session: AsyncSession, test_data: TestData
     assert list_knowledge[0].id == knowledges[0].id
     assert list_knowledge[0].file_name == knowledges[0].file_name
     assert brain.brain_id in brains_of_knowledge
+
+
+@pytest.mark.asyncio(loop_scope="session")
+async def test_should_process_knowledge_exists(
+    session: AsyncSession, test_data: TestData
+):
+    brain, [existing_knowledge, _] = test_data
+    assert brain.brain_id
+    new = KnowledgeDB(
+        file_name="new",
+        extension="txt",
+        status="PROCESSING",
+        source="test_source",
+        source_link="test_source_link",
+        file_size=100,
+        file_sha1=None,
+        brains=[brain],
+        user_id=existing_knowledge.user_id,
+    )
+    session.add(new)
+    await session.commit()
+    await session.refresh(new)
+    incoming_knowledge = await new.to_dto()
+    repo = KnowledgeRepository(session)
+    service = KnowledgeService(repo)
+    assert existing_knowledge.file_sha1
+    with pytest.raises(FileExistsError):
+        await service.update_sha1_conflict(
+            incoming_knowledge, brain.brain_id, file_sha1=existing_knowledge.file_sha1
+        )
+
+
+@pytest.mark.asyncio(loop_scope="session")
+async def test_should_process_knowledge_link_brain(
+    session: AsyncSession, test_data: TestData
+):
+    repo = KnowledgeRepository(session)
+    service = KnowledgeService(repo)
+    brain, [existing_knowledge, _] = test_data
+    user_id = existing_knowledge.user_id
+    assert brain.brain_id
+    prev = KnowledgeDB(
+        file_name="prev",
+        extension=".txt",
+        status=KnowledgeStatus.UPLOADED,
+        source="test_source",
+        source_link="test_source_link",
+        file_size=100,
+        file_sha1="test1",
+        brains=[brain],
+        user_id=user_id,
+    )
+    brain_2 = Brain(
+        name="test_brain",
+        description="this is a test brain",
+        brain_type=BrainType.integration,
+    )
+    session.add(brain_2)
+    session.add(prev)
+    await session.commit()
+    await session.refresh(prev)
+    await session.refresh(brain_2)
+
+    assert prev.id
+    assert brain_2.brain_id
+
+    new = KnowledgeDB(
+        file_name="new",
+        extension="txt",
+        status="PROCESSING",
+        source="test_source",
+        source_link="test_source_link",
+        file_size=100,
+        file_sha1=None,
+        brains=[brain_2],
+        user_id=user_id,
+    )
+    session.add(new)
+    await session.commit()
+    await session.refresh(new)
+
+    incoming_knowledge = await new.to_dto()
+    assert prev.file_sha1
+
+    should_process = await service.update_sha1_conflict(
+        incoming_knowledge, brain_2.brain_id, file_sha1=prev.file_sha1
+    )
+    assert not should_process
+
+    # Check prev knowledge was linked
+    assert incoming_knowledge.file_sha1
+    prev_knowledge = await service.repository.get_knowledge_by_id(prev.id)
+    prev_brains = await prev_knowledge.awaitable_attrs.brains
+    assert {b.brain_id for b in prev_brains} == {
+        brain.brain_id,
+        brain_2.brain_id,
+    }
+    # Check new knowledge was removed
+    assert new.id
+    with pytest.raises(NoResultFound):
+        await service.repository.get_knowledge_by_id(new.id)
+
+
+@pytest.mark.asyncio(loop_scope="session")
+async def test_should_process_knowledge_prev_error(
+    session: AsyncSession, test_data: TestData
+):
+    repo = KnowledgeRepository(session)
+    service = KnowledgeService(repo)
+    brain, [existing_knowledge, _] = test_data
+    user_id = existing_knowledge.user_id
+    assert brain.brain_id
+    prev = KnowledgeDB(
+        file_name="prev",
+        extension="txt",
+        status=KnowledgeStatus.ERROR,
+        source="test_source",
+        source_link="test_source_link",
+        file_size=100,
+        file_sha1="test1",
+        brains=[brain],
+        user_id=user_id,
+    )
+    session.add(prev)
+    await session.commit()
+    await session.refresh(prev)
+
+    assert prev.id
+
+    new = KnowledgeDB(
+        file_name="new",
+        extension="txt",
+        status="PROCESSING",
+        source="test_source",
+        source_link="test_source_link",
+        file_size=100,
+        file_sha1=None,
+        brains=[brain],
+        user_id=user_id,
+    )
+    session.add(new)
+    await session.commit()
+    await session.refresh(new)
+
+    incoming_knowledge = await new.to_dto()
+    assert prev.file_sha1
+    should_process = await service.update_sha1_conflict(
+        incoming_knowledge, brain.brain_id, file_sha1=prev.file_sha1
+    )
+
+    # Checks we should process this file
+    assert should_process
+    # Previous errored file is cleaned up
+    with pytest.raises(NoResultFound):
+        await service.repository.get_knowledge_by_id(prev.id)
+
+    assert new.id
+    new = await service.repository.get_knowledge_by_id(new.id)
+    assert new.file_sha1
+
+
+@pytest.mark.asyncio(loop_scope="session")
+async def test_get_knowledge_storage_path(session: AsyncSession, test_data: TestData):
+    brain, [knowledge, _] = test_data
+    assert knowledge.file_name
+    repository = KnowledgeRepository(session)
+    service = KnowledgeService(repository)
+    brain_2 = Brain(
+        name="test_brain",
+        description="this is a test brain",
+        brain_type=BrainType.integration,
+    )
+    session.add(brain_2)
+    await session.commit()
+    await session.refresh(brain_2)
+    assert brain_2.brain_id
+    km_data = os.urandom(128)
+    km_path = f"{str(knowledge.brains[0].brain_id)}/{knowledge.file_name}"
+    await upload_file_storage(km_data, km_path)
+    # Link knowledge to two brains
+    await repository.link_to_brain(knowledge, brain_2.brain_id)
+    storage_path = await service.get_knowledge_storage_path(
+        knowledge.file_name, brain_2.brain_id
+    )
+    assert storage_path == km_path

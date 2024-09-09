@@ -16,8 +16,6 @@ from quivr_api.modules.sync.service.sync_notion import (
 )
 from quivr_api.modules.user.entity.user_identity import User
 
-pg_database_base_url = "postgres:postgres@localhost:54322/postgres"
-
 
 def test_deserialize_notion_page(fetch_response):
     page = NotionPage.model_validate(fetch_response[0])  # type: ignore
@@ -74,7 +72,7 @@ def test_fetch_limit_notion_pages_now(fetch_response):
     assert len(result) == 0
 
 
-@pytest.mark.asyncio
+@pytest.mark.asyncio(loop_scope="session")
 async def test_store_notion_pages_success(
     session: AsyncSession, notion_search_result: NotionSearchResult, user_1: User
 ):
@@ -91,7 +89,7 @@ async def test_store_notion_pages_success(
     assert sync_files[0].notion_id == notion_search_result.results[0].id
 
 
-@pytest.mark.asyncio
+@pytest.mark.asyncio(loop_scope="session")
 async def test_store_notion_pages_fail(
     session: AsyncSession,
     notion_search_result_bad_parent: NotionSearchResult,

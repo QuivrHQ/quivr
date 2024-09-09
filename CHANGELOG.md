@@ -1,5 +1,101 @@
 # Changelog
 
+## 0.0.308 (2024-09-06)
+
+## What's Changed
+* fix: remove knowledge and idle conn by @AmineDiro in https://github.com/QuivrHQ/quivr/pull/3165
+
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.307...v0.0.308
+
+## 0.0.307 (2024-09-06)
+
+## What's Changed
+* fix: tests pytest-asyncio by @AmineDiro in https://github.com/QuivrHQ/quivr/pull/3157
+* fix: remove unused 'models' field in check_premium.py by @StanGirard in https://github.com/QuivrHQ/quivr/pull/3164
+
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.306...v0.0.307
+
+## 0.0.306 (2024-09-05)
+
+## What's Changed
+* feat(readme): trigger deploy by @StanGirard in https://github.com/QuivrHQ/quivr/pull/3159
+
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.305...v0.0.306
+
+## 0.0.305 (2024-09-05)
+
+## What's Changed
+* chore: update next.config.js with PostHog domains by @StanGirard in https://github.com/QuivrHQ/quivr/pull/3155
+
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.304...v0.0.305
+
+## 0.0.304 (2024-09-05)
+
+## What's Changed
+* feat: update Azure login button text by @StanGirard in https://github.com/QuivrHQ/quivr/pull/3152
+* fix: url knowledge multiple brain by @AmineDiro in https://github.com/QuivrHQ/quivr/pull/3145
+* chore: update Dockerfile with PostHog environment variables by @StanGirard in https://github.com/QuivrHQ/quivr/pull/3154
+
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.303...v0.0.304
+
+## 0.0.303 (2024-09-04)
+
+## What's Changed
+* fix(chat): order of chat history was reversed by @StanGirard in https://github.com/QuivrHQ/quivr/pull/3148
+
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.302...v0.0.303
+
+## 0.0.302 (2024-09-04)
+
+## What's Changed
+* feat(anthropic): add llm by @StanGirard in https://github.com/QuivrHQ/quivr/pull/3146
+
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.301...v0.0.302
+
+## 0.0.301 (2024-09-03)
+
+## What's Changed
+* feat(smtp): not enforcing tls by @StanGirard in https://github.com/QuivrHQ/quivr/pull/3067
+* feat: Update send_email.py to conditionally login with SMTP credentials by @StanGirard in https://github.com/QuivrHQ/quivr/pull/3069
+* feat: Add NEXT_PUBLIC_PROJECT_NAME environment variable by @StanGirard in https://github.com/QuivrHQ/quivr/pull/3070
+* feat: Add Azure login support by @StanGirard in https://github.com/QuivrHQ/quivr/pull/3071
+* fix(frontend): only owner can access knowledge and edit brain snippet by @Zewed in https://github.com/QuivrHQ/quivr/pull/3073
+* fix(frontend): brain knowledge visibility by @Zewed in https://github.com/QuivrHQ/quivr/pull/3074
+* fix(frontend): revamp of settings  by @Zewed in https://github.com/QuivrHQ/quivr/pull/3081
+* fix: Update README.md by @Zewed in https://github.com/QuivrHQ/quivr/pull/3084
+* fix(frontend): send invitation clearer by @Zewed in https://github.com/QuivrHQ/quivr/pull/3090
+* fix(frontend): spacing chats by @Zewed in https://github.com/QuivrHQ/quivr/pull/3091
+* fix(frontend): use click delay by @Zewed in https://github.com/QuivrHQ/quivr/pull/3092
+* fix(frontend): back buttons by @Zewed in https://github.com/QuivrHQ/quivr/pull/3094
+* fix(frontend): change hover delay for tooltips by @Zewed in https://github.com/QuivrHQ/quivr/pull/3095
+* fix(frontend): rename search by thread by @Zewed in https://github.com/QuivrHQ/quivr/pull/3099
+* feat(frontend): revamp of some basics components by @Zewed in https://github.com/QuivrHQ/quivr/pull/3105
+* feat(frontend): interaction with brain items by @Zewed in https://github.com/QuivrHQ/quivr/pull/3106
+* fix(frontend): remove intercom on thread page of mobile by @Zewed in https://github.com/QuivrHQ/quivr/pull/3108
+* feat:  quivr core 0.1 by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2970
+* fix: Blank scrollbar on certain browsers by @adityanandanx in https://github.com/QuivrHQ/quivr/pull/3118
+* chore(docs): moved repository by @StanGirard in https://github.com/QuivrHQ/quivr/pull/3123
+* fix: knowledge user by @AmineDiro in https://github.com/QuivrHQ/quivr/pull/3124
+* chore(readme): increase size icon by @StanGirard in https://github.com/QuivrHQ/quivr/pull/3125
+* chore: remove unused syncNotion function in ConnectionCards.tsx by @StanGirard in https://github.com/QuivrHQ/quivr/pull/3129
+* chore: update compatibility by @StanGirard in https://github.com/QuivrHQ/quivr/pull/3136
+* ci(raise): only on tags by @StanGirard in https://github.com/QuivrHQ/quivr/pull/3140
+* feat: using langgraph in our RAG pipeline by @jacopo-chevallard in https://github.com/QuivrHQ/quivr/pull/3130
+* fix: knowledge multiple brains by @AmineDiro in https://github.com/QuivrHQ/quivr/pull/3142
+* fix: knowledge multiple brains - update knowledge rollback by @AmineDiro in https://github.com/QuivrHQ/quivr/pull/3143
+
+## New Contributors
+* @jacopo-chevallard made their first contribution in https://github.com/QuivrHQ/quivr/pull/3130
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.300...v0.0.301
+
 ## 0.0.300 (2024-08-22)
 
 ## What's Changed

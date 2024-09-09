@@ -184,260 +184,255 @@ def test_should_download_file_lastsynctime_after():
     )
 
 
-class TestSyncUtils:
-    @pytest.mark.asyncio
-    async def test_get_syncfiles_from_ids_nofolder(self, syncutils: SyncUtils):
-        files = await syncutils.get_syncfiles_from_ids(
-            credentials={}, files_ids=[str(uuid4())], folder_ids=[]
-        )
-        assert len(files) == 1
+@pytest.mark.asyncio(loop_scope="session")
+async def test_get_syncfiles_from_ids_nofolder(syncutils: SyncUtils):
+    files = await syncutils.get_syncfiles_from_ids(
+        credentials={}, files_ids=[str(uuid4())], folder_ids=[]
+    )
+    assert len(files) == 1
 
-    @pytest.mark.asyncio
-    async def test_get_syncfiles_from_ids_folder(self, syncutils: SyncUtils):
-        files = await syncutils.get_syncfiles_from_ids(
-            credentials={}, files_ids=[str(uuid4())], folder_ids=[str(uuid4())]
-        )
-        assert len(files) == 2
 
-    @pytest.mark.asyncio
-    async def test_get_syncfiles_from_ids_notion(self, syncutils_notion: SyncUtils):
-        files = await syncutils_notion.get_syncfiles_from_ids(
-            credentials={}, files_ids=[str(uuid4())], folder_ids=[str(uuid4())]
-        )
-        assert len(files) == 3
+@pytest.mark.asyncio(loop_scope="session")
+async def test_get_syncfiles_from_ids_folder(syncutils: SyncUtils):
+    files = await syncutils.get_syncfiles_from_ids(
+        credentials={}, files_ids=[str(uuid4())], folder_ids=[str(uuid4())]
+    )
+    assert len(files) == 2
 
-    @pytest.mark.asyncio
-    async def test_download_file(self, syncutils: SyncUtils):
-        file = SyncFile(
-            id=str(uuid4()),
-            name="test_file.txt",
-            is_folder=False,
-            last_modified=datetime.now().strftime(syncutils.sync_cloud.datetime_format),
-            mime_type="txt",
-            web_view_link="",
-        )
-        dfile = await syncutils.download_file(file, {})
-        assert dfile.extension == ".txt"
-        assert dfile.file_name == file.name
-        assert len(dfile.file_data.read()) > 0
 
-    @pytest.mark.asyncio
-    async def test_process_sync_file_not_supported(self, syncutils: SyncUtils):
-        file = SyncFile(
-            id=str(uuid4()),
-            name="test_file.asldkjfalsdkjf",
-            is_folder=False,
-            last_modified=datetime.now().strftime(syncutils.sync_cloud.datetime_format),
-            mime_type="txt",
-            web_view_link="",
-            notification_id=uuid4(),  #
-        )
-        brain_id = uuid4()
-        sync_user = SyncsUser(
-            id=1,
-            user_id=uuid4(),
-            name="c8xfz3g566b8xa1ajiesdh",
-            provider="mock",
-            credentials={},
-            state={},
-            additional_data={},
-        )
-        sync_active = SyncsActive(
-            id=1,
-            name="test",
-            syncs_user_id=1,
-            user_id=sync_user.user_id,
-            settings={},
-            last_synced=str(datetime.now() - timedelta(hours=5)),
-            sync_interval_minutes=1,
-            brain_id=brain_id,
-        )
+@pytest.mark.asyncio(loop_scope="session")
+async def test_get_syncfiles_from_ids_notion(syncutils_notion: SyncUtils):
+    files = await syncutils_notion.get_syncfiles_from_ids(
+        credentials={}, files_ids=[str(uuid4())], folder_ids=[str(uuid4())]
+    )
+    assert len(files) == 3
 
-        with pytest.raises(ValueError):
-            await syncutils.process_sync_file(
-                file=file,
-                previous_file=None,
-                current_user=sync_user,
-                sync_active=sync_active,
-            )
 
-    @pytest.mark.asyncio
-    async def test_process_sync_file_noprev(
-        self,
-        monkeypatch,
-        brain_user_setup: Tuple[Brain, User],
-        setup_syncs_data: Tuple[SyncsUser, SyncsActive],
-        syncutils: SyncUtils,
-        sync_file: SyncFile,
-    ):
-        task = {}
+@pytest.mark.asyncio(loop_scope="session")
+async def test_download_file(syncutils: SyncUtils):
+    file = SyncFile(
+        id=str(uuid4()),
+        name="test_file.txt",
+        is_folder=False,
+        last_modified=datetime.now().strftime(syncutils.sync_cloud.datetime_format),
+        mime_type="txt",
+        web_view_link="",
+    )
+    dfile = await syncutils.download_file(file, {})
+    assert dfile.extension == ".txt"
+    assert dfile.file_name == file.name
+    assert len(dfile.file_data.read()) > 0
 
-        def _send_task(*args, **kwargs):
-            task["args"] = args
-            task["kwargs"] = {**kwargs["kwargs"]}
 
-        monkeypatch.setattr("quivr_api.celery_config.celery.send_task", _send_task)
+@pytest.mark.asyncio(loop_scope="session")
+async def test_process_sync_file_not_supported(syncutils: SyncUtils):
+    file = SyncFile(
+        id=str(uuid4()),
+        name="test_file.asldkjfalsdkjf",
+        is_folder=False,
+        last_modified=datetime.now().strftime(syncutils.sync_cloud.datetime_format),
+        mime_type="txt",
+        web_view_link="",
+        notification_id=uuid4(),  #
+    )
+    brain_id = uuid4()
+    sync_user = SyncsUser(
+        id=1,
+        user_id=uuid4(),
+        name="c8xfz3g566b8xa1ajiesdh",
+        provider="mock",
+        credentials={},
+        state={},
+        additional_data={},
+    )
+    sync_active = SyncsActive(
+        id=1,
+        name="test",
+        syncs_user_id=1,
+        user_id=sync_user.user_id,
+        settings={},
+        last_synced=str(datetime.now() - timedelta(hours=5)),
+        sync_interval_minutes=1,
+        brain_id=brain_id,
+    )
 
-        brain_1, _ = brain_user_setup
-        assert brain_1.brain_id
-        (sync_user, sync_active) = setup_syncs_data
+    with pytest.raises(ValueError):
         await syncutils.process_sync_file(
-            file=sync_file,
+            file=file,
             previous_file=None,
             current_user=sync_user,
             sync_active=sync_active,
         )
 
-        # Check notification inserted
-        assert (
-            sync_file.notification_id
-            in syncutils.notification_service.repository.received  # type: ignore
-        )
-        assert (
-            syncutils.notification_service.repository.received[  # type: ignore
-                sync_file.notification_id  # type: ignore
-            ].status
-            == NotificationsStatusEnum.SUCCESS
-        )
 
-        # Check Syncfile created
-        dbfiles: list[DBSyncFile] = syncutils.sync_files_repo.get_sync_files(
-            sync_active.id
-        )
-        assert len(dbfiles) == 1
-        assert dbfiles[0].brain_id == str(brain_1.brain_id)
-        assert dbfiles[0].syncs_active_id == sync_active.id
-        assert dbfiles[0].supported
+@pytest.mark.asyncio(loop_scope="session")
+async def test_process_sync_file_noprev(
+    monkeypatch,
+    brain_user_setup: Tuple[Brain, User],
+    setup_syncs_data: Tuple[SyncsUser, SyncsActive],
+    syncutils: SyncUtils,
+    sync_file: SyncFile,
+):
+    task = {}
 
-        # Check knowledge created
-        all_km = await syncutils.knowledge_service.get_all_knowledge_in_brain(
-            brain_1.brain_id
-        )
-        assert len(all_km) == 1
-        created_km = all_km[0]
-        assert created_km.file_name == sync_file.name
-        assert created_km.extension == ".txt"
-        assert created_km.file_sha1 is not None
-        assert created_km.created_at is not None
-        assert created_km.metadata == {"sync_file_id": "1"}
-        assert created_km.brain_ids == [brain_1.brain_id]
+    def _send_task(*args, **kwargs):
+        task["args"] = args
+        task["kwargs"] = {**kwargs["kwargs"]}
 
-        # Assert celery task in correct
-        assert task["args"] == ("process_file_task",)
-        minimal_task_kwargs = {
-            "brain_id": brain_1.brain_id,
-            "knowledge_id": created_km.id,
-            "file_original_name": sync_file.name,
-            "source": syncutils.sync_cloud.name,
-            "notification_id": sync_file.notification_id,
-        }
-        all(
-            minimal_task_kwargs[key] == task["kwargs"][key]  # type: ignore
-            for key in minimal_task_kwargs
-        )
+    monkeypatch.setattr("quivr_api.celery_config.celery.send_task", _send_task)
 
-    @pytest.mark.asyncio
-    async def test_process_sync_file_with_prev(
-        self,
-        monkeypatch,
-        supabase_client,
-        brain_user_setup: Tuple[Brain, User],
-        setup_syncs_data: Tuple[SyncsUser, SyncsActive],
-        syncutils: SyncUtils,
-        sync_file: SyncFile,
-        prev_file: SyncFile,
-    ):
-        task = {}
+    brain_1, _ = brain_user_setup
+    assert brain_1.brain_id
+    (sync_user, sync_active) = setup_syncs_data
+    await syncutils.process_sync_file(
+        file=sync_file,
+        previous_file=None,
+        current_user=sync_user,
+        sync_active=sync_active,
+    )
 
-        def _send_task(*args, **kwargs):
-            task["args"] = args
-            task["kwargs"] = {**kwargs["kwargs"]}
+    # Check notification inserted
+    assert (
+        sync_file.notification_id in syncutils.notification_service.repository.received  # type: ignore
+    )
+    assert (
+        syncutils.notification_service.repository.received[  # type: ignore
+            sync_file.notification_id  # type: ignore
+        ].status
+        == NotificationsStatusEnum.SUCCESS
+    )
 
-        monkeypatch.setattr("quivr_api.celery_config.celery.send_task", _send_task)
-        brain_1, _ = brain_user_setup
-        assert brain_1.brain_id
-        (sync_user, sync_active) = setup_syncs_data
+    # Check Syncfile created
+    dbfiles: list[DBSyncFile] = syncutils.sync_files_repo.get_sync_files(sync_active.id)
+    assert len(dbfiles) == 1
+    assert dbfiles[0].brain_id == str(brain_1.brain_id)
+    assert dbfiles[0].syncs_active_id == sync_active.id
+    assert dbfiles[0].supported
 
-        # Run process_file on prev_file first
-        await syncutils.process_sync_file(
-            file=prev_file,
-            previous_file=None,
-            current_user=sync_user,
-            sync_active=sync_active,
-        )
-        dbfiles: list[DBSyncFile] = syncutils.sync_files_repo.get_sync_files(
-            sync_active.id
-        )
-        assert len(dbfiles) == 1
-        prev_dbfile = dbfiles[0]
+    # Check knowledge created
+    all_km = await syncutils.knowledge_service.get_all_knowledge_in_brain(
+        brain_1.brain_id
+    )
+    assert len(all_km) == 1
+    created_km = all_km[0]
+    assert created_km.file_name == sync_file.name
+    assert created_km.extension == ".txt"
+    assert created_km.file_sha1 is not None
+    assert created_km.created_at is not None
+    assert created_km.metadata == {"sync_file_id": "1"}
+    assert created_km.brain_ids == [brain_1.brain_id]
 
-        assert check_file_exists(str(brain_1.brain_id), prev_file.name)
-        prev_file_data = supabase_client.storage.from_("quivr").download(
-            f"{brain_1.brain_id}/{prev_file.name}"
-        )
+    # Assert celery task in correct
+    assert task["args"] == ("process_file_task",)
+    minimal_task_kwargs = {
+        "brain_id": brain_1.brain_id,
+        "knowledge_id": created_km.id,
+        "file_original_name": sync_file.name,
+        "source": syncutils.sync_cloud.name,
+        "notification_id": sync_file.notification_id,
+    }
+    all(
+        minimal_task_kwargs[key] == task["kwargs"][key]  # type: ignore
+        for key in minimal_task_kwargs
+    )
 
-        #####
-        # Run process_file on newer file
-        await syncutils.process_sync_file(
-            file=sync_file,
-            previous_file=prev_dbfile,
-            current_user=sync_user,
-            sync_active=sync_active,
-        )
 
-        # Check notification inserted
-        assert (
-            sync_file.notification_id
-            in syncutils.notification_service.repository.received  # type: ignore
-        )
-        assert (
-            syncutils.notification_service.repository.received[  # type: ignore
-                sync_file.notification_id  # type: ignore
-            ].status
-            == NotificationsStatusEnum.SUCCESS
-        )
+@pytest.mark.asyncio(loop_scope="session")
+async def test_process_sync_file_with_prev(
+    monkeypatch,
+    supabase_client,
+    brain_user_setup: Tuple[Brain, User],
+    setup_syncs_data: Tuple[SyncsUser, SyncsActive],
+    syncutils: SyncUtils,
+    sync_file: SyncFile,
+    prev_file: SyncFile,
+):
+    task = {}
 
-        # Check Syncfile created
-        dbfiles: list[DBSyncFile] = syncutils.sync_files_repo.get_sync_files(
-            sync_active.id
-        )
-        assert len(dbfiles) == 1
-        assert dbfiles[0].brain_id == str(brain_1.brain_id)
-        assert dbfiles[0].syncs_active_id == sync_active.id
-        assert dbfiles[0].supported
+    def _send_task(*args, **kwargs):
+        task["args"] = args
+        task["kwargs"] = {**kwargs["kwargs"]}
 
-        # Check prev file was deleted and replaced with the new
-        all_km = await syncutils.knowledge_service.get_all_knowledge_in_brain(
-            brain_1.brain_id
-        )
-        assert len(all_km) == 1
-        created_km = all_km[0]
-        assert created_km.file_name == sync_file.name
-        assert created_km.extension == ".txt"
-        assert created_km.file_sha1 is not None
-        assert created_km.updated_at
-        assert created_km.created_at
-        assert created_km.updated_at == created_km.created_at  # new line
-        assert created_km.metadata == {"sync_file_id": str(dbfiles[0].id)}
-        assert created_km.brain_ids == [brain_1.brain_id]
+    monkeypatch.setattr("quivr_api.celery_config.celery.send_task", _send_task)
+    brain_1, _ = brain_user_setup
+    assert brain_1.brain_id
+    (sync_user, sync_active) = setup_syncs_data
 
-        # Check file content changed
-        assert check_file_exists(str(brain_1.brain_id), sync_file.name)
-        new_file_data = supabase_client.storage.from_("quivr").download(
-            f"{brain_1.brain_id}/{sync_file.name}"
-        )
-        assert new_file_data != prev_file_data, "Same file in prev_file and new file"
+    # Run process_file on prev_file first
+    await syncutils.process_sync_file(
+        file=prev_file,
+        previous_file=None,
+        current_user=sync_user,
+        sync_active=sync_active,
+    )
+    dbfiles: list[DBSyncFile] = syncutils.sync_files_repo.get_sync_files(sync_active.id)
+    assert len(dbfiles) == 1
+    prev_dbfile = dbfiles[0]
 
-        # Assert celery task in correct
-        assert task["args"] == ("process_file_task",)
-        minimal_task_kwargs = {
-            "brain_id": brain_1.brain_id,
-            "knowledge_id": created_km.id,
-            "file_original_name": sync_file.name,
-            "source": syncutils.sync_cloud.name,
-            "notification_id": sync_file.notification_id,
-        }
-        all(
-            minimal_task_kwargs[key] == task["kwargs"][key]  # type: ignore
-            for key in minimal_task_kwargs
-        )
+    assert check_file_exists(str(brain_1.brain_id), prev_file.name)
+    prev_file_data = supabase_client.storage.from_("quivr").download(
+        f"{brain_1.brain_id}/{prev_file.name}"
+    )
+
+    #####
+    # Run process_file on newer file
+    await syncutils.process_sync_file(
+        file=sync_file,
+        previous_file=prev_dbfile,
+        current_user=sync_user,
+        sync_active=sync_active,
+    )
+
+    # Check notification inserted
+    assert (
+        sync_file.notification_id in syncutils.notification_service.repository.received  # type: ignore
+    )
+    assert (
+        syncutils.notification_service.repository.received[  # type: ignore
+            sync_file.notification_id  # type: ignore
+        ].status
+        == NotificationsStatusEnum.SUCCESS
+    )
+
+    # Check Syncfile created
+    dbfiles: list[DBSyncFile] = syncutils.sync_files_repo.get_sync_files(sync_active.id)
+    assert len(dbfiles) == 1
+    assert dbfiles[0].brain_id == str(brain_1.brain_id)
+    assert dbfiles[0].syncs_active_id == sync_active.id
+    assert dbfiles[0].supported
+
+    # Check prev file was deleted and replaced with the new
+    all_km = await syncutils.knowledge_service.get_all_knowledge_in_brain(
+        brain_1.brain_id
+    )
+    assert len(all_km) == 1
+    created_km = all_km[0]
+    assert created_km.file_name == sync_file.name
+    assert created_km.extension == ".txt"
+    assert created_km.file_sha1 is not None
+    assert created_km.updated_at
+    assert created_km.created_at
+    assert created_km.updated_at == created_km.created_at  # new line
+    assert created_km.metadata == {"sync_file_id": str(dbfiles[0].id)}
+    assert created_km.brain_ids == [brain_1.brain_id]
+
+    # Check file content changed
+    assert check_file_exists(str(brain_1.brain_id), sync_file.name)
+    new_file_data = supabase_client.storage.from_("quivr").download(
+        f"{brain_1.brain_id}/{sync_file.name}"
+    )
+    assert new_file_data != prev_file_data, "Same file in prev_file and new file"
+
+    # Assert celery task in correct
+    assert task["args"] == ("process_file_task",)
+    minimal_task_kwargs = {
+        "brain_id": brain_1.brain_id,
+        "knowledge_id": created_km.id,
+        "file_original_name": sync_file.name,
+        "source": syncutils.sync_cloud.name,
+        "notification_id": sync_file.notification_id,
+    }
+    all(
+        minimal_task_kwargs[key] == task["kwargs"][key]  # type: ignore
+        for key in minimal_task_kwargs
+    )

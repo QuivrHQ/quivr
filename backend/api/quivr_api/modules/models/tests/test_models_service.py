@@ -4,7 +4,7 @@ from quivr_api.modules.models.repository.model import ModelRepository
 from quivr_api.modules.models.service.model_service import ModelService
 
 
-@pytest.mark.asyncio
+@pytest.mark.asyncio(loop_scope="session")
 async def test_service_get_chat_models(session):
     repo = ModelRepository(session)
     service = ModelService(repo)
@@ -12,7 +12,7 @@ async def test_service_get_chat_models(session):
     assert len(models) >= 1
 
 
-@pytest.mark.asyncio
+@pytest.mark.asyncio(loop_scope="session")
 async def test_service_get_non_existing_chat_model(session):
     repo = ModelRepository(session)
     service = ModelService(repo)
@@ -20,7 +20,7 @@ async def test_service_get_non_existing_chat_model(session):
     assert model is None
 
 
-@pytest.mark.asyncio
+@pytest.mark.asyncio(loop_scope="session")
 async def test_service_get_existing_chat_model(session):
     repo = ModelRepository(session)
     service = ModelService(repo)

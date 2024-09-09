@@ -11,7 +11,6 @@ from quivr_api.modules.brain.service.brain_authorization_service import (
     has_brain_authorization,
     validate_brain_authorization,
 )
-from quivr_api.modules.brain.service.brain_vector_service import BrainVectorService
 from quivr_api.modules.dependencies import get_service
 from quivr_api.modules.knowledge.service.knowledge_service import KnowledgeService
 from quivr_api.modules.upload.service.generate_file_signed_url import (
@@ -68,12 +67,6 @@ async def delete_endpoint(
     file_name = knowledge.file_name if knowledge.file_name else knowledge.url
     await knowledge_service.remove_knowledge(brain_id, knowledge_id)
 
-    brain_vector_service = BrainVectorService(brain_id)
-    if knowledge.file_name:
-        brain_vector_service.delete_file_from_brain(knowledge.file_name)
-    elif knowledge.url:
-        brain_vector_service.delete_file_url_from_brain(knowledge.url)
-
     return {
         "message": f"{file_name} of brain {brain_id} has been deleted by user {current_user.email}."
     }
@@ -95,13 +88,13 @@ async def generate_signed_url_endpoint(
 
     knowledge = await knowledge_service.get_knowledge(knowledge_id)
 
-    if len(knowledge.brains_ids) == 0:
+    if len(knowledge.brain_ids) == 0:
         raise HTTPException(
             status_code=HTTPStatus.NOT_FOUND,
             detail="knowledge not associated with brains yet.",
         )
 
-    brain_id = knowledge.brains_ids[0]
+    brain_id = knowledge.brain_ids[0]
 
     validate_brain_authorization(brain_id=brain_id, user_id=current_user.id)
 

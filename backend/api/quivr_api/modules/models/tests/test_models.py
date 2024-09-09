@@ -1,3 +1,5 @@
+import pytest
+
 from quivr_api.modules.models.entity.model import Model
 
 
@@ -9,7 +11,8 @@ def test_model_creation():
     assert model.max_output == 500
 
 
-def test_model_attributes(test_data):
+@pytest.mark.asyncio(loop_scope="session")  # noqa: F821
+async def test_model_attributes(test_data):
     model = test_data[0]
     assert hasattr(model, "name")
     assert hasattr(model, "price")
