@@ -14,8 +14,8 @@ build:
     - asdf install uv latest
     - asdf global uv latest
     - uv venv
-    - cd backend && pip install -r requirements.lock
-    - cd backend/ && ls -la && NO_COLOR=1 ../.venv/bin/mkdocs build --strict --site-dir $READTHEDOCS_OUTPUT/html --config-file backend/docs/mkdocs.yml
+    - cd backend && uv pip install -r requirements.lock
+    - cd backend/ && ls -la && NO_COLOR=1 ../.venv/bin/mkdocs build --strict --site-dir $READTHEDOCS_OUTPUT/html --config-file docs/mkdocs.yml
 
   
 
