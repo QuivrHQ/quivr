@@ -77,17 +77,13 @@ const ConnectionAccount = ({
               !syncElements?.files.filter((file) => file.is_folder).length
                 ? styles.empty
                 : ""
-            }`}
+            } ${singleAccount ? styles.single_account : ""}`}
           >
             {syncElements?.files
               .filter((file) => file.is_folder)
               .map((element, id) => (
                 <div key={id}>
-                  <SyncFolder
-                    element={element}
-                    singleAccount={!!singleAccount}
-                    syncId={sync.id}
-                  />
+                  <SyncFolder element={element} syncId={sync.id} />
                 </div>
               ))}
           </div>

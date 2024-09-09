@@ -5,6 +5,11 @@
   display: flex;
   flex-direction: column;
   gap: Spacings.$spacing01;
+  margin-left: Spacings.$spacing03;
+
+  &.no_margin {
+    margin-left: 0;
+  }
 
   .folder_line_wrapper {
     display: flex;
@@ -14,14 +19,15 @@
   }
 
   .loader_icon {
-    padding-left: Spacings.$spacing09 + Spacings.$spacing03;
+    padding-left: Spacings.$spacing06;
   }
 
   .sync_elements_wrapper {
     display: flex;
     flex-direction: column;
     gap: Spacings.$spacing01;
-
+    border-left: 0.5px solid var(--border-0);
+    margin-left: Spacings.$spacing03;
     font-size: Typography.$small;
   }
 }

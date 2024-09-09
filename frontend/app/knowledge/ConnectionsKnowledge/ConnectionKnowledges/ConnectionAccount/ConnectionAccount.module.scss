@@ -10,12 +10,12 @@
     display: flex;
     align-items: center;
     gap: Spacings.$spacing03;
-    padding-left: Spacings.$spacing05;
+    padding-left: Spacings.$spacing03;
     font-size: Typography.$small;
   }
 
   .loader_icon {
-    padding-left: Spacings.$spacing09 + Spacings.$spacing03;
+    padding-left: Spacings.$spacing06;
   }
 
   .sync_elements_wrapper {
@@ -23,10 +23,16 @@
     flex-direction: column;
     gap: Spacings.$spacing01;
     font-size: Typography.$small;
-    padding-left: Spacings.$spacing05;
+    margin-left: Spacings.$spacing05;
+    border-left: 0.5px solid var(--border-0);
 
     &.empty {
       height: 0;
+    }
+
+    &.single_account {
+      border-left: none;
+      margin-left: 0;
     }
   }
 }

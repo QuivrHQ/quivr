@@ -9,20 +9,14 @@ import styles from "./SyncFolder.module.scss";
 
 interface SyncFolderProps {
   element: SyncElement;
-  singleAccount: boolean;
   syncId: number;
 }
 
-const SyncFolder = ({
-  element,
-  singleAccount,
-  syncId,
-}: SyncFolderProps): JSX.Element => {
+const SyncFolder = ({ element, syncId }: SyncFolderProps): JSX.Element => {
   const [folded, setFolded] = useState(true);
   const [loading, setLoading] = useState(false);
   const { getSyncFiles } = useSync();
   const [syncElements, setSyncElements] = useState<SyncElements>();
-  const paddingLeft = `${singleAccount ? 0 : 16}px`;
 
   useEffect(() => {
     if (!folded) {
@@ -40,7 +34,7 @@ const SyncFolder = ({
   }, [folded]);
 
   return (
-    <div className={styles.folder_wrapper} style={{ paddingLeft }}>
+    <div className={styles.folder_wrapper}>
       <div className={styles.folder_line_wrapper}>
         <Icon
           name={folded ? "chevronRight" : "chevronDown"}
@@ -68,11 +62,7 @@ const SyncFolder = ({
               .filter((file) => file.is_folder)
               .map((folder, id) => (
                 <div key={id}>
-                  <SyncFolder
-                    element={folder}
-                    singleAccount={singleAccount}
-                    syncId={syncId}
-                  />
+                  <SyncFolder element={folder} syncId={syncId} />
                 </div>
               ))}
           </div>
