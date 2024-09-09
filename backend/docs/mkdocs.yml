@@ -1,0 +1,62 @@
+site_name: Quivr
+extra_css:
+  - css/style.css
+
+markdown_extensions:
+  - attr_list
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences
+  - md_in_html
+  - toc:
+      permalink: "#"
+
+theme:
+  custom_dir: overrides
+  features:
+    - navigation.instant
+    - navigation.tabs
+    - navigation.indexes
+    - navigation.top
+    - navigation.footer
+    - toc.follow
+    - content.code.copy
+    - search.suggest
+    - search.highlight
+  name: material
+  palette:
+    - media: (prefers-color-scheme)
+      toggle:
+        icon: material/brightness-auto
+        name: Switch to light mode
+    - accent: purple
+      media: "(prefers-color-scheme: light)"
+      primary: white
+      scheme: default
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - accent: purple
+      media: "(prefers-color-scheme: dark)"
+      primary: black
+      scheme: slate
+      toggle:
+        icon: material/brightness-4
+        name: Switch to system preference
+
+plugins:
+- mkdocstrings:
+    default_handler: python
+
+
+nav:
+  - Home: 
+    - index.md
+    - installation.md
+    - Features:
+      - Parsers:
+        - parsers/index.md
+        - parsers/megaparse.md
+        - parsers/simple.md
+  - Enterprise: https://docs.quivr.app/
+
