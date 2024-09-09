@@ -39,11 +39,15 @@ const SyncFolder = ({ element, syncId }: SyncFolderProps): JSX.Element => {
         <Icon
           name={folded ? "chevronRight" : "chevronDown"}
           size="normal"
-          color="black"
+          color="dark-grey"
           handleHover={true}
           onClick={() => setFolded(!folded)}
         />
-        <span>{element.name}</span>
+        <span>
+          {element.name?.includes(".")
+            ? element.name.split(".").slice(0, -1).join(".")
+            : element.name}
+        </span>
       </div>
       {!folded &&
         (loading ? (

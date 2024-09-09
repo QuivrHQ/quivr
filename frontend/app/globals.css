@@ -74,6 +74,7 @@ div:focus {
   --icon-1: var(--grey-2);
   --icon-2: var(--grey-0);
   --icon-3: var(--black-0);
+  --icon-4: var(--grey-1);
 
   /* Text */
   --text-0: var(--white-0);
@@ -111,6 +112,7 @@ body.dark_mode {
   --icon-1: var(--grey-0);
   --icon-2: var(--grey-2);
   --icon-3: var(--white-0);
+  --icon-4: var(--grey-2);
  
   /* Text */
   --text-0: var(--black-0);

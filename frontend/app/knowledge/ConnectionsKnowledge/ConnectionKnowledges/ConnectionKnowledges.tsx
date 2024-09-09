@@ -40,7 +40,7 @@ const ConnectionKnowledges = ({
         <Icon
           name={folded ? "chevronRight" : "chevronDown"}
           size="normal"
-          color="black"
+          color="dark-grey"
           handleHover={true}
         />
         <Image
