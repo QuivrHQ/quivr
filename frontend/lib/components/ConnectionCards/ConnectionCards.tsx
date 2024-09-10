@@ -10,14 +10,13 @@ interface ConnectionCardsProps {
 export const ConnectionCards = ({
   fromAddKnowledge,
 }: ConnectionCardsProps): JSX.Element => {
-  const { syncGoogleDrive, syncSharepoint, syncDropbox, syncNotion } =
+  const { syncGoogleDrive, syncSharepoint, syncDropbox } =
     useSync();
 
   return (
     <div
-      className={`${styles.connection_cards} ${
-        fromAddKnowledge ? styles.spaced : ""
-      }`}
+      className={`${styles.connection_cards} ${fromAddKnowledge ? styles.spaced : ""
+        }`}
     >
       <ConnectionSection
         label="Google Drive"
@@ -37,12 +36,12 @@ export const ConnectionCards = ({
         callback={(name) => syncDropbox(name)}
         fromAddKnowledge={fromAddKnowledge}
       />
-      <ConnectionSection
+      {/* <ConnectionSection
         label="Notion"
         provider="Notion"
         callback={(name) => syncNotion(name)}
         fromAddKnowledge={fromAddKnowledge}
-      />
+      /> */}
     </div>
   );
 };

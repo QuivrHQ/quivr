@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.0.309 (2024-09-10)
+
+## What's Changed
+* chore: Add initial documentation files and configuration by @StanGirard in https://github.com/QuivrHQ/quivr/pull/3126
+* chore: Add .readthedocs.yaml configuration file by @StanGirard in https://github.com/QuivrHQ/quivr/pull/3172
+* fix(frontend): notion integration in front end by @Zewed in https://github.com/QuivrHQ/quivr/pull/3175
+* chore(main): release core 0.0.14 by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2945
+* ci(rye): now core is built with rye by @StanGirard in https://github.com/QuivrHQ/quivr/pull/3177
+* feat: Add external Supabase URL support for generating file signed URL by @StanGirard in https://github.com/QuivrHQ/quivr/pull/3179
+* fix(onboarding): keeps setting it at false by @StanGirard in https://github.com/QuivrHQ/quivr/pull/3180
+
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.308...v0.0.309
+
 ## 0.0.308 (2024-09-06)
 
 ## What's Changed
