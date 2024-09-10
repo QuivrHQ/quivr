@@ -6,7 +6,6 @@
 .search_bar_wrapper {
   position: sticky;
   bottom: Spacings.$spacing06;
-  // width: 50%;
 }
 
 .editor_wrapper {
@@ -36,16 +35,16 @@
     }
 
     h1 {
-      @include Typography.Big;
+      @include Typography.H1;
       font-weight: 700;
     }
 
     h2 {
-      @include Typography.H1;
+      @include Typography.H2;
     }
 
     h3 {
-      @include Typography.H2;
+      @include Typography.H3;
     }
 
     p {
