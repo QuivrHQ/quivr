@@ -55,11 +55,13 @@ const renderExistingConnections = ({
   fromAddKnowledge,
   handleGetSyncFiles,
   openedConnections,
+  setCurrentProvider,
 }: {
   existingConnections: Sync[];
   folded: boolean;
   setFolded: (folded: boolean) => void;
   fromAddKnowledge: boolean;
+  setCurrentProvider: (provider: Provider) => void;
   handleGetSyncFiles: (
     userSyncId: number,
     currentProvider: Provider
@@ -96,9 +98,10 @@ const renderExistingConnections = ({
                   openedConnection.submitted
                 );
               })}
-              onClick={() =>
-                void handleGetSyncFiles(connection.id, connection.provider)
-              }
+              onClick={() => {
+                void handleGetSyncFiles(connection.id, connection.provider);
+                setCurrentProvider(connection.provider);
+              }}
             />
           </div>
         ))}
@@ -124,6 +127,7 @@ export const ConnectionSection = ({
     hasToReload,
     setHasToReload,
     setLoadingFirstList,
+    setCurrentProvider,
   } = useFromConnectionsContext();
   const [existingConnections, setExistingConnections] = useState<Sync[]>([]);
   const [folded, setFolded] = useState<boolean>(!fromAddKnowledge);
@@ -251,6 +255,7 @@ export const ConnectionSection = ({
           fromAddKnowledge: !!fromAddKnowledge,
           handleGetSyncFiles,
           openedConnections,
+          setCurrentProvider,
         })}
       </div>
     </>

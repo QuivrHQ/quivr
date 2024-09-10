@@ -27,6 +27,11 @@ def recursive_character_splitter(
 
 
 class SimpleTxtProcessor(ProcessorBase):
+    """
+    SimpleTxtProcessor is a class that implements the ProcessorBase interface.
+    It is used to process the files with the Simple Txt parser.
+    """
+
     supported_extensions = [FileExtension.txt]
 
     def __init__(

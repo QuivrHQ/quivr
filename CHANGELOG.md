@@ -1,5 +1,22 @@
 # Changelog
 
+## 0.0.308 (2024-09-06)
+
+## What's Changed
+* fix: remove knowledge and idle conn by @AmineDiro in https://github.com/QuivrHQ/quivr/pull/3165
+
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.307...v0.0.308
+
+## 0.0.307 (2024-09-06)
+
+## What's Changed
+* fix: tests pytest-asyncio by @AmineDiro in https://github.com/QuivrHQ/quivr/pull/3157
+* fix: remove unused 'models' field in check_premium.py by @StanGirard in https://github.com/QuivrHQ/quivr/pull/3164
+
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.306...v0.0.307
+
 ## 0.0.306 (2024-09-05)
 
 ## What's Changed
