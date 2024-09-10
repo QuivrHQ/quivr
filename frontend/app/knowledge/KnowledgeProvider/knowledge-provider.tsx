@@ -1,8 +1,12 @@
 import { createContext, useState } from "react";
 
+import { SyncElement } from "@/lib/api/sync/types";
+
 type KnowledgeContextType = {
-  isVisible: boolean;
-  setIsVisible: React.Dispatch<React.SetStateAction<boolean>>;
+  currentFolder: SyncElement | undefined;
+  setCurrentFolder: React.Dispatch<
+    React.SetStateAction<SyncElement | undefined>
+  >;
 };
 
 export const KnowledgeContext = createContext<KnowledgeContextType | undefined>(
@@ -14,13 +18,15 @@ export const KnowledgeProvider = ({
 }: {
   children: React.ReactNode;
 }): JSX.Element => {
-  const [isVisible, setIsVisible] = useState(false);
+  const [currentFolder, setCurrentFolder] = useState<SyncElement | undefined>(
+    undefined
+  );
 
   return (
     <KnowledgeContext.Provider
       value={{
-        isVisible,
-        setIsVisible,
+        currentFolder,
+        setCurrentFolder,
       }}
     >
       {children}

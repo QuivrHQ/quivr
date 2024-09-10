@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 
+import { useKnowledgeContext } from "@/app/knowledge/KnowledgeProvider/hooks/useKnowledgeContext";
 import { SyncElement, SyncElements } from "@/lib/api/sync/types";
 import { useSync } from "@/lib/api/sync/useSync";
 import { Icon } from "@/lib/components/ui/Icon/Icon";
@@ -18,6 +19,8 @@ const SyncFolder = ({ element, syncId }: SyncFolderProps): JSX.Element => {
   const { getSyncFiles } = useSync();
   const [syncElements, setSyncElements] = useState<SyncElements>();
 
+  const { setCurrentFolder } = useKnowledgeContext();
+
   useEffect(() => {
     if (!folded) {
       setLoading(true);
@@ -35,7 +38,10 @@ const SyncFolder = ({ element, syncId }: SyncFolderProps): JSX.Element => {
 
   return (
     <div className={styles.folder_wrapper}>
-      <div className={styles.folder_line_wrapper}>
+      <div
+        className={styles.folder_line_wrapper}
+        onClick={() => setCurrentFolder(element)}
+      >
         <Icon
           name={folded ? "chevronRight" : "chevronDown"}
           size="normal"
