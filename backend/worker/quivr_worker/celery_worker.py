@@ -304,16 +304,22 @@ def fetch_and_store_notion_files_task(
     if async_engine is None:
         init_worker()
     assert async_engine
-    logger.debug("Fetching and storing Notion files")
-    loop = asyncio.get_event_loop()
-    loop.run_until_complete(
-        fetch_and_store_notion_files_async(
-            async_engine, access_token, user_id, sync_user_id
+    try:
+        logger.debug("Fetching and storing Notion files")
+        loop = asyncio.get_event_loop()
+        loop.run_until_complete(
+            fetch_and_store_notion_files_async(
+                async_engine, access_token, user_id, sync_user_id
+            )
         )
-    )
-    sync_user_service.update_sync_user_status(
-        sync_user_id=sync_user_id, status=str(SyncsUserStatus.SYNCED)
-    )
+        sync_user_service.update_sync_user_status(
+            sync_user_id=sync_user_id, status=str(SyncsUserStatus.SYNCED)
+        )
+    except Exception:
+        logger.error("Error fetching and storing Notion files")
+        sync_user_service.update_sync_user_status(
+            sync_user_id=sync_user_id, status=str(SyncsUserStatus.ERROR)
+        )
 
 
 celery.conf.beat_schedule = {
