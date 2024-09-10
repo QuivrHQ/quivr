@@ -63,5 +63,8 @@ class AuthBearer(HTTPBearer):
         )  # replace with test user information
 
 
-def get_current_user(user: UserIdentity = Depends(AuthBearer())) -> UserIdentity:
+auth_bearer = AuthBearer()
+
+
+def get_current_user(user: UserIdentity = Depends(auth_bearer)) -> UserIdentity:
     return user

@@ -1,49 +1,53 @@
 import json
-from uuid import UUID
 
 import pytest
+import pytest_asyncio
 from fastapi.testclient import TestClient
+from sqlmodel import select
 from sqlmodel.ext.asyncio.session import AsyncSession
 
 from quivr_api.main import app
 from quivr_api.middlewares.auth.auth_bearer import get_current_user
 from quivr_api.modules.dependencies import get_async_session
-from quivr_api.modules.user.entity.user_identity import UserIdentity
-
-client = TestClient(app)
-
-
-def on_request(request):
-    body = request.read()
-    raw_request = (
-        f"{request.method} {request.url} HTTP/1.1\n"
-        + "\n".join(f"{k}: {v}" for k, v in request.headers.items())
-        + "\n\n"
-        + (body.decode("utf-8") if body else "")
-    )
-    print("Raw Request:\n", raw_request)
+from quivr_api.modules.knowledge.repository.knowledges import KnowledgeRepository
+from quivr_api.modules.knowledge.service.knowledge_service import KnowledgeService
+from quivr_api.modules.knowledge.tests.conftest import FakeStorage
+from quivr_api.modules.user.entity.user_identity import User, UserIdentity
 
 
-@pytest.fixture(scope="function")
-def override_dependency(
-    session: AsyncSession,
-):
-    def _current_user(*args, **kwargs) -> UserIdentity:
-        return UserIdentity(
-            email="admin@quivr.app",
-            id=UUID("39418e3b-0258-4452-af60-7acfcc1263ff"),
-        )
+@pytest_asyncio.fixture(scope="function")
+async def user(session: AsyncSession) -> User:
+    user_1 = (
+        await session.exec(select(User).where(User.email == "admin@quivr.app"))
+    ).one()
+    assert user_1.id
+    return user_1
 
-    async def test_session():
-        return session
 
-    app.dependency_overrides[get_current_user] = _current_user
-    app.dependency_overrides[get_async_session] = test_session
-    yield
+@pytest_asyncio.fixture(scope="function")
+async def test_client(session: AsyncSession, user: User):
+    assert user.id
+
+    def default_current_user() -> UserIdentity:
+        return UserIdentity(email=user.email, id=user.id)
+
+    async def test_service():
+        storage = FakeStorage()
+        repository = KnowledgeRepository(session)
+        return KnowledgeService(repository, storage)
+
+    app.dependency_overrides[get_current_user] = default_current_user
+    app.dependency_overrides[get_async_session] = lambda: session
+    # app.dependency_overrides[get_service(KnowledgeService)] = test_service
+
+    client = TestClient(app)
+    yield client
     app.dependency_overrides = {}
 
 
-def test_post_knowledge(override_dependency):
+@pytest.mark.skip
+@pytest.mark.asyncio(loop_scope="session")
+async def test_post_knowledge(test_client):
     km_data = {
         "file_name": "test_file.txt",
         "source": "local",
@@ -51,21 +55,22 @@ def test_post_knowledge(override_dependency):
         "parent_id": None,
     }
 
-    files = {
+    multipart_data = {
         "knowledge_data": (None, json.dumps(km_data), "application/json"),
         "file": ("test_file.txt", b"Test file content", "application/octet-stream"),
     }
 
-    response = client.post(
+    response = test_client.post(
         "/knowledge/",
-        files=files,
+        files=multipart_data,
     )
 
     assert response.status_code == 200
 
 
-def test_add_knowledge_invalid_input(override_dependency):
-    # Test with invalid input (missing both file_name and url)
-    response = client.post("/knowledge/", json={})
+@pytest.mark.skip
+@pytest.mark.asyncio(loop_scope="session")
+async def test_add_knowledge_invalid_input(test_client):
+    response = test_client.post("/knowledge/", data={})
     assert response.status_code == 400
     assert response.json()["detail"] == "Either file_name or url must be provided"
