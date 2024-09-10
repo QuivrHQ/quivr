@@ -21,5 +21,9 @@
     gap: Spacings.$spacing03;
     border-left: 0.5px solid var(--border-0);
     margin-left: Spacings.$spacing03;
+
+    &.folded {
+      display: none;
+    }
   }
 }

@@ -19,17 +19,19 @@ const SyncFolder = ({ element, syncId }: SyncFolderProps): JSX.Element => {
   const [syncElements, setSyncElements] = useState<SyncElements>();
 
   useEffect(() => {
-    setLoading(true);
-    void (async () => {
-      try {
-        const res = await getSyncFiles(syncId, element.id);
-        setSyncElements(res);
-        setLoading(false);
-      } catch (error) {
-        console.error("Failed to get sync files:", error);
-      }
-    })();
-  }, []);
+    if (!folded) {
+      setLoading(true);
+      void (async () => {
+        try {
+          const res = await getSyncFiles(syncId, element.id);
+          setSyncElements(res);
+          setLoading(false);
+        } catch (error) {
+          console.error("Failed to get sync files:", error);
+        }
+      })();
+    }
+  }, [folded]);
 
   return (
     <div className={styles.folder_wrapper}>

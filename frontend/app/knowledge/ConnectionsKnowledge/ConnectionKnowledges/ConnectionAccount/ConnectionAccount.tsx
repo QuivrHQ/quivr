@@ -40,10 +40,8 @@ const ConnectionAccount = ({
   };
 
   useEffect(() => {
-    if (!folded) {
-      getFiles();
-    }
-  }, [folded]);
+    getFiles();
+  }, []);
 
   useEffect(() => {
     if (singleAccount) {
