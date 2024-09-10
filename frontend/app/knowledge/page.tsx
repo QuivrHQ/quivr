@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import PageHeader from "@/lib/components/PageHeader/PageHeader";
 
 import ConnectionsKnowledges from "./ConnectionsKnowledge/ConnectionsKnowledges";
+import CurrentFolderExplorer from "./CurrentFolderExplorer/CurrentFolderExplorer";
 import styles from "./page.module.scss";
 
 const Knowledge = (): JSX.Element => {
@@ -61,10 +62,12 @@ const Knowledge = (): JSX.Element => {
           onMouseDown={(e) => {
             setIsResizing(true);
             setInitialMouseX(e.clientX);
-            setInitialWidth(foldersWidth); // Mémoriser la largeur initiale au début du redimensionnement
+            setInitialWidth(foldersWidth);
           }}
         ></div>
-        <div className={styles.folder_content}></div>
+        <div className={styles.folder_content}>
+          <CurrentFolderExplorer />
+        </div>
       </div>
     </div>
   );

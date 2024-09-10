@@ -1,5 +1,5 @@
 const CurrentFolderExplorer = (): JSX.Element => {
-  return <div></div>;
+  return <div>Current folder</div>;
 };
 
 export default CurrentFolderExplorer;
