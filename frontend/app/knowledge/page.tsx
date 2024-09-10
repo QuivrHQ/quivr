@@ -21,7 +21,7 @@ const Knowledge = (): JSX.Element => {
     const handleMouseMove = (e: MouseEvent) => {
       if (isResizing && foldersRef.current) {
         const newWidth = initialWidth + (e.clientX - initialMouseX);
-        setFoldersWidth(newWidth < 300 ? 300 : newWidth > 900 ? 900 : newWidth);
+        setFoldersWidth(newWidth < 200 ? 200 : newWidth > 900 ? 900 : newWidth);
       }
     };
 
@@ -50,7 +50,7 @@ const Knowledge = (): JSX.Element => {
           <div
             className={styles.folders_wrapper}
             ref={foldersRef}
-            style={{ width: `${foldersWidth}px` }}
+            style={{ minWidth: `${foldersWidth}px` }}
           >
             <div className={styles.folders}>
               <ConnectionsKnowledges />

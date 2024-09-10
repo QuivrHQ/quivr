@@ -1,3 +1,4 @@
+@use "styles/BoxShadow.module.scss";
 @use "styles/Spacings.module.scss";
 @use "styles/Typography.module.scss";
 
@@ -17,9 +18,8 @@
       padding-block: Spacings.$spacing05;
       display: flex;
       flex-direction: column;
-      overflow-y: hidden;
-      overflow-x: hidden;
       gap: Spacings.$spacing06;
+      box-shadow: BoxShadow.$large;
 
       .folders {
         display: flex;
@@ -29,24 +29,28 @@
       }
     }
 
-    $resize_width: 9px;
+    $resizeWidth: 8px;
 
     .resize_wrapper {
       height: 100%;
-      width: $resize_width;
+      width: $resizeWidth;
       cursor: col-resize;
       background-color: var(--background-0);
 
       .resize_handle {
         height: 100%;
-        margin-left: calc(#{$resize_width} / 2 - 1px);
+        margin-left: calc(#{$resizeWidth} - 1px);
         width: 1px;
         cursor: col-resize;
-        background-color: var(--border-0);
+        background-color: var(--background-4);
       }
 
       &:hover {
-        background-color: var(--border-0);
+        background-color: var(--background-3);
+
+        .resize_handle {
+          background-color: var(--background-3);
+        }
       }
     }
 
