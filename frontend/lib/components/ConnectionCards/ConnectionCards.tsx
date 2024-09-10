@@ -42,6 +42,7 @@ export const ConnectionCards = ({
         provider="Notion"
         callback={(name) => syncNotion(name)}
         fromAddKnowledge={fromAddKnowledge}
+        oneAccountLimitation={true}
       />
     </div>
   );

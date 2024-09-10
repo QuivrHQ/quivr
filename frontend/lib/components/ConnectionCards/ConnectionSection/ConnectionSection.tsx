@@ -19,6 +19,7 @@ interface ConnectionSectionProps {
   provider: Provider;
   callback: (name: string) => Promise<{ authorization_url: string }>;
   fromAddKnowledge?: boolean;
+  oneAccountLimitation?: boolean;
 }
 
 const renderConnectionLines = (
@@ -102,6 +103,7 @@ const renderExistingConnections = ({
                 void handleGetSyncFiles(connection.id, connection.provider);
                 setCurrentProvider(connection.provider);
               }}
+              sync={connection}
             />
           </div>
         ))}
@@ -117,6 +119,7 @@ export const ConnectionSection = ({
   provider,
   fromAddKnowledge,
   callback,
+  oneAccountLimitation,
 }: ConnectionSectionProps): JSX.Element => {
   const { providerIconUrls, getUserSyncs, getSyncFiles } = useSync();
   const {
@@ -230,23 +233,27 @@ export const ConnectionSection = ({
             />
             <span className={styles.label}>{label}</span>
           </div>
-          {!fromAddKnowledge ? (
+          {!fromAddKnowledge &&
+          (!oneAccountLimitation || existingConnections.length === 0) ? (
             <QuivrButton
-              iconName={existingConnections.length ? "add" : "sync"}
-              label={existingConnections.length ? "Add more" : "Connect"}
+              iconName="sync"
+              label="Connect"
               color="primary"
               onClick={() => connect()}
               small={true}
             />
-          ) : (
-            <TextButton
-              iconName={existingConnections.length ? "add" : "sync"}
-              label={existingConnections.length ? "Add more" : "Connect"}
-              color="black"
-              onClick={() => connect()}
-              small={true}
-            />
-          )}
+          ) : null}
+
+          {fromAddKnowledge &&
+            (!oneAccountLimitation || existingConnections.length === 0) && (
+              <TextButton
+                iconName="sync"
+                label="Connect"
+                color="black"
+                onClick={() => connect()}
+                small={true}
+              />
+            )}
         </div>
         {renderExistingConnections({
           existingConnections,

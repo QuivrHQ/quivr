@@ -15,12 +15,12 @@
     justify-content: space-between;
   }
 
-  @media screen and (min-width: ScreenSizes.$large) {
-    column-count: 4;
+  @media screen and (min-width: ScreenSizes.$medium) {
+    column-count: 3;
   }
 
-  @media screen and (max-width: ScreenSizes.$medium) {
-    column-count: 2;
+  @media screen and (min-width: ScreenSizes.$large) {
+    column-count: 4;
   }
 
   @media screen and (max-width: ScreenSizes.$small) {
