@@ -49,6 +49,49 @@ async def brain(session):
     return brain_1
 
 
+@pytest_asyncio.fixture(scope="function")
+async def folder(session, user):
+    folder = KnowledgeDB(
+        file_name="folder_1",
+        extension="",
+        status="UPLOADED",
+        source="local",
+        source_link="local",
+        file_size=4,
+        file_sha1=None,
+        brains=[],
+        children=[],
+        user_id=user.id,
+        is_folder=True,
+    )
+
+    session.add(folder)
+    await session.commit()
+    await session.refresh(folder)
+    return folder
+
+
+@pytest.mark.asyncio(loop_scope="session")
+async def test_knowledge_default_file(session, folder, user):
+    km = KnowledgeDB(
+        file_name="test_file_1.txt",
+        extension=".txt",
+        status="UPLOADED",
+        source="test_source",
+        source_link="test_source_link",
+        file_size=100,
+        file_sha1="test_sha1",
+        brains=[],
+        user_id=user.id,
+        parent_id=folder.id,
+    )
+    session.add(km)
+    await session.commit()
+    await session.refresh(km)
+
+    assert not km.is_folder
+
+
 @pytest.mark.asyncio(loop_scope="session")
 async def test_knowledge_parent(session: AsyncSession, user: User):
     assert user.id
@@ -97,49 +140,6 @@ async def test_knowledge_parent(session: AsyncSession, user: User):
     assert len(children) > 0
 
     assert children[0].id == km.id
-
-
-@pytest_asyncio.fixture(scope="function")
-async def folder(session, user):
-    folder = KnowledgeDB(
-        file_name="folder_1",
-        extension="",
-        status="UPLOADED",
-        source="local",
-        source_link="local",
-        file_size=4,
-        file_sha1=None,
-        brains=[],
-        children=[],
-        user_id=user.id,
-        is_folder=True,
-    )
-
-    session.add(folder)
-    await session.commit()
-    await session.refresh(folder)
-    return folder
-
-
-@pytest.mark.asyncio(loop_scope="session")
-async def test_knowledge_default_file(session, folder, user):
-    km = KnowledgeDB(
-        file_name="test_file_1.txt",
-        extension=".txt",
-        status="UPLOADED",
-        source="test_source",
-        source_link="test_source_link",
-        file_size=100,
-        file_sha1="test_sha1",
-        brains=[],
-        user_id=user.id,
-        parent_id=folder.id,
-    )
-    session.add(km)
-    await session.commit()
-    await session.refresh(km)
-
-    assert not km.is_folder
 
 
 @pytest.mark.asyncio(loop_scope="session")

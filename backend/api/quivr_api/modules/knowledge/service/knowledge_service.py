@@ -21,7 +21,9 @@ from quivr_api.modules.knowledge.entity.knowledge import (
 from quivr_api.modules.knowledge.repository.knowledges import KnowledgeRepository
 from quivr_api.modules.knowledge.repository.storage import SupabaseS3Storage
 from quivr_api.modules.knowledge.repository.storage_interface import StorageInterface
-from quivr_api.modules.knowledge.service.knowledge_exceptions import UploadError
+from quivr_api.modules.knowledge.service.knowledge_exceptions import (
+    UploadError,
+)
 from quivr_api.modules.sync.entity.sync_models import (
     DBSyncFile,
     DownloadedSyncFile,
@@ -68,12 +70,12 @@ class KnowledgeService(BaseService[KnowledgeRepository]):
             raise FileNotFoundError(f"No knowledge for file_name: {file_name}")
 
     async def get_knowledge(self, knowledge_id: UUID) -> Knowledge:
-        inserted_knowledge_db_instance = await self.repository.get_knowledge_by_id(
-            knowledge_id
-        )
-        assert inserted_knowledge_db_instance.id, "Knowledge ID not generated"
-        km = await inserted_knowledge_db_instance.to_dto()
-        return km
+        try:
+            km = await self.repository.get_knowledge_by_id(knowledge_id)
+            km = await km.to_dto()
+            return km
+        except NoResultFound:
+            raise
 
     # TODO (@aminediro): Replace with ON CONFLICT smarter query...
     # there is a chance of race condition but for now we let it crash in worker
@@ -218,11 +220,13 @@ class KnowledgeService(BaseService[KnowledgeRepository]):
     ) -> DeleteKnowledgeResponse:
         # TODO: fix KMS
         # REDO ALL THIS
-        knowledge = await self.get_knowledge(knowledge_id)
-        if len(knowledge.brain_ids) > 1:
+        knowledge = await self.repository.get_knowledge_by_id(knowledge_id)
+        km_brains = await knowledge.awaitable_attrs.brains
+        if len(km_brains) > 1:
             km = await self.repository.remove_knowledge_from_brain(
                 knowledge_id, brain_id
             )
+            assert km.id
             return DeleteKnowledgeResponse(file_name=km.file_name, knowledge_id=km.id)
         else:
             message = await self.repository.remove_knowledge_by_id(knowledge_id)

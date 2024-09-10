@@ -27,14 +27,18 @@ class Knowledge(BaseModel):
     url: Optional[str] = None
     extension: str = ".txt"
     status: str
+    is_folder: bool = False
     source: Optional[str] = None
     source_link: Optional[str] = None
-    file_size: Optional[int] = None
+    file_size: int = 0
     file_sha1: Optional[str] = None
     updated_at: Optional[datetime] = None
     created_at: Optional[datetime] = None
     metadata: Optional[Dict[str, str]] = None
     brain_ids: list[UUID]
+    user_id: UUID
+    parent_id: Optional[UUID]
+    children: Optional[list["Knowledge"]]
 
 
 class KnowledgeDB(AsyncAttrs, SQLModel, table=True):
@@ -76,6 +80,7 @@ class KnowledgeDB(AsyncAttrs, SQLModel, table=True):
     metadata_: Optional[Dict[str, str]] = Field(
         default=None, sa_column=Column("metadata", JSON)
     )
+    is_folder: bool = Field(default=False)
     user_id: UUID = Field(foreign_key="users.id", nullable=False)
     brains: List["Brain"] = Relationship(
         back_populates="knowledges",
@@ -83,7 +88,6 @@ class KnowledgeDB(AsyncAttrs, SQLModel, table=True):
         sa_relationship_kwargs={"lazy": "select"},
     )
 
-    is_folder: bool | None = Field(default=False)
     parent_id: UUID | None = Field(
         default=None, foreign_key="knowledge.id", ondelete="CASCADE"
     )
@@ -98,10 +102,12 @@ class KnowledgeDB(AsyncAttrs, SQLModel, table=True):
         sa_relationship_kwargs={"cascade": "all, delete-orphan"},
     )
 
-    async def to_dto(self) -> Knowledge:
+    # TODO: nested folder search
+    async def to_dto(self, get_children: bool = True) -> Knowledge:
         brains = await self.awaitable_attrs.brains
-        size = self.file_size if self.file_size else 0
-        sha1 = self.file_sha1 if self.file_sha1 else ""
+        children: list[KnowledgeDB] = (
+            await self.awaitable_attrs.children if get_children else []
+        )
         return Knowledge(
             id=self.id,  # type: ignore
             file_name=self.file_name,
@@ -110,10 +116,14 @@ class KnowledgeDB(AsyncAttrs, SQLModel, table=True):
             status=KnowledgeStatus(self.status),
             source=self.source,
             source_link=self.source_link,
-            file_size=size,
-            file_sha1=sha1,
+            is_folder=self.is_folder,
+            file_size=self.file_size or 0,
+            file_sha1=self.file_sha1,
             updated_at=self.updated_at,
             created_at=self.created_at,
             metadata=self.metadata_,  # type: ignore
             brain_ids=[brain.brain_id for brain in brains],
+            parent_id=self.parent_id,
+            children=[await c.to_dto(get_children=False) for c in children],
+            user_id=self.user_id,
         )

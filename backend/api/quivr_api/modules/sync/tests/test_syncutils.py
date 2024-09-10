@@ -317,7 +317,7 @@ async def test_process_sync_file_noprev(
     created_km = all_km[0]
     assert created_km.file_name == sync_file.name
     assert created_km.extension == ".txt"
-    assert created_km.file_sha1 is not None
+    assert created_km.file_sha1 is None
     assert created_km.created_at is not None
     assert created_km.metadata == {"sync_file_id": "1"}
     assert created_km.brain_ids == [brain_1.brain_id]
@@ -409,7 +409,7 @@ async def test_process_sync_file_with_prev(
     created_km = all_km[0]
     assert created_km.file_name == sync_file.name
     assert created_km.extension == ".txt"
-    assert created_km.file_sha1 is not None
+    assert created_km.file_sha1 is None
     assert created_km.updated_at
     assert created_km.created_at
     assert created_km.updated_at == created_km.created_at  # new line

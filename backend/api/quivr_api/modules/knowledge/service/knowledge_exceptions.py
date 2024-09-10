@@ -22,3 +22,13 @@ class UpdateError(KnowledgeException):
 class DeleteError(KnowledgeException):
     def __init__(self, message="An error occurred while deleting"):
         super().__init__(message)
+
+
+class ForbiddenAccess(KnowledgeException):
+    def __init__(self, message="You do not have permission to access this knowledge."):
+        super().__init__(message)
+
+
+class KnowledgeNotFoundException(KnowledgeException):
+    def __init__(self, message="The requested knowledge was not found"):
+        super().__init__(message)

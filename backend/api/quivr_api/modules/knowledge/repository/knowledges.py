@@ -151,7 +151,6 @@ class KnowledgeRepository(BaseRepository):
         query = select(KnowledgeDB).where(KnowledgeDB.id == knowledge_id)
         result = await self.session.exec(query)
         knowledge = result.first()
-
         if not knowledge:
             raise NoResultFound("Knowledge not found")
 

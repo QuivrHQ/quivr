@@ -1,3 +1,9 @@
+ALTER USER postgres
+SET idle_session_timeout = '3min';
+ALTER USER postgres
+SET idle_in_transaction_session_timeout = '3min';
+-- Drop previous contraint
+alter table "public"."knowledge" drop constraint "unique_file_sha1_user_id";
 alter table "public"."knowledge"
 add column "is_folder" boolean default false;
 -- Update the knowledge to backfill knowledge to is_folder = false

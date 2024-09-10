@@ -13,6 +13,9 @@ from quivr_api.modules.brain.service.brain_authorization_service import (
 )
 from quivr_api.modules.dependencies import get_service
 from quivr_api.modules.knowledge.dto.inputs import AddKnowledge
+from quivr_api.modules.knowledge.service.knowledge_exceptions import (
+    KnowledgeNotFoundException,
+)
 from quivr_api.modules.knowledge.service.knowledge_service import KnowledgeService
 from quivr_api.modules.upload.service.generate_file_signed_url import (
     generate_file_signed_url,
@@ -54,7 +57,7 @@ async def list_knowledge_in_brain_endpoint(
     ],
     tags=["Knowledge"],
 )
-async def delete_knowledge(
+async def delete_knowledge_brain(
     knowledge_id: UUID,
     knowledge_service: KnowledgeServiceDep,
     current_user: UserIdentity = Depends(get_current_user),
@@ -134,5 +137,28 @@ async def add_knowledge(
         raise HTTPException(status_code=422, detail="Unprocessable knowledge ")
     except FileExistsError:
         raise HTTPException(status_code=409, detail="Existing knowledge")
+    except Exception:
+        raise HTTPException(status_code=500)
+
+
+@knowledge_router.get(
+    "/knowledge/{knowledge_id}",
+    tags=["Knowledge"],
+)
+async def get_knowledge(
+    knowledge_id: UUID,
+    knowledge_service: KnowledgeService = Depends(get_service(KnowledgeService)),
+    current_user: UserIdentity = Depends(get_current_user),
+):
+    try:
+        km = await knowledge_service.get_knowledge(knowledge_id)
+        if km.user_id != current_user.id:
+            raise HTTPException(
+                status_code=403,
+                detail="You do not have permission to access this knowledge.",
+            )
+        return km
+    except KnowledgeNotFoundException as e:
+        raise HTTPException(status_code=404, detail=f"{e.message}")
     except Exception:
         raise HTTPException(status_code=500)

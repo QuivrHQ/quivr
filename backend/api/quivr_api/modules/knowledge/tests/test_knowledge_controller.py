@@ -45,7 +45,7 @@ async def test_client(session: AsyncSession, user: User):
     app.dependency_overrides = {}
 
 
-@pytest.mark.skip
+@pytest.mark.skip("todo: fix session")
 @pytest.mark.asyncio(loop_scope="session")
 async def test_post_knowledge(test_client):
     km_data = {
@@ -68,7 +68,7 @@ async def test_post_knowledge(test_client):
     assert response.status_code == 200
 
 
-@pytest.mark.skip
+@pytest.mark.skip("todo: fix session")
 @pytest.mark.asyncio(loop_scope="session")
 async def test_add_knowledge_invalid_input(test_client):
     response = test_client.post("/knowledge/", data={})

@@ -94,6 +94,96 @@ async def test_data(session: AsyncSession) -> TestData:
     return brain_1, [knowledge_brain_1, knowledge_brain_2]
 
 
+@pytest_asyncio.fixture(scope="function")
+async def folder_km_nested(session: AsyncSession, user: User):
+    assert user.id
+
+    nested_folder = KnowledgeDB(
+        file_name="folder_1",
+        extension="",
+        status="UPLOADED",
+        source="local",
+        source_link="local",
+        file_size=4,
+        file_sha1=None,
+        brains=[],
+        children=[],
+        user_id=user.id,
+        is_folder=True,
+    )
+    folder = KnowledgeDB(
+        file_name="folder_2",
+        extension="",
+        status="UPLOADED",
+        source="local",
+        source_link="local",
+        file_size=4,
+        file_sha1=None,
+        brains=[],
+        children=[],
+        user_id=user.id,
+        is_folder=True,
+        parent=nested_folder,
+    )
+
+    knowledge_folder = KnowledgeDB(
+        file_name="file.txt",
+        extension=".txt",
+        status="UPLOADED",
+        source="test_source",
+        source_link="test_source_link",
+        file_size=100,
+        file_sha1="test_sha2",
+        brains=[],
+        user_id=user.id,
+        parent=folder,
+    )
+
+    session.add(nested_folder)
+    session.add(folder)
+    session.add(knowledge_folder)
+    await session.commit()
+    await session.refresh(folder)
+    return nested_folder
+
+
+@pytest_asyncio.fixture(scope="function")
+async def folder_km(session: AsyncSession, user: User):
+    assert user.id
+    folder = KnowledgeDB(
+        file_name="folder_1",
+        extension="",
+        status="UPLOADED",
+        source="local",
+        source_link="local",
+        file_size=4,
+        file_sha1=None,
+        brains=[],
+        children=[],
+        user_id=user.id,
+        is_folder=True,
+    )
+
+    knowledge_folder = KnowledgeDB(
+        file_name="file.txt",
+        extension=".txt",
+        status="UPLOADED",
+        source="test_source",
+        source_link="test_source_link",
+        file_size=100,
+        file_sha1="test_sha2",
+        brains=[],
+        user_id=user.id,
+        parent=folder,
+    )
+
+    session.add(folder)
+    session.add(knowledge_folder)
+    await session.commit()
+    await session.refresh(folder)
+    return folder
+
+
 @pytest.mark.asyncio(loop_scope="session")
 async def test_updates_knowledge_status(session: AsyncSession, test_data: TestData):
     brain, knowledges = test_data
@@ -546,3 +636,38 @@ async def test_create_knowledge_upload_error(session: AsyncSession, user: User):
     statement = select(KnowledgeDB)
     results = (await session.exec(statement)).all()
     assert results == []
+
+
+@pytest.mark.asyncio(loop_scope="session")
+async def test_get_knowledge(session: AsyncSession, folder_km: KnowledgeDB, user: User):
+    assert user.id
+    assert folder_km.id
+    storage = ErrorStorage()
+    repository = KnowledgeRepository(session)
+    service = KnowledgeService(repository, storage)
+
+    result = await service.get_knowledge(folder_km.id)
+    assert result.id == folder_km.id
+    assert result.children
+    assert len(result.children) > 0
+    assert result.children[0] == await folder_km.children[0].to_dto()
+
+
+@pytest.mark.asyncio(loop_scope="session")
+async def test_get_knowledge_nested(
+    session: AsyncSession, folder_km_nested: KnowledgeDB, user: User
+):
+    assert user.id
+    assert folder_km_nested.id
+    storage = ErrorStorage()
+    repository = KnowledgeRepository(session)
+    service = KnowledgeService(repository, storage)
+
+    result = await service.get_knowledge(folder_km_nested.id)
+    assert result.id == folder_km_nested.id
+    assert result.children
+    assert len(result.children) > 0
+    assert result.children[0].is_folder
+    assert result.children[0] == await folder_km_nested.children[0].to_dto(
+        get_children=False
+    )
