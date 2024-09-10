@@ -3,16 +3,19 @@
 @use "styles/Radius.module.scss";
 @use "styles/ScreenSizes.module.scss";
 
+.main_container {
+  max-width: ScreenSizes.$medium;
+  width: 100%;
+  margin: 0 auto;
+  padding: Spacings.$spacing07;
+}
+
 .search_bar_wrapper {
   position: sticky;
   bottom: Spacings.$spacing06;
 }
 
 .editor_wrapper {
-  max-width: ScreenSizes.$medium;
-  width: 100%;
-  margin: 0 auto;
-  padding: Spacings.$spacing07;
   min-height: 100vh;
 
   .content_wrapper {
