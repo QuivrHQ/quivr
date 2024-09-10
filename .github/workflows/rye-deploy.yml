@@ -1,0 +1,28 @@
+name: rye-deploy
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+
+jobs:
+  rye-deploy:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend/
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Rye
+        uses: eifinger/setup-rye@v2
+        with:
+          enable-cache: true
+          working-directory: backend/
+      - name: Rye Sync
+        run: cd core/ && UV_INDEX_STRATEGY=unsafe-first-match rye sync --no-lock
+      - name: Rye Build
+        run: cd core/ && rye build
+      - name: Rye Publish
+        run: rye publish --token ${{ secrets.PYPI_API_TOKEN }} --yes --skip-existing

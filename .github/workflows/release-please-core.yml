@@ -32,24 +32,5 @@ jobs:
         with:
           path: backend/core
           token: ${{ secrets.RELEASE_PLEASE_TOKEN }}
-       
-
-  deploy:
-    if: needs.release-please.outputs.release_created == 'true'
-    needs: release-please
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: backend/core
-    steps:
-      - uses: actions/checkout@v4
-      - name: Install Rye
-        uses: eifinger/setup-rye@v2
-        with:
-          enable-cache: true
-      - name: Rye Sync
-        run: UV_INDEX_STRATEGY=unsafe-first-match rye sync --no-lock
-      - name: Rye Build
-        run: rye build
-      - name: Rye Publish
-        run: rye publish --token ${{ secrets.PYPI_API_TOKEN }} --yes
+      
+    
