@@ -1,4 +1,5 @@
 import logging
+import os
 from typing import AsyncGenerator, Optional, Sequence, Annotated, Sequence, TypedDict
 # TODO(@aminediro): this is the only dependency to langchain package, we should remove it
 from langchain.retrievers import ContextualCompressionRetriever
@@ -7,12 +8,14 @@ from langchain_core.documents import BaseDocumentCompressor, Document
 from langchain_core.messages import AIMessage, HumanMessage, BaseMessage
 from langchain_core.messages.ai import AIMessageChunk
 from langchain_core.vectorstores import VectorStore
+from langchain_cohere import CohereRerank
+from langchain_community.document_compressors import JinaRerank
 
 from langgraph.graph.message import add_messages
 from langgraph.graph import END, StateGraph
 
 from quivr_core.chat import ChatHistory
-from quivr_core.config import RAGConfig
+from quivr_core.config import RAGConfig, RerankerConfig
 from quivr_core.llm import LLMEndpoint
 from quivr_core.models import (
     ParsedRAGChunkResponse,
@@ -80,7 +83,17 @@ class QuivrQARAGLangGraph:
         self.rag_config = rag_config
         self.vector_store = vector_store
         self.llm_endpoint = llm
-        self.reranker = reranker if reranker is not None else IdempotentCompressor()
+
+        if reranker is not None:
+            self.reranker = reranker
+        elif os.getenv("COHERE_API_KEY"):
+            self.reranker_config = RerankerConfig(supplier='cohere')
+            self.reranker = CohereRerank(model=self.reranker_config.model, top_n=self.reranker_config.top_n)
+        elif os.getenv("JINA_API_KEY"):
+            self.reranker_config = RerankerConfig(supplier='jina')
+            self.reranker = JinaRerank(model=self.reranker_config.model, top_n=self.reranker_config.top_n)
+        else:
+            self.reranker = IdempotentCompressor()
 
         self.compression_retriever = ContextualCompressionRetriever(
             base_compressor=self.reranker, base_retriever=self.retriever
