@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.0.310 (2024-09-10)
+
+## What's Changed
+* feat: Add Azure OpenAI embeddings support by @StanGirard in https://github.com/QuivrHQ/quivr/pull/3182
+
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.309...v0.0.310
+
 ## 0.0.309 (2024-09-10)
 
 ## What's Changed
