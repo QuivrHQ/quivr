@@ -46,7 +46,7 @@
         align-items: center;
 
         .quivr_text {
-          @include Typography.Big;
+          @include Typography.H1;
 
           .quivr_text_primary {
             color: var(--primary-0);

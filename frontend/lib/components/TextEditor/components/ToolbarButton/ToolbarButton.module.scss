@@ -1,0 +1,20 @@
+@use "styles/IconSizes.module.scss";
+@use "styles/Spacings.module.scss";
+
+.toolbar_button {
+  padding: Spacings.$spacing03;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: transparent;
+  border: none;
+
+  &:hover {
+    background-color: var(--background-3);
+  }
+
+  &.active {
+    background-color: var(--background-3);
+    border: 1px solid var(--primary-0);
+  }
+}

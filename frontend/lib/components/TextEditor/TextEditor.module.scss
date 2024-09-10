@@ -1,0 +1,135 @@
+@use "styles/Spacings.module.scss";
+@use "styles/Typography.module.scss";
+@use "styles/Radius.module.scss";
+@use "styles/ScreenSizes.module.scss";
+
+.main_container {
+  max-width: ScreenSizes.$medium;
+  width: 100%;
+  margin: 0 auto;
+  padding: Spacings.$spacing07;
+}
+
+.search_bar_wrapper {
+  position: sticky;
+  bottom: Spacings.$spacing06;
+}
+
+.editor_wrapper {
+  min-height: 100vh;
+
+  .content_wrapper {
+    color: var(--text-3);
+    width: 100%;
+    position: relative;
+
+    .has_focus {
+      position: relative;
+
+      &::after {
+        content: "";
+        position: absolute;
+        top: 0;
+        right: calc(100% + Spacings.$spacing04);
+        width: Spacings.$spacing02;
+        background-color: var(--primary-0);
+        height: 100%;
+      }
+    }
+
+    h1 {
+      @include Typography.H1;
+      font-weight: 700;
+    }
+
+    h2 {
+      @include Typography.H2;
+    }
+
+    h3 {
+      @include Typography.H3;
+    }
+
+    h4 {
+      @include Typography.H4;
+    }
+
+    p {
+      margin-bottom: Spacings.$spacing02;
+    }
+
+    ul,
+    ol {
+      margin-bottom: Spacings.$spacing02;
+
+      li {
+        margin-bottom: Spacings.$spacing02;
+        margin-left: Spacings.$spacing07;
+        padding-left: Spacings.$spacing03;
+      }
+    }
+
+    ol {
+      list-style-type: decimal;
+    }
+
+    ul {
+      list-style-type: disc;
+    }
+
+    blockquote {
+      margin: Spacings.$spacing05 0;
+      padding: Spacings.$spacing04 Spacings.$spacing06;
+      border-left: 4px solid var(--border-1);
+      background-color: var(--background-1);
+      font-style: italic;
+    }
+
+    hr {
+      margin: Spacings.$spacing06 0;
+      border: 0;
+      border-top: 1px solid var(--border-2);
+    }
+
+    a {
+      color: var(--link-color);
+      text-decoration: underline;
+
+      &:hover {
+        text-decoration: none;
+      }
+    }
+
+    img {
+      max-width: 100%;
+      height: auto;
+      margin: Spacings.$spacing04 0;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: Spacings.$spacing04 0;
+
+      th,
+      td {
+        border: 1px solid var(--border-2);
+        padding: Spacings.$spacing03;
+        text-align: left;
+      }
+
+      th {
+        background-color: var(--background-3);
+      }
+    }
+
+    code {
+      display: block;
+      margin: Spacings.$spacing05 0;
+      padding: Spacings.$spacing04 Spacings.$spacing05;
+      background-color: var(--background-2);
+      border-radius: 4px;
+      font-family: monospace;
+    }
+  }
+}

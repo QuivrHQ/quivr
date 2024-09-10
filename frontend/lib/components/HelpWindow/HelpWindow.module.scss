@@ -28,7 +28,7 @@
       border-bottom: 1px solid var(--border-1);
 
       .title {
-        @include Typography.H1;
+        @include Typography.H2;
       }
     }
 
@@ -41,7 +41,7 @@
         flex-direction: column;
 
         .title {
-          @include Typography.H2;
+          @include Typography.H3;
         }
 
         .section_content {

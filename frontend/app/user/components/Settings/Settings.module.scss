@@ -11,7 +11,7 @@
   max-width: 700px;
 
   .title {
-    @include Typography.H2;
+    @include Typography.H3;
   }
 
   .infos_wrapper {

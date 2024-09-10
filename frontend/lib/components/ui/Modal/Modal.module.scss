@@ -30,7 +30,7 @@
     overflow: auto;
 
     .title {
-      @include Typography.H1;
+      @include Typography.H2;
     }
 
     .subtitle {

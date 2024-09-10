@@ -83,7 +83,7 @@
       display: flex;
       gap: Spacings.$spacing04;
       align-items: baseline;
-      @include Typography.H2;
+      @include Typography.H3;
     }
 
     .message_row_content {
@@ -112,7 +112,7 @@
           gap: Spacings.$spacing03;
 
           .title {
-            @include Typography.H2;
+            @include Typography.H3;
           }
         }
 
@@ -151,7 +151,7 @@
         gap: Spacings.$spacing03;
 
         .title {
-          @include Typography.H2;
+          @include Typography.H3;
         }
       }
 

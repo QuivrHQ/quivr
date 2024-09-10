@@ -49,6 +49,10 @@
     @include Typography.H3;
   }
 
+  h4 {
+    @include Typography.H4;
+  }
+
   table {
     width: 100%;
     border-collapse: collapse;
