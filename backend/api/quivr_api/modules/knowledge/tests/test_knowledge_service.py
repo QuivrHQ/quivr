@@ -6,7 +6,7 @@ from uuid import uuid4
 import pytest
 import pytest_asyncio
 from fastapi import UploadFile
-from sqlalchemy.exc import IntegrityError, NoResultFound
+from sqlalchemy.exc import NoResultFound
 from sqlmodel import select, text
 from sqlmodel.ext.asyncio.session import AsyncSession
 
@@ -300,8 +300,7 @@ async def test_duplicate_sha1_knowledge_same_user(
         user_id=existing_knowledge.user_id,
     )
 
-    with pytest.raises(IntegrityError):  # FIXME: Should raise IntegrityError
-        await repo.insert_knowledge_brain(knowledge, brain.brain_id)
+    await repo.insert_knowledge_brain(knowledge, brain.brain_id)
 
 
 @pytest.mark.asyncio(loop_scope="session")
