@@ -47,6 +47,10 @@
       @include Typography.H3;
     }
 
+    h4 {
+      @include Typography.H4;
+    }
+
     p {
       margin-bottom: Spacings.$spacing02;
     }

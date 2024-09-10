@@ -38,7 +38,7 @@
     .left {
       display: flex;
       gap: Spacings.$spacing03;
-      @include Typography.H2;
+      @include Typography.H3;
       align-items: center;
       overflow: hidden;
 

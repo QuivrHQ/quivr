@@ -19,7 +19,7 @@
     padding-block: Spacings.$spacing05;
 
     .section_title {
-      @include Typography.H2;
+      @include Typography.H3;
     }
 
     .inputs_wrapper {
@@ -137,7 +137,7 @@
     padding-block: Spacings.$spacing05;
 
     .section_title {
-      @include Typography.H2;
+      @include Typography.H3;
     }
   }
 }

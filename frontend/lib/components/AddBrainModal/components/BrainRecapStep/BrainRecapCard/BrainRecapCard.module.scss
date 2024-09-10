@@ -14,11 +14,11 @@
   gap: Spacings.$spacing03;
 
   .number_label {
-    @include Typography.Big;
+    @include Typography.H1;
     color: var(--primary-0);
   }
 
   .type {
-    @include Typography.H1;
+    @include Typography.H2;
   }
 }

@@ -29,7 +29,7 @@
     justify-content: space-between;
     width: 100%;
     padding-block: Spacings.$spacing03;
-    @include Typography.H3;
+    @include Typography.H4;
 
     .left {
       display: flex;
@@ -49,7 +49,7 @@
       transform: rotate(-90deg);
 
       .label {
-        @include Typography.H3;
+        @include Typography.H4;
       }
     }
   }

@@ -10,7 +10,7 @@
   border-radius: Radius.$normal;
 
   .title {
-    @include Typography.H2;
+    @include Typography.H3;
   }
 
   .table_header {

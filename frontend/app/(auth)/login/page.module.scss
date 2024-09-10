@@ -20,7 +20,7 @@
     }
 
     .title {
-      @include Typography.Big;
+      @include Typography.H1;
       text-align: center;
 
       .primary_text {
