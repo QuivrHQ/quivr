@@ -43,7 +43,7 @@ const SyncFolder = ({ element, syncId }: SyncFolderProps): JSX.Element => {
           handleHover={true}
           onClick={() => setFolded(!folded)}
         />
-        <span>
+        <span className={styles.name}>
           {element.name?.includes(".")
             ? element.name.split(".").slice(0, -1).join(".")
             : element.name}

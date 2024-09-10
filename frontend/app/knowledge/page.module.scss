@@ -17,7 +17,7 @@
       padding-block: Spacings.$spacing05;
       display: flex;
       flex-direction: column;
-      overflow-y: auto;
+      overflow-y: hidden;
       overflow-x: hidden;
       gap: Spacings.$spacing06;
 
@@ -29,22 +29,24 @@
       }
     }
 
-    .resize_handle {
+    $resize_width: 9px;
+
+    .resize_wrapper {
       height: 100%;
-      width: 1px;
+      width: $resize_width;
       cursor: col-resize;
-      background-color: var(--border-0);
+      background-color: var(--background-0);
+
+      .resize_handle {
+        height: 100%;
+        margin-left: calc(#{$resize_width} / 2 - 1px);
+        width: 1px;
+        cursor: col-resize;
+        background-color: var(--border-0);
+      }
 
       &:hover {
         background-color: var(--border-0);
-        width: 5px;
-        margin-left: -2px;
-      }
-
-      &.active {
-        background-color: var(--border-0);
-        width: 5px;
-        margin-left: -2px;
       }
     }
 

@@ -16,6 +16,10 @@
     align-items: center;
     gap: Spacings.$spacing03;
     font-size: Typography.$small;
+
+    .name {
+      @include Typography.EllipsisOverflow;
+    }
   }
 
   .loader_icon {

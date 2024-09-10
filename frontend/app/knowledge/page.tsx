@@ -57,16 +57,20 @@ const Knowledge = (): JSX.Element => {
             </div>
           </div>
           <div
-            className={`${styles.resize_handle} ${
-              isResizing ? styles.active : ""
-            }`}
+            className={styles.resize_wrapper}
             ref={resizeHandleRef}
             onMouseDown={(e) => {
               setIsResizing(true);
               setInitialMouseX(e.clientX);
               setInitialWidth(foldersWidth);
             }}
-          ></div>
+          >
+            <div
+              className={`${styles.resize_handle} ${
+                isResizing ? styles.active : ""
+              }`}
+            ></div>
+          </div>
           <div className={styles.folder_content}>
             <CurrentFolderExplorer />
           </div>
