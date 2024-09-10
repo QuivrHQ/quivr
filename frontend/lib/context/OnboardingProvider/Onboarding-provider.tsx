@@ -23,9 +23,11 @@ export const OnboardingProvider = ({
   const { userIdentityData } = useUserData();
 
   useEffect(() => {
-    if (userIdentityData) {
-      setIsOnboardingModalOpened(!userIdentityData.username);
-    }
+    setTimeout(() => {
+      if (userIdentityData) {
+        setIsOnboardingModalOpened(!userIdentityData.username);
+      }
+    });
   }, [userIdentityData]);
 
   return (
