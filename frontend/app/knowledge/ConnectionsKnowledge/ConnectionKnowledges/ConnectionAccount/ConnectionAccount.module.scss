@@ -12,6 +12,7 @@
     gap: Spacings.$spacing03;
     padding-left: Spacings.$spacing03;
     font-size: Typography.$small;
+    font-weight: 500;
   }
 
   .loader_icon {
@@ -21,7 +22,7 @@
   .sync_elements_wrapper {
     display: flex;
     flex-direction: column;
-    gap: Spacings.$spacing01;
+    gap: Spacings.$spacing02;
     font-size: Typography.$small;
     margin-left: Spacings.$spacing05;
     border-left: 0.5px solid var(--border-0);

@@ -1,10 +1,11 @@
+@use "styles/Radius.module.scss";
 @use "styles/Spacings.module.scss";
 @use "styles/Typography.module.scss";
 
 .folder_wrapper {
   display: flex;
   flex-direction: column;
-  gap: Spacings.$spacing01;
+  gap: Spacings.$spacing02;
   margin-left: Spacings.$spacing03;
 
   &.no_margin {
@@ -14,11 +15,18 @@
   .folder_line_wrapper {
     display: flex;
     align-items: center;
-    gap: Spacings.$spacing03;
-    font-size: Typography.$small;
+    font-size: Typography.$tiny;
 
     .name {
       @include Typography.EllipsisOverflow;
+      padding: Spacings.$spacing01;
+      padding-inline: Spacings.$spacing03;
+
+      &:hover {
+        background-color: var(--background-6);
+        cursor: pointer;
+        border-radius: Radius.$normal;
+      }
     }
   }
 
@@ -29,7 +37,7 @@
   .sync_elements_wrapper {
     display: flex;
     flex-direction: column;
-    gap: Spacings.$spacing01;
+    gap: Spacings.$spacing02;
     border-left: 0.5px solid var(--border-0);
     margin-left: Spacings.$spacing03;
     font-size: Typography.$small;

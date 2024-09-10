@@ -42,7 +42,7 @@
         margin-left: calc(#{$resizeWidth} - 1px);
         width: 1px;
         cursor: col-resize;
-        background-color: var(--background-4);
+        background-color: var(--border-0);
       }
 
       &:hover {
