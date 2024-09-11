@@ -2695,13 +2695,6 @@
   dependencies:
     "@types/react" "*"
 
-"@types/react-file-icon@^1.0.4":
-  version "1.0.4"
-  resolved "https://registry.npmjs.org/@types/react-file-icon/-/react-file-icon-1.0.4.tgz"
-  integrity sha512-c1mIklUDaxm9odxf8RTiy/EAxsblZliJ86EKIOAyuafP9eK3iudyn4ATv53DX6ZvgGymc7IttVNm97LTGnTiYA==
-  dependencies:
-    "@types/react" "*"
-
 "@types/react-katex@^3.0.4":
   version "3.0.4"
   resolved "https://registry.npmjs.org/@types/react-katex/-/react-katex-3.0.4.tgz"
@@ -7598,14 +7591,6 @@ react-fast-compare@^3.2.0:
   version "3.2.2"
   resolved "https://registry.npmjs.org/react-fast-compare/-/react-fast-compare-3.2.2.tgz"
   integrity sha512-nsO+KSNgo1SbJqJEYRE9ERzo7YtYbou/OqjSQKxV7jcKox7+usiUVZOAC+XnDOABXggQTno0Y1CpVnuWEc1boQ==
-
-react-file-icon@^1.5.0:
-  version "1.5.0"
-  resolved "https://registry.npmjs.org/react-file-icon/-/react-file-icon-1.5.0.tgz"
-  integrity sha512-6K2/nAI69CS838HOS+4S95MLXwf1neWywek1FgqcTFPTYjnM8XT7aBLz4gkjoqQKY9qPhu3A2tu+lvxhmZYY9w==
-  dependencies:
-    colord "^2.9.3"
-    prop-types "^15.7.2"
 
 react-ga4@2.1.0:
   version "2.1.0"
