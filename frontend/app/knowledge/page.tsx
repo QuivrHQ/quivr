@@ -27,16 +27,19 @@ const Knowledge = (): JSX.Element => {
 
     const handleMouseUp = () => {
       setIsResizing(false);
+      document.body.style.userSelect = "";
     };
 
     if (isResizing) {
       window.addEventListener("mousemove", handleMouseMove);
       window.addEventListener("mouseup", handleMouseUp);
+      document.body.style.userSelect = "none";
     }
 
     return () => {
       window.removeEventListener("mousemove", handleMouseMove);
       window.removeEventListener("mouseup", handleMouseUp);
+      document.body.style.userSelect = "";
     };
   }, [isResizing, initialMouseX, initialWidth]);
 

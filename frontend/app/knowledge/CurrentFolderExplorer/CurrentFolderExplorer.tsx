@@ -3,8 +3,10 @@ import styles from "./CurrentFolderExplorer.module.scss";
 import { SyncElements } from "@/lib/api/sync/types";
 import { useSync } from "@/lib/api/sync/useSync";
 import { Icon } from "@/lib/components/ui/Icon/Icon";
+import { LoaderIcon } from "@/lib/components/ui/LoaderIcon/LoaderIcon";
 import { useEffect, useState } from "react";
 import { useKnowledgeContext } from "../KnowledgeProvider/hooks/useKnowledgeContext";
+import CurrentFolderExplorerLine from "./CurrentFolderExplorerLine/CurrentFolderExplorerLine";
 
 const CurrentFolderExplorer = (): JSX.Element => {
   const [loading, setLoading] = useState(false);
@@ -49,7 +51,17 @@ const CurrentFolderExplorer = (): JSX.Element => {
           <span>{currentFolder?.name?.replace(/(\..+)$/, "")}</span>
         </div>
         <div className={styles.current_folder_content}>
-          {syncElements?.files.length}
+          {loading ? (
+            <div className={styles.loading_icon}>
+              <LoaderIcon size="large" color="primary" />
+            </div>
+          ) : (
+            syncElements?.files
+              .sort((a, b) => Number(b.is_folder) - Number(a.is_folder))
+              .map((syncElement) => (
+                <CurrentFolderExplorerLine element={syncElement} />
+              ))
+          )}
         </div>
       </div>
     </div>

@@ -1,0 +1,34 @@
+@use "styles/Spacings.module.scss";
+@use "styles/Typography.module.scss";
+
+.folder_explorer_line_wrapper {
+  display: flex;
+  align-items: center;
+  padding-inline: Spacings.$spacing05;
+  padding-block: Spacings.$spacing03;
+  border-bottom: 1px solid var(--border-1);
+  font-size: Typography.$small;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  .left {
+    display: flex;
+    align-items: center;
+    gap: Spacings.$spacing03;
+
+    .file_icon {
+      height: 12px;
+      width: 12px;
+    }
+  }
+
+  &.folder {
+    font-weight: 550;
+
+    &:hover {
+      cursor: pointer;
+      background-color: var(--background-2);
+    }
+  }
+}

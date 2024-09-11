@@ -49,7 +49,7 @@ const SyncFolder = ({ element }: SyncFolderProps): JSX.Element => {
   return (
     <div
       className={`${styles.folder_wrapper} ${
-        !syncElements?.files.filter((file) => file.is_folder).length
+        !syncElements?.files.filter((file) => file.is_folder).length && !loading
           ? styles.empty
           : ""
       }`}

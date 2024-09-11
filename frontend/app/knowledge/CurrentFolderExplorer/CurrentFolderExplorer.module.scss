@@ -6,6 +6,7 @@
   width: 100%;
   height: 100%;
   background-color: var(--background-1);
+  overflow: auto;
 
   .current_folder_explorer_wrapper {
     height: 100%;
@@ -19,6 +20,7 @@
       align-items: center;
       gap: Spacings.$spacing04;
       font-weight: 550;
+      background-color: var(--background-0);
 
       .icon {
         min-width: 18px;
@@ -28,6 +30,20 @@
         display: flex;
         align-items: center;
         justify-content: center;
+      }
+    }
+
+    .current_folder_content {
+      display: flex;
+      flex-direction: column;
+      overflow: scroll;
+
+      .loading_icon {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding-top: Spacings.$spacing06;
       }
     }
   }
