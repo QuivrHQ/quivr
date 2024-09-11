@@ -2,12 +2,13 @@ from abc import ABC, abstractmethod
 from typing import List
 from uuid import UUID
 
+from quivr_api.modules.assistant.dto.inputs import CreateTask
 from quivr_api.modules.assistant.entity.task_entity import Task
 
 
 class TasksInterface(ABC):
     @abstractmethod
-    def create_task(self, task: Task) -> Task:
+    def create_task(self, task: CreateTask) -> Task:
         pass
 
     @abstractmethod
@@ -15,7 +16,7 @@ class TasksInterface(ABC):
         pass
 
     @abstractmethod
-    def delete_task(self, task_id: UUID) -> None:
+    def delete_task(self, task_id: UUID, user_id: UUID) -> None:
         pass
 
     @abstractmethod
