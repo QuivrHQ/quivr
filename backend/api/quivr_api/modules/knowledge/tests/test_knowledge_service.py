@@ -578,7 +578,7 @@ async def test_create_knowledge_file(
 
     assert km.file_name == km_to_add.file_name
     assert km.id
-    assert km.status == KnowledgeStatus.RESERVED
+    assert km.status == KnowledgeStatus.UPLOADED
     # km in storage
     storage.knowledge_exists(km)
 
@@ -606,7 +606,7 @@ async def test_create_knowledge_folder(session: AsyncSession, user: User):
 
     assert km.file_name == km_to_add.file_name
     assert km.id
-    assert km.status == KnowledgeStatus.RESERVED
+    assert km.status == KnowledgeStatus.UPLOADED
     assert storage.knowledge_exists(km)
 
 
@@ -729,7 +729,7 @@ async def test_update_knowledge_multiple(session: AsyncSession, user: User):
     file = KnowledgeDB(
         file_name="file",
         extension="",
-        status="RESERVED",
+        status="UPLOADED",
         source="local",
         source_link="local",
         file_size=None,
