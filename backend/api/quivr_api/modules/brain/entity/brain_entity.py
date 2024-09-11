@@ -69,6 +69,7 @@ class Brain(AsyncAttrs, SQLModel, table=True):
         back_populates="brains", link_model=KnowledgeBrain
     )
 
+
     # TODO : add
     # "meaning" "public"."vector",
     # "tags" "public"."tags"[]

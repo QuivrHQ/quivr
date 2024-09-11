@@ -3,6 +3,7 @@ from uuid import uuid4
 
 import pytest
 import pytest_asyncio
+from quivr_core.models import KnowledgeStatus
 from sqlmodel import select, text
 from sqlmodel.ext.asyncio.session import AsyncSession
 
@@ -69,7 +70,6 @@ async def folder(session, user):
     await session.commit()
     await session.refresh(folder)
     return folder
-
 
 @pytest.mark.asyncio(loop_scope="session")
 async def test_knowledge_default_file(session, folder, user):
@@ -171,3 +171,57 @@ async def test_knowledge_remove_folder_cascade(
     statement = select(KnowledgeDB)
     results = (await session.exec(statement)).all()
     assert results == []
+
+@pytest.mark.asyncio(loop_scope="session")
+async def test_knowledge_dto(session, user, brain):
+    # add folder in brain
+    folder = KnowledgeDB(
+        file_name="folder_1",
+        extension="",
+        status="UPLOADED",
+        source="local",
+        source_link="local",
+        file_size=4,
+        file_sha1=None,
+        brains=[brain],
+        children=[],
+        user_id=user.id,
+        is_folder=True,
+    )
+    km = KnowledgeDB(
+        file_name="test_file_1.txt",
+        extension=".txt",
+        status="UPLOADED",
+        source="test_source",
+        source_link="test_source_link",
+        file_size=100,
+        file_sha1="test_sha1",
+        user_id=user.id,
+        brains=[],
+        parent=folder,
+    )
+    session.add(folder)
+    session.add(km)
+    await session.commit()
+    await session.refresh(folder)
+
+    folder_dto = await folder.to_dto()
+
+    assert folder_dto.file_name== folder.file_name
+    assert folder_dto.url== folder.url
+    assert folder_dto.extension== folder.extension
+    assert folder_dto.status== KnowledgeStatus(folder.status)
+    assert folder_dto.source== folder.source
+    assert folder_dto.source_link== folder.source_link
+    assert folder_dto.is_folder== folder.is_folder
+    assert folder_dto.file_size== folder.file_size 
+    assert folder_dto.file_sha1== folder.file_sha1
+    assert folder_dto.updated_at== folder.updated_at
+    assert folder_dto.created_at== folder.created_at
+    assert folder_dto.metadata== folder.metadata_  # type: ignor
+    assert folder_dto.parent_id == folder.parent_id
+
+    assert folder_dto.brain_ids== [brain.brain_id]
+    assert folder_dto.brains ==[brain.model_dump()]
+    assert folder_dto.children== [await km.to_dto()]
+

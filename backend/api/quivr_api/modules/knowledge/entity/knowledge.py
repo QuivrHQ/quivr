@@ -1,6 +1,6 @@
 from datetime import datetime
 from enum import Enum
-from typing import Dict, List, Optional
+from typing import Any, Dict, List, Optional
 from uuid import UUID
 
 from pydantic import BaseModel
@@ -35,6 +35,7 @@ class Knowledge(BaseModel):
     updated_at: Optional[datetime] = None
     created_at: Optional[datetime] = None
     metadata: Optional[Dict[str, str]] = None
+    brains: List[Dict[str,Any]]
     brain_ids: list[UUID]
     user_id: UUID
     parent_id: Optional[UUID]
@@ -123,6 +124,7 @@ class KnowledgeDB(AsyncAttrs, SQLModel, table=True):
             created_at=self.created_at,
             metadata=self.metadata_,  # type: ignore
             brain_ids=[brain.brain_id for brain in brains],
+            brains=[b.model_dump() for b in brains],
             parent_id=self.parent_id,
             children=[await c.to_dto(get_children=False) for c in children],
             user_id=self.user_id,
