@@ -130,7 +130,8 @@ async def create_knowledge(
     knowledge = AddKnowledge.model_validate_json(knowledge_data)
     if not knowledge.file_name and not knowledge.url:
         raise HTTPException(
-            status_code=400, detail="Either file_name or url must be provided"
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Either file_name or url must be provided",
         )
     try:
         km = await knowledge_service.create_knowledge(
@@ -139,13 +140,21 @@ async def create_knowledge(
         km_dto = await km.to_dto()
         return km_dto
     except ValueError:
-        raise HTTPException(status_code=422, detail="Unprocessable knowledge ")
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail="Unprocessable knowledge ",
+        )
     except FileExistsError:
-        raise HTTPException(status_code=409, detail="Existing knowledge")
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT, detail="Existing knowledge"
+        )
     except UploadError:
-        raise HTTPException(status_code=500, detail="Error occured uplaoding knowledge")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Error occured uploading knowledge",
+        )
     except Exception:
-        raise HTTPException(status_code=500)
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 @knowledge_router.get(
@@ -160,14 +169,16 @@ async def get_knowledge(
         km = await knowledge_service.get_knowledge(knowledge_id)
         if km.user_id != current_user.id:
             raise HTTPException(
-                status_code=403,
+                status_code=status.HTTP_403_FORBIDDEN,
                 detail="You do not have permission to access this knowledge.",
             )
         return await km.to_dto()
     except KnowledgeNotFoundException as e:
-        raise HTTPException(status_code=404, detail=f"{e.message}")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail=f"{e.message}"
+        )
     except Exception:
-        raise HTTPException(status_code=500)
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 @knowledge_router.get(
@@ -185,18 +196,20 @@ async def update_knowledge(
         km = await knowledge_service.get_knowledge(knowledge_id)
         if payload.id and km.id != payload.id:
             raise HTTPException(
-                status_code=404,
+                status_code=status.HTTP_404_NOT_FOUND,
                 detail="Trying to update a knowledge with different knowledge id",
             )
 
         if km.user_id != current_user.id:
             raise HTTPException(
-                status_code=403,
+                status_code=status.HTTP_403_FORBIDDEN,
                 detail="You do not have permission to access this knowledge.",
             )
         km = await knowledge_service.update_knowledge(km, payload)
         return km
     except KnowledgeNotFoundException as e:
-        raise HTTPException(status_code=404, detail=f"{e.message}")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail=f"{e.message}"
+        )
     except Exception:
-        raise HTTPException(status_code=500)
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)

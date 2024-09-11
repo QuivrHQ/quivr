@@ -27,7 +27,7 @@ class Knowledge(BaseModel):
     file_name: Optional[str] = None
     url: Optional[str] = None
     extension: str = ".txt"
-    status: str
+    status: KnowledgeStatus
     file_size: int = 0
     is_folder: bool = False
     updated_at: datetime
@@ -108,6 +108,12 @@ class KnowledgeDB(AsyncAttrs, SQLModel, table=True):
 
     # TODO: nested folder search
     async def to_dto(self, get_children: bool = True) -> Knowledge:
+        assert (
+            self.updated_at
+        ), "knowledge should be inserted before transforming to dto"
+        assert (
+            self.created_at
+        ), "knowledge should be inserted before transforming to dto"
         brains = await self.awaitable_attrs.brains
         children: list[KnowledgeDB] = (
             await self.awaitable_attrs.children if get_children else []
@@ -126,7 +132,6 @@ class KnowledgeDB(AsyncAttrs, SQLModel, table=True):
             updated_at=self.updated_at,
             created_at=self.created_at,
             metadata=self.metadata_,  # type: ignore
-            brain_ids=[brain.brain_id for brain in brains],
             brains=[b.model_dump() for b in brains],
             parent_id=self.parent_id,
             children=[await c.to_dto(get_children=False) for c in children],
