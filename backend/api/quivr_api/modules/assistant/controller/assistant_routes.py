@@ -1,12 +1,13 @@
+from typing import Annotated
+
 from fastapi import APIRouter, Depends, Request
 
 from quivr_api.logger import get_logger
 from quivr_api.middlewares.auth.auth_bearer import AuthBearer, get_current_user
-from quivr_api.modules.user.entity.user_identity import UserIdentity
-from quivr_api.modules.dependencies import get_service
-from quivr_api.modules.assistant.services.tasks_service import TasksService
-from typing import Annotated
 from quivr_api.modules.assistant.dto.inputs import CreateTask
+from quivr_api.modules.assistant.services.tasks_service import TasksService
+from quivr_api.modules.dependencies import get_service
+from quivr_api.modules.user.entity.user_identity import UserIdentity
 
 logger = get_logger(__name__)
 logger = get_logger(__name__)
@@ -16,7 +17,6 @@ assistant_router = APIRouter()
 
 TasksServiceDep = Annotated[TasksService, Depends(get_service(TasksService))]
 UserIdentityDep = Annotated[UserIdentity, Depends(get_current_user)]
-
 
 
 @assistant_router.get(

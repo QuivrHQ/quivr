@@ -1,11 +1,11 @@
 from datetime import datetime
+from typing import Dict
 from uuid import UUID
 
-from sqlmodel import TIMESTAMP, Column, Field, SQLModel, text, JSON, BigInteger
-from typing import Dict
+from sqlmodel import JSON, TIMESTAMP, BigInteger, Column, Field, SQLModel, text
+
 
 class Task(SQLModel, table=True):
-
     __tablename__ = "tasks"  # type: ignore
 
     id: int | None = Field(
@@ -30,6 +30,6 @@ class Task(SQLModel, table=True):
     # Json for answer_raw
     answer_raw: Dict = Field(default_factory=dict, sa_column=Column(JSON))
     answer_pretty: str | None = Field(default=None)
-    
+
     class Config:
         arbitrary_types_allowed = True
