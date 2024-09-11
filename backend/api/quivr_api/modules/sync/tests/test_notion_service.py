@@ -1,4 +1,5 @@
 from datetime import datetime
+from typing import Tuple
 
 import httpx
 import pytest
@@ -7,6 +8,7 @@ from sqlmodel.ext.asyncio.session import AsyncSession
 
 from quivr_api.modules.brain.integrations.Notion.Notion_connector import NotionPage
 from quivr_api.modules.sync.entity.notion_page import NotionSearchResult
+from quivr_api.modules.sync.entity.sync_models import SyncsActive, SyncsUser
 from quivr_api.modules.sync.repository.sync_repository import NotionRepository
 from quivr_api.modules.sync.service.sync_notion import (
     SyncNotionService,
@@ -76,16 +78,19 @@ def test_fetch_limit_notion_pages_now(fetch_response):
 async def test_store_notion_pages_success(
     session: AsyncSession,
     notion_search_result: NotionSearchResult,
+    setup_syncs_data: Tuple[SyncsUser, SyncsActive],
     user_1: User,
 ):
     assert user_1.id
+    (sync_user, sync_active) = setup_syncs_data
+
     notion_repository = NotionRepository(session)
     notion_service = SyncNotionService(notion_repository)
     sync_files = await store_notion_pages(
         notion_search_result.results,
         notion_service,
         user_1.id,
-        sync_user_id=0,  # FIXME
+        sync_user_id=sync_user.id,  # FIXME
     )
     assert sync_files
     assert len(sync_files) == 1

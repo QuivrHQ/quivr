@@ -365,7 +365,11 @@ class MockSyncCloud(BaseSync):
         ]
 
     async def aget_files(
-        self, credentials: Dict, folder_id: str | None = None, recursive: bool = False
+        self,
+        credentials: Dict,
+        sync_user_id=int,
+        folder_id: str | None = None,
+        recursive: bool = False,
     ) -> List[SyncFile]:
         n_files = 1
         return [
