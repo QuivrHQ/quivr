@@ -152,7 +152,7 @@ def combine_documents(
     docs, document_prompt=DEFAULT_DOCUMENT_PROMPT, document_separator="\n\n"
 ):
     # for each docs, add an index in the metadata to be able to cite the sources
-    for doc, index in zip(docs, range(len(docs))):
+    for doc, index in zip(docs, range(len(docs)), strict=False):
         doc.metadata["index"] = index
     doc_strings = [format_document(doc, document_prompt) for doc in docs]
     return document_separator.join(doc_strings)

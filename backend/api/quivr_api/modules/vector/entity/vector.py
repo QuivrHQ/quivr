@@ -3,11 +3,10 @@ from uuid import UUID
 
 from pgvector.sqlalchemy import Vector as PGVector
 from pydantic import BaseModel
+from quivr_api.models.settings import settings
 from sqlalchemy import Column
 from sqlmodel import JSON, Column, Field, SQLModel, text
 from sqlmodel import UUID as PGUUID
-
-from quivr_api.models.settings import settings
 
 
 class Vector(SQLModel, table=True):

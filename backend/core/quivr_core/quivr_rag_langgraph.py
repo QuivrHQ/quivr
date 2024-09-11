@@ -1,16 +1,15 @@
 import logging
-from typing import AsyncGenerator, Optional, Sequence, Annotated, Sequence, TypedDict
+from typing import Annotated, AsyncGenerator, Optional, Sequence, TypedDict
 
 # TODO(@aminediro): this is the only dependency to langchain package, we should remove it
 from langchain.retrievers import ContextualCompressionRetriever
 from langchain_core.callbacks import Callbacks
 from langchain_core.documents import BaseDocumentCompressor, Document
-from langchain_core.messages import AIMessage, HumanMessage, BaseMessage
+from langchain_core.messages import AIMessage, BaseMessage, HumanMessage
 from langchain_core.messages.ai import AIMessageChunk
 from langchain_core.vectorstores import VectorStore
-
-from langgraph.graph.message import add_messages
 from langgraph.graph import END, StateGraph
+from langgraph.graph.message import add_messages
 
 from quivr_core.chat import ChatHistory
 from quivr_core.config import RAGConfig
@@ -22,12 +21,12 @@ from quivr_core.models import (
     RAGResponseMetadata,
     cited_answer,
 )
-from quivr_core.prompts import CONDENSE_QUESTION_PROMPT, ANSWER_PROMPT
+from quivr_core.prompts import ANSWER_PROMPT, CONDENSE_QUESTION_PROMPT
 from quivr_core.utils import (
+    combine_documents,
     format_file_list,
     get_chunk_metadata,
     parse_chunk_response,
-    combine_documents,
     parse_response,
 )
 

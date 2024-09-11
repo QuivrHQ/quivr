@@ -1,10 +1,10 @@
 import logging
 from urllib.parse import parse_qs, urlparse
 
-from langchain_core.language_models.chat_models import BaseChatModel
-from pydantic.v1 import SecretStr
-from langchain_openai import AzureChatOpenAI, ChatOpenAI
 from langchain_anthropic import ChatAnthropic
+from langchain_core.language_models.chat_models import BaseChatModel
+from langchain_openai import AzureChatOpenAI, ChatOpenAI
+from pydantic.v1 import SecretStr
 
 from quivr_core.brain.info import LLMInfo
 from quivr_core.config import LLMEndpointConfig

@@ -1,7 +1,8 @@
-from unittest.mock import patch, MagicMock
-from quivr_api.modules.dependencies import get_embedding_client
+from unittest.mock import MagicMock, patch
+
 from langchain_community.embeddings.ollama import OllamaEmbeddings
 from langchain_openai import AzureOpenAIEmbeddings
+from quivr_api.modules.dependencies import get_embedding_client
 
 
 def test_ollama_embedding():

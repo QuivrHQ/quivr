@@ -4,7 +4,6 @@ from uuid import uuid4
 import pytest
 from langchain_core.documents import Document
 from langchain_core.embeddings import Embeddings
-
 from quivr_core.brain import Brain
 from quivr_core.chat import ChatHistory
 from quivr_core.llm import LLMEndpoint

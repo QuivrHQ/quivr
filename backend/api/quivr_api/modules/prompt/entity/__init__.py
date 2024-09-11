@@ -1,7 +1,7 @@
 from .prompt import (
+    CreatePromptProperties,
+    DeletePromptResponse,
     Prompt,
     PromptStatusEnum,
-    CreatePromptProperties,
     PromptUpdatableProperties,
-    DeletePromptResponse,
 )

@@ -3,6 +3,7 @@ from typing import Optional
 
 from fastapi import Depends, HTTPException, Request
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
+
 from quivr_api.middlewares.auth.jwt_token_handler import (
     decode_access_token,
     verify_token,

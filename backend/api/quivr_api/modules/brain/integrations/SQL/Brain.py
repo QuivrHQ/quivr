@@ -7,6 +7,7 @@ from langchain_community.utilities import SQLDatabase
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.runnables import RunnablePassthrough
+
 from quivr_api.modules.brain.integrations.SQL.SQL_connector import SQLConnector
 from quivr_api.modules.brain.knowledge_brain_qa import KnowledgeBrainQA
 from quivr_api.modules.brain.repository.integration_brains import IntegrationBrain

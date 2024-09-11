@@ -2,7 +2,6 @@ import os
 from uuid import uuid4
 
 import pytest
-
 from quivr_worker.files import File
 
 

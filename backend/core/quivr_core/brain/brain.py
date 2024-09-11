@@ -2,7 +2,7 @@ import asyncio
 import logging
 from pathlib import Path
 from pprint import PrettyPrinter
-from typing import Any, AsyncGenerator, Callable, Dict, Self, Union, Type
+from typing import Any, AsyncGenerator, Callable, Dict, Self, Type, Union
 from uuid import UUID, uuid4
 
 from langchain_core.documents import Document

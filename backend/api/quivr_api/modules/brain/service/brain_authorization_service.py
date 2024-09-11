@@ -2,6 +2,7 @@ from typing import List, Optional, Union
 from uuid import UUID
 
 from fastapi import Depends, HTTPException, status
+
 from quivr_api.middlewares.auth.auth_bearer import get_current_user
 from quivr_api.modules.brain.entity.brain_entity import RoleEnum
 from quivr_api.modules.brain.service.brain_service import BrainService
