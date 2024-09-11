@@ -27,19 +27,18 @@ class Knowledge(BaseModel):
     url: Optional[str] = None
     extension: str = ".txt"
     status: str
+    file_size: int = 0
     is_folder: bool = False
+    updated_at: datetime
+    created_at: datetime
     source: Optional[str] = None
     source_link: Optional[str] = None
-    file_size: int = 0
-    file_sha1: Optional[str] = None
-    updated_at: Optional[datetime] = None
-    created_at: Optional[datetime] = None
-    metadata: Optional[Dict[str, str]] = None
-    brains: List[Dict[str, Any]]
-    #brain_ids: list[UUID]
     user_id: UUID
     parent_id: Optional[UUID]
     children: Optional[list["Knowledge"]]
+    file_sha1: Optional[str] = None
+    metadata: Optional[Dict[str, str]] = None
+    brains: List[Dict[str, Any]]
 
 
 class KnowledgeDB(AsyncAttrs, SQLModel, table=True):
