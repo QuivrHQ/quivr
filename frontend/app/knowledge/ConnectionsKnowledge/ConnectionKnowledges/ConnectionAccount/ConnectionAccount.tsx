@@ -61,7 +61,7 @@ const ConnectionAccount = ({
             onClick={() => setFolded(!folded)}
           />
           <ConnectionIcon letter={sync.email[0]} index={index} />
-          <span>{sync.email}</span>
+          <span className={styles.name}>{sync.email}</span>
         </div>
       )}
       {(!singleAccount && !folded) || singleAccount ? (

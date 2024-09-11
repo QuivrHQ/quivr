@@ -13,6 +13,10 @@
     padding-left: Spacings.$spacing03;
     font-size: Typography.$small;
     font-weight: 500;
+
+    .name {
+      @include Typography.EllipsisOverflow;
+    }
   }
 
   .loader_icon {
