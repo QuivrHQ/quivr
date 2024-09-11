@@ -4,6 +4,7 @@ from collections import Counter
 from enum import Enum
 from pathlib import Path
 from typing import List, Set
+import logging
 
 import pandas as pd
 from docx import Document
@@ -23,7 +24,9 @@ from pptx.enum.shapes import MSO_SHAPE_TYPE
 from megaparse.markdown_processor import MarkdownProcessor
 from megaparse.multimodal_convertor.megaparse_vision import MegaParseVision
 from megaparse.unstructured_convertor import ModelEnum, UnstructuredParser
+from megaparse.config import MegaparseConfig
 
+logger = logging.getLogger("megaparse")
 
 class Converter:
     def __init__(self) -> None:
@@ -271,6 +274,7 @@ class PDFConverter:
         self.method = method
 
     async def _llama_parse(self, api_key: str, file_path: str | Path):
+        logger.debug(f"Parsing {file_path.name} using llama_parse")
         parsing_instructions = "Do not take into account the page breaks (no --- between pages), do not repeat the header and the footer so the tables are merged. Keep the same format for similar tables."
         self.parser = LlamaParse(
             api_key=str(api_key),
@@ -290,6 +294,7 @@ class PDFConverter:
     def _unstructured_parse(
         self, file_path: str | Path, model: ModelEnum = ModelEnum.NONE
     ):
+        logger.debug(f"Parsing {file_path.name} using unstructured")
         unstructured_parser = UnstructuredParser()
         return unstructured_parser.convert(
             file_path, model=model, strategy=self.strategy
@@ -347,14 +352,12 @@ class MegaParse(BaseLoader):
     def __init__(
         self,
         file_path: str | Path,
-        llama_parse_api_key: str | None = None,
-        strategy="fast",
+        config: MegaparseConfig = MegaparseConfig(),
     ) -> None:
         if isinstance(file_path, str):
             file_path = Path(file_path)
         self.file_path = file_path
-        self.llama_parse_api_key = llama_parse_api_key
-        self.strategy = strategy
+        self.config = config
 
     async def aload(self, **convert_kwargs) -> LangChainDocument:
         file_extension: str = os.path.splitext(self.file_path)[1]
@@ -364,8 +367,9 @@ class MegaParse(BaseLoader):
             converter = PPTXConverter()
         elif file_extension == ".pdf":
             converter = PDFConverter(
-                llama_parse_api_key=str(self.llama_parse_api_key),
-                strategy=self.strategy,
+                llama_parse_api_key=str(self.config.llama_parse_api_key),
+                strategy=self.config.strategy,
+                method=self.config.pdf_parser
             )
         elif file_extension == ".xlsx":
             converter = XLSXConverter()
@@ -382,8 +386,8 @@ class MegaParse(BaseLoader):
             converter = PPTXConverter()
         elif file_extension == ".pdf":
             converter = PDFConverter(
-                llama_parse_api_key=str(self.llama_parse_api_key),
-                strategy=self.strategy,
+                llama_parse_api_key=str(self.config.llama_parse_api_key),
+                strategy=self.config.strategy,
             )
         elif file_extension == ".xlsx":
             converter = XLSXConverter()
