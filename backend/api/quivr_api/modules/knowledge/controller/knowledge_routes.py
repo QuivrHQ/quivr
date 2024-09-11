@@ -2,7 +2,7 @@ from http import HTTPStatus
 from typing import Annotated, Optional
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, File, HTTPException, Query, UploadFile
+from fastapi import APIRouter, Depends, File, HTTPException, Query, UploadFile, status
 
 from quivr_api.logger import get_logger
 from quivr_api.middlewares.auth import AuthBearer, get_current_user
@@ -13,8 +13,10 @@ from quivr_api.modules.brain.service.brain_authorization_service import (
 )
 from quivr_api.modules.dependencies import get_service
 from quivr_api.modules.knowledge.dto.inputs import AddKnowledge
+from quivr_api.modules.knowledge.entity.knowledge import Knowledge, KnowledgeUpdate
 from quivr_api.modules.knowledge.service.knowledge_exceptions import (
     KnowledgeNotFoundException,
+    UploadError,
 )
 from quivr_api.modules.knowledge.service.knowledge_service import KnowledgeService
 from quivr_api.modules.upload.service.generate_file_signed_url import (
@@ -92,13 +94,13 @@ async def generate_signed_url_endpoint(
 
     knowledge = await knowledge_service.get_knowledge(knowledge_id)
 
-    if len(knowledge.brain_ids) == 0:
+    if len(knowledge.brains) == 0:
         raise HTTPException(
             status_code=HTTPStatus.NOT_FOUND,
             detail="knowledge not associated with brains yet.",
         )
 
-    brain_id = knowledge.brain_ids[0]
+    brain_id = knowledge.brains[0]["brain_id"]
 
     validate_brain_authorization(brain_id=brain_id, user_id=current_user.id)
 
@@ -117,8 +119,9 @@ async def generate_signed_url_endpoint(
 @knowledge_router.post(
     "/knowledge/",
     tags=["Knowledge"],
+    response_model=Knowledge,
 )
-async def add_knowledge(
+async def create_knowledge(
     knowledge_data: str = File(...),
     file: Optional[UploadFile] = None,
     knowledge_service: KnowledgeService = Depends(get_service(KnowledgeService)),
@@ -130,20 +133,23 @@ async def add_knowledge(
             status_code=400, detail="Either file_name or url must be provided"
         )
     try:
-        await knowledge_service.create_knowledge(
+        km = await knowledge_service.create_knowledge(
             knowledge_to_add=knowledge, upload_file=file, user_id=current_user.id
         )
+        km_dto = await km.to_dto()
+        return km_dto
     except ValueError:
         raise HTTPException(status_code=422, detail="Unprocessable knowledge ")
     except FileExistsError:
         raise HTTPException(status_code=409, detail="Existing knowledge")
+    except UploadError:
+        raise HTTPException(status_code=500, detail="Error occured uplaoding knowledge")
     except Exception:
         raise HTTPException(status_code=500)
 
 
 @knowledge_router.get(
-    "/knowledge/{knowledge_id}",
-    tags=["Knowledge"],
+    "/knowledge/{knowledge_id}", tags=["Knowledge"], response_model=Knowledge
 )
 async def get_knowledge(
     knowledge_id: UUID,
@@ -157,6 +163,38 @@ async def get_knowledge(
                 status_code=403,
                 detail="You do not have permission to access this knowledge.",
             )
+        return await km.to_dto()
+    except KnowledgeNotFoundException as e:
+        raise HTTPException(status_code=404, detail=f"{e.message}")
+    except Exception:
+        raise HTTPException(status_code=500)
+
+
+@knowledge_router.get(
+    "/knowledge/{knowledge_id}",
+    status_code=status.HTTP_202_ACCEPTED,
+    response_model=Knowledge,
+)
+async def update_knowledge(
+    knowledge_id: UUID,
+    payload: KnowledgeUpdate,
+    knowledge_service: KnowledgeService = Depends(get_service(KnowledgeService)),
+    current_user: UserIdentity = Depends(get_current_user),
+):
+    try:
+        km = await knowledge_service.get_knowledge(knowledge_id)
+        if payload.id and km.id != payload.id:
+            raise HTTPException(
+                status_code=404,
+                detail="Trying to update a knowledge with different knowledge id",
+            )
+
+        if km.user_id != current_user.id:
+            raise HTTPException(
+                status_code=403,
+                detail="You do not have permission to access this knowledge.",
+            )
+        km = await knowledge_service.update_knowledge(km, payload)
         return km
     except KnowledgeNotFoundException as e:
         raise HTTPException(status_code=404, detail=f"{e.message}")

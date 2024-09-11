@@ -1,5 +1,5 @@
 import io
-from typing import List
+from typing import Any, List
 from uuid import UUID
 
 from fastapi import UploadFile
@@ -17,6 +17,7 @@ from quivr_api.modules.knowledge.entity.knowledge import (
     Knowledge,
     KnowledgeDB,
     KnowledgeSource,
+    KnowledgeUpdate,
 )
 from quivr_api.modules.knowledge.repository.knowledges import KnowledgeRepository
 from quivr_api.modules.knowledge.repository.storage import SupabaseS3Storage
@@ -69,19 +70,22 @@ class KnowledgeService(BaseService[KnowledgeRepository]):
         except NoResultFound:
             raise FileNotFoundError(f"No knowledge for file_name: {file_name}")
 
-    async def get_knowledge(self, knowledge_id: UUID) -> Knowledge:
-        try:
-            km = await self.repository.get_knowledge_by_id(knowledge_id)
-            km = await km.to_dto()
-            return km
-        except NoResultFound:
-            raise
+    async def get_knowledge(self, knowledge_id: UUID) -> KnowledgeDB:
+        km = await self.repository.get_knowledge_by_id(knowledge_id)
+        return km
+
+    async def update_knowledge(
+        self,
+        knowledge: KnowledgeDB,
+        payload: Knowledge | KnowledgeUpdate | dict[str, Any],
+    ):
+        return await self.repository.update_knowledge(knowledge, payload)
 
     # TODO (@aminediro): Replace with ON CONFLICT smarter query...
     # there is a chance of race condition but for now we let it crash in worker
     # the tasks will be dealt with on retry
     async def update_sha1_conflict(
-        self, knowledge: Knowledge, brain_id: UUID, file_sha1: str
+        self, knowledge: KnowledgeDB, brain_id: UUID, file_sha1: str
     ) -> bool:
         assert knowledge.id
         knowledge.file_sha1 = file_sha1
@@ -124,7 +128,7 @@ class KnowledgeService(BaseService[KnowledgeRepository]):
         user_id: UUID,
         knowledge_to_add: AddKnowledge,
         upload_file: UploadFile | None = None,
-    ) -> Knowledge:
+    ) -> KnowledgeDB:
         knowledgedb = KnowledgeDB(
             user_id=user_id,
             file_name=knowledge_to_add.file_name,
@@ -145,16 +149,18 @@ class KnowledgeService(BaseService[KnowledgeRepository]):
                     knowledgedb, buff_reader
                 )
                 knowledgedb.source_link = storage_path
+            # TODO(@aminediro): Update status after upload ?
+            await self.repository.update_knowledge(
+                knowledge_db,
+                KnowledgeUpdate(status="UPLOADED"),  # type: ignore
+            )
+            return knowledge_db
         except Exception as e:
             logger.exception(
                 f"Error uploading knowledge {knowledgedb.id} to storage : {e}"
             )
             await self.repository.remove_knowledge(knowledge=knowledge_db)
             raise UploadError()
-
-        # TODO(@aminediro): Update status after upload ?
-        inserted_knowledge = await knowledge_db.to_dto()
-        return inserted_knowledge
 
     async def insert_knowledge_brain(
         self,

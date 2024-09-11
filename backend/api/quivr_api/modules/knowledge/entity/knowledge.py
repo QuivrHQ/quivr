@@ -11,6 +11,7 @@ from sqlmodel import UUID as PGUUID
 from sqlmodel import Field, Relationship, SQLModel
 
 from quivr_api.modules.knowledge.entity.knowledge_brain import KnowledgeBrain
+from quivr_api.utils.partial import all_optional
 
 
 class KnowledgeSource(str, Enum):
@@ -39,6 +40,11 @@ class Knowledge(BaseModel):
     file_sha1: Optional[str] = None
     metadata: Optional[Dict[str, str]] = None
     brains: List[Dict[str, Any]]
+
+
+@all_optional()
+class KnowledgeUpdate(Knowledge):
+    pass
 
 
 class KnowledgeDB(AsyncAttrs, SQLModel, table=True):
@@ -93,9 +99,7 @@ class KnowledgeDB(AsyncAttrs, SQLModel, table=True):
     )
     parent: Optional["KnowledgeDB"] = Relationship(
         back_populates="children",
-        sa_relationship_kwargs={
-            "remote_side": "KnowledgeDB.id",
-        },
+        sa_relationship_kwargs={"remote_side": "KnowledgeDB.id"},
     )
     children: list["KnowledgeDB"] = Relationship(
         back_populates="parent",

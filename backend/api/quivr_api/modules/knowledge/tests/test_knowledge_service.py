@@ -12,10 +12,13 @@ from sqlmodel.ext.asyncio.session import AsyncSession
 
 from quivr_api.modules.brain.entity.brain_entity import Brain, BrainType
 from quivr_api.modules.knowledge.dto.inputs import AddKnowledge, KnowledgeStatus
-from quivr_api.modules.knowledge.entity.knowledge import KnowledgeDB
+from quivr_api.modules.knowledge.entity.knowledge import KnowledgeDB, KnowledgeUpdate
 from quivr_api.modules.knowledge.entity.knowledge_brain import KnowledgeBrain
 from quivr_api.modules.knowledge.repository.knowledges import KnowledgeRepository
-from quivr_api.modules.knowledge.service.knowledge_exceptions import UploadError
+from quivr_api.modules.knowledge.service.knowledge_exceptions import (
+    KnowledgeNotFoundException,
+    UploadError,
+)
 from quivr_api.modules.knowledge.service.knowledge_service import KnowledgeService
 from quivr_api.modules.knowledge.tests.conftest import ErrorStorage, FakeStorage
 from quivr_api.modules.upload.service.upload_file import upload_file_storage
@@ -239,7 +242,7 @@ async def test_cascade_remove_knowledge_by_id(
     assert knowledges[0].id
     repo = KnowledgeRepository(session)
     await repo.remove_knowledge_by_id(knowledges[0].id)
-    with pytest.raises(NoResultFound):
+    with pytest.raises(KnowledgeNotFoundException):
         await repo.get_knowledge_by_id(knowledges[0].id)
 
     query = select(KnowledgeBrain).where(
@@ -385,13 +388,12 @@ async def test_should_process_knowledge_exists(
     session.add(new)
     await session.commit()
     await session.refresh(new)
-    incoming_knowledge = await new.to_dto()
     repo = KnowledgeRepository(session)
     service = KnowledgeService(repo)
     assert existing_knowledge.file_sha1
     with pytest.raises(FileExistsError):
         await service.update_sha1_conflict(
-            incoming_knowledge, brain.brain_id, file_sha1=existing_knowledge.file_sha1
+            new, brain.brain_id, file_sha1=existing_knowledge.file_sha1
         )
 
 
@@ -462,7 +464,7 @@ async def test_should_process_knowledge_link_brain(
     }
     # Check new knowledge was removed
     assert new.id
-    with pytest.raises(NoResultFound):
+    with pytest.raises(KnowledgeNotFoundException):
         await service.repository.get_knowledge_by_id(new.id)
 
 
@@ -516,7 +518,7 @@ async def test_should_process_knowledge_prev_error(
     # Checks we should process this file
     assert should_process
     # Previous errored file is cleaned up
-    with pytest.raises(NoResultFound):
+    with pytest.raises(KnowledgeNotFoundException):
         await service.repository.get_knowledge_by_id(prev.id)
 
     assert new.id
@@ -649,7 +651,7 @@ async def test_get_knowledge(session: AsyncSession, folder_km: KnowledgeDB, user
     assert result.id == folder_km.id
     assert result.children
     assert len(result.children) > 0
-    assert result.children[0] == await folder_km.children[0].to_dto()
+    assert result.children[0] == folder_km.children[0]
 
 
 @pytest.mark.asyncio(loop_scope="session")
@@ -667,6 +669,104 @@ async def test_get_knowledge_nested(
     assert result.children
     assert len(result.children) > 0
     assert result.children[0].is_folder
-    assert result.children[0] == await folder_km_nested.children[0].to_dto(
-        get_children=False
+    assert result.children[0] == folder_km_nested.children[0]
+
+
+@pytest.mark.asyncio(loop_scope="session")
+async def test_update_knowledge_rename(
+    session: AsyncSession, folder_km: KnowledgeDB, user: User
+):
+    assert user.id
+    assert folder_km.id
+    storage = ErrorStorage()
+    repository = KnowledgeRepository(session)
+    service = KnowledgeService(repository, storage)
+
+    new_km = await service.update_knowledge(
+        folder_km,
+        KnowledgeUpdate(file_name="change_name"),  # type: ignore
     )
+    assert new_km.file_name == "change_name"
+
+
+@pytest.mark.asyncio(loop_scope="session")
+async def test_update_knowledge_move(
+    session: AsyncSession, folder_km: KnowledgeDB, user: User
+):
+    assert user.id
+    assert folder_km.id
+    folder_2 = KnowledgeDB(
+        file_name="folder_2",
+        extension="",
+        status="UPLOADED",
+        source="local",
+        source_link="local",
+        file_size=4,
+        file_sha1=None,
+        brains=[],
+        children=[],
+        user_id=user.id,
+        is_folder=True,
+    )
+    session.add(folder_2)
+    await session.commit()
+    await session.refresh(folder_2)
+
+    storage = ErrorStorage()
+    repository = KnowledgeRepository(session)
+    service = KnowledgeService(repository, storage)
+
+    new_km = await service.update_knowledge(
+        folder_km,
+        KnowledgeUpdate(parent_id=folder_2.id),  # type: ignore
+    )
+    assert new_km.parent_id == folder_2.id
+
+
+@pytest.mark.asyncio(loop_scope="session")
+async def test_update_knowledge_multiple(session: AsyncSession, user: User):
+    assert user.id
+    file = KnowledgeDB(
+        file_name="file",
+        extension="",
+        status="RESERVED",
+        source="local",
+        source_link="local",
+        file_size=None,
+        file_sha1=None,
+        user_id=user.id,
+    )
+    folder = KnowledgeDB(
+        file_name="folder_2",
+        extension="",
+        status="UPLOADED",
+        source="local",
+        source_link="local",
+        file_size=4,
+        file_sha1=None,
+        brains=[],
+        children=[],
+        user_id=user.id,
+        is_folder=True,
+    )
+    session.add(file)
+    session.add(folder)
+    await session.commit()
+    await session.refresh(folder)
+
+    storage = ErrorStorage()
+    repository = KnowledgeRepository(session)
+    service = KnowledgeService(repository, storage)
+
+    await service.update_knowledge(
+        file,
+        KnowledgeUpdate(parent_id=folder.id, status="UPLOADED", file_sha1="sha1"),  # type: ignore
+    )
+
+    km = (
+        await session.exec(select(KnowledgeDB).where(KnowledgeDB.id == file.id))
+    ).first()
+    assert km
+    assert km.parent_id == folder.id
+    assert km.status == "UPLOADED"
+    assert km.file_sha1 == "sha1"

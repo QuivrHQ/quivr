@@ -1,9 +1,10 @@
-from typing import Sequence
+from typing import Any, Sequence
 from uuid import UUID
 
 from fastapi import HTTPException
 from quivr_core.models import KnowledgeStatus
 from sqlalchemy.exc import IntegrityError, NoResultFound
+from sqlalchemy.orm import joinedload
 from sqlmodel import select, text
 from sqlmodel.ext.asyncio.session import AsyncSession
 
@@ -11,7 +12,10 @@ from quivr_api.logger import get_logger
 from quivr_api.modules.brain.entity.brain_entity import Brain
 from quivr_api.modules.dependencies import BaseRepository, get_supabase_client
 from quivr_api.modules.knowledge.dto.outputs import DeleteKnowledgeResponse
-from quivr_api.modules.knowledge.entity.knowledge import KnowledgeDB
+from quivr_api.modules.knowledge.entity.knowledge import Knowledge, KnowledgeDB
+from quivr_api.modules.knowledge.service.knowledge_exceptions import (
+    KnowledgeNotFoundException,
+)
 
 logger = get_logger(__name__)
 
@@ -33,6 +37,21 @@ class KnowledgeRepository(BaseRepository):
         except Exception:
             await self.session.rollback()
             raise
+        return knowledge
+
+    async def update_knowledge(
+        self, knowledge: KnowledgeDB, payload: Knowledge | dict[str, Any]
+    ) -> KnowledgeDB:
+        if isinstance(payload, dict):
+            update_data = payload
+        else:
+            update_data = payload.model_dump(exclude_unset=True)
+        for field in update_data:
+            setattr(knowledge, field, update_data[field])
+
+        self.session.add(knowledge)
+        await self.session.commit()
+        await self.session.refresh(knowledge)
         return knowledge
 
     async def insert_knowledge_brain(
@@ -148,12 +167,15 @@ class KnowledgeRepository(BaseRepository):
         return knowledge
 
     async def get_knowledge_by_id(self, knowledge_id: UUID) -> KnowledgeDB:
-        query = select(KnowledgeDB).where(KnowledgeDB.id == knowledge_id)
+        query = (
+            select(KnowledgeDB)
+            .where(KnowledgeDB.id == knowledge_id)
+            .options(joinedload(KnowledgeDB.parent), joinedload(KnowledgeDB.children))
+        )
         result = await self.session.exec(query)
         knowledge = result.first()
         if not knowledge:
-            raise NoResultFound("Knowledge not found")
-
+            raise KnowledgeNotFoundException("Knowledge not found")
         return knowledge
 
     async def get_brain_by_id(self, brain_id: UUID) -> Brain:
