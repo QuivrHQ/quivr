@@ -18,8 +18,13 @@ const SyncFolder = ({ element, syncId }: SyncFolderProps): JSX.Element => {
   const [loading, setLoading] = useState(false);
   const { getSyncFiles } = useSync();
   const [syncElements, setSyncElements] = useState<SyncElements>();
+  const [selectedFolder, setSelectedFolder] = useState<boolean>(false);
 
-  const { setCurrentFolder } = useKnowledgeContext();
+  const { currentFolder, setCurrentFolder } = useKnowledgeContext();
+
+  useEffect(() => {
+    setSelectedFolder(currentFolder?.id === element.id);
+  }, [currentFolder]);
 
   useEffect(() => {
     if (!folded) {
@@ -37,11 +42,14 @@ const SyncFolder = ({ element, syncId }: SyncFolderProps): JSX.Element => {
   }, [folded]);
 
   return (
-    <div className={styles.folder_wrapper}>
-      <div
-        className={styles.folder_line_wrapper}
-        onClick={() => setCurrentFolder(element)}
-      >
+    <div
+      className={`${styles.folder_wrapper} ${
+        !syncElements?.files.filter((file) => file.is_folder).length
+          ? styles.empty
+          : ""
+      }`}
+    >
+      <div className={styles.folder_line_wrapper}>
         <Icon
           name={folded ? "chevronRight" : "chevronDown"}
           size="normal"
@@ -49,7 +57,10 @@ const SyncFolder = ({ element, syncId }: SyncFolderProps): JSX.Element => {
           handleHover={true}
           onClick={() => setFolded(!folded)}
         />
-        <span className={styles.name}>
+        <span
+          className={`${styles.name} ${selectedFolder ? styles.selected : ""}`}
+          onClick={() => setCurrentFolder(element)}
+        >
           {element.name?.includes(".")
             ? element.name.split(".").slice(0, -1).join(".")
             : element.name}
@@ -61,13 +72,7 @@ const SyncFolder = ({ element, syncId }: SyncFolderProps): JSX.Element => {
             <LoaderIcon color="primary" size="small" />
           </div>
         ) : (
-          <div
-            className={`${styles.sync_elements_wrapper} ${
-              !syncElements?.files.filter((file) => file.is_folder).length
-                ? styles.empty
-                : ""
-            }`}
-          >
+          <div className={styles.sync_elements_wrapper}>
             {syncElements?.files
               .filter((file) => file.is_folder)
               .map((folder, id) => (

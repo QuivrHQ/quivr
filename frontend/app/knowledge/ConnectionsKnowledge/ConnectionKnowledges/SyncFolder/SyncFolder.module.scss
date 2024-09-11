@@ -8,8 +8,8 @@
   gap: Spacings.$spacing02;
   margin-left: Spacings.$spacing03;
 
-  &.no_margin {
-    margin-left: 0;
+  &.empty {
+    gap: 0;
   }
 
   .folder_line_wrapper {
@@ -22,7 +22,8 @@
       padding: Spacings.$spacing01;
       padding-inline: Spacings.$spacing03;
 
-      &:hover {
+      &:hover,
+      &.selected {
         background-color: var(--background-6);
         cursor: pointer;
         border-radius: Radius.$normal;
