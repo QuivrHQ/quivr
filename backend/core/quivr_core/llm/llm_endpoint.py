@@ -27,8 +27,6 @@ class LLMEndpoint:
     @classmethod
     def from_config(cls, config: LLMEndpointConfig = LLMEndpointConfig()):
         try:
-            
-
             if config.model.startswith("azure/"):
                 # Parse the URL
                 parsed_url = urlparse(config.llm_base_url)

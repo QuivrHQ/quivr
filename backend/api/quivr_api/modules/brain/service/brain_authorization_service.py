@@ -13,7 +13,7 @@ brain_service = BrainService()
 
 
 def has_brain_authorization(
-    required_roles: Optional[Union[RoleEnum, List[RoleEnum]]] = RoleEnum.Owner
+    required_roles: Optional[Union[RoleEnum, List[RoleEnum]]] = RoleEnum.Owner,
 ):
     """
     Decorator to check if the user has the required role(s) for the brain

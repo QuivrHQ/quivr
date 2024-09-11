@@ -253,7 +253,7 @@ async def accept_invitation(
             is_default_brain=False,
         )
         shared_brain = brain_service.get_brain_by_id(brain_id)
-        
+
     except Exception as e:
         logger.error(f"Error adding user to brain: {e}")
         raise HTTPException(status_code=400, detail=f"Error adding user to brain: {e}")

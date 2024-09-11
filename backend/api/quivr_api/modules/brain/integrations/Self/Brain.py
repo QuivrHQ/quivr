@@ -210,13 +210,11 @@ class SelfBrain(KnowledgeBrainQA):
         return question_rewriter
 
     def get_chain(self):
-
         graph = self.create_graph()
 
         return graph
 
     def create_graph(self):
-
         workflow = StateGraph(GraphState)
 
         # Define the nodes

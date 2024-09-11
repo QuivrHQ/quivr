@@ -20,7 +20,7 @@ from quivr_core.llm import LLMEndpoint
 from quivr_core.models import ParsedRAGChunkResponse, ParsedRAGResponse, SearchResult
 from quivr_core.processor.registry import get_processor_class
 from quivr_core.quivr_rag import QuivrQARAG
-from quivr_core.quivr_rag_langgraph import QuivrQARAGLangGraph 
+from quivr_core.quivr_rag_langgraph import QuivrQARAGLangGraph
 from quivr_core.storage.local_storage import TransparentStorage
 from quivr_core.storage.storage_base import StorageBase
 
@@ -177,7 +177,7 @@ class Brain:
         storage: StorageBase = TransparentStorage(),
         llm: LLMEndpoint | None = None,
         embedder: Embeddings | None = None,
-        skip_file_error: bool = False
+        skip_file_error: bool = False,
     ) -> Self:
         loop = asyncio.get_event_loop()
         return loop.run_until_complete(
@@ -223,7 +223,7 @@ class Brain:
             storage=storage,
             llm=llm,
             embedder=embedder,
-            vector_db=vector_db
+            vector_db=vector_db,
         )
 
     async def asearch(

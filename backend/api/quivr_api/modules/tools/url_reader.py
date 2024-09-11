@@ -29,7 +29,6 @@ class URLReaderTool(BaseTool):
     def _run(
         self, url: str, run_manager: Optional[CallbackManagerForToolRun] = None
     ) -> Dict:
-
         loader = PlaywrightURLLoader(urls=[url], remove_selectors=["header", "footer"])
         data = loader.load()
 

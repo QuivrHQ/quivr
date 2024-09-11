@@ -1,63 +1,71 @@
-from typing import List
-
-from fastapi import APIRouter, Depends, HTTPException, UploadFile
+from fastapi import APIRouter, Request, Depends
 from quivr_api.logger import get_logger
-from quivr_api.middlewares.auth import AuthBearer, get_current_user
-from quivr_api.modules.assistant.dto.inputs import InputAssistant
-from quivr_api.modules.assistant.dto.outputs import AssistantOutput
-from quivr_api.modules.assistant.ito.difference import DifferenceAssistant
-from quivr_api.modules.assistant.ito.summary import SummaryAssistant, summary_inputs
-from quivr_api.modules.assistant.service.assistant import Assistant
+from quivr_api.middlewares.auth.auth_bearer import AuthBearer, get_current_user
 from quivr_api.modules.user.entity.user_identity import UserIdentity
 
-assistant_router = APIRouter()
+
 logger = get_logger(__name__)
 
-assistant_service = Assistant()
+
+assistant_router = APIRouter()
 
 
 @assistant_router.get(
     "/assistants", dependencies=[Depends(AuthBearer())], tags=["Assistant"]
 )
-async def list_assistants(
+async def get_assistants(
+    request: Request,
     current_user: UserIdentity = Depends(get_current_user),
-) -> List[AssistantOutput]:
-    """
-    Retrieve and list all the knowledge in a brain.
-    """
+):
+    logger.info("Getting assistants")
+    return {"message": "Hello World"}
 
-    summary = summary_inputs()
-    # difference = difference_inputs()
-    # crawler = crawler_inputs()
-    return [summary]
+
+@assistant_router.get(
+    "/assistants/tasks", dependencies=[Depends(AuthBearer())], tags=["Assistant"]
+)
+async def get_tasks(
+    request: Request,
+    current_user: UserIdentity = Depends(get_current_user),
+):
+    logger.info("Getting tasks")
+    return {"message": "Hello World"}
 
 
 @assistant_router.post(
-    "/assistant/process",
+    "/assistants/task", dependencies=[Depends(AuthBearer())], tags=["Assistant"]
+)
+async def create_task(
+    request: Request,
+    current_user: UserIdentity = Depends(get_current_user),
+):
+    logger.info("Creating task")
+    return {"message": "Hello World"}
+
+
+@assistant_router.get(
+    "/assistants/task/{task_id}",
     dependencies=[Depends(AuthBearer())],
     tags=["Assistant"],
 )
-async def process_assistant(
-    input: InputAssistant,
-    files: List[UploadFile] = None,
+async def get_task(
+    request: Request,
+    task_id: str,
     current_user: UserIdentity = Depends(get_current_user),
 ):
-    if input.name.lower() == "summary":
-        summary_assistant = SummaryAssistant(
-            input=input, files=files, current_user=current_user
-        )
-        try:
-            summary_assistant.check_input()
-            return await summary_assistant.process_assistant()
-        except ValueError as e:
-            raise HTTPException(status_code=400, detail=str(e))
-    elif input.name.lower() == "difference":
-        difference_assistant = DifferenceAssistant(
-            input=input, files=files, current_user=current_user
-        )
-        try:
-            difference_assistant.check_input()
-            return await difference_assistant.process_assistant()
-        except ValueError as e:
-            raise HTTPException(status_code=400, detail=str(e))
-    return {"message": "Assistant not found"}
+    logger.info("Getting task")
+    return {"message": "Hello World"}
+
+
+@assistant_router.delete(
+    "/assistants/task/{task_id}",
+    dependencies=[Depends(AuthBearer())],
+    tags=["Assistant"],
+)
+async def delete_task(
+    request: Request,
+    task_id: str,
+    current_user: UserIdentity = Depends(get_current_user),
+):
+    logger.info("Deleting task")
+    return {"message": "Hello World"}
