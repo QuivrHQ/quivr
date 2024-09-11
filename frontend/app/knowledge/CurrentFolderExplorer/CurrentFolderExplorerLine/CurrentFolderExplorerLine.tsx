@@ -8,47 +8,32 @@ import styles from "./CurrentFolderExplorerLine.module.scss";
 // Fonction pour associer des extensions de fichier à des couleurs spécifiques
 const getColorByExtension = (extension: string): string => {
   const extensionColorMap: { [key: string]: string } = {
-    // Documents
-    pdf: "#db4437",
-    doc: "#4285f4",
-    docx: "#4285f4",
-    txt: "#4285f4",
-
-    // Feuilles de calcul
-    xls: "#0f9d58",
-    xlsx: "#0f9d58",
-    csv: "#0f9d58",
-
-    // Présentations
-    ppt: "#f4b400",
-    pptx: "#f4b400",
-
-    // Images
-    jpg: "#673ab7",
-    jpeg: "#673ab7",
-    png: "#673ab7",
-    gif: "#ff63b6",
-
-    // Audio
-    mp3: "#f9ab00",
-    wav: "#f9ab00",
-
-    // Vidéo
-    mp4: "#34a853",
-    mov: "#34a853",
-
-    // Archives
-    zip: "#9e9e9e",
-    rar: "#9e9e9e",
-
-    // Code
-    js: "#fbbc05",
-    py: "#4285f4",
-    html: "#ea4335",
-    css: "#34a853",
+    pdf: "#ffe5e5",
+    doc: "#d0e0e3",
+    docx: "#d0e0e3",
+    txt: "#d8f0f5",
+    xls: "#c0f4c0",
+    xlsx: "#c0f4c0",
+    csv: "#c0f4c0",
+    ppt: "#fff7e5",
+    pptx: "#fff7e5",
+    jpg: "#f1f1fa",
+    jpeg: "#f1f1fa",
+    png: "#f1f1fa",
+    gif: "#ffd4d8",
+    mp3: "#ffe6d5",
+    wav: "#ffe6d5",
+    mp4: "#c0f4c0",
+    mov: "#c0f4c0",
+    zip: "#ededed",
+    rar: "#ededed",
+    js: "#fffde7",
+    py: "#d8f0f5",
+    html: "#ffebee",
+    css: "#c0f4c0",
   };
 
-  return extensionColorMap[extension] ?? "gray";
+  return extensionColorMap[extension] ?? "lightgrey";
 };
 
 interface CurrentFolderExplorerLineProps {
