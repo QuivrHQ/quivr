@@ -25,7 +25,7 @@ all = [
     "unstructured[epub,docx,odt,doc,pptx,ppt,xlsx,md]>=0.15.5",
     "faiss-cpu>=1.8.0.post1",
     "docx2txt>=0.8",
-    "megaparse>=0.0.29",
+    "megaparse"
 ]
 
 [build-system]
@@ -62,3 +62,7 @@ markers = [
     "tika: these tests require a tika server to be running",
     "unstructured: these tests require `unstructured` dependency",
 ]
+
+[[tool.rye.sources]]
+name = "megaparse"
+path = "./MegaParse"

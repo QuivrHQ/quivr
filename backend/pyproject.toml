@@ -9,7 +9,8 @@ authors = [
     { name = "Jacopo Chevallard", email = "jacopo@quivr.app" },
 ]
 dependencies = [
-    "packaging>=22.0"
+    "packaging>=22.0",
+    "langchain-anthropic>=0.1.23",
 ]
 readme = "README.md"
 requires-python = ">= 3.11"
@@ -40,7 +41,7 @@ dev-dependencies = [
 ]
 
 [tool.rye.workspace]
-members = [".", "core", "worker", "api", "docs", "core/examples/chatbot"]
+members = [".", "core", "worker", "api", "docs", "core/examples/chatbot", "core/MegaParse"]
 
 [tool.hatch.metadata]
 allow-direct-references = true
