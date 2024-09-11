@@ -1,5 +1,7 @@
+import os
+
 from quivr_core.processor.splitter import SplitterConfig
-from quivr_core.processor.implementations.megaparse_config import MegaparseConfig
+from megaparse.config import MegaparseConfig
 from quivr_core.base_config import QuivrBaseConfig
 
 RERANKERS_DEFAULT_MODELS = {
@@ -22,6 +24,7 @@ class RerankerConfig(QuivrBaseConfig):
     supplier: str | None = None
     model: str | None = None
     top_n: int = 5
+    api_key: str | None = None
 
     def __init__(self, **data):
         super().__init__(**data)  # Call Pydantic's BaseModel init
@@ -34,7 +37,17 @@ class RerankerConfig(QuivrBaseConfig):
             try:
                 self.model = RERANKERS_DEFAULT_MODELS[self.supplier]
             except:
-                raise ValueError(f"Unknown supplier: {self.supplier}")
+                raise ValueError(f"Unknown supplier: {self.supplier}")  
+         
+        # Check if the corresponding API key environment variable is set
+        if self.supplier:
+            api_key_var = f"{self.supplier.upper()}_API_KEY"
+            self.api_key = os.getenv(api_key_var)
+
+            if self.api_key is None:
+                raise ValueError(f"The API key for supplier '{self.supplier}' is not set. "
+                                 f"Please set the environment variable: {api_key_var}")
+
 
 class RetrievalConfig(QuivrBaseConfig):
     reranker_config: RerankerConfig = RerankerConfig()
