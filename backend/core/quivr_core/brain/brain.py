@@ -127,6 +127,7 @@ class Brain:
         llm: LLMEndpoint | None = None,
         embedder: Embeddings | None = None,
         skip_file_error: bool = False,
+        processor_kwargs: dict[str, Any]
     ):
         if llm is None:
             llm = default_llm()
@@ -148,6 +149,7 @@ class Brain:
         docs = await process_files(
             storage=storage,
             skip_file_error=skip_file_error,
+            **processor_kwargs,
         )
 
         # Building brain's vectordb
@@ -177,7 +179,8 @@ class Brain:
         storage: StorageBase = TransparentStorage(),
         llm: LLMEndpoint | None = None,
         embedder: Embeddings | None = None,
-        skip_file_error: bool = False
+        skip_file_error: bool = False,
+        processor_kwargs: dict[str, Any]
     ) -> Self:
         loop = asyncio.get_event_loop()
         return loop.run_until_complete(
@@ -189,6 +192,7 @@ class Brain:
                 llm=llm,
                 embedder=embedder,
                 skip_file_error=skip_file_error,
+                processor_kwargs=processor_kwargs
             )
         )
 
