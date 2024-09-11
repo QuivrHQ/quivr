@@ -1,12 +1,14 @@
-import styles from "./CurrentFolderExplorer.module.scss";
+import { useEffect, useState } from "react";
 
 import { SyncElements } from "@/lib/api/sync/types";
 import { useSync } from "@/lib/api/sync/useSync";
 import { Icon } from "@/lib/components/ui/Icon/Icon";
 import { LoaderIcon } from "@/lib/components/ui/LoaderIcon/LoaderIcon";
-import { useEffect, useState } from "react";
-import { useKnowledgeContext } from "../KnowledgeProvider/hooks/useKnowledgeContext";
+
+import styles from "./CurrentFolderExplorer.module.scss";
 import CurrentFolderExplorerLine from "./CurrentFolderExplorerLine/CurrentFolderExplorerLine";
+
+import { useKnowledgeContext } from "../KnowledgeProvider/hooks/useKnowledgeContext";
 
 const CurrentFolderExplorer = (): JSX.Element => {
   const [loading, setLoading] = useState(false);
@@ -16,7 +18,7 @@ const CurrentFolderExplorer = (): JSX.Element => {
 
   useEffect(() => {
     setLoading(true);
-    (async () => {
+    void (async () => {
       try {
         if (currentFolder?.syncId) {
           const res = await getSyncFiles(
@@ -44,7 +46,7 @@ const CurrentFolderExplorer = (): JSX.Element => {
       <div className={styles.current_folder_explorer_wrapper}>
         <div className={styles.header}>
           {currentFolder?.icon ? (
-            <div className={styles.icon}>{currentFolder?.icon}</div>
+            <div className={styles.icon}>{currentFolder.icon}</div>
           ) : (
             <Icon name={"folder"} color="black" size="normal" />
           )}
@@ -58,8 +60,10 @@ const CurrentFolderExplorer = (): JSX.Element => {
           ) : (
             syncElements?.files
               .sort((a, b) => Number(b.is_folder) - Number(a.is_folder))
-              .map((syncElement) => (
-                <CurrentFolderExplorerLine element={syncElement} />
+              .map((syncElement, index) => (
+                <div key={index}>
+                  <CurrentFolderExplorerLine element={syncElement} />
+                </div>
               ))
           )}
         </div>

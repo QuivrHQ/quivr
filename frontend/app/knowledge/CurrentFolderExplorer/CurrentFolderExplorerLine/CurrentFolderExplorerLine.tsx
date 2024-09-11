@@ -89,4 +89,4 @@ const CurrentFolderExplorerLine = ({
   );
 };
 
-export { CurrentFolderExplorerLine };
+export default CurrentFolderExplorerLine;
