@@ -1,0 +1,50 @@
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write
+  pull-requests: write
+
+name: release-please
+
+jobs:
+  release-please:
+    runs-on: ubuntu-latest
+    outputs:
+      release_created: ${{ steps.release.outputs.release_created }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0 # Fetch all history for tags and releases
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Run release-please
+        id: release
+        uses: google-github-actions/release-please-action@v4
+        with:
+          token: ${{ secrets.RELEASE_PLEASE_TOKEN }}
+
+
+  deploy:
+    if: needs.release-please.outputs.release_created == 'true'
+    needs: release-please
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Rye
+        uses: eifinger/setup-rye@v2
+        with:
+          enable-cache: true
+      - name: Rye Sync
+        run: rye sync --no-lock
+      - name: Rye Build
+        run: rye build
+      - name: Rye Publish
+        run: rye publish --token ${{ secrets.PYPI_API_TOKEN }} --yes
