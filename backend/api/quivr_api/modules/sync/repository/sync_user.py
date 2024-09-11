@@ -259,7 +259,10 @@ class SyncUserRepository:
             sync = NotionSync(notion_service=notion_service)
             return {
                 "files": await sync.aget_files(
-                    sync_user["credentials"], folder_id if folder_id else "", recursive
+                    sync_user["credentials"],
+                    sync_active_id,
+                    folder_id if folder_id else "",
+                    recursive,
                 )
             }
         elif provider == "github":
