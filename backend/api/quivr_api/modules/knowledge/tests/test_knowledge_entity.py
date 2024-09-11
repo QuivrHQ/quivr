@@ -221,7 +221,6 @@ async def test_knowledge_dto(session, user, brain):
     assert folder_dto.metadata== folder.metadata_  # type: ignor
     assert folder_dto.parent_id == folder.parent_id
 
-    assert folder_dto.brain_ids== [brain.brain_id]
-    assert folder_dto.brains ==[brain.model_dump()]
+    assert folder_dto.brains[0] == brain.model_dump()
     assert folder_dto.children== [await km.to_dto()]
 

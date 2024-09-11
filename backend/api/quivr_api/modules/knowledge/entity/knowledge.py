@@ -36,7 +36,7 @@ class Knowledge(BaseModel):
     created_at: Optional[datetime] = None
     metadata: Optional[Dict[str, str]] = None
     brains: List[Dict[str, Any]]
-    brain_ids: list[UUID]
+    #brain_ids: list[UUID]
     user_id: UUID
     parent_id: Optional[UUID]
     children: Optional[list["Knowledge"]]
