@@ -19,6 +19,16 @@
       align-items: center;
       gap: Spacings.$spacing04;
       font-weight: 550;
+
+      .icon {
+        min-width: 18px;
+        max-width: 18px;
+        min-height: 18px;
+        max-height: 18px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
     }
   }
 }

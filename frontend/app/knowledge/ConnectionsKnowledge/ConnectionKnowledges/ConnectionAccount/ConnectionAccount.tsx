@@ -31,7 +31,13 @@ const ConnectionAccount = ({
     void (async () => {
       try {
         const res = await getSyncFiles(sync.id);
-        setSyncElements(res);
+        setSyncElements((prevState) => ({
+          ...prevState,
+          files: res.files.map((syncElement) => ({
+            ...syncElement,
+            syncId: sync.id,
+          })),
+        }));
         setLoading(false);
       } catch (error) {
         console.error("Failed to get sync files:", error);
