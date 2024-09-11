@@ -15,10 +15,10 @@ from quivr_api.modules.knowledge.entity.knowledge_brain import KnowledgeBrain
 
 class KnowledgeSource(str, Enum):
     LOCAL = "local"
-    WEB = "WEB"
-    GDRIVE = "Google Drive"
-    DROPBOX = "Dropbox"
-    SHAREPOINT = "Sharepoint"
+    WEB = "web"
+    GDRIVE = "google drive"
+    DROPBOX = "dropbox"
+    SHAREPOINT = "sharepoint"
 
 
 class Knowledge(BaseModel):
@@ -35,7 +35,7 @@ class Knowledge(BaseModel):
     updated_at: Optional[datetime] = None
     created_at: Optional[datetime] = None
     metadata: Optional[Dict[str, str]] = None
-    brains: List[Dict[str,Any]]
+    brains: List[Dict[str, Any]]
     brain_ids: list[UUID]
     user_id: UUID
     parent_id: Optional[UUID]
