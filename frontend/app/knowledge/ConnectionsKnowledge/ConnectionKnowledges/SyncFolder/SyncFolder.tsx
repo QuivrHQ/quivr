@@ -10,10 +10,9 @@ import styles from "./SyncFolder.module.scss";
 
 interface SyncFolderProps {
   element: SyncElement;
-  syncId: number;
 }
 
-const SyncFolder = ({ element, syncId }: SyncFolderProps): JSX.Element => {
+const SyncFolder = ({ element }: SyncFolderProps): JSX.Element => {
   const [folded, setFolded] = useState(true);
   const [loading, setLoading] = useState(false);
   const { getSyncFiles } = useSync();
@@ -31,10 +30,13 @@ const SyncFolder = ({ element, syncId }: SyncFolderProps): JSX.Element => {
       setLoading(true);
       void (async () => {
         try {
-          const res = await getSyncFiles(syncId, element.id);
+          const res = await getSyncFiles(element.syncId, element.id);
           setSyncElements((prevState) => ({
             ...prevState,
-            files: res.files.map((syncElement) => ({ ...syncElement, syncId })),
+            files: res.files.map((syncElement) => ({
+              ...syncElement,
+              syncId: element.syncId,
+            })),
           }));
           setLoading(false);
         } catch (error) {
@@ -80,7 +82,7 @@ const SyncFolder = ({ element, syncId }: SyncFolderProps): JSX.Element => {
               .filter((file) => file.is_folder)
               .map((folder, id) => (
                 <div key={id}>
-                  <SyncFolder element={folder} syncId={syncId} />
+                  <SyncFolder element={folder} />
                 </div>
               ))}
           </div>

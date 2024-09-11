@@ -87,7 +87,7 @@ const ConnectionAccount = ({
               .filter((file) => file.is_folder)
               .map((element, id) => (
                 <div key={id}>
-                  <SyncFolder element={element} syncId={sync.id} />
+                  <SyncFolder element={element} />
                 </div>
               ))}
           </div>
