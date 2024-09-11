@@ -1,4 +1,6 @@
-from pydantic import BaseModel
+from quivr_core.processor.splitter import SplitterConfig
+from quivr_core.processor.implementations.megaparse_config import MegaparseConfig
+from quivr_core.base_config import QuivrBaseConfig
 
 RERANKERS_DEFAULT_MODELS = {
     'cohere': "rerank-multilingual-v3.0",
@@ -6,7 +8,7 @@ RERANKERS_DEFAULT_MODELS = {
     # Add more suppliers as needed
 }
 
-class LLMEndpointConfig(BaseModel):
+class LLMEndpointConfig(QuivrBaseConfig):
     model: str = "gpt-3.5-turbo-0125"
     llm_base_url: str | None = None
     llm_api_key: str | None = None
@@ -16,7 +18,7 @@ class LLMEndpointConfig(BaseModel):
     streaming: bool = True
 
 # Cannot use Pydantic v2 field_validator because of conflicts with pydantic v1 still in use in LangChain
-class RerankerConfig(BaseModel):
+class RerankerConfig(QuivrBaseConfig):
     supplier: str
     model: str | None = None
     top_n: int = 5
@@ -33,9 +35,23 @@ class RerankerConfig(BaseModel):
                 self.model = RERANKERS_DEFAULT_MODELS[self.supplier]
             except:
                 raise ValueError(f"Unknown supplier: {self.supplier}")
-        
-class RAGConfig(BaseModel):
+
+class RetrievalConfig(QuivrBaseConfig):
+    reranker_config: RerankerConfig
+
+class ParserConfig(QuivrBaseConfig):
+    splitter_config: SplitterConfig
+    megaparse_config: MegaparseConfig
+
+class IngestionConfig(QuivrBaseConfig):
+    parser_config: ParserConfig
+
+class RAGConfig(QuivrBaseConfig):
+    retrieval_config: RetrievalConfig
+    ingestion_config: IngestionConfig
     llm_config: LLMEndpointConfig = LLMEndpointConfig()
     max_history: int = 10
     max_files: int = 20
     prompt: str | None = None
+
+
