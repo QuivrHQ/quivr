@@ -20,7 +20,14 @@ class DefaultRerankers(str, Enum):
         }[self]
 
 
+class DefaultLLMs(str, Enum):
+    OPENAI = "openai"
+    AZURE = "azure"
+    ANTHROPIC = "anthropic"
+
+
 class LLMEndpointConfig(QuivrBaseConfig):
+    supplier: DefaultLLMs = DefaultLLMs.OPENAI
     model: str = "gpt-3.5-turbo-0125"
     llm_base_url: str | None = None
     llm_api_key: str | None = None

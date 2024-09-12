@@ -7,7 +7,7 @@ from langchain_openai import AzureChatOpenAI, ChatOpenAI
 from pydantic.v1 import SecretStr
 
 from quivr_core.brain.info import LLMInfo
-from quivr_core.config import LLMEndpointConfig
+from quivr_core.config import DefaultLLMs, LLMEndpointConfig
 from quivr_core.utils import model_supports_function_calling
 
 logger = logging.getLogger("quivr_core")
@@ -27,7 +27,7 @@ class LLMEndpoint:
     @classmethod
     def from_config(cls, config: LLMEndpointConfig = LLMEndpointConfig()):
         try:
-            if config.model.startswith("azure/"):
+            if config.supplier == DefaultLLMs.AZURE:
                 # Parse the URL
                 parsed_url = urlparse(config.llm_base_url)
                 deployment = parsed_url.path.split("/")[3]  # type: ignore
@@ -41,7 +41,7 @@ class LLMEndpoint:
                     else None,
                     azure_endpoint=azure_endpoint,
                 )
-            elif config.model.startswith("claude"):
+            elif config.supplier == DefaultLLMs.ANTHROPIC:
                 _llm = ChatAnthropic(
                     model_name=config.model,
                     api_key=SecretStr(config.llm_api_key)
@@ -49,13 +49,17 @@ class LLMEndpoint:
                     else None,
                     base_url=config.llm_base_url,
                 )
-            else:
+            elif config.supplier == DefaultLLMs.OPENAI:
                 _llm = ChatOpenAI(
                     model=config.model,
                     api_key=SecretStr(config.llm_api_key)
                     if config.llm_api_key
                     else None,
                     base_url=config.llm_base_url,
+                )
+            else:
+                raise ValueError(
+                    f"Unsupported LLM supplier: {config.supplier}. Supported values: {list(DefaultLLMs)}"
                 )
             return cls(llm=_llm, llm_config=config)
 
