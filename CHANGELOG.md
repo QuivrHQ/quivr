@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.0.311 (2024-09-12)
+
+## What's Changed
+* chore(embeddings): added tests for embeddings by @StanGirard in https://github.com/QuivrHQ/quivr/pull/3183
+* feat(uptime): check if connection to db works by @StanGirard in https://github.com/QuivrHQ/quivr/pull/3199
+
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.310...v0.0.311
+
 ## 0.0.310 (2024-09-10)
 
 ## What's Changed
