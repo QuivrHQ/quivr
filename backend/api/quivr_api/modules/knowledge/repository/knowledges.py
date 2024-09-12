@@ -179,11 +179,50 @@ class KnowledgeRepository(BaseRepository):
 
         return knowledge
 
+    async def get_all_children(self, parent_id: UUID) -> list[KnowledgeDB]:
+        query = text("""
+            WITH RECURSIVE knowledge_tree AS (
+                SELECT *
+                FROM knowledge
+                WHERE parent_id = :parent_id
+                UNION ALL
+                SELECT k.*
+                FROM knowledge k
+                JOIN knowledge_tree kt ON k.parent_id = kt.id
+            )
+            SELECT * FROM knowledge_tree
+            """)
+
+        result = await self.session.execute(query, params={"parent_id": parent_id})
+        rows = result.fetchall()
+        knowledge_list = []
+        for row in rows:
+            knowledge = KnowledgeDB(
+                id=row.id,
+                parent_id=row.parent_id,
+                file_name=row.file_name,
+                url=row.url,
+                extension=row.extension,
+                status=row.status,
+                source=row.source,
+                source_link=row.source_link,
+                file_size=row.file_size,
+                file_sha1=row.file_sha1,
+                created_at=row.created_at,
+                updated_at=row.updated_at,
+                metadata_=row.metadata,
+                is_folder=row.is_folder,
+                user_id=row.user_id,
+            )
+            knowledge_list.append(knowledge)
+
+        return knowledge_list
+
     async def get_knowledge_by_id(self, knowledge_id: UUID) -> KnowledgeDB:
         query = (
             select(KnowledgeDB)
             .where(KnowledgeDB.id == knowledge_id)
-            .options(joinedload(KnowledgeDB.parent), joinedload(KnowledgeDB.children))
+            .options(joinedload(KnowledgeDB.parent), joinedload(KnowledgeDB.children))  # type: ignore
         )
         result = await self.session.exec(query)
         knowledge = result.first()

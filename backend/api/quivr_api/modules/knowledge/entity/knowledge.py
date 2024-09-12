@@ -109,7 +109,9 @@ class KnowledgeDB(AsyncAttrs, SQLModel, table=True):
     )
     children: list["KnowledgeDB"] = Relationship(
         back_populates="parent",
-        sa_relationship_kwargs={"cascade": "all, delete-orphan"},
+        sa_relationship_kwargs={
+            "cascade": "all, delete-orphan",
+        },
     )
 
     # TODO: nested folder search

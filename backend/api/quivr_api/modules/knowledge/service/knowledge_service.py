@@ -1,3 +1,4 @@
+import asyncio
 import io
 from typing import Any, List
 from uuid import UUID
@@ -141,6 +142,7 @@ class KnowledgeService(BaseService[KnowledgeRepository]):
             file_size=upload_file.size if upload_file else 0,
             metadata_=knowledge_to_add.metadata,  # type: ignore
             status=KnowledgeStatus.RESERVED,
+            parent_id=knowledge_to_add.parent_id,
         )
         knowledge_db = await self.repository.create_knowledge(knowledgedb)
         try:
@@ -222,14 +224,21 @@ class KnowledgeService(BaseService[KnowledgeRepository]):
 
     async def remove_knowledge(self, knowledge: KnowledgeDB) -> DeleteKnowledgeResponse:
         assert knowledge.id
+
         try:
-            deleted_km = await self.repository.remove_knowledge(knowledge)
             # TODO:
-            # - Remove all knowledge stored in folder recursively
-            # - Notion folders are special
+            # - Notion folders are special, they are themselves files and should be removed from storage
+            children = await self.repository.get_all_children(knowledge.id)
+            km_paths = [
+                self.storage.get_storage_path(k) for k in children if not k.is_folder
+            ]
             if not knowledge.is_folder:
-                km_path = self.storage.get_storage_path(knowledge)
-                await self.storage.remove_file(km_path)
+                km_paths.append(self.storage.get_storage_path(knowledge))
+
+            # recursively deletes files
+            deleted_km = await self.repository.remove_knowledge(knowledge)
+            await asyncio.gather(*[self.storage.remove_file(p) for p in km_paths])
+
             return deleted_km
         except Exception as e:
             logger.error(f"Error while remove knowledge : {e}")
