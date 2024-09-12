@@ -4,7 +4,8 @@ max_files: 20
 ingestion_config:
   parser_config:
     megaparse_config:
-      strategy: "fast"
+      strategy: "hi_res"
+      pdf_parser: "unstructured"
     splitter_config:
       chunk_size: 400
       chunk_overlap: 100
