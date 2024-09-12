@@ -270,7 +270,7 @@ class Brain:
             retrieval_config = RetrievalConfig(llm_config=self.llm.get_config())
 
         if rag_pipeline is None:
-            rag_pipeline = QuivrQARAG
+            rag_pipeline = QuivrQARAGLangGraph
 
         rag_instance = rag_pipeline(
             retrieval_config=retrieval_config, llm=llm, vector_store=self.vector_db
@@ -302,7 +302,7 @@ class Brain:
             retrieval_config = RetrievalConfig(llm_config=self.llm.get_config())
 
         if rag_pipeline is None:
-            rag_pipeline = QuivrQARAG
+            rag_pipeline = QuivrQARAGLangGraph
 
         rag_instance = rag_pipeline(
             retrieval_config=retrieval_config, llm=llm, vector_store=self.vector_db
