@@ -87,7 +87,7 @@ class QuivrQARAG:
             # TODO: replace with tiktoken
             message_tokens = (len(human_message.content) + len(ai_message.content)) // 4
             if (
-                total_tokens + message_tokens > self.retrieval_config.llm_config.max_tokens
+                total_tokens + message_tokens > self.retrieval_config.llm_config.max_output_tokens
                 or total_pairs >= self.retrieval_config.max_history
             ):
                 break

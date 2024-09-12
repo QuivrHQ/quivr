@@ -94,8 +94,8 @@ class RAGService:
                 llm_base_url=model.endpoint_url,
                 llm_api_key=api_key,
                 temperature=(LLMEndpointConfig.model_fields["temperature"].default),
-                max_input=model.max_input,
-                max_tokens=model.max_output,
+                max_input_tokens=model.max_input,
+                max_output_tokens=model.max_output,
             ),
             prompt=self.prompt.content if self.prompt else None,
         )
@@ -153,7 +153,7 @@ class RAGService:
         )
         # Build RAG dependencies to inject
         vector_store = self.create_vector_store(
-            self.brain.brain_id, retrieval_config.llm_config.max_input
+            self.brain.brain_id, retrieval_config.llm_config.max_input_tokens
         )
         llm = self.get_llm(retrieval_config)
         # Initialize the RAG pipline
@@ -208,7 +208,7 @@ class RAGService:
         )
         llm = self.get_llm(retrieval_config)
         vector_store = self.create_vector_store(
-            self.brain.brain_id, retrieval_config.llm_config.max_input
+            self.brain.brain_id, retrieval_config.llm_config.max_input_tokens
         )
         # Initialize the rag pipline
         rag_pipeline = QuivrQARAGLangGraph(

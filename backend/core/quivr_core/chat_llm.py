@@ -47,7 +47,7 @@ class ChatLLM:
             # TODO: replace with tiktoken
             message_tokens = (len(human_message.content) + len(ai_message.content)) // 4
             if (
-                total_tokens + message_tokens > self.llm_endpoint._config.max_input
+                total_tokens + message_tokens > self.llm_endpoint._config.max_input_tokens
                 or total_pairs >= 20
             ):
                 break

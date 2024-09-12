@@ -76,6 +76,6 @@ class LLMEndpoint:
                 self._config.llm_base_url if self._config.llm_base_url else "openai"
             ),
             temperature=self._config.temperature,
-            max_tokens=self._config.max_tokens,
+            max_tokens=self._config.max_output_tokens,
             supports_function_calling=self.supports_func_calling(),
         )

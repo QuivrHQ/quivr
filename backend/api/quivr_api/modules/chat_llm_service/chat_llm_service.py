@@ -62,8 +62,8 @@ class ChatLLMService:
                     llm_base_url=model.endpoint_url,
                     llm_api_key=api_key,
                     temperature=(LLMEndpointConfig.model_fields["temperature"].default),
-                    max_input=model.max_input,
-                    max_tokens=model.max_output,
+                    max_input_tokens=model.max_input,
+                    max_output_tokens=model.max_output,
                 ),
             )
         )
