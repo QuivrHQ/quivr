@@ -13,7 +13,7 @@ from langchain_core.runnables import RunnableLambda, RunnablePassthrough
 from langchain_core.vectorstores import VectorStore
 
 from quivr_core.chat import ChatHistory
-from quivr_core.config import RAGConfig
+from quivr_core.config import AssistantConfig
 from quivr_core.llm import LLMEndpoint
 from quivr_core.models import (
     ParsedRAGChunkResponse,
@@ -52,7 +52,7 @@ class QuivrQARAG:
     def __init__(
         self,
         *,
-        rag_config: RAGConfig,
+        rag_config: AssistantConfig,
         llm: LLMEndpoint,
         vector_store: VectorStore,
         reranker: BaseDocumentCompressor | None = None,

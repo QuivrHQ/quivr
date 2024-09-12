@@ -14,7 +14,7 @@ from rich.panel import Panel
 
 from quivr_core.brain.info import BrainInfo, ChatHistoryInfo
 from quivr_core.chat import ChatHistory
-from quivr_core.config import RAGConfig
+from quivr_core.config import AssistantConfig
 from quivr_core.files.file import load_qfile
 from quivr_core.llm import LLMEndpoint
 from quivr_core.models import ParsedRAGChunkResponse, ParsedRAGResponse, SearchResult
@@ -255,7 +255,7 @@ class Brain:
     def ask(
         self,
         question: str,
-        rag_config: RAGConfig | None = None,
+        rag_config: AssistantConfig | None = None,
         rag_pipeline: Type[Union[QuivrQARAG, QuivrQARAGLangGraph]] | None = None,
     ) -> ParsedRAGResponse:
         llm = self.llm
@@ -265,7 +265,7 @@ class Brain:
             if rag_config.llm_config != self.llm.get_config():
                 llm = LLMEndpoint.from_config(config=rag_config.llm_config)
         else:
-            rag_config = RAGConfig(llm_config=self.llm.get_config())
+            rag_config = AssistantConfig(llm_config=self.llm.get_config())
 
         if rag_pipeline is None:
             rag_pipeline = QuivrQARAG
@@ -287,7 +287,7 @@ class Brain:
     async def ask_streaming(
         self,
         question: str,
-        rag_config: RAGConfig | None = None,
+        rag_config: AssistantConfig | None = None,
         rag_pipeline: Type[Union[QuivrQARAG, QuivrQARAGLangGraph]] | None = None,
     ) -> AsyncGenerator[ParsedRAGChunkResponse, ParsedRAGChunkResponse]:
         llm = self.llm
@@ -297,7 +297,7 @@ class Brain:
             if rag_config.llm_config != self.llm.get_config():
                 llm = LLMEndpoint.from_config(config=rag_config.llm_config)
         else:
-            rag_config = RAGConfig(llm_config=self.llm.get_config())
+            rag_config = AssistantConfig(llm_config=self.llm.get_config())
 
         if rag_pipeline is None:
             rag_pipeline = QuivrQARAG

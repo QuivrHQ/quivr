@@ -1,12 +1,10 @@
 from quivr_core import Brain
 from quivr_core.quivr_rag_langgraph import QuivrQARAGLangGraph
-from quivr_core.quivr_rag import QuivrQARAG
-from quivr_core.config import RAGConfig
+from quivr_core.config import AssistantConfig
 import asyncio
 from pathlib import Path
 import dotenv
 import logging
-import sys
 import os
 
 ConsoleOutputHandler = logging.StreamHandler()
@@ -38,7 +36,7 @@ async def main():
 
     config_file_name = "/Users/jchevall/Coding/quivr/backend/core/tests/rag_config.yaml"
     
-    rag_config = RAGConfig.from_yaml(config_file_name)
+    rag_config = AssistantConfig.from_yaml(config_file_name)
     #megaparse_config = find_nested_key(config, "megaparse_config")
     megaparse_config = rag_config.ingestion_config.parser_config.megaparse_config
     megaparse_config.llama_parse_api_key = os.getenv("LLAMA_PARSE_API_KEY")

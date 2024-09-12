@@ -7,13 +7,13 @@ from langchain_core.messages.ai import AIMessageChunk
 from langchain_core.vectorstores import InMemoryVectorStore
 
 from quivr_core.chat import ChatHistory
-from quivr_core.config import LLMEndpointConfig, RAGConfig
+from quivr_core.config import LLMEndpointConfig, AssistantConfig
 from quivr_core.llm import LLMEndpoint
 from quivr_core.quivr_rag import QuivrQARAG
 
 
 async def main():
-    rag_config = RAGConfig(llm_config=LLMEndpointConfig(model="gpt-4o"))
+    rag_config = AssistantConfig(llm_config=LLMEndpointConfig(model="gpt-4o"))
     embedder = DeterministicFakeEmbedding(size=20)
     vec = InMemoryVectorStore(embedder)
 

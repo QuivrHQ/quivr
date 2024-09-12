@@ -3,7 +3,7 @@ import os
 from uuid import UUID, uuid4
 
 from quivr_core.chat import ChatHistory as ChatHistoryCore
-from quivr_core.config import LLMEndpointConfig, RAGConfig
+from quivr_core.config import LLMEndpointConfig, AssistantConfig
 from quivr_core.llm.llm_endpoint import LLMEndpoint
 from quivr_core.models import ParsedRAGResponse, RAGResponseMetadata
 from quivr_core.quivr_rag_langgraph import QuivrQARAGLangGraph
@@ -84,11 +84,11 @@ class RAGService:
         [chat_history.append(m) for m in transformed_history]
         return chat_history
 
-    async def _build_rag_config(self) -> RAGConfig:
+    async def _build_rag_config(self) -> AssistantConfig:
         model = await self.model_service.get_model(self.model_to_use)  # type: ignore
         api_key = os.getenv(model.env_variable_name, "not-defined")
 
-        rag_config = RAGConfig(
+        rag_config = AssistantConfig(
             llm_config=LLMEndpointConfig(
                 model=self.model_to_use,  # type: ignore
                 llm_base_url=model.endpoint_url,
@@ -101,7 +101,7 @@ class RAGService:
         )
         return rag_config
 
-    def get_llm(self, rag_config: RAGConfig):
+    def get_llm(self, rag_config: AssistantConfig):
         return LLMEndpoint.from_config(rag_config.llm_config)
 
     def create_vector_store(

@@ -15,7 +15,7 @@ from langgraph.graph.message import add_messages
 from langgraph.graph import END, StateGraph
 
 from quivr_core.chat import ChatHistory
-from quivr_core.config import RAGConfig, RerankerConfig
+from quivr_core.config import AssistantConfig, RerankerConfig
 from quivr_core.llm import LLMEndpoint
 from quivr_core.models import (
     ParsedRAGChunkResponse,
@@ -66,7 +66,7 @@ class QuivrQARAGLangGraph:
     def __init__(
         self,
         *,
-        rag_config: RAGConfig,
+        rag_config: AssistantConfig,
         llm: LLMEndpoint,
         vector_store: VectorStore,
         reranker: BaseDocumentCompressor | None = None,

@@ -1,4 +1,4 @@
-from quivr_core.config import LLMEndpointConfig, RAGConfig
+from quivr_core.config import LLMEndpointConfig, AssistantConfig
 
 
 def test_default_llm_config():
@@ -19,7 +19,7 @@ def test_default_llm_config():
 
 
 def test_default_ragconfig():
-    config = RAGConfig()
+    config = AssistantConfig()
 
     assert config.max_files == 20
     assert config.prompt is None

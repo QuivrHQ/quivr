@@ -59,7 +59,7 @@ class ParserConfig(QuivrBaseConfig):
 class IngestionConfig(QuivrBaseConfig):
     parser_config: ParserConfig = ParserConfig()
 
-class RAGConfig(QuivrBaseConfig):
+class AssistantConfig(QuivrBaseConfig):
     retrieval_config: RetrievalConfig = RetrievalConfig()
     ingestion_config: IngestionConfig = IngestionConfig()
     llm_config: LLMEndpointConfig = LLMEndpointConfig()

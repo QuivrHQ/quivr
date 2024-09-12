@@ -2,7 +2,7 @@ from uuid import uuid4
 
 import pytest
 from quivr_core.chat import ChatHistory
-from quivr_core.config import LLMEndpointConfig, RAGConfig
+from quivr_core.config import LLMEndpointConfig, AssistantConfig
 from quivr_core.llm import LLMEndpoint
 from quivr_core.models import ParsedRAGChunkResponse, RAGResponseMetadata
 from quivr_core.quivr_rag import QuivrQARAG
@@ -29,7 +29,7 @@ async def test_quivrqarag(
     # Making sure the model
     llm_config = LLMEndpointConfig(model="gpt-4o")
     llm = LLMEndpoint.from_config(llm_config)
-    rag_config = RAGConfig(llm_config=llm_config)
+    rag_config = AssistantConfig(llm_config=llm_config)
     chat_history = ChatHistory(uuid4(), uuid4())
     rag_pipeline = QuivrQARAG(
         rag_config=rag_config, llm=llm, vector_store=mem_vector_store
