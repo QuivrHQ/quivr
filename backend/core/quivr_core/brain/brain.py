@@ -127,13 +127,15 @@ class Brain:
         llm: LLMEndpoint | None = None,
         embedder: Embeddings | None = None,
         skip_file_error: bool = False,
-        processor_kwargs: dict[str, Any]
+        processor_kwargs: dict[str, Any] | None = None
     ):
         if llm is None:
             llm = default_llm()
 
         if embedder is None:
             embedder = default_embedder()
+
+        processor_kwargs = processor_kwargs or {}
 
         brain_id = uuid4()
 
@@ -180,7 +182,7 @@ class Brain:
         llm: LLMEndpoint | None = None,
         embedder: Embeddings | None = None,
         skip_file_error: bool = False,
-        processor_kwargs: dict[str, Any]
+        processor_kwargs: dict[str, Any] | None = None
     ) -> Self:
         loop = asyncio.get_event_loop()
         return loop.run_until_complete(
