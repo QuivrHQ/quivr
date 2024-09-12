@@ -16,6 +16,7 @@ dependencies = [
     "aiofiles>=23.1.0",
     "langchain-community>=0.2.12",
     "langchain-anthropic>=0.1.23",
+    "types-pyyaml>=6.0.12.20240808",
 ]
 readme = "README.md"
 requires-python = ">= 3.11"
@@ -62,6 +63,10 @@ markers = [
     "tika: these tests require a tika server to be running",
     "unstructured: these tests require `unstructured` dependency",
 ]
+
+[[tool.mypy.overrides]]
+module = "yaml"
+ignore_missing_imports = true
 
 [[tool.rye.sources]]
 name = "megaparse"

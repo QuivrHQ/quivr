@@ -1149,6 +1149,8 @@ traitlets==5.14.3
     # via nbformat
 transformers==4.44.1
     # via unstructured-inference
+types-pyyaml==6.0.12.20240808
+    # via quivr-core
 types-requests==2.31.0.6
     # via cohere
 types-urllib3==1.26.25.14
