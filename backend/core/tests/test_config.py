@@ -1,4 +1,4 @@
-from quivr_core.config import LLMEndpointConfig, AssistantConfig
+from quivr_core.config import LLMEndpointConfig, RetrievalConfig
 
 
 def test_default_llm_config():
@@ -18,8 +18,8 @@ def test_default_llm_config():
     )
 
 
-def test_default_ragconfig():
-    config = AssistantConfig()
+def test_default_retrievalconfig():
+    config = RetrievalConfig()
 
     assert config.max_files == 20
     assert config.prompt is None
