@@ -1,4 +1,5 @@
 @use "styles/BoxShadow.module.scss";
+@use "styles/Radius.module.scss";
 @use "styles/Spacings.module.scss";
 
 .current_folder_explorer_container {
@@ -18,18 +19,47 @@
       border-bottom: 1px solid var(--border-0);
       display: flex;
       align-items: center;
-      gap: Spacings.$spacing04;
+      gap: Spacings.$spacing03;
       font-weight: 550;
       background-color: var(--background-0);
 
-      .icon {
-        min-width: 18px;
-        max-width: 18px;
-        min-height: 18px;
-        max-height: 18px;
+      .parent_folder {
         display: flex;
         align-items: center;
-        justify-content: center;
+        gap: Spacings.$spacing03;
+
+        .icon {
+          min-width: 18px;
+          max-width: 18px;
+          min-height: 18px;
+          max-height: 18px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+
+        .name {
+          &:hover {
+            cursor: pointer;
+            text-decoration: underline;
+          }
+        }
+      }
+
+      .current_folder {
+        display: flex;
+        align-items: center;
+        gap: Spacings.$spacing03;
+
+        .name {
+          padding-block: Spacings.$spacing02;
+          padding-inline: Spacings.$spacing03;
+          border-radius: Radius.$normal;
+
+          &.selected {
+            background-color: var(--background-6);
+          }
+        }
       }
     }
 

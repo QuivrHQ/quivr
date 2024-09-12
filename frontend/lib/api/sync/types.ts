@@ -13,6 +13,9 @@ export interface SyncElement {
   is_folder: boolean;
   icon?: string;
   syncId: number;
+  parentFolderId?: string;
+  parentFolderName?: string;
+  parentFolderIcon?: string;
 }
 
 export interface SyncElements {

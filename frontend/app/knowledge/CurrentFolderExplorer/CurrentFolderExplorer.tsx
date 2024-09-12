@@ -30,6 +30,9 @@ const CurrentFolderExplorer = (): JSX.Element => {
             files: res.files.map((syncElement) => ({
               ...syncElement,
               syncId: currentFolder.syncId,
+              parentFolderId: currentFolder.id,
+              parentFolderName: currentFolder.name,
+              parentFolderIcon: currentFolder.icon,
             })),
           }));
         }
@@ -45,12 +48,29 @@ const CurrentFolderExplorer = (): JSX.Element => {
     <div className={styles.current_folder_explorer_container}>
       <div className={styles.current_folder_explorer_wrapper}>
         <div className={styles.header}>
-          {currentFolder?.icon ? (
-            <div className={styles.icon}>{currentFolder.icon}</div>
-          ) : (
-            <Icon name={"folder"} color="black" size="normal" />
+          {currentFolder?.parentFolderId && (
+            <div className={styles.parent_folder}>
+              {currentFolder.parentFolderIcon && (
+                <div className={styles.icon}>{currentFolder.icon}</div>
+              )}
+              <span className={styles.name}>
+                {currentFolder.parentFolderName?.replace(/(\..+)$/, "")}
+              </span>
+              <Icon name="chevronRight" size="normal" color="black" />
+            </div>
           )}
-          <span>{currentFolder?.name?.replace(/(\..+)$/, "")}</span>
+          <div className={styles.current_folder}>
+            {currentFolder?.icon && (
+              <div className={styles.icon}>{currentFolder.icon}</div>
+            )}
+            <span
+              className={`${styles.name} ${
+                currentFolder?.parentFolderId ? styles.selected : ""
+              }`}
+            >
+              {currentFolder?.name?.replace(/(\..+)$/, "")}
+            </span>
+          </div>
         </div>
         <div className={styles.current_folder_content}>
           {loading ? (

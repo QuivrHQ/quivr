@@ -40,6 +40,9 @@ const CurrentFolderExplorerLine = ({
       mp3: "#FFC220",
       mp4: "#FFC220",
       wav: "#FFC220",
+
+      html: "#F16529",
+      py: "#F16529",
     };
 
     const fileTypeLowerCase = fileType.toLowerCase();
@@ -72,6 +75,7 @@ const CurrentFolderExplorerLine = ({
             }
             size="small"
             customColor={getIconColor()}
+            color={element.is_folder ? "black" : undefined}
           />
         }
         <span className={styles.name}>{element.name}</span>
