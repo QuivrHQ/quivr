@@ -294,7 +294,7 @@ class PDFConverter:
     def _unstructured_parse(
         self, file_path: str | Path, model: ModelEnum = ModelEnum.NONE
     ):
-        logger.debug(f"Parsing {file_path.name} using unstructured")
+        logger.debug(f"Parsing {file_path.name} using unstructured with strategy {self.strategy}")
         unstructured_parser = UnstructuredParser()
         return unstructured_parser.convert(
             file_path, model=model, strategy=self.strategy
