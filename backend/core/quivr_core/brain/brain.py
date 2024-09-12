@@ -14,7 +14,7 @@ from rich.panel import Panel
 
 from quivr_core.brain.info import BrainInfo, ChatHistoryInfo
 from quivr_core.chat import ChatHistory
-from quivr_core.config import AssistantConfig
+from quivr_core.config import RetrievalConfig
 from quivr_core.files.file import load_qfile
 from quivr_core.llm import LLMEndpoint
 from quivr_core.models import ParsedRAGChunkResponse, ParsedRAGResponse, SearchResult
@@ -255,23 +255,23 @@ class Brain:
     def ask(
         self,
         question: str,
-        rag_config: AssistantConfig | None = None,
+        retrieval_config: RetrievalConfig | None = None,
         rag_pipeline: Type[Union[QuivrQARAG, QuivrQARAGLangGraph]] | None = None,
     ) -> ParsedRAGResponse:
         llm = self.llm
 
         # If you passed a different llm model we'll override the brain  one
-        if rag_config:
-            if rag_config.llm_config != self.llm.get_config():
-                llm = LLMEndpoint.from_config(config=rag_config.llm_config)
+        if retrieval_config:
+            if retrieval_config.llm_config != self.llm.get_config():
+                llm = LLMEndpoint.from_config(config=retrieval_config.llm_config)
         else:
-            rag_config = AssistantConfig(llm_config=self.llm.get_config())
+            retrieval_config = RetrievalConfig(llm_config=self.llm.get_config())
 
         if rag_pipeline is None:
             rag_pipeline = QuivrQARAG
 
         rag_instance = rag_pipeline(
-            rag_config=rag_config, llm=llm, vector_store=self.vector_db
+            retrieval_config=retrieval_config, llm=llm, vector_store=self.vector_db
         )
 
         chat_history = self.default_chat
@@ -287,23 +287,23 @@ class Brain:
     async def ask_streaming(
         self,
         question: str,
-        rag_config: AssistantConfig | None = None,
+        retrieval_config: RetrievalConfig | None = None,
         rag_pipeline: Type[Union[QuivrQARAG, QuivrQARAGLangGraph]] | None = None,
     ) -> AsyncGenerator[ParsedRAGChunkResponse, ParsedRAGChunkResponse]:
         llm = self.llm
 
         # If you passed a different llm model we'll override the brain  one
-        if rag_config:
-            if rag_config.llm_config != self.llm.get_config():
-                llm = LLMEndpoint.from_config(config=rag_config.llm_config)
+        if retrieval_config:
+            if retrieval_config.llm_config != self.llm.get_config():
+                llm = LLMEndpoint.from_config(config=retrieval_config.llm_config)
         else:
-            rag_config = AssistantConfig(llm_config=self.llm.get_config())
+            retrieval_config = RetrievalConfig(llm_config=self.llm.get_config())
 
         if rag_pipeline is None:
             rag_pipeline = QuivrQARAG
 
         rag_instance = rag_pipeline(
-            rag_config=rag_config, llm=llm, vector_store=self.vector_db
+            retrieval_config=retrieval_config, llm=llm, vector_store=self.vector_db
         )
 
         chat_history = self.default_chat

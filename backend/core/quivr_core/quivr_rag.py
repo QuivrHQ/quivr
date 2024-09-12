@@ -13,7 +13,7 @@ from langchain_core.runnables import RunnableLambda, RunnablePassthrough
 from langchain_core.vectorstores import VectorStore
 
 from quivr_core.chat import ChatHistory
-from quivr_core.config import AssistantConfig
+from quivr_core.config import RetrievalConfig
 from quivr_core.llm import LLMEndpoint
 from quivr_core.models import (
     ParsedRAGChunkResponse,
@@ -52,12 +52,12 @@ class QuivrQARAG:
     def __init__(
         self,
         *,
-        rag_config: AssistantConfig,
+        retrieval_config: RetrievalConfig,
         llm: LLMEndpoint,
         vector_store: VectorStore,
         reranker: BaseDocumentCompressor | None = None,
     ):
-        self.rag_config = rag_config
+        self.retrieval_config = retrieval_config
         self.vector_store = vector_store
         self.llm_endpoint = llm
         self.reranker = reranker if reranker is not None else IdempotentCompressor()
@@ -87,8 +87,8 @@ class QuivrQARAG:
             # TODO: replace with tiktoken
             message_tokens = (len(human_message.content) + len(ai_message.content)) // 4
             if (
-                total_tokens + message_tokens > self.rag_config.llm_config.max_tokens
-                or total_pairs >= self.rag_config.max_history
+                total_tokens + message_tokens > self.retrieval_config.llm_config.max_tokens
+                or total_pairs >= self.retrieval_config.max_history
             ):
                 break
             filtered_chat_history.append(human_message)
@@ -127,7 +127,7 @@ class QuivrQARAG:
         retrieved_documents = {
             "docs": itemgetter("standalone_question") | compression_retriever,
             "question": lambda x: x["standalone_question"],
-            "custom_instructions": lambda x: self.rag_config.prompt,
+            "custom_instructions": lambda x: self.retrieval_config.prompt,
         }
 
         final_inputs = {
@@ -162,17 +162,17 @@ class QuivrQARAG:
         """
         Answers a question using the QuivrQA RAG synchronously.
         """
-        concat_list_files = format_file_list(list_files, self.rag_config.max_files)
+        concat_list_files = format_file_list(list_files, self.retrieval_config.max_files)
         conversational_qa_chain = self.build_chain(concat_list_files)
         raw_llm_response = conversational_qa_chain.invoke(
             {
                 "question": question,
                 "chat_history": history,
-                "custom_instructions": (self.rag_config.prompt),
+                "custom_instructions": (self.retrieval_config.prompt),
             },
             config={"metadata": metadata},
         )
-        response = parse_response(raw_llm_response, self.rag_config.llm_config.model)
+        response = parse_response(raw_llm_response, self.retrieval_config.llm_config.model)
         return response
 
     async def answer_astream(
@@ -185,7 +185,7 @@ class QuivrQARAG:
         """
         Answers a question using the QuivrQA RAG asynchronously.
         """
-        concat_list_files = format_file_list(list_files, self.rag_config.max_files)
+        concat_list_files = format_file_list(list_files, self.retrieval_config.max_files)
         conversational_qa_chain = self.build_chain(concat_list_files)
 
         rolling_message = AIMessageChunk(content="")
@@ -197,7 +197,7 @@ class QuivrQARAG:
             {
                 "question": question,
                 "chat_history": history,
-                "custom_personality": (self.rag_config.prompt),
+                "custom_personality": (self.retrieval_config.prompt),
             },
             config={"metadata": metadata},
         ):

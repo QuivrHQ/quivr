@@ -3,7 +3,7 @@ import os
 from uuid import UUID, uuid4
 
 from quivr_core.chat import ChatHistory as ChatHistoryCore
-from quivr_core.config import LLMEndpointConfig, AssistantConfig
+from quivr_core.config import LLMEndpointConfig, RetrievalConfig
 from quivr_core.llm.llm_endpoint import LLMEndpoint
 from quivr_core.models import ParsedRAGResponse, RAGResponseMetadata
 from quivr_core.quivr_rag_langgraph import QuivrQARAGLangGraph
@@ -84,11 +84,11 @@ class RAGService:
         [chat_history.append(m) for m in transformed_history]
         return chat_history
 
-    async def _build_rag_config(self) -> AssistantConfig:
+    async def _build_retrieval_config(self) -> RetrievalConfig:
         model = await self.model_service.get_model(self.model_to_use)  # type: ignore
         api_key = os.getenv(model.env_variable_name, "not-defined")
 
-        rag_config = AssistantConfig(
+        retrieval_config = RetrievalConfig(
             llm_config=LLMEndpointConfig(
                 model=self.model_to_use,  # type: ignore
                 llm_base_url=model.endpoint_url,
@@ -99,10 +99,10 @@ class RAGService:
             ),
             prompt=self.prompt.content if self.prompt else None,
         )
-        return rag_config
+        return retrieval_config
 
-    def get_llm(self, rag_config: AssistantConfig):
-        return LLMEndpoint.from_config(rag_config.llm_config)
+    def get_llm(self, retrieval_config: RetrievalConfig):
+        return LLMEndpoint.from_config(retrieval_config.llm_config)
 
     def create_vector_store(
         self, brain_id: UUID, max_input: int
@@ -144,8 +144,8 @@ class RAGService:
         logger.info(
             f"Creating question for chat {self.chat_id} with brain {self.brain.brain_id} "
         )
-        rag_config = await self._build_rag_config()
-        logger.debug(f"generate_answer with config : {rag_config.model_dump()}")
+        retrieval_config = await self._build_retrieval_config()
+        logger.debug(f"generate_answer with config : {retrieval_config.model_dump()}")
         history = await self.chat_service.get_chat_history(self.chat_id)
         # Get list of files
         list_files = await self.knowledge_service.get_all_knowledge_in_brain(
@@ -153,12 +153,12 @@ class RAGService:
         )
         # Build RAG dependencies to inject
         vector_store = self.create_vector_store(
-            self.brain.brain_id, rag_config.llm_config.max_input
+            self.brain.brain_id, retrieval_config.llm_config.max_input
         )
-        llm = self.get_llm(rag_config)
+        llm = self.get_llm(retrieval_config)
         # Initialize the RAG pipline
         rag_pipeline = QuivrQARAGLangGraph(
-            rag_config=rag_config, llm=llm, vector_store=vector_store
+            retrieval_config=retrieval_config, llm=llm, vector_store=vector_store
         )
         #  Format the history, sanitize the input
         chat_history = self._build_chat_history(history)
@@ -196,7 +196,7 @@ class RAGService:
             f"Creating question for chat {self.chat_id} with brain {self.brain.brain_id} "
         )
         # Build the rag config
-        rag_config = await self._build_rag_config()
+        retrieval_config = await self._build_retrieval_config()
         # Get chat history
         history = await self.chat_service.get_chat_history(self.chat_id)
         #  Format the history, sanitize the input
@@ -206,13 +206,13 @@ class RAGService:
         list_files = await self.knowledge_service.get_all_knowledge_in_brain(
             self.brain.brain_id
         )
-        llm = self.get_llm(rag_config)
+        llm = self.get_llm(retrieval_config)
         vector_store = self.create_vector_store(
-            self.brain.brain_id, rag_config.llm_config.max_input
+            self.brain.brain_id, retrieval_config.llm_config.max_input
         )
         # Initialize the rag pipline
         rag_pipeline = QuivrQARAGLangGraph(
-            rag_config=rag_config, llm=llm, vector_store=vector_store
+            retrieval_config=retrieval_config, llm=llm, vector_store=vector_store
         )
 
         full_answer = ""
