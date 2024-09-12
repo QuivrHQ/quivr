@@ -2,10 +2,10 @@ from uuid import uuid4
 
 import pytest
 from quivr_core.chat import ChatHistory
-from quivr_core.config import LLMEndpointConfig, AssistantConfig
+from quivr_core.config import LLMEndpointConfig, RetrievalConfig
 from quivr_core.llm import LLMEndpoint
 from quivr_core.models import ParsedRAGChunkResponse, RAGResponseMetadata
-from quivr_core.quivr_rag import QuivrQARAG
+from quivr_core.quivr_rag_langgraph import QuivrQARAGLangGraph
 
 
 @pytest.fixture(scope="function")
@@ -18,7 +18,7 @@ def mock_chain_qa_stream(monkeypatch, chunks_stream_answer):
     def mock_qa_chain(*args, **kwargs):
         return MockQAChain()
 
-    monkeypatch.setattr(QuivrQARAG, "build_chain", mock_qa_chain)
+    monkeypatch.setattr(QuivrQARAGLangGraph, "build_chain", mock_qa_chain)
 
 
 @pytest.mark.base
@@ -29,10 +29,10 @@ async def test_quivrqarag(
     # Making sure the model
     llm_config = LLMEndpointConfig(model="gpt-4o")
     llm = LLMEndpoint.from_config(llm_config)
-    rag_config = AssistantConfig(llm_config=llm_config)
+    retrieval_config = RetrievalConfig(llm_config=llm_config)
     chat_history = ChatHistory(uuid4(), uuid4())
-    rag_pipeline = QuivrQARAG(
-        rag_config=rag_config, llm=llm, vector_store=mem_vector_store
+    rag_pipeline = QuivrQARAGLangGraph(
+        retrieval_config=retrieval_config, llm=llm, vector_store=mem_vector_store
     )
 
     stream_responses: list[ParsedRAGChunkResponse] = []
