@@ -23,7 +23,7 @@ def mock_chain_qa_stream(monkeypatch, chunks_stream_answer):
 
 @pytest.mark.base
 @pytest.mark.asyncio
-async def test_quivrqarag(
+async def test_quivrqaraglanggraph(
     mem_vector_store, full_response, mock_chain_qa_stream, openai_api_key
 ):
     # Making sure the model
