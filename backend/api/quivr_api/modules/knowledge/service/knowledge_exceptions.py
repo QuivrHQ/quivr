@@ -9,22 +9,22 @@ class UploadError(KnowledgeException):
         super().__init__(message)
 
 
-class CreationError(KnowledgeException):
+class KnowledgeCreationError(KnowledgeException):
     def __init__(self, message="An error occurred while creating"):
         super().__init__(message)
 
 
-class UpdateError(KnowledgeException):
+class KnowledgeUpdateError(KnowledgeException):
     def __init__(self, message="An error occurred while updating"):
         super().__init__(message)
 
 
-class DeleteError(KnowledgeException):
+class KnowledgeDeleteError(KnowledgeException):
     def __init__(self, message="An error occurred while deleting"):
         super().__init__(message)
 
 
-class ForbiddenAccess(KnowledgeException):
+class KnowledgeForbiddenAccess(KnowledgeException):
     def __init__(self, message="You do not have permission to access this knowledge."):
         super().__init__(message)
 

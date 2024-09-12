@@ -17,6 +17,7 @@ from quivr_api.modules.knowledge.entity.knowledge_brain import KnowledgeBrain
 from quivr_api.modules.knowledge.repository.knowledges import KnowledgeRepository
 from quivr_api.modules.knowledge.service.knowledge_exceptions import (
     KnowledgeNotFoundException,
+    KnowledgeUpdateError,
     UploadError,
 )
 from quivr_api.modules.knowledge.service.knowledge_service import KnowledgeService
@@ -712,7 +713,7 @@ async def test_update_knowledge_move(
     await session.commit()
     await session.refresh(folder_2)
 
-    storage = ErrorStorage()
+    storage = FakeStorage()
     repository = KnowledgeRepository(session)
     service = KnowledgeService(repository, storage)
 
@@ -721,6 +722,52 @@ async def test_update_knowledge_move(
         KnowledgeUpdate(parent_id=folder_2.id),  # type: ignore
     )
     assert new_km.parent_id == folder_2.id
+
+
+@pytest.mark.asyncio(loop_scope="session")
+async def test_update_knowledge_move_error(session: AsyncSession, user: User):
+    assert user.id
+    file_1 = KnowledgeDB(
+        file_name="file_1",
+        extension="",
+        status="UPLOADED",
+        source="local",
+        source_link="local",
+        file_size=4,
+        file_sha1=None,
+        brains=[],
+        children=[],
+        user_id=user.id,
+        is_folder=False,
+    )
+    file_2 = KnowledgeDB(
+        file_name="file_2",
+        extension="",
+        status="UPLOADED",
+        source="local",
+        source_link="local",
+        file_size=4,
+        file_sha1=None,
+        brains=[],
+        children=[],
+        user_id=user.id,
+        is_folder=False,
+    )
+    session.add(file_1)
+    session.add(file_2)
+    await session.commit()
+    await session.refresh(file_1)
+    await session.refresh(file_2)
+
+    storage = FakeStorage()
+    repository = KnowledgeRepository(session)
+    service = KnowledgeService(repository, storage)
+
+    with pytest.raises(KnowledgeUpdateError):
+        await service.update_knowledge(
+            file_2,
+            KnowledgeUpdate(parent_id=file_1.id),  # type: ignore
+        )
 
 
 @pytest.mark.asyncio(loop_scope="session")

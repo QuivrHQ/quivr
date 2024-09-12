@@ -15,6 +15,7 @@ from quivr_api.modules.knowledge.dto.outputs import DeleteKnowledgeResponse
 from quivr_api.modules.knowledge.entity.knowledge import Knowledge, KnowledgeDB
 from quivr_api.modules.knowledge.service.knowledge_exceptions import (
     KnowledgeNotFoundException,
+    KnowledgeUpdateError,
 )
 
 logger = get_logger(__name__)
@@ -42,17 +43,23 @@ class KnowledgeRepository(BaseRepository):
     async def update_knowledge(
         self, knowledge: KnowledgeDB, payload: Knowledge | dict[str, Any]
     ) -> KnowledgeDB:
-        if isinstance(payload, dict):
-            update_data = payload
-        else:
-            update_data = payload.model_dump(exclude_unset=True)
-        for field in update_data:
-            setattr(knowledge, field, update_data[field])
+        try:
+            logger.debug(f"updating {knowledge.id} with payload {payload}")
+            if isinstance(payload, dict):
+                update_data = payload
+            else:
+                update_data = payload.model_dump(exclude_unset=True)
+            for field in update_data:
+                setattr(knowledge, field, update_data[field])
 
-        self.session.add(knowledge)
-        await self.session.commit()
-        await self.session.refresh(knowledge)
-        return knowledge
+            self.session.add(knowledge)
+            await self.session.commit()
+            await self.session.refresh(knowledge)
+            return knowledge
+        except IntegrityError as e:
+            await self.session.rollback()
+            logger.error(f"Error updating knowledge {e}")
+            raise KnowledgeUpdateError
 
     async def insert_knowledge_brain(
         self, knowledge: KnowledgeDB, brain_id: UUID
