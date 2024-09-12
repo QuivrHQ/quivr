@@ -2,7 +2,7 @@ import asyncio
 import logging
 from pathlib import Path
 from pprint import PrettyPrinter
-from typing import Any, AsyncGenerator, Callable, Dict, Self, Union, Type
+from typing import Any, AsyncGenerator, Callable, Dict, Self, Type, Union
 from uuid import UUID, uuid4
 
 from langchain_core.documents import Document
@@ -20,7 +20,7 @@ from quivr_core.llm import LLMEndpoint
 from quivr_core.models import ParsedRAGChunkResponse, ParsedRAGResponse, SearchResult
 from quivr_core.processor.registry import get_processor_class
 from quivr_core.quivr_rag import QuivrQARAG
-from quivr_core.quivr_rag_langgraph import QuivrQARAGLangGraph 
+from quivr_core.quivr_rag_langgraph import QuivrQARAGLangGraph
 from quivr_core.storage.local_storage import TransparentStorage
 from quivr_core.storage.storage_base import StorageBase
 
@@ -127,7 +127,7 @@ class Brain:
         llm: LLMEndpoint | None = None,
         embedder: Embeddings | None = None,
         skip_file_error: bool = False,
-        processor_kwargs: dict[str, Any] | None = None
+        processor_kwargs: dict[str, Any] | None = None,
     ):
         if llm is None:
             llm = default_llm()
@@ -182,7 +182,7 @@ class Brain:
         llm: LLMEndpoint | None = None,
         embedder: Embeddings | None = None,
         skip_file_error: bool = False,
-        processor_kwargs: dict[str, Any] | None = None
+        processor_kwargs: dict[str, Any] | None = None,
     ) -> Self:
         loop = asyncio.get_event_loop()
         return loop.run_until_complete(
@@ -194,7 +194,7 @@ class Brain:
                 llm=llm,
                 embedder=embedder,
                 skip_file_error=skip_file_error,
-                processor_kwargs=processor_kwargs
+                processor_kwargs=processor_kwargs,
             )
         )
 
@@ -229,7 +229,7 @@ class Brain:
             storage=storage,
             llm=llm,
             embedder=embedder,
-            vector_db=vector_db
+            vector_db=vector_db,
         )
 
     async def asearch(
@@ -278,9 +278,9 @@ class Brain:
 
         chat_history = self.default_chat
 
-        parsed_response = rag_instance.answer(question=question, 
-                                              history=chat_history, 
-                                              list_files=[])
+        parsed_response = rag_instance.answer(
+            question=question, history=chat_history, list_files=[]
+        )
 
         chat_history.append(HumanMessage(content=question))
         chat_history.append(AIMessage(content=parsed_response.answer))
@@ -314,9 +314,9 @@ class Brain:
 
         # TODO: List of files
         full_answer = ""
-        async for response in rag_instance.answer_astream(question=question, 
-                                                          history=chat_history, 
-                                                          list_files=[]):
+        async for response in rag_instance.answer_astream(
+            question=question, history=chat_history, list_files=[]
+        ):
             # Format output to be correct servicedf;j
             if not response.last_chunk:
                 yield response

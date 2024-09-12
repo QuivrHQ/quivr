@@ -47,7 +47,8 @@ class ChatLLM:
             # TODO: replace with tiktoken
             message_tokens = (len(human_message.content) + len(ai_message.content)) // 4
             if (
-                total_tokens + message_tokens > self.llm_endpoint._config.max_input_tokens
+                total_tokens + message_tokens
+                > self.llm_endpoint._config.max_input_tokens
                 or total_pairs >= 20
             ):
                 break
@@ -55,7 +56,7 @@ class ChatLLM:
             filtered_chat_history.append(ai_message)
             total_tokens += message_tokens
             total_pairs += 1
-            
+
         return filtered_chat_history
 
     def build_chain(self):

@@ -31,7 +31,7 @@ repos:
     hooks:
       - id: mypy
         name: mypy
-        additional_dependencies: ["types-aiofiles"]
+        additional_dependencies: ["types-aiofiles", "types-pyyaml"]
   - repo: https://github.com/python-poetry/poetry
     rev: "1.8.0"
     hooks:
