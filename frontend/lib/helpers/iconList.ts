@@ -5,13 +5,8 @@ import {
   BsFiletypeDocx,
   BsFiletypeHtml,
   BsFiletypeMd,
-  BsFiletypeMp3,
-  BsFiletypeMp4,
-  BsFiletypePptx,
   BsFiletypePy,
   BsFiletypeTxt,
-  BsFiletypeXls,
-  BsFiletypeXlsx,
   BsTextParagraph,
 } from "react-icons/bs";
 import { CgSoftwareDownload } from "react-icons/cg";
@@ -23,11 +18,13 @@ import {
   FaDiscord,
   FaFile,
   FaFileAlt,
+  FaFileCsv,
   FaGithub,
   FaLinkedin,
   FaQuestionCircle,
   FaRegFileAlt,
   FaRegFileAudio,
+  FaRegFileExcel,
   FaRegFilePdf,
   FaRegFolder,
   FaRegKeyboard,
@@ -39,9 +36,9 @@ import {
   FaTwitter,
   FaUnlock,
 } from "react-icons/fa";
-import { FaInfo } from "react-icons/fa6";
+import { FaInfo, FaRegFilePowerpoint, FaRegFileWord } from "react-icons/fa6";
 import { FiUpload } from "react-icons/fi";
-import { GoLightBulb } from "react-icons/go";
+import { GoLightBulb, GoTable } from "react-icons/go";
 import { HiBuildingOffice } from "react-icons/hi2";
 import {
   IoIosAdd,
@@ -55,11 +52,13 @@ import {
 import {
   IoArrowUpCircleOutline,
   IoBookOutline,
+  IoCameraOutline,
   IoChatbubbleEllipsesOutline,
   IoCloudDownloadOutline,
   IoFootsteps,
   IoHelp,
   IoHomeOutline,
+  IoMusicalNote,
   IoShareSocial,
   IoWarningOutline,
 } from "react-icons/io5";
@@ -77,6 +76,7 @@ import {
   LuExternalLink,
   LuGoal,
   LuPlusCircle,
+  LuPresentation,
   LuSearch,
 } from "react-icons/lu";
 import {
@@ -128,12 +128,12 @@ export const iconList: { [name: string]: IconType } = {
   coin: BiCoin,
   color: MdOutlinePalette,
   copy: LuCopy,
-  csv: BsFiletypeXlsx,
+  csv: FaFileCsv,
   custom: MdDashboardCustomize,
   delete: MdDeleteOutline,
   discord: FaDiscord,
-  doc: BsFiletypeDocx,
-  docx: BsFiletypeDocx,
+  doc: FaRegFileAlt,
+  docx: FaRegFileWord,
   download: IoCloudDownloadOutline,
   edit: MdOutlineModeEditOutline,
   email: MdOutlineMail,
@@ -160,6 +160,7 @@ export const iconList: { [name: string]: IconType } = {
   info: FaInfo,
   invite: IoIosSend,
   ipynb: BsFiletypePy,
+  jpg: IoCameraOutline,
   key: MdOutlineVpnKey,
   knowledge: LuBook,
   link: MdLink,
@@ -170,8 +171,8 @@ export const iconList: { [name: string]: IconType } = {
   markdown: BsFiletypeMd,
   md: BsFiletypeMd,
   moon: MdDarkMode,
-  mp3: BsFiletypeMp3,
-  mp4: BsFiletypeMp4,
+  mp3: IoMusicalNote,
+  mp4: IoMusicalNote,
   mpga: FaRegFileAudio,
   mpeg: LiaFileVideo,
   notifications: RiNotification2Line,
@@ -179,8 +180,10 @@ export const iconList: { [name: string]: IconType } = {
   odt: BsFiletypeDocx,
   options: SlOptionsVertical,
   paragraph: BsTextParagraph,
+  png: IoCameraOutline,
   pdf: FaRegFilePdf,
-  pptx: BsFiletypePptx,
+  ppt: LuPresentation,
+  pptx: FaRegFilePowerpoint,
   prompt: FaRegKeyboard,
   py: BsFiletypePy,
   question: FaQuestionCircle,
@@ -213,6 +216,6 @@ export const iconList: { [name: string]: IconType } = {
   wav: FaRegFileAudio,
   webm: LiaFileVideo,
   website: TbNetwork,
-  xls: BsFiletypeXls,
-  xlsx: BsFiletypeXlsx,
+  xls: GoTable,
+  xlsx: FaRegFileExcel,
 };
