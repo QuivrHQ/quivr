@@ -224,7 +224,7 @@ class QuivrQARAGLangGraph:
         return {"messages": [response], "final_response": formatted_response}
 
 
-    def build_langgraph_chain(self):
+    def build_chain(self):
         """
         Builds the langchain chain for the given configuration.
 
@@ -294,7 +294,7 @@ class QuivrQARAGLangGraph:
             ParsedRAGResponse: The answer to the question.
         """
         concat_list_files = format_file_list(list_files, self.retrieval_config.max_files)
-        conversational_qa_chain = self.build_langgraph_chain()
+        conversational_qa_chain = self.build_chain()
         inputs = {
             "messages": [
                 ("user", question),
@@ -330,7 +330,7 @@ class QuivrQARAGLangGraph:
             ParsedRAGChunkResponse: Each chunk of the answer.
         """
         concat_list_files = format_file_list(list_files, self.retrieval_config.max_files)
-        conversational_qa_chain = self.build_langgraph_chain()
+        conversational_qa_chain = self.build_chain()
 
         rolling_message = AIMessageChunk(content="")
         sources = []
