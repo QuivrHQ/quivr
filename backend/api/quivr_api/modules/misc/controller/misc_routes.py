@@ -1,8 +1,5 @@
-from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException
-from quivr_api.modules.dependencies import get_service
-from quivr_api.modules.misc.service.misc_service import MiscService
 from quivr_api.logger import get_logger
 from quivr_api.modules.dependencies import get_async_session
 from sqlmodel.ext.asyncio.session import AsyncSession
@@ -11,8 +8,6 @@ from sqlmodel import text
 logger = get_logger(__name__)
 
 misc_router = APIRouter()
-
-MiscServiceDep = Annotated[MiscService, Depends(get_service(MiscService))]
 
 
 @misc_router.get("/")
@@ -28,7 +23,6 @@ async def healthz(session: AsyncSession = Depends(get_async_session)):
 
     try:
         result = await session.execute(text("SELECT 1"))
-        logger.info(f"Database health check result: {result.all()}")
         if not result:
             raise HTTPException(status_code=500, detail="Database is not healthy")
     except Exception as e:
