@@ -51,6 +51,10 @@ class RerankerConfig(QuivrBaseConfig):
 
 class RetrievalConfig(QuivrBaseConfig):
     reranker_config: RerankerConfig = RerankerConfig()
+    llm_config: LLMEndpointConfig = LLMEndpointConfig()
+    max_history: int = 10
+    max_files: int = 20
+    prompt: str | None = None
 
 class ParserConfig(QuivrBaseConfig):
     splitter_config: SplitterConfig = SplitterConfig()
@@ -62,9 +66,3 @@ class IngestionConfig(QuivrBaseConfig):
 class AssistantConfig(QuivrBaseConfig):
     retrieval_config: RetrievalConfig = RetrievalConfig()
     ingestion_config: IngestionConfig = IngestionConfig()
-    llm_config: LLMEndpointConfig = LLMEndpointConfig()
-    max_history: int = 10
-    max_files: int = 20
-    prompt: str | None = None
-
-
