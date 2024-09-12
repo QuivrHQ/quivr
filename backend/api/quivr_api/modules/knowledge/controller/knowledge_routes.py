@@ -159,7 +159,9 @@ async def create_knowledge(
 
 
 @knowledge_router.get(
-    "/knowledge/{knowledge_id}", tags=["Knowledge"], response_model=Knowledge
+    "/knowledge/{knowledge_id}",
+    response_model=Knowledge,
+    tags=["Knowledge"],
 )
 async def get_knowledge(
     knowledge_id: UUID,
@@ -186,6 +188,7 @@ async def get_knowledge(
     "/knowledge/{knowledge_id}",
     status_code=status.HTTP_202_ACCEPTED,
     response_model=Knowledge,
+    tags=["Knowledge"],
 )
 async def update_knowledge(
     knowledge_id: UUID,
