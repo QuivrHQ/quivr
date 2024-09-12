@@ -5,5 +5,5 @@ from pydantic import BaseModel
 
 class DeleteKnowledgeResponse(BaseModel):
     file_name: str | None = None
-    status: str = "delete"
+    status: str = "DELETED"
     knowledge_id: UUID

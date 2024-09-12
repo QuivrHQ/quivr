@@ -17,8 +17,8 @@ class SupabaseS3Storage(StorageInterface):
         if self.client is None:
             self.client = await get_supabase_async_client()
 
-    @staticmethod
     def get_storage_path(
+        self,
         knowledge: KnowledgeDB,
     ) -> str:
         if knowledge.id is None:

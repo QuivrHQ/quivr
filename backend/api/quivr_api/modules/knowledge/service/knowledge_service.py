@@ -23,6 +23,7 @@ from quivr_api.modules.knowledge.repository.knowledges import KnowledgeRepositor
 from quivr_api.modules.knowledge.repository.storage import SupabaseS3Storage
 from quivr_api.modules.knowledge.repository.storage_interface import StorageInterface
 from quivr_api.modules.knowledge.service.knowledge_exceptions import (
+    KnowledgeDeleteError,
     UploadError,
 )
 from quivr_api.modules.sync.entity.sync_models import (
@@ -108,12 +109,12 @@ class KnowledgeService(BaseService[KnowledgeRepository]):
                     )
                 else:
                     await self.repository.link_to_brain(existing_knowledge, brain_id)
-                    await self.remove_knowledge(brain_id, knowledge.id)
+                    await self.remove_knowledge_brain(brain_id, knowledge.id)
                     return False
             else:
                 logger.debug(f"Removing previous errored file {existing_knowledge.id}")
                 assert existing_knowledge.id
-                await self.remove_knowledge(brain_id, existing_knowledge.id)
+                await self.remove_knowledge_brain(brain_id, existing_knowledge.id)
                 await self.update_file_sha1_knowledge(knowledge.id, knowledge.file_sha1)
                 return True
         except NoResultFound:
@@ -219,7 +220,22 @@ class KnowledgeService(BaseService[KnowledgeRepository]):
     async def update_file_sha1_knowledge(self, knowledge_id: UUID, file_sha1: str):
         return await self.repository.update_file_sha1_knowledge(knowledge_id, file_sha1)
 
-    async def remove_knowledge(
+    async def remove_knowledge(self, knowledge: KnowledgeDB) -> DeleteKnowledgeResponse:
+        assert knowledge.id
+        try:
+            deleted_km = await self.repository.remove_knowledge(knowledge)
+            # TODO:
+            # - Remove all knowledge stored in folder recursively
+            # - Notion folders are special
+            if not knowledge.is_folder:
+                km_path = self.storage.get_storage_path(knowledge)
+                await self.storage.remove_file(km_path)
+            return deleted_km
+        except Exception as e:
+            logger.error(f"Error while remove knowledge : {e}")
+            raise KnowledgeDeleteError
+
+    async def remove_knowledge_brain(
         self,
         brain_id: UUID,
         knowledge_id: UUID,  # FIXME: @amine when name in storage change no need for brain id
@@ -243,7 +259,6 @@ class KnowledgeService(BaseService[KnowledgeRepository]):
                 logger.error(
                     f"Error while removing file {file_name_with_brain_id}: {e}"
                 )
-
             return message
 
     async def remove_all_knowledges_from_brain(self, brain_id: UUID) -> None:

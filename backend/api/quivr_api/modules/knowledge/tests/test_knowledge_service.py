@@ -825,3 +825,83 @@ async def test_update_knowledge_multiple(session: AsyncSession, user: User):
     assert km.parent_id == folder.id
     assert km.status == "UPLOADED"
     assert km.file_sha1 == "sha1"
+
+
+@pytest.mark.asyncio(loop_scope="session")
+async def test_remove_knowledge(session: AsyncSession, user: User):
+    assert user.id
+    storage = FakeStorage()
+    repository = KnowledgeRepository(session)
+    service = KnowledgeService(repository, storage)
+
+    km_to_add = AddKnowledge(
+        file_name="test",
+        source="local",
+        is_folder=False,
+        parent_id=None,
+    )
+    km_data = BytesIO(os.urandom(128))
+
+    # Create the knowledge
+    km = await service.create_knowledge(
+        user_id=user.id,
+        knowledge_to_add=km_to_add,
+        upload_file=UploadFile(file=km_data, size=128, filename=km_to_add.file_name),
+    )
+
+    # Remove knowledge
+    response = await service.remove_knowledge(knowledge=km)
+
+    assert response.knowledge_id == km.id
+    assert response.file_name == km.file_name
+
+    assert not storage.knowledge_exists(km)
+    assert (
+        await session.exec(select(KnowledgeDB).where(KnowledgeDB.id == km.id))
+    ).first() is None
+
+
+@pytest.mark.asyncio(loop_scope="session")
+async def test_remove_knowledge_folder(session: AsyncSession, user: User):
+    assert user.id
+    storage = FakeStorage()
+    repository = KnowledgeRepository(session)
+    service = KnowledgeService(repository, storage)
+
+    folder_add = AddKnowledge(
+        file_name="folder",
+        source="local",
+        is_folder=True,
+        parent_id=None,
+    )
+
+    # Create the knowledge
+    folder = await service.create_knowledge(
+        user_id=user.id, knowledge_to_add=folder_add, upload_file=None
+    )
+    file_add = AddKnowledge(
+        file_name="file",
+        source="local",
+        is_folder=False,
+        parent_id=folder.id,
+    )
+
+    km_data = BytesIO(os.urandom(128))
+    file = await service.create_knowledge(
+        user_id=user.id,
+        knowledge_to_add=file_add,
+        upload_file=UploadFile(file=km_data, size=128, filename=file_add.file_name),
+    )
+    assert storage.knowledge_exists(file)
+
+    # Remove knowledge
+    await service.remove_knowledge(knowledge=folder)
+
+    assert not storage.knowledge_exists(folder)
+    assert not storage.knowledge_exists(file)
+    assert (
+        await session.exec(select(KnowledgeDB).where(KnowledgeDB.id == folder.id))
+    ).first() is None
+    assert (
+        await session.exec(select(KnowledgeDB).where(KnowledgeDB.id == file.id))
+    ).first() is None

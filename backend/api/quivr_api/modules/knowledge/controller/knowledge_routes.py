@@ -15,6 +15,7 @@ from quivr_api.modules.dependencies import get_service
 from quivr_api.modules.knowledge.dto.inputs import AddKnowledge
 from quivr_api.modules.knowledge.entity.knowledge import Knowledge, KnowledgeUpdate
 from quivr_api.modules.knowledge.service.knowledge_exceptions import (
+    KnowledgeDeleteError,
     KnowledgeNotFoundException,
     UploadError,
 )
@@ -71,7 +72,7 @@ async def delete_knowledge_brain(
 
     knowledge = await knowledge_service.get_knowledge(knowledge_id)
     file_name = knowledge.file_name if knowledge.file_name else knowledge.url
-    await knowledge_service.remove_knowledge(brain_id, knowledge_id)
+    await knowledge_service.remove_knowledge_brain(brain_id, knowledge_id)
 
     return {
         "message": f"{file_name} of brain {brain_id} has been deleted by user {current_user.email}."
@@ -194,12 +195,6 @@ async def update_knowledge(
 ):
     try:
         km = await knowledge_service.get_knowledge(knowledge_id)
-        if payload.id and km.id != payload.id:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail="Trying to update a knowledge with different knowledge id",
-            )
-
         if km.user_id != current_user.id:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
@@ -212,4 +207,32 @@ async def update_knowledge(
             status_code=status.HTTP_404_NOT_FOUND, detail=f"{e.message}"
         )
     except Exception:
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@knowledge_router.delete(
+    "/knowledge/{knowledge_id}",
+    status_code=status.HTTP_202_ACCEPTED,
+    tags=["Knowledge"],
+)
+async def delete_knowledge(
+    knowledge_id: UUID,
+    knowledge_service: KnowledgeServiceDep,
+    current_user: UserIdentity = Depends(get_current_user),
+):
+    try:
+        km = await knowledge_service.get_knowledge(knowledge_id)
+
+        if km.user_id != current_user.id:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="You do not have permission to remove this knowledge.",
+            )
+        delete_response = await knowledge_service.remove_knowledge(km)
+        return delete_response
+    except KnowledgeNotFoundException as e:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail=f"{e.message}"
+        )
+    except KnowledgeDeleteError:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)

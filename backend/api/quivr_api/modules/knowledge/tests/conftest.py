@@ -13,6 +13,14 @@ class ErrorStorage(StorageInterface):
     ):
         raise SystemError
 
+    def get_storage_path(
+        self,
+        knowledge: KnowledgeDB | Knowledge,
+    ) -> str:
+        if knowledge.id is None:
+            raise ValueError("knowledge should have a valid id")
+        return str(knowledge.id)
+
     async def remove_file(self, storage_path: str):
         raise SystemError
 
@@ -21,8 +29,8 @@ class FakeStorage(StorageInterface):
     def __init__(self):
         self.storage = {}
 
-    @staticmethod
     def get_storage_path(
+        self,
         knowledge: KnowledgeDB | Knowledge,
     ) -> str:
         if knowledge.id is None:
