@@ -554,10 +554,7 @@ async def test_get_knowledge_storage_path(session: AsyncSession, test_data: Test
 
 
 @pytest.mark.asyncio(loop_scope="session")
-@pytest.mark.parametrize("is_folder", [True, False])
-async def test_create_knowledge_file(
-    session: AsyncSession, user: User, is_folder: bool
-):
+async def test_create_knowledge_file(session: AsyncSession, user: User):
     assert user.id
     storage = FakeStorage()
     repository = KnowledgeRepository(session)
@@ -566,7 +563,7 @@ async def test_create_knowledge_file(
     km_to_add = AddKnowledge(
         file_name="test",
         source="local",
-        is_folder=is_folder,
+        is_folder=False,
         parent_id=None,
     )
     km_data = BytesIO(os.urandom(128))
@@ -580,6 +577,7 @@ async def test_create_knowledge_file(
     assert km.file_name == km_to_add.file_name
     assert km.id
     assert km.status == KnowledgeStatus.UPLOADED
+    assert not km.is_folder
     # km in storage
     storage.knowledge_exists(km)
 
@@ -607,7 +605,17 @@ async def test_create_knowledge_folder(session: AsyncSession, user: User):
 
     assert km.file_name == km_to_add.file_name
     assert km.id
+    # Knowledge properties
+    assert km.file_name == km_to_add.file_name
+    assert km.is_folder == km_to_add.is_folder
+    assert km.url == km_to_add.url
+    assert km.extension == km_to_add.extension
+    assert km.source == km_to_add.source
+    assert km.file_size == 128
+    assert km.metadata_ == km_to_add.metadata
+    assert km.is_folder == km_to_add.is_folder
     assert km.status == KnowledgeStatus.UPLOADED
+    # Knowledge was saved
     assert storage.knowledge_exists(km)
 
 

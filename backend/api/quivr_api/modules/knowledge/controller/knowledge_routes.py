@@ -181,7 +181,7 @@ async def get_knowledge(
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
-@knowledge_router.get(
+@knowledge_router.patch(
     "/knowledge/{knowledge_id}",
     status_code=status.HTTP_202_ACCEPTED,
     response_model=Knowledge,

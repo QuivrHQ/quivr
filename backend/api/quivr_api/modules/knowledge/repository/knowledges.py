@@ -12,7 +12,11 @@ from quivr_api.logger import get_logger
 from quivr_api.modules.brain.entity.brain_entity import Brain
 from quivr_api.modules.dependencies import BaseRepository, get_supabase_client
 from quivr_api.modules.knowledge.dto.outputs import DeleteKnowledgeResponse
-from quivr_api.modules.knowledge.entity.knowledge import Knowledge, KnowledgeDB
+from quivr_api.modules.knowledge.entity.knowledge import (
+    Knowledge,
+    KnowledgeDB,
+    KnowledgeUpdate,
+)
 from quivr_api.modules.knowledge.service.knowledge_exceptions import (
     KnowledgeNotFoundException,
     KnowledgeUpdateError,
@@ -41,7 +45,9 @@ class KnowledgeRepository(BaseRepository):
         return knowledge
 
     async def update_knowledge(
-        self, knowledge: KnowledgeDB, payload: Knowledge | dict[str, Any]
+        self,
+        knowledge: KnowledgeDB,
+        payload: Knowledge | KnowledgeUpdate | dict[str, Any],
     ) -> KnowledgeDB:
         try:
             logger.debug(f"updating {knowledge.id} with payload {payload}")

@@ -132,6 +132,7 @@ class KnowledgeService(BaseService[KnowledgeRepository]):
         knowledgedb = KnowledgeDB(
             user_id=user_id,
             file_name=knowledge_to_add.file_name,
+            is_folder=knowledge_to_add.is_folder,
             url=knowledge_to_add.url,
             extension=knowledge_to_add.extension,
             source=knowledge_to_add.source,
@@ -149,10 +150,9 @@ class KnowledgeService(BaseService[KnowledgeRepository]):
                     knowledgedb, buff_reader
                 )
                 knowledgedb.source_link = storage_path
-            # TODO(@aminediro): Update status after upload ?
-            await self.repository.update_knowledge(
+            knowledge_db = await self.repository.update_knowledge(
                 knowledge_db,
-                KnowledgeUpdate(status="UPLOADED"),  # type: ignore
+                KnowledgeUpdate(status=KnowledgeStatus.UPLOADED),  # type: ignore
             )
             return knowledge_db
         except Exception as e:

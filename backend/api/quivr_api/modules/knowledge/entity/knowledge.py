@@ -11,7 +11,6 @@ from sqlmodel import UUID as PGUUID
 from sqlmodel import Field, Relationship, SQLModel
 
 from quivr_api.modules.knowledge.entity.knowledge_brain import KnowledgeBrain
-from quivr_api.utils.partial import all_optional
 
 
 class KnowledgeSource(str, Enum):
@@ -24,27 +23,34 @@ class KnowledgeSource(str, Enum):
 
 class Knowledge(BaseModel):
     id: UUID
+    file_size: int = 0
+    status: KnowledgeStatus
     file_name: Optional[str] = None
     url: Optional[str] = None
     extension: str = ".txt"
-    status: KnowledgeStatus
-    file_size: int = 0
     is_folder: bool = False
     updated_at: datetime
     created_at: datetime
     source: Optional[str] = None
     source_link: Optional[str] = None
-    user_id: UUID
     parent_id: Optional[UUID]
     children: Optional[list["Knowledge"]]
     file_sha1: Optional[str] = None
     metadata: Optional[Dict[str, str]] = None
+    user_id: UUID
     brains: List[Dict[str, Any]]
 
 
-@all_optional()
-class KnowledgeUpdate(Knowledge):
-    pass
+class KnowledgeUpdate(BaseModel):
+    file_name: Optional[str] = None
+    status: Optional[KnowledgeStatus] = None
+    url: Optional[str] = None
+    file_sha1: Optional[str] = None
+    extension: Optional[str] = None
+    parent_id: Optional[UUID] = None
+    source: Optional[str] = None
+    source_link: Optional[str] = None
+    metadata: Optional[Dict[str, str]] = None
 
 
 class KnowledgeDB(AsyncAttrs, SQLModel, table=True):
