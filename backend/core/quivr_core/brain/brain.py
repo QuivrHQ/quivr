@@ -278,7 +278,9 @@ class Brain:
 
         chat_history = self.default_chat
 
-        parsed_response = rag_instance.answer(question, chat_history, [])
+        parsed_response = rag_instance.answer(question=question, 
+                                              history=chat_history, 
+                                              list_files=[])
 
         chat_history.append(HumanMessage(content=question))
         chat_history.append(AIMessage(content=parsed_response.answer))
@@ -312,7 +314,9 @@ class Brain:
 
         # TODO: List of files
         full_answer = ""
-        async for response in rag_instance.answer_astream(question, chat_history, []):
+        async for response in rag_instance.answer_astream(question=question, 
+                                                          history=chat_history, 
+                                                          list_files=[]):
             # Format output to be correct servicedf;j
             if not response.last_chunk:
                 yield response

@@ -163,7 +163,9 @@ class RAGService:
         #  Format the history, sanitize the input
         chat_history = self._build_chat_history(history)
 
-        parsed_response = rag_pipeline.answer(question, chat_history, list_files)
+        parsed_response = rag_pipeline.answer(question=question, 
+                                              history=chat_history, 
+                                              list_files=list_files)
 
         # Save the answer to db
         new_chat_entry = self.save_answer(question, parsed_response)
@@ -231,7 +233,7 @@ class RAGService:
         }
 
         async for response in rag_pipeline.answer_astream(
-            question, chat_history, list_files
+            question=question, history=chat_history, list_files=list_files
         ):
             # Format output to be correct servicedf;j
             if not response.last_chunk:
