@@ -24,7 +24,8 @@ interface ConnectionSectionProps {
 
 const renderConnectionLines = (
   existingConnections: Sync[],
-  folded: boolean
+  folded: boolean,
+  provider: Provider
 ) => {
   if (!folded) {
     return existingConnections.map((connection, index) => (
@@ -33,6 +34,7 @@ const renderConnectionLines = (
           label={connection.email}
           index={index}
           id={connection.id}
+          warnUserOnDelete={provider === "Notion"}
         />
       </div>
     ));
@@ -51,6 +53,7 @@ const renderConnectionLines = (
 
 const renderExistingConnections = ({
   existingConnections,
+  provider,
   folded,
   setFolded,
   fromAddKnowledge,
@@ -59,6 +62,7 @@ const renderExistingConnections = ({
   setCurrentProvider,
 }: {
   existingConnections: Sync[];
+  provider: Provider;
   folded: boolean;
   setFolded: (folded: boolean) => void;
   fromAddKnowledge: boolean;
@@ -82,7 +86,7 @@ const renderExistingConnections = ({
             onClick={() => setFolded(!folded)}
           />
         </div>
-        {renderConnectionLines(existingConnections, folded)}
+        {renderConnectionLines(existingConnections, folded, provider)}
       </div>
     );
   } else if (existingConnections.length > 0 && fromAddKnowledge) {
@@ -257,6 +261,7 @@ export const ConnectionSection = ({
         </div>
         {renderExistingConnections({
           existingConnections,
+          provider,
           folded,
           setFolded,
           fromAddKnowledge: !!fromAddKnowledge,
