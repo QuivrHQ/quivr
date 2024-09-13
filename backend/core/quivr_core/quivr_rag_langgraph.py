@@ -262,19 +262,35 @@ class QuivrQARAGLangGraph:
         """
         workflow = StateGraph(AgentState)
 
-        # Define the nodes we will cycle between
-        workflow.add_node("filter_history", self.filter_history)
-        workflow.add_node("rewrite", self.rewrite)  # Re-writing the question
-        workflow.add_node("retrieve", self.retrieve)  # retrieval
-        workflow.add_node("generate", self.generate)
+        if self.retrieval_config.workflow_config:
+            for node in self.retrieval_config.workflow_config.nodes:
+                workflow.add_node(node.name, getattr(self, node.name))
 
-        # Add node for filtering history
+            workflow.set_entry_point(
+                self.retrieval_config.workflow_config.nodes[0].name
+            )
+            for node in self.retrieval_config.workflow_config.nodes:
+                for edge in node.edges:
+                    if edge == "END":
+                        workflow.add_edge(node.name, END)
+                    else:
+                        workflow.add_edge(node.name, edge)
+        else:
+            # Define the nodes we will cycle between
+            workflow.add_node("filter_history", self.filter_history)
+            workflow.add_node("rewrite", self.rewrite)  # Re-writing the question
+            workflow.add_node("retrieve", self.retrieve)  # retrieval
+            workflow.add_node("generate", self.generate)
 
-        workflow.set_entry_point("filter_history")
-        workflow.add_edge("filter_history", "rewrite")
-        workflow.add_edge("rewrite", "retrieve")
-        workflow.add_edge("retrieve", "generate")
-        workflow.add_edge("generate", END)  # Add edge from generate to format_response
+            # Add node for filtering history
+
+            workflow.set_entry_point("filter_history")
+            workflow.add_edge("filter_history", "rewrite")
+            workflow.add_edge("rewrite", "retrieve")
+            workflow.add_edge("retrieve", "generate")
+            workflow.add_edge(
+                "generate", END
+            )  # Add edge from generate to format_response
 
         # Compile
         graph = workflow.compile()

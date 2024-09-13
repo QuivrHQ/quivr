@@ -2,7 +2,6 @@ import os
 from enum import Enum
 from typing import Dict, List, Optional
 
-import yaml
 from megaparse.config import MegaparseConfig
 
 from quivr_core.base_config import QuivrBaseConfig
@@ -169,12 +168,24 @@ class RerankerConfig(QuivrBaseConfig):
                 )
 
 
+class NodeConfig(QuivrBaseConfig):
+    name: str
+    # config: QuivrBaseConfig  # This can be any config like RerankerConfig or LLMEndpointConfig
+    edges: List[str]  # List of names of other nodes this node links to
+
+
+class WorkflowConfig(QuivrBaseConfig):
+    name: str
+    nodes: List[NodeConfig]
+
+
 class RetrievalConfig(QuivrBaseConfig):
     reranker_config: RerankerConfig = RerankerConfig()
     llm_config: LLMEndpointConfig = LLMEndpointConfig()
     max_history: int = 10
     max_files: int = 20
     prompt: str | None = None
+    workflow_config: WorkflowConfig | None = None
 
 
 class ParserConfig(QuivrBaseConfig):
@@ -186,27 +197,6 @@ class IngestionConfig(QuivrBaseConfig):
     parser_config: ParserConfig = ParserConfig()
 
 
-class NodeConfig(QuivrBaseConfig):
-    name: str
-    config: QuivrBaseConfig  # This can be any config like RerankerConfig or LLMEndpointConfig
-    links: List[str]  # List of names of other nodes this node links to
-
-
 class AssistantConfig(QuivrBaseConfig):
     retrieval_config: RetrievalConfig = RetrievalConfig()
     ingestion_config: IngestionConfig = IngestionConfig()
-
-
-class WorkflowConfig(QuivrBaseConfig):
-    nodes: Dict[str, NodeConfig]
-
-    @classmethod
-    def from_yaml(cls, file_path: str):
-        with open(file_path, "r") as stream:
-            config_data = yaml.safe_load(stream)
-
-        # Parsing the nodes from YAML
-        nodes_data = config_data.pop("nodes")
-        nodes = {node["name"]: NodeConfig(**node) for node in nodes_data}
-
-        return cls(nodes=nodes, **config_data)
