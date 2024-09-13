@@ -22,6 +22,7 @@
       gap: Spacings.$spacing03;
       font-weight: 550;
       background-color: var(--background-0);
+      height: 64px;
 
       .parent_folder {
         display: flex;
@@ -41,7 +42,7 @@
         .name {
           &:hover {
             cursor: pointer;
-            text-decoration: underline;
+            color: var(--primary-0);
           }
         }
       }
@@ -52,12 +53,11 @@
         gap: Spacings.$spacing03;
 
         .name {
-          padding-block: Spacings.$spacing02;
-          padding-inline: Spacings.$spacing03;
-          border-radius: Radius.$normal;
-
           &.selected {
             background-color: var(--background-6);
+            padding-block: Spacings.$spacing02;
+            padding-inline: Spacings.$spacing03;
+            border-radius: Radius.$normal;
           }
         }
       }

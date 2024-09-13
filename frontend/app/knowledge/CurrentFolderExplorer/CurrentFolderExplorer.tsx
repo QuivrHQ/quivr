@@ -13,48 +13,56 @@ import { useKnowledgeContext } from "../KnowledgeProvider/hooks/useKnowledgeCont
 const CurrentFolderExplorer = (): JSX.Element => {
   const [loading, setLoading] = useState(false);
   const [syncElements, setSyncElements] = useState<SyncElements>();
-  const { currentFolder } = useKnowledgeContext();
+  const { currentFolder, setCurrentFolder } = useKnowledgeContext();
   const { getSyncFiles } = useSync();
 
-  useEffect(() => {
+  const fetchSyncFiles = async (folderId: string) => {
     setLoading(true);
-    void (async () => {
+    if (currentFolder) {
       try {
-        if (currentFolder?.syncId) {
-          const res = await getSyncFiles(
-            currentFolder.syncId,
-            currentFolder.id
-          );
-          setSyncElements((prevState) => ({
-            ...prevState,
-            files: res.files.map((syncElement) => ({
-              ...syncElement,
-              syncId: currentFolder.syncId,
-              parentFolderId: currentFolder.id,
-              parentFolderName: currentFolder.name,
-              parentFolderIcon: currentFolder.icon,
-            })),
-          }));
-        }
+        const res = await getSyncFiles(currentFolder.syncId, folderId);
+        setSyncElements((prevState) => ({
+          ...prevState,
+          files: res.files.map((syncElement) => ({
+            ...syncElement,
+            syncId: currentFolder.syncId,
+            parentSyncElement: currentFolder,
+          })),
+        }));
       } catch (error) {
         console.error("Failed to get sync files:", error);
       } finally {
         setLoading(false);
       }
-    })();
+    }
+  };
+
+  useEffect(() => {
+    if (currentFolder?.syncId && currentFolder.id) {
+      void fetchSyncFiles(currentFolder.id);
+    }
   }, [currentFolder]);
+
+  const loadParentFolder = () => {
+    if (currentFolder?.parentSyncElement) {
+      setCurrentFolder(currentFolder.parentSyncElement);
+    }
+  };
 
   return (
     <div className={styles.current_folder_explorer_container}>
       <div className={styles.current_folder_explorer_wrapper}>
         <div className={styles.header}>
-          {currentFolder?.parentFolderId && (
+          {currentFolder?.parentSyncElement && (
             <div className={styles.parent_folder}>
-              {currentFolder.parentFolderIcon && (
+              {currentFolder.parentSyncElement.icon && (
                 <div className={styles.icon}>{currentFolder.icon}</div>
               )}
-              <span className={styles.name}>
-                {currentFolder.parentFolderName?.replace(/(\..+)$/, "")}
+              <span
+                className={styles.name}
+                onClick={() => void loadParentFolder()}
+              >
+                {currentFolder.parentSyncElement.name?.replace(/(\..+)$/, "")}
               </span>
               <Icon name="chevronRight" size="normal" color="black" />
             </div>
@@ -65,7 +73,7 @@ const CurrentFolderExplorer = (): JSX.Element => {
             )}
             <span
               className={`${styles.name} ${
-                currentFolder?.parentFolderId ? styles.selected : ""
+                currentFolder?.parentSyncElement ? styles.selected : ""
               }`}
             >
               {currentFolder?.name?.replace(/(\..+)$/, "")}
