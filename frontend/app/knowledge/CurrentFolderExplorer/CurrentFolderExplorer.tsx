@@ -60,7 +60,9 @@ const CurrentFolderExplorer = (): JSX.Element => {
           {currentFolder?.parentSyncElement && (
             <div className={styles.parent_folder}>
               {currentFolder.parentSyncElement.icon && (
-                <div className={styles.icon}>{currentFolder.icon}</div>
+                <div className={styles.icon}>
+                  {currentFolder.parentSyncElement.icon}
+                </div>
               )}
               <span
                 className={styles.name}

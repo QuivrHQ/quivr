@@ -10,13 +10,9 @@ import styles from "./SyncFolder.module.scss";
 
 interface SyncFolderProps {
   element: SyncElement;
-  parentElement?: SyncElement;
 }
 
-const SyncFolder = ({
-  element,
-  parentElement,
-}: SyncFolderProps): JSX.Element => {
+const SyncFolder = ({ element }: SyncFolderProps): JSX.Element => {
   const [folded, setFolded] = useState(true);
   const [loading, setLoading] = useState(false);
   const { getSyncFiles } = useSync();
@@ -24,6 +20,10 @@ const SyncFolder = ({
   const [selectedFolder, setSelectedFolder] = useState<boolean>(false);
 
   const { currentFolder, setCurrentFolder } = useKnowledgeContext();
+
+  const setAncestors = () => {
+    console.info("ey");
+  };
 
   useEffect(() => {
     setSelectedFolder(currentFolder?.id === element.id);
@@ -68,12 +68,13 @@ const SyncFolder = ({
         />
         <span
           className={`${styles.name} ${selectedFolder ? styles.selected : ""}`}
-          onClick={() =>
+          onClick={() => {
+            setAncestors();
             setCurrentFolder({
               ...element,
-              parentSyncElement: parentElement,
-            })
-          }
+              parentSyncElement: element.parentSyncElement,
+            });
+          }}
         >
           {element.name?.includes(".")
             ? element.name.split(".").slice(0, -1).join(".")
@@ -91,7 +92,12 @@ const SyncFolder = ({
               .filter((file) => file.is_folder)
               .map((folder, id) => (
                 <div key={id}>
-                  <SyncFolder element={folder} parentElement={element} />
+                  <SyncFolder
+                    element={{
+                      ...folder,
+                      parentSyncElement: element,
+                    }}
+                  />
                 </div>
               ))}
           </div>
