@@ -135,7 +135,9 @@ class QuivrQARAGLangGraph:
         filtered_chat_history: list[AIMessage | HumanMessage] = []
         for human_message, ai_message in reversed(list(chat_history.iter_pairs())):
             # TODO: replace with tiktoken
-            message_tokens = (len(human_message.content) + len(ai_message.content)) // 4
+            message_tokens = self.llm_endpoint.count_tokens(
+                human_message.content
+            ) + self.llm_endpoint.count_tokens(ai_message.content)
             if (
                 total_tokens + message_tokens
                 > self.retrieval_config.llm_config.max_output_tokens
