@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.0.312 (2024-09-13)
+
+## What's Changed
+* fix: Update LLMEndpoint to include max_tokens parameter by @StanGirard in https://github.com/QuivrHQ/quivr/pull/3201
+
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.311...v0.0.312
+
 ## 0.0.311 (2024-09-12)
 
 ## What's Changed
