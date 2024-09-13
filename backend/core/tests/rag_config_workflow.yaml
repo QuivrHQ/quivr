@@ -26,6 +26,8 @@ retrieval_config:
   # to include in the context of the answer
   max_history: 10
 
+  prompt: "my prompt"
+
   max_files: 20
   reranker_config:
     # The reranker supplier to use
