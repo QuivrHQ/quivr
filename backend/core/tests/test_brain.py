@@ -4,7 +4,6 @@ from uuid import uuid4
 import pytest
 from langchain_core.documents import Document
 from langchain_core.embeddings import Embeddings
-
 from quivr_core.brain import Brain
 from quivr_core.chat import ChatHistory
 from quivr_core.llm import LLMEndpoint
@@ -150,3 +149,13 @@ def test_brain_info_empty(fake_llm: LLMEndpoint, embedder, mem_vector_store):
         },
         "llm_info": asdict(fake_llm.info()),
     }
+
+
+@pytest.mark.noautofixt
+@pytest.mark.asyncio
+async def test_brain_save(temp_data_file, tmpdir):
+    brain = await Brain.afrom_files(
+        name="test_brain",
+        file_paths=[temp_data_file],
+    )
+    await brain.save(tmpdir.strpath)
