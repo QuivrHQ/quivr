@@ -10,7 +10,8 @@ interface ConnectionCardsProps {
 export const ConnectionCards = ({
   fromAddKnowledge,
 }: ConnectionCardsProps): JSX.Element => {
-  const { syncGoogleDrive, syncSharepoint, syncDropbox } = useSync();
+  const { syncGoogleDrive, syncSharepoint, syncDropbox } =
+    useSync();
 
   return (
     <div

@@ -1,5 +1,6 @@
 import os
 from typing import AsyncGenerator, Callable, Generator, Generic, Optional, Type, TypeVar
+from urllib.parse import urlparse
 
 from fastapi import Depends
 from langchain.embeddings.base import Embeddings
@@ -7,6 +8,7 @@ from langchain_community.embeddings.ollama import OllamaEmbeddings
 
 # from langchain_community.vectorstores.supabase import SupabaseVectorStore
 from langchain_openai import OpenAIEmbeddings
+from langchain_openai import AzureOpenAIEmbeddings
 
 # from quivr_api.modules.vector.service.vector_service import VectorService
 # from quivr_api.modules.vectorstore.supabase import CustomSupabaseVectorStore
@@ -19,6 +21,7 @@ from quivr_api.logger import get_logger
 from quivr_api.models.databases.supabase.supabase import SupabaseDB
 from quivr_api.models.settings import BrainSettings
 from supabase.client import AsyncClient, Client, create_async_client, create_client
+
 
 # Global variables to store the Supabase client and database instances
 _supabase_client: Optional[Client] = None
@@ -125,6 +128,20 @@ def get_embedding_client() -> Embeddings:
         embeddings = OllamaEmbeddings(
             base_url=settings.ollama_api_base_url,
         )  # pyright: ignore reportPrivateUsage=none
+    elif settings.azure_openai_embeddings_url:
+        # https://quivr-test.openai.azure.com/openai/deployments/embedding/embeddings?api-version=2023-05-15
+        # parse the url to get the deployment name
+        deployment = settings.azure_openai_embeddings_url.split("/")[5]
+        netloc = "https://" + urlparse(settings.azure_openai_embeddings_url).netloc
+        api_version = settings.azure_openai_embeddings_url.split("=")[1]
+        logger.debug(f"Using Azure OpenAI embeddings: {deployment}")
+        logger.debug(f"Using Azure OpenAI embeddings: {netloc}")
+        logger.debug(f"Using Azure OpenAI embeddings: {api_version}")
+        embeddings = AzureOpenAIEmbeddings(
+            azure_deployment=deployment,
+            azure_endpoint=netloc,
+            api_version=api_version,
+        )
     else:
         embeddings = OpenAIEmbeddings()  # pyright: ignore reportPrivateUsage=none
     return embeddings
