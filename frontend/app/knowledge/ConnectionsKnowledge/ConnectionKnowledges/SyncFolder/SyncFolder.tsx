@@ -10,9 +10,13 @@ import styles from "./SyncFolder.module.scss";
 
 interface SyncFolderProps {
   element: SyncElement;
+  parentElement?: SyncElement;
 }
 
-const SyncFolder = ({ element }: SyncFolderProps): JSX.Element => {
+const SyncFolder = ({
+  element,
+  parentElement,
+}: SyncFolderProps): JSX.Element => {
   const [folded, setFolded] = useState(true);
   const [loading, setLoading] = useState(false);
   const { getSyncFiles } = useSync();
@@ -64,7 +68,12 @@ const SyncFolder = ({ element }: SyncFolderProps): JSX.Element => {
         />
         <span
           className={`${styles.name} ${selectedFolder ? styles.selected : ""}`}
-          onClick={() => setCurrentFolder(element)}
+          onClick={() =>
+            setCurrentFolder({
+              ...element,
+              parentSyncElement: parentElement,
+            })
+          }
         >
           {element.name?.includes(".")
             ? element.name.split(".").slice(0, -1).join(".")
@@ -82,7 +91,7 @@ const SyncFolder = ({ element }: SyncFolderProps): JSX.Element => {
               .filter((file) => file.is_folder)
               .map((folder, id) => (
                 <div key={id}>
-                  <SyncFolder element={folder} />
+                  <SyncFolder element={folder} parentElement={element} />
                 </div>
               ))}
           </div>

@@ -45,7 +45,11 @@ const CurrentFolderExplorer = (): JSX.Element => {
 
   const loadParentFolder = () => {
     if (currentFolder?.parentSyncElement) {
-      setCurrentFolder(currentFolder.parentSyncElement);
+      console.info(currentFolder.parentSyncElement);
+      setCurrentFolder({
+        ...currentFolder.parentSyncElement,
+        parentSyncElement: currentFolder.parentSyncElement.parentSyncElement,
+      });
     }
   };
 
