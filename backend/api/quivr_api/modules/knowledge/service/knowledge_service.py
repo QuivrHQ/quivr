@@ -25,6 +25,7 @@ from quivr_api.modules.knowledge.repository.storage import SupabaseS3Storage
 from quivr_api.modules.knowledge.repository.storage_interface import StorageInterface
 from quivr_api.modules.knowledge.service.knowledge_exceptions import (
     KnowledgeDeleteError,
+    KnowledgeForbiddenAccess,
     UploadError,
 )
 from quivr_api.modules.sync.entity.sync_models import (
@@ -72,9 +73,23 @@ class KnowledgeService(BaseService[KnowledgeRepository]):
         except NoResultFound:
             raise FileNotFoundError(f"No knowledge for file_name: {file_name}")
 
-    async def get_knowledge(self, knowledge_id: UUID) -> KnowledgeDB:
-        km = await self.repository.get_knowledge_by_id(knowledge_id)
-        return km
+    async def list_knowledge(
+        self, knowledge_id: UUID | None, user_id: UUID | None = None
+    ) -> list[KnowledgeDB]:
+        if knowledge_id is not None:
+            km = await self.repository.get_knowledge_by_id(knowledge_id, user_id)
+            return km.children
+        else:
+            if user_id is None:
+                raise KnowledgeForbiddenAccess(
+                    "can't get root knowledges without user_id"
+                )
+            return await self.repository.get_root_knowledge_user(user_id)
+
+    async def get_knowledge(
+        self, knowledge_id: UUID, user_id: UUID | None = None
+    ) -> KnowledgeDB | list[KnowledgeDB]:
+        return await self.repository.get_knowledge_by_id(knowledge_id, user_id)
 
     async def update_knowledge(
         self,
@@ -83,6 +98,7 @@ class KnowledgeService(BaseService[KnowledgeRepository]):
     ):
         return await self.repository.update_knowledge(knowledge, payload)
 
+    # TODO: Remove all of this
     # TODO (@aminediro): Replace with ON CONFLICT smarter query...
     # there is a chance of race condition but for now we let it crash in worker
     # the tasks will be dealt with on retry

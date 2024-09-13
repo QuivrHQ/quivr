@@ -1,5 +1,5 @@
 from http import HTTPStatus
-from typing import Annotated, Optional
+from typing import Annotated, List, Optional
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, File, HTTPException, Query, UploadFile, status
@@ -16,6 +16,7 @@ from quivr_api.modules.knowledge.dto.inputs import AddKnowledge
 from quivr_api.modules.knowledge.entity.knowledge import Knowledge, KnowledgeUpdate
 from quivr_api.modules.knowledge.service.knowledge_exceptions import (
     KnowledgeDeleteError,
+    KnowledgeForbiddenAccess,
     KnowledgeNotFoundException,
     UploadError,
 )
@@ -153,6 +154,32 @@ async def create_knowledge(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Error occured uploading knowledge",
+        )
+    except Exception:
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@knowledge_router.get(
+    "/knowledge/children",
+    response_model=List[Knowledge] | None,
+    tags=["Knowledge"],
+)
+async def list_knowledge(
+    parent_id: UUID | None = None,
+    knowledge_service: KnowledgeService = Depends(get_service(KnowledgeService)),
+    current_user: UserIdentity = Depends(get_current_user),
+):
+    try:
+        # TODO: Returns one level of children
+        children = await knowledge_service.list_knowledge(parent_id, current_user.id)
+        return [await c.to_dto(get_children=False) for c in children]
+    except KnowledgeNotFoundException as e:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN, detail=f"{e.message}"
+        )
+    except KnowledgeForbiddenAccess as e:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail=f"{e.message}"
         )
     except Exception:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)

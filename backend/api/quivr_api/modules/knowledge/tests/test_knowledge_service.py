@@ -905,3 +905,115 @@ async def test_remove_knowledge_folder(session: AsyncSession, user: User):
     assert (
         await session.exec(select(KnowledgeDB).where(KnowledgeDB.id == file.id))
     ).first() is None
+
+
+@pytest.mark.asyncio(loop_scope="session")
+async def test_list_knowledge_root(session: AsyncSession, user: User):
+    assert user.id
+    root_file = KnowledgeDB(
+        file_name="file_1",
+        extension="",
+        status="UPLOADED",
+        source="local",
+        source_link="local",
+        file_size=None,
+        file_sha1=None,
+        user_id=user.id,
+    )
+
+    root_folder = KnowledgeDB(
+        file_name="folder",
+        extension="",
+        status="UPLOADED",
+        source="local",
+        source_link="local",
+        file_size=4,
+        file_sha1=None,
+        brains=[],
+        children=[],
+        user_id=user.id,
+        is_folder=True,
+    )
+    nested_file = KnowledgeDB(
+        file_name="file_2",
+        extension="",
+        status="UPLOADED",
+        source="local",
+        source_link="local",
+        file_size=10,
+        file_sha1=None,
+        user_id=user.id,
+        parent=root_folder,
+    )
+    session.add(nested_file)
+    session.add(root_file)
+    session.add(root_folder)
+    await session.commit()
+    await session.refresh(root_folder)
+    await session.refresh(root_file)
+    await session.refresh(nested_file)
+
+    storage = FakeStorage()
+    repository = KnowledgeRepository(session)
+    service = KnowledgeService(repository, storage)
+
+    root_kms = await service.list_knowledge(knowledge_id=None, user_id=user.id)
+
+    assert len(root_kms) == 2
+    assert {k.id for k in root_kms} == {root_folder.id, root_file.id}
+
+
+@pytest.mark.asyncio(loop_scope="session")
+async def test_list_knowledge(session: AsyncSession, user: User):
+    assert user.id
+    root_file = KnowledgeDB(
+        file_name="file_1",
+        extension="",
+        status="UPLOADED",
+        source="local",
+        source_link="local",
+        file_size=None,
+        file_sha1=None,
+        user_id=user.id,
+    )
+
+    root_folder = KnowledgeDB(
+        file_name="folder",
+        extension="",
+        status="UPLOADED",
+        source="local",
+        source_link="local",
+        file_size=4,
+        file_sha1=None,
+        brains=[],
+        children=[],
+        user_id=user.id,
+        is_folder=True,
+    )
+    nested_file = KnowledgeDB(
+        file_name="file_2",
+        extension="",
+        status="UPLOADED",
+        source="local",
+        source_link="local",
+        file_size=10,
+        file_sha1=None,
+        user_id=user.id,
+        parent=root_folder,
+    )
+    session.add(nested_file)
+    session.add(root_file)
+    session.add(root_folder)
+    await session.commit()
+    await session.refresh(root_folder)
+    await session.refresh(root_file)
+    await session.refresh(nested_file)
+
+    storage = FakeStorage()
+    repository = KnowledgeRepository(session)
+    service = KnowledgeService(repository, storage)
+
+    kms = await service.list_knowledge(knowledge_id=root_folder.id, user_id=user.id)
+
+    assert len(kms) == 1
+    assert kms[0].id == nested_file.id

@@ -218,12 +218,27 @@ class KnowledgeRepository(BaseRepository):
 
         return knowledge_list
 
-    async def get_knowledge_by_id(self, knowledge_id: UUID) -> KnowledgeDB:
+    async def get_root_knowledge_user(self, user_id: UUID) -> list[KnowledgeDB]:
+        query = (
+            select(KnowledgeDB)
+            .where(KnowledgeDB.parent_id.is_(None))  # type: ignore
+            .where(KnowledgeDB.user_id == user_id)
+            .options(joinedload(KnowledgeDB.parent), joinedload(KnowledgeDB.children))  # type: ignore
+        )
+        result = await self.session.exec(query)
+        kms = result.unique().all()
+        return list(kms)
+
+    async def get_knowledge_by_id(
+        self, knowledge_id: UUID, user_id: UUID | None = None
+    ) -> KnowledgeDB:
         query = (
             select(KnowledgeDB)
             .where(KnowledgeDB.id == knowledge_id)
             .options(joinedload(KnowledgeDB.parent), joinedload(KnowledgeDB.children))  # type: ignore
         )
+        if user_id:
+            query = query.where(KnowledgeDB.user_id == user_id)
         result = await self.session.exec(query)
         knowledge = result.first()
         if not knowledge:
