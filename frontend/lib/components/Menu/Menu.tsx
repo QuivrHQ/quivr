@@ -17,6 +17,7 @@ import { HomeButton } from "./components/HomeButton/HomeButton";
 import { Notifications } from "./components/Notifications/Notifications";
 import { NotificationsButton } from "./components/NotificationsButton/NotificationsButton";
 import { ProfileButton } from "./components/ProfileButton/ProfileButton";
+import { QualityAssistantButton } from "./components/QualityAssistantButton/QualityAssistantButton";
 import { SocialsButtons } from "./components/SocialsButtons/SocialsButtons";
 import { StudioButton } from "./components/StudioButton/StudioButton";
 import { ThreadsButton } from "./components/ThreadsButton/ThreadsButton";
@@ -44,6 +45,7 @@ export const Menu = (): JSX.Element => {
     "/library",
     "/search",
     "studio",
+    "/quality-assistant",
     "/user",
   ];
 
@@ -83,6 +85,7 @@ export const Menu = (): JSX.Element => {
                 <div className={styles.block}>
                   <DiscussionButton />
                   <HomeButton />
+                  <QualityAssistantButton />
                   <StudioButton />
                   <NotificationsButton />
                   <ThreadsButton />
