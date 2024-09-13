@@ -1,8 +1,10 @@
 import yaml
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 
 class QuivrBaseConfig(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
     @classmethod
     def from_yaml(cls, file_path: str):
         # Load the YAML file
