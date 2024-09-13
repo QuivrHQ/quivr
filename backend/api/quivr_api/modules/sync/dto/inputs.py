@@ -12,6 +12,7 @@ class SyncsUserStatus(enum.Enum):
     SYNCED = "SYNCED"
     SYNCING = "SYNCING"
     ERROR = "ERROR"
+    REMOVED = "REMOVED"
 
     def __str__(self):
         return self.value
@@ -31,6 +32,7 @@ class SyncsUserInput(BaseModel):
 
     user_id: str
     name: str
+    email: str | None = None
     provider: str
     credentials: dict
     state: dict

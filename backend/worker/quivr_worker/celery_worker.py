@@ -322,6 +322,12 @@ def fetch_and_store_notion_files_task(
         )
 
 
+@celery.task(name="clean_notion_user_syncs")
+def clean_notion_user_syncs():
+    logger.debug("Cleaning Notion user syncs")
+    sync_user_service.clean_notion_user_syncs()
+
+
 celery.conf.beat_schedule = {
     "ping_telemetry": {
         "task": f"{__name__}.ping_telemetry",
@@ -338,5 +344,9 @@ celery.conf.beat_schedule = {
     "process_notion_sync": {
         "task": "process_notion_sync_task",
         "schedule": crontab(minute="0", hour="*/6"),
+    },
+    "clean_notion_user_syncs": {
+        "task": "clean_notion_user_syncs",
+        "schedule": crontab(minute="0", hour="0"),
     },
 }

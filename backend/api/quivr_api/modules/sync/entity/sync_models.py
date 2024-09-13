@@ -54,10 +54,12 @@ class SyncsUser(BaseModel):
     id: int
     user_id: UUID
     name: str
+    email: str | None = None
     provider: str
     credentials: dict
     state: dict
     additional_data: dict
+    status: str
 
 
 class SyncsActive(BaseModel):
