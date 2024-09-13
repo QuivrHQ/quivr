@@ -91,11 +91,13 @@ class QuivrQARAGLangGraph:
             self.reranker = CohereRerank(
                 model=self.retrieval_config.reranker_config.model,
                 top_n=self.retrieval_config.reranker_config.top_n,
+                cohere_api_key=self.retrieval_config.reranker_config.api_key,
             )
         elif self.retrieval_config.reranker_config.supplier == DefaultRerankers.JINA:
             self.reranker = JinaRerank(
                 model=self.retrieval_config.reranker_config.model,
                 top_n=self.retrieval_config.reranker_config.top_n,
+                jina_api_key=self.retrieval_config.reranker_config.api_key,
             )
         else:
             self.reranker = IdempotentCompressor()
