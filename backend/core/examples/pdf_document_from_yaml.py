@@ -6,6 +6,7 @@ from pathlib import Path
 import dotenv
 from quivr_core import Brain
 from quivr_core.config import AssistantConfig
+from rich.traceback import install as rich_install
 
 ConsoleOutputHandler = logging.StreamHandler()
 
@@ -17,6 +18,10 @@ logger.addHandler(ConsoleOutputHandler)
 logger = logging.getLogger("megaparse")
 logger.setLevel(logging.DEBUG)
 logger.addHandler(ConsoleOutputHandler)
+
+
+# Install rich's traceback handler to automatically format tracebacks
+rich_install()
 
 
 async def main():
