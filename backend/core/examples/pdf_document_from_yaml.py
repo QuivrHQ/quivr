@@ -1,11 +1,11 @@
-from quivr_core import Brain
-from quivr_core.quivr_rag_langgraph import QuivrQARAGLangGraph
-from quivr_core.config import AssistantConfig
 import asyncio
-from pathlib import Path
-import dotenv
 import logging
 import os
+from pathlib import Path
+
+import dotenv
+from quivr_core import Brain
+from quivr_core.config import AssistantConfig
 
 ConsoleOutputHandler = logging.StreamHandler()
 
@@ -18,31 +18,30 @@ logger = logging.getLogger("megaparse")
 logger.setLevel(logging.DEBUG)
 logger.addHandler(ConsoleOutputHandler)
 
-def find_nested_key(d, target_key):
-    if target_key in d:
-        return d[target_key]
-    for key, value in d.items():
-        if isinstance(value, dict):
-            result = find_nested_key(value, target_key)
-            if result is not None:
-                return result
-    return None
 
 async def main():
+    file_path = [
+        Path("data/YamEnterprises_Monotype Fonts Plan License.US.en 04.0 (BLP).pdf")
+    ]
+    file_path = [
+        Path(
+            "data/YamEnterprises_Monotype Fonts Plan License.US.en 04.0 (BLP) reduced.pdf"
+        )
+    ]
 
-    n_files = 1
+    config_file_name = (
+        "/Users/jchevall/Coding/quivr/backend/core/tests/rag_config_workflow.yaml"
+    )
 
-    file_path = [Path("data/YamEnterprises_Monotype Fonts Plan License.US.en 04.0 (BLP).pdf")]
-
-    config_file_name = "/Users/jchevall/Coding/quivr/backend/core/tests/rag_config.yaml"
-    
-    rag_config = AssistantConfig.from_yaml(config_file_name)
-    #megaparse_config = find_nested_key(config, "megaparse_config")
-    megaparse_config = rag_config.ingestion_config.parser_config.megaparse_config
+    assistant_config = AssistantConfig.from_yaml(config_file_name)
+    # megaparse_config = find_nested_key(config, "megaparse_config")
+    megaparse_config = assistant_config.ingestion_config.parser_config.megaparse_config
     megaparse_config.llama_parse_api_key = os.getenv("LLAMA_PARSE_API_KEY")
 
-    processor_kwargs = {"megaparse_config": megaparse_config, 
-                        "splitter_config": rag_config.ingestion_config.parser_config.splitter_config}
+    processor_kwargs = {
+        "megaparse_config": megaparse_config,
+        "splitter_config": assistant_config.ingestion_config.parser_config.splitter_config,
+    }
 
     brain = await Brain.afrom_files(
         name="test_brain",
@@ -56,14 +55,14 @@ async def main():
     questions = [
         "What is the contact name for Yam Enterprises?",
         "What is the customer phone for Yam Enterprises?",
-        "What is the Production Fonts (maximum) for Yam Enterprises?",       
+        "What is the Production Fonts (maximum) for Yam Enterprises?",
         "List the past use font software according to past use term for Yam Enterprises.",
         "How many unique Font Name are there in the Add-On Font Software Section for Yam Enterprises?",
         "What is the maximum number of Production Fonts allowed based on the license usage per term for Yam Enterprises?",
         "What is the number of production fonts licensed by Yam Enterprises? List them one by one.",
-        "What is the number of Licensed Monthly Page Views for Yam Enterprises?",  
+        "What is the number of Licensed Monthly Page Views for Yam Enterprises?",
         "What is the monthly licensed impressions (Digital Marketing Communications) for Yam Enterprises?",
-        "What is the number of Licensed Applications for Yam Enterprises?",  
+        "What is the number of Licensed Applications for Yam Enterprises?",
         "For Yam Enterprises what is the number of applications aggregate Registered users?",
         "What is the number of licensed servers for Yam Enterprises?",
         "When is swap of Production Fonts available in Yam Enterprises?",
@@ -81,8 +80,8 @@ async def main():
         "Who is the Third Party Payor's contact in Yam Enterprises?",
         "Does Yam Enterprises contract have Company Desktop License?",
         "What is the Number of Swaps Allowed for Yam Enterprises?",
-        "When is swap of Production Fonts available in Yam Enterprises?"
-]
+        "When is swap of Production Fonts available in Yam Enterprises?",
+    ]
 
     answers = [
         "Haruko Yamamoto",
@@ -122,13 +121,17 @@ async def main():
         """,
         "Yes",
         "One (1) swap per calendar quarter",
-        "The swap of Production Fonts will be available one (1) time per calendar quarter by removing Font Software as a Production Font and choosing other Font Software on the Monotype Fonts Platform."
-]
+        "The swap of Production Fonts will be available one (1) time per calendar quarter by removing Font Software as a Production Font and choosing other Font Software on the Monotype Fonts Platform.",
+    ]
 
-
-    for question, truth in zip(questions, answers):
-        chunk = brain.ask(question, rag_pipeline=QuivrQARAGLangGraph)
-        print("\n Question: ", question, "\n Answer: ", chunk.answer, "\n Truth: ", truth)
+    retrieval_config = assistant_config.retrieval_config
+    for i, (question, truth) in enumerate(zip(questions, answers, strict=False)):
+        chunk = brain.ask(question=question, retrieval_config=retrieval_config)
+        print(
+            "\n Question: ", question, "\n Answer: ", chunk.answer, "\n Truth: ", truth
+        )
+        if i == 5:
+            break
 
 
 if __name__ == "__main__":
