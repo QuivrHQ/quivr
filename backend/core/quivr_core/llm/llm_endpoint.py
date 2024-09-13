@@ -69,7 +69,7 @@ class LLMEndpoint:
                     if config.llm_api_key
                     else None,
                     base_url=config.llm_base_url,
-                    max_tokens=config.max_tokens,
+                    max_tokens=config.max_output_tokens,
                 )
             elif config.supplier == DefaultLLMs.OPENAI:
                 _llm = ChatOpenAI(
@@ -78,7 +78,7 @@ class LLMEndpoint:
                     if config.llm_api_key
                     else None,
                     base_url=config.llm_base_url,
-                    max_tokens=config.max_tokens,
+                    max_tokens=config.max_output_tokens,
                 )
             else:
                 raise ValueError(
