@@ -1,10 +1,12 @@
 import logging
 from urllib.parse import parse_qs, urlparse
 
+import tiktoken
 from langchain_anthropic import ChatAnthropic
 from langchain_core.language_models.chat_models import BaseChatModel
 from langchain_openai import AzureChatOpenAI, ChatOpenAI
 from pydantic.v1 import SecretStr
+from transformers import AutoTokenizer
 
 from quivr_core.brain.info import LLMInfo
 from quivr_core.config import DefaultLLMs, LLMEndpointConfig
@@ -20,6 +22,16 @@ class LLMEndpoint:
         self._supports_func_calling = model_supports_function_calling(
             self._config.model
         )
+
+        if llm_config.tokenizer_hub:
+            self.tokenizer = AutoTokenizer.from_pretrained(llm_config.tokenizer_hub)
+        else:
+            self.tokenizer = tiktoken.get_encoding("cl100k_base")
+
+    def count_tokens(self, text: str) -> int:
+        # Tokenize the input text and return the token count
+        encoding = self.tokenizer.encode(text)
+        return len(encoding)
 
     def get_config(self):
         return self._config
