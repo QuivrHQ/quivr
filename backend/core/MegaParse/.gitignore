@@ -1,4 +1,4 @@
-*.md
+CHANGE*.md
 /output
 /input
 .env
@@ -7,7 +7,7 @@ dist/**
 megaparse.egg-info/
 *.pyc
 build/*
-ENV 
+ENV
 venv
 */evaluations/*
 */cdp/*
