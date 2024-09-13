@@ -1,4 +1,5 @@
 import logging
+import os
 from urllib.parse import parse_qs, urlparse
 
 import tiktoken
@@ -24,6 +25,13 @@ class LLMEndpoint:
         )
 
         if llm_config.tokenizer_hub:
+            # To prevent the warning
+            # huggingface/tokenizers: The current process just got forked, after parallelism has already been used. Disabling parallelism to avoid deadlocks...
+            os.environ["TOKENIZERS_PARALLELISM"] = (
+                "false"
+                if not os.environ.get("TOKENIZERS_PARALLELISM")
+                else os.environ["TOKENIZERS_PARALLELISM"]
+            )
             self.tokenizer = AutoTokenizer.from_pretrained(llm_config.tokenizer_hub)
         else:
             self.tokenizer = tiktoken.get_encoding("cl100k_base")
