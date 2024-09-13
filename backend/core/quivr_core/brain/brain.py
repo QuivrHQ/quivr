@@ -1,18 +1,27 @@
 import asyncio
 import logging
+import os
 from pathlib import Path
 from pprint import PrettyPrinter
-from typing import Any, AsyncGenerator, Callable, Dict, Self, Union, Type
+from typing import Any, AsyncGenerator, Callable, Dict, Self, Type, Union
 from uuid import UUID, uuid4
 
 from langchain_core.documents import Document
 from langchain_core.embeddings import Embeddings
 from langchain_core.messages import AIMessage, HumanMessage
 from langchain_core.vectorstores import VectorStore
+from langchain_openai import OpenAIEmbeddings
 from rich.console import Console
 from rich.panel import Panel
 
 from quivr_core.brain.info import BrainInfo, ChatHistoryInfo
+from quivr_core.brain.serialization import (
+    BrainSerialized,
+    EmbedderConfig,
+    FAISSConfig,
+    LocalStorageConfig,
+    TransparentStorageConfig,
+)
 from quivr_core.chat import ChatHistory
 from quivr_core.config import RAGConfig
 from quivr_core.files.file import load_qfile
@@ -20,8 +29,8 @@ from quivr_core.llm import LLMEndpoint
 from quivr_core.models import ParsedRAGChunkResponse, ParsedRAGResponse, SearchResult
 from quivr_core.processor.registry import get_processor_class
 from quivr_core.quivr_rag import QuivrQARAG
-from quivr_core.quivr_rag_langgraph import QuivrQARAGLangGraph 
-from quivr_core.storage.local_storage import TransparentStorage
+from quivr_core.quivr_rag_langgraph import QuivrQARAGLangGraph
+from quivr_core.storage.local_storage import LocalStorage, TransparentStorage
 from quivr_core.storage.storage_base import StorageBase
 
 from .brain_defaults import build_default_vectordb, default_embedder, default_llm
@@ -89,6 +98,108 @@ class Brain:
         tree = self.info().to_tree()
         panel = Panel(tree, title="Brain Info", expand=False, border_style="bold")
         console.print(panel)
+
+    @classmethod
+    def load(cls, folder_path: str | Path) -> Self:
+        if isinstance(folder_path, str):
+            folder_path = Path(folder_path)
+        if not folder_path.exists():
+            raise ValueError(f"path {folder_path} doesn't exist")
+
+        # Load brainserialized
+        with open(os.path.join(folder_path, "config.json"), "r") as f:
+            bserialized = BrainSerialized.model_validate_json(f.read())
+
+        # Loading storage
+        if bserialized.storage_config.storage_type == "transparent_storage":
+            storage: StorageBase = TransparentStorage.load(bserialized.storage_config)
+        elif bserialized.storage_config.storage_type == "local_storage":
+            storage: StorageBase = LocalStorage.load(bserialized.storage_config)
+        else:
+            raise ValueError("unknown storage")
+
+        # Load Embedder
+        if bserialized.embedding_config.embedder_type == "openai_embedding":
+            from langchain_openai import OpenAIEmbeddings
+
+            embedder = OpenAIEmbeddings(**bserialized.embedding_config.config)
+        else:
+            raise ValueError("unknown embedder")
+
+        # Load vector db
+        if bserialized.vectordb_config.vectordb_type == "faiss":
+            from langchain_community.vectorstores import FAISS
+
+            vector_db = FAISS.load_local(
+                folder_path=bserialized.vectordb_config.vectordb_folder_path,
+                embeddings=embedder,
+                allow_dangerous_deserialization=True,
+            )
+        else:
+            raise ValueError("Unsupported vectordb")
+
+        return cls(
+            id=bserialized.id,
+            name=bserialized.name,
+            embedder=embedder,
+            llm=LLMEndpoint.from_config(bserialized.llm_config),
+            storage=storage,
+            vector_db=vector_db,
+        )
+
+    async def save(self, folder_path: str | Path):
+        if isinstance(folder_path, str):
+            folder_path = Path(folder_path)
+
+        brain_path = os.path.join(folder_path, f"brain_{self.id}")
+        os.makedirs(brain_path, exist_ok=True)
+
+        from langchain_community.vectorstores import FAISS
+
+        if isinstance(self.vector_db, FAISS):
+            vectordb_path = os.path.join(brain_path, "vector_store")
+            os.makedirs(vectordb_path, exist_ok=True)
+            self.vector_db.save_local(folder_path=vectordb_path)
+            vector_store = FAISSConfig(vectordb_folder_path=vectordb_path)
+        else:
+            raise Exception("can't serialize other vector stores for now")
+
+        if isinstance(self.embedder, OpenAIEmbeddings):
+            embedder_config = EmbedderConfig(
+                config=self.embedder.dict(exclude={"openai_api_key"})
+            )
+        else:
+            raise Exception("can't serialize embedder other than openai for now")
+
+        # TODO : each instance should know how to serialize/deserialize itself
+        if isinstance(self.storage, LocalStorage):
+            serialized_files = {
+                f.id: f.serialize() for f in await self.storage.get_files()
+            }
+            storage_config = LocalStorageConfig(
+                storage_path=self.storage.dir_path, files=serialized_files
+            )
+        elif isinstance(self.storage, TransparentStorage):
+            serialized_files = {
+                f.id: f.serialize() for f in await self.storage.get_files()
+            }
+            storage_config = TransparentStorageConfig(files=serialized_files)
+        else:
+            raise Exception("can't serialize storage. not supported for now")
+
+        bserialized = BrainSerialized(
+            id=self.id,
+            name=self.name,
+            chat_history=self.chat_history.get_chat_history(),
+            llm_config=self.llm.get_config(),
+            vectordb_config=vector_store,
+            embedding_config=embedder_config,
+            storage_config=storage_config,
+        )
+
+        with open(os.path.join(brain_path, "config.json"), "w") as f:
+            f.write(bserialized.model_dump_json())
+        return brain_path
 
     def info(self) -> BrainInfo:
         # TODO: dim of embedding
@@ -177,7 +288,7 @@ class Brain:
         storage: StorageBase = TransparentStorage(),
         llm: LLMEndpoint | None = None,
         embedder: Embeddings | None = None,
-        skip_file_error: bool = False
+        skip_file_error: bool = False,
     ) -> Self:
         loop = asyncio.get_event_loop()
         return loop.run_until_complete(
@@ -223,7 +334,7 @@ class Brain:
             storage=storage,
             llm=llm,
             embedder=embedder,
-            vector_db=vector_db
+            vector_db=vector_db,
         )
 
     async def asearch(
