@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.0.313 (2024-09-13)
+
+## What's Changed
+* feat: save and load brain by @AmineDiro in https://github.com/QuivrHQ/quivr/pull/3202
+
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.312...v0.0.313
+
 ## 0.0.312 (2024-09-13)
 
 ## What's Changed
