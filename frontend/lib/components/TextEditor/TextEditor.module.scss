@@ -123,13 +123,20 @@
       }
     }
 
-    code {
+    pre {
       display: block;
       margin: Spacings.$spacing05 0;
       padding: Spacings.$spacing04 Spacings.$spacing05;
       background-color: var(--background-2);
-      border-radius: 4px;
+      border-radius: Radius.$normal;
       font-family: monospace;
+    }
+
+    code {
+      display: inline-block;
+      padding: 0 Spacings.$spacing02;
+      background-color: var(--background-2);
+      border-radius: Radius.$normal;
     }
   }
 }
