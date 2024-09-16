@@ -961,6 +961,10 @@ class NotionSync(BaseSync):
 
                 markdown_content = []
                 for block in blocks:
+                    logger.info(f"Block: {block}")
+                    if "image" in block["type"] or "file" in block["type"]:
+                        logger.info(f"Block is an image or file: {block}")
+                        continue
                     markdown_content.append(self.get_block_content(block))
                     if block["has_children"]:
                         sub_elements = [
