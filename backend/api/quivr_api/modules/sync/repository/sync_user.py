@@ -96,7 +96,7 @@ class SyncUserRepository:
             self.db.from_("syncs_user")
             .select("*")
             .eq("user_id", user_id)
-            .neq("status", "REMOVED")
+            # .neq("status", "REMOVED")
         )
         if sync_user_id:
             query = query.eq("id", str(sync_user_id))
