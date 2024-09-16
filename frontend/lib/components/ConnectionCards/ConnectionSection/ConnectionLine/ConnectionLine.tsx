@@ -22,6 +22,7 @@ export const ConnectionLine = ({
   id,
   warnUserOnDelete,
 }: ConnectionLineProps): JSX.Element => {
+  const [deleteLoading, setDeleteLoading] = useState(false);
   const [deleteModalOpened, setDeleteModalOpened] = useState(false);
 
   const { deleteUserSync } = useSync();
@@ -64,7 +65,7 @@ export const ConnectionLine = ({
               <Icon name="warning" size="large" color="warning" />
             </div>
             <span>
-              If you delete this connection, you will need to wait 24 hours
+              If you delete this connection, you will need to wait tomorrow
               before opening a new one. Are you sure you want to proceed?
             </span>
           </div>
@@ -79,9 +80,13 @@ export const ConnectionLine = ({
               iconName="delete"
               label="Delete"
               color="dangerous"
+              isLoading={deleteLoading}
               onClick={async () => {
+                setDeleteLoading(true);
                 await deleteUserSync(id);
+                setDeleteLoading(false);
                 setHasToReload(true);
+                setDeleteModalOpened(false);
               }}
             />
           </div>
