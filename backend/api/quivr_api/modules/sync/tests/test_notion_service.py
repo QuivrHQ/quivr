@@ -79,10 +79,10 @@ async def test_store_notion_pages_success(
     session: AsyncSession,
     notion_search_result: NotionSearchResult,
     setup_syncs_data: Tuple[SyncsUser, SyncsActive],
+    sync_user_notion_setup: SyncsUser,
     user_1: User,
 ):
     assert user_1.id
-    (sync_user, sync_active) = setup_syncs_data
 
     notion_repository = NotionRepository(session)
     notion_service = SyncNotionService(notion_repository)
@@ -90,7 +90,7 @@ async def test_store_notion_pages_success(
         notion_search_result.results,
         notion_service,
         user_1.id,
-        sync_user_id=sync_user.id,  # FIXME
+        sync_user_id=sync_user_notion_setup.id,
     )
     assert sync_files
     assert len(sync_files) == 1

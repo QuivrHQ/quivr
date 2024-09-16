@@ -11,7 +11,7 @@ from uuid import UUID, uuid4
 import pytest
 import pytest_asyncio
 from dotenv import load_dotenv
-from sqlmodel import select
+from sqlmodel import select, text
 
 from quivr_api.modules.brain.entity.brain_entity import Brain, BrainType
 from quivr_api.modules.brain.repository.brains_vectors import BrainsVectors
@@ -677,10 +677,11 @@ async def sync_user_notion_setup(
         credentials={},
         state={},
         additional_data={},
+        status="",
     )
-    breakpoint()
-    sync_user = sync_user_service.create_sync_user(sync_user_input)  # type:ignore
-    breakpoint()
+    sync_user = SyncsUser.model_validate(
+        sync_user_service.create_sync_user(sync_user_input)
+    )
     assert sync_user.id
 
     # Notion pages
@@ -710,7 +711,9 @@ async def sync_user_notion_setup(
     session.add(notion_page_1)
     session.add(notion_page_2)
     yield sync_user
-    sync_user_service.delete_sync_user(sync_user.id, str(user_1.id))
+    await session.execute(
+        text("DELETE FROM syncs_user WHERE id = :sync_id"), {"sync_id": sync_user.id}
+    )
 
 
 @pytest_asyncio.fixture(scope="function")
