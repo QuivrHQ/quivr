@@ -1,4 +1,4 @@
-from typing import Annotated
+from typing import Annotated, List
 
 from fastapi import APIRouter, Depends, Request
 
@@ -8,6 +8,11 @@ from quivr_api.modules.assistant.dto.inputs import CreateTask
 from quivr_api.modules.assistant.services.tasks_service import TasksService
 from quivr_api.modules.dependencies import get_service
 from quivr_api.modules.user.entity.user_identity import UserIdentity
+from quivr_api.modules.assistant.entity.assistant_entity import (
+    Assistant,
+    AssistantInput,
+    AssistantSettings,
+)
 
 logger = get_logger(__name__)
 logger = get_logger(__name__)
@@ -25,9 +30,22 @@ UserIdentityDep = Annotated[UserIdentity, Depends(get_current_user)]
 async def get_assistants(
     request: Request,
     current_user: UserIdentity = Depends(get_current_user),
-):
+) -> List[Assistant]:
     logger.info("Getting assistants")
-    return {"message": "Hello World"}
+    assistant1 = Assistant(
+        name="Assistant 1",
+        description="Assistant 1 description",
+        settings=AssistantSettings(
+            inputs=[
+                AssistantInput(
+                    name="Complex File",
+                    description="Complex File to read",
+                    type="boolean",
+                )
+            ]
+        ),
+    )
+    return [assistant1]
 
 
 @assistant_router.get(
