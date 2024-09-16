@@ -10,8 +10,8 @@ def test_default_llm_config():
             model="gpt-3.5-turbo-0125",
             llm_base_url=None,
             llm_api_key=None,
-            max_input=2000,
-            max_tokens=2000,
+            max_input_tokens=2000,
+            max_output_tokens=2000,
             temperature=0.7,
             streaming=True,
         ).model_dump()
