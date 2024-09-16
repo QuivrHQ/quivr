@@ -18,6 +18,9 @@ const defaultContent = `
     This is a note with the help of which you can jot down ideas and store them in your brains.<br>
     Start by typing <code>@</code> to select a brain!
   </p>
+  <p>
+    Also, you can press <code>Ctrl+F</code> or <code>Cmd+F</code> to ask a brain to generate some content for you! 
+  </p>
 `;
 
 export const TextEditor = (): JSX.Element => {
