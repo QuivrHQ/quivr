@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
+import { Checkbox } from "@/lib/components/ui/Checkbox/Checkbox";
 import { Icon } from "@/lib/components/ui/Icon/Icon";
 import { QuivrButton } from "@/lib/components/ui/QuivrButton/QuivrButton";
 import { TextInput } from "@/lib/components/ui/TextInput/TextInput";
@@ -57,19 +58,82 @@ const mockProcesses: Process[] = [
   },
 ];
 
+const filterAndSortProcess = (
+  processList: Process[],
+  searchQuery: string,
+  sortConfig: { key: string; direction: string }
+): Process[] => {
+  let filteredList = processList.filter((process) =>
+    process.name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  if (sortConfig.key) {
+    const compareStrings = (a: string | number, b: string | number) => {
+      if (a < b) {
+        return sortConfig.direction === "ascending" ? -1 : 1;
+      }
+      if (a > b) {
+        return sortConfig.direction === "ascending" ? 1 : -1;
+      }
+
+      return 0;
+    };
+
+    const getComparableValue = (item: Process) => {
+      if (sortConfig.key === "name") {
+        return item.name;
+      }
+      if (sortConfig.key === "status") {
+        return item.status;
+      }
+
+      return "";
+    };
+
+    filteredList = filteredList.sort((a, b) =>
+      compareStrings(getComparableValue(a), getComparableValue(b))
+    );
+  }
+
+  return filteredList;
+};
+
 const ProcessTab = (): JSX.Element => {
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [selectedProcess, setSelectedProcess] = useState<Process[]>([]);
+  const [allChecked, setAllChecked] = useState<boolean>(false);
+  const [sortConfig, setSortConfig] = useState<{
+    key: string;
+    direction: string;
+  }>({ key: "", direction: "" });
+  const [filteredProcess, setFilteredProcess] =
+    useState<Process[]>(mockProcesses);
 
   const { isMobile } = useDevice();
+
+  useEffect(() => {
+    setFilteredProcess(
+      filterAndSortProcess(mockProcesses, searchQuery, sortConfig)
+    );
+  }, [searchQuery, mockProcesses, sortConfig]);
 
   const handleDelete = () => {
     console.info("delete");
   };
 
-  const filteredProcesses = mockProcesses.filter((process) =>
-    process.name.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const handleSort = (key: string) => {
+    setSortConfig((prevSortConfig) => {
+      let direction = "ascending";
+      if (
+        prevSortConfig.key === key &&
+        prevSortConfig.direction === "ascending"
+      ) {
+        direction = "descending";
+      }
+
+      return { key, direction };
+    });
+  };
 
   return (
     <div className={styles.process_tab_wrapper}>
@@ -95,15 +159,15 @@ const ProcessTab = (): JSX.Element => {
       <div>
         <div className={styles.first_line}>
           <div className={styles.left}>
-            {/* <Checkbox
-            checked={allChecked}
-            setChecked={(checked) => {
-              setAllChecked(checked);
-              setSelectedKnowledge(checked ? filteredKnowledgeList : []);
-            }}
-          /> */}
-            <div className={styles.name}>
-              Name
+            <Checkbox
+              checked={allChecked}
+              setChecked={(checked) => {
+                setAllChecked(checked);
+                setSelectedProcess(checked ? filteredProcess : []);
+              }}
+            />
+            <div className={styles.name} onClick={() => handleSort("name")}>
+              Nom
               <div className={styles.icon}>
                 <Icon name="sort" size="small" color="black" />
               </div>
@@ -112,21 +176,20 @@ const ProcessTab = (): JSX.Element => {
           <div className={styles.right}>
             {!isMobile && (
               <div className={styles.status}>
-                Status
+                Statut
                 <div className={styles.icon}>
                   <Icon name="sort" size="small" color="black" />
                 </div>
               </div>
             )}
-            <span className={styles.actions}>Actions</span>
           </div>
         </div>
         <div className={styles.process_list}>
-          {filteredProcesses.map((process, index) => (
+          {filteredProcess.map((process, index) => (
             <div key={process.id} className={styles.process_line}>
               <ProcessLine
                 process={process}
-                last={index === filteredProcesses.length - 1}
+                last={index === filteredProcess.length - 1}
               />
             </div>
           ))}
