@@ -71,6 +71,7 @@ async def folder(session, user):
     await session.refresh(folder)
     return folder
 
+
 @pytest.mark.asyncio(loop_scope="session")
 async def test_knowledge_default_file(session, folder, user):
     km = KnowledgeDB(
@@ -172,6 +173,7 @@ async def test_knowledge_remove_folder_cascade(
     results = (await session.exec(statement)).all()
     assert results == []
 
+
 @pytest.mark.asyncio(loop_scope="session")
 async def test_knowledge_dto(session, user, brain):
     # add folder in brain
@@ -197,30 +199,31 @@ async def test_knowledge_dto(session, user, brain):
         file_size=100,
         file_sha1="test_sha1",
         user_id=user.id,
-        brains=[],
+        brains=[brain],
         parent=folder,
     )
-    session.add(folder)
+    session.add(km)
     session.add(km)
     await session.commit()
-    await session.refresh(folder)
+    await session.refresh(km)
+
+    km_dto = await km.to_dto()
+
+    assert km_dto.file_name == km.file_name
+    assert km_dto.url == km.url
+    assert km_dto.extension == km.extension
+    assert km_dto.status == KnowledgeStatus(km.status)
+    assert km_dto.source == km.source
+    assert km_dto.source_link == km.source_link
+    assert km_dto.is_folder == km.is_folder
+    assert km_dto.file_size == km.file_size
+    assert km_dto.file_sha1 == km.file_sha1
+    assert km_dto.updated_at == km.updated_at
+    assert km_dto.created_at == km.created_at
+    assert km_dto.metadata == km.metadata_  # type: ignor
+    assert km_dto.parent
+    assert km_dto.parent.id == folder.id
 
     folder_dto = await folder.to_dto()
-
-    assert folder_dto.file_name== folder.file_name
-    assert folder_dto.url== folder.url
-    assert folder_dto.extension== folder.extension
-    assert folder_dto.status== KnowledgeStatus(folder.status)
-    assert folder_dto.source== folder.source
-    assert folder_dto.source_link== folder.source_link
-    assert folder_dto.is_folder== folder.is_folder
-    assert folder_dto.file_size== folder.file_size 
-    assert folder_dto.file_sha1== folder.file_sha1
-    assert folder_dto.updated_at== folder.updated_at
-    assert folder_dto.created_at== folder.created_at
-    assert folder_dto.metadata== folder.metadata_  # type: ignor
-    assert folder_dto.parent_id == folder.parent_id
-
     assert folder_dto.brains[0] == brain.model_dump()
-    assert folder_dto.children== [await km.to_dto()]
-
+    assert folder_dto.children == [await km.to_dto()]

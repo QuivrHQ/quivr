@@ -33,12 +33,12 @@ class Knowledge(BaseModel):
     created_at: datetime
     source: Optional[str] = None
     source_link: Optional[str] = None
-    parent_id: Optional[UUID]
-    children: Optional[list["Knowledge"]]
     file_sha1: Optional[str] = None
     metadata: Optional[Dict[str, str]] = None
     user_id: UUID
     brains: List[Dict[str, Any]]
+    parent: Optional["Knowledge"]
+    children: Optional[list["Knowledge"]]
 
 
 class KnowledgeUpdate(BaseModel):
@@ -126,6 +126,9 @@ class KnowledgeDB(AsyncAttrs, SQLModel, table=True):
         children: list[KnowledgeDB] = (
             await self.awaitable_attrs.children if get_children else []
         )
+        parent = await self.awaitable_attrs.parent
+        parent = await parent.to_dto(get_children=False) if parent else None
+
         return Knowledge(
             id=self.id,  # type: ignore
             file_name=self.file_name,
@@ -141,7 +144,7 @@ class KnowledgeDB(AsyncAttrs, SQLModel, table=True):
             created_at=self.created_at,
             metadata=self.metadata_,  # type: ignore
             brains=[b.model_dump() for b in brains],
-            parent_id=self.parent_id,
+            parent=parent,
             children=[await c.to_dto(get_children=False) for c in children],
             user_id=self.user_id,
         )

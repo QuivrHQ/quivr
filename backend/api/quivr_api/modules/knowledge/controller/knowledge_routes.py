@@ -29,9 +29,8 @@ from quivr_api.modules.user.entity.user_identity import UserIdentity
 knowledge_router = APIRouter()
 logger = get_logger(__name__)
 
-KnowledgeServiceDep = Annotated[
-    KnowledgeService, Depends(get_service(KnowledgeService))
-]
+get_km_service = get_service(KnowledgeService)
+KnowledgeServiceDep = Annotated[KnowledgeService, Depends(get_km_service)]
 
 
 @knowledge_router.get(
@@ -126,7 +125,7 @@ async def generate_signed_url_endpoint(
 async def create_knowledge(
     knowledge_data: str = File(...),
     file: Optional[UploadFile] = None,
-    knowledge_service: KnowledgeService = Depends(get_service(KnowledgeService)),
+    knowledge_service: KnowledgeService = Depends(get_km_service),
     current_user: UserIdentity = Depends(get_current_user),
 ):
     knowledge = AddKnowledge.model_validate_json(knowledge_data)
@@ -166,7 +165,7 @@ async def create_knowledge(
 )
 async def list_knowledge(
     parent_id: UUID | None = None,
-    knowledge_service: KnowledgeService = Depends(get_service(KnowledgeService)),
+    knowledge_service: KnowledgeService = Depends(get_km_service),
     current_user: UserIdentity = Depends(get_current_user),
 ):
     try:
@@ -192,7 +191,7 @@ async def list_knowledge(
 )
 async def get_knowledge(
     knowledge_id: UUID,
-    knowledge_service: KnowledgeService = Depends(get_service(KnowledgeService)),
+    knowledge_service: KnowledgeService = Depends(get_km_service),
     current_user: UserIdentity = Depends(get_current_user),
 ):
     try:
@@ -220,7 +219,7 @@ async def get_knowledge(
 async def update_knowledge(
     knowledge_id: UUID,
     payload: KnowledgeUpdate,
-    knowledge_service: KnowledgeService = Depends(get_service(KnowledgeService)),
+    knowledge_service: KnowledgeService = Depends(get_km_service),
     current_user: UserIdentity = Depends(get_current_user),
 ):
     try:
@@ -247,7 +246,7 @@ async def update_knowledge(
 )
 async def delete_knowledge(
     knowledge_id: UUID,
-    knowledge_service: KnowledgeServiceDep,
+    knowledge_service: KnowledgeService = Depends(get_km_service),
     current_user: UserIdentity = Depends(get_current_user),
 ):
     try:

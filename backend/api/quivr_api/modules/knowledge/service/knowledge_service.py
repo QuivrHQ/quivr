@@ -88,7 +88,7 @@ class KnowledgeService(BaseService[KnowledgeRepository]):
 
     async def get_knowledge(
         self, knowledge_id: UUID, user_id: UUID | None = None
-    ) -> KnowledgeDB | list[KnowledgeDB]:
+    ) -> KnowledgeDB:
         return await self.repository.get_knowledge_by_id(knowledge_id, user_id)
 
     async def update_knowledge(

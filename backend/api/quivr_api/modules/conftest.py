@@ -24,9 +24,6 @@ async_engine = create_async_engine(
     "postgresql+asyncpg://" + pg_database_base_url,
     echo=True if os.getenv("ORM_DEBUG") else False,
     future=True,
-    pool_pre_ping=True,
-    pool_size=10,
-    pool_recycle=0.1,
 )
 
 
