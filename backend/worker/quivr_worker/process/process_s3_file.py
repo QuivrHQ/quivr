@@ -2,6 +2,7 @@ from uuid import UUID
 
 from quivr_api.logger import get_logger
 from quivr_api.modules.brain.service.brain_service import BrainService
+from quivr_api.modules.knowledge.entity.knowledge import KnowledgeUpdate
 from quivr_api.modules.knowledge.service.knowledge_service import KnowledgeService
 from quivr_api.modules.vector.service.vector_service import VectorService
 
@@ -41,17 +42,15 @@ async def process_uploaded_file(
     # If we have some knowledge with error
     with build_file(file_data, knowledge_id, file_name) as file_instance:
         knowledge = await knowledge_service.get_knowledge(knowledge_id=knowledge_id)
-        should_process = await knowledge_service.update_sha1_conflict(
-            knowledge=knowledge,
-            brain_id=brain.brain_id,
-            file_sha1=file_instance.file_sha1,
+        await knowledge_service.update_knowledge(
+            knowledge,
+            KnowledgeUpdate(file_sha1=file_instance.file_sha1),  # type: ignore
         )
-        if should_process:
-            await process_file(
-                file_instance=file_instance,
-                brain=brain,
-                brain_service=brain_service,
-                vector_service=vector_service,
-                integration=integration,
-                integration_link=integration_link,
-            )
+        await process_file(
+            file_instance=file_instance,
+            brain=brain,
+            brain_service=brain_service,
+            vector_service=vector_service,
+            integration=integration,
+            integration_link=integration_link,
+        )

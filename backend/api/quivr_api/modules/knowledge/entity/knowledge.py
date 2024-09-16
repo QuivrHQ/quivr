@@ -1,5 +1,6 @@
 from datetime import datetime
-from typing import Dict, List, Optional
+from enum import Enum
+from typing import Any, Dict, List, Optional
 from uuid import UUID
 
 from pydantic import BaseModel
@@ -12,20 +13,44 @@ from sqlmodel import Field, Relationship, SQLModel
 from quivr_api.modules.knowledge.entity.knowledge_brain import KnowledgeBrain
 
 
+class KnowledgeSource(str, Enum):
+    LOCAL = "local"
+    WEB = "web"
+    GDRIVE = "google drive"
+    DROPBOX = "dropbox"
+    SHAREPOINT = "sharepoint"
+
+
 class Knowledge(BaseModel):
     id: UUID
+    file_size: int = 0
+    status: KnowledgeStatus
     file_name: Optional[str] = None
     url: Optional[str] = None
     extension: str = ".txt"
-    status: str
+    is_folder: bool = False
+    updated_at: datetime
+    created_at: datetime
     source: Optional[str] = None
     source_link: Optional[str] = None
-    file_size: Optional[int] = None
     file_sha1: Optional[str] = None
-    updated_at: Optional[datetime] = None
-    created_at: Optional[datetime] = None
     metadata: Optional[Dict[str, str]] = None
-    brain_ids: list[UUID]
+    user_id: UUID
+    brains: List[Dict[str, Any]]
+    parent: Optional["Knowledge"]
+    children: Optional[list["Knowledge"]]
+
+
+class KnowledgeUpdate(BaseModel):
+    file_name: Optional[str] = None
+    status: Optional[KnowledgeStatus] = None
+    url: Optional[str] = None
+    file_sha1: Optional[str] = None
+    extension: Optional[str] = None
+    parent_id: Optional[UUID] = None
+    source: Optional[str] = None
+    source_link: Optional[str] = None
+    metadata: Optional[Dict[str, str]] = None
 
 
 class KnowledgeDB(AsyncAttrs, SQLModel, table=True):
@@ -49,13 +74,6 @@ class KnowledgeDB(AsyncAttrs, SQLModel, table=True):
     file_sha1: Optional[str] = Field(
         max_length=40
     )  # FIXME: Should not be optional @chloedia
-    updated_at: datetime | None = Field(
-        default=None,
-        sa_column=Column(
-            TIMESTAMP(timezone=False),
-            server_default=text("CURRENT_TIMESTAMP"),
-        ),
-    )
     created_at: datetime | None = Field(
         default=None,
         sa_column=Column(
@@ -63,9 +81,18 @@ class KnowledgeDB(AsyncAttrs, SQLModel, table=True):
             server_default=text("CURRENT_TIMESTAMP"),
         ),
     )
+    updated_at: datetime | None = Field(
+        default=None,
+        sa_column=Column(
+            TIMESTAMP(timezone=False),
+            server_default=text("CURRENT_TIMESTAMP"),
+            onupdate=datetime.utcnow,
+        ),
+    )
     metadata_: Optional[Dict[str, str]] = Field(
         default=None, sa_column=Column("metadata", JSON)
     )
+    is_folder: bool = Field(default=False)
     user_id: UUID = Field(foreign_key="users.id", nullable=False)
     brains: List["Brain"] = Relationship(
         back_populates="knowledges",
@@ -73,10 +100,35 @@ class KnowledgeDB(AsyncAttrs, SQLModel, table=True):
         sa_relationship_kwargs={"lazy": "select"},
     )
 
-    async def to_dto(self) -> Knowledge:
+    parent_id: UUID | None = Field(
+        default=None, foreign_key="knowledge.id", ondelete="CASCADE"
+    )
+    parent: Optional["KnowledgeDB"] = Relationship(
+        back_populates="children",
+        sa_relationship_kwargs={"remote_side": "KnowledgeDB.id"},
+    )
+    children: list["KnowledgeDB"] = Relationship(
+        back_populates="parent",
+        sa_relationship_kwargs={
+            "cascade": "all, delete-orphan",
+        },
+    )
+
+    # TODO: nested folder search
+    async def to_dto(self, get_children: bool = True) -> Knowledge:
+        assert (
+            self.updated_at
+        ), "knowledge should be inserted before transforming to dto"
+        assert (
+            self.created_at
+        ), "knowledge should be inserted before transforming to dto"
         brains = await self.awaitable_attrs.brains
-        size = self.file_size if self.file_size else 0
-        sha1 = self.file_sha1 if self.file_sha1 else ""
+        children: list[KnowledgeDB] = (
+            await self.awaitable_attrs.children if get_children else []
+        )
+        parent = await self.awaitable_attrs.parent
+        parent = await parent.to_dto(get_children=False) if parent else None
+
         return Knowledge(
             id=self.id,  # type: ignore
             file_name=self.file_name,
@@ -85,10 +137,14 @@ class KnowledgeDB(AsyncAttrs, SQLModel, table=True):
             status=KnowledgeStatus(self.status),
             source=self.source,
             source_link=self.source_link,
-            file_size=size,
-            file_sha1=sha1,
+            is_folder=self.is_folder,
+            file_size=self.file_size or 0,
+            file_sha1=self.file_sha1,
             updated_at=self.updated_at,
             created_at=self.created_at,
             metadata=self.metadata_,  # type: ignore
-            brain_ids=[brain.brain_id for brain in brains],
+            brains=[b.model_dump() for b in brains],
+            parent=parent,
+            children=[await c.to_dto(get_children=False) for c in children],
+            user_id=self.user_id,
         )

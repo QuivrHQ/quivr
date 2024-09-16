@@ -317,10 +317,11 @@ async def test_process_sync_file_noprev(
     created_km = all_km[0]
     assert created_km.file_name == sync_file.name
     assert created_km.extension == ".txt"
-    assert created_km.file_sha1 is not None
+    assert created_km.file_sha1 is None
     assert created_km.created_at is not None
     assert created_km.metadata == {"sync_file_id": "1"}
-    assert created_km.brain_ids == [brain_1.brain_id]
+    assert len(created_km.brains)> 0 
+    assert created_km.brains[0]["brain_id"]== brain_1.brain_id
 
     # Assert celery task in correct
     assert task["args"] == ("process_file_task",)
@@ -409,12 +410,12 @@ async def test_process_sync_file_with_prev(
     created_km = all_km[0]
     assert created_km.file_name == sync_file.name
     assert created_km.extension == ".txt"
-    assert created_km.file_sha1 is not None
+    assert created_km.file_sha1 is None
     assert created_km.updated_at
     assert created_km.created_at
     assert created_km.updated_at == created_km.created_at  # new line
     assert created_km.metadata == {"sync_file_id": str(dbfiles[0].id)}
-    assert created_km.brain_ids == [brain_1.brain_id]
+    assert created_km.brains[0]["brain_id"]== brain_1.brain_id
 
     # Check file content changed
     assert check_file_exists(str(brain_1.brain_id), sync_file.name)
