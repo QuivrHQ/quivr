@@ -6,6 +6,7 @@ import { Checkbox } from "@/lib/components/ui/Checkbox/Checkbox";
 import { Icon } from "@/lib/components/ui/Icon/Icon";
 import { QuivrButton } from "@/lib/components/ui/QuivrButton/QuivrButton";
 import { TextInput } from "@/lib/components/ui/TextInput/TextInput";
+import { filterAndSort, updateSelectedItems } from "@/lib/helpers/table";
 import { useDevice } from "@/lib/hooks/useDevice";
 
 import ProcessLine from "./Process/ProcessLine";
@@ -58,75 +59,57 @@ const mockProcesses: Process[] = [
   },
 ];
 
-const filterAndSortProcess = (
-  processList: Process[],
-  searchQuery: string,
-  sortConfig: { key: string; direction: string }
-): Process[] => {
-  let filteredList = processList.filter((process) =>
-    process.name.toLowerCase().includes(searchQuery.toLowerCase())
-  );
-
-  if (sortConfig.key) {
-    const compareStrings = (a: string | number, b: string | number) => {
-      if (a < b) {
-        return sortConfig.direction === "ascending" ? -1 : 1;
-      }
-      if (a > b) {
-        return sortConfig.direction === "ascending" ? 1 : -1;
-      }
-
-      return 0;
-    };
-
-    const getComparableValue = (item: Process) => {
-      if (sortConfig.key === "name") {
-        return item.name;
-      }
-      if (sortConfig.key === "status") {
-        return item.status;
-      }
-      if (sortConfig.key === "datetime") {
-        return item.datetime;
-      }
-
-      return "";
-    };
-
-    filteredList = filteredList.sort((a, b) =>
-      compareStrings(getComparableValue(a), getComparableValue(b))
-    );
-  }
-
-  return filteredList;
-};
-
 const ProcessTab = (): JSX.Element => {
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [selectedProcess, setSelectedProcess] = useState<Process[]>([]);
   const [allChecked, setAllChecked] = useState<boolean>(false);
   const [sortConfig, setSortConfig] = useState<{
-    key: string;
-    direction: string;
-  }>({ key: "", direction: "" });
+    key: keyof Process;
+    direction: "ascending" | "descending";
+  }>({ key: "name", direction: "ascending" });
   const [filteredProcess, setFilteredProcess] =
     useState<Process[]>(mockProcesses);
+  const [lastSelectedIndex, setLastSelectedIndex] = useState<number | null>(
+    null
+  );
 
   const { isMobile } = useDevice();
 
   useEffect(() => {
     setFilteredProcess(
-      filterAndSortProcess(mockProcesses, searchQuery, sortConfig)
+      filterAndSort(
+        mockProcesses,
+        searchQuery,
+        sortConfig,
+        (process) => process[sortConfig.key]
+      )
     );
-  }, [searchQuery, mockProcesses, sortConfig]);
+  }, [searchQuery, sortConfig]);
 
   const handleDelete = () => {
     console.info("delete");
   };
 
-  const handleSort = (key: string) => {
+  const handleSelect = (
+    process: Process,
+    index: number,
+    event: React.MouseEvent
+  ) => {
+    const newSelectedProcess = updateSelectedItems<Process>({
+      item: process,
+      index,
+      event,
+      lastSelectedIndex,
+      filteredList: filteredProcess,
+      selectedItems: selectedProcess,
+    });
+    setSelectedProcess(newSelectedProcess.selectedItems);
+    setLastSelectedIndex(newSelectedProcess.lastSelectedIndex);
+  };
+
+  const handleSort = (key: keyof Process) => {
     setSortConfig((prevSortConfig) => {
-      let direction = "ascending";
+      let direction: "ascending" | "descending" = "ascending";
       if (
         prevSortConfig.key === key &&
         prevSortConfig.direction === "ascending"
@@ -188,7 +171,10 @@ const ProcessTab = (): JSX.Element => {
                     <Icon name="sort" size="small" color="black" />
                   </div>
                 </div>
-                <div className={styles.status}>
+                <div
+                  className={styles.status}
+                  onClick={() => handleSort("status")}
+                >
                   Statut
                   <div className={styles.icon}>
                     <Icon name="sort" size="small" color="black" />
@@ -204,6 +190,12 @@ const ProcessTab = (): JSX.Element => {
               <ProcessLine
                 process={process}
                 last={index === filteredProcess.length - 1}
+                selected={selectedProcess.some(
+                  (item) => item.id === process.id
+                )}
+                setSelected={(_selected, event) =>
+                  handleSelect(process, index, event)
+                }
               />
             </div>
           ))}
