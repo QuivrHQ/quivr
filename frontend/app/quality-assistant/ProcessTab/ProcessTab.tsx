@@ -19,13 +19,13 @@ const mockProcesses: Process[] = [
     id: 1,
     name: "Process 1",
     datetime: new Date().toISOString(),
-    status: "pending",
+    status: "completed",
   },
   {
     id: 2,
     name: "Process 2",
-    datetime: new Date(Date.now() - 86400000 * 1).toISOString(),
-    status: "processing",
+    datetime: new Date(Date.now() - 86400000 * 100).toISOString(),
+    status: "completed",
   },
   {
     id: 3,
@@ -37,25 +37,25 @@ const mockProcesses: Process[] = [
     id: 4,
     name: "Process 4",
     datetime: new Date(Date.now() - 86400000 * 3).toISOString(),
-    status: "error",
+    status: "processing",
   },
   {
     id: 5,
     name: "Process 5",
     datetime: new Date(Date.now() - 86400000 * 4).toISOString(),
-    status: "pending",
+    status: "processing",
   },
   {
     id: 6,
     name: "Process 6",
     datetime: new Date(Date.now() - 86400000 * 5).toISOString(),
-    status: "processing",
+    status: "pending",
   },
   {
     id: 7,
     name: "Process 7",
     datetime: new Date(Date.now() - 86400000 * 6).toISOString(),
-    status: "completed",
+    status: "error",
   },
 ];
 

@@ -1,6 +1,13 @@
 "use client";
 
+import { capitalCase } from "change-case";
+import format from "date-fns/format";
+import { fr } from "date-fns/locale";
+
 import { Checkbox } from "@/lib/components/ui/Checkbox/Checkbox";
+import { Icon } from "@/lib/components/ui/Icon/Icon";
+import { Tag } from "@/lib/components/ui/Tag/Tag";
+import { useDevice } from "@/lib/hooks/useDevice";
 
 import styles from "./ProcessLine.module.scss";
 
@@ -19,6 +26,8 @@ const ProcessLine = ({
   selected,
   setSelected,
 }: ProcessLineProps): JSX.Element => {
+  const { isMobile } = useDevice();
+
   return (
     <div className={`${styles.process_wrapper} ${last ? styles.last : ""}`}>
       <div className={styles.left}>
@@ -27,6 +36,43 @@ const ProcessLine = ({
           setChecked={(checked, event) => setSelected(checked, event)}
         />
         <span className={styles.name}>{process.name}</span>
+      </div>
+      <div className={styles.right}>
+        {!isMobile && (
+          <>
+            <span className={styles.date}>
+              {format(new Date(process.datetime), " d MMMM yyyy '-' HH:mm", {
+                locale: fr,
+              })}
+            </span>
+            <div className={styles.status}>
+              <Tag
+                name={capitalCase(process.status)}
+                color={
+                  process.status === "error"
+                    ? "dangerous"
+                    : process.status === "processing"
+                    ? "primary"
+                    : process.status === "completed"
+                    ? "success"
+                    : "grey"
+                }
+              />
+            </div>
+          </>
+        )}
+        <Icon
+          name={
+            process.status === "completed"
+              ? "download"
+              : process.status === "error"
+              ? "warning"
+              : "waiting"
+          }
+          size="normal"
+          color="black"
+          handleHover={process.status === "completed"}
+        />
       </div>
     </div>
   );

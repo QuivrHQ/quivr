@@ -25,5 +25,33 @@
     display: flex;
     align-items: center;
     gap: calc(Spacings.$spacing06 + 6px);
+    overflow: hidden;
+
+    .name {
+      @include Typography.EllipsisOverflow;
+    }
+  }
+
+  .right {
+    display: flex;
+    gap: Spacings.$spacing05;
+    align-items: center;
+
+    .date {
+      font-size: Typography.$very_tiny;
+      width: 150px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      @include Typography.EllipsisOverflow;
+    }
+
+    .status {
+      width: 100px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      @include Typography.EllipsisOverflow;
+    }
   }
 }

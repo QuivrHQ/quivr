@@ -28,4 +28,9 @@
     color: var(--success);
     background-color: var(--background-success);
   }
+
+  &.grey {
+    color: var(--text-4);
+    background-color: var(--background-pending);
+  }
 }
