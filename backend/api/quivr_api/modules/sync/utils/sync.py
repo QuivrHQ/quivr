@@ -800,6 +800,7 @@ class NotionSync(BaseSync):
         if not folder_id or folder_id == "":
             folder_id = None  # ROOT FOLDER HAVE A TRUE PARENT ID
 
+        logger.info(f"Fetching notion files with parent_id 🔥: {folder_id}")
         children = await self.notion_service.get_notion_files_by_parent_id(
             folder_id, sync_user_id
         )
@@ -818,7 +819,8 @@ class NotionSync(BaseSync):
             pages.append(page_info)
 
             if recursive:
-                sub_pages = await self.aget_files(credentials, str(page.id), recursive)
+                logger.info(f"Fetching sub pages with parent_id 🔥🔥: {page.id}")
+                sub_pages = await self.aget_files(credentials=credentials, sync_user_id=sync_user_id, folder_id=str(page.id), recursive=recursive)
                 pages.extend(sub_pages)
         return pages
 
