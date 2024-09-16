@@ -1,0 +1,27 @@
+@use "styles/Radius.module.scss";
+@use "styles/Spacings.module.scss";
+@use "styles/Typography.module.scss";
+
+.process_wrapper {
+  padding-inline: Spacings.$spacing06;
+  overflow: hidden;
+  display: flex;
+  gap: Spacings.$spacing02;
+  justify-content: space-between;
+  align-items: center;
+  border: 1px solid var(--border-0);
+  padding-block: Spacings.$spacing03;
+  position: relative;
+  overflow: visible;
+  font-size: Typography.$small;
+  border-bottom: none;
+
+  &.first {
+    border-radius: Radius.$normal Radius.$normal 0 0;
+  }
+
+  &.last {
+    border-radius: 0 0 Radius.$normal Radius.$normal;
+    border-bottom: 1px solid var(--border-0);
+  }
+}

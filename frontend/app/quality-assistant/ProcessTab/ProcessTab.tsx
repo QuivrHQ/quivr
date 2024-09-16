@@ -53,10 +53,15 @@ const mockProcesses: Process[] = [
 const ProcessTab = (): JSX.Element => {
   return (
     <div className={styles.process_tab_wrapper}>
+      <span className={styles.title}>Uploaded knowledge</span>
       <div className={styles.process_list}>
-        {mockProcesses.map((process) => (
+        {mockProcesses.map((process, index) => (
           <div key={process.id} className={styles.process_line}>
-            <ProcessLine process={process} />
+            <ProcessLine
+              process={process}
+              first={index === 0}
+              last={index === mockProcesses.length - 1}
+            />
           </div>
         ))}
       </div>
