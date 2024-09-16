@@ -203,7 +203,7 @@ fonttools==4.53.1
     # via matplotlib
     # via pdf2docx
 fpdf==1.7.2
-    # via quivr-api
+    # via quivr-worker
 frozenlist==1.4.1
     # via aiohttp
     # via aiosignal

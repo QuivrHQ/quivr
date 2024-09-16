@@ -39,7 +39,7 @@ from quivr_worker.syncs.process_active_syncs import (
     process_sync,
 )
 from quivr_worker.syncs.store_notion import fetch_and_store_notion_files_async
-from quivr_worker.utils import _patch_json
+from quivr_worker.utils.utils import _patch_json
 from quivr_api.modules.assistant.services.tasks_service import TasksService
 from quivr_api.modules.assistant.repository.tasks import TasksRepository
 from quivr_worker.assistants.assistants import process_assistant
