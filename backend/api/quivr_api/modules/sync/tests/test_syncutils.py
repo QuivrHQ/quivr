@@ -250,6 +250,7 @@ async def test_process_sync_file_not_supported(syncutils: SyncUtils):
         credentials={},
         state={},
         additional_data={},
+        status="",
     )
     sync_active = SyncsActive(
         id=1,

@@ -727,6 +727,7 @@ async def setup_syncs_data(
         credentials={},
         state={},
         additional_data={},
+        status="",
     )
     sync_active = SyncsActive(
         id=0,
