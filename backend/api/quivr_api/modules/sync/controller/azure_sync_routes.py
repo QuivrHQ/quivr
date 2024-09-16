@@ -144,7 +144,6 @@ def oauth2callback_azure(request: Request):
 
     sync_user_input = SyncUserUpdateInput(
         credentials=result,
-        state={},
         email=user_email,
         status=str(SyncsUserStatus.SYNCED),
     )

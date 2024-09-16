@@ -150,7 +150,7 @@ def oauth2callback_notion(request: Request, background_tasks: BackgroundTasks):
 
         sync_user_input = SyncUserUpdateInput(
             credentials=result,
-            state={},
+            # state={},
             email=user_email,
             status=str(SyncsUserStatus.SYNCING),
         )

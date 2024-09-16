@@ -50,7 +50,7 @@ class SyncUserUpdateInput(BaseModel):
     """
 
     credentials: dict
-    state: dict
+    state: dict | None = None
     email: str
     status: str
 

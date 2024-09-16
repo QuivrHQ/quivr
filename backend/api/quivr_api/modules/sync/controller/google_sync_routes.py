@@ -161,7 +161,7 @@ def oauth2callback_google(request: Request):
 
     sync_user_input = SyncUserUpdateInput(
         credentials=json.loads(creds.to_json()),
-        state={},
+        # state={},
         email=user_email,
         status=str(SyncsUserStatus.SYNCED),
     )

@@ -170,7 +170,7 @@ class SyncUserRepository:
         )
 
         state_str = json.dumps(state)
-        self.db.from_("syncs_user").update(sync_user_input.model_dump()).eq(
+        self.db.from_("syncs_user").update(sync_user_input.model_dump(exclude_unset=True)).eq(
             "user_id", str(sync_user_id)
         ).eq("state", state_str).execute()
         logger.info("Sync user updated successfully")

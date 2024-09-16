@@ -154,7 +154,7 @@ def oauth2callback_github(request: Request):
 
     sync_user_input = SyncUserUpdateInput(
         credentials=result,
-        state={},
+        # state={},
         email=user_email,
         status=str(SyncsUserStatus.SYNCED),
     )
