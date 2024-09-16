@@ -13,6 +13,15 @@
 .search_bar_wrapper {
   position: sticky;
   bottom: Spacings.$spacing06;
+  transform: translateY(calc(100% + Spacings.$spacing06));
+  opacity: 0.1;
+  transition: transform 0.2s ease-out, opacity 0.2s ease-out;
+
+  &:focus-within,
+  &:hover {
+    transform: translateY(0%);
+    opacity: 1;
+  }
 }
 
 .editor_wrapper {
