@@ -1,4 +1,5 @@
 export interface Process {
+  result: string;
   id: number;
   name: string;
   datetime: string;

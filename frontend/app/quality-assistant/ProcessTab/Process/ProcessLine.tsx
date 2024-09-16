@@ -3,6 +3,7 @@
 import { capitalCase } from "change-case";
 import format from "date-fns/format";
 import { fr } from "date-fns/locale";
+import { useState } from "react";
 
 import { Checkbox } from "@/lib/components/ui/Checkbox/Checkbox";
 import { Icon } from "@/lib/components/ui/Icon/Icon";
@@ -26,10 +27,20 @@ const ProcessLine = ({
   selected,
   setSelected,
 }: ProcessLineProps): JSX.Element => {
+  const [showResult, setShowResult] = useState(false);
   const { isMobile } = useDevice();
 
   return (
-    <div className={`${styles.process_wrapper} ${last ? styles.last : ""}`}>
+    <div
+      className={`${styles.process_wrapper} ${last ? styles.last : ""} ${
+        process.status === "completed" ? styles.clickable : ""
+      }`}
+      onClick={() => {
+        if (process.status === "completed") {
+          setShowResult(!showResult);
+        }
+      }}
+    >
       <div className={styles.left}>
         <Checkbox
           checked={selected}

@@ -21,6 +21,14 @@
     border-bottom: 1px solid var(--border-0);
   }
 
+  &.clickable {
+    cursor: pointer;
+
+    &:hover {
+      background-color: var(--background-1);
+    }
+  }
+
   .left {
     display: flex;
     align-items: center;
