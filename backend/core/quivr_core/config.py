@@ -1,11 +1,21 @@
 import os
 from enum import Enum
 from typing import Dict, List, Optional
+from uuid import UUID
 
 from megaparse.config import MegaparseConfig
 
 from quivr_core.base_config import QuivrBaseConfig
 from quivr_core.processor.splitter import SplitterConfig
+
+
+class BrainConfig(QuivrBaseConfig):
+    brain_id: UUID
+    name: str
+
+    @property
+    def id(self) -> UUID:
+        return self.brain_id
 
 
 class DefaultRerankers(str, Enum):
