@@ -1,8 +1,9 @@
 import os
 from collections import Counter
-from typing import List, Tuple, Dict
-from langchain_openai import ChatOpenAI
+from typing import Dict, List, Tuple
+
 from dotenv import load_dotenv
+from langchain_openai import ChatOpenAI
 
 
 class MarkdownProcessor:
@@ -55,7 +56,7 @@ class MarkdownProcessor:
         """
         return "\n\n".join(pages).split("\n\n")
 
-    def remove_duplicates(self, paragraphs: list) -> Tuple[str, List[str]]:
+    def remove_duplicates(self, paragraphs: list) -> Tuple[List[str], List[str]]:
         """
         Remove duplicate paragraphs and identify unique and duplicate paragraphs.
 
@@ -68,8 +69,8 @@ class MarkdownProcessor:
         unique_paragraphs = list(
             set([self.clean(paragraph) for paragraph in paragraphs])
         )
-        duplicate_paragraphs = []
-        cleaned_paragraphs = []
+        duplicate_paragraphs: List[str] = []
+        cleaned_paragraphs: List[str] = []
 
         for paragraph in paragraphs:
             cleaned_paragraph = self.clean(paragraph)
@@ -80,7 +81,7 @@ class MarkdownProcessor:
                 duplicate_paragraphs.append(paragraph)
         return cleaned_paragraphs, duplicate_paragraphs
 
-    def identify_header_components(self, duplicate_paragraphs: list) -> Dict:
+    def identify_header_components(self, duplicate_paragraphs: list) -> Counter:
         """
         Identify words in duplicate paragraphs that are likely header components.
 
@@ -95,11 +96,13 @@ class MarkdownProcessor:
         )
         header_components = " ".join(header_components).strip().split(" ")
         header_components_count = Counter(header_components)
-        header_components_count = {
-            k.replace(":", ""): v
-            for k, v in header_components_count.items()
-            if v > 1 and len(k) > 3
-        }
+        header_components_count = Counter(
+            {
+                k.replace(":", ""): v
+                for k, v in header_components_count.items()
+                if v > 1 and len(k) > 3
+            }
+        )
         return header_components_count
 
     def remove_header_lines(
@@ -160,7 +163,7 @@ class MarkdownProcessor:
         prompt = f"""You are a document cleaner and you are used to remove repetitive headers / footer from parsed files in markdown.
         Here is a md file : "{self.md_result}"
         I want you to identify repetitive texts that could be associate to a document header and footer. Please identify the headers, the footer and remove them from the document.
-        Answer with only the cleaned document in markdown format. 
+        Answer with only the cleaned document in markdown format.
         Result : """
 
         messages.append(("human", self.md_result))  # type: ignore

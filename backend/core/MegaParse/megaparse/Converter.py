@@ -1,10 +1,9 @@
 import asyncio
+import logging
 import os
 from collections import Counter
-from enum import Enum
 from pathlib import Path
 from typing import List, Set
-import logging
 
 import pandas as pd
 from docx import Document
@@ -21,12 +20,13 @@ from llama_parse.utils import Language, ResultType
 from pptx import Presentation
 from pptx.enum.shapes import MSO_SHAPE_TYPE
 
+from megaparse.config import MegaparseConfig, PdfParser
 from megaparse.markdown_processor import MarkdownProcessor
 from megaparse.multimodal_convertor.megaparse_vision import MegaParseVision
 from megaparse.unstructured_convertor import ModelEnum, UnstructuredParser
-from megaparse.config import MegaparseConfig
 
 logger = logging.getLogger("megaparse")
+
 
 class Converter:
     def __init__(self) -> None:
@@ -248,19 +248,11 @@ class PPTXConverter:
             f.write(md_content)
 
 
-class MethodEnum(str, Enum):
-    """Method to use for the conversion"""
-
-    LLAMA_PARSE = "llama_parse"
-    UNSTRUCTURED = "unstructured"
-    MEGAPARSE_VISION = "megaparse_vision"
-
-
 class PDFConverter:
     def __init__(
         self,
         llama_parse_api_key: str,
-        method: MethodEnum | str = MethodEnum.UNSTRUCTURED,
+        method: PdfParser | str = PdfParser.UNSTRUCTURED,
         model=ModelEnum.NONE,
         strategy="fast",
     ) -> None:
@@ -268,7 +260,7 @@ class PDFConverter:
         self.llama_parse_api_key = llama_parse_api_key
         if isinstance(method, str):
             try:
-                method = MethodEnum(method)
+                method = PdfParser(method)
             except ValueError:
                 raise ValueError(f"Method {method} not supported")
         self.method = method
@@ -294,7 +286,9 @@ class PDFConverter:
     def _unstructured_parse(
         self, file_path: str | Path, model: ModelEnum = ModelEnum.NONE
     ):
-        logger.debug(f"Parsing {file_path.name} using unstructured with strategy {self.strategy}")
+        logger.debug(
+            f"Parsing {file_path.name} using unstructured with strategy {self.strategy}"
+        )
         unstructured_parser = UnstructuredParser()
         return unstructured_parser.convert(
             file_path, model=model, strategy=self.strategy
@@ -314,14 +308,14 @@ class PDFConverter:
             file_path = Path(file_path)
 
         parsed_md = ""
-        if self.method == MethodEnum.LLAMA_PARSE:
+        if self.method == PdfParser.LLAMA_PARSE:
             assert (
                 self.llama_parse_api_key is not None
             ), "LLama Parse API key is required for this method"
             parsed_md = await self._llama_parse(self.llama_parse_api_key, file_path)
-        elif self.method == MethodEnum.MEGAPARSE_VISION:
+        elif self.method == PdfParser.MEGAPARSE_VISION:
             parsed_md = await self._lmm_parse(file_path)
-        elif self.method == MethodEnum.UNSTRUCTURED:
+        elif self.method == PdfParser.UNSTRUCTURED:
             parsed_md = self._unstructured_parse(file_path, model)
         else:
             raise ValueError(f"Method {self.method} not supported")
@@ -369,7 +363,7 @@ class MegaParse(BaseLoader):
             converter = PDFConverter(
                 llama_parse_api_key=str(self.config.llama_parse_api_key),
                 strategy=self.config.strategy,
-                method=self.config.pdf_parser
+                method=self.config.pdf_parser,
             )
         elif file_extension == ".xlsx":
             converter = XLSXConverter()

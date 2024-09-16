@@ -15,19 +15,20 @@ logger = logging.getLogger("quivr_core")
 
 
 class MegaparseProcessor(ProcessorBase):
-    '''
+    """
     Megaparse processor for PDF files.
-    
+
     It can be used to parse PDF files and split them into chunks.
-    
+
     It comes from the megaparse library.
-    
+
     ## Installation
     ```bash
     pip install megaparse
     ```
-    
-    '''
+
+    """
+
     supported_extensions = [FileExtension.pdf]
 
     def __init__(
@@ -58,10 +59,11 @@ class MegaparseProcessor(ProcessorBase):
     async def process_file_inner(self, file: QuivrFile) -> list[Document]:
         mega_parse = MegaParse(file_path=file.path, config=self.megaparse_config)  # type: ignore
         document: Document = await mega_parse.aload()
+        print("\n\n document: ", document.page_content)
         if len(document.page_content) > self.splitter_config.chunk_size:
             docs = self.text_splitter.split_documents([document])
             for doc in docs:
-                #if "Production Fonts (maximum)" in doc.page_content:
+                # if "Production Fonts (maximum)" in doc.page_content:
                 #    print('Doc: ', doc.page_content)
                 doc.metadata = {"chunk_size": len(self.enc.encode(doc.page_content))}
             return docs

@@ -1,10 +1,11 @@
-from enum import Enum
 import re
+from enum import Enum
+
+from dotenv import load_dotenv
+from langchain_community.chat_models import ChatOllama
+from langchain_core.prompts import ChatPromptTemplate
 from langchain_openai import ChatOpenAI
 from unstructured.partition.pdf import partition_pdf
-from dotenv import load_dotenv
-from langchain_core.prompts import ChatPromptTemplate
-from langchain_community.chat_models import ChatOllama
 
 
 class ModelEnum(str, Enum):
@@ -102,13 +103,13 @@ class UnstructuredParser:
                     (
                         "human",
                         """You are an expert in markdown tables, match this text and this html table to fill a md table. You answer with just the table in pure markdown, nothing else.
-                    <TEXT> 
-                    {text} 
+                    <TEXT>
+                    {text}
                     </TEXT>
                     <HTML>
                     {html}
                     </HTML>
-                    
+
                     Note, the previous table (that might be related since appearing just before):
                     <PREVIOUS_TABLE>
                     {previous_table}
@@ -118,7 +119,7 @@ class UnstructuredParser:
             )
             chain = prompt | llm
 
-        table_stack = []
+        table_stack: list[str] = []
 
         improved_elements = []
         for el in elements:
