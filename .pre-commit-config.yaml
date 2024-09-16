@@ -31,7 +31,7 @@ repos:
     hooks:
       - id: mypy
         name: mypy
-        additional_dependencies: ["types-aiofiles", "types-pyyaml"]
+        additional_dependencies: ["types-aiofiles", "types-pyyaml", "pydantic", "sqlmodel"]
 ci:
   autofix_commit_msg: |
     [pre-commit.ci] auto fixes from pre-commit.com hooks

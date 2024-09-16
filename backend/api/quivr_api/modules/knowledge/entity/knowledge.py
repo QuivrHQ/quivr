@@ -23,7 +23,7 @@ class KnowledgeDB(AsyncAttrs, SQLModel, table=True):
             primary_key=True,
         ),
     )
-    file_name: Optional[str] = Field(default=None, max_length=255)
+    file_name: str = Field(default="", max_length=255)
     url: Optional[str] = Field(default=None, max_length=2048)
     extension: str = Field(default=".txt", max_length=100)
     status: str = Field(max_length=50)

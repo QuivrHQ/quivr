@@ -17,7 +17,7 @@ class ModelRepository(BaseRepository):
         response = await self.session.exec(query)
         return response.all()
 
-    async def get_model(self, model_name: str) -> Model | None:
+    async def get_model(self, model_name: str) -> Model:
         query = select(Model).where(Model.name == model_name)
         response = await self.session.exec(query)
         return response.first()

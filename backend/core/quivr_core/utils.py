@@ -73,7 +73,7 @@ def get_chunk_metadata(
                 followup_questions = gathered_args["followup_questions"]
                 metadata["followup_questions"] = followup_questions
 
-    return RAGResponseMetadata(**metadata)
+    return RAGResponseMetadata(**metadata, metadata_model=None)
 
 
 def get_prev_message_str(msg: AIMessageChunk) -> str:

@@ -2,6 +2,7 @@ import datetime
 import os
 from uuid import UUID, uuid4
 
+from quivr_core.brain import Brain as BrainCore
 from quivr_core.chat import ChatHistory as ChatHistoryCore
 from quivr_core.config import LLMEndpointConfig, RetrievalConfig
 from quivr_core.llm.llm_endpoint import LLMEndpoint
@@ -156,16 +157,25 @@ class RAGService:
             self.brain.brain_id, retrieval_config.llm_config.max_input_tokens
         )
         llm = self.get_llm(retrieval_config)
-        # Initialize the RAG pipline
-        rag_pipeline = QuivrQARAGLangGraph(
-            retrieval_config=retrieval_config, llm=llm, vector_store=vector_store
+
+        brain_core = BrainCore(
+            name=self.brain.name,
+            id=self.brain.id,
+            vector_db=vector_store,
+            llm=llm,
+            embedder=vector_store.embeddings,
         )
+
         #  Format the history, sanitize the input
         chat_history = self._build_chat_history(history)
 
-        parsed_response = rag_pipeline.answer(question=question, 
-                                              history=chat_history, 
-                                              list_files=list_files)
+        parsed_response = brain_core.ask(
+            question=question,
+            retrieval_config=retrieval_config,
+            rag_pipeline=QuivrQARAGLangGraph,
+            list_files=list_files,
+            chat_history=chat_history,
+        )
 
         # Save the answer to db
         new_chat_entry = self.save_answer(question, parsed_response)
@@ -212,9 +222,13 @@ class RAGService:
         vector_store = self.create_vector_store(
             self.brain.brain_id, retrieval_config.llm_config.max_input_tokens
         )
-        # Initialize the rag pipline
-        rag_pipeline = QuivrQARAGLangGraph(
-            retrieval_config=retrieval_config, llm=llm, vector_store=vector_store
+
+        brain_core = BrainCore(
+            name=self.brain.name,
+            id=self.brain.id,
+            vector_db=vector_store,
+            llm=llm,
+            embedder=vector_store.embeddings,
         )
 
         full_answer = ""
@@ -232,8 +246,12 @@ class RAGService:
             "brain_id": self.brain.brain_id if self.brain else None,
         }
 
-        async for response in rag_pipeline.answer_astream(
-            question=question, history=chat_history, list_files=list_files
+        async for response in brain_core.ask_streaming(
+            question=question,
+            retrieval_config=retrieval_config,
+            rag_pipeline=QuivrQARAGLangGraph,
+            chat_history=chat_history,
+            list_files=list_files,
         ):
             # Format output to be correct servicedf;j
             if not response.last_chunk:

@@ -60,7 +60,7 @@ class LLMEndpoint:
                     if config.llm_api_key
                     else None,
                     azure_endpoint=azure_endpoint,
-                    max_tokens=config.max_tokens,
+                    max_tokens=config.max_output_tokens,
                 )
             elif config.supplier == DefaultLLMs.ANTHROPIC:
                 _llm = ChatAnthropic(

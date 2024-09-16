@@ -100,7 +100,7 @@ class IntegrationBrain(IntegrationBrainInterface):
 
     def get_integration_brain_by_type_integration(
         self, integration_name
-    ) -> List[IntegrationEntity]:
+    ) -> List[IntegrationEntity] | None:
         response = (
             self.db.table("integrations_user")
             .select("*, integrations ()")

@@ -26,7 +26,12 @@ from quivr_core.chat import ChatHistory
 from quivr_core.config import RetrievalConfig
 from quivr_core.files.file import load_qfile
 from quivr_core.llm import LLMEndpoint
-from quivr_core.models import ParsedRAGChunkResponse, ParsedRAGResponse, SearchResult
+from quivr_core.models import (
+    ParsedRAGChunkResponse,
+    ParsedRAGResponse,
+    QuivrKnowledge,
+    SearchResult,
+)
 from quivr_core.processor.registry import get_processor_class
 from quivr_core.quivr_rag import QuivrQARAG
 from quivr_core.quivr_rag_langgraph import QuivrQARAGLangGraph
@@ -74,7 +79,7 @@ class Brain:
         vector_db: VectorStore,
         llm: LLMEndpoint,
         embedder: Embeddings,
-        storage: StorageBase,
+        storage: StorageBase | None = None,
     ):
         self.id = id
         self.name = name
@@ -172,6 +177,7 @@ class Brain:
         else:
             raise Exception("can't serialize embedder other than openai for now")
 
+        storage_config: Union[LocalStorageConfig, TransparentStorageConfig]
         # TODO : each instance should know how to serialize/deserialize itself
         if isinstance(self.storage, LocalStorage):
             serialized_files = {
@@ -214,7 +220,7 @@ class Brain:
         return BrainInfo(
             brain_id=self.id,
             brain_name=self.name,
-            files_info=self.storage.info(),
+            files_info=self.storage.info() if self.storage else None,
             chats_info=chats_info,
             llm_info=self.llm.info(),
         )
@@ -371,6 +377,8 @@ class Brain:
         question: str,
         retrieval_config: RetrievalConfig | None = None,
         rag_pipeline: Type[Union[QuivrQARAG, QuivrQARAGLangGraph]] | None = None,
+        list_files: list[QuivrKnowledge] | None = None,
+        chat_history: ChatHistory | None = None,
     ) -> ParsedRAGResponse:
         llm = self.llm
 
@@ -388,10 +396,11 @@ class Brain:
             retrieval_config=retrieval_config, llm=llm, vector_store=self.vector_db
         )
 
-        chat_history = self.default_chat
+        chat_history = self.default_chat if chat_history is None else chat_history
+        list_files = [] if list_files is None else list_files
 
         parsed_response = rag_instance.answer(
-            question=question, history=chat_history, list_files=[]
+            question=question, history=chat_history, list_files=list_files
         )
 
         chat_history.append(HumanMessage(content=question))
@@ -405,6 +414,8 @@ class Brain:
         question: str,
         retrieval_config: RetrievalConfig | None = None,
         rag_pipeline: Type[Union[QuivrQARAG, QuivrQARAGLangGraph]] | None = None,
+        list_files: list[QuivrKnowledge] | None = None,
+        chat_history: ChatHistory | None = None,
     ) -> AsyncGenerator[ParsedRAGChunkResponse, ParsedRAGChunkResponse]:
         llm = self.llm
 
@@ -422,9 +433,9 @@ class Brain:
             retrieval_config=retrieval_config, llm=llm, vector_store=self.vector_db
         )
 
-        chat_history = self.default_chat
+        chat_history = self.default_chat if chat_history is None else chat_history
+        list_files = [] if list_files is None else list_files
 
-        # TODO: List of files
         full_answer = ""
         async for response in rag_instance.answer_astream(
             question=question, history=chat_history, list_files=[]

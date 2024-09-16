@@ -2,6 +2,7 @@ from typing import List
 from uuid import UUID
 
 from quivr_core.models import KnowledgeStatus
+from quivr_core.models import QuivrKnowledge as Knowledge
 from sqlalchemy.exc import NoResultFound
 
 from quivr_api.logger import get_logger
@@ -10,7 +11,7 @@ from quivr_api.modules.knowledge.dto.inputs import (
     CreateKnowledgeProperties,
 )
 from quivr_api.modules.knowledge.dto.outputs import DeleteKnowledgeResponse
-from quivr_api.modules.knowledge.entity.knowledge import Knowledge, KnowledgeDB
+from quivr_api.modules.knowledge.entity.knowledge import KnowledgeDB
 from quivr_api.modules.knowledge.repository.knowledges import KnowledgeRepository
 from quivr_api.modules.knowledge.repository.storage import Storage
 from quivr_api.modules.sync.entity.sync_models import (
@@ -31,9 +32,9 @@ class KnowledgeService(BaseService[KnowledgeRepository]):
         self.storage = Storage()
 
     async def get_knowledge_sync(self, sync_id: int) -> Knowledge:
-        km = await self.repository.get_knowledge_by_sync_id(sync_id)
-        assert km.id, "Knowledge ID not generated"
-        km = await km.to_dto()
+        km_db = await self.repository.get_knowledge_by_sync_id(sync_id)
+        assert km_db.id, "Knowledge ID not generated"
+        km = await km_db.to_dto()
         return km
 
     # TODO: this is temporary fix for getting knowledge path.
@@ -169,7 +170,7 @@ class KnowledgeService(BaseService[KnowledgeRepository]):
         # TODO: fix KMS
         # REDO ALL THIS
         knowledge = await self.get_knowledge(knowledge_id)
-        if len(knowledge.brain_ids) > 1:
+        if knowledge.brain_ids and len(knowledge.brain_ids) > 1:
             km = await self.repository.remove_knowledge_from_brain(
                 knowledge_id, brain_id
             )
