@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.0.314 (2024-09-16)
+
+## What's Changed
+* feat:  CRUD KMS (no syncs)  by @AmineDiro in https://github.com/QuivrHQ/quivr/pull/3162
+
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.313...v0.0.314
+
 ## 0.0.313 (2024-09-13)
 
 ## What's Changed
