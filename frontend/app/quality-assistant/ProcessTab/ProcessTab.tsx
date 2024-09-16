@@ -86,6 +86,9 @@ const filterAndSortProcess = (
       if (sortConfig.key === "status") {
         return item.status;
       }
+      if (sortConfig.key === "datetime") {
+        return item.datetime;
+      }
 
       return "";
     };
@@ -175,12 +178,23 @@ const ProcessTab = (): JSX.Element => {
           </div>
           <div className={styles.right}>
             {!isMobile && (
-              <div className={styles.status}>
-                Statut
-                <div className={styles.icon}>
-                  <Icon name="sort" size="small" color="black" />
+              <>
+                <div
+                  className={styles.date}
+                  onClick={() => handleSort("datetime")}
+                >
+                  Date
+                  <div className={styles.icon}>
+                    <Icon name="sort" size="small" color="black" />
+                  </div>
                 </div>
-              </div>
+                <div className={styles.status}>
+                  Statut
+                  <div className={styles.icon}>
+                    <Icon name="sort" size="small" color="black" />
+                  </div>
+                </div>
+              </>
             )}
           </div>
         </div>

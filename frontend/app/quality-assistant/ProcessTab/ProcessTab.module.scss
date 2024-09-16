@@ -85,6 +85,23 @@
           }
         }
       }
+
+      .date {
+        display: flex;
+        align-items: center;
+        gap: Spacings.$spacing02;
+        cursor: pointer;
+
+        .icon {
+          visibility: hidden;
+        }
+
+        &:hover {
+          .icon {
+            visibility: visible;
+          }
+        }
+      }
     }
   }
 }
