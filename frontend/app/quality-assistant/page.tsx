@@ -6,6 +6,8 @@ import PageHeader from "@/lib/components/PageHeader/PageHeader";
 import { Tabs } from "@/lib/components/ui/Tabs/Tabs";
 import { Tab } from "@/lib/types/Tab";
 
+import AssistantTab from "./AssistantTab/AssistantTab";
+import ProcessTab from "./ProcessTab/ProcessTab";
 import styles from "./page.module.scss";
 
 const QualityAssistant = (): JSX.Element => {
@@ -37,6 +39,8 @@ const QualityAssistant = (): JSX.Element => {
       </div>
       <div className={styles.content_wrapper}>
         <Tabs tabList={qualityAssistantTab} />
+        {selectedTab === "Assistant" && <AssistantTab />}
+        {selectedTab === "Process" && <ProcessTab />}
       </div>
     </div>
   );

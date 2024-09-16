@@ -1,0 +1,13 @@
+@use "styles/Spacings.module.scss";
+
+.assistant_tab_wrapper {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+
+  .button_wrapper {
+    display: flex;
+    align-self: flex-end;
+  }
+}
