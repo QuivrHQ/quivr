@@ -7,9 +7,8 @@ import { StarterKit } from "@tiptap/starter-kit";
 import { useBrainMention } from "@/app/chat/[chatId]/components/ActionsBar/components/ChatInput/components/ChatEditor/Editor/hooks/useBrainMention";
 
 import styles from "./TextEditor.module.scss";
+import { TextEditorSearchBar } from "./components/TextEditorSearchBar/TextEditorSearchBar";
 import { Toolbar } from "./components/Toolbar/Toolbar";
-
-import { SearchBar } from "../ui/SearchBar/SearchBar";
 
 const defaultContent = `
   <h1>My Note</h1>
@@ -21,6 +20,7 @@ const defaultContent = `
 
 export const TextEditor = (): JSX.Element => {
   const { BrainMention, items } = useBrainMention();
+
   const editor = useEditor(
     {
       extensions: [
@@ -40,7 +40,6 @@ export const TextEditor = (): JSX.Element => {
     },
     [items.length]
   );
-
   if (!editor) {
     return <></>;
   }
@@ -52,7 +51,7 @@ export const TextEditor = (): JSX.Element => {
         <EditorContent className={styles.content_wrapper} editor={editor} />
       </div>
       <div className={styles.search_bar_wrapper}>
-        <SearchBar />
+        <TextEditorSearchBar editor={editor} />
       </div>
     </div>
   );
