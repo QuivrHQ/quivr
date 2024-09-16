@@ -12,4 +12,15 @@
   .title {
     @include Typography.H2;
   }
+
+  .table_header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: Spacings.$spacing03;
+
+    .search {
+      width: 250px;
+    }
+  }
 }

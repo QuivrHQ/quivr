@@ -3,6 +3,9 @@
 import ProcessLine from "./Process/ProcessLine";
 import styles from "./ProcessTab.module.scss";
 
+import QuivrButton from "@/lib/components/ui/QuivrButton/QuivrButton";
+import { TextInput } from "@/lib/components/ui/TextInput/TextInput";
+import { useState } from "react";
 import { Process } from "../types/process";
 
 const mockProcesses: Process[] = [
@@ -51,9 +54,34 @@ const mockProcesses: Process[] = [
 ];
 
 const ProcessTab = (): JSX.Element => {
+  const [searchQuery, setSearchQuery] = useState<string>("");
+  const [selectedProcess, setSelectedProcess] = useState<Process[]>([]);
+
+  const handleDelete = () => {
+    console.info("delete");
+  };
+
   return (
     <div className={styles.process_tab_wrapper}>
-      <span className={styles.title}>Uploaded knowledge</span>
+      <span className={styles.title}>Mes Résultats</span>
+      <div className={styles.table_header}>
+        <div className={styles.search}>
+          <TextInput
+            iconName="search"
+            label="Search"
+            inputValue={searchQuery}
+            setInputValue={setSearchQuery}
+            small={true}
+          />
+        </div>
+        <QuivrButton
+          label="Delete"
+          iconName="delete"
+          color="dangerous"
+          disabled={selectedProcess.length === 0}
+          onClick={handleDelete}
+        />
+      </div>
       <div className={styles.process_list}>
         {mockProcesses.map((process, index) => (
           <div key={process.id} className={styles.process_line}>
