@@ -11,9 +11,13 @@ from quivr_core.quivr_rag_langgraph import QuivrQARAGLangGraph
 @pytest.fixture(scope="function")
 def mock_chain_qa_stream(monkeypatch, chunks_stream_answer):
     class MockQAChain:
-        async def astream(self, *args, **kwargs):
+        async def astream_events(self, *args, **kwargs):
             for c in chunks_stream_answer:
-                yield c
+                yield {
+                    "event": "on_chat_model_stream",
+                    "metadata": {"langgraph_node": "generate"},
+                    "data": {"chunk": c},
+                }
 
     def mock_qa_chain(*args, **kwargs):
         return MockQAChain()
