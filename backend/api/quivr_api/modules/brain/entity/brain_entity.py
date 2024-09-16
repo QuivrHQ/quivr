@@ -4,6 +4,7 @@ from typing import List, Optional
 from uuid import UUID
 
 from pydantic import BaseModel
+from quivr_core.config import BrainConfig
 from sqlalchemy.dialects.postgresql import ENUM as PGEnum
 from sqlalchemy.ext.asyncio import AsyncAttrs
 from sqlmodel import TIMESTAMP, Column, Field, Relationship, SQLModel, text
@@ -74,11 +75,12 @@ class Brain(AsyncAttrs, SQLModel, table=True):
     # "tags" "public"."tags"[]
 
 
-class BrainEntity(BaseModel):
-    brain_id: UUID
-    name: str
+class BrainEntity(BrainConfig):
     description: Optional[str] = None
     temperature: Optional[float] = None
+    meaning: Optional[str] = None
+    openai_api_key: Optional[str] = None
+    tags: Optional[List[str]] = None
     model: Optional[str] = None
     max_tokens: Optional[int] = None
     status: Optional[str] = None
@@ -89,10 +91,6 @@ class BrainEntity(BaseModel):
     integration_description: Optional[IntegrationDescriptionEntity] = None
     snippet_emoji: Optional[str] = None
     snippet_color: Optional[str] = None
-
-    @property
-    def id(self) -> UUID:
-        return self.brain_id
 
     def dict(self, **kwargs):
         data = super().dict(
