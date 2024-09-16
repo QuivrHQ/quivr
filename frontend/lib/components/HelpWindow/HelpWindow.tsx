@@ -18,11 +18,11 @@ export const HelpWindow = (): JSX.Element => {
 
   const closeHelpWindow = async () => {
     setIsVisible(false);
-    if (!userIdentityData?.onboarded) {
+    if (userIdentityData && !userIdentityData.onboarded) {
       setLoadingOnboarded(true);
       await updateUserIdentity({
         ...userIdentityData,
-        username: userIdentityData?.username ?? "",
+        username: userIdentityData.username,
         onboarded: true,
       });
     }

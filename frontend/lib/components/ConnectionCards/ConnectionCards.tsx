@@ -15,9 +15,8 @@ export const ConnectionCards = ({
 
   return (
     <div
-      className={`${styles.connection_cards} ${
-        fromAddKnowledge ? styles.spaced : ""
-      }`}
+      className={`${styles.connection_cards} ${fromAddKnowledge ? styles.spaced : ""
+        }`}
     >
       <ConnectionSection
         label="Google Drive"
