@@ -1,5 +1,6 @@
 from datetime import datetime
 from enum import Enum
+from pathlib import Path
 from typing import List, Optional
 from uuid import UUID
 
@@ -91,6 +92,8 @@ class BrainEntity(BrainConfig):
     integration_description: Optional[IntegrationDescriptionEntity] = None
     snippet_emoji: Optional[str] = None
     snippet_color: Optional[str] = None
+
+    config_path: Path | None = None
 
     def dict(self, **kwargs):
         data = super().dict(

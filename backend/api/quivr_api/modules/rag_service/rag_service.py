@@ -1,5 +1,6 @@
 import datetime
 import os
+from pathlib import Path
 from uuid import UUID, uuid4
 
 from quivr_core.brain import Brain as BrainCore
@@ -85,6 +86,18 @@ class RAGService:
         [chat_history.append(m) for m in transformed_history]
         return chat_history
 
+    async def _get_retrieval_config(self) -> RetrievalConfig:
+        if self.brain.config_path:
+            retrieval_config = RetrievalConfig.from_yaml(self.brain.config_path)
+        elif os.getenv("BRAIN_CONFIG_PATH"):
+            current_path = os.path.dirname(os.path.abspath(__file__))
+            file_path = os.path.join(current_path, os.getenv("BRAIN_CONFIG_PATH"))  # type: ignore
+            retrieval_config = RetrievalConfig.from_yaml(Path(file_path))
+        else:
+            retrieval_config = self._build_retrieval_config()
+
+        return retrieval_config
+
     async def _build_retrieval_config(self) -> RetrievalConfig:
         model = await self.model_service.get_model(self.model_to_use)  # type: ignore
         api_key = os.getenv(model.env_variable_name, "not-defined")
@@ -145,7 +158,7 @@ class RAGService:
         logger.info(
             f"Creating question for chat {self.chat_id} with brain {self.brain.brain_id} "
         )
-        retrieval_config = await self._build_retrieval_config()
+        retrieval_config = await self._get_retrieval_config()
         logger.debug(f"generate_answer with config : {retrieval_config.model_dump()}")
         history = await self.chat_service.get_chat_history(self.chat_id)
         # Get list of files
@@ -208,7 +221,7 @@ class RAGService:
             f"Creating question for chat {self.chat_id} with brain {self.brain.brain_id} "
         )
         # Build the rag config
-        retrieval_config = await self._build_retrieval_config()
+        retrieval_config = await self._get_retrieval_config()
         # Get chat history
         history = await self.chat_service.get_chat_history(self.chat_id)
         #  Format the history, sanitize the input
