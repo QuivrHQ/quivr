@@ -5,6 +5,7 @@ import { useFromConnectionsContext } from "@/app/chat/[chatId]/components/Action
 import { OpenedConnection, Provider, Sync } from "@/lib/api/sync/types";
 import { useSync } from "@/lib/api/sync/useSync";
 import { QuivrButton } from "@/lib/components/ui/QuivrButton/QuivrButton";
+import { iconList } from "@/lib/helpers/iconList";
 
 import { ConnectionButton } from "./ConnectionButton/ConnectionButton";
 import { ConnectionLine } from "./ConnectionLine/ConnectionLine";
@@ -57,6 +58,10 @@ export const ConnectionSection = ({
     } catch (error) {
       console.error(error);
     }
+  };
+
+  const getButtonIcon = (): keyof typeof iconList => {
+    return existingConnections.length > 0 ? "add" : "sync";
   };
 
   useEffect(() => {
@@ -226,17 +231,15 @@ export const ConnectionSection = ({
           {!fromAddKnowledge &&
           (!oneAccountLimitation || existingConnections.length === 0) ? (
             <QuivrButton
-              iconName="sync"
-              label="Connect"
+              iconName={getButtonIcon()}
+              label={existingConnections.length > 0 ? "Add more" : "Connect"}
               color="primary"
               onClick={connect}
               small={true}
             />
           ) : existingConnections[0] &&
             existingConnections[0].status === "REMOVED" ? (
-            <Tooltip
-              tooltip={`We are deleting your connection. \n Please come back tomorrow to create a new one.`}
-            >
+            <Tooltip tooltip={`We are deleting your connection.`}>
               <div className={styles.deleting_wrapper}>
                 <Icon name="waiting" size="small" color="warning" />
                 <span className={styles.deleting_mention}>Deleting</span>
@@ -247,8 +250,8 @@ export const ConnectionSection = ({
           {fromAddKnowledge &&
             (!oneAccountLimitation || existingConnections.length === 0) && (
               <TextButton
-                iconName="sync"
-                label="Connect"
+                iconName={getButtonIcon()}
+                label={existingConnections.length > 0 ? "Add more" : "Connect"}
                 color="black"
                 onClick={connect}
                 small={true}

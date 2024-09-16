@@ -65,8 +65,8 @@ export const ConnectionLine = ({
               <Icon name="warning" size="large" color="warning" />
             </div>
             <span>
-              If you delete this connection, you will need to wait tomorrow
-              before opening a new one. Are you sure you want to proceed?
+              It takes up to 24 hours to delete this connection. Are you sure
+              you want to proceed?
             </span>
           </div>
           <div className={styles.buttons_wrapper}>

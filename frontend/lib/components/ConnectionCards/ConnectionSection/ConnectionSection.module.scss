@@ -15,9 +15,10 @@
   justify-content: space-between;
   align-items: center;
   border-radius: Radius.$normal;
-  box-shadow: BoxShadow.$medium;
+  border: 1px solid var(--border-0);
   height: min-content;
   width: 100%;
+  max-width: 800px;
 
   @media (max-width: ScreenSizes.$small) {
     width: 100%;
