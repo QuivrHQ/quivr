@@ -2,30 +2,14 @@ from datetime import datetime
 from typing import Dict, List, Optional
 from uuid import UUID
 
-from pydantic import BaseModel
 from quivr_core.models import KnowledgeStatus
+from quivr_core.models import QuivrKnowledge as Knowledge
 from sqlalchemy import JSON, TIMESTAMP, Column, text
 from sqlalchemy.ext.asyncio import AsyncAttrs
 from sqlmodel import UUID as PGUUID
 from sqlmodel import Field, Relationship, SQLModel
 
 from quivr_api.modules.knowledge.entity.knowledge_brain import KnowledgeBrain
-
-
-class Knowledge(BaseModel):
-    id: UUID
-    file_name: Optional[str] = None
-    url: Optional[str] = None
-    extension: str = ".txt"
-    status: str
-    source: Optional[str] = None
-    source_link: Optional[str] = None
-    file_size: Optional[int] = None
-    file_sha1: Optional[str] = None
-    updated_at: Optional[datetime] = None
-    created_at: Optional[datetime] = None
-    metadata: Optional[Dict[str, str]] = None
-    brain_ids: list[UUID]
 
 
 class KnowledgeDB(AsyncAttrs, SQLModel, table=True):
@@ -67,7 +51,7 @@ class KnowledgeDB(AsyncAttrs, SQLModel, table=True):
         default=None, sa_column=Column("metadata", JSON)
     )
     user_id: UUID = Field(foreign_key="users.id", nullable=False)
-    brains: List["Brain"] = Relationship(
+    brains: List["Brain"] = Relationship(  # type: ignore # noqa: F821
         back_populates="knowledges",
         link_model=KnowledgeBrain,
         sa_relationship_kwargs={"lazy": "select"},
