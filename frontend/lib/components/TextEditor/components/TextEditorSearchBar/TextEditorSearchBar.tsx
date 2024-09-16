@@ -33,6 +33,7 @@ const TextEditorSearchBar = forwardRef<Editor, TextEditorSearchBarProps>(
         editor.setEditable(false);
       } else {
         editor.setEditable(true);
+        editor.commands.focus();
       }
     }, [editor, chatInput.generatingAnswer]);
 

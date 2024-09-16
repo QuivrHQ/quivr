@@ -67,11 +67,7 @@ export const TextEditor = (): JSX.Element => {
         <EditorContent className={styles.content_wrapper} editor={editor} />
       </div>
       <div className={styles.search_bar_wrapper}>
-        <TextEditorSearchBar
-          onSearch={() => editor.commands.focus()}
-          ref={searchEditorRef}
-          editor={editor}
-        />
+        <TextEditorSearchBar ref={searchEditorRef} editor={editor} />
       </div>
     </div>
   );
