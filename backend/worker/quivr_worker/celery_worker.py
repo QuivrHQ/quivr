@@ -40,6 +40,9 @@ from quivr_worker.syncs.process_active_syncs import (
 )
 from quivr_worker.syncs.store_notion import fetch_and_store_notion_files_async
 from quivr_worker.utils import _patch_json
+from quivr_api.modules.assistant.services.tasks_service import TasksService
+from quivr_api.modules.assistant.repository.tasks import TasksRepository
+from quivr_worker.assistants.assistants import process_assistant
 
 load_dotenv()
 
@@ -90,6 +93,49 @@ def init_worker(**kwargs):
             pool_recycle=1800,
         )
 
+@celery.task(
+    retries=3,
+    default_retry_delay=1,
+    name="process_assistant_task",
+    autoretry_for=(Exception,),
+)
+def process_assistant_task(
+    assistant_id: str,
+    notification_uuid: str,
+    file1_name_path: str,
+    file2_name_path: str,
+    task_id: int,
+):
+    
+    logger.info(f"process_assistant_task started for assistant_id={assistant_id}, notification_uuid={notification_uuid}, file1_name_path={file1_name_path}, file2_name_path={file2_name_path}, task_id={task_id}")
+    print("process_assistant_task")
+    
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(aprocess_assistant_task(assistant_id, notification_uuid, file1_name_path, file2_name_path, task_id))
+    
+
+async def aprocess_assistant_task(assistant_id: str, notification_uuid: str, file1_name_path: str, file2_name_path: str, task_id: int):
+    
+    async with AsyncSession(async_engine) as async_session:
+        try:
+            await async_session.execute(
+                text("SET SESSION idle_in_transaction_session_timeout = '5min';")
+            )
+            tasks_repository = TasksRepository(async_session)
+            tasks_service = TasksService(tasks_repository) 
+            
+            await process_assistant(assistant_id, notification_uuid, file1_name_path, file2_name_path, task_id, tasks_service)
+            
+        except Exception as e:
+            await async_session.rollback()
+            raise e
+        finally:
+            await async_session.close()
+            
+            
+            
+    
+    
 
 @celery.task(
     retries=3,
@@ -110,10 +156,6 @@ def process_file_task(
 ):
     if async_engine is None:
         init_worker()
-
-    logger.info(
-        f"Task process_file started for file_name={file_name}, knowledge_id={knowledge_id}, brain_id={brain_id}, notification_id={notification_id}"
-    )
 
     loop = asyncio.get_event_loop()
     loop.run_until_complete(

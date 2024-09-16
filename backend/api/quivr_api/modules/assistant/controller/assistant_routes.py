@@ -4,6 +4,7 @@ import io
 from fastapi import APIRouter, Depends, Request, UploadFile, HTTPException
 
 from quivr_api.logger import get_logger
+from quivr_api.celery_config import celery
 from quivr_api.middlewares.auth.auth_bearer import AuthBearer, get_current_user
 from quivr_api.modules.assistant.services.tasks_service import TasksService
 from quivr_api.modules.dependencies import get_service
@@ -15,15 +16,9 @@ from quivr_api.modules.assistant.entity.assistant_entity import (
 )
 from quivr_api.modules.assistant.dto.inputs import CreateTask
 from quivr_api.modules.user.entity.user_identity import UserIdentity
-from quivr_api.modules.notification.service.notification_service import NotificationService
-from quivr_api.modules.notification.dto.inputs import (
-    CreateNotification,
-    NotificationUpdatableProperties,
-)
 from quivr_api.modules.upload.service.upload_file import (
     upload_file_storage,
 )
-from quivr_api.modules.notification.entity.notification import NotificationsStatusEnum
 
 
 
@@ -32,8 +27,6 @@ logger = get_logger(__name__)
 
 
 assistant_router = APIRouter()
-
-notification_service = NotificationService()
 
 
 TasksServiceDep = Annotated[TasksService, Depends(get_service(TasksService))]
@@ -101,15 +94,6 @@ async def create_task(
         raise HTTPException(status_code=404, detail="Assistant not found")
     
     notification_uuid = uuid4()
-    upload_notification = notification_service.add_notification(
-        CreateNotification(
-            user_id=current_user.id,
-            bulk_id=notification_uuid,
-            status=NotificationsStatusEnum.INFO,
-            title=f"{assistant.name}",
-            category="assistant",
-        )
-    )
     
     file1_name_path= str(assistant_id)+ "/" + str(notification_uuid) + "/" + str(file1.filename)
     file2_name_path= str(assistant_id) + "/" + str(notification_uuid) + "/" + str(file2.filename)
@@ -122,13 +106,6 @@ async def create_task(
         await upload_file_storage(buff_reader2, file2_name_path)
     except Exception as e:
         logger.exception(f"Exception in upload_route {e}")
-        notification_service.update_notification_by_id(
-            upload_notification.id if upload_notification else None,
-            NotificationUpdatableProperties(
-                status=NotificationsStatusEnum.ERROR,
-                description="There was an error uploading the file",
-            ),
-        )
         raise HTTPException(
             status_code=500, detail=f"Failed to upload file to storage. {e}"
         )
@@ -137,7 +114,19 @@ async def create_task(
         pretty_id=str(notification_uuid)
     )
     
-    return await tasks_service.create_task(task, current_user.id)
+    task_created = await tasks_service.create_task(task, current_user.id)
+    
+    celery.send_task(
+        "process_assistant_task",
+        kwargs={
+            "assistant_id": assistant_id,
+            "notification_uuid": notification_uuid,
+            "file1_name_path": file1_name_path,
+            "file2_name_path": file2_name_path,
+            "task_id": task_created.id,
+        },
+    )
+    return task_created
 
 
 @assistant_router.get(

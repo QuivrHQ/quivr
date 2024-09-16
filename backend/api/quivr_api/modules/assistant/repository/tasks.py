@@ -45,3 +45,14 @@ class TasksRepository(BaseRepository):
             await self.session.commit()
         else:
             raise Exception()
+        
+    async def update_task(self, task_id: int, task_updates: dict) -> None:
+        query = select(Task).where(Task.id == task_id)
+        response = await self.session.exec(query)
+        task = response.one()
+        if task:
+            for key, value in task_updates.items():
+                setattr(task, key, value)
+            await self.session.commit()
+        else:
+            raise Exception("Task not found")

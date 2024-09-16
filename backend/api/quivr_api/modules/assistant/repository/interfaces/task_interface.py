@@ -22,3 +22,7 @@ class TasksInterface(ABC):
     @abstractmethod
     def get_tasks_by_user_id(self, user_id: UUID) -> List[Task]:
         pass
+
+    @abstractmethod
+    def update_task(self, task_id: int, task: dict) -> None:
+        pass
