@@ -16,13 +16,13 @@ const QualityAssistant = (): JSX.Element => {
       label: "Assistant",
       isSelected: selectedTab === "Assistant",
       onClick: () => setSelectedTab("Assistant"),
-      iconName: "edit",
+      iconName: "assistant",
     },
     {
       label: "Process",
       isSelected: selectedTab === "Process",
       onClick: () => setSelectedTab("Process"),
-      iconName: "graph",
+      iconName: "waiting",
     },
   ];
 
@@ -31,7 +31,7 @@ const QualityAssistant = (): JSX.Element => {
       <div className={styles.page_header}>
         <PageHeader
           iconName="assistant"
-          label="Quality Assistant"
+          label="Assistant Qualité"
           buttons={[]}
         />
       </div>
