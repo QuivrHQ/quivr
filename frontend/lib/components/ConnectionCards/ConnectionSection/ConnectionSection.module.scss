@@ -52,6 +52,17 @@
         @include Typography.H3;
       }
     }
+
+    .deleting_wrapper {
+      display: flex;
+      align-items: center;
+      gap: Spacings.$spacing02;
+
+      .deleting_mention {
+        color: var(--warning);
+        font-size: Typography.$tiny;
+      }
+    }
   }
 
   .existing_connections {
