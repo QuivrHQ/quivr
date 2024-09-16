@@ -1,6 +1,6 @@
 import os
 
-from fpdf import FPDF
+from fpdf import FPDF, XPos, YPos
 from pydantic import BaseModel
 
 
@@ -60,7 +60,7 @@ class PDFGenerator(FPDF):
     def chapter_body(self):
 
         self.set_font("DejaVu", "", 12)
-        self.multi_cell(0, 10, self.pdf_model.content, markdown=True)
+        self.multi_cell(0, 10, self.pdf_model.content, markdown=True, new_x=XPos.RIGHT, new_y=YPos.TOP)
         self.ln()
 
     def print_pdf(self):
