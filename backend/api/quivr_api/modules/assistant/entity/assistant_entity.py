@@ -1,5 +1,6 @@
 from pydantic import BaseModel
 from typing import List
+import uuid
 
 
 class AssistantInput(BaseModel):
@@ -13,6 +14,9 @@ class AssistantSettings(BaseModel):
 
 
 class Assistant(BaseModel):
+    id: int
     name: str
     description: str
     settings: AssistantSettings
+    file1_name: str
+    file2_name: str

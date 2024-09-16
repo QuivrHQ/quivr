@@ -1,5 +1,4 @@
 from typing import Annotated, List
-
 from fastapi import APIRouter, Depends, Request
 
 from quivr_api.logger import get_logger
@@ -33,8 +32,11 @@ async def get_assistants(
 ) -> List[Assistant]:
     logger.info("Getting assistants")
     assistant1 = Assistant(
+        id=1,
         name="Assistant 1",
         description="Assistant 1 description",
+        file1_name="Fichier 1",
+        file2_name="Fichier 2",
         settings=AssistantSettings(
             inputs=[
                 AssistantInput(
