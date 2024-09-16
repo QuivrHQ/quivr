@@ -61,7 +61,19 @@ export const ConnectionSection = ({
   };
 
   const getButtonIcon = (): keyof typeof iconList => {
-    return existingConnections.length > 0 ? "add" : "sync";
+    return existingConnections.filter(
+      (connection) => connection.status !== "REMOVED"
+    ).length > 0
+      ? "add"
+      : "sync";
+  };
+
+  const getButtonName = (): string => {
+    return existingConnections.filter(
+      (connection) => connection.status !== "REMOVED"
+    ).length > 0
+      ? "Add more"
+      : "Connect";
   };
 
   useEffect(() => {
@@ -232,7 +244,7 @@ export const ConnectionSection = ({
           (!oneAccountLimitation || existingConnections.length === 0) ? (
             <QuivrButton
               iconName={getButtonIcon()}
-              label={existingConnections.length > 0 ? "Add more" : "Connect"}
+              label={getButtonName()}
               color="primary"
               onClick={connect}
               small={true}
@@ -251,7 +263,7 @@ export const ConnectionSection = ({
             (!oneAccountLimitation || existingConnections.length === 0) && (
               <TextButton
                 iconName={getButtonIcon()}
-                label={existingConnections.length > 0 ? "Add more" : "Connect"}
+                label={getButtonName()}
                 color="black"
                 onClick={connect}
                 small={true}
