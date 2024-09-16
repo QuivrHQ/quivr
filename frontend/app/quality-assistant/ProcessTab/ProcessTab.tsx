@@ -1,11 +1,15 @@
 "use client";
 
+import { useState } from "react";
+
+import { Icon } from "@/lib/components/ui/Icon/Icon";
+import { QuivrButton } from "@/lib/components/ui/QuivrButton/QuivrButton";
+import { TextInput } from "@/lib/components/ui/TextInput/TextInput";
+import { useDevice } from "@/lib/hooks/useDevice";
+
 import ProcessLine from "./Process/ProcessLine";
 import styles from "./ProcessTab.module.scss";
 
-import QuivrButton from "@/lib/components/ui/QuivrButton/QuivrButton";
-import { TextInput } from "@/lib/components/ui/TextInput/TextInput";
-import { useState } from "react";
 import { Process } from "../types/process";
 
 const mockProcesses: Process[] = [
@@ -57,9 +61,15 @@ const ProcessTab = (): JSX.Element => {
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [selectedProcess, setSelectedProcess] = useState<Process[]>([]);
 
+  const { isMobile } = useDevice();
+
   const handleDelete = () => {
     console.info("delete");
   };
+
+  const filteredProcesses = mockProcesses.filter((process) =>
+    process.name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   return (
     <div className={styles.process_tab_wrapper}>
@@ -82,16 +92,45 @@ const ProcessTab = (): JSX.Element => {
           onClick={handleDelete}
         />
       </div>
-      <div className={styles.process_list}>
-        {mockProcesses.map((process, index) => (
-          <div key={process.id} className={styles.process_line}>
-            <ProcessLine
-              process={process}
-              first={index === 0}
-              last={index === mockProcesses.length - 1}
-            />
+      <div>
+        <div className={styles.first_line}>
+          <div className={styles.left}>
+            {/* <Checkbox
+            checked={allChecked}
+            setChecked={(checked) => {
+              setAllChecked(checked);
+              setSelectedKnowledge(checked ? filteredKnowledgeList : []);
+            }}
+          /> */}
+            <div className={styles.name}>
+              Name
+              <div className={styles.icon}>
+                <Icon name="sort" size="small" color="black" />
+              </div>
+            </div>
           </div>
-        ))}
+          <div className={styles.right}>
+            {!isMobile && (
+              <div className={styles.status}>
+                Status
+                <div className={styles.icon}>
+                  <Icon name="sort" size="small" color="black" />
+                </div>
+              </div>
+            )}
+            <span className={styles.actions}>Actions</span>
+          </div>
+        </div>
+        <div className={styles.process_list}>
+          {filteredProcesses.map((process, index) => (
+            <div key={process.id} className={styles.process_line}>
+              <ProcessLine
+                process={process}
+                last={index === filteredProcesses.length - 1}
+              />
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );

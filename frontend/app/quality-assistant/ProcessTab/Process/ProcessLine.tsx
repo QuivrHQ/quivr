@@ -6,21 +6,12 @@ import { Process } from "../../types/process";
 
 interface ProcessLineProps {
   process: Process;
-  first?: boolean;
   last?: boolean;
 }
 
-const ProcessLine = ({
-  process,
-  first,
-  last,
-}: ProcessLineProps): JSX.Element => {
+const ProcessLine = ({ process, last }: ProcessLineProps): JSX.Element => {
   return (
-    <div
-      className={`${styles.process_wrapper} ${
-        first ? styles.first : last ? styles.last : ""
-      }`}
-    >
+    <div className={`${styles.process_wrapper} ${last ? styles.last : ""}`}>
       {process.name}
     </div>
   );

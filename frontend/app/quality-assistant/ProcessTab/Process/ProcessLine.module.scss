@@ -16,10 +16,6 @@
   font-size: Typography.$small;
   border-bottom: none;
 
-  &.first {
-    border-radius: Radius.$normal Radius.$normal 0 0;
-  }
-
   &.last {
     border-radius: 0 0 Radius.$normal Radius.$normal;
     border-bottom: 1px solid var(--border-0);
