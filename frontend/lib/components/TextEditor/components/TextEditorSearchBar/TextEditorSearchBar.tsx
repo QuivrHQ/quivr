@@ -15,7 +15,7 @@ type TextEditorSearchBarProps = {
 
 const TextEditorSearchBar = forwardRef<Editor, TextEditorSearchBarProps>(
   ({ onSearch, newBrain, editor }, ref): JSX.Element => {
-    const chatInput = useChatInput();
+    const { submitQuestion, ...chatInput } = useChatInput();
     const { messages } = useChat();
     const router = useRouter();
 
@@ -47,6 +47,7 @@ const TextEditorSearchBar = forwardRef<Editor, TextEditorSearchBarProps>(
           onSearch?.();
         }}
         newBrain={newBrain}
+        submitQuestion={(question) => submitQuestion(question, false)}
         {...chatInput}
       />
     );

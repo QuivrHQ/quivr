@@ -8,10 +8,10 @@ export const useChatInput = () => {
   const { addQuestion, generatingAnswer, chatId } = useChat();
 
   const submitQuestion = useCallback(
-    (question?: string) => {
+    (question?: string, redirect = true) => {
       const finalMessage = question ?? message;
       if (!generatingAnswer) {
-        void addQuestion(finalMessage, () => setMessage(""));
+        void addQuestion(finalMessage, () => setMessage(""), redirect);
       }
     },
     [addQuestion, generatingAnswer, message]
