@@ -147,8 +147,6 @@ def get_processor_class(file_extension: FileExtension | str) -> Type[ProcessorBa
         if file_extension not in known_processors:
             raise ValueError(f"Extension not known: {file_extension}")
         entries = known_processors[file_extension]
-        if file_extension == FileExtension.txt:
-            print(entries)
         while entries:
             proc_entry = heappop(entries)
             try:
