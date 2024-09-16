@@ -7,7 +7,7 @@ export type Integration =
   | "Notion"
   | "GitHub";
 
-export type SyncStatus = "SYNCING" | "SYNCED" | "ERROR";
+export type SyncStatus = "SYNCING" | "SYNCED" | "ERROR" | "REMOVED";
 
 export interface SyncElement {
   name?: string;

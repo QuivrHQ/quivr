@@ -23,3 +23,21 @@
     gap: Spacings.$spacing02;
   }
 }
+
+.modal_wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: Spacings.$spacing05;
+  padding-inline: Spacings.$spacing06;
+
+  .modal_title {
+    display: flex;
+    margin-left: -(Spacings.$spacing08);
+    gap: Spacings.$spacing06;
+  }
+
+  .buttons_wrapper {
+    display: flex;
+    justify-content: space-between;
+  }
+}

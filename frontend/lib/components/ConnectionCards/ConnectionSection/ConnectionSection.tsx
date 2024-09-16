@@ -5,6 +5,7 @@ import { useFromConnectionsContext } from "@/app/chat/[chatId]/components/Action
 import { OpenedConnection, Provider, Sync } from "@/lib/api/sync/types";
 import { useSync } from "@/lib/api/sync/useSync";
 import { QuivrButton } from "@/lib/components/ui/QuivrButton/QuivrButton";
+import { iconList } from "@/lib/helpers/iconList";
 
 import { ConnectionButton } from "./ConnectionButton/ConnectionButton";
 import { ConnectionLine } from "./ConnectionLine/ConnectionLine";
@@ -13,6 +14,7 @@ import styles from "./ConnectionSection.module.scss";
 import { ConnectionIcon } from "../../ui/ConnectionIcon/ConnectionIcon";
 import { Icon } from "../../ui/Icon/Icon";
 import { TextButton } from "../../ui/TextButton/TextButton";
+import Tooltip from "../../ui/Tooltip/Tooltip";
 
 interface ConnectionSectionProps {
   label: string;
@@ -21,98 +23,6 @@ interface ConnectionSectionProps {
   fromAddKnowledge?: boolean;
   oneAccountLimitation?: boolean;
 }
-
-const renderConnectionLines = (
-  existingConnections: Sync[],
-  folded: boolean
-) => {
-  if (!folded) {
-    return existingConnections.map((connection, index) => (
-      <div key={index}>
-        <ConnectionLine
-          label={connection.email}
-          index={index}
-          id={connection.id}
-        />
-      </div>
-    ));
-  } else {
-    return (
-      <div className={styles.folded}>
-        {existingConnections.map((connection, index) => (
-          <div className={styles.negative_margin} key={index}>
-            <ConnectionIcon letter={connection.email[0]} index={index} />
-          </div>
-        ))}
-      </div>
-    );
-  }
-};
-
-const renderExistingConnections = ({
-  existingConnections,
-  folded,
-  setFolded,
-  fromAddKnowledge,
-  handleGetSyncFiles,
-  openedConnections,
-  setCurrentProvider,
-}: {
-  existingConnections: Sync[];
-  folded: boolean;
-  setFolded: (folded: boolean) => void;
-  fromAddKnowledge: boolean;
-  setCurrentProvider: (provider: Provider) => void;
-  handleGetSyncFiles: (
-    userSyncId: number,
-    currentProvider: Provider
-  ) => Promise<void>;
-  openedConnections: OpenedConnection[];
-}) => {
-  if (!!existingConnections.length && !fromAddKnowledge) {
-    return (
-      <div className={styles.existing_connections}>
-        <div className={styles.existing_connections_header}>
-          <span className={styles.label}>Connected accounts</span>
-          <Icon
-            name="settings"
-            size="normal"
-            color="black"
-            handleHover={true}
-            onClick={() => setFolded(!folded)}
-          />
-        </div>
-        {renderConnectionLines(existingConnections, folded)}
-      </div>
-    );
-  } else if (existingConnections.length > 0 && fromAddKnowledge) {
-    return (
-      <div className={styles.existing_connections}>
-        {existingConnections.map((connection, index) => (
-          <div key={index}>
-            <ConnectionButton
-              label={connection.email}
-              index={index}
-              submitted={openedConnections.some((openedConnection) => {
-                return (
-                  openedConnection.name === connection.name &&
-                  openedConnection.submitted
-                );
-              })}
-              onClick={() => {
-                void handleGetSyncFiles(connection.id, connection.provider);
-                setCurrentProvider(connection.provider);
-              }}
-              sync={connection}
-            />
-          </div>
-        ))}
-      </div>
-    );
-  } else {
-    return null;
-  }
-};
 
 export const ConnectionSection = ({
   label,
@@ -148,6 +58,10 @@ export const ConnectionSection = ({
     } catch (error) {
       console.error(error);
     }
+  };
+
+  const getButtonIcon = (): keyof typeof iconList => {
+    return existingConnections.length > 0 ? "add" : "sync";
   };
 
   useEffect(() => {
@@ -220,6 +134,87 @@ export const ConnectionSection = ({
     }
   };
 
+  const renderConnectionLines = (
+    connections: Sync[],
+    connectionFolded: boolean
+  ) => {
+    if (!connectionFolded) {
+      return connections
+        .filter((connection) => connection.status !== "REMOVED")
+        .map((connection, index) => (
+          <ConnectionLine
+            key={index}
+            label={connection.email}
+            index={index}
+            id={connection.id}
+            warnUserOnDelete={provider === "Notion"}
+          />
+        ));
+    } else {
+      return (
+        <div className={styles.folded}>
+          {connections.map((connection, index) => (
+            <ConnectionIcon
+              key={index}
+              letter={connection.email[0]}
+              index={index}
+            />
+          ))}
+        </div>
+      );
+    }
+  };
+
+  const renderExistingConnections = () => {
+    const activeConnections = existingConnections.filter(
+      (connection) => connection.status !== "REMOVED"
+    );
+
+    if (activeConnections.length === 0) {
+      return null;
+    }
+
+    if (!fromAddKnowledge) {
+      return (
+        <div className={styles.existing_connections}>
+          <div className={styles.existing_connections_header}>
+            <span className={styles.label}>Connected accounts</span>
+            <Icon
+              name="settings"
+              size="normal"
+              color="black"
+              handleHover={true}
+              onClick={() => setFolded(!folded)}
+            />
+          </div>
+          {renderConnectionLines(activeConnections, folded)}
+        </div>
+      );
+    } else {
+      return (
+        <div className={styles.existing_connections}>
+          {activeConnections.map((connection, index) => (
+            <ConnectionButton
+              key={index}
+              label={connection.email}
+              index={index}
+              submitted={openedConnections.some(
+                (openedConnection) =>
+                  openedConnection.name === connection.name &&
+                  openedConnection.submitted
+              )}
+              onClick={() => {
+                void handleGetSyncFiles(connection.id);
+                setCurrentProvider(connection.provider);
+              }}
+              sync={connection}
+            />
+          ))}
+        </div>
+      );
+    }
+  };
+
   return (
     <>
       <div className={styles.connection_section_wrapper}>
@@ -236,34 +231,34 @@ export const ConnectionSection = ({
           {!fromAddKnowledge &&
           (!oneAccountLimitation || existingConnections.length === 0) ? (
             <QuivrButton
-              iconName="sync"
-              label="Connect"
+              iconName={getButtonIcon()}
+              label={existingConnections.length > 0 ? "Add more" : "Connect"}
               color="primary"
-              onClick={() => connect()}
+              onClick={connect}
               small={true}
             />
+          ) : existingConnections[0] &&
+            existingConnections[0].status === "REMOVED" ? (
+            <Tooltip tooltip={`We are deleting your connection.`}>
+              <div className={styles.deleting_wrapper}>
+                <Icon name="waiting" size="small" color="warning" />
+                <span className={styles.deleting_mention}>Deleting</span>
+              </div>
+            </Tooltip>
           ) : null}
 
           {fromAddKnowledge &&
             (!oneAccountLimitation || existingConnections.length === 0) && (
               <TextButton
-                iconName="sync"
-                label="Connect"
+                iconName={getButtonIcon()}
+                label={existingConnections.length > 0 ? "Add more" : "Connect"}
                 color="black"
-                onClick={() => connect()}
+                onClick={connect}
                 small={true}
               />
             )}
         </div>
-        {renderExistingConnections({
-          existingConnections,
-          folded,
-          setFolded,
-          fromAddKnowledge: !!fromAddKnowledge,
-          handleGetSyncFiles,
-          openedConnections,
-          setCurrentProvider,
-        })}
+        {renderExistingConnections()}
       </div>
     </>
   );
