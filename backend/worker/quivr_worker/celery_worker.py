@@ -13,7 +13,7 @@ from quivr_api.modules.brain.repository.brains_vectors import BrainsVectors
 from quivr_api.modules.brain.service.brain_service import BrainService
 from quivr_api.modules.dependencies import get_supabase_client
 from quivr_api.modules.knowledge.repository.knowledges import KnowledgeRepository
-from quivr_api.modules.knowledge.repository.storage import Storage
+from quivr_api.modules.knowledge.repository.storage import SupabaseS3Storage
 from quivr_api.modules.knowledge.service.knowledge_service import KnowledgeService
 from quivr_api.modules.notification.service.notification_service import (
     NotificationService,
@@ -58,7 +58,7 @@ sync_user_service = SyncUserService()
 sync_files_repo_service = SyncFilesRepository()
 brain_service = BrainService()
 brain_vectors = BrainsVectors()
-storage = Storage()
+storage = SupabaseS3Storage()
 notion_service: SyncNotionService | None = None
 async_engine: AsyncEngine | None = None
 engine: Engine | None = None
@@ -170,6 +170,8 @@ async def aprocess_file_task(
                     integration_link=source_link,
                     delete_file=delete_file,
                 )
+                session.commit()
+            await async_session.commit()
         except Exception as e:
             session.rollback()
             await async_session.rollback()
@@ -196,19 +198,29 @@ def process_crawl_task(
     )
     global engine
     assert engine
-    with Session(engine, expire_on_commit=False, autoflush=False) as session:
-        vector_repository = VectorRepository(session)
-        vector_service = VectorService(vector_repository)
-        loop = asyncio.get_event_loop()
-        loop.run_until_complete(
-            process_url_func(
-                url=crawl_website_url,
-                brain_id=brain_id,
-                knowledge_id=knowledge_id,
-                brain_service=brain_service,
-                vector_service=vector_service,
+    try:
+        with Session(engine, expire_on_commit=False, autoflush=False) as session:
+            session.execute(
+                text("SET SESSION idle_in_transaction_session_timeout = '5min';")
             )
-        )
+            vector_repository = VectorRepository(session)
+            vector_service = VectorService(vector_repository)
+            loop = asyncio.get_event_loop()
+            loop.run_until_complete(
+                process_url_func(
+                    url=crawl_website_url,
+                    brain_id=brain_id,
+                    knowledge_id=knowledge_id,
+                    brain_service=brain_service,
+                    vector_service=vector_service,
+                )
+            )
+            session.commit()
+    except Exception as e:
+        session.rollback()
+        raise e
+    finally:
+        session.close()
 
 
 @celery.task(name="NotionConnectorLoad")
