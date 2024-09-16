@@ -20,7 +20,7 @@ const mockProcesses: Process[] = [
     name: "Process 1",
     datetime: new Date().toISOString(),
     status: "completed",
-    result: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+    result: "**Lorem** ipsum dolor sit amet, consectetur adipiscing elit.",
   },
   {
     id: 2,
