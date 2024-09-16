@@ -1,5 +1,6 @@
+import { Editor as EditorType } from "@tiptap/core";
 import { EditorContent } from "@tiptap/react";
-import { useEffect } from "react";
+import { forwardRef, useEffect, useImperativeHandle } from "react";
 import "./styles.css";
 
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
@@ -16,73 +17,76 @@ type EditorProps = {
   placeholder?: string;
 };
 
-export const Editor = ({
-  setMessage,
-  onSubmit,
-  placeholder,
-  message,
-}: EditorProps): JSX.Element => {
-  const { editor } = useCreateEditorState(placeholder);
-  const { currentBrain } = useBrainContext();
+const Editor = forwardRef<EditorType | undefined, EditorProps>(
+  ({ setMessage, onSubmit, placeholder, message }, ref): JSX.Element => {
+    const { editor } = useCreateEditorState(placeholder);
+    const { currentBrain } = useBrainContext();
 
-  useEffect(() => {
-    const htmlString = editor?.getHTML();
-    if (
-      message === "" ||
-      (htmlString &&
-        new DOMParser().parseFromString(htmlString, "text/html").body
-          .textContent === " ")
-    ) {
-      editor?.commands.clearContent();
-    }
-  }, [message, editor]);
+    useImperativeHandle(ref, () => (editor ? editor : undefined));
 
-  useEffect(() => {
-    editor?.commands.focus();
-  }, [currentBrain, editor]);
+    useEffect(() => {
+      const htmlString = editor?.getHTML();
+      if (
+        message === "" ||
+        (htmlString &&
+          new DOMParser().parseFromString(htmlString, "text/html").body
+            .textContent === " ")
+      ) {
+        editor?.commands.clearContent();
+      }
+    }, [message, editor]);
 
-  useEffect(() => {
-    if (editor && placeholder) {
-      (
-        editor.extensionManager.extensions.find(
-          (ext) => ext.name === "placeholder"
-        ) as { options: { placeholder: string } }
-      ).options.placeholder = placeholder;
-      editor.view.updateState(editor.state);
-    }
-  }, [placeholder, editor]);
+    useEffect(() => {
+      editor?.commands.focus();
+    }, [currentBrain, editor]);
 
-  useChatStateUpdater({
-    editor,
-    setMessage,
-  });
+    useEffect(() => {
+      if (editor && placeholder) {
+        (
+          editor.extensionManager.extensions.find(
+            (ext) => ext.name === "placeholder"
+          ) as { options: { placeholder: string } }
+        ).options.placeholder = placeholder;
+        editor.view.updateState(editor.state);
+      }
+    }, [placeholder, editor]);
 
-  const { submitOnEnter } = useEditor({
-    onSubmit,
-  });
+    useChatStateUpdater({
+      editor,
+      setMessage,
+    });
 
-  return (
-    <EditorContent
-      className={styles.editor_wrapper}
-      onKeyDown={(event) => {
-        if (event.key === "Enter" && !event.shiftKey && !currentBrain) {
-          event.preventDefault();
-          const lastChar = editor?.state.doc.textBetween(
-            editor.state.selection.$from.pos - 1,
-            editor.state.selection.$from.pos,
-            undefined,
-            "\ufffc"
-          );
-          if (lastChar === " ") {
-            editor?.chain().insertContent("@").focus().run();
+    const { submitOnEnter } = useEditor({
+      onSubmit,
+    });
+
+    return (
+      <EditorContent
+        className={styles.editor_wrapper}
+        onKeyDown={(event) => {
+          if (event.key === "Enter" && !event.shiftKey && !currentBrain) {
+            event.preventDefault();
+            const lastChar = editor?.state.doc.textBetween(
+              editor.state.selection.$from.pos - 1,
+              editor.state.selection.$from.pos,
+              undefined,
+              "\ufffc"
+            );
+            if (lastChar === " ") {
+              editor?.chain().insertContent("@").focus().run();
+            } else {
+              editor?.chain().insertContent(" @").focus().run();
+            }
           } else {
-            editor?.chain().insertContent(" @").focus().run();
+            submitOnEnter(event);
           }
-        } else {
-          submitOnEnter(event);
-        }
-      }}
-      editor={editor}
-    />
-  );
-};
+        }}
+        editor={editor}
+      />
+    );
+  }
+);
+
+Editor.displayName = "Editor";
+
+export { Editor };

@@ -1,8 +1,10 @@
 "use client";
+import { Editor, Extension } from "@tiptap/core";
 import Focus from "@tiptap/extension-focus";
 import { Link } from "@tiptap/extension-link";
 import { EditorContent, useEditor } from "@tiptap/react";
 import { StarterKit } from "@tiptap/starter-kit";
+import { useRef } from "react";
 
 import { useBrainMention } from "@/app/chat/[chatId]/components/ActionsBar/components/ChatInput/components/ChatEditor/Editor/hooks/useBrainMention";
 
@@ -20,11 +22,24 @@ const defaultContent = `
 
 export const TextEditor = (): JSX.Element => {
   const { BrainMention, items } = useBrainMention();
+  const searchEditorRef = useRef<Editor>(null);
+
+  const FocusSearchBar = Extension.create().extend({
+    addKeyboardShortcuts: () => {
+      return {
+        "Mod-f": () => {
+          searchEditorRef.current?.commands.focus();
+
+          return true;
+        },
+      };
+    },
+  });
 
   const editor = useEditor(
     {
       extensions: [
-        StarterKit.configure({}),
+        StarterKit,
         Focus.configure({
           className: styles.has_focus,
           mode: "shallowest",
@@ -33,6 +48,7 @@ export const TextEditor = (): JSX.Element => {
           openOnClick: false,
         }),
         BrainMention,
+        FocusSearchBar,
       ],
       content: defaultContent,
       immediatelyRender: false,
@@ -51,7 +67,11 @@ export const TextEditor = (): JSX.Element => {
         <EditorContent className={styles.content_wrapper} editor={editor} />
       </div>
       <div className={styles.search_bar_wrapper}>
-        <TextEditorSearchBar editor={editor} />
+        <TextEditorSearchBar
+          onSearch={() => editor.commands.focus()}
+          ref={searchEditorRef}
+          editor={editor}
+        />
       </div>
     </div>
   );

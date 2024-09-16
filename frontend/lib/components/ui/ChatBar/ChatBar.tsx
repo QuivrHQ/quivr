@@ -1,3 +1,4 @@
+import { Editor as EditorType } from "@tiptap/core";
 import { forwardRef, useEffect, useState } from "react";
 import { LuSearch } from "react-icons/lu";
 
@@ -17,7 +18,7 @@ type ChatBarProps = {
   newBrain?: boolean;
 } & ReturnType<typeof useChatInput>;
 
-const ChatBar = forwardRef<HTMLDivElement, ChatBarProps>(
+const ChatBar = forwardRef<EditorType, ChatBarProps>(
   (
     {
       onSearch,
@@ -63,7 +64,6 @@ const ChatBar = forwardRef<HTMLDivElement, ChatBarProps>(
 
     return (
       <div
-        ref={ref}
         className={`${styles.search_bar_wrapper} ${
           newBrain ? styles.new_brain : ""
         }`}
@@ -79,6 +79,7 @@ const ChatBar = forwardRef<HTMLDivElement, ChatBarProps>(
           } ${currentBrain ? styles.current : ""}`}
         >
           <Editor
+            ref={ref}
             message={message}
             setMessage={setMessage}
             onSubmit={() => submit()}
