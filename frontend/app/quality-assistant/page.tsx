@@ -33,7 +33,7 @@ const QualityAssistant = (): JSX.Element => {
       <div className={styles.page_header}>
         <PageHeader
           iconName="assistant"
-          label="Assistant Qualité"
+          label="Quality Assistant"
           buttons={[]}
         />
       </div>

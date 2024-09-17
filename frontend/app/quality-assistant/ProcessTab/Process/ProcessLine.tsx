@@ -8,6 +8,7 @@ import ReactMarkdown from "react-markdown";
 
 import { Checkbox } from "@/lib/components/ui/Checkbox/Checkbox";
 import { Icon } from "@/lib/components/ui/Icon/Icon";
+import { Modal } from "@/lib/components/ui/Modal/Modal";
 import { Tag } from "@/lib/components/ui/Tag/Tag";
 import { useDevice } from "@/lib/hooks/useDevice";
 
@@ -88,7 +89,15 @@ const ProcessLine = ({
           />
         </div>
       </div>
-      {showResult && <ReactMarkdown>{process.result}</ReactMarkdown>}
+
+      <Modal
+        size="big"
+        isOpen={showResult}
+        setOpen={setShowResult}
+        CloseTrigger={<div />}
+      >
+        <ReactMarkdown>{process.result}</ReactMarkdown>
+      </Modal>
     </>
   );
 };
