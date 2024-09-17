@@ -1,7 +1,7 @@
 from typing import Annotated, List
 from uuid import uuid4
 import io
-from fastapi import APIRouter, Depends, Request, UploadFile, HTTPException
+from fastapi import APIRouter, Depends, Request, UploadFile, HTTPException, Form
 
 from quivr_api.logger import get_logger
 from quivr_api.celery_config import celery
@@ -11,8 +11,7 @@ from quivr_api.modules.dependencies import get_service
 from quivr_api.modules.assistant.entity.assistant_entity import (
     Assistant,
     AssistantInput,
-    AssistantSettings,
-    AssistantInputOutput
+    AssistantSettings
 )
 from quivr_api.modules.assistant.dto.inputs import CreateTask
 from quivr_api.modules.user.entity.user_identity import UserIdentity
@@ -74,7 +73,6 @@ async def get_tasks(
     logger.info("Getting tasks")
     return await tasks_service.get_tasks_by_user_id(current_user.id)
 
-
 @assistant_router.post(
     "/assistants/task", dependencies=[Depends(AuthBearer())], tags=["Assistant"]
 )
@@ -85,18 +83,16 @@ async def create_task(
     assistant_id: int,
     current_user: UserIdentityDep,
     tasks_service: TasksServiceDep,
-    assistant_settings: List[AssistantInputOutput] | None = None,
-
+    assistant_settings: str = Form(None),
 ):
-    
     assistant = next((assistant for assistant in assistants if assistant.id == assistant_id), None)
     if assistant is None:
         raise HTTPException(status_code=404, detail="Assistant not found")
     
     notification_uuid = uuid4()
     
-    file1_name_path= str(assistant_id)+ "/" + str(notification_uuid) + "/" + str(file1.filename)
-    file2_name_path= str(assistant_id) + "/" + str(notification_uuid) + "/" + str(file2.filename)
+    file1_name_path = f"{assistant_id}/{notification_uuid}/{file1.filename}"
+    file2_name_path = f"{assistant_id}/{notification_uuid}/{file2.filename}"
     
     buff_reader1 = io.BufferedReader(file1.file)  # type: ignore
     buff_reader2 = io.BufferedReader(file2.file)  # type: ignore
@@ -110,8 +106,22 @@ async def create_task(
             status_code=500, detail=f"Failed to upload file to storage. {e}"
         )
     
+    # Parse the assistant_settings string into a list of dictionaries
+    import json
+    if assistant_settings is not None:
+        assistant_settings_list = json.loads(assistant_settings)
+        logger.info(f"Assistant settings: {assistant_settings_list}")
+    else:
+        assistant_settings_list = []
+    
+    # Convert the list of dictionaries to a single dictionary
+    assistant_settings_dict = {item['name']: item['value'] for item in assistant_settings_list}
+    
+    logger.error(f"Assistant settings: {assistant_settings_dict}")
     task = CreateTask(
-        pretty_id=str(notification_uuid)
+        assistant_id=assistant_id,
+        pretty_id=str(notification_uuid),
+        settings=assistant_settings_dict
     )
     
     task_created = await tasks_service.create_task(task, current_user.id)
@@ -124,6 +134,7 @@ async def create_task(
             "file1_name_path": file1_name_path,
             "file2_name_path": file2_name_path,
             "task_id": task_created.id,
+            "user_id": str(current_user.id),
         },
     )
     return task_created
@@ -140,8 +151,8 @@ async def get_task(
     current_user: UserIdentityDep,
     tasks_service: TasksServiceDep,
 ):
-    logger.info("Getting task")
-    return {"message": "Hello World"}
+    
+    return await tasks_service.get_task_by_id(task_id, current_user.id) # type: ignore
 
 
 @assistant_router.delete(
@@ -156,3 +167,17 @@ async def delete_task(
     tasks_service: TasksServiceDep,
 ):
     return await tasks_service.delete_task(task_id, current_user.id)
+
+
+@assistant_router.get(
+    "/assistants/task/{task_id}/download",
+    dependencies=[Depends(AuthBearer())],
+    tags=["Assistant"],
+)
+async def get_download_link_task(
+    request: Request,
+    task_id: int,
+    current_user: UserIdentityDep,
+    tasks_service: TasksServiceDep,
+):
+    return await tasks_service.get_download_link_task(task_id, current_user.id)

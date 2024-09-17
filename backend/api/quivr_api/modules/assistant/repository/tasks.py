@@ -8,6 +8,8 @@ from sqlmodel import select
 from quivr_api.modules.assistant.dto.inputs import CreateTask
 from quivr_api.modules.assistant.entity.task_entity import Task
 from quivr_api.modules.dependencies import BaseRepository
+from quivr_api.modules.upload.service.generate_file_signed_url import generate_file_signed_url
+
 
 
 class TasksRepository(BaseRepository):
@@ -16,7 +18,7 @@ class TasksRepository(BaseRepository):
 
     async def create_task(self, task: CreateTask, user_id: UUID) -> Task:
         try:
-            task_to_create = Task(pretty_id=task.pretty_id, user_id=user_id)
+            task_to_create = Task(assistant_id=task.assistant_id, pretty_id=task.pretty_id, user_id=user_id, settings=task.settings)
             self.session.add(task_to_create)
             await self.session.commit()
         except exc.IntegrityError:
@@ -26,8 +28,8 @@ class TasksRepository(BaseRepository):
         await self.session.refresh(task_to_create)
         return task_to_create
 
-    async def get_task_by_id(self, task_id: UUID) -> Task:
-        query = select(Task).where(Task.id == task_id)
+    async def get_task_by_id(self, task_id: UUID, user_id: UUID) -> Task:
+        query = select(Task).where(Task.id == task_id, Task.user_id == user_id)
         response = await self.session.exec(query)
         return response.one()
 
@@ -56,3 +58,20 @@ class TasksRepository(BaseRepository):
             await self.session.commit()
         else:
             raise Exception("Task not found")
+
+    async def get_download_link_task(self, task_id: int, user_id: UUID) -> str:
+        query = select(Task).where(Task.id == task_id, Task.user_id == user_id)
+        response = await self.session.exec(query)
+        task = response.one()
+        
+        path = f"{task.assistant_id}/{task.pretty_id}/output.pdf"
+        
+        try:
+            signed_url = generate_file_signed_url(path)
+            if signed_url and "signedURL" in signed_url:
+                return signed_url["signedURL"]
+            else:
+                raise Exception()
+        except Exception as e:
+            return "error"
+        

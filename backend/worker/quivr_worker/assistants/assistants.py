@@ -5,9 +5,10 @@ from quivr_api.modules.upload.service.upload_file import (
 )
 import os
 
-async def process_assistant(assistant_id: str, notification_uuid: str, file1_name_path: str, file2_name_path: str, task_id: int, tasks_service: TasksService):
+async def process_assistant(assistant_id: str, notification_uuid: str, file1_name_path: str, file2_name_path: str, task_id: int, tasks_service: TasksService,
+                            user_id: str):
     
-    task = await tasks_service.get_task_by_id(task_id) # type: ignore
+    task = await tasks_service.get_task_by_id(task_id, user_id) # type: ignore
     
     await tasks_service.update_task(task_id, {"status": "in_progress"})
     
@@ -17,10 +18,7 @@ async def process_assistant(assistant_id: str, notification_uuid: str, file1_nam
     
     task_result = {
         "status": "completed",
-        "answer_raw":{
-            "text": "#### Assistant answer"
-        },
-        "answer_pretty": "#### Assistant answer"
+        "answer": "#### Assistant answer"
     }
     
     output_dir = f"{assistant_id}/{notification_uuid}"

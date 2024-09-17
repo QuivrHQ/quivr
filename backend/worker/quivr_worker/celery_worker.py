@@ -105,16 +105,17 @@ def process_assistant_task(
     file1_name_path: str,
     file2_name_path: str,
     task_id: int,
+    user_id: str,
 ):
     
     logger.info(f"process_assistant_task started for assistant_id={assistant_id}, notification_uuid={notification_uuid}, file1_name_path={file1_name_path}, file2_name_path={file2_name_path}, task_id={task_id}")
     print("process_assistant_task")
     
     loop = asyncio.get_event_loop()
-    loop.run_until_complete(aprocess_assistant_task(assistant_id, notification_uuid, file1_name_path, file2_name_path, task_id))
+    loop.run_until_complete(aprocess_assistant_task(assistant_id, notification_uuid, file1_name_path, file2_name_path, task_id, user_id))
     
 
-async def aprocess_assistant_task(assistant_id: str, notification_uuid: str, file1_name_path: str, file2_name_path: str, task_id: int):
+async def aprocess_assistant_task(assistant_id: str, notification_uuid: str, file1_name_path: str, file2_name_path: str, task_id: int, user_id: str):
     
     async with AsyncSession(async_engine) as async_session:
         try:
@@ -124,7 +125,7 @@ async def aprocess_assistant_task(assistant_id: str, notification_uuid: str, fil
             tasks_repository = TasksRepository(async_session)
             tasks_service = TasksService(tasks_repository) 
             
-            await process_assistant(assistant_id, notification_uuid, file1_name_path, file2_name_path, task_id, tasks_service)
+            await process_assistant(assistant_id, notification_uuid, file1_name_path, file2_name_path, task_id, tasks_service, user_id)
             
         except Exception as e:
             await async_session.rollback()

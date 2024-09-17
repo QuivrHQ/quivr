@@ -12,7 +12,7 @@ class TasksInterface(ABC):
         pass
 
     @abstractmethod
-    def get_task_by_id(self, task_id: UUID) -> Task:
+    def get_task_by_id(self, task_id: UUID, user_id: UUID) -> Task:
         pass
 
     @abstractmethod
@@ -25,4 +25,8 @@ class TasksInterface(ABC):
 
     @abstractmethod
     def update_task(self, task_id: int, task: dict) -> None:
+        pass
+    
+    @abstractmethod
+    def get_download_link_task(self, task_id: int, user_id: UUID) -> str:
         pass

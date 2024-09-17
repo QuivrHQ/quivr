@@ -16,7 +16,7 @@ class Task(SQLModel, table=True):
             autoincrement=True,
         ),
     )
-
+    assistant_id: int
     pretty_id: str
     user_id: UUID
     status: str = Field(default="pending")
@@ -27,9 +27,8 @@ class Task(SQLModel, table=True):
             server_default=text("CURRENT_TIMESTAMP"),
         ),
     )
-    # Json for answer_raw
-    answer_raw: Dict = Field(default_factory=dict, sa_column=Column(JSON))
-    answer_pretty: str | None = Field(default=None)
+    settings: Dict = Field(default_factory=dict, sa_column=Column(JSON))
+    answer: str | None = Field(default=None)
 
     class Config:
         arbitrary_types_allowed = True
