@@ -7,12 +7,18 @@
   flex-direction: column;
   justify-content: space-between;
 
-  .title {
-    @include Typography.H1;
-  }
-
-  .assistant_choice_wrapper {
+  .content_section {
     display: flex;
-    justify-content: space-between;
+    flex-direction: column;
+    gap: Spacings.$spacing05;
+
+    .title {
+      @include Typography.H2;
+    }
+
+    .assistant_choice_wrapper {
+      display: flex;
+      gap: Spacings.$spacing05;
+    }
   }
 }

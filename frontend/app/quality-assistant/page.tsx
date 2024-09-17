@@ -11,13 +11,13 @@ import ProcessTab from "./ProcessTab/ProcessTab";
 import styles from "./page.module.scss";
 
 const QualityAssistant = (): JSX.Element => {
-  const [selectedTab, setSelectedTab] = useState("Assistant");
+  const [selectedTab, setSelectedTab] = useState("Assistants");
 
   const qualityAssistantTab: Tab[] = [
     {
-      label: "Assistant",
-      isSelected: selectedTab === "Assistant",
-      onClick: () => setSelectedTab("Assistant"),
+      label: "Assistants",
+      isSelected: selectedTab === "Assistants",
+      onClick: () => setSelectedTab("Assistants"),
       iconName: "assistant",
     },
     {
@@ -33,13 +33,13 @@ const QualityAssistant = (): JSX.Element => {
       <div className={styles.page_header}>
         <PageHeader
           iconName="assistant"
-          label="Quality Assistant"
+          label="Quality Assistants"
           buttons={[]}
         />
       </div>
       <div className={styles.content_wrapper}>
         <Tabs tabList={qualityAssistantTab} />
-        {selectedTab === "Assistant" && <AssistantTab />}
+        {selectedTab === "Assistants" && <AssistantTab />}
         {selectedTab === "Process" && <ProcessTab />}
       </div>
     </div>

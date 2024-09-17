@@ -131,7 +131,7 @@ const ProcessTab = (): JSX.Element => {
 
   return (
     <div className={styles.process_tab_wrapper}>
-      <span className={styles.title}>Mes Résultats</span>
+      <span className={styles.title}>My Results</span>
       <div className={styles.table_header}>
         <div className={styles.search}>
           <TextInput
