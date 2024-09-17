@@ -103,13 +103,11 @@ def init_worker(**kwargs):
 def process_assistant_task(
     assistant_id: str,
     notification_uuid: str,
-    file1_name_path: str,
-    file2_name_path: str,
     task_id: int,
     user_id: str,
 ):
     logger.info(
-        f"process_assistant_task started for assistant_id={assistant_id}, notification_uuid={notification_uuid}, file1_name_path={file1_name_path}, file2_name_path={file2_name_path}, task_id={task_id}"
+        f"process_assistant_task started for assistant_id={assistant_id}, notification_uuid={notification_uuid}, task_id={task_id}"
     )
     print("process_assistant_task")
 
@@ -118,8 +116,6 @@ def process_assistant_task(
         aprocess_assistant_task(
             assistant_id,
             notification_uuid,
-            file1_name_path,
-            file2_name_path,
             task_id,
             user_id,
         )
@@ -129,8 +125,6 @@ def process_assistant_task(
 async def aprocess_assistant_task(
     assistant_id: str,
     notification_uuid: str,
-    file1_name_path: str,
-    file2_name_path: str,
     task_id: int,
     user_id: str,
 ):
@@ -145,8 +139,6 @@ async def aprocess_assistant_task(
             await process_assistant(
                 assistant_id,
                 notification_uuid,
-                file1_name_path,
-                file2_name_path,
                 task_id,
                 tasks_service,
                 user_id,

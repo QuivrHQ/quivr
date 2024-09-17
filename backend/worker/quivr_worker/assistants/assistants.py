@@ -11,8 +11,6 @@ from quivr_worker.utils.pdf_generator.pdf_generator import PDFGenerator, PDFMode
 async def process_assistant(
     assistant_id: str,
     notification_uuid: str,
-    file1_name_path: str,
-    file2_name_path: str,
     task_id: int,
     tasks_service: TasksService,
     user_id: str,
