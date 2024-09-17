@@ -23,4 +23,11 @@
       flex-wrap: wrap;
     }
   }
+
+  .form_wrapper {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    gap: Spacings.$spacing05;
+  }
 }

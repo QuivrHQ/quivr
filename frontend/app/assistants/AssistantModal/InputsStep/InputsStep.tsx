@@ -5,7 +5,7 @@ import { FileInput } from "@/lib/components/ui/FileInput/FileInput";
 
 interface InputsStepProps {
   inputs: AssistantInputs;
-  onFileChange: (file: File, inputKey: string) => void; //
+  onFileChange: (file: File, inputKey: string) => void;
 }
 
 export const InputsStep = ({
@@ -18,7 +18,6 @@ export const InputsStep = ({
         <FileInput
           key={fileInput.key}
           label={capitalCase(fileInput.key)}
-          icon="file"
           acceptedFileTypes={fileInput.allowed_extensions}
           onFileChange={(file) => onFileChange(file, fileInput.key)}
         />

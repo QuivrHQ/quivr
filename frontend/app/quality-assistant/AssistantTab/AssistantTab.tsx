@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 
+import { FileInput } from "@/lib/components/ui/FileInput/FileInput";
 import QuivrButton from "@/lib/components/ui/QuivrButton/QuivrButton";
 
 import AssistantCard from "./AssistantCard/AssistantCard";
@@ -34,18 +35,30 @@ const mockAssistants: AssistantCardType[] = [
 const AssistantTab = (): JSX.Element => {
   const [assistantChoosed, setAssistantChoosed] = useState(false);
 
+  const handleFileChange = (file: File) => {
+    console.log("Selected file:", file);
+    // Handle the selected file
+  };
+
   return (
     <div className={styles.assistant_tab_wrapper}>
-      <div className={styles.content_section}>
-        <span className={styles.title}>Choose an assistant</span>
-        <div className={styles.assistant_choice_wrapper}>
-          {mockAssistants.map((assistant, index) => (
-            <div key={index} onClick={() => setAssistantChoosed(true)}>
-              <AssistantCard assistantCard={assistant} />
-            </div>
-          ))}
+      {!assistantChoosed ? (
+        <div className={styles.content_section}>
+          <span className={styles.title}>Choose an assistant</span>
+          <div className={styles.assistant_choice_wrapper}>
+            {mockAssistants.map((assistant, index) => (
+              <div key={index} onClick={() => setAssistantChoosed(true)}>
+                <AssistantCard assistantCard={assistant} />
+              </div>
+            ))}
+          </div>
         </div>
-      </div>
+      ) : (
+        <div className={styles.form_wrapper}>
+          <FileInput label="Document 1" onFileChange={handleFileChange} />
+          <FileInput label="Document 2" onFileChange={handleFileChange} />
+        </div>
+      )}
       {assistantChoosed && (
         <div className={styles.button_wrapper}>
           <QuivrButton
