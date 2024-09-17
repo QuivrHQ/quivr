@@ -7,6 +7,13 @@
   width: 100%;
   height: 200px;
 
+  &.drag_active {
+    .header_wrapper {
+      border: 3px dashed var(--accent);
+      background-color: var(--background-3);
+    }
+  }
+
   .header_wrapper {
     display: flex;
     justify-content: space-between;
@@ -20,6 +27,11 @@
 
     &:hover {
       border: 3px dashed var(--accent);
+    }
+
+    &.drag_active {
+      border: 3px dashed var(--accent);
+      background-color: var(--background-3);
     }
 
     .box_content {
