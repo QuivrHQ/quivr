@@ -26,7 +26,7 @@ class TasksInterface(ABC):
     @abstractmethod
     def update_task(self, task_id: int, task: dict) -> None:
         pass
-    
+
     @abstractmethod
     def get_download_link_task(self, task_id: int, user_id: UUID) -> str:
         pass

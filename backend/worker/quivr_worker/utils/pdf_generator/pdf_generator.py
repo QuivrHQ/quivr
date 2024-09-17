@@ -58,9 +58,15 @@ class PDFGenerator(FPDF):
         self.cell(0, 10, "Github", 0, 1, "C", link="https://github.com/quivrhq/quivr")
 
     def chapter_body(self):
-
         self.set_font("DejaVu", "", 12)
-        self.multi_cell(0, 10, self.pdf_model.content, markdown=True, new_x=XPos.RIGHT, new_y=YPos.TOP)
+        self.multi_cell(
+            0,
+            10,
+            self.pdf_model.content,
+            markdown=True,
+            new_x=XPos.RIGHT,
+            new_y=YPos.TOP,
+        )
         self.ln()
 
     def print_pdf(self):

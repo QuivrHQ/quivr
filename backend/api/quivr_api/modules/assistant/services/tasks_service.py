@@ -24,9 +24,9 @@ class TasksService(BaseService[TasksRepository]):
 
     async def delete_task(self, task_id: int, user_id: UUID) -> None:
         return await self.repository.delete_task(task_id, user_id)
-    
+
     async def update_task(self, task_id: int, task: dict) -> None:
         return await self.repository.update_task(task_id, task)
-    
+
     async def get_download_link_task(self, task_id: int, user_id: UUID) -> str:
         return await self.repository.get_download_link_task(task_id, user_id)

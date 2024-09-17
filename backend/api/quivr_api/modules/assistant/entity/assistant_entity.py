@@ -6,7 +6,8 @@ class AssistantInput(BaseModel):
     name: str
     description: str
     type: str
-    
+
+
 class AssistantInputOutput(BaseModel):
     name: str
     value: str
@@ -14,7 +15,6 @@ class AssistantInputOutput(BaseModel):
 
 class AssistantSettings(BaseModel):
     inputs: List[AssistantInput]
-    
 
 
 class Assistant(BaseModel):

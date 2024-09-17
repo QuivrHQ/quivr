@@ -8,8 +8,9 @@ from sqlmodel import select
 from quivr_api.modules.assistant.dto.inputs import CreateTask
 from quivr_api.modules.assistant.entity.task_entity import Task
 from quivr_api.modules.dependencies import BaseRepository
-from quivr_api.modules.upload.service.generate_file_signed_url import generate_file_signed_url
-
+from quivr_api.modules.upload.service.generate_file_signed_url import (
+    generate_file_signed_url,
+)
 
 
 class TasksRepository(BaseRepository):
@@ -18,7 +19,12 @@ class TasksRepository(BaseRepository):
 
     async def create_task(self, task: CreateTask, user_id: UUID) -> Task:
         try:
-            task_to_create = Task(assistant_id=task.assistant_id, pretty_id=task.pretty_id, user_id=user_id, settings=task.settings)
+            task_to_create = Task(
+                assistant_id=task.assistant_id,
+                pretty_id=task.pretty_id,
+                user_id=user_id,
+                settings=task.settings,
+            )
             self.session.add(task_to_create)
             await self.session.commit()
         except exc.IntegrityError:
@@ -47,7 +53,7 @@ class TasksRepository(BaseRepository):
             await self.session.commit()
         else:
             raise Exception()
-        
+
     async def update_task(self, task_id: int, task_updates: dict) -> None:
         query = select(Task).where(Task.id == task_id)
         response = await self.session.exec(query)
@@ -63,9 +69,9 @@ class TasksRepository(BaseRepository):
         query = select(Task).where(Task.id == task_id, Task.user_id == user_id)
         response = await self.session.exec(query)
         task = response.one()
-        
+
         path = f"{task.assistant_id}/{task.pretty_id}/output.pdf"
-        
+
         try:
             signed_url = generate_file_signed_url(path)
             if signed_url and "signedURL" in signed_url:
@@ -74,4 +80,3 @@ class TasksRepository(BaseRepository):
                 raise Exception()
         except Exception as e:
             return "error"
-        
