@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.0.315 (2024-09-17)
+
+## What's Changed
+* chore(main): release core 0.0.15 by @StanGirard in https://github.com/QuivrHQ/quivr/pull/3203
+* fix: knowledge user_id fix by @AmineDiro in https://github.com/QuivrHQ/quivr/pull/3216
+
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.314...v0.0.315
+
 ## 0.0.314 (2024-09-16)
 
 ## What's Changed
