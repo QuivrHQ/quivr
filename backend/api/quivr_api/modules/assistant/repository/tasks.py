@@ -78,5 +78,5 @@ class TasksRepository(BaseRepository):
                 return signed_url["signedURL"]
             else:
                 raise Exception()
-        except Exception as e:
+        except Exception:
             return "error"

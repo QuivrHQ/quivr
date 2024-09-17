@@ -8,6 +8,8 @@ from dotenv import load_dotenv
 from quivr_api.celery_config import celery
 from quivr_api.logger import get_logger
 from quivr_api.models.settings import settings
+from quivr_api.modules.assistant.repository.tasks import TasksRepository
+from quivr_api.modules.assistant.services.tasks_service import TasksService
 from quivr_api.modules.brain.integrations.Notion.Notion_connector import NotionConnector
 from quivr_api.modules.brain.repository.brains_vectors import BrainsVectors
 from quivr_api.modules.brain.service.brain_service import BrainService
@@ -29,6 +31,7 @@ from sqlalchemy.ext.asyncio import AsyncEngine, create_async_engine
 from sqlmodel import Session, text
 from sqlmodel.ext.asyncio.session import AsyncSession
 
+from quivr_worker.assistants.assistants import process_assistant
 from quivr_worker.check_premium import check_is_premium
 from quivr_worker.process.process_s3_file import process_uploaded_file
 from quivr_worker.process.process_url import process_url_func
@@ -40,9 +43,6 @@ from quivr_worker.syncs.process_active_syncs import (
 )
 from quivr_worker.syncs.store_notion import fetch_and_store_notion_files_async
 from quivr_worker.utils.utils import _patch_json
-from quivr_api.modules.assistant.services.tasks_service import TasksService
-from quivr_api.modules.assistant.repository.tasks import TasksRepository
-from quivr_worker.assistants.assistants import process_assistant
 
 load_dotenv()
 

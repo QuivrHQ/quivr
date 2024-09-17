@@ -1,9 +1,11 @@
+import os
+
 from quivr_api.modules.assistant.services.tasks_service import TasksService
-from quivr_worker.utils.pdf_generator.pdf_generator import PDFGenerator, PDFModel
 from quivr_api.modules.upload.service.upload_file import (
     upload_file_storage,
 )
-import os
+
+from quivr_worker.utils.pdf_generator.pdf_generator import PDFGenerator, PDFModel
 
 
 async def process_assistant(

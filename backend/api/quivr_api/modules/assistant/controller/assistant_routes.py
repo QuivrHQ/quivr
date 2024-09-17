@@ -1,24 +1,24 @@
+import io
 from typing import Annotated, List
 from uuid import uuid4
-import io
-from fastapi import APIRouter, Depends, Request, UploadFile, HTTPException, Form
 
-from quivr_api.logger import get_logger
+from fastapi import APIRouter, Depends, Form, HTTPException, Request, UploadFile
+
 from quivr_api.celery_config import celery
+from quivr_api.logger import get_logger
 from quivr_api.middlewares.auth.auth_bearer import AuthBearer, get_current_user
-from quivr_api.modules.assistant.services.tasks_service import TasksService
-from quivr_api.modules.dependencies import get_service
+from quivr_api.modules.assistant.dto.inputs import CreateTask
 from quivr_api.modules.assistant.entity.assistant_entity import (
     Assistant,
     AssistantInput,
     AssistantSettings,
 )
-from quivr_api.modules.assistant.dto.inputs import CreateTask
-from quivr_api.modules.user.entity.user_identity import UserIdentity
+from quivr_api.modules.assistant.services.tasks_service import TasksService
+from quivr_api.modules.dependencies import get_service
 from quivr_api.modules.upload.service.upload_file import (
     upload_file_storage,
 )
-
+from quivr_api.modules.user.entity.user_identity import UserIdentity
 
 logger = get_logger(__name__)
 logger = get_logger(__name__)
