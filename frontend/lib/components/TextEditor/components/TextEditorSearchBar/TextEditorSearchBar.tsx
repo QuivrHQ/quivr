@@ -40,12 +40,7 @@ const TextEditorSearchBar = forwardRef<Editor, TextEditorSearchBarProps>(
     return (
       <ChatBar
         ref={ref}
-        onSearch={() => {
-          if (!chatInput.chatId && messages.length > 0) {
-            router.replace(`/note/${messages[0].chat_id}`);
-          }
-          onSearch?.();
-        }}
+        onSearch={onSearch}
         newBrain={newBrain}
         submitQuestion={(question) => submitQuestion(question, false)}
         {...chatInput}
