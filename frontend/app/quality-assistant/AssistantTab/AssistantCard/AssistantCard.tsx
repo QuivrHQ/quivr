@@ -1,5 +1,7 @@
 "use client";
 
+import { Icon } from "@/lib/components/ui/Icon/Icon";
+
 import styles from "./AssistantCard.module.scss";
 
 import { AssistantCardType } from "../../types/assistant";
@@ -15,7 +17,10 @@ const AssistantCard = ({ assistantCard }: AssistantCardProps): JSX.Element => {
         assistantCard.disabled ? styles.disabled : ""
       }`}
     >
-      <span className={styles.title}>{assistantCard.name}</span>
+      <div className={styles.header}>
+        <Icon name={assistantCard.iconName} color="black" size="normal" />
+        <span className={styles.title}>{assistantCard.name}</span>
+      </div>
       <span className={styles.description}>{assistantCard.description}</span>
     </div>
   );

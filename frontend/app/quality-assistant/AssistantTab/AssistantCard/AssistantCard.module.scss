@@ -12,14 +12,22 @@
   padding: Spacings.$spacing05;
   width: 250px;
   cursor: pointer;
+  height: 100%;
 
   &.disabled {
     pointer-events: none;
     opacity: 0.3;
   }
 
-  .title {
-    @include Typography.H3;
+  .header {
+    display: flex;
+    align-self: flex-start;
+    align-items: center;
+    gap: Spacings.$spacing03;
+
+    .title {
+      @include Typography.H3;
+    }
   }
 
   .description {

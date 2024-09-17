@@ -19,6 +19,8 @@
     .assistant_choice_wrapper {
       display: flex;
       gap: Spacings.$spacing05;
+      align-items: stretch;
+      flex-wrap: wrap;
     }
   }
 }

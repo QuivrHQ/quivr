@@ -11,17 +11,23 @@ import { AssistantCardType } from "../types/assistant";
 
 const mockAssistants: AssistantCardType[] = [
   {
-    name: "Use Case #1",
-    description: "Description 1",
+    name: "Compliance Check",
+    description:
+      "Allows analyzing the compliance of the information contained in documents against charter or regulatory requirements.",
     disabled: true,
+    iconName: "assistant",
   },
   {
-    name: "Use Case #2",
-    description: "Description 2",
+    name: "Consistency Check",
+    description:
+      "Ensures that the information in one document is replicated identically in another document.",
+    iconName: "assistant",
   },
   {
-    name: "Use Case #3",
-    description: "Description 3",
+    name: "Difference Detection",
+    description:
+      "Highlights differences between one document and another after modifications.",
+    iconName: "assistant",
   },
 ];
 
