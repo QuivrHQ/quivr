@@ -29,3 +29,8 @@ class SyncEmptyCredentials(SyncException):
 class SyncNotFoundException(SyncException):
     def __init__(self, message="The requested sync was not found"):
         super().__init__(message)
+
+
+class SyncProviderError(SyncException):
+    def __init__(self, message="Unknown provider"):
+        super().__init__(message)

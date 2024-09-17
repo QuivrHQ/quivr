@@ -1,9 +1,8 @@
-import json
 from sqlite3 import IntegrityError
-from typing import List
+from typing import Any, List
 from uuid import UUID
 
-from sqlmodel import select
+from sqlmodel import delete, select
 from sqlmodel.ext.asyncio.session import AsyncSession
 
 from quivr_api.logger import get_logger
@@ -22,7 +21,10 @@ from quivr_api.modules.sync.utils.sync import (
     GoogleDriveSync,
     NotionSync,
 )
-from quivr_api.modules.sync.utils.sync_exceptions import SyncEmptyCredentials
+from quivr_api.modules.sync.utils.sync_exceptions import (
+    SyncEmptyCredentials,
+    SyncProviderError,
+)
 
 logger = get_logger(__name__)
 
@@ -129,44 +131,22 @@ class SyncsRepository(BaseRepository):
 
         return None
 
-    def delete_sync(self, sync_id: int, user_id: UUID | str):
-        """
-        Delete a sync user from the database.
-
-        Args:
-            provider (str): The provider of the sync user.
-            user_id (str): The user ID of the sync user.
-        """
+    async def delete_sync(self, sync_id: int, user_id: UUID):
         logger.info(
             "Deleting sync user with sync_id: %s, user_id: %s", sync_id, user_id
         )
-        self.db.from_("syncs_user").delete().eq("id", sync_id).eq(
-            "user_id", user_id
-        ).execute()
+        await self.session.execute(
+            delete(Syncs).where(Syncs.id == sync_id).where(Syncs.user_id == user_id)
+        )
         logger.info("Sync user deleted successfully")
 
-    def update_sync_user(
-        self, sync_user_id: UUID, state: dict, sync_user_input: SyncUpdateInput
-    ):
-        """
-        Update a sync user in the database.
-
-        Args:
-            sync_user_id (str): The user ID of the sync user.
-            state (dict): The state to filter sync users.
-            sync_user_input (SyncUserUpdateInput): The input data for updating the sync user.
-        """
+    def update_sync(self, sync_id: UUID, sync_input: SyncUpdateInput | dict[str, Any]):
         logger.info(
             "Updating sync user with user_id: %s, state: %s, input: %s",
-            sync_user_id,
-            state,
-            sync_user_input,
+            sync_id,
+            sync_input,
         )
 
-        state_str = json.dumps(state)
-        self.db.from_("syncs_user").update(sync_user_input.model_dump()).eq(
-            "user_id", str(sync_user_id)
-        ).eq("state", state_str).execute()
         logger.info("Sync user updated successfully")
 
     def get_all_notion_user_syncs(self):
@@ -208,7 +188,10 @@ class SyncsRepository(BaseRepository):
             return None
 
         provider = sync_user.provider.lower()
-        sync_provider = self.sync_provider_mapping[SyncProvider(provider)]
+        try:
+            sync_provider = self.sync_provider_mapping[SyncProvider(provider)]
+        except KeyError:
+            raise SyncProviderError
 
         if sync_user.credentials is None:
             raise SyncEmptyCredentials
