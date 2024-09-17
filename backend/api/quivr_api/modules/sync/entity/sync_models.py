@@ -17,7 +17,7 @@ from sqlmodel import (  # noqa: F811
 )
 from sqlmodel import UUID as PGUUID
 
-from quivr_api.modules.sync.dto.outputs import SyncsOutput
+from quivr_api.modules.sync.dto.outputs import SyncProvider, SyncsOutput
 from quivr_api.modules.user.entity.user_identity import User
 
 
@@ -63,7 +63,12 @@ class Syncs(SQLModel, table=True):
     additional_data: dict
 
     def to_dto(self) -> SyncsOutput:
-        return SyncsOutput(user_id=self.user_id, provider=self.provider)
+        return SyncsOutput(
+            user_id=self.user_id,
+            provider=SyncProvider(self.provider),
+            credentials=self.credentials,
+            state=self.state,
+        )
 
 
 class NotionSyncFile(SQLModel, table=True):

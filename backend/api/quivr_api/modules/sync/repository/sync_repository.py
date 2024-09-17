@@ -12,7 +12,6 @@ from quivr_api.modules.sync.dto.outputs import SyncProvider
 from quivr_api.modules.sync.entity.sync_models import SyncFile, Syncs
 from quivr_api.modules.sync.repository.notion_repository import NotionRepository
 from quivr_api.modules.sync.service.sync_notion import SyncNotionService
-from quivr_api.modules.sync.utils.exceptions import SyncNotFoundException
 from quivr_api.modules.sync.utils.sync import (
     AzureDriveSync,
     BaseSync,
@@ -23,7 +22,9 @@ from quivr_api.modules.sync.utils.sync import (
 )
 from quivr_api.modules.sync.utils.sync_exceptions import (
     SyncEmptyCredentials,
+    SyncNotFoundException,
     SyncProviderError,
+    SyncUpdateError,
 )
 
 logger = get_logger(__name__)
@@ -70,7 +71,7 @@ class SyncsRepository(BaseRepository):
             await self.session.rollback()
             raise
 
-    async def get_sync_id(self, sync_id: int) -> Syncs | None:
+    async def get_sync_id(self, sync_id: int) -> Syncs:
         """
         Retrieve sync users from the database.
         """
@@ -110,7 +111,7 @@ class SyncsRepository(BaseRepository):
             raise SyncNotFoundException()
         return sync
 
-    async def get_sync_user_by_state(self, state: dict) -> Syncs | None:
+    async def get_sync_user_by_state(self, state: dict) -> Syncs:
         """
         Retrieve a sync user by their state.
 
@@ -140,14 +141,30 @@ class SyncsRepository(BaseRepository):
         )
         logger.info("Sync user deleted successfully")
 
-    def update_sync(self, sync_id: UUID, sync_input: SyncUpdateInput | dict[str, Any]):
-        logger.info(
+    async def update_sync(
+        self, sync: Syncs, sync_input: SyncUpdateInput | dict[str, Any]
+    ):
+        logger.debug(
             "Updating sync user with user_id: %s, state: %s, input: %s",
-            sync_id,
+            sync.id,
             sync_input,
         )
+        try:
+            if isinstance(sync_input, dict):
+                update_data = sync_input
+            else:
+                update_data = sync_input.model_dump(exclude_unset=True)
+            for field in update_data:
+                setattr(sync, field, update_data[field])
 
-        logger.info("Sync user updated successfully")
+            self.session.add(sync)
+            await self.session.commit()
+            await self.session.refresh(sync)
+            return sync
+        except IntegrityError as e:
+            await self.session.rollback()
+            logger.error(f"Error updating knowledge {e}")
+            raise SyncUpdateError
 
     def get_all_notion_user_syncs(self):
         """

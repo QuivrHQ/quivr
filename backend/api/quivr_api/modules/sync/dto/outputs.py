@@ -1,4 +1,5 @@
 from enum import Enum
+from uuid import UUID
 
 from pydantic import BaseModel
 
@@ -22,7 +23,7 @@ class SyncsDescription(BaseModel):
 
 
 class SyncsOutput(BaseModel):
-    user_id: str
-    provider: str
-    state: dict
-    credentials: dict
+    user_id: UUID
+    provider: SyncProvider
+    state: dict | None
+    credentials: dict | None
