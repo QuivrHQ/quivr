@@ -7,6 +7,7 @@ from megaparse.config import MegaparseConfig
 
 from quivr_core.base_config import QuivrBaseConfig
 from quivr_core.processor.splitter import SplitterConfig
+from quivr_core.prompts import CustomPromptsModel
 
 
 class BrainConfig(QuivrBaseConfig):
@@ -113,7 +114,7 @@ class LLMModelConfig:
     }
 
     @classmethod
-    def get_model_config(
+    def get_llm_model_config(
         cls, supplier: DefaultLLMs, model_name: str
     ) -> Optional[LLMConfig]:
         """Retrieve the LLMConfig (context and tokenizer_hub) for a given supplier and model."""
@@ -140,14 +141,17 @@ class LLMEndpointConfig(QuivrBaseConfig):
     max_output_tokens: int = 2000
     temperature: float = 0.7
     streaming: bool = True
+    prompt: CustomPromptsModel | None = None
 
     def __init__(self, **data):
         super().__init__(**data)
         # Automatically set context_length and tokenizer_hub based on the supplier and model
-        model_config = LLMModelConfig.get_model_config(self.supplier, self.model)
-        if model_config:
-            self.context_length = model_config.context
-            self.tokenizer_hub = model_config.tokenizer_hub
+        llm_model_config = LLMModelConfig.get_llm_model_config(
+            self.supplier, self.model
+        )
+        if llm_model_config:
+            self.context_length = llm_model_config.context
+            self.tokenizer_hub = llm_model_config.tokenizer_hub
 
 
 # Cannot use Pydantic v2 field_validator because of conflicts with pydantic v1 still in use in LangChain

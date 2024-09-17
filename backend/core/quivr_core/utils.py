@@ -12,7 +12,7 @@ from quivr_core.models import (
     RAGResponseMetadata,
     RawRAGResponse,
 )
-from quivr_core.prompts import DEFAULT_DOCUMENT_PROMPT
+from quivr_core.prompts import custom_prompts
 
 # TODO(@aminediro): define a types packages where we clearly define IO types
 # This should be used for serialization/deseriallization later
@@ -119,18 +119,18 @@ def parse_chunk_response(
 @no_type_check
 def parse_response(raw_response: RawRAGResponse, model_name: str) -> ParsedRAGResponse:
     answer = ""
-    sources = raw_response["docs"] or []
+    sources = raw_response["docs"] if "docs" in raw_response else []
 
     metadata = RAGResponseMetadata(
         sources=sources, metadata_model=ChatLLMMetadata(name=model_name)
     )
 
-    if model_supports_function_calling(model_name):
-        if (
-            "tool_calls" in raw_response["answer"]
-            and raw_response["answer"].tool_calls
-            and "citations" in raw_response["answer"].tool_calls[-1]["args"]
-        ):
+    if (
+        model_supports_function_calling(model_name)
+        and "tool_calls" in raw_response["answer"]
+        and raw_response["answer"].tool_calls
+    ):
+        if "citations" in raw_response["answer"].tool_calls[-1]["args"]:
             citations = raw_response["answer"].tool_calls[-1]["args"]["citations"]
             metadata.citations = citations
             followup_questions = raw_response["answer"].tool_calls[-1]["args"][
@@ -149,7 +149,9 @@ def parse_response(raw_response: RawRAGResponse, model_name: str) -> ParsedRAGRe
 
 
 def combine_documents(
-    docs, document_prompt=DEFAULT_DOCUMENT_PROMPT, document_separator="\n\n"
+    docs,
+    document_prompt=custom_prompts.DEFAULT_DOCUMENT_PROMPT,
+    document_separator="\n\n",
 ):
     # for each docs, add an index in the metadata to be able to cite the sources
     for doc, index in zip(docs, range(len(docs)), strict=False):

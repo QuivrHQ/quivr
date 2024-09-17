@@ -1,5 +1,6 @@
 import logging
 from typing import Annotated, AsyncGenerator, Optional, Sequence, TypedDict
+from uuid import uuid4
 
 # TODO(@aminediro): this is the only dependency to langchain package, we should remove it
 from langchain.retrievers import ContextualCompressionRetriever
@@ -7,7 +8,7 @@ from langchain_cohere import CohereRerank
 from langchain_community.document_compressors import JinaRerank
 from langchain_core.callbacks import Callbacks
 from langchain_core.documents import BaseDocumentCompressor, Document
-from langchain_core.messages import AIMessage, BaseMessage, HumanMessage
+from langchain_core.messages import BaseMessage
 from langchain_core.messages.ai import AIMessageChunk
 from langchain_core.vectorstores import VectorStore
 from langgraph.graph import END, StateGraph
@@ -23,7 +24,7 @@ from quivr_core.models import (
     RAGResponseMetadata,
     cited_answer,
 )
-from quivr_core.prompts import ANSWER_PROMPT, CONDENSE_QUESTION_PROMPT
+from quivr_core.prompts import custom_prompts
 from quivr_core.utils import (
     combine_documents,
     format_file_list,
@@ -40,9 +41,7 @@ class AgentState(TypedDict):
     # Default is to replace. add_messages says "append"
     messages: Annotated[Sequence[BaseMessage], add_messages]
     chat_history: ChatHistory
-    filtered_chat_history: list[AIMessage | HumanMessage]
     docs: list[Document]
-    transformed_question: BaseMessage
     files: str
     final_response: dict
 
@@ -116,7 +115,7 @@ class QuivrQARAGLangGraph:
         """
         return self.vector_store.as_retriever()
 
-    def filter_history(self, state):
+    def filter_history(self, state: AgentState) -> dict:
         """
         Filter out the chat history to only include the messages that are relevant to the current question
 
@@ -132,7 +131,8 @@ class QuivrQARAGLangGraph:
         chat_history = state["chat_history"]
         total_tokens = 0
         total_pairs = 0
-        filtered_chat_history: list[AIMessage | HumanMessage] = []
+        _chat_id = uuid4()
+        _chat_history = ChatHistory(chat_id=_chat_id, brain_id=chat_history.brain_id)
         for human_message, ai_message in reversed(list(chat_history.iter_pairs())):
             # TODO: replace with tiktoken
             message_tokens = self.llm_endpoint.count_tokens(
@@ -144,12 +144,12 @@ class QuivrQARAGLangGraph:
                 or total_pairs >= self.retrieval_config.max_history
             ):
                 break
-            filtered_chat_history.append(human_message)
-            filtered_chat_history.append(ai_message)
+            _chat_history.append(human_message)
+            _chat_history.append(ai_message)
             total_tokens += message_tokens
             total_pairs += 1
 
-        return {"filtered_chat_history": filtered_chat_history}
+        return {"chat_history": _chat_history}
 
     ### Nodes
     def rewrite(self, state):
@@ -164,14 +164,14 @@ class QuivrQARAGLangGraph:
         """
 
         # Grader
-        msg = CONDENSE_QUESTION_PROMPT.format(
-            chat_history=state["filtered_chat_history"],
+        msg = custom_prompts.CONDENSE_QUESTION_PROMPT.format(
+            chat_history=state["chat_history"],
             question=state["messages"][0].content,
         )
 
         model = self.llm_endpoint._llm
         response = model.invoke(msg)
-        return {"transformed_question": response}
+        return {"messages": [response]}
 
     def retrieve(self, state):
         """
@@ -183,11 +183,11 @@ class QuivrQARAGLangGraph:
         Returns:
             dict: The retrieved chunks
         """
-
-        docs = self.compression_retriever.invoke(state["transformed_question"].content)
+        question = state["messages"][-1].content
+        docs = self.compression_retriever.invoke(question)
         return {"docs": docs}
 
-    def generate(self, state):
+    def generate_rag(self, state):
         """
         Generate answer
 
@@ -198,7 +198,7 @@ class QuivrQARAGLangGraph:
             dict: The updated state with re-phrased question
         """
         messages = state["messages"]
-        question = messages[0].content
+        user_question = messages[0].content
         files = state["files"]
 
         docs = state["docs"]
@@ -206,12 +206,11 @@ class QuivrQARAGLangGraph:
         # Prompt
         prompt = self.retrieval_config.prompt
 
-        final_inputs = {
-            "context": combine_documents(docs),
-            "question": question,
-            "custom_instructions": prompt,
-            "files": files,
-        }
+        final_inputs = {}
+        final_inputs["context"] = combine_documents(docs) if docs else "None"
+        final_inputs["question"] = user_question
+        final_inputs["custom_instructions"] = prompt if prompt else "None"
+        final_inputs["files"] = files if files else "None"
 
         # LLM
         llm = self.llm_endpoint._llm
@@ -222,13 +221,47 @@ class QuivrQARAGLangGraph:
             )
 
         # Chain
-        rag_chain = ANSWER_PROMPT | llm
+        rag_chain = custom_prompts.RAG_ANSWER_PROMPT | llm
 
         # Run
         response = rag_chain.invoke(final_inputs)
         formatted_response = {
             "answer": response,  # Assuming the last message contains the final answer
             "docs": docs,
+        }
+        return {"messages": [response], "final_response": formatted_response}
+
+    def generate_chat_llm(self, state):
+        """
+        Generate answer
+
+        Args:
+            state (messages): The current state
+
+        Returns:
+            dict: The updated state with re-phrased question
+        """
+        messages = state["messages"]
+        user_question = messages[0].content
+
+        # Prompt
+        prompt = self.retrieval_config.prompt
+
+        final_inputs = {}
+        final_inputs["question"] = user_question
+        final_inputs["custom_instructions"] = prompt if prompt else "None"
+        final_inputs["chat_history"] = state["chat_history"].to_list()
+
+        # LLM
+        llm = self.llm_endpoint._llm
+
+        # Chain
+        rag_chain = custom_prompts.CHAT_LLM_PROMPT | llm
+
+        # Run
+        response = rag_chain.invoke(final_inputs)
+        formatted_response = {
+            "answer": response,  # Assuming the last message contains the final answer
         }
         return {"messages": [response], "final_response": formatted_response}
 
