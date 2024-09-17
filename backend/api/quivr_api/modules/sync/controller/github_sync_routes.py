@@ -3,10 +3,11 @@ import os
 import requests
 from fastapi import APIRouter, Depends, HTTPException, Request
 from fastapi.responses import HTMLResponse
+
 from quivr_api.logger import get_logger
 from quivr_api.middlewares.auth import AuthBearer, get_current_user
-from quivr_api.modules.sync.dto.inputs import SyncsUserInput, SyncUserUpdateInput
-from quivr_api.modules.sync.service.sync_service import SyncService, SyncUserService
+from quivr_api.modules.sync.dto.inputs import SyncCreateInput, SyncUpdateInput
+from quivr_api.modules.sync.service.sync_service import SyncsService
 from quivr_api.modules.user.entity.user_identity import UserIdentity
 
 from .successfull_connection import successfullConnectionPage
@@ -15,8 +16,8 @@ from .successfull_connection import successfullConnectionPage
 logger = get_logger(__name__)
 
 # Initialize sync service
-sync_service = SyncService()
-sync_user_service = SyncUserService()
+sync_service = SyncsService()
+sync_user_service = SyncsService()
 
 # Initialize API router
 github_sync_router = APIRouter()
@@ -54,7 +55,7 @@ def authorize_github(
         f"&redirect_uri={REDIRECT_URI}&scope={SCOPE}&state={state}"
     )
 
-    sync_user_input = SyncsUserInput(
+    sync_user_input = SyncCreateInput(
         user_id=str(current_user.id),
         name=name,
         provider="GitHub",
@@ -84,7 +85,7 @@ def oauth2callback_github(request: Request):
     logger.debug(
         f"Handling OAuth2 callback for user: {current_user} with state: {state}"
     )
-    sync_user_state = sync_user_service.get_sync_user_by_state(state_dict)
+    sync_user_state = sync_user_service.get_sync_by_state(state_dict)
     logger.info(f"Retrieved sync user state: {sync_user_state}")
 
     if state_dict != sync_user_state["state"]:
@@ -146,10 +147,8 @@ def oauth2callback_github(request: Request):
 
     logger.info(f"Retrieved email for user: {current_user} - {user_email}")
 
-    sync_user_input = SyncUserUpdateInput(
-        credentials=result, state={}, email=user_email
-    )
+    sync_user_input = SyncUpdateInput(credentials=result, state={}, email=user_email)
 
-    sync_user_service.update_sync_user(current_user, state_dict, sync_user_input)
+    sync_user_service.update_sync(current_user, state_dict, sync_user_input)
     logger.info(f"GitHub sync created successfully for user: {current_user}")
     return HTMLResponse(successfullConnectionPage)

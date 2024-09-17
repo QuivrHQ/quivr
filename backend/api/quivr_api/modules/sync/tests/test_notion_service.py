@@ -7,7 +7,7 @@ from sqlmodel.ext.asyncio.session import AsyncSession
 
 from quivr_api.modules.brain.integrations.Notion.Notion_connector import NotionPage
 from quivr_api.modules.sync.entity.notion_page import NotionSearchResult
-from quivr_api.modules.sync.repository.sync_repository import NotionRepository
+from quivr_api.modules.sync.repository.notion_repository import NotionRepository
 from quivr_api.modules.sync.service.sync_notion import (
     SyncNotionService,
     fetch_limit_notion_pages,

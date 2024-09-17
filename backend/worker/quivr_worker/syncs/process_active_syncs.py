@@ -7,14 +7,13 @@ from quivr_api.logger import get_logger
 from quivr_api.modules.notification.service.notification_service import (
     NotificationService,
 )
-from quivr_api.modules.sync.entity.sync_models import SyncsActive
-from quivr_api.modules.sync.repository.sync_repository import NotionRepository
+from quivr_api.modules.sync.repository.notion_repository import NotionRepository
 from quivr_api.modules.sync.service.sync_notion import (
     SyncNotionService,
     fetch_limit_notion_pages,
     update_notion_pages,
 )
-from quivr_api.modules.sync.service.sync_service import SyncService, SyncUserService
+from quivr_api.modules.sync.service.sync_service import SyncsService
 from quivr_api.modules.sync.utils.syncutils import SyncUtils
 from sqlalchemy.ext.asyncio import AsyncEngine
 from sqlmodel import text
@@ -35,9 +34,7 @@ async def process_sync(
 ):
     async with build_syncs_utils(services) as mapping_syncs_utils:
         try:
-            user_sync = services.sync_user_service.get_sync_user_by_id(
-                sync.syncs_user_id
-            )
+            user_sync = services.sync_user_service.get_sync_by_id(sync.syncs_user_id)
             services.notification_service.remove_notification_by_id(
                 sync.notification_id
             )
@@ -45,7 +42,7 @@ async def process_sync(
             sync_util = mapping_syncs_utils[user_sync.provider.lower()]
             await sync_util.direct_sync(
                 sync_active=sync,
-                user_sync=user_sync,
+                sync_user=user_sync,
                 files_ids=files_ids,
                 folder_ids=folder_ids,
             )
@@ -69,8 +66,8 @@ async def process_all_active_syncs(sync_services: SyncServices):
 
 
 async def _process_all_active_syncs(
-    sync_active_service: SyncService,
-    sync_user_service: SyncUserService,
+    sync_active_service: SyncsService,
+    sync_user_service: SyncsService,
     mapping_syncs_utils: dict[str, SyncUtils],
     notification_service: NotificationService,
 ):
@@ -78,7 +75,7 @@ async def _process_all_active_syncs(
     logger.debug(f"Found active syncs: {active_syncs}")
     for sync in active_syncs:
         try:
-            user_sync = sync_user_service.get_sync_user_by_id(sync.syncs_user_id)
+            user_sync = sync_user_service.get_sync_by_id(sync.syncs_user_id)
             # TODO: this should be global
             # NOTE: Remove the global notification
             notification_service.remove_notification_by_id(sync.notification_id)
@@ -104,7 +101,7 @@ async def process_notion_sync(
             await session.execute(
                 text("SET SESSION idle_in_transaction_session_timeout = '5min';")
             )
-            sync_user_service = SyncUserService()
+            sync_user_service = SyncsService()
             notion_repository = NotionRepository(session)
             notion_service = SyncNotionService(notion_repository)
 

@@ -1,6 +1,6 @@
 import os
 import uuid
-from typing import Annotated, List
+from typing import List
 
 from fastapi import APIRouter, Depends, HTTPException, status
 
@@ -23,7 +23,7 @@ from quivr_api.modules.sync.dto.inputs import SyncsActiveInput, SyncsActiveUpdat
 from quivr_api.modules.sync.dto.outputs import AuthMethodEnum
 from quivr_api.modules.sync.entity.sync_models import SyncsActive
 from quivr_api.modules.sync.service.sync_notion import SyncNotionService
-from quivr_api.modules.sync.service.sync_service import SyncService, SyncUserService
+from quivr_api.modules.sync.service.sync_service import SyncsService
 from quivr_api.modules.user.entity.user_identity import UserIdentity
 
 notification_service = NotificationService()
@@ -35,9 +35,8 @@ os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
 logger = get_logger(__name__)
 
 # Initialize sync service
-sync_service = SyncService()
-sync_user_service = SyncUserService()
-NotionServiceDep = Annotated[SyncNotionService, Depends(get_service(SyncNotionService))]
+sync_service = SyncsService()
+sync_user_service = SyncsService()
 
 
 # Initialize API router
@@ -119,7 +118,7 @@ async def get_user_syncs(current_user: UserIdentity = Depends(get_current_user))
         List: A list of syncs for the user.
     """
     logger.debug(f"Fetching user syncs for user: {current_user.id}")
-    return sync_user_service.get_syncs_user(current_user.id)
+    return sync_user_service.get_syncs(current_user.id)
 
 
 @sync_router.delete(
@@ -144,7 +143,7 @@ async def delete_user_sync(
     logger.debug(
         f"Deleting user sync for user: {current_user.id} with sync ID: {sync_id}"
     )
-    sync_user_service.delete_sync_user(sync_id, str(current_user.id))  # type: ignore
+    sync_user_service.delete_sync(sync_id, str(current_user.id))  # type: ignore
     return None
 
 
@@ -372,8 +371,8 @@ async def get_active_syncs_for_user(
 )
 async def get_files_folder_user_sync(
     user_sync_id: int,
-    notion_service: NotionServiceDep,
     folder_id: str | None = None,
+    notion_service: SyncNotionService = Depends(get_service(SyncNotionService)),
     current_user: UserIdentity = Depends(get_current_user),
 ):
     """

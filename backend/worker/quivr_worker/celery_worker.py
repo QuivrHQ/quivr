@@ -20,7 +20,7 @@ from quivr_api.modules.notification.service.notification_service import (
 )
 from quivr_api.modules.sync.repository.sync_files import SyncFilesRepository
 from quivr_api.modules.sync.service.sync_notion import SyncNotionService
-from quivr_api.modules.sync.service.sync_service import SyncService, SyncUserService
+from quivr_api.modules.sync.service.sync_service import SyncsService
 from quivr_api.modules.vector.repository.vectors_repository import VectorRepository
 from quivr_api.modules.vector.service.vector_service import VectorService
 from quivr_api.utils.telemetry import maybe_send_telemetry
@@ -53,8 +53,8 @@ _patch_json()
 supabase_client = get_supabase_client()
 # document_vector_store = get_documents_vector_store()
 notification_service = NotificationService()
-sync_active_service = SyncService()
-sync_user_service = SyncUserService()
+sync_active_service = SyncsService()
+sync_user_service = SyncsService()
 sync_files_repo_service = SyncFilesRepository()
 brain_service = BrainService()
 brain_vectors = BrainsVectors()

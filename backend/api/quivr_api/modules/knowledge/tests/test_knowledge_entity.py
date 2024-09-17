@@ -209,6 +209,8 @@ async def test_knowledge_dto(session, user, brain):
 
     km_dto = await km.to_dto()
 
+    breakpoint()
+
     assert km_dto.file_name == km.file_name
     assert km_dto.url == km.url
     assert km_dto.extension == km.extension

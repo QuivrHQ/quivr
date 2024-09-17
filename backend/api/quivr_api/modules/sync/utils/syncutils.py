@@ -346,16 +346,16 @@ class SyncUtils:
     async def direct_sync(
         self,
         sync_active: SyncsActive,
-        user_sync: SyncsUser,
+        sync_user: SyncsUser,
         files_ids: list[str],
         folder_ids: list[str],
     ):
         files = await self.get_syncfiles_from_ids(
-            user_sync.credentials, files_ids, folder_ids
+            sync_user.credentials, files_ids, folder_ids
         )
         processed_files = await self.process_sync_files(
             files=files,
-            current_user=user_sync,
+            current_user=sync_user,
             sync_active=sync_active,
         )
 

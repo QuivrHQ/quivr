@@ -11,12 +11,12 @@ from quivr_api.modules.knowledge.service.knowledge_service import KnowledgeServi
 from quivr_api.modules.notification.service.notification_service import (
     NotificationService,
 )
+from quivr_api.modules.sync.repository.notion_repository import NotionRepository
 from quivr_api.modules.sync.repository.sync_files import SyncFilesRepository
-from quivr_api.modules.sync.repository.sync_repository import NotionRepository
 from quivr_api.modules.sync.service.sync_notion import (
     SyncNotionService,
 )
-from quivr_api.modules.sync.service.sync_service import SyncService, SyncUserService
+from quivr_api.modules.sync.service.sync_service import SyncsService
 from quivr_api.modules.sync.utils.sync import (
     AzureDriveSync,
     DropboxSync,
@@ -37,8 +37,8 @@ logger = get_logger("celery_worker")
 @dataclass
 class SyncServices:
     async_engine: AsyncEngine
-    sync_active_service: SyncService
-    sync_user_service: SyncUserService
+    sync_active_service: SyncsService
+    sync_user_service: SyncsService
     sync_files_repo_service: SyncFilesRepository
     notification_service: NotificationService
     brain_vectors: BrainsVectors

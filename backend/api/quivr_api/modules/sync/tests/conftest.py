@@ -30,12 +30,12 @@ from quivr_api.modules.notification.service.notification_service import (
     NotificationService,
 )
 from quivr_api.modules.sync.dto.inputs import (
+    SyncCreateInput,
     SyncFileInput,
     SyncFileUpdateInput,
     SyncsActiveInput,
     SyncsActiveUpdateInput,
-    SyncsUserInput,
-    SyncUserUpdateInput,
+    SyncUpdateInput,
 )
 from quivr_api.modules.sync.entity.notion_page import (
     BlockParent,
@@ -487,7 +487,7 @@ class MockSyncUserService(ISyncUserService):
     def get_sync_user_by_id(self, sync_id: int):
         return self.map_id[sync_id]
 
-    def create_sync_user(self, sync_user_input: SyncsUserInput):
+    def create_sync_user(self, sync_user_input: SyncCreateInput):
         id = len(self.map_userid) + 1
         self.map_userid[sync_user_input.user_id] = SyncsUser(
             id=id, **sync_user_input.model_dump()
@@ -503,7 +503,7 @@ class MockSyncUserService(ISyncUserService):
         return list(self.map_userid.values())[-1]
 
     def update_sync_user(
-        self, sync_user_id: UUID, state: dict, sync_user_input: SyncUserUpdateInput
+        self, sync_user_id: UUID, state: dict, sync_user_input: SyncUpdateInput
     ):
         return
 

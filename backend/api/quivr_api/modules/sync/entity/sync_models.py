@@ -2,13 +2,22 @@ import hashlib
 import io
 from dataclasses import dataclass
 from datetime import datetime
-from typing import Optional
+from typing import Dict, Optional
 from uuid import UUID
 
 from pydantic import BaseModel
-from sqlmodel import TIMESTAMP, Column, Field, Relationship, SQLModel, text
+from sqlmodel import (  # noqa: F811
+    JSON,
+    TIMESTAMP,
+    Column,
+    Field,
+    Relationship,
+    SQLModel,
+    text,
+)
 from sqlmodel import UUID as PGUUID
 
+from quivr_api.modules.sync.dto.outputs import SyncsOutput
 from quivr_api.modules.user.entity.user_identity import User
 
 
@@ -27,15 +36,6 @@ class DownloadedSyncFile:
         return m.hexdigest()
 
 
-class DBSyncFile(BaseModel):
-    id: int
-    path: str
-    syncs_active_id: int
-    last_modified: str
-    brain_id: str
-    supported: bool
-
-
 class SyncFile(BaseModel):
     id: str
     name: str
@@ -50,32 +50,20 @@ class SyncFile(BaseModel):
     type: Optional[str] = None
 
 
-class SyncsUser(BaseModel):
-    id: int
-    user_id: UUID
+class Syncs(SQLModel, table=True):
+    __tablename__ = "syns_user"  # type: ignore
+    id: UUID | None = Field(default=None, primary_key=True)
+    user_id: UUID = Field(foreign_key="users.id", nullable=False)
     name: str
     provider: str
-    credentials: dict
-    state: dict
+    credentials: Dict[str, str] | None = Field(
+        default=None, sa_column=Column("state", JSON)
+    )
+    state: Dict[str, str] | None = Field(default=None, sa_column=Column("state", JSON))
     additional_data: dict
 
-
-class SyncsActive(BaseModel):
-    id: int
-    name: str
-    syncs_user_id: int
-    user_id: UUID
-    settings: dict
-    last_synced: str
-    sync_interval_minutes: int
-    brain_id: UUID
-    syncs_user: Optional[SyncsUser] = None
-    notification_id: Optional[str] = None
-
-
-# TODO: all of this should be rewritten
-class SyncsActiveDetails(BaseModel):
-    pass
+    def to_dto(self) -> SyncsOutput:
+        return SyncsOutput(user_id=self.user_id, provider=self.provider)
 
 
 class NotionSyncFile(SQLModel, table=True):

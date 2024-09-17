@@ -10,8 +10,8 @@ from notion_client import Client
 from quivr_api.celery_config import celery
 from quivr_api.logger import get_logger
 from quivr_api.middlewares.auth import AuthBearer, get_current_user
-from quivr_api.modules.sync.dto.inputs import SyncsUserInput, SyncUserUpdateInput
-from quivr_api.modules.sync.service.sync_service import SyncService, SyncUserService
+from quivr_api.modules.sync.dto.inputs import SyncCreateInput, SyncUpdateInput
+from quivr_api.modules.sync.service.sync_service import SyncsService
 from quivr_api.modules.user.entity.user_identity import UserIdentity
 
 from .successfull_connection import successfullConnectionPage
@@ -25,8 +25,8 @@ SCOPE = "users.read,databases.read,databases.write,blocks.read,blocks.write"
 
 
 # Initialize sync service
-sync_service = SyncService()
-sync_user_service = SyncUserService()
+sync_service = SyncsService()
+sync_user_service = SyncsService()
 
 logger = get_logger(__name__)
 
@@ -59,7 +59,7 @@ def authorize_notion(
     logger.info(
         f"Generated authorization URL: {authorize_url} for user: {current_user.id}"
     )
-    sync_user_input = SyncsUserInput(
+    sync_user_input = SyncCreateInput(
         name=name,
         user_id=str(current_user.id),
         provider="Notion",
@@ -93,7 +93,7 @@ def oauth2callback_notion(request: Request, background_tasks: BackgroundTasks):
     logger.debug(
         f"Handling OAuth2 callback for user: {current_user} with state: {state} and state_dict: {state_dict}"
     )
-    sync_user_state = sync_user_service.get_sync_user_by_state(state_dict)
+    sync_user_state = sync_user_service.get_sync_by_state(state_dict)
 
     if not sync_user_state or state_dict != sync_user_state.state:
         logger.error(f"Invalid state parameter for {sync_user_state}")
@@ -143,12 +143,12 @@ def oauth2callback_notion(request: Request, background_tasks: BackgroundTasks):
             "expires_in": oauth_result.get("expires_in", ""),
         }
 
-        sync_user_input = SyncUserUpdateInput(
+        sync_user_input = SyncUpdateInput(
             credentials=result,
             state={},
             email=user_email,
         )
-        sync_user_service.update_sync_user(current_user, state_dict, sync_user_input)
+        sync_user_service.update_sync(current_user, state_dict, sync_user_input)
         logger.info(f"Notion sync created successfully for user: {current_user}")
         # launch celery task to sync notion data
         celery.send_task(

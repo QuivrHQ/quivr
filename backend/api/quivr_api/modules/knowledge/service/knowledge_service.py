@@ -209,8 +209,7 @@ class KnowledgeService(BaseService[KnowledgeRepository]):
 
     async def get_all_knowledge_in_brain(self, brain_id: UUID) -> List[Knowledge]:
         brain = await self.repository.get_brain_by_id(brain_id)
-
-        all_knowledges = await brain.awaitable_attrs.knowledges
+        all_knowledges: List[KnowledgeDB] = await brain.awaitable_attrs.knowledges
         knowledges = [await knowledge.to_dto() for knowledge in all_knowledges]
 
         return knowledges

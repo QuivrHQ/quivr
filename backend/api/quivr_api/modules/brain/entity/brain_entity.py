@@ -68,8 +68,6 @@ class Brain(AsyncAttrs, SQLModel, table=True):
     knowledges: List[KnowledgeDB] = Relationship(
         back_populates="brains", link_model=KnowledgeBrain
     )
-
-
     # TODO : add
     # "meaning" "public"."vector",
     # "tags" "public"."tags"[]
