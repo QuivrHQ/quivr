@@ -1,0 +1,47 @@
+workflow_config:
+  name: "standard RAG"
+  nodes:
+    - name: "filter_history"
+      edges: ["rewrite"]
+
+    - name: "rewrite"
+      edges: ["retrieve"]
+
+    - name: "retrieve"
+      edges: ["generate"]
+
+    - name: "generate"
+      edges: ["END"]
+# Maximum number of previous conversation iterations
+# to include in the context of the answer
+max_history: 10
+
+prompt: "my prompt"
+
+max_files: 20
+reranker_config:
+  # The reranker supplier to use
+  supplier: "cohere"
+
+  # The model to use for the reranker for the given supplier
+  model: "rerank-multilingual-v3.0"
+
+  # Number of chunks returned by the reranker
+  top_n: 5
+llm_config:
+  # The LLM supplier to use
+  #supplier: "claude"
+  supplier: "anthropic"
+
+  # The model to use for the LLM for the given supplier
+  #model: "gpt-3.5-turbo-0125"
+  model: "claude-3-5-sonnet-20240620"
+
+  max_input_tokens: 2000
+
+  # Maximum number of tokens to pass to the LLM
+  # as a context to generate the answer
+  max_output_tokens: 2000
+
+  temperature: 0.7
+  streaming: true
