@@ -79,14 +79,6 @@ if __name__ == "__main__":
         title="Summary of Legal Services Rendered by Orrick",
         content="""
 **Summary:** 
-The document is an invoice from Quivr Technologies, Inc. for legal services provided to client YC W24, related to initial corporate work. The total fees and disbursements amount to $8,345.00 for services rendered through February 29, 2024. The invoice includes specific instructions for payment remittance and contact information for inquiries. Online payment through e-billexpress.com is also an option.
-
-**Key Points:**
-- Quivr Technologies, Inc., based in France and represented by Stanislas Girard, provided legal services to client YC W24.
-- Services included preparing and completing forms, drafting instructions, reviewing and responding to emails, filing 83(b) elections, and finalizing documents for submission to YC.
-- The timekeepers involved in providing these services were Julien Barbey, Maria T. Coladonato, Michael LaBlanc, Jessy K. Parker, Marisol Sandoval Villasenor, Alexis A. Smith, and Serena Tibrewala.
-- The total hours billed for the services provided was 16.20, with a total cost of $8,345.00.
-- Instructions for payment remittance, contact information, and online payment options through e-billex
 """,
     )
     pdf = PDFGenerator(pdf_model)
