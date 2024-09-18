@@ -4,7 +4,7 @@ workflow_config:
     - name: "filter_history"
       edges: ["generate_chat_llm"]
 
-    - name: "generate_chat_llm" # the name of the last node should always start with "generate"
+    - name: "generate_chat_llm" # the name of the last node, from which we want to stream the answer to the user, should always start with "generate"
       edges: ["END"]
 # Maximum number of previous conversation iterations
 # to include in the context of the answer
