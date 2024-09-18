@@ -6,7 +6,7 @@ from quivr_api.celery_config import celery
 from quivr_api.logger import get_logger
 from quivr_api.modules.brain.repository.brains_vectors import BrainsVectors
 from quivr_api.modules.knowledge.repository.knowledges import KnowledgeRepository
-from quivr_api.modules.knowledge.repository.storage import Storage
+from quivr_api.modules.knowledge.repository.storage import SupabaseS3Storage
 from quivr_api.modules.knowledge.service.knowledge_service import KnowledgeService
 from quivr_api.modules.notification.service.notification_service import (
     NotificationService,
@@ -42,7 +42,7 @@ class SyncServices:
     sync_files_repo_service: SyncFilesRepository
     notification_service: NotificationService
     brain_vectors: BrainsVectors
-    storage: Storage
+    storage: SupabaseS3Storage
 
 
 @asynccontextmanager
@@ -56,7 +56,6 @@ async def build_syncs_utils(
             await session.execute(
                 text("SET SESSION idle_in_transaction_session_timeout = '5min';")
             )
-            # TODO pass services from celery_worker
             notion_repository = NotionRepository(session)
             notion_service = SyncNotionService(notion_repository)
             knowledge_service = KnowledgeService(KnowledgeRepository(session))
@@ -84,7 +83,7 @@ async def build_syncs_utils(
                 mapping_sync_utils[provider_name] = provider_sync_util
 
             yield mapping_sync_utils
-
+            await session.commit()
     except Exception as e:
         await session.rollback()
         raise e

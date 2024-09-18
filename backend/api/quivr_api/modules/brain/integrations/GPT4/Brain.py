@@ -10,6 +10,7 @@ from langchain_core.tools import BaseTool
 from langchain_openai import ChatOpenAI
 from langgraph.graph import END, StateGraph
 from langgraph.prebuilt import ToolExecutor, ToolInvocation
+
 from quivr_api.logger import get_logger
 from quivr_api.modules.brain.knowledge_brain_qa import KnowledgeBrainQA
 from quivr_api.modules.chat.dto.chats import ChatQuestion

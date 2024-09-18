@@ -53,12 +53,10 @@ AsyncClientDep = Annotated[AsyncClient, Depends(get_supabase_async_client)]
 @upload_router.post("/upload", dependencies=[Depends(AuthBearer())], tags=["Upload"])
 async def upload_file(
     uploadFile: UploadFile,
-    client: AsyncClientDep,
-    background_tasks: BackgroundTasks,
     knowledge_service: KnowledgeServiceDep,
+    background_tasks: BackgroundTasks,
     bulk_id: Optional[UUID] = Query(None, description="The ID of the bulk upload"),
     brain_id: UUID = Query(..., description="The ID of the brain"),
-    chat_id: Optional[UUID] = Query(None, description="The ID of the chat"),
     current_user: UserIdentity = Depends(get_current_user),
     integration: Optional[str] = None,
     integration_link: Optional[str] = None,
@@ -121,7 +119,7 @@ async def upload_file(
         file_size=uploadFile.size,
         file_sha1=None,
     )
-    knowledge = await knowledge_service.insert_knowledge(
+    knowledge = await knowledge_service.insert_knowledge_brain(
         user_id=current_user.id, knowledge_to_add=knowledge_to_add
     )  # type: ignore
 

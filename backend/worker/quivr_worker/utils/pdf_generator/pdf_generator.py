@@ -1,6 +1,6 @@
 import os
 
-from fpdf import FPDF
+from fpdf import FPDF, XPos, YPos
 from pydantic import BaseModel
 
 
@@ -17,7 +17,6 @@ class PDFGenerator(FPDF):
             "DejaVu",
             "",
             os.path.join(os.path.dirname(__file__), "font/DejaVuSansCondensed.ttf"),
-            uni=True,
         )
         self.add_font(
             "DejaVu",
@@ -25,7 +24,6 @@ class PDFGenerator(FPDF):
             os.path.join(
                 os.path.dirname(__file__), "font/DejaVuSansCondensed-Bold.ttf"
             ),
-            uni=True,
         )
         self.add_font(
             "DejaVu",
@@ -60,9 +58,15 @@ class PDFGenerator(FPDF):
         self.cell(0, 10, "Github", 0, 1, "C", link="https://github.com/quivrhq/quivr")
 
     def chapter_body(self):
-
         self.set_font("DejaVu", "", 12)
-        self.multi_cell(0, 10, self.pdf_model.content, markdown=True)
+        self.multi_cell(
+            0,
+            10,
+            self.pdf_model.content,
+            markdown=True,
+            new_x=XPos.RIGHT,
+            new_y=YPos.TOP,
+        )
         self.ln()
 
     def print_pdf(self):
@@ -75,14 +79,6 @@ if __name__ == "__main__":
         title="Summary of Legal Services Rendered by Orrick",
         content="""
 **Summary:** 
-The document is an invoice from Quivr Technologies, Inc. for legal services provided to client YC W24, related to initial corporate work. The total fees and disbursements amount to $8,345.00 for services rendered through February 29, 2024. The invoice includes specific instructions for payment remittance and contact information for inquiries. Online payment through e-billexpress.com is also an option.
-
-**Key Points:**
-- Quivr Technologies, Inc., based in France and represented by Stanislas Girard, provided legal services to client YC W24.
-- Services included preparing and completing forms, drafting instructions, reviewing and responding to emails, filing 83(b) elections, and finalizing documents for submission to YC.
-- The timekeepers involved in providing these services were Julien Barbey, Maria T. Coladonato, Michael LaBlanc, Jessy K. Parker, Marisol Sandoval Villasenor, Alexis A. Smith, and Serena Tibrewala.
-- The total hours billed for the services provided was 16.20, with a total cost of $8,345.00.
-- Instructions for payment remittance, contact information, and online payment options through e-billex
 """,
     )
     pdf = PDFGenerator(pdf_model)

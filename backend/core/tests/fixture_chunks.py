@@ -5,7 +5,6 @@ from uuid import uuid4
 from langchain_core.embeddings import DeterministicFakeEmbedding
 from langchain_core.messages.ai import AIMessageChunk
 from langchain_core.vectorstores import InMemoryVectorStore
-
 from quivr_core.chat import ChatHistory
 from quivr_core.config import LLMEndpointConfig, RAGConfig
 from quivr_core.llm import LLMEndpoint

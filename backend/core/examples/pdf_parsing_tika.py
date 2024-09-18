@@ -1,12 +1,11 @@
 from langchain_core.embeddings import DeterministicFakeEmbedding
 from langchain_core.language_models import FakeListChatModel
-from rich.console import Console
-from rich.panel import Panel
-from rich.prompt import Prompt
-
 from quivr_core import Brain
 from quivr_core.config import LLMEndpointConfig
 from quivr_core.llm.llm_endpoint import LLMEndpoint
+from rich.console import Console
+from rich.panel import Panel
+from rich.prompt import Prompt
 
 if __name__ == "__main__":
     brain = Brain.from_files(

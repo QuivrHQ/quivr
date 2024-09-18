@@ -3,6 +3,7 @@ from typing import Any, Generator, Tuple
 from uuid import UUID, uuid4
 
 from langchain_core.messages import AIMessage, HumanMessage
+
 from quivr_core.models import ChatMessage
 
 
@@ -54,7 +55,7 @@ class ChatHistory:
         """
         # Reverse the chat_history, newest first
         it = iter(self.get_chat_history(newest_first=True))
-        for ai_message, human_message in zip(it, it):
+        for ai_message, human_message in zip(it, it, strict=False):
             assert isinstance(
                 human_message.msg, HumanMessage
             ), f"msg {human_message} is not HumanMessage"
