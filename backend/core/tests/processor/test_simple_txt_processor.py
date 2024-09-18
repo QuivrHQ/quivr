@@ -1,6 +1,5 @@
 import pytest
 from langchain_core.documents import Document
-
 from quivr_core.files.file import FileExtension
 from quivr_core.processor.implementations.simple_txt_processor import (
     SimpleTxtProcessor,

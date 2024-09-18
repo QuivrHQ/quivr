@@ -37,6 +37,7 @@ def model_supports_function_calling(model_name: str):
     ]
     return model_name in models_supporting_function_calls
 
+
 def format_history_to_openai_mesages(
     tuple_history: List[Tuple[str, str]], system_message: str, question: str
 ) -> List[BaseMessage]:
@@ -125,7 +126,11 @@ def parse_response(raw_response: RawRAGResponse, model_name: str) -> ParsedRAGRe
     )
 
     if model_supports_function_calling(model_name):
-        if 'tool_calls' in raw_response["answer"] and raw_response["answer"].tool_calls and "citations" in raw_response["answer"].tool_calls[-1]["args"]:
+        if (
+            "tool_calls" in raw_response["answer"]
+            and raw_response["answer"].tool_calls
+            and "citations" in raw_response["answer"].tool_calls[-1]["args"]
+        ):
             citations = raw_response["answer"].tool_calls[-1]["args"]["citations"]
             metadata.citations = citations
             followup_questions = raw_response["answer"].tool_calls[-1]["args"][
@@ -147,7 +152,7 @@ def combine_documents(
     docs, document_prompt=DEFAULT_DOCUMENT_PROMPT, document_separator="\n\n"
 ):
     # for each docs, add an index in the metadata to be able to cite the sources
-    for doc, index in zip(docs, range(len(docs))):
+    for doc, index in zip(docs, range(len(docs)), strict=False):
         doc.metadata["index"] = index
     doc_strings = [format_document(doc, document_prompt) for doc in docs]
     return document_separator.join(doc_strings)

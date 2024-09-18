@@ -3,7 +3,6 @@ from uuid import uuid4
 import pytest
 from langchain_core.messages.ai import AIMessageChunk
 from langchain_core.messages.tool import ToolCall
-
 from quivr_core.utils import (
     get_prev_message_str,
     model_supports_function_calling,

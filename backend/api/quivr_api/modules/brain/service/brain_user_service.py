@@ -2,6 +2,7 @@ from typing import List
 from uuid import UUID
 
 from fastapi import HTTPException
+
 from quivr_api.logger import get_logger
 from quivr_api.modules.brain.entity.brain_entity import (
     BrainEntity,

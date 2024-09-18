@@ -150,6 +150,7 @@ debugpy==1.8.5
 decorator==5.1.1
     # via ipython
 defusedxml==0.7.1
+    # via fpdf2
     # via langchain-anthropic
     # via nbconvert
 deprecated==1.2.14
@@ -200,10 +201,11 @@ flatbuffers==24.3.25
 flower==2.0.1
     # via quivr-worker
 fonttools==4.53.1
+    # via fpdf2
     # via matplotlib
     # via pdf2docx
-fpdf==1.7.2
-    # via quivr-api
+fpdf2==2.7.9
+    # via quivr-worker
 frozenlist==1.4.1
     # via aiohttp
     # via aiosignal
@@ -650,6 +652,7 @@ pgvector==0.3.2
 pikepdf==9.1.1
     # via unstructured
 pillow==10.2.0
+    # via fpdf2
     # via layoutparser
     # via llama-index-core
     # via matplotlib

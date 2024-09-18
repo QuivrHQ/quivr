@@ -2,19 +2,19 @@ from datetime import datetime, timedelta
 from typing import List, Sequence
 from uuid import UUID
 
-from quivr_api.logger import get_logger
-from quivr_api.modules.dependencies import (BaseRepository, get_supabase_client)
-from quivr_api.modules.notification.service.notification_service import \
-    NotificationService
-from quivr_api.modules.sync.dto.inputs import (SyncsActiveInput,
-                                               SyncsActiveUpdateInput)
-from quivr_api.modules.sync.entity.sync_models import (NotionSyncFile,
-                                                       SyncsActive)
-from quivr_api.modules.sync.repository.sync_interfaces import SyncInterface
 from sqlalchemy import or_
 from sqlalchemy.exc import IntegrityError
 from sqlmodel import col, select
 from sqlmodel.ext.asyncio.session import AsyncSession
+
+from quivr_api.logger import get_logger
+from quivr_api.modules.dependencies import BaseRepository, get_supabase_client
+from quivr_api.modules.notification.service.notification_service import (
+    NotificationService,
+)
+from quivr_api.modules.sync.dto.inputs import SyncsActiveInput, SyncsActiveUpdateInput
+from quivr_api.modules.sync.entity.sync_models import NotionSyncFile, SyncsActive
+from quivr_api.modules.sync.repository.sync_interfaces import SyncInterface
 
 notification_service = NotificationService()
 

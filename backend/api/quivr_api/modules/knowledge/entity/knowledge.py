@@ -35,7 +35,7 @@ class Knowledge(BaseModel):
     source_link: Optional[str] = None
     file_sha1: Optional[str] = None
     metadata: Optional[Dict[str, str]] = None
-    user_id: UUID
+    user_id: Optional[UUID] = None
     brains: List[Dict[str, Any]]
     parent: Optional["Knowledge"]
     children: Optional[list["Knowledge"]]
