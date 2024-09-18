@@ -24,7 +24,6 @@ const AssistantTab = (): JSX.Element => {
   };
 
   useEffect(() => {
-    console.log("Assistant choosed:", assistantChoosed);
     void (async () => {
       try {
         const res = await getAssistants();

@@ -7,3 +7,9 @@ export const getAssistants = async (
 ): Promise<Assistant[]> => {
   return (await axiosInstance.get<Assistant[]>(`/assistants`)).data;
 };
+
+export const getTasks = async (
+  axiosInstance: AxiosInstance
+): Promise<string> => {
+  return (await axiosInstance.get<string>(`/assistants/tasks`)).data;
+};

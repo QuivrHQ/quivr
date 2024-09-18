@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 
+import { useAssistants } from "@/lib/api/assistants/useAssistants";
 import { Checkbox } from "@/lib/components/ui/Checkbox/Checkbox";
 import { Icon } from "@/lib/components/ui/Icon/Icon";
 import { QuivrButton } from "@/lib/components/ui/QuivrButton/QuivrButton";
@@ -81,7 +82,20 @@ const ProcessTab = (): JSX.Element => {
     null
   );
 
+  const { getTasks } = useAssistants();
+
   const { isMobile } = useDevice();
+
+  useEffect(() => {
+    void (async () => {
+      try {
+        const res = await getTasks();
+        console.info(res);
+      } catch (error) {
+        console.error(error);
+      }
+    })();
+  }, []);
 
   useEffect(() => {
     setFilteredProcess(

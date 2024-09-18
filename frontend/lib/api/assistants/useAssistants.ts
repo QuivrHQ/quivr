@@ -1,6 +1,6 @@
 import { useAxios } from "@/lib/hooks";
 
-import { getAssistants } from "./assistants";
+import { getAssistants, getTasks } from "./assistants";
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export const useAssistants = () => {
@@ -8,5 +8,6 @@ export const useAssistants = () => {
 
   return {
     getAssistants: async () => getAssistants(axiosInstance),
+    getTasks: async () => getTasks(axiosInstance),
   };
 };
