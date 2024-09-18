@@ -3,6 +3,7 @@ from typing import Any, List, Literal, Union
 from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
+
 from quivr_api.modules.sync.entity.sync_models import NotionSyncFile
 
 

@@ -9,7 +9,7 @@ from uuid import UUID
 from quivr_api.logger import get_logger
 from quivr_core.files.file import FileExtension, QuivrFile
 
-from quivr_worker.utils import get_tmp_name
+from quivr_worker.utils.utils import get_tmp_name
 
 logger = get_logger("celery_worker")
 

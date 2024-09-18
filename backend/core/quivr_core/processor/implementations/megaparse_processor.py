@@ -14,19 +14,20 @@ logger = logging.getLogger("quivr_core")
 
 
 class MegaparseProcessor(ProcessorBase):
-    '''
+    """
     Megaparse processor for PDF files.
-    
+
     It can be used to parse PDF files and split them into chunks.
-    
+
     It comes from the megaparse library.
-    
+
     ## Installation
     ```bash
     pip install megaparse
     ```
-    
-    '''
+
+    """
+
     supported_extensions = [FileExtension.pdf]
 
     def __init__(

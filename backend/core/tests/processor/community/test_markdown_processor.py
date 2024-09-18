@@ -2,7 +2,6 @@ from pathlib import Path
 from uuid import uuid4
 
 import pytest
-
 from quivr_core.files.file import FileExtension, QuivrFile
 from quivr_core.processor.implementations.default import MarkdownProcessor
 

@@ -122,4 +122,4 @@ def test_process_crawl_task(test_data: TestData):
             "notification_id": uuid4(),
         },
     )
-    result = task.wait()
+    result = task.wait()  # noqa: F841

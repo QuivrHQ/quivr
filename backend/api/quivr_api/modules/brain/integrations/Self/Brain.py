@@ -12,13 +12,14 @@ from langchain_core.pydantic_v1 import BaseModel as BaseModelV1
 from langchain_core.pydantic_v1 import Field as FieldV1
 from langchain_openai import ChatOpenAI
 from langgraph.graph import END, StateGraph
+from typing_extensions import TypedDict
+
 from quivr_api.logger import get_logger
 from quivr_api.modules.brain.knowledge_brain_qa import KnowledgeBrainQA
 from quivr_api.modules.chat.dto.chats import ChatQuestion
 from quivr_api.modules.chat.dto.outputs import GetChatHistoryOutput
 from quivr_api.modules.chat.service.chat_service import ChatService
 from quivr_api.modules.dependencies import get_service
-from typing_extensions import TypedDict
 
 
 # Post-processing
@@ -210,13 +211,11 @@ class SelfBrain(KnowledgeBrainQA):
         return question_rewriter
 
     def get_chain(self):
-
         graph = self.create_graph()
 
         return graph
 
     def create_graph(self):
-
         workflow = StateGraph(GraphState)
 
         # Define the nodes

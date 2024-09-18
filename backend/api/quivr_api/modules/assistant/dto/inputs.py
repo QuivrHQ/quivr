@@ -1,16 +1,16 @@
-import json
 from typing import List, Optional
 from uuid import UUID
 
-from pydantic import BaseModel, model_validator, root_validator
+from pydantic import BaseModel, root_validator
 
 
-class EmailInput(BaseModel):
-    activated: bool
+class CreateTask(BaseModel):
+    pretty_id: str
+    assistant_id: int
+    settings: dict
 
 
 class BrainInput(BaseModel):
-    activated: Optional[bool] = False
     value: Optional[UUID] = None
 
     @root_validator(pre=True)
@@ -64,19 +64,10 @@ class Inputs(BaseModel):
     numbers: Optional[List[InputNumber]] = None
     select_texts: Optional[List[InputSelectText]] = None
     select_numbers: Optional[List[InputSelectNumber]] = None
-
-
-class Outputs(BaseModel):
-    email: Optional[EmailInput] = None
     brain: Optional[BrainInput] = None
 
 
 class InputAssistant(BaseModel):
+    id: int
     name: str
     inputs: Inputs
-    outputs: Outputs
-
-    @model_validator(mode="before")
-    @classmethod
-    def to_py_dict(cls, data):
-        return json.loads(data)

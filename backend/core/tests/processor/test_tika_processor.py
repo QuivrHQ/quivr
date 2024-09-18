@@ -1,5 +1,4 @@
 import pytest
-
 from quivr_core.processor.implementations.tika_processor import TikaProcessor
 
 # TODO: TIKA server should be set
