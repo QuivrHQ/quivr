@@ -50,7 +50,11 @@ export const useChat = () => {
   const { addStreamQuestion } = useQuestion();
   const { t } = useTranslation(["chat"]);
 
-  const addQuestion = async (question: string, callback?: () => void) => {
+  const addQuestion = async (
+    question: string,
+    callback?: () => void,
+    redirect = true
+  ) => {
     if (question === "") {
       publish({
         variant: "danger",
@@ -70,7 +74,9 @@ export const useChat = () => {
         const chat = await createChat(getChatNameFromQuestion(question));
         currentChatId = chat.chat_id;
         setChatId(currentChatId);
-        router.push(`/chat/${currentChatId}`);
+        if (redirect) {
+          router.push(`/chat/${currentChatId}`);
+        }
         void queryClient.invalidateQueries({
           queryKey: [CHATS_DATA_KEY],
         });

@@ -4,7 +4,7 @@ import { TextEditor } from "@/lib/components/TextEditor/TextEditor";
 
 import styles from "./page.module.scss";
 
-const Note = (): JSX.Element => {
+const NotetakerPage = (): JSX.Element => {
   return (
     <div className={styles.main_container}>
       <div className={styles.page_header}>
@@ -17,4 +17,4 @@ const Note = (): JSX.Element => {
   );
 };
 
-export default Note;
+export default NotetakerPage;
