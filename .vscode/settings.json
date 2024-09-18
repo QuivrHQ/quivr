@@ -1,8 +1,9 @@
 {
   "editor.codeActionsOnSave": {
     "source.organizeImports": "explicit",
+    "source.organizeImports.ruff": "explicit",
     "source.fixAll": "explicit",
-    "source.unusedImports": "explicit",
+    "source.unusedImports": "explicit"
   },
   "editor.formatOnSave": true,
   "editor.formatOnSaveMode": "file",
@@ -16,7 +17,6 @@
     "**/.docusaurus/": true,
     "**/node_modules/": true
   },
-  "json.sortOnSave.enable": true,
   "[python]": {
     "editor.defaultFormatter": "charliermarsh.ruff",
     "editor.formatOnSave": true,
@@ -25,19 +25,8 @@
       "source.fixAll": "explicit"
     }
   },
-  "python.formatting.provider": "black",
-  "python.analysis.extraPaths": [
-    "./backend"
-  ],
-  "python.sortImports.path": "isort",
-  "python.linting.mypyEnabled": true,
+  "python.analysis.extraPaths": ["./backend"],
   "python.defaultInterpreterPath": "python3",
-  "python.linting.enabled": true,
-  "python.linting.flake8Enabled": true,
-  "python.linting.pycodestyleEnabled": true,
-  "python.linting.pylintEnabled": true,
-  "python.linting.pycodestyleCategorySeverity.W": "Error",
-  "python.linting.flake8CategorySeverity.W": "Error",
   "python.testing.pytestArgs": [
     "-v",
     "--color=yes",
