@@ -2,7 +2,7 @@ import base64
 import os
 
 import requests
-from fastapi import APIRouter, Depends, HTTPException, Request, status
+from fastapi import APIRouter, Depends, HTTPException, Request
 from fastapi.responses import HTMLResponse
 from notion_client import Client
 
@@ -10,10 +10,9 @@ from quivr_api.celery_config import celery
 from quivr_api.logger import get_logger
 from quivr_api.middlewares.auth import AuthBearer, get_current_user
 from quivr_api.modules.dependencies import get_service
-from quivr_api.modules.sync.dto.inputs import SyncCreateInput, SyncUpdateInput
+from quivr_api.modules.sync.dto.inputs import SyncUpdateInput
 from quivr_api.modules.sync.service.sync_service import SyncsService
-from quivr_api.modules.sync.utils.oauth2 import Oauth2State
-from quivr_api.modules.sync.utils.sync_exceptions import SyncNotFoundException
+from quivr_api.modules.sync.utils.oauth2 import parse_oauth2_state
 from quivr_api.modules.user.entity.user_identity import UserIdentity
 
 from .successfull_connection import successfullConnectionPage
@@ -57,20 +56,11 @@ async def authorize_notion(
         dict: A dictionary containing the authorization URL.
     """
     logger.debug(f"Authorizing Notion sync for user: {current_user.id}, name : {name}")
-    state_struct = Oauth2State(name=name, user_id=current_user.id)
-    state = state_struct.model_dump_json()
-    sync_user_input = SyncCreateInput(
-        name=name,
-        user_id=current_user.id,
-        provider="Notion",
-        credentials={},
-        state={"state": state},
+    state = await syncs_service.create_oauth2_state(
+        provider="Notion", name=name, user_id=current_user.id
     )
-    sync = await syncs_service.create_sync_user(sync_user_input)
-    state_struct.sync_id = sync.id
-    state = state_struct.model_dump_json()
     # Finalize the state
-    authorize_url = str(NOTION_AUTH_URL) + f"&state={state}"
+    authorize_url = str(NOTION_AUTH_URL) + f"&state={state.model_dump_json()}"
     logger.debug(
         f"Generated authorization URL: {authorize_url} for user: {current_user.id}"
     )
@@ -92,38 +82,9 @@ async def oauth2callback_notion(
         dict: A dictionary containing a success message.
     """
     code = request.query_params.get("code")
-    state = request.query_params.get("state")
 
-    if not state:
-        raise HTTPException(status_code=400, detail="Invalid state parameter")
-
-    state = Oauth2State.model_validate_json(state)
-
-    if state.sync_id is None:
-        raise HTTPException(
-            status_code=400, detail="Invalid state parameter. Unknown sync"
-        )
-
-    logger.debug(
-        f"Handling OAuth2 callback for user: {state.user_id} with state: {state}"
-    )
-
-    try:
-        sync = await syncs_service.get_sync_by_id(state.sync_id)
-    except SyncNotFoundException as e:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail=f"{e.message}"
-        )
-    if (
-        not sync
-        or not sync.state
-        or state.model_dump(exclude={"sync_id"}) != sync.state["state"]
-    ):
-        logger.error("Invalid state parameter")
-        raise HTTPException(status_code=400, detail="Invalid state parameter")
-
-    if sync.user_id != state.user_id:
-        raise HTTPException(status_code=400, detail="Invalid user")
+    state_str = request.query_params.get("state")
+    state = parse_oauth2_state(state_str)
 
     try:
         token_url = "https://api.notion.com/v1/oauth/token"

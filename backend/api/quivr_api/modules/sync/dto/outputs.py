@@ -28,3 +28,4 @@ class SyncsOutput(BaseModel):
     provider: SyncProvider
     state: dict | None
     credentials: dict | None
+    additional_data: dict | None

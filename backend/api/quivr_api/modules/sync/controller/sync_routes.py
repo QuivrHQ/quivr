@@ -113,7 +113,7 @@ async def get_user_syncs(
         List: A list of syncs for the user.
     """
     logger.debug(f"Fetching user syncs for user: {current_user.id}")
-    return await syncs_service.get_syncs(current_user.id)
+    return await syncs_service.get_user_syncs(current_user.id)
 
 
 @sync_router.delete(

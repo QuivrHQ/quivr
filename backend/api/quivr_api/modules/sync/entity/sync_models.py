@@ -54,6 +54,7 @@ class Syncs(SQLModel, table=True):
     __tablename__ = "syncs_user"  # type: ignore
 
     id: int | None = Field(default=None, primary_key=True)
+    email: str | None = Field(default=None)
     user_id: UUID = Field(foreign_key="users.id", nullable=False)
     name: str
     provider: str
@@ -70,9 +71,10 @@ class Syncs(SQLModel, table=True):
         return SyncsOutput(
             id=self.id,
             user_id=self.user_id,
-            provider=SyncProvider(self.provider),
+            provider=SyncProvider(self.provider.lower()),
             credentials=self.credentials,
             state=self.state,
+            additional_data=self.additional_data,
         )
 
 

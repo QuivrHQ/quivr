@@ -1,16 +1,16 @@
 import os
+from typing import Tuple
 
 from dropbox import Dropbox, DropboxOAuth2Flow
-from fastapi import APIRouter, Depends, HTTPException, Request, status
+from fastapi import APIRouter, Depends, HTTPException, Request
 from fastapi.responses import HTMLResponse
 
 from quivr_api.logger import get_logger
 from quivr_api.middlewares.auth import AuthBearer, get_current_user
 from quivr_api.modules.dependencies import get_service
-from quivr_api.modules.sync.dto.inputs import SyncCreateInput, SyncUpdateInput
+from quivr_api.modules.sync.dto.inputs import SyncUpdateInput
 from quivr_api.modules.sync.service.sync_service import SyncsService
-from quivr_api.modules.sync.utils.oauth2 import Oauth2State
-from quivr_api.modules.sync.utils.sync_exceptions import SyncNotFoundException
+from quivr_api.modules.sync.utils.oauth2 import parse_oauth2_state
 from quivr_api.modules.user.entity.user_identity import UserIdentity
 
 from .successfull_connection import successfullConnectionPage
@@ -63,23 +63,24 @@ async def authorize_dropbox(
         token_access_type="offline",
         scope=SCOPE,
     )
-    state_struct = Oauth2State(name=name, user_id=current_user.id)
-    sync_user_input = SyncCreateInput(
-        name=name,
-        user_id=current_user.id,
-        provider="DropBox",
-        credentials={},
-        state={"state": state_struct.model_dump_json()},
-        additional_data={},
+    state = await syncs_service.create_oauth2_state(
+        provider="DropBox", name=name, user_id=current_user.id
     )
-    sync = await syncs_service.create_sync_user(sync_user_input)
-    state_struct.sync_id = sync.id
-    state = state_struct.model_dump_json()
-    authorize_url = auth_flow.start(state)
+    authorize_url = auth_flow.start(state.model_dump_json())
     logger.info(
         f"Generated authorization URL: {authorize_url} for user: {current_user.id}"
     )
     return {"authorization_url": authorize_url}
+
+
+def parse_dropbox_oauth2_session(state_str: str | None) -> Tuple[dict[str, str], str]:
+    if state_str is None:
+        raise ValueError
+    session = {}
+    session["csrf-token"] = state_str.split("|")[0] if "|" in state_str else ""
+    logger.debug("Keys in session : %s", session.keys())
+    logger.debug("Value in session : %s", session.values())
+    return session, state_str.split("|")[1]
 
 
 @dropbox_sync_router.get("/sync/dropbox/oauth2callback", tags=["Sync"])
@@ -96,42 +97,10 @@ async def oauth2callback_dropbox(
     Returns:
         dict: A dictionary containing a success message.
     """
-    state = request.query_params.get("state")
-    if not state:
-        raise HTTPException(status_code=400, detail="Invalid state parameter")
-    session = {}
-    session["csrf-token"] = state.split("|")[0] if "|" in state else ""
-
-    logger.debug("Keys in session : %s", session.keys())
-    logger.debug("Value in session : %s", session.values())
-
-    state = Oauth2State.model_validate_json(state)
-
-    if state.sync_id is None:
-        raise HTTPException(
-            status_code=400, detail="Invalid state parameter. Unknown sync"
-        )
-
-    logger.debug(
-        f"Handling OAuth2 callback for user: {state.user_id} with state: {state} "
-    )
-    try:
-        sync = await syncs_service.get_sync_by_id(state.sync_id)
-    except SyncNotFoundException as e:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail=f"{e.message}"
-        )
-
-    if (
-        not sync
-        or not sync.state
-        or state.model_dump(exclude={"sync_id"}) != sync.state["state"]
-    ):
-        logger.error("Invalid state parameter")
-        raise HTTPException(status_code=400, detail="Invalid state parameter")
-
-    if sync.user_id != state.user_id:
-        raise HTTPException(status_code=400, detail="Invalid user")
+    state_str = request.query_params.get("state")
+    session, state_str = parse_dropbox_oauth2_session(state_str)
+    state = parse_oauth2_state(state_str)
+    sync = await syncs_service.get_from_oauth2_state(state)
 
     auth_flow = DropboxOAuth2Flow(
         DROPBOX_APP_KEY,
@@ -166,7 +135,7 @@ async def oauth2callback_dropbox(
             state={},
             email=user_email,
         )
-        await syncs_service.update_sync(state.sync_id, sync_user_input)
+        await syncs_service.update_sync(sync.id, sync_user_input)
         logger.info(f"DropBox sync created successfully for user: {state.user_id}")
         return HTMLResponse(successfullConnectionPage)
     except Exception as e:

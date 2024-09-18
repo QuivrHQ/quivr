@@ -101,15 +101,11 @@ class SyncsRepository(BaseRepository):
             user_id,
             sync_id,
         )
-        query = select(Syncs).where(Syncs.id == sync_id).where(Syncs.user_id == user_id)
+        query = select(Syncs).where(Syncs.user_id == user_id)
+        if sync_id is not None:
+            query = query.where(Syncs.id == sync_id)
         result = await self.session.exec(query)
-        sync = result.first()
-        if not sync:
-            logger.error(
-                f"No sync user found for sync_id:  {sync_id}",
-            )
-            raise SyncNotFoundException()
-        return sync
+        return result.all()
 
     async def get_sync_user_by_state(self, state: dict) -> Syncs:
         """
