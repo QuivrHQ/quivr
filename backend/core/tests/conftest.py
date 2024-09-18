@@ -67,7 +67,7 @@ def chunks_stream_answer():
 
 @pytest.fixture(autouse=True)
 def openai_api_key():
-    os.environ["OPENAI_API_KEY"] = "abcd"
+    os.environ["OPENAI_API_KEY"] = "this-is-a-test-key"
 
 
 @pytest.fixture

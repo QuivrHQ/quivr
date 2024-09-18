@@ -179,7 +179,8 @@ class LLMEndpointConfig(QuivrBaseConfig):
 
     def set_api_key(self):
         # Check if the corresponding API key environment variable is set
-        self.llm_api_key = os.getenv(self.env_variable_name)
+        if not self.llm_api_key:
+            self.llm_api_key = os.getenv(self.env_variable_name)
 
         if not self.llm_api_key:
             raise ValueError(
