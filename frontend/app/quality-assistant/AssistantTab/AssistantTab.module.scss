@@ -38,6 +38,20 @@
       justify-content: space-between;
       width: 100%;
       gap: Spacings.$spacing05;
+
+      .file_input_wrapper {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        gap: Spacings.$spacing03;
+
+        .file_header {
+          display: flex;
+          align-items: center;
+          gap: Spacings.$spacing03;
+          font-size: Typography.$small;
+        }
+      }
     }
   }
 

@@ -192,8 +192,8 @@ assistant2 = AssistantOutput(
     icon_url="https://example.com/icon.png",
     inputs=Inputs(
         files=[
-            InputFile(key="file_1", description="File description"),
-            InputFile(key="file_2", description="File description"),
+            InputFile(key="Document 1", description="File description"),
+            InputFile(key="Document 2", description="File description"),
         ],
     ),
 )
@@ -209,8 +209,8 @@ assistant3 = AssistantOutput(
     icon_url="https://example.com/icon.png",
     inputs=Inputs(
         files=[
-            InputFile(key="file_1", description="File description"),
-            InputFile(key="file_2", description="File description"),
+            InputFile(key="Document 1", description="File description"),
+            InputFile(key="Document 2", description="File description"),
         ],
     ),
 )

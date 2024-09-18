@@ -10,7 +10,7 @@ export const QualityAssistantButton = (): JSX.Element => {
   return (
     <Link href={`/quality-assistant`}>
       <MenuButton
-        label="Quality Assistants"
+        label="Assistants"
         isSelected={isSelected}
         iconName="assistant"
         type="open"

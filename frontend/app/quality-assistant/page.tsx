@@ -31,11 +31,7 @@ const QualityAssistant = (): JSX.Element => {
   return (
     <div className={styles.page_wrapper}>
       <div className={styles.page_header}>
-        <PageHeader
-          iconName="assistant"
-          label="Quality Assistants"
-          buttons={[]}
-        />
+        <PageHeader iconName="assistant" label="Assistants" buttons={[]} />
       </div>
       <div className={styles.content_wrapper}>
         <Tabs tabList={qualityAssistantTab} />

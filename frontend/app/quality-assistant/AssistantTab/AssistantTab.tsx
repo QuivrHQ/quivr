@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 
 import { useAssistants } from "@/lib/api/assistants/useAssistants";
 import { FileInput } from "@/lib/components/ui/FileInput/FileInput";
+import { Icon } from "@/lib/components/ui/Icon/Icon";
 import QuivrButton from "@/lib/components/ui/QuivrButton/QuivrButton";
 
 import AssistantCard from "./AssistantCard/AssistantCard";
@@ -51,8 +52,15 @@ const AssistantTab = (): JSX.Element => {
         <div className={styles.form_wrapper}>
           <span className={styles.title}>{assistantChoosed.name}</span>
           <div className={styles.file_inputs_wrapper}>
-            <FileInput label="Document 1" onFileChange={handleFileChange} />
-            <FileInput label="Document 2" onFileChange={handleFileChange} />
+            {assistantChoosed.inputs.files.map((input, index) => (
+              <div className={styles.file_input_wrapper} key={index}>
+                <div className={styles.file_header}>
+                  <Icon name="file" color="black" size="small" />
+                  <span>{input.key}</span>
+                </div>
+                <FileInput label={input.key} onFileChange={handleFileChange} />
+              </div>
+            ))}
           </div>
         </div>
       )}
