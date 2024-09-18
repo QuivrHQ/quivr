@@ -26,9 +26,19 @@
 
   .form_wrapper {
     display: flex;
-    justify-content: space-between;
-    width: 100%;
+    flex-direction: column;
     gap: Spacings.$spacing05;
+
+    .title {
+      @include Typography.H2;
+    }
+
+    .file_inputs_wrapper {
+      display: flex;
+      justify-content: space-between;
+      width: 100%;
+      gap: Spacings.$spacing05;
+    }
   }
 
   .buttons_wrapper {

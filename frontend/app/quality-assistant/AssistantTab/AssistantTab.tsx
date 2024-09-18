@@ -33,11 +33,12 @@ const mockAssistants: AssistantCardType[] = [
 ];
 
 const AssistantTab = (): JSX.Element => {
-  const [assistantChoosed, setAssistantChoosed] = useState(false);
+  const [assistantChoosed, setAssistantChoosed] = useState<string | undefined>(
+    undefined
+  );
 
   const handleFileChange = (file: File) => {
     console.log("Selected file:", file);
-    // Handle the selected file
   };
 
   return (
@@ -47,7 +48,10 @@ const AssistantTab = (): JSX.Element => {
           <span className={styles.title}>Choose an assistant</span>
           <div className={styles.assistant_choice_wrapper}>
             {mockAssistants.map((assistant, index) => (
-              <div key={index} onClick={() => setAssistantChoosed(true)}>
+              <div
+                key={index}
+                onClick={() => setAssistantChoosed(assistant.name)}
+              >
                 <AssistantCard assistantCard={assistant} />
               </div>
             ))}
@@ -55,8 +59,11 @@ const AssistantTab = (): JSX.Element => {
         </div>
       ) : (
         <div className={styles.form_wrapper}>
-          <FileInput label="Document 1" onFileChange={handleFileChange} />
-          <FileInput label="Document 2" onFileChange={handleFileChange} />
+          <span className={styles.title}>{assistantChoosed}</span>
+          <div className={styles.file_inputs_wrapper}>
+            <FileInput label="Document 1" onFileChange={handleFileChange} />
+            <FileInput label="Document 2" onFileChange={handleFileChange} />
+          </div>
         </div>
       )}
       {assistantChoosed && (
@@ -65,7 +72,7 @@ const AssistantTab = (): JSX.Element => {
             iconName="chevronLeft"
             label="Back"
             color="primary"
-            onClick={() => setAssistantChoosed(false)}
+            onClick={() => setAssistantChoosed(undefined)}
           />
           <QuivrButton
             iconName="chevronRight"
