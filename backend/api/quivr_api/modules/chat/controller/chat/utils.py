@@ -6,8 +6,27 @@ from quivr_api.modules.models.entity.model import Model
 from quivr_api.modules.models.service.model_service import ModelService
 from quivr_api.modules.user.entity.user_identity import UserIdentity
 from quivr_api.modules.user.service.user_usage import UserUsage
+from quivr_core.config import RetrievalConfig
 
 logger = get_logger(__name__)
+
+
+def load_and_merge_retrieval_configuration(
+    config_file_path: str, sqlmodel: Model
+) -> RetrievalConfig:
+    retrieval_config = RetrievalConfig.from_yaml(config_file_path)
+    field_mapping = {
+        "env_variable_name": "env_variable_name",
+        "endpoint_url": "llm_base_url",
+    }
+
+    retrieval_config.llm_config.set_from_sqlmodel(
+        sqlmodel=sqlmodel, mapping=field_mapping
+    )
+
+    retrieval_config.llm_config.set_llm_model(sqlmodel.name)
+
+    return retrieval_config
 
 
 # TODO: rewrite

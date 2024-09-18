@@ -12,7 +12,10 @@ from quivr_api.modules.brain.service.brain_authorization_service import (
     validate_brain_authorization,
 )
 from quivr_api.modules.brain.service.brain_service import BrainService
-from quivr_api.modules.chat.controller.chat.utils import check_and_update_user_usage
+from quivr_api.modules.chat.controller.chat.utils import (
+    check_and_update_user_usage,
+    load_and_merge_retrieval_configuration,
+)
 from quivr_api.modules.chat.dto.chats import ChatItem, ChatQuestion
 from quivr_api.modules.chat.dto.inputs import (
     ChatMessageProperties,
@@ -297,15 +300,9 @@ async def create_stream_question_handler(
                 raise ValueError("BRAIN_CONFIG_PATH not set")
             current_path = os.path.dirname(os.path.abspath(__file__))
             file_path = os.path.join(current_path, os.getenv("BRAIN_CONFIG_PATH"))  # type: ignore
-            retrieval_config = RetrievalConfig.from_yaml(file_path)
-            field_mapping = {
-                "env_variable_name": "env_variable_name",
-                "endpoint_url": "llm_base_url",
-            }
-            retrieval_config.llm_config.set_from_sqlmodel(
-                sqlmodel=model, mapping=field_mapping
+            retrieval_config = load_and_merge_retrieval_configuration(
+                config_file_path=file_path, sqlmodel=model
             )
-            retrieval_config.llm_config.set_llm_model(model.name)
             service = RAGService(
                 current_user=current_user,
                 chat_id=chat_id,
@@ -326,15 +323,9 @@ async def create_stream_question_handler(
                 raise ValueError("CHAT_LLM_CONFIG_PATH not set")
             current_path = os.path.dirname(os.path.abspath(__file__))
             file_path = os.path.join(current_path, os.getenv("CHAT_LLM_CONFIG_PATH"))  # type: ignore
-            retrieval_config = RetrievalConfig.from_yaml(file_path)
-            field_mapping = {
-                "env_variable_name": "env_variable_name",
-                "endpoint_url": "llm_base_url",
-            }
-            retrieval_config.llm_config.set_from_sqlmodel(
-                sqlmodel=model_to_use, mapping=field_mapping
+            retrieval_config = load_and_merge_retrieval_configuration(
+                config_file_path=file_path, sqlmodel=model_to_use
             )
-            retrieval_config.llm_config.set_llm_model(model_to_use.name)
             service = RAGService(
                 current_user=current_user,
                 chat_id=chat_id,
