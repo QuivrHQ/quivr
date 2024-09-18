@@ -60,12 +60,18 @@ const AssistantTab = (): JSX.Element => {
         </div>
       )}
       {assistantChoosed && (
-        <div className={styles.button_wrapper}>
+        <div className={styles.buttons_wrapper}>
           <QuivrButton
             iconName="chevronLeft"
             label="Back"
             color="primary"
             onClick={() => setAssistantChoosed(false)}
+          />
+          <QuivrButton
+            iconName="chevronRight"
+            label="EXECUTE"
+            color="primary"
+            important={true}
           />
         </div>
       )}
