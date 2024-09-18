@@ -2,7 +2,7 @@ import hashlib
 import io
 from dataclasses import dataclass
 from datetime import datetime
-from typing import Dict, Optional
+from typing import Dict, List, Optional
 from uuid import UUID
 
 from pydantic import BaseModel
@@ -50,8 +50,8 @@ class SyncFile(BaseModel):
     type: Optional[str] = None
 
 
-class Syncs(SQLModel, table=True):
-    __tablename__ = "syncs_user"  # type: ignore
+class Sync(SQLModel, table=True):
+    __tablename__ = "syncs"  # type: ignore
 
     id: int | None = Field(default=None, primary_key=True)
     email: str | None = Field(default=None)
@@ -62,9 +62,26 @@ class Syncs(SQLModel, table=True):
         default=None, sa_column=Column("credentials", JSON)
     )
     state: Dict[str, str] | None = Field(default=None, sa_column=Column("state", JSON))
+    created_at: datetime | None = Field(
+        default=None,
+        sa_column=Column(
+            TIMESTAMP(timezone=False),
+            server_default=text("CURRENT_TIMESTAMP"),
+        ),
+    )
+    updated_at: datetime | None = Field(
+        default=None,
+        sa_column=Column(
+            TIMESTAMP(timezone=False),
+            server_default=text("CURRENT_TIMESTAMP"),
+            onupdate=datetime.utcnow,
+        ),
+    )
+    last_synced_at: datetime | None = Field(default=None)
     additional_data: dict | None = Field(
         default=None, sa_column=Column("additional_data", JSON)
     )
+    knowledges: List["KnowledgeDB"] | None = Relationship(back_populates="sync")
 
     def to_dto(self) -> SyncsOutput:
         assert self.id, "can't create create output if sync isn't inserted"

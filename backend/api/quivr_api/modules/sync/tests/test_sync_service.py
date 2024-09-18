@@ -3,7 +3,7 @@ import pytest_asyncio
 from sqlmodel import select
 
 from quivr_api.modules.sync.dto.outputs import SyncProvider
-from quivr_api.modules.sync.entity.sync_models import Syncs
+from quivr_api.modules.sync.entity.sync_models import Sync
 from quivr_api.modules.sync.repository.sync_repository import SyncsRepository
 from quivr_api.modules.sync.service.sync_service import SyncsService
 from quivr_api.modules.user.entity.user_identity import User
@@ -21,7 +21,7 @@ async def user(session):
 async def test_sync(session, user):
     assert user.id
 
-    sync = Syncs(
+    sync = Sync(
         user_id=user.id,
         name="test_sync",
         provider=SyncProvider.GOOGLE,

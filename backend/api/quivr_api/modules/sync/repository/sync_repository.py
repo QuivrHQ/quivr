@@ -9,7 +9,7 @@ from quivr_api.logger import get_logger
 from quivr_api.modules.dependencies import BaseRepository, get_supabase_client
 from quivr_api.modules.sync.dto.inputs import SyncCreateInput, SyncUpdateInput
 from quivr_api.modules.sync.dto.outputs import SyncProvider
-from quivr_api.modules.sync.entity.sync_models import SyncFile, Syncs
+from quivr_api.modules.sync.entity.sync_models import Sync, SyncFile
 from quivr_api.modules.sync.repository.notion_repository import NotionRepository
 from quivr_api.modules.sync.service.sync_notion import SyncNotionService
 from quivr_api.modules.sync.utils.sync import (
@@ -48,7 +48,7 @@ class SyncsRepository(BaseRepository):
     async def create_sync(
         self,
         sync_user_input: SyncCreateInput,
-    ) -> Syncs:
+    ) -> Sync:
         """
         Create a new sync user in the database.
 
@@ -59,7 +59,7 @@ class SyncsRepository(BaseRepository):
         """
         logger.info("Creating sync user with input: %s", sync_user_input)
         try:
-            sync = Syncs.model_validate(sync_user_input.model_dump())
+            sync = Sync.model_validate(sync_user_input.model_dump())
             self.session.add(sync)
             await self.session.commit()
             await self.session.refresh(sync)
@@ -71,11 +71,11 @@ class SyncsRepository(BaseRepository):
             await self.session.rollback()
             raise
 
-    async def get_sync_id(self, sync_id: int) -> Syncs:
+    async def get_sync_id(self, sync_id: int) -> Sync:
         """
         Retrieve sync users from the database.
         """
-        query = select(Syncs).where(Syncs.id == sync_id)
+        query = select(Sync).where(Sync.id == sync_id)
         result = await self.session.exec(query)
         sync = result.first()
         if not sync:
@@ -101,13 +101,13 @@ class SyncsRepository(BaseRepository):
             user_id,
             sync_id,
         )
-        query = select(Syncs).where(Syncs.user_id == user_id)
+        query = select(Sync).where(Sync.user_id == user_id)
         if sync_id is not None:
-            query = query.where(Syncs.id == sync_id)
+            query = query.where(Sync.id == sync_id)
         result = await self.session.exec(query)
         return result.all()
 
-    async def get_sync_user_by_state(self, state: dict) -> Syncs:
+    async def get_sync_user_by_state(self, state: dict) -> Sync:
         """
         Retrieve a sync user by their state.
 
@@ -119,7 +119,7 @@ class SyncsRepository(BaseRepository):
         """
         logger.info("Getting sync user by state: %s", state)
 
-        query = select(Syncs).where(Syncs.state == state)
+        query = select(Sync).where(Sync.state == state)
         result = await self.session.exec(query)
         sync = result.first()
         if not sync:
@@ -133,12 +133,12 @@ class SyncsRepository(BaseRepository):
             "Deleting sync user with sync_id: %s, user_id: %s", sync_id, user_id
         )
         await self.session.execute(
-            delete(Syncs).where(Syncs.id == sync_id).where(Syncs.user_id == user_id)
+            delete(Sync).where(Sync.id == sync_id).where(Sync.user_id == user_id)
         )
         logger.info("Sync user deleted successfully")
 
     async def update_sync(
-        self, sync: Syncs, sync_input: SyncUpdateInput | dict[str, Any]
+        self, sync: Sync, sync_input: SyncUpdateInput | dict[str, Any]
     ):
         logger.debug(
             "Updating sync user with user_id: %s, state: %s, input: %s",

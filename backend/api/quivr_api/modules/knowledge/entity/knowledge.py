@@ -1,6 +1,6 @@
 from datetime import datetime
 from enum import Enum
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Self
 from uuid import UUID
 
 from pydantic import BaseModel
@@ -11,6 +11,7 @@ from sqlmodel import UUID as PGUUID
 from sqlmodel import Field, Relationship, SQLModel
 
 from quivr_api.modules.knowledge.entity.knowledge_brain import KnowledgeBrain
+from quivr_api.modules.sync.entity.sync_models import Sync
 
 
 class KnowledgeSource(str, Enum):
@@ -37,8 +38,8 @@ class Knowledge(BaseModel):
     metadata: Optional[Dict[str, str]] = None
     user_id: UUID
     brains: List[Dict[str, Any]]
-    parent: Optional["Knowledge"]
-    children: Optional[list["Knowledge"]]
+    parent: Optional[Self]
+    children: Optional[List[Self]]
 
 
 class KnowledgeUpdate(BaseModel):
@@ -112,6 +113,12 @@ class KnowledgeDB(AsyncAttrs, SQLModel, table=True):
         sa_relationship_kwargs={
             "cascade": "all, delete-orphan",
         },
+    )
+    sync_id: int | None = Field(
+        default=None, foreign_key="syncs.id", ondelete="CASCADE"
+    )
+    sync: Sync | None = Relationship(
+        back_populates="knowledges", sa_relationship_kwargs={"lazy": "joined"}
     )
 
     # TODO: nested folder search
