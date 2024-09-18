@@ -798,6 +798,7 @@ protobuf==4.25.4
     # via onnxruntime
     # via opentelemetry-proto
     # via proto-plus
+    # via transformers
 psutil==6.0.0
     # via ipykernel
     # via unstructured
@@ -1019,6 +1020,8 @@ safetensors==0.4.4
     # via transformers
 scipy==1.14.1
     # via layoutparser
+sentencepiece==0.2.0
+    # via transformers
 sentry-sdk==2.13.0
     # via quivr-api
 setuptools==70.0.0
@@ -1147,7 +1150,8 @@ traitlets==5.14.3
     # via nbclient
     # via nbconvert
     # via nbformat
-transformers==4.44.1
+transformers==4.44.2
+    # via quivr-core
     # via unstructured-inference
 types-pyyaml==6.0.12.20240808
     # via quivr-core
