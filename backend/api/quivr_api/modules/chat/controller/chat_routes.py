@@ -293,10 +293,24 @@ async def create_stream_question_handler(
             assert model is not None
             brain.model = model.name
             validate_authorization(user_id=current_user.id, brain_id=brain_id)
+            if not os.getenv("BRAIN_CONFIG_PATH"):
+                raise ValueError("BRAIN_CONFIG_PATH not set")
+            current_path = os.path.dirname(os.path.abspath(__file__))
+            file_path = os.path.join(current_path, os.getenv("BRAIN_CONFIG_PATH"))  # type: ignore
+            retrieval_config = RetrievalConfig.from_yaml(file_path)
+            field_mapping = {
+                "env_variable_name": "env_variable_name",
+                "endpoint_url": "llm_base_url",
+            }
+            retrieval_config.llm_config.set_from_sqlmodel(
+                sqlmodel=model, mapping=field_mapping
+            )
+            retrieval_config.llm_config.set_llm_model(model.name)
             service = RAGService(
                 current_user=current_user,
                 chat_id=chat_id,
                 brain=brain,
+                retrieval_config=retrieval_config,
                 model_service=model_service,
                 brain_service=brain_service,
                 prompt_service=prompt_service,
@@ -313,7 +327,14 @@ async def create_stream_question_handler(
             current_path = os.path.dirname(os.path.abspath(__file__))
             file_path = os.path.join(current_path, os.getenv("CHAT_LLM_CONFIG_PATH"))  # type: ignore
             retrieval_config = RetrievalConfig.from_yaml(file_path)
-            retrieval_config.llm_config.set_model(model_to_use.name)
+            field_mapping = {
+                "env_variable_name": "env_variable_name",
+                "endpoint_url": "llm_base_url",
+            }
+            retrieval_config.llm_config.set_from_sqlmodel(
+                sqlmodel=model_to_use, mapping=field_mapping
+            )
+            retrieval_config.llm_config.set_llm_model(model_to_use.name)
             service = RAGService(
                 current_user=current_user,
                 chat_id=chat_id,

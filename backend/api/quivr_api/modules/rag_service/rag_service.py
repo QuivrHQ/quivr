@@ -1,6 +1,5 @@
 import datetime
 import os
-from pathlib import Path
 from uuid import UUID, uuid4
 
 from quivr_core.brain import Brain as BrainCore
@@ -98,12 +97,6 @@ class RAGService:
     async def _get_retrieval_config(self) -> RetrievalConfig:
         if self.retrieval_config:
             retrieval_config = self.retrieval_config
-        elif self.brain and self.brain.config_path:
-            retrieval_config = RetrievalConfig.from_yaml(self.brain.config_path)
-        elif os.getenv("BRAIN_CONFIG_PATH"):
-            current_path = os.path.dirname(os.path.abspath(__file__))
-            file_path = os.path.join(current_path, os.getenv("BRAIN_CONFIG_PATH"))  # type: ignore
-            retrieval_config = RetrievalConfig.from_yaml(Path(file_path))
         else:
             retrieval_config = self._build_retrieval_config()
 
