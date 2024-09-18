@@ -1,7 +1,6 @@
 from uuid import uuid4
 
 import pytest
-
 from quivr_core.storage.file import FileExtension, QuivrFile
 
 
@@ -13,7 +12,7 @@ def txt_qfile(temp_data_file):
         original_filename="data.txt",
         path=temp_data_file,
         file_extension=FileExtension.txt,
-        file_md5="hash",
+        file_sha1="hash",
     )
 
 
@@ -29,12 +28,10 @@ async def test_process_txt(txt_qfile):
     doc = await tparser.process_file(txt_qfile)
     assert len(doc) > 0
     assert doc[0].page_content == "This is some test data."
-
-    print(doc[0].metadata)
     assert (
         doc[0].metadata.items()
         >= {
-            "chunk_index": 0,
+            "chunk_index": 1,
             "original_file_name": "data.txt",
             "chunk_size": 6,
             "processor_cls": "TextLoader",

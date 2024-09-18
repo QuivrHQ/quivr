@@ -1,38 +1,34 @@
-test:
-	pytest backend/
+.DEFAULT_TARGET=help
 
-dev-build:
-	DOCKER_BUILDKIT=1 docker compose -f docker-compose.dev.yml build backend-core
+## help: Display list of commands
+.PHONY: help
+help:
+	@echo "Available commands:"
+	@sed -n 's|^##||p' $(MAKEFILE_LIST) | column -t -s ':' | sed -e 's|^| |'
+
+
+## dev: Start development environment
+.PHONY: dev
+dev:
 	DOCKER_BUILDKIT=1 docker compose -f docker-compose.dev.yml up --build
 
-dev:
+dev-build:
+	DOCKER_BUILDKIT=1 docker compose -f docker-compose.dev.yml build --no-cache
 	DOCKER_BUILDKIT=1 docker compose -f docker-compose.dev.yml up
 
-
-dev-saas:
-	docker compose -f docker-compose-dev-saas-supabase.yml build backend-core
-	docker compose -f docker-compose-dev-saas-supabase.yml up --build
-
-dev-saas-back:
-	docker compose -f docker-compose-dev-only-back-saas-supabase.yml build backend-core
-	docker compose -f docker-compose-dev-only-back-saas-supabase.yml up --build backend-core
-
-dev-stan:
-	docker compose -f docker-compose-no-frontend.dev.yml up --build 
-
+## prod: Build and start production environment
+.PHONY: prod
 prod:
-	docker compose build backend-core
 	docker compose -f docker-compose.yml up --build
 
-test-type:
-	@if command -v python3 &>/dev/null; then \
-		python3 -m pyright; \
-	else \
-		python -m pyright; \
-	fi
-
+## front: Build and start frontend
+.PHONY: front
 front:
-	cd frontend  && yarn build && yarn start
+	cd frontend  && yarn && yarn build && yarn start
 
+## test: Run tests
+.PHONY: test
 test:
-	cd backend/core && ./scripts/run_tests.sh
+	# Ensure dependencies are installed with dev and test extras
+	# poetry install --with dev,test && brew install tesseract pandoc libmagic
+	./.run_tests.sh

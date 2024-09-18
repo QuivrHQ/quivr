@@ -1,9 +1,7 @@
 # Using a slim version for a smaller base image
 FROM python:3.11.6-slim-bullseye
 
-ARG DEV_MODE
-ENV DEV_MODE=$DEV_MODE
-
+WORKDIR /app
 # Install GEOS library, Rust, and other dependencies, then clean up
 RUN apt-get clean && apt-get update && apt-get install -y \
     libgeos-dev \
@@ -28,35 +26,20 @@ RUN apt-get clean && apt-get update && apt-get install -y \
     pandoc && \
     rm -rf /var/lib/apt/lists/* && apt-get clean
 
-# TODO(@aminediro) : multistage build. Probably dont neet poetry once its built
-# Install Poetry
-RUN curl -sSL https://install.python-poetry.org | POETRY_HOME=/opt/poetry python && \
-    cd /usr/local/bin && \
-    ln -s /opt/poetry/bin/poetry && \
-    poetry config virtualenvs.create false
+COPY requirements.lock  pyproject.toml README.md ./
+COPY api/pyproject.toml api/README.md ./api/
+COPY api/quivr_api/__init__.py ./api/quivr_api/__init__.py
+COPY core/pyproject.toml core/README.md ./core/
+COPY core/quivr_core/__init__.py ./core/quivr_core/__init__.py
+COPY worker/pyproject.toml worker/README.md ./worker/
+COPY worker/quivr_worker/__init__.py ./worker/quivr_worker/__init__.py
 
-# Add Rust binaries to the PATH
-ENV PATH="/root/.cargo/bin:${PATH}" \
-    POETRY_CACHE_DIR=/tmp/poetry_cache \
-    PYTHONDONTWRITEBYTECODE=1
+RUN PYTHONDONTWRITEBYTECODE=1 pip install --no-cache-dir -r requirements.lock
 
-WORKDIR /code
+RUN playwright install --with-deps && \
+    python -c "from unstructured.nlp.tokenize import download_nltk_packages; download_nltk_packages()" && \
+    python -c "import nltk;nltk.download('punkt_tab'); nltk.download('averaged_perceptron_tagger_eng')"
 
-# Copy monorepo dependencies
-# CORE
-COPY core/pyproject.toml core/README.md core/poetry.lock  /code/core/
-COPY core/quivr_core /code/core/quivr_core
-# API
-COPY api/pyproject.toml  api/poetry.lock api/README.md /code/api/
-COPY api/quivr_api /code/api/quivr_api
-COPY ./pyproject.toml ./poetry.lock* /code/
-
-# Run install
-RUN poetry install --no-root --with dev,test && \
-    playwright install --with-deps && \
-    rm -rf $POETRY_CACHE_DIR
-
-
-ENV PYTHONPATH=/code
+COPY . .
 
 EXPOSE 5050

@@ -71,6 +71,8 @@ const ContentSecurityPolicy = {
     "https://cdn.growthbook.io",
     "https://vitals.vercel-insights.com/v1/vitals",
     "https://us.posthog.com",
+    "*.posthog.com",
+    "https://us.i.posthog.com"
   ],
   "img-src": [
     "'self'",

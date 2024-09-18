@@ -7,6 +7,7 @@ from langchain_community.utilities import SQLDatabase
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.runnables import RunnablePassthrough
+
 from quivr_api.modules.brain.integrations.SQL.SQL_connector import SQLConnector
 from quivr_api.modules.brain.knowledge_brain_qa import KnowledgeBrainQA
 from quivr_api.modules.brain.repository.integration_brains import IntegrationBrain
@@ -85,7 +86,6 @@ class SQLBrain(KnowledgeBrainQA, IntegrationBrain):
     async def generate_stream(
         self, chat_id: UUID, question: ChatQuestion, save_answer: bool = True
     ) -> AsyncIterable:
-
         conversational_qa_chain = self.get_chain()
         transformed_history, streamed_chat_history = (
             self.initialize_streamed_chat_history(chat_id, question)

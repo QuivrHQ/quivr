@@ -2,7 +2,6 @@ from pathlib import Path
 from uuid import uuid4
 
 import pytest
-
 from quivr_core.files.file import FileExtension, QuivrFile
 from quivr_core.processor.implementations.default import DOCXProcessor
 
@@ -17,7 +16,7 @@ async def test_docx_filedocx():
         original_filename=p.stem,
         path=p,
         file_extension=FileExtension.docx,
-        file_md5="123",
+        file_sha1="123",
     )
     processor = DOCXProcessor()
     result = await processor.process_file(f)

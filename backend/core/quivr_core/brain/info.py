@@ -33,7 +33,6 @@ class LLMInfo:
         llm_tree.add(f"Base URL: [underline]{self.llm_base_url}[/underline]")
         llm_tree.add(f"Temperature: [bold]{self.temperature}[/bold]")
         llm_tree.add(f"Max Tokens: [bold]{self.max_tokens}[/bold]")
-
         func_call_color = "green" if self.supports_function_calling else "red"
         llm_tree.add(
             f"Supports Function Calling: [bold {func_call_color}]{self.supports_function_calling}[/bold {func_call_color}]"

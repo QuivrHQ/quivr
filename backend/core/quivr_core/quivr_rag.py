@@ -45,6 +45,10 @@ class IdempotentCompressor(BaseDocumentCompressor):
 
 
 class QuivrQARAG:
+    """
+    QuivrQA RAG is a class that provides a RAG interface to the QuivrQA system.
+    """
+
     def __init__(
         self,
         *,
@@ -60,6 +64,9 @@ class QuivrQARAG:
 
     @property
     def retriever(self):
+        """
+        Retriever is a function that retrieves the documents from the vector store.
+        """
         return self.vector_store.as_retriever()
 
     def filter_history(
@@ -92,6 +99,9 @@ class QuivrQARAG:
         return filtered_chat_history[::-1]
 
     def build_chain(self, files: str):
+        """
+        Builds the chain for the QuivrQA RAG.
+        """
         compression_retriever = ContextualCompressionRetriever(
             base_compressor=self.reranker, base_retriever=self.retriever
         )
@@ -149,6 +159,9 @@ class QuivrQARAG:
         list_files: list[QuivrKnowledge],
         metadata: dict[str, str] = {},
     ) -> ParsedRAGResponse:
+        """
+        Answers a question using the QuivrQA RAG synchronously.
+        """
         concat_list_files = format_file_list(list_files, self.rag_config.max_files)
         conversational_qa_chain = self.build_chain(concat_list_files)
         raw_llm_response = conversational_qa_chain.invoke(
@@ -169,6 +182,9 @@ class QuivrQARAG:
         list_files: list[QuivrKnowledge],
         metadata: dict[str, str] = {},
     ) -> AsyncGenerator[ParsedRAGChunkResponse, ParsedRAGChunkResponse]:
+        """
+        Answers a question using the QuivrQA RAG asynchronously.
+        """
         concat_list_files = format_file_list(list_files, self.rag_config.max_files)
         conversational_qa_chain = self.build_chain(concat_list_files)
 

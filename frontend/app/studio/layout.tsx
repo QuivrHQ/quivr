@@ -15,7 +15,7 @@ const Layout = ({ children }: LayoutProps): JSX.Element => {
   }
 
   return (
-    <div className="relative h-full w-full flex justify-stretch items-stretch overflow-scroll">
+    <div className="relative h-full w-full flex justify-stretch items-stretch overflow-auto">
       {children}
     </div>
   );

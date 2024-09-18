@@ -1,6 +1,7 @@
 from datetime import datetime
 
 from fastapi import HTTPException
+
 from quivr_api.logger import get_logger
 from quivr_api.modules.api_key.repository.api_key_interface import ApiKeysInterface
 from quivr_api.modules.api_key.repository.api_keys import ApiKeys

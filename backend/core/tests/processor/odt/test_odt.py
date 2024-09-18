@@ -2,7 +2,6 @@ from pathlib import Path
 from uuid import uuid4
 
 import pytest
-
 from quivr_core.files.file import FileExtension, QuivrFile
 from quivr_core.processor.implementations.default import ODTProcessor
 
@@ -17,7 +16,7 @@ async def test_odt_processor():
         original_filename=p.stem,
         path=p,
         file_extension=FileExtension.odt,
-        file_md5="123",
+        file_sha1="123",
     )
     processor = ODTProcessor()
     result = await processor.process_file(f)
@@ -34,7 +33,7 @@ async def test_odt_processor_fail():
         original_filename=p.stem,
         path=p,
         file_extension=FileExtension.txt,
-        file_md5="123",
+        file_sha1="123",
     )
     processor = ODTProcessor()
     with pytest.raises(ValueError):

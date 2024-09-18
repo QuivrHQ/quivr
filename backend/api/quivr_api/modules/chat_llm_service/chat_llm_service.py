@@ -17,7 +17,7 @@ from quivr_api.modules.chat.dto.outputs import GetChatHistoryOutput
 from quivr_api.modules.chat.service.chat_service import ChatService
 from quivr_api.modules.models.service.model_service import ModelService
 from quivr_api.modules.user.entity.user_identity import UserIdentity
-from quivr_api.packages.utils.uuid_generator import generate_uuid_from_string
+from quivr_api.utils.uuid_generator import generate_uuid_from_string
 
 logger = get_logger(__name__)
 

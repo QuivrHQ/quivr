@@ -14,7 +14,7 @@
   .feed_brain {
     display: flex;
     flex-direction: column;
-    overflow: scroll;
+    overflow: auto;
     height: 100%;
 
     .title {

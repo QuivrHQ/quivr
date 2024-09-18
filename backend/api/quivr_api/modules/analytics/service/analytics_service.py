@@ -11,5 +11,4 @@ class AnalyticsService:
         self.repository = Analytics()
 
     def get_brains_usages(self, user_id, graph_range, brain_id=None):
-
         return self.repository.get_brains_usages(user_id, graph_range, brain_id)

@@ -10,7 +10,8 @@ interface ConnectionCardsProps {
 export const ConnectionCards = ({
   fromAddKnowledge,
 }: ConnectionCardsProps): JSX.Element => {
-  const { syncGoogleDrive, syncSharepoint, syncDropbox } = useSync();
+  const { syncGoogleDrive, syncSharepoint, syncDropbox } =
+    useSync();
 
   return (
     <div
@@ -35,6 +36,12 @@ export const ConnectionCards = ({
         callback={(name) => syncDropbox(name)}
         fromAddKnowledge={fromAddKnowledge}
       />
+      {/* <ConnectionSection
+        label="Notion"
+        provider="Notion"
+        callback={(name) => syncNotion(name)}
+        fromAddKnowledge={fromAddKnowledge}
+      /> */}
     </div>
   );
 };

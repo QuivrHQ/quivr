@@ -9,7 +9,7 @@
   box-sizing: border-box;
   cursor: pointer;
   height: 100%;
-  overflow: scroll;
+  overflow: auto;
   transition: border-color 0.3s ease 0.2s, border-width 0.1s ease 0.1s;
 
   &.dragging {

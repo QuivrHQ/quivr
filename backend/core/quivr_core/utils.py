@@ -95,7 +95,12 @@ def parse_chunk_response(
     # Init with sources
     answer_str = ""
 
-    rolling_msg += raw_chunk["answer"]
+    if "answer" in raw_chunk:
+        answer = raw_chunk["answer"]
+    else:
+        answer = raw_chunk
+
+    rolling_msg += answer
     if supports_func_calling:
         if rolling_msg.tool_calls:
             cited_answer = next(
@@ -108,12 +113,12 @@ def parse_chunk_response(
                     answer_str = gathered_args["answer"]
         return rolling_msg, answer_str
     else:
-        return rolling_msg, raw_chunk["answer"].content
+        return rolling_msg, answer.content
 
 
 @no_type_check
 def parse_response(raw_response: RawRAGResponse, model_name: str) -> ParsedRAGResponse:
-    answer = raw_response["answer"].content
+    answer = ""
     sources = raw_response["docs"] or []
 
     metadata = RAGResponseMetadata(
@@ -121,7 +126,11 @@ def parse_response(raw_response: RawRAGResponse, model_name: str) -> ParsedRAGRe
     )
 
     if model_supports_function_calling(model_name):
-        if raw_response["answer"].tool_calls:
+        if (
+            "tool_calls" in raw_response["answer"]
+            and raw_response["answer"].tool_calls
+            and "citations" in raw_response["answer"].tool_calls[-1]["args"]
+        ):
             citations = raw_response["answer"].tool_calls[-1]["args"]["citations"]
             metadata.citations = citations
             followup_questions = raw_response["answer"].tool_calls[-1]["args"][
@@ -129,6 +138,11 @@ def parse_response(raw_response: RawRAGResponse, model_name: str) -> ParsedRAGRe
             ]
             if followup_questions:
                 metadata.followup_questions = followup_questions
+            answer = raw_response["answer"].tool_calls[-1]["args"]["answer"]
+        else:
+            answer = raw_response["answer"].tool_calls[-1]["args"]["answer"]
+    else:
+        answer = raw_response["answer"].content
 
     parsed_response = ParsedRAGResponse(answer=answer, metadata=metadata)
     return parsed_response
@@ -138,7 +152,7 @@ def combine_documents(
     docs, document_prompt=DEFAULT_DOCUMENT_PROMPT, document_separator="\n\n"
 ):
     # for each docs, add an index in the metadata to be able to cite the sources
-    for doc, index in zip(docs, range(len(docs))):
+    for doc, index in zip(docs, range(len(docs)), strict=False):
         doc.metadata["index"] = index
     doc_strings = [format_document(doc, document_prompt) for doc in docs]
     return document_separator.join(doc_strings)

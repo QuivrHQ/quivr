@@ -1,7 +1,9 @@
 import logging
 from urllib.parse import parse_qs, urlparse
 
+from langchain_anthropic import ChatAnthropic
 from langchain_core.language_models.chat_models import BaseChatModel
+from langchain_openai import AzureChatOpenAI, ChatOpenAI
 from pydantic.v1 import SecretStr
 
 from quivr_core.brain.info import LLMInfo
@@ -25,8 +27,6 @@ class LLMEndpoint:
     @classmethod
     def from_config(cls, config: LLMEndpointConfig = LLMEndpointConfig()):
         try:
-            from langchain_openai import AzureChatOpenAI, ChatOpenAI
-
             if config.model.startswith("azure/"):
                 # Parse the URL
                 parsed_url = urlparse(config.llm_base_url)
@@ -40,6 +40,16 @@ class LLMEndpoint:
                     if config.llm_api_key
                     else None,
                     azure_endpoint=azure_endpoint,
+                    max_tokens=config.max_tokens
+                )
+            elif config.model.startswith("claude"):
+                _llm = ChatAnthropic(
+                    model_name=config.model,
+                    api_key=SecretStr(config.llm_api_key)
+                    if config.llm_api_key
+                    else None,
+                    base_url=config.llm_base_url,
+                    max_tokens=config.max_tokens
                 )
             else:
                 _llm = ChatOpenAI(
@@ -48,6 +58,7 @@ class LLMEndpoint:
                     if config.llm_api_key
                     else None,
                     base_url=config.llm_base_url,
+                    max_tokens=config.max_tokens
                 )
             return cls(llm=_llm, llm_config=config)
 

@@ -1,11 +1,9 @@
 from typing import Sequence
 
+from quivr_api.modules.dependencies import BaseRepository, get_supabase_client
+from quivr_api.modules.models.entity.model import Model
 from sqlmodel import select
 from sqlmodel.ext.asyncio.session import AsyncSession
-
-from quivr_api.models.settings import get_supabase_client
-from quivr_api.modules.dependencies import BaseRepository
-from quivr_api.modules.models.entity.model import Model
 
 
 class ModelRepository(BaseRepository):

@@ -54,7 +54,7 @@ class ChatService(BaseService[ChatRepository]):
 
     def get_follow_up_question(
         self, brain_id: UUID | None = None, question: str | None = None
-    ) -> [str]:
+    ) -> list[str]:
         follow_up = [
             "Summarize the conversation",
             "Explain in more detail",
