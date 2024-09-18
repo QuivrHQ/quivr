@@ -1,16 +1,18 @@
 import json
 import os
-from uuid import UUID
 
-from fastapi import APIRouter, Depends, HTTPException, Request
+from fastapi import APIRouter, Depends, HTTPException, Request, status
 from fastapi.responses import HTMLResponse
 from google_auth_oauthlib.flow import Flow
 from googleapiclient.discovery import build
 
 from quivr_api.logger import get_logger
 from quivr_api.middlewares.auth import AuthBearer, get_current_user
+from quivr_api.modules.dependencies import get_service
 from quivr_api.modules.sync.dto.inputs import SyncCreateInput, SyncUpdateInput
 from quivr_api.modules.sync.service.sync_service import SyncsService
+from quivr_api.modules.sync.utils.oauth2 import Oauth2State
+from quivr_api.modules.sync.utils.sync_exceptions import SyncNotFoundException
 from quivr_api.modules.user.entity.user_identity import UserIdentity
 
 from .successfull_connection import successfullConnectionPage
@@ -22,8 +24,7 @@ os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
 logger = get_logger(__name__)
 
 # Initialize sync service
-sync_service = SyncsService()
-sync_user_service = SyncsService()
+syncs_service_dep = get_service(SyncsService)
 
 # Initialize API router
 google_sync_router = APIRouter()
@@ -62,8 +63,11 @@ CLIENT_SECRETS_FILE_CONTENT = {
     dependencies=[Depends(AuthBearer())],
     tags=["Sync"],
 )
-def authorize_google(
-    request: Request, name: str, current_user: UserIdentity = Depends(get_current_user)
+async def authorize_google(
+    request: Request,
+    name: str,
+    current_user: UserIdentity = Depends(get_current_user),
+    syncs_service: SyncsService = Depends(syncs_service_dep),
 ):
     """
     Authorize Google Drive sync for the current user.
@@ -84,7 +88,19 @@ def authorize_google(
         scopes=SCOPES,
         redirect_uri=redirect_uri,
     )
-    state = f"user_id={current_user.id}, name={name}"
+    state_struct = Oauth2State(name=name, user_id=current_user.id)
+    state = state_struct.model_dump_json()
+    sync_user_input = SyncCreateInput(
+        name=name,
+        user_id=current_user.id,
+        provider="Google",
+        credentials={},
+        state={"state": state},
+        additional_data={},
+    )
+    sync = await syncs_service.create_sync_user(sync_user_input)
+    state_struct.sync_id = sync.id
+    state = state_struct.model_dump_json()
     authorization_url, state = flow.authorization_url(
         access_type="offline",
         include_granted_scopes="true",
@@ -94,20 +110,14 @@ def authorize_google(
     logger.info(
         f"Generated authorization URL: {authorization_url} for user: {current_user.id}"
     )
-    sync_user_input = SyncCreateInput(
-        name=name,
-        user_id=str(current_user.id),
-        provider="Google",
-        credentials={},
-        state={"state": state},
-        additional_data={},
-    )
-    sync_user_service.create_sync_user(sync_user_input)
     return {"authorization_url": authorization_url}
 
 
 @google_sync_router.get("/sync/google/oauth2callback", tags=["Sync"])
-def oauth2callback_google(request: Request):
+async def oauth2callback_google(
+    request: Request,
+    syncs_service: SyncsService = Depends(syncs_service_dep),
+):
     """
     Handle OAuth2 callback from Google.
 
@@ -118,23 +128,35 @@ def oauth2callback_google(request: Request):
         dict: A dictionary containing a success message.
     """
     state = request.query_params.get("state")
-    state_dict = {"state": state}
-    logger.info(f"State: {state}")
-    state_split = state.split(",")
-    current_user = UUID(state_split[0].split("=")[1]) if state else None
-    assert current_user, f"oauth2callback_googl empty current_user in {request}"
-    logger.debug(
-        f"Handling OAuth2 callback for user: {current_user} with state: {state}"
-    )
-    sync_user_state = sync_user_service.get_sync_by_state(state_dict)
-    logger.info(f"Retrieved sync user state: {sync_user_state}")
+    logger.debug(f"request state: {state}")
+    if not state:
+        raise HTTPException(status_code=400, detail="Invalid state parameter")
 
-    if not sync_user_state or state_dict != sync_user_state.state:
+    state = Oauth2State.model_validate_json(state)
+    if state.sync_id is None:
+        raise HTTPException(
+            status_code=400, detail="Invalid state parameter. Unknown sync"
+        )
+
+    logger.debug(
+        f"Handling OAuth2 callback for user: {state.user_id} with state: {state}"
+    )
+
+    try:
+        sync = await syncs_service.get_sync_by_id(state.sync_id)
+    except SyncNotFoundException as e:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail=f"{e.message}"
+        )
+    if (
+        not sync
+        or not sync.state
+        or state.model_dump(exclude={"sync_id"}) != sync.state["state"]
+    ):
         logger.error("Invalid state parameter")
         raise HTTPException(status_code=400, detail="Invalid state parameter")
-    if sync_user_state.user_id != current_user:
-        logger.error("Invalid user")
-        logger.info(f"Invalid user: {current_user}")
+
+    if sync.user_id != state.user_id:
         raise HTTPException(status_code=400, detail="Invalid user")
 
     redirect_uri = f"{BASE_REDIRECT_URI}"
@@ -146,19 +168,19 @@ def oauth2callback_google(request: Request):
     )
     flow.fetch_token(authorization_response=str(request.url))
     creds = flow.credentials
-    logger.info(f"Fetched OAuth2 token for user: {current_user}")
+    logger.info(f"Fetched OAuth2 token for user: {state.user_id}")
 
     # Use the credentials to get the user's email
     service = build("oauth2", "v2", credentials=creds)
     user_info = service.userinfo().get().execute()
     user_email = user_info.get("email")
-    logger.info(f"Retrieved email for user: {current_user} - {user_email}")
+    logger.info(f"Retrieved email for user: {state.user_id} - {user_email}")
 
     sync_user_input = SyncUpdateInput(
         credentials=json.loads(creds.to_json()),
         state={},
         email=user_email,
     )
-    sync_user_service.update_sync(current_user, state_dict, sync_user_input)
-    logger.info(f"Google Drive sync created successfully for user: {current_user}")
+    sync = await syncs_service.update_sync(state.sync_id, sync_user_input)
+    logger.info(f"Google Drive sync created successfully for user: {state.user_id}")
     return HTMLResponse(successfullConnectionPage)

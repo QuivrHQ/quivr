@@ -32,6 +32,7 @@ class SyncUpdateInput(BaseModel):
         state (dict): The updated state information for the sync user.
     """
 
-    credentials: dict
-    state: dict
-    email: str
+    additional_data: dict | None = None
+    credentials: dict | None = None
+    state: dict | None = None
+    email: str | None = None

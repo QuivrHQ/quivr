@@ -16,18 +16,9 @@ from quivr_api.modules.notification.entity.notification import NotificationsStat
 from quivr_api.modules.notification.service.notification_service import (
     NotificationService,
 )
-from quivr_api.modules.sync.dto.inputs import SyncsActiveUpdateInput
 from quivr_api.modules.sync.entity.sync_models import (
-    DBSyncFile,
     DownloadedSyncFile,
     SyncFile,
-    SyncsActive,
-    SyncsUser,
-)
-from quivr_api.modules.sync.repository.sync_interfaces import SyncFileInterface
-from quivr_api.modules.sync.service.sync_service import (
-    ISyncService,
-    ISyncUserService,
 )
 from quivr_api.modules.sync.utils.sync import BaseSync
 from quivr_api.modules.upload.service.upload_file import (

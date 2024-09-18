@@ -51,19 +51,24 @@ class SyncFile(BaseModel):
 
 
 class Syncs(SQLModel, table=True):
-    __tablename__ = "syns_user"  # type: ignore
-    id: UUID | None = Field(default=None, primary_key=True)
+    __tablename__ = "syncs_user"  # type: ignore
+
+    id: int | None = Field(default=None, primary_key=True)
     user_id: UUID = Field(foreign_key="users.id", nullable=False)
     name: str
     provider: str
     credentials: Dict[str, str] | None = Field(
-        default=None, sa_column=Column("state", JSON)
+        default=None, sa_column=Column("credentials", JSON)
     )
     state: Dict[str, str] | None = Field(default=None, sa_column=Column("state", JSON))
-    additional_data: dict
+    additional_data: dict | None = Field(
+        default=None, sa_column=Column("additional_data", JSON)
+    )
 
     def to_dto(self) -> SyncsOutput:
+        assert self.id, "can't create create output if sync isn't inserted"
         return SyncsOutput(
+            id=self.id,
             user_id=self.user_id,
             provider=SyncProvider(self.provider),
             credentials=self.credentials,

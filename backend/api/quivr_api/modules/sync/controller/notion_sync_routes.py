@@ -1,17 +1,19 @@
 import base64
 import os
-from uuid import UUID
 
 import requests
-from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Request
+from fastapi import APIRouter, Depends, HTTPException, Request, status
 from fastapi.responses import HTMLResponse
 from notion_client import Client
 
 from quivr_api.celery_config import celery
 from quivr_api.logger import get_logger
 from quivr_api.middlewares.auth import AuthBearer, get_current_user
+from quivr_api.modules.dependencies import get_service
 from quivr_api.modules.sync.dto.inputs import SyncCreateInput, SyncUpdateInput
 from quivr_api.modules.sync.service.sync_service import SyncsService
+from quivr_api.modules.sync.utils.oauth2 import Oauth2State
+from quivr_api.modules.sync.utils.sync_exceptions import SyncNotFoundException
 from quivr_api.modules.user.entity.user_identity import UserIdentity
 
 from .successfull_connection import successfullConnectionPage
@@ -25,8 +27,7 @@ SCOPE = "users.read,databases.read,databases.write,blocks.read,blocks.write"
 
 
 # Initialize sync service
-sync_service = SyncsService()
-sync_user_service = SyncsService()
+syncs_service_dep = get_service(SyncsService)
 
 logger = get_logger(__name__)
 
@@ -39,8 +40,11 @@ notion_sync_router = APIRouter()
     dependencies=[Depends(AuthBearer())],
     tags=["Sync"],
 )
-def authorize_notion(
-    request: Request, name: str, current_user: UserIdentity = Depends(get_current_user)
+async def authorize_notion(
+    request: Request,
+    name: str,
+    current_user: UserIdentity = Depends(get_current_user),
+    syncs_service: SyncsService = Depends(syncs_service_dep),
 ):
     """
     Authorize Notion sync for the current user.
@@ -53,25 +57,31 @@ def authorize_notion(
         dict: A dictionary containing the authorization URL.
     """
     logger.debug(f"Authorizing Notion sync for user: {current_user.id}, name : {name}")
-    state: str = f"user_id={current_user.id}, name={name}"
-    authorize_url = str(NOTION_AUTH_URL) + f"&state={state}"
-
-    logger.info(
-        f"Generated authorization URL: {authorize_url} for user: {current_user.id}"
-    )
+    state_struct = Oauth2State(name=name, user_id=current_user.id)
+    state = state_struct.model_dump_json()
     sync_user_input = SyncCreateInput(
         name=name,
-        user_id=str(current_user.id),
+        user_id=current_user.id,
         provider="Notion",
         credentials={},
         state={"state": state},
     )
-    sync_user_service.create_sync_user(sync_user_input)
+    sync = await syncs_service.create_sync_user(sync_user_input)
+    state_struct.sync_id = sync.id
+    state = state_struct.model_dump_json()
+    # Finalize the state
+    authorize_url = str(NOTION_AUTH_URL) + f"&state={state}"
+    logger.debug(
+        f"Generated authorization URL: {authorize_url} for user: {current_user.id}"
+    )
     return {"authorization_url": authorize_url}
 
 
 @notion_sync_router.get("/sync/notion/oauth2callback", tags=["Sync"])
-def oauth2callback_notion(request: Request, background_tasks: BackgroundTasks):
+async def oauth2callback_notion(
+    request: Request,
+    syncs_service: SyncsService = Depends(syncs_service_dep),
+):
     """
     Handle OAuth2 callback from Notion.
 
@@ -83,27 +93,36 @@ def oauth2callback_notion(request: Request, background_tasks: BackgroundTasks):
     """
     code = request.query_params.get("code")
     state = request.query_params.get("state")
+
     if not state:
         raise HTTPException(status_code=400, detail="Invalid state parameter")
 
-    state_dict = {"state": state}
-    state_split = state.split(",")  # type: ignore
-    current_user = UUID(state_split[0].split("=")[1]) if state else None
-    assert current_user, "Oauth callback user is None"
-    logger.debug(
-        f"Handling OAuth2 callback for user: {current_user} with state: {state} and state_dict: {state_dict}"
-    )
-    sync_user_state = sync_user_service.get_sync_by_state(state_dict)
+    state = Oauth2State.model_validate_json(state)
 
-    if not sync_user_state or state_dict != sync_user_state.state:
-        logger.error(f"Invalid state parameter for {sync_user_state}")
-        raise HTTPException(status_code=400, detail="Invalid state parameter")
-    else:
-        logger.info(
-            f"Current user: {current_user}, sync user state: {sync_user_state.state}"
+    if state.sync_id is None:
+        raise HTTPException(
+            status_code=400, detail="Invalid state parameter. Unknown sync"
         )
 
-    if sync_user_state.user_id != current_user:
+    logger.debug(
+        f"Handling OAuth2 callback for user: {state.user_id} with state: {state}"
+    )
+
+    try:
+        sync = await syncs_service.get_sync_by_id(state.sync_id)
+    except SyncNotFoundException as e:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail=f"{e.message}"
+        )
+    if (
+        not sync
+        or not sync.state
+        or state.model_dump(exclude={"sync_id"}) != sync.state["state"]
+    ):
+        logger.error("Invalid state parameter")
+        raise HTTPException(status_code=400, detail="Invalid state parameter")
+
+    if sync.user_id != state.user_id:
         raise HTTPException(status_code=400, detail="Invalid user")
 
     try:
@@ -148,12 +167,13 @@ def oauth2callback_notion(request: Request, background_tasks: BackgroundTasks):
             state={},
             email=user_email,
         )
-        sync_user_service.update_sync(current_user, state_dict, sync_user_input)
-        logger.info(f"Notion sync created successfully for user: {current_user}")
+        await syncs_service.update_sync(state.sync_id, sync_user_input)
+
+        logger.info(f"Notion sync created successfully for user: {state.user_id}")
         # launch celery task to sync notion data
         celery.send_task(
             "fetch_and_store_notion_files_task",
-            kwargs={"access_token": access_token, "user_id": current_user},
+            kwargs={"access_token": access_token, "user_id": state.user_id},
         )
         return HTMLResponse(successfullConnectionPage)
 

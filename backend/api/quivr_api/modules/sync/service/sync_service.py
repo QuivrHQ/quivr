@@ -23,17 +23,13 @@ class SyncsService(BaseService[SyncsRepository]):
         return sync.to_dto()
 
     async def get_syncs(self, user_id: UUID, sync_id: int | None = None):
-        return self.repository.get_syncs(user_id, sync_id)
+        return await self.repository.get_syncs(user_id, sync_id)
 
     async def delete_sync(self, sync_id: int, user_id: UUID):
         await self.repository.delete_sync(sync_id, user_id)
 
-    async def get_sync_by_state(self, state: dict) -> SyncsOutput:
-        sync = await self.repository.get_sync_user_by_state(state)
-        return sync.to_dto()
-
     async def get_sync_by_id(self, sync_id: int):
-        return self.repository.get_sync_id(sync_id)
+        return await self.repository.get_sync_id(sync_id)
 
     async def update_sync(
         self, sync_id: int, sync_user_input: SyncUpdateInput

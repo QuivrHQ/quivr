@@ -28,11 +28,6 @@ from quivr_api.modules.knowledge.service.knowledge_exceptions import (
     KnowledgeForbiddenAccess,
     UploadError,
 )
-from quivr_api.modules.sync.entity.sync_models import (
-    DBSyncFile,
-    DownloadedSyncFile,
-    SyncFile,
-)
 from quivr_api.modules.upload.service.upload_file import check_file_exists
 
 logger = get_logger(__name__)
@@ -294,43 +289,43 @@ class KnowledgeService(BaseService[KnowledgeRepository]):
 
     # TODO: REDO THIS MESS !!!!
     # REMOVE ALL SYNC TABLES and start from scratch
-    async def update_or_create_knowledge_sync(
-        self,
-        brain_id: UUID,
-        user_id: UUID,
-        file: SyncFile,
-        new_sync_file: DBSyncFile | None,
-        prev_sync_file: DBSyncFile | None,
-        downloaded_file: DownloadedSyncFile,
-        source: str,
-        source_link: str,
-    ) -> Knowledge:
-        sync_id = None
-        # TODO: THIS IS A HACK!! Remove all of this
-        if prev_sync_file:
-            prev_knowledge = await self.get_knowledge_sync(sync_id=prev_sync_file.id)
-            if len(prev_knowledge.brains) > 1:
-                await self.repository.remove_knowledge_from_brain(
-                    prev_knowledge.id, brain_id
-                )
-            else:
-                await self.repository.remove_knowledge_by_id(prev_knowledge.id)
-            sync_id = prev_sync_file.id
+    # async def update_or_create_knowledge_sync(
+    #     self,
+    #     brain_id: UUID,
+    #     user_id: UUID,
+    #     file: SyncFile,
+    #     new_sync_file: DBSyncFile | None,
+    #     prev_sync_file: DBSyncFile | None,
+    #     downloaded_file: DownloadedSyncFile,
+    #     source: str,
+    #     source_link: str,
+    # ) -> Knowledge:
+    #     sync_id = None
+    #     # TODO: THIS IS A HACK!! Remove all of this
+    #     if prev_sync_file:
+    #         prev_knowledge = await self.get_knowledge_sync(sync_id=prev_sync_file.id)
+    #         if len(prev_knowledge.brains) > 1:
+    #             await self.repository.remove_knowledge_from_brain(
+    #                 prev_knowledge.id, brain_id
+    #             )
+    #         else:
+    #             await self.repository.remove_knowledge_by_id(prev_knowledge.id)
+    #         sync_id = prev_sync_file.id
 
-        sync_id = new_sync_file.id if new_sync_file else sync_id
-        knowledge_to_add = CreateKnowledgeProperties(
-            brain_id=brain_id,
-            file_name=file.name,
-            extension=downloaded_file.extension,
-            source=source,
-            status=KnowledgeStatus.PROCESSING,
-            source_link=source_link,
-            file_size=file.size if file.size else 0,
-            # FIXME (@aminediro): This is a temporary fix, redo in KMS
-            file_sha1=None,
-            metadata={"sync_file_id": str(sync_id)},
-        )
-        added_knowledge = await self.insert_knowledge_brain(
-            knowledge_to_add=knowledge_to_add, user_id=user_id
-        )
-        return added_knowledge
+    #     sync_id = new_sync_file.id if new_sync_file else sync_id
+    #     knowledge_to_add = CreateKnowledgeProperties(
+    #         brain_id=brain_id,
+    #         file_name=file.name,
+    #         extension=downloaded_file.extension,
+    #         source=source,
+    #         status=KnowledgeStatus.PROCESSING,
+    #         source_link=source_link,
+    #         file_size=file.size if file.size else 0,
+    #         # FIXME (@aminediro): This is a temporary fix, redo in KMS
+    #         file_sha1=None,
+    #         metadata={"sync_file_id": str(sync_id)},
+    #     )
+    #     added_knowledge = await self.insert_knowledge_brain(
+    #         knowledge_to_add=knowledge_to_add, user_id=user_id
+    #     )
+    #     return added_knowledge

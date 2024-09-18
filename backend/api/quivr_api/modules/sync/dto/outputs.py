@@ -23,6 +23,7 @@ class SyncsDescription(BaseModel):
 
 
 class SyncsOutput(BaseModel):
+    id: int
     user_id: UUID
     provider: SyncProvider
     state: dict | None
