@@ -2,6 +2,7 @@ import os
 from enum import Enum
 from typing import Dict, List, Optional
 from uuid import UUID
+from sqlmodel import SQLModel
 
 from megaparse.config import MegaparseConfig
 
@@ -38,6 +39,7 @@ class DefaultLLMs(str, Enum):
     ANTHROPIC = "anthropic"
     META = "meta"
     MISTRAL = "mistral"
+    GROQ = "groq"
 
 
 class LLMConfig(QuivrBaseConfig):
@@ -66,7 +68,7 @@ class LLMModelConfig:
             ),
         },
         DefaultLLMs.ANTHROPIC: {
-            "claude-3.5-sonnet": LLMConfig(
+            "claude-3-5-sonnet": LLMConfig(
                 context=200000, tokenizer_hub="Xenova/claude-tokenizer"
             ),
             "claude-3-opus": LLMConfig(
@@ -78,13 +80,13 @@ class LLMModelConfig:
             "claude-3-haiku": LLMConfig(
                 context=200000, tokenizer_hub="Xenova/claude-tokenizer"
             ),
-            "claude-2.1": LLMConfig(
+            "claude-2-1": LLMConfig(
                 context=200000, tokenizer_hub="Xenova/claude-tokenizer"
             ),
-            "claude-2.0": LLMConfig(
+            "claude-2-0": LLMConfig(
                 context=100000, tokenizer_hub="Xenova/claude-tokenizer"
             ),
-            "claude-instant-1.2": LLMConfig(
+            "claude-instant-1-2": LLMConfig(
                 context=100000, tokenizer_hub="Xenova/claude-tokenizer"
             ),
         },
@@ -100,8 +102,23 @@ class LLMModelConfig:
                 context=16384, tokenizer_hub="Xenova/llama-code-tokenizer"
             ),
         },
+        DefaultLLMs.GROQ: {
+            "llama-3.1": LLMConfig(
+                context=128000, tokenizer_hub="Xenova/Meta-Llama-3.1-Tokenizer"
+            ),
+            "llama-3": LLMConfig(
+                context=8192, tokenizer_hub="Xenova/llama3-tokenizer-new"
+            ),
+            "llama-2": LLMConfig(context=4096, tokenizer_hub="Xenova/llama2-tokenizer"),
+            "code-llama": LLMConfig(
+                context=16384, tokenizer_hub="Xenova/llama-code-tokenizer"
+            ),
+        },
         DefaultLLMs.MISTRAL: {
             "mistral-large": LLMConfig(
+                context=128000, tokenizer_hub="Xenova/mistral-tokenizer-v3"
+            ),
+            "mistral-small": LLMConfig(
                 context=128000, tokenizer_hub="Xenova/mistral-tokenizer-v3"
             ),
             "mistral-nemo": LLMConfig(
@@ -147,6 +164,7 @@ class LLMEndpointConfig(QuivrBaseConfig):
     context_length: int | None = None
     tokenizer_hub: str | None = None
     llm_base_url: str | None = None
+    env_variable_name: str = f"{supplier.upper()}_API_KEY"
     llm_api_key: str | None = None
     max_input_tokens: int = 2000
     max_output_tokens: int = 2000
@@ -156,9 +174,20 @@ class LLMEndpointConfig(QuivrBaseConfig):
 
     def __init__(self, **data):
         super().__init__(**data)
-        self.set_model_config()
+        self.set_llm_model_config()
+        self.set_api_key()
 
-    def set_model_config(self):
+    def set_api_key(self):
+        # Check if the corresponding API key environment variable is set
+        self.llm_api_key = os.getenv(self.env_variable_name)
+
+        if not self.llm_api_key:
+            raise ValueError(
+                f"The API key for supplier '{self.supplier}' is not set. "
+                f"Please set the environment variable: {self.env_variable_name}"
+            )
+
+    def set_llm_model_config(self):
         # Automatically set context_length and tokenizer_hub based on the supplier and model
         llm_model_config = LLMModelConfig.get_llm_model_config(
             self.supplier, self.model
@@ -167,7 +196,7 @@ class LLMEndpointConfig(QuivrBaseConfig):
             self.context_length = llm_model_config.context
             self.tokenizer_hub = llm_model_config.tokenizer_hub
 
-    def set_model(self, model: str):
+    def set_llm_model(self, model: str):
         supplier = LLMModelConfig.get_supplier_by_model_name(model)
         if supplier is None:
             raise ValueError(
@@ -176,7 +205,24 @@ class LLMEndpointConfig(QuivrBaseConfig):
         self.supplier = supplier
         self.model = model
 
-        self.set_model_config()
+        self.set_llm_model_config()
+        self.set_api_key()
+
+    def set_from_sqlmodel(self, sqlmodel: SQLModel, mapping: Dict[str, str]):
+        """
+        Set attributes in LLMEndpointConfig from Model attributes using a field mapping.
+
+        :param model_instance: An instance of the Model class.
+        :param mapping: A dictionary that maps Model fields to LLMEndpointConfig fields.
+                        Example: {"max_input": "max_input_tokens", "env_variable_name": "env_variable_name"}
+        """
+        for model_field, llm_field in mapping.items():
+            if hasattr(sqlmodel, model_field) and hasattr(self, llm_field):
+                setattr(self, llm_field, getattr(sqlmodel, model_field))
+            else:
+                raise AttributeError(
+                    f"Invalid mapping: {model_field} or {llm_field} does not exist."
+                )
 
 
 # Cannot use Pydantic v2 field_validator because of conflicts with pydantic v1 still in use in LangChain
