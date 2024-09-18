@@ -4,24 +4,24 @@ import { Icon } from "@/lib/components/ui/Icon/Icon";
 
 import styles from "./AssistantCard.module.scss";
 
-import { AssistantCardType } from "../../types/assistant";
+import { Assistant } from "../../types/assistant";
 
 interface AssistantCardProps {
-  assistantCard: AssistantCardType;
+  assistant: Assistant;
 }
 
-const AssistantCard = ({ assistantCard }: AssistantCardProps): JSX.Element => {
+const AssistantCard = ({ assistant }: AssistantCardProps): JSX.Element => {
   return (
     <div
       className={`${styles.assistant_tab_wrapper} ${
-        assistantCard.disabled ? styles.disabled : ""
+        assistant.tags.includes("Disabled") ? styles.disabled : ""
       }`}
     >
       <div className={styles.header}>
-        <Icon name={assistantCard.iconName} color="black" size="normal" />
-        <span className={styles.title}>{assistantCard.name}</span>
+        <Icon name="assistant" color="black" size="normal" />
+        <span className={styles.title}>{assistant.name}</span>
       </div>
-      <span className={styles.description}>{assistantCard.description}</span>
+      <span className={styles.description}>{assistant.description}</span>
     </div>
   );
 };

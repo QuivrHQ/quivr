@@ -1,45 +1,39 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
+import { useAssistants } from "@/lib/api/assistants/useAssistants";
 import { FileInput } from "@/lib/components/ui/FileInput/FileInput";
 import QuivrButton from "@/lib/components/ui/QuivrButton/QuivrButton";
 
 import AssistantCard from "./AssistantCard/AssistantCard";
 import styles from "./AssistantTab.module.scss";
 
-import { AssistantCardType } from "../types/assistant";
-
-const mockAssistants: AssistantCardType[] = [
-  {
-    name: "Compliance Check",
-    description:
-      "Allows analyzing the compliance of the information contained in documents against charter or regulatory requirements.",
-    disabled: true,
-    iconName: "assistant",
-  },
-  {
-    name: "Consistency Check",
-    description:
-      "Ensures that the information in one document is replicated identically in another document.",
-    iconName: "assistant",
-  },
-  {
-    name: "Difference Detection",
-    description:
-      "Highlights differences between one document and another after modifications.",
-    iconName: "assistant",
-  },
-];
+import { Assistant } from "../types/assistant";
 
 const AssistantTab = (): JSX.Element => {
-  const [assistantChoosed, setAssistantChoosed] = useState<string | undefined>(
-    undefined
-  );
+  const [assistantChoosed, setAssistantChoosed] = useState<
+    Assistant | undefined
+  >(undefined);
+  const [assistants, setAssistants] = useState<Assistant[]>([]);
+
+  const { getAssistants } = useAssistants();
 
   const handleFileChange = (file: File) => {
     console.log("Selected file:", file);
   };
+
+  useEffect(() => {
+    console.log("Assistant choosed:", assistantChoosed);
+    void (async () => {
+      try {
+        const res = await getAssistants();
+        setAssistants(res);
+      } catch (error) {
+        console.error(error);
+      }
+    })();
+  }, [assistantChoosed]);
 
   return (
     <div className={styles.assistant_tab_wrapper}>
@@ -47,19 +41,16 @@ const AssistantTab = (): JSX.Element => {
         <div className={styles.content_section}>
           <span className={styles.title}>Choose an assistant</span>
           <div className={styles.assistant_choice_wrapper}>
-            {mockAssistants.map((assistant, index) => (
-              <div
-                key={index}
-                onClick={() => setAssistantChoosed(assistant.name)}
-              >
-                <AssistantCard assistantCard={assistant} />
+            {assistants.map((assistant, index) => (
+              <div key={index} onClick={() => setAssistantChoosed(assistant)}>
+                <AssistantCard assistant={assistant} />
               </div>
             ))}
           </div>
         </div>
       ) : (
         <div className={styles.form_wrapper}>
-          <span className={styles.title}>{assistantChoosed}</span>
+          <span className={styles.title}>{assistantChoosed.name}</span>
           <div className={styles.file_inputs_wrapper}>
             <FileInput label="Document 1" onFileChange={handleFileChange} />
             <FileInput label="Document 2" onFileChange={handleFileChange} />
