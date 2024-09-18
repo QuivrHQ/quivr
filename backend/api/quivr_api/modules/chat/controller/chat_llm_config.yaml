@@ -13,12 +13,6 @@ max_history: 10
 #prompt: "my prompt"
 
 llm_config:
-  # The LLM supplier to use
-  supplier: "openai"
-
-  # The model to use for the LLM for the given supplier
-  model: "gpt-3.5-turbo-0125"
-
   max_input_tokens: 2000
 
   # Maximum number of tokens to pass to the LLM
