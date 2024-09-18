@@ -40,14 +40,15 @@ class RAGService:
     def __init__(
         self,
         current_user: UserIdentity,
-        brain: BrainEntity,
         chat_id: UUID,
-        brain_service: BrainService,
-        prompt_service: PromptService,
-        chat_service: ChatService,
-        knowledge_service: KnowledgeService,
-        vector_service: VectorService,
         model_service: ModelService,
+        chat_service: ChatService,
+        brain: BrainEntity,
+        retrieval_config: RetrievalConfig | None = None,
+        brain_service: BrainService | None = None,
+        prompt_service: PromptService | None = None,
+        knowledge_service: KnowledgeService | None = None,
+        vector_service: VectorService | None = None,
     ):
         # Services
         self.brain_service = brain_service
@@ -61,13 +62,21 @@ class RAGService:
         self.current_user = current_user
         self.chat_id = chat_id
         self.brain = brain
-        self.prompt = self.get_brain_prompt(self.brain)
+        self.prompt = (
+            self.get_brain_prompt(self.brain)
+            if self.brain and self.brain_service
+            else None
+        )
+
+        self.retrieval_config = retrieval_config
 
         # check at init time
-        self.model_to_use = brain.model
-        assert self.model_to_use is not None
+        self.model_to_use = brain.model if brain else None
 
     def get_brain_prompt(self, brain: BrainEntity) -> Prompt | None:
+        if not self.prompt_service:
+            raise ValueError("PromptService not provided")
+
         return (
             self.prompt_service.get_prompt_by_id(brain.prompt_id)
             if brain.prompt_id
@@ -87,7 +96,9 @@ class RAGService:
         return chat_history
 
     async def _get_retrieval_config(self) -> RetrievalConfig:
-        if self.brain.config_path:
+        if self.retrieval_config:
+            retrieval_config = self.retrieval_config
+        elif self.brain and self.brain.config_path:
             retrieval_config = RetrievalConfig.from_yaml(self.brain.config_path)
         elif os.getenv("BRAIN_CONFIG_PATH"):
             current_path = os.path.dirname(os.path.abspath(__file__))
@@ -121,6 +132,9 @@ class RAGService:
     def create_vector_store(
         self, brain_id: UUID, max_input: int
     ) -> CustomSupabaseVectorStore:
+        if not self.vector_service:
+            raise ValueError("VectorService not provided")
+
         supabase_client = get_supabase_client()
         embeddings = get_embedding_client()
         return CustomSupabaseVectorStore(
@@ -161,26 +175,34 @@ class RAGService:
         retrieval_config = await self._get_retrieval_config()
         logger.debug(f"generate_answer with config : {retrieval_config.model_dump()}")
         history = await self.chat_service.get_chat_history(self.chat_id)
+        #  Format the history, sanitize the input
+        chat_history = self._build_chat_history(history)
+
         # Get list of files
-        list_files = await self.knowledge_service.get_all_knowledge_in_brain(
-            self.brain.brain_id
+        list_files = (
+            await self.knowledge_service.get_all_knowledge_in_brain(self.brain.brain_id)
+            if self.knowledge_service
+            else []
         )
+
         # Build RAG dependencies to inject
-        vector_store = self.create_vector_store(
-            self.brain.brain_id, retrieval_config.llm_config.max_input_tokens
+        vector_store = (
+            self.create_vector_store(
+                self.brain.brain_id, retrieval_config.llm_config.max_input_tokens
+            )
+            if self.vector_service
+            else None
         )
+
         llm = self.get_llm(retrieval_config)
 
         brain_core = BrainCore(
             name=self.brain.name,
             id=self.brain.id,
-            vector_db=vector_store,
             llm=llm,
-            embedder=vector_store.embeddings,
+            vector_db=vector_store,
+            embedder=vector_store.embeddings if vector_store else None,
         )
-
-        #  Format the history, sanitize the input
-        chat_history = self._build_chat_history(history)
 
         parsed_response = brain_core.ask(
             question=question,
@@ -191,7 +213,8 @@ class RAGService:
         )
 
         # Save the answer to db
-        new_chat_entry = self.save_answer(question, parsed_response)
+        if self.brain_service:
+            new_chat_entry = self.save_answer(question, parsed_response)
 
         # Format output to be correct
         metadata = (
@@ -204,10 +227,10 @@ class RAGService:
                 "chat_id": self.chat_id,
                 "user_message": question,
                 "assistant": parsed_response.answer,
-                "message_time": new_chat_entry.message_time,
+                "message_time": new_chat_entry.message_time if new_chat_entry else None,
                 "prompt_title": (self.prompt.title if self.prompt else None),
                 "brain_name": self.brain.name if self.brain else None,
-                "message_id": new_chat_entry.message_id,
+                "message_id": new_chat_entry.message_id if new_chat_entry else None,
                 "brain_id": str(self.brain.brain_id) if self.brain else None,
                 "metadata": metadata,
             }
@@ -228,20 +251,28 @@ class RAGService:
         chat_history = self._build_chat_history(history)
 
         # Get list of files urls
-        list_files = await self.knowledge_service.get_all_knowledge_in_brain(
-            self.brain.brain_id
+        list_files = (
+            await self.knowledge_service.get_all_knowledge_in_brain(self.brain.brain_id)
+            if self.knowledge_service
+            else []
         )
+
+        vector_store = (
+            self.create_vector_store(
+                self.brain.brain_id, retrieval_config.llm_config.max_input_tokens
+            )
+            if self.vector_service
+            else None
+        )
+
         llm = self.get_llm(retrieval_config)
-        vector_store = self.create_vector_store(
-            self.brain.brain_id, retrieval_config.llm_config.max_input_tokens
-        )
 
         brain_core = BrainCore(
             name=self.brain.name,
             id=self.brain.id,
-            vector_db=vector_store,
             llm=llm,
-            embedder=vector_store.embeddings,
+            vector_db=vector_store,
+            embedder=vector_store.embeddings if vector_store else None,
         )
 
         full_answer = ""
@@ -296,26 +327,33 @@ class RAGService:
             streamed_chat_history.metadata["snippet_emoji"] = (
                 self.brain.snippet_emoji if self.brain else None
             )
-        sources_urls = await generate_source(
-            knowledge_service=self.knowledge_service,
-            brain_id=self.brain.brain_id,
-            source_documents=response.metadata.sources,
-            citations=(
-                streamed_chat_history.metadata["citations"]
-                if streamed_chat_history.metadata
-                else None
-            ),
+
+        sources_urls = (
+            await generate_source(
+                knowledge_service=self.knowledge_service,
+                brain_id=self.brain.brain_id,
+                source_documents=response.metadata.sources,
+                citations=(
+                    streamed_chat_history.metadata["citations"]
+                    if streamed_chat_history.metadata
+                    else None
+                ),
+            )
+            if self.knowledge_service
+            else []
         )
+
         if streamed_chat_history.metadata:
             streamed_chat_history.metadata["sources"] = sources_urls
 
-        self.save_answer(
-            question,
-            ParsedRAGResponse(
-                answer=full_answer,
-                metadata=RAGResponseMetadata.model_validate(
-                    streamed_chat_history.metadata
+        if self.brain_service:
+            self.save_answer(
+                question,
+                ParsedRAGResponse(
+                    answer=full_answer,
+                    metadata=RAGResponseMetadata.model_validate(
+                        streamed_chat_history.metadata
+                    ),
                 ),
-            ),
-        )
+            )
         yield f"data: {streamed_chat_history.model_dump_json()}"
