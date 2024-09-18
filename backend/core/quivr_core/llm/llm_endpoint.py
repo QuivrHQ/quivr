@@ -1,5 +1,6 @@
 import logging
 import os
+from typing import Union
 from urllib.parse import parse_qs, urlparse
 
 import tiktoken
@@ -46,6 +47,7 @@ class LLMEndpoint:
 
     @classmethod
     def from_config(cls, config: LLMEndpointConfig = LLMEndpointConfig()):
+        _llm: Union[AzureChatOpenAI, ChatOpenAI, ChatAnthropic]
         try:
             if config.supplier == DefaultLLMs.AZURE:
                 # Parse the URL
@@ -81,8 +83,13 @@ class LLMEndpoint:
                     max_tokens=config.max_output_tokens,
                 )
             else:
-                raise ValueError(
-                    f"Unsupported LLM supplier: {config.supplier}. Supported values: {list(DefaultLLMs)}"
+                _llm = ChatOpenAI(
+                    model=config.model,
+                    api_key=SecretStr(config.llm_api_key)
+                    if config.llm_api_key
+                    else None,
+                    base_url=config.llm_base_url,
+                    max_tokens=config.max_output_tokens,
                 )
             return cls(llm=_llm, llm_config=config)
 
