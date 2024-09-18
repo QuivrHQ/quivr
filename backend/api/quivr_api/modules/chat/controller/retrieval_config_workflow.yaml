@@ -29,13 +29,6 @@ reranker_config:
   # Number of chunks returned by the reranker
   top_n: 5
 llm_config:
-  # The LLM supplier to use
-  #supplier: "claude"
-  supplier: "anthropic"
-
-  # The model to use for the LLM for the given supplier
-  #model: "gpt-3.5-turbo-0125"
-  model: "claude-3-5-sonnet-20240620"
 
   max_input_tokens: 2000
 
