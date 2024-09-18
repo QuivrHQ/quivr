@@ -19,7 +19,7 @@ async def on_chat_start():
 
     file = files[0]
 
-    msg = cl.Message(content=f"Processing `{file.name}`...", disable_feedback=True)
+    msg = cl.Message(content=f"Processing `{file.name}`...")
     await msg.send()
 
     with open(file.path, "r", encoding="utf-8") as f:
