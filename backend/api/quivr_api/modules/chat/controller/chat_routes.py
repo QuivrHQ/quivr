@@ -313,6 +313,7 @@ async def create_stream_question_handler(
             current_path = os.path.dirname(os.path.abspath(__file__))
             file_path = os.path.join(current_path, os.getenv("CHAT_LLM_CONFIG_PATH"))  # type: ignore
             retrieval_config = RetrievalConfig.from_yaml(file_path)
+            retrieval_config.llm_config.set_model(model_to_use.name)
             service = RAGService(
                 current_user=current_user,
                 chat_id=chat_id,

@@ -114,6 +114,17 @@ class LLMModelConfig:
     }
 
     @classmethod
+    def get_supplier_by_model_name(cls, model: str) -> DefaultLLMs | None:
+        # Iterate over the suppliers and their models
+        for supplier, models in cls._model_defaults.items():
+            # Check if the model name or a base part of the model name is in the supplier's models
+            for base_model_name in models:
+                if model.startswith(base_model_name):
+                    return supplier
+        # Return None if no supplier matches the model name
+        return None
+
+    @classmethod
     def get_llm_model_config(
         cls, supplier: DefaultLLMs, model_name: str
     ) -> Optional[LLMConfig]:
@@ -145,6 +156,9 @@ class LLMEndpointConfig(QuivrBaseConfig):
 
     def __init__(self, **data):
         super().__init__(**data)
+        self.set_model_config()
+
+    def set_model_config(self):
         # Automatically set context_length and tokenizer_hub based on the supplier and model
         llm_model_config = LLMModelConfig.get_llm_model_config(
             self.supplier, self.model
@@ -152,6 +166,17 @@ class LLMEndpointConfig(QuivrBaseConfig):
         if llm_model_config:
             self.context_length = llm_model_config.context
             self.tokenizer_hub = llm_model_config.tokenizer_hub
+
+    def set_model(self, model: str):
+        supplier = LLMModelConfig.get_supplier_by_model_name(model)
+        if supplier is None:
+            raise ValueError(
+                f"Cannot find the corresponding supplier for model {model}"
+            )
+        self.supplier = supplier
+        self.model = model
+
+        self.set_model_config()
 
 
 # Cannot use Pydantic v2 field_validator because of conflicts with pydantic v1 still in use in LangChain
