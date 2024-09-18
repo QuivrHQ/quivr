@@ -40,6 +40,7 @@ class LLMEndpoint:
                     if config.llm_api_key
                     else None,
                     azure_endpoint=azure_endpoint,
+                    max_tokens=config.max_tokens
                 )
             elif config.model.startswith("claude"):
                 _llm = ChatAnthropic(
@@ -48,6 +49,7 @@ class LLMEndpoint:
                     if config.llm_api_key
                     else None,
                     base_url=config.llm_base_url,
+                    max_tokens=config.max_tokens
                 )
             else:
                 _llm = ChatOpenAI(
@@ -56,6 +58,7 @@ class LLMEndpoint:
                     if config.llm_api_key
                     else None,
                     base_url=config.llm_base_url,
+                    max_tokens=config.max_tokens
                 )
             return cls(llm=_llm, llm_config=config)
 

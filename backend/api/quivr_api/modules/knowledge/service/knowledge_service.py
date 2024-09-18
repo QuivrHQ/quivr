@@ -1,18 +1,33 @@
-from typing import List
+import asyncio
+import io
+from typing import Any, List
 from uuid import UUID
 
+from fastapi import UploadFile
 from quivr_core.models import KnowledgeStatus
 from sqlalchemy.exc import NoResultFound
 
 from quivr_api.logger import get_logger
 from quivr_api.modules.dependencies import BaseService
 from quivr_api.modules.knowledge.dto.inputs import (
+    AddKnowledge,
     CreateKnowledgeProperties,
 )
 from quivr_api.modules.knowledge.dto.outputs import DeleteKnowledgeResponse
-from quivr_api.modules.knowledge.entity.knowledge import Knowledge, KnowledgeDB
+from quivr_api.modules.knowledge.entity.knowledge import (
+    Knowledge,
+    KnowledgeDB,
+    KnowledgeSource,
+    KnowledgeUpdate,
+)
 from quivr_api.modules.knowledge.repository.knowledges import KnowledgeRepository
-from quivr_api.modules.knowledge.repository.storage import Storage
+from quivr_api.modules.knowledge.repository.storage import SupabaseS3Storage
+from quivr_api.modules.knowledge.repository.storage_interface import StorageInterface
+from quivr_api.modules.knowledge.service.knowledge_exceptions import (
+    KnowledgeDeleteError,
+    KnowledgeForbiddenAccess,
+    UploadError,
+)
 from quivr_api.modules.sync.entity.sync_models import (
     DBSyncFile,
     DownloadedSyncFile,
@@ -26,9 +41,13 @@ logger = get_logger(__name__)
 class KnowledgeService(BaseService[KnowledgeRepository]):
     repository_cls = KnowledgeRepository
 
-    def __init__(self, repository: KnowledgeRepository):
+    def __init__(
+        self,
+        repository: KnowledgeRepository,
+        storage: StorageInterface = SupabaseS3Storage(),
+    ):
         self.repository = repository
-        self.storage = Storage()
+        self.storage = storage
 
     async def get_knowledge_sync(self, sync_id: int) -> Knowledge:
         km = await self.repository.get_knowledge_by_sync_id(sync_id)
@@ -54,19 +73,37 @@ class KnowledgeService(BaseService[KnowledgeRepository]):
         except NoResultFound:
             raise FileNotFoundError(f"No knowledge for file_name: {file_name}")
 
-    async def get_knowledge(self, knowledge_id: UUID) -> Knowledge:
-        inserted_knowledge_db_instance = await self.repository.get_knowledge_by_id(
-            knowledge_id
-        )
-        assert inserted_knowledge_db_instance.id, "Knowledge ID not generated"
-        km = await inserted_knowledge_db_instance.to_dto()
-        return km
+    async def list_knowledge(
+        self, knowledge_id: UUID | None, user_id: UUID | None = None
+    ) -> list[KnowledgeDB]:
+        if knowledge_id is not None:
+            km = await self.repository.get_knowledge_by_id(knowledge_id, user_id)
+            return km.children
+        else:
+            if user_id is None:
+                raise KnowledgeForbiddenAccess(
+                    "can't get root knowledges without user_id"
+                )
+            return await self.repository.get_root_knowledge_user(user_id)
 
+    async def get_knowledge(
+        self, knowledge_id: UUID, user_id: UUID | None = None
+    ) -> KnowledgeDB:
+        return await self.repository.get_knowledge_by_id(knowledge_id, user_id)
+
+    async def update_knowledge(
+        self,
+        knowledge: KnowledgeDB,
+        payload: Knowledge | KnowledgeUpdate | dict[str, Any],
+    ):
+        return await self.repository.update_knowledge(knowledge, payload)
+
+    # TODO: Remove all of this
     # TODO (@aminediro): Replace with ON CONFLICT smarter query...
     # there is a chance of race condition but for now we let it crash in worker
     # the tasks will be dealt with on retry
     async def update_sha1_conflict(
-        self, knowledge: Knowledge, brain_id: UUID, file_sha1: str
+        self, knowledge: KnowledgeDB, brain_id: UUID, file_sha1: str
     ) -> bool:
         assert knowledge.id
         knowledge.file_sha1 = file_sha1
@@ -89,12 +126,12 @@ class KnowledgeService(BaseService[KnowledgeRepository]):
                     )
                 else:
                     await self.repository.link_to_brain(existing_knowledge, brain_id)
-                    await self.remove_knowledge(brain_id, knowledge.id)
+                    await self.remove_knowledge_brain(brain_id, knowledge.id)
                     return False
             else:
                 logger.debug(f"Removing previous errored file {existing_knowledge.id}")
                 assert existing_knowledge.id
-                await self.remove_knowledge(brain_id, existing_knowledge.id)
+                await self.remove_knowledge_brain(brain_id, existing_knowledge.id)
                 await self.update_file_sha1_knowledge(knowledge.id, knowledge.file_sha1)
                 return True
         except NoResultFound:
@@ -104,7 +141,47 @@ class KnowledgeService(BaseService[KnowledgeRepository]):
             await self.update_file_sha1_knowledge(knowledge.id, knowledge.file_sha1)
             return True
 
-    async def insert_knowledge(
+    async def create_knowledge(
+        self,
+        user_id: UUID,
+        knowledge_to_add: AddKnowledge,
+        upload_file: UploadFile | None = None,
+    ) -> KnowledgeDB:
+        knowledgedb = KnowledgeDB(
+            user_id=user_id,
+            file_name=knowledge_to_add.file_name,
+            is_folder=knowledge_to_add.is_folder,
+            url=knowledge_to_add.url,
+            extension=knowledge_to_add.extension,
+            source=knowledge_to_add.source,
+            source_link=knowledge_to_add.source_link,
+            file_size=upload_file.size if upload_file else 0,
+            metadata_=knowledge_to_add.metadata,  # type: ignore
+            status=KnowledgeStatus.RESERVED,
+            parent_id=knowledge_to_add.parent_id,
+        )
+        knowledge_db = await self.repository.create_knowledge(knowledgedb)
+        try:
+            if knowledgedb.source == KnowledgeSource.LOCAL and upload_file:
+                # NOTE(@aminediro): Unnecessary mem buffer because supabase doesnt accept FileIO..
+                buff_reader = io.BufferedReader(upload_file.file)  # type: ignore
+                storage_path = await self.storage.upload_file_storage(
+                    knowledgedb, buff_reader
+                )
+                knowledgedb.source_link = storage_path
+            knowledge_db = await self.repository.update_knowledge(
+                knowledge_db,
+                KnowledgeUpdate(status=KnowledgeStatus.UPLOADED),  # type: ignore
+            )
+            return knowledge_db
+        except Exception as e:
+            logger.exception(
+                f"Error uploading knowledge {knowledgedb.id} to storage : {e}"
+            )
+            await self.repository.remove_knowledge(knowledge=knowledge_db)
+            raise UploadError()
+
+    async def insert_knowledge_brain(
         self,
         user_id: UUID,
         knowledge_to_add: CreateKnowledgeProperties,  # FIXME: (later) @Amine brain id should not be in CreateKnowledgeProperties but since storage is brain_id/file_name
@@ -122,7 +199,7 @@ class KnowledgeService(BaseService[KnowledgeRepository]):
             user_id=user_id,
         )
 
-        knowledge_db = await self.repository.insert_knowledge(
+        knowledge_db = await self.repository.insert_knowledge_brain(
             knowledge, brain_id=knowledge_to_add.brain_id
         )
 
@@ -150,7 +227,7 @@ class KnowledgeService(BaseService[KnowledgeRepository]):
             assert isinstance(knowledge.file_name, str), "file_name should be a string"
             file_name_with_brain_id = f"{brain_id}/{knowledge.file_name}"
             try:
-                self.storage.remove_file(file_name_with_brain_id)
+                await self.storage.remove_file(file_name_with_brain_id)
             except Exception as e:
                 logger.error(
                     f"Error while removing file {file_name_with_brain_id}: {e}"
@@ -161,29 +238,52 @@ class KnowledgeService(BaseService[KnowledgeRepository]):
     async def update_file_sha1_knowledge(self, knowledge_id: UUID, file_sha1: str):
         return await self.repository.update_file_sha1_knowledge(knowledge_id, file_sha1)
 
-    async def remove_knowledge(
+    async def remove_knowledge(self, knowledge: KnowledgeDB) -> DeleteKnowledgeResponse:
+        assert knowledge.id
+
+        try:
+            # TODO:
+            # - Notion folders are special, they are themselves files and should be removed from storage
+            children = await self.repository.get_all_children(knowledge.id)
+            km_paths = [
+                self.storage.get_storage_path(k) for k in children if not k.is_folder
+            ]
+            if not knowledge.is_folder:
+                km_paths.append(self.storage.get_storage_path(knowledge))
+
+            # recursively deletes files
+            deleted_km = await self.repository.remove_knowledge(knowledge)
+            await asyncio.gather(*[self.storage.remove_file(p) for p in km_paths])
+
+            return deleted_km
+        except Exception as e:
+            logger.error(f"Error while remove knowledge : {e}")
+            raise KnowledgeDeleteError
+
+    async def remove_knowledge_brain(
         self,
         brain_id: UUID,
         knowledge_id: UUID,  # FIXME: @amine when name in storage change no need for brain id
     ) -> DeleteKnowledgeResponse:
         # TODO: fix KMS
         # REDO ALL THIS
-        knowledge = await self.get_knowledge(knowledge_id)
-        if len(knowledge.brain_ids) > 1:
+        knowledge = await self.repository.get_knowledge_by_id(knowledge_id)
+        km_brains = await knowledge.awaitable_attrs.brains
+        if len(km_brains) > 1:
             km = await self.repository.remove_knowledge_from_brain(
                 knowledge_id, brain_id
             )
+            assert km.id
             return DeleteKnowledgeResponse(file_name=km.file_name, knowledge_id=km.id)
         else:
             message = await self.repository.remove_knowledge_by_id(knowledge_id)
             file_name_with_brain_id = f"{brain_id}/{message.file_name}"
             try:
-                self.storage.remove_file(file_name_with_brain_id)
+                await self.storage.remove_file(file_name_with_brain_id)
             except Exception as e:
                 logger.error(
                     f"Error while removing file {file_name_with_brain_id}: {e}"
                 )
-
             return message
 
     async def remove_all_knowledges_from_brain(self, brain_id: UUID) -> None:
@@ -210,7 +310,7 @@ class KnowledgeService(BaseService[KnowledgeRepository]):
         # TODO: THIS IS A HACK!! Remove all of this
         if prev_sync_file:
             prev_knowledge = await self.get_knowledge_sync(sync_id=prev_sync_file.id)
-            if len(prev_knowledge.brain_ids) > 1:
+            if len(prev_knowledge.brains) > 1:
                 await self.repository.remove_knowledge_from_brain(
                     prev_knowledge.id, brain_id
                 )
@@ -231,7 +331,7 @@ class KnowledgeService(BaseService[KnowledgeRepository]):
             file_sha1=None,
             metadata={"sync_file_id": str(sync_id)},
         )
-        added_knowledge = await self.insert_knowledge(
+        added_knowledge = await self.insert_knowledge_brain(
             knowledge_to_add=knowledge_to_add, user_id=user_id
         )
         return added_knowledge

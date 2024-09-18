@@ -17,6 +17,8 @@ async def main():
 
         brain = await Brain.afrom_files(name="test_brain", file_paths=[temp_file.name])
 
+        await brain.save("~/.local/quivr")
+
         question = "what is gold? answer in french"
         async for chunk in brain.ask_streaming(question, rag_pipeline=QuivrQARAG):
             print("answer QuivrQARAG:", chunk.answer)

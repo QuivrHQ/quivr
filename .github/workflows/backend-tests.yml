@@ -9,7 +9,9 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
-
+    strategy:
+      matrix:
+        project: [quivr-api, quivr-worker]
     steps:
       - name: 👀 Checkout code
         uses: actions/checkout@v2
@@ -65,4 +67,4 @@ jobs:
           supabase start
           rye run python -c "from unstructured.nlp.tokenize import download_nltk_packages; download_nltk_packages()"
           rye run python -c "import nltk;nltk.download('punkt_tab'); nltk.download('averaged_perceptron_tagger_eng')"
-          rye test -p quivr-api -p quivr-worker
+          rye test -p ${{ matrix.project }}
