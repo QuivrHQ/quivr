@@ -1,8 +1,7 @@
-import json
 from typing import List, Optional
 from uuid import UUID
 
-from pydantic import BaseModel, model_validator, root_validator
+from pydantic import BaseModel, root_validator
 
 
 class CreateTask(BaseModel):
@@ -72,8 +71,3 @@ class InputAssistant(BaseModel):
     id: int
     name: str
     inputs: Inputs
-
-    @model_validator(mode="before")
-    @classmethod
-    def to_py_dict(cls, data):
-        return json.loads(data)
