@@ -12,21 +12,15 @@ retrieval_config:
     name: "standard RAG"
     nodes:
       - name: "filter_history"
-        edges: ["rewrite"]
+        edges: ["generate_chat_llm"]
 
-      - name: "rewrite"
-        edges: ["retrieve"]
-
-      - name: "retrieve"
-        edges: ["generate"]
-
-      - name: "generate"
+      - name: "generate_chat_llm"
         edges: ["END"]
   # Maximum number of previous conversation iterations
   # to include in the context of the answer
   max_history: 10
 
-  prompt: "my prompt"
+  #prompt: "my prompt"
 
   max_files: 20
   reranker_config:

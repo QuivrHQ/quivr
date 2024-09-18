@@ -8,9 +8,9 @@ workflow_config:
       edges: ["retrieve"]
 
     - name: "retrieve"
-      edges: ["generate"]
+      edges: ["generate_rag"]
 
-    - name: "generate"
+    - name: "generate_rag"
       edges: ["END"]
 # Maximum number of previous conversation iterations
 # to include in the context of the answer
