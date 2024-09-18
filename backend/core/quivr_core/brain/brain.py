@@ -76,9 +76,9 @@ class Brain:
         *,
         name: str,
         id: UUID,
-        vector_db: VectorStore,
         llm: LLMEndpoint,
-        embedder: Embeddings,
+        vector_db: VectorStore | None = None,
+        embedder: Embeddings | None = None,
         storage: StorageBase | None = None,
     ):
         self.id = id
@@ -357,6 +357,9 @@ class Brain:
         filter: Callable | Dict[str, Any] | None = None,
         fetch_n_neighbors: int = 20,
     ) -> list[SearchResult]:
+        if not self.vector_db:
+            raise ValueError("No vector db configured for this brain")
+
         result = await self.vector_db.asimilarity_search_with_score(
             query, k=n_results, filter=filter, fetch_k=fetch_n_neighbors
         )

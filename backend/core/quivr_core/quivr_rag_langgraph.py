@@ -68,7 +68,7 @@ class QuivrQARAGLangGraph:
         *,
         retrieval_config: RetrievalConfig,
         llm: LLMEndpoint,
-        vector_store: VectorStore,
+        vector_store: VectorStore | None = None,
         reranker: BaseDocumentCompressor | None = None,
     ):
         """
@@ -101,9 +101,10 @@ class QuivrQARAGLangGraph:
         else:
             self.reranker = IdempotentCompressor()
 
-        self.compression_retriever = ContextualCompressionRetriever(
-            base_compressor=self.reranker, base_retriever=self.retriever
-        )
+        if self.vector_store:
+            self.compression_retriever = ContextualCompressionRetriever(
+                base_compressor=self.reranker, base_retriever=self.retriever
+            )
 
     @property
     def retriever(self):
@@ -113,7 +114,10 @@ class QuivrQARAGLangGraph:
         Returns:
             VectorStoreRetriever: The retriever.
         """
-        return self.vector_store.as_retriever()
+        if self.vector_store:
+            return self.vector_store.as_retriever()
+        else:
+            raise ValueError("No vector store provided")
 
     def filter_history(self, state: AgentState) -> dict:
         """
@@ -315,7 +319,7 @@ class QuivrQARAGLangGraph:
             workflow.add_node("filter_history", self.filter_history)
             workflow.add_node("rewrite", self.rewrite)  # Re-writing the question
             workflow.add_node("retrieve", self.retrieve)  # retrieval
-            workflow.add_node("generate", self.generate)
+            workflow.add_node("generate", self.generate_rag)
 
             # Add node for filtering history
 
@@ -411,7 +415,6 @@ class QuivrQARAGLangGraph:
             config={"metadata": metadata},
         ):
             kind = event["event"]
-
             if (
                 not sources
                 and "output" in event["data"]
@@ -421,18 +424,19 @@ class QuivrQARAGLangGraph:
 
             if (
                 kind == "on_chat_model_stream"
-                and event["metadata"]["langgraph_node"] == "generate"
+                and "generate" in event["metadata"]["langgraph_node"]
             ):
                 chunk = event["data"]["chunk"]
-
                 rolling_message, answer_str = parse_chunk_response(
                     rolling_message,
                     chunk,
                     self.llm_endpoint.supports_func_calling(),
                 )
-
                 if len(answer_str) > 0:
-                    if self.llm_endpoint.supports_func_calling():
+                    if (
+                        self.llm_endpoint.supports_func_calling()
+                        and rolling_message.tool_calls
+                    ):
                         diff_answer = answer_str[len(prev_answer) :]
                         if len(diff_answer) > 0:
                             parsed_chunk = ParsedRAGChunkResponse(

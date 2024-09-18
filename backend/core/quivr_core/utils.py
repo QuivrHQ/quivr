@@ -101,19 +101,15 @@ def parse_chunk_response(
         answer = raw_chunk
 
     rolling_msg += answer
-    if supports_func_calling:
-        if rolling_msg.tool_calls:
-            cited_answer = next(
-                x for x in rolling_msg.tool_calls if cited_answer_filter(x)
-            )
-            if "args" in cited_answer:
-                gathered_args = cited_answer["args"]
-                if "answer" in gathered_args:
-                    # Only send the difference between answer and response_tokens which was the previous answer
-                    answer_str = gathered_args["answer"]
-        return rolling_msg, answer_str
-    else:
-        return rolling_msg, answer.content
+    if supports_func_calling and rolling_msg.tool_calls:
+        cited_answer = next(x for x in rolling_msg.tool_calls if cited_answer_filter(x))
+        if "args" in cited_answer and "answer" in cited_answer["args"]:
+            gathered_args = cited_answer["args"]
+            # Only send the difference between answer and response_tokens which was the previous answer
+            answer_str = gathered_args["answer"]
+            return rolling_msg, answer_str
+
+    return rolling_msg, answer.content
 
 
 @no_type_check
