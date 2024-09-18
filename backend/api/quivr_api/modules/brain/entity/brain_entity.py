@@ -77,6 +77,8 @@ class Brain(AsyncAttrs, SQLModel, table=True):
 
 
 class BrainEntity(BrainConfig):
+    last_update: datetime | None = None
+    brain_type: BrainType | None = None
     description: Optional[str] = None
     temperature: Optional[float] = None
     meaning: Optional[str] = None
@@ -86,8 +88,6 @@ class BrainEntity(BrainConfig):
     max_tokens: Optional[int] = None
     status: Optional[str] = None
     prompt_id: Optional[UUID] = None
-    last_update: datetime
-    brain_type: BrainType
     integration: Optional[IntegrationEntity] = None
     integration_description: Optional[IntegrationDescriptionEntity] = None
     snippet_emoji: Optional[str] = None
