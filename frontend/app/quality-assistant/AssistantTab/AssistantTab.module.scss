@@ -10,7 +10,7 @@
   .content_section {
     display: flex;
     flex-direction: column;
-    gap: Spacings.$spacing05;
+    gap: Spacings.$spacing06;
 
     .title {
       @include Typography.H2;
@@ -27,7 +27,7 @@
   .form_wrapper {
     display: flex;
     flex-direction: column;
-    gap: Spacings.$spacing05;
+    gap: Spacings.$spacing06;
 
     .title {
       @include Typography.H2;

@@ -10,6 +10,7 @@ import QuivrButton from "@/lib/components/ui/QuivrButton/QuivrButton";
 import AssistantCard from "./AssistantCard/AssistantCard";
 import styles from "./AssistantTab.module.scss";
 
+import { Checkbox } from "@/lib/components/ui/Checkbox/Checkbox";
 import { Assistant } from "../types/assistant";
 
 const AssistantTab = (): JSX.Element => {
@@ -17,6 +18,9 @@ const AssistantTab = (): JSX.Element => {
     Assistant | undefined
   >(undefined);
   const [assistants, setAssistants] = useState<Assistant[]>([]);
+  const [booleanStates, setBooleanStates] = useState<{
+    [key: string]: boolean;
+  }>({});
 
   const { getAssistants } = useAssistants();
 
@@ -34,6 +38,23 @@ const AssistantTab = (): JSX.Element => {
       }
     })();
   }, [assistantChoosed]);
+
+  useEffect(() => {
+    if (assistantChoosed && assistantChoosed.inputs.booleans) {
+      const initialBooleanStates = assistantChoosed.inputs.booleans.reduce(
+        (acc, input) => ({ ...acc, [input.key]: false }),
+        {}
+      );
+      setBooleanStates(initialBooleanStates);
+    }
+  }, [assistantChoosed]);
+
+  const handleCheckboxChange = (key: string, checked: boolean) => {
+    setBooleanStates((prevState) => ({
+      ...prevState,
+      [key]: checked,
+    }));
+  };
 
   return (
     <div className={styles.assistant_tab_wrapper}>
@@ -62,13 +83,21 @@ const AssistantTab = (): JSX.Element => {
               </div>
             ))}
           </div>
-          <div className={styles.boolean_inputs_wrapper}>
-            {assistantChoosed.inputs.booleans.map((input, index) => (
-              <div key={index} className={styles.boolean_input}>
-                <span>{input.key}</span>
-              </div>
-            ))}
-          </div>
+          {assistantChoosed.inputs.booleans && (
+            <div className={styles.boolean_inputs_wrapper}>
+              {assistantChoosed.inputs.booleans.map((input, index) => (
+                <div key={index} className={styles.boolean_input}>
+                  <Checkbox
+                    label={input.key}
+                    checked={booleanStates[input.key]}
+                    setChecked={(checked) =>
+                      handleCheckboxChange(input.key, checked)
+                    }
+                  />
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       )}
       {assistantChoosed && (
