@@ -177,9 +177,9 @@ class LLMEndpointConfig(QuivrBaseConfig):
         self.set_llm_model_config()
         self.set_api_key()
 
-    def set_api_key(self):
+    def set_api_key(self, force_reset: bool = False):
         # Check if the corresponding API key environment variable is set
-        if not self.llm_api_key:
+        if not self.llm_api_key or force_reset:
             self.llm_api_key = os.getenv(self.env_variable_name)
 
         if not self.llm_api_key:
@@ -207,7 +207,7 @@ class LLMEndpointConfig(QuivrBaseConfig):
         self.model = model
 
         self.set_llm_model_config()
-        self.set_api_key()
+        self.set_api_key(force_reset=True)
 
     def set_from_sqlmodel(self, sqlmodel: SQLModel, mapping: Dict[str, str]):
         """
