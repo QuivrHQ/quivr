@@ -11,6 +11,7 @@ import AssistantCard from "./AssistantCard/AssistantCard";
 import styles from "./AssistantTab.module.scss";
 
 import { Checkbox } from "@/lib/components/ui/Checkbox/Checkbox";
+import { SingleSelector } from "@/lib/components/ui/SingleSelector/SingleSelector";
 import { Assistant } from "../types/assistant";
 
 const AssistantTab = (): JSX.Element => {
@@ -20,6 +21,9 @@ const AssistantTab = (): JSX.Element => {
   const [assistants, setAssistants] = useState<Assistant[]>([]);
   const [booleanStates, setBooleanStates] = useState<{
     [key: string]: boolean;
+  }>({});
+  const [selectTextStates, setSelectTextStates] = useState<{
+    [key: string]: string;
   }>({});
 
   const { getAssistants } = useAssistants();
@@ -46,6 +50,14 @@ const AssistantTab = (): JSX.Element => {
         {}
       );
       setBooleanStates(initialBooleanStates);
+    }
+    if (assistantChoosed && assistantChoosed.inputs.select_texts) {
+      const initialSelectTextStates =
+        assistantChoosed.inputs.select_texts.reduce(
+          (acc, input) => ({ ...acc, [input.key]: input.default }),
+          {}
+        );
+      setSelectTextStates(initialSelectTextStates);
     }
   }, [assistantChoosed]);
 
@@ -83,6 +95,31 @@ const AssistantTab = (): JSX.Element => {
               </div>
             ))}
           </div>
+          {assistantChoosed.inputs.select_texts && (
+            <div className={styles.select_texts_wrapper}>
+              {assistantChoosed.inputs.select_texts.map((input, index) => (
+                <div key={index} className={styles.select_text}>
+                  <SingleSelector
+                    iconName="brain"
+                    placeholder={input.key}
+                    options={input.options.map((option) => {
+                      return { label: option, value: option };
+                    })}
+                    onChange={(value) =>
+                      setSelectTextStates((prevState) => ({
+                        ...prevState,
+                        [input.key]: value,
+                      }))
+                    }
+                    selectedOption={{
+                      label: input.options[0],
+                      value: input.options[0],
+                    }}
+                  />
+                </div>
+              ))}
+            </div>
+          )}
           {assistantChoosed.inputs.booleans && (
             <div className={styles.boolean_inputs_wrapper}>
               {assistantChoosed.inputs.booleans.map((input, index) => (

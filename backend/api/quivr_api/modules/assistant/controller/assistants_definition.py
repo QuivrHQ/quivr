@@ -3,6 +3,7 @@ from quivr_api.modules.assistant.dto.outputs import (
     AssistantOutput,
     InputBoolean,
     InputFile,
+    InputSelectText,
     Inputs,
     Pricing,
 )
@@ -196,6 +197,13 @@ assistant2 = AssistantOutput(
             InputFile(key="Document 1", description="File description"),
             InputFile(key="Document 2", description="File description"),
         ],
+        select_texts=[
+            InputSelectText(
+                key="Language",
+                description="Select Documents Type",
+                options=["Etiquettes VS Cahier des charges", "Fiche Dev VS Cahier des charges"],
+            ),
+        ],
     ),
 )
 
@@ -214,8 +222,15 @@ assistant3 = AssistantOutput(
             InputFile(key="Document 2", description="File description"),
         ],
         booleans=[
-            InputBoolean(key="Complex Document", description="Boolean description"),
-        ]
+            InputBoolean(key="Hard-to-Read Document?", description="Boolean description"),
+        ],
+        select_texts=[
+            InputSelectText(
+                key="Language",
+                description="Select Documents Type",
+                options=["Etiquettes", "Cahier des charges"],
+            ),
+        ],
     ),
 )
 
