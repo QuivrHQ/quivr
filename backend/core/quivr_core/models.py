@@ -42,6 +42,7 @@ class KnowledgeStatus(str, Enum):
     PROCESSING = "PROCESSING"
     UPLOADED = "UPLOADED"
     ERROR = "ERROR"
+    RESERVED = "RESERVED"
 
 
 class Source(BaseModel):

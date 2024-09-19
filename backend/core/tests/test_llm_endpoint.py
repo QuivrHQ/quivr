@@ -3,7 +3,6 @@ import os
 import pytest
 from langchain_core.language_models import FakeListChatModel
 from pydantic.v1.error_wrappers import ValidationError
-
 from quivr_core.config import LLMEndpointConfig
 from quivr_core.llm import LLMEndpoint
 

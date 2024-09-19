@@ -40,6 +40,8 @@ async def fetch_and_store_notion_files_async(
             else:
                 logger.warn("No notion page fetched")
 
+            # Commit all before exiting
+            await session.commit()
     except Exception as e:
         await session.rollback()
         raise e

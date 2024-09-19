@@ -11,6 +11,7 @@ from langchain.pydantic_v1 import Field as FieldV1
 from langchain_community.document_loaders import PlaywrightURLLoader
 from langchain_core.tools import BaseTool
 from pydantic import BaseModel
+
 from quivr_api.logger import get_logger
 
 logger = get_logger(__name__)
@@ -29,7 +30,6 @@ class URLReaderTool(BaseTool):
     def _run(
         self, url: str, run_manager: Optional[CallbackManagerForToolRun] = None
     ) -> Dict:
-
         loader = PlaywrightURLLoader(urls=[url], remove_selectors=["header", "footer"])
         data = loader.load()
 

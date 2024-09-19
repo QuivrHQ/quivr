@@ -141,7 +141,7 @@ async def process_notion_sync(
                     UUID(user_id),
                     notion_client,  # type: ignore
                 )
-
+            await session.commit()
     except Exception as e:
         await session.rollback()
         raise e

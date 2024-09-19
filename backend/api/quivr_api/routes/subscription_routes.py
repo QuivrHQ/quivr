@@ -3,6 +3,7 @@ from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
+
 from quivr_api.logger import get_logger
 from quivr_api.middlewares.auth.auth_bearer import AuthBearer, get_current_user
 from quivr_api.models.brains_subscription_invitations import BrainSubscription
@@ -253,7 +254,7 @@ async def accept_invitation(
             is_default_brain=False,
         )
         shared_brain = brain_service.get_brain_by_id(brain_id)
-        
+
     except Exception as e:
         logger.error(f"Error adding user to brain: {e}")
         raise HTTPException(status_code=400, detail=f"Error adding user to brain: {e}")
