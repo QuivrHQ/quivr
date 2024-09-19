@@ -5,6 +5,7 @@ import format from "date-fns/format";
 import { fr } from "date-fns/locale";
 import { useState } from "react";
 import ReactMarkdown from "react-markdown";
+import gfm from "remark-gfm";
 
 import { Checkbox } from "@/lib/components/ui/Checkbox/Checkbox";
 import { Icon } from "@/lib/components/ui/Icon/Icon";
@@ -31,6 +32,8 @@ const ProcessLine = ({
 }: ProcessLineProps): JSX.Element => {
   const [showResult, setShowResult] = useState(false);
   const { isMobile } = useDevice();
+
+  console.info(process.result);
 
   return (
     <>
@@ -96,7 +99,11 @@ const ProcessLine = ({
         setOpen={setShowResult}
         CloseTrigger={<div />}
       >
-        <ReactMarkdown>{process.result}</ReactMarkdown>
+        <div className={styles.markdown}>
+          <ReactMarkdown remarkPlugins={[gfm]}>
+            {process.result.replace(/\n/g, "\n")}
+          </ReactMarkdown>
+        </div>
       </Modal>
     </>
   );

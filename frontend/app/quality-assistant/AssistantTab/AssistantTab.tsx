@@ -3,15 +3,16 @@
 import { useEffect, useState } from "react";
 
 import { useAssistants } from "@/lib/api/assistants/useAssistants";
+import { Checkbox } from "@/lib/components/ui/Checkbox/Checkbox";
 import { FileInput } from "@/lib/components/ui/FileInput/FileInput";
 import { Icon } from "@/lib/components/ui/Icon/Icon";
 import QuivrButton from "@/lib/components/ui/QuivrButton/QuivrButton";
+import { SingleSelector } from "@/lib/components/ui/SingleSelector/SingleSelector";
 
 import AssistantCard from "./AssistantCard/AssistantCard";
 import styles from "./AssistantTab.module.scss";
 
-import { Checkbox } from "@/lib/components/ui/Checkbox/Checkbox";
-import { SingleSelector } from "@/lib/components/ui/SingleSelector/SingleSelector";
+
 import { Assistant } from "../types/assistant";
 
 const AssistantTab = (): JSX.Element => {
