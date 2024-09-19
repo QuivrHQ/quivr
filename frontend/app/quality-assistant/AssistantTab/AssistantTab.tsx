@@ -62,6 +62,13 @@ const AssistantTab = (): JSX.Element => {
               </div>
             ))}
           </div>
+          <div className={styles.boolean_inputs_wrapper}>
+            {assistantChoosed.inputs.booleans.map((input, index) => (
+              <div key={index} className={styles.boolean_input}>
+                <span>{input.key}</span>
+              </div>
+            ))}
+          </div>
         </div>
       )}
       {assistantChoosed && (

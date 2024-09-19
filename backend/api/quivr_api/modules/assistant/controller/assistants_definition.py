@@ -1,4 +1,4 @@
-from quivr_api.modules.assistant.dto.inputs import InputAssistant
+from quivr_api.modules.assistant.dto.inputs import InputAssistant, InputBoolean
 from quivr_api.modules.assistant.dto.outputs import (
     AssistantOutput,
     InputFile,
@@ -212,6 +212,9 @@ assistant3 = AssistantOutput(
             InputFile(key="Document 1", description="File description"),
             InputFile(key="Document 2", description="File description"),
         ],
+        booleans=[
+            InputBoolean(key="Complex Document", description="Boolean description"),
+        ]
     ),
 )
 
