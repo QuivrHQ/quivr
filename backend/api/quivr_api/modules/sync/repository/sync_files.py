@@ -1,6 +1,9 @@
 from quivr_api.logger import get_logger
 from quivr_api.modules.dependencies import get_supabase_client
-from quivr_api.modules.sync.dto.inputs import SyncFileInput, SyncFileUpdateInput
+from quivr_api.modules.sync.dto.inputs import (
+    SyncFileInput,
+    SyncFileUpdateInput,
+)
 from quivr_api.modules.sync.entity.sync_models import DBSyncFile, SyncFile, SyncsActive
 from quivr_api.modules.sync.repository.sync_interfaces import SyncFileInterface
 

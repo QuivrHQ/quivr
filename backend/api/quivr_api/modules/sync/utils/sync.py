@@ -51,7 +51,11 @@ class BaseSync(ABC):
 
     @abstractmethod
     async def aget_files(
-        self, credentials: Dict, folder_id: str | None = None, recursive: bool = False
+        self,
+        credentials: Dict,
+        folder_id: str | None = None,
+        recursive: bool = False,
+        sync_user_id: int | None = None,
     ) -> List[SyncFile]:
         pass
 
@@ -782,7 +786,11 @@ class NotionSync(BaseSync):
         return credentials
 
     async def aget_files(
-        self, credentials: Dict, folder_id: str | None = None, recursive: bool = False
+        self,
+        credentials: Dict,
+        sync_user_id: int,
+        folder_id: str | None = None,
+        recursive: bool = False,
     ) -> List[SyncFile]:
         pages = []
 
@@ -792,7 +800,9 @@ class NotionSync(BaseSync):
         if not folder_id or folder_id == "":
             folder_id = None  # ROOT FOLDER HAVE A TRUE PARENT ID
 
-        children = await self.notion_service.get_notion_files_by_parent_id(folder_id)
+        children = await self.notion_service.get_notion_files_by_parent_id(
+            folder_id, sync_user_id
+        )
         for page in children:
             page_info = SyncFile(
                 name=page.name,
@@ -808,7 +818,7 @@ class NotionSync(BaseSync):
             pages.append(page_info)
 
             if recursive:
-                sub_pages = await self.aget_files(credentials, str(page.id), recursive)
+                sub_pages = await self.aget_files(credentials=credentials, sync_user_id=sync_user_id, folder_id=str(page.id), recursive=recursive)
                 pages.extend(sub_pages)
         return pages
 
@@ -951,6 +961,10 @@ class NotionSync(BaseSync):
 
                 markdown_content = []
                 for block in blocks:
+                    logger.info(f"Block: {block}")
+                    if "image" in block["type"] or "file" in block["type"]:
+                        logger.info(f"Block is an image or file: {block}")
+                        continue
                     markdown_content.append(self.get_block_content(block))
                     if block["has_children"]:
                         sub_elements = [

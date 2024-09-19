@@ -7,6 +7,7 @@ from quivr_api.modules.sync.dto.inputs import (
     SyncsActiveInput,
     SyncsActiveUpdateInput,
     SyncsUserInput,
+    SyncsUserStatus,
     SyncUserUpdateInput,
 )
 from quivr_api.modules.sync.entity.sync_models import SyncsActive, SyncsUser
@@ -68,10 +69,35 @@ class SyncUserService(ISyncUserService):
         return self.repository.get_syncs_user(user_id, sync_user_id)
 
     def create_sync_user(self, sync_user_input: SyncsUserInput):
+        if sync_user_input.provider == "Notion":
+            response = self.repository.get_corresponding_deleted_sync(
+                user_id=sync_user_input.user_id
+            )
+            if response:
+                raise ValueError("User removed this connection less than 24 hours ago")
+
         return self.repository.create_sync_user(sync_user_input)
 
     def delete_sync_user(self, sync_id: int, user_id: str):
-        return self.repository.delete_sync_user(sync_id, user_id)
+        sync_user = self.repository.get_sync_user_by_id(sync_id)
+        if sync_user and sync_user.provider == "Notion":
+            sync_user_input = SyncUserUpdateInput(
+                email=str(sync_user.email),
+                credentials=sync_user.credentials,
+                state=sync_user.state,
+                status=str(SyncsUserStatus.REMOVED),
+            )
+            self.repository.update_sync_user(
+                sync_user_id=sync_user.user_id,
+                state=sync_user.state,
+                sync_user_input=sync_user_input,
+            )
+            return None
+        else:
+            return self.repository.delete_sync_user(sync_id, user_id)
+
+    def clean_notion_user_syncs(self):
+        return self.repository.clean_notion_user_syncs()
 
     def get_sync_user_by_state(self, state: dict) -> SyncsUser | None:
         return self.repository.get_sync_user_by_state(state)
@@ -83,6 +109,9 @@ class SyncUserService(ISyncUserService):
         self, sync_user_id: UUID, state: dict, sync_user_input: SyncUserUpdateInput
     ):
         return self.repository.update_sync_user(sync_user_id, state, sync_user_input)
+
+    def update_sync_user_status(self, sync_user_id: int, status: str):
+        return self.repository.update_sync_user_status(sync_user_id, status)
 
     def get_all_notion_user_syncs(self):
         return self.repository.get_all_notion_user_syncs()

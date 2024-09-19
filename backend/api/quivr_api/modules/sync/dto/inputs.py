@@ -1,6 +1,21 @@
+import enum
 from typing import List, Optional
 
 from pydantic import BaseModel
+
+
+class SyncsUserStatus(enum.Enum):
+    """
+    Enum for the status of a sync user.
+    """
+
+    SYNCED = "SYNCED"
+    SYNCING = "SYNCING"
+    ERROR = "ERROR"
+    REMOVED = "REMOVED"
+
+    def __str__(self):
+        return self.value
 
 
 class SyncsUserInput(BaseModel):
@@ -17,10 +32,12 @@ class SyncsUserInput(BaseModel):
 
     user_id: str
     name: str
+    email: str | None = None
     provider: str
     credentials: dict
     state: dict
     additional_data: dict = {}
+    status: str
 
 
 class SyncUserUpdateInput(BaseModel):
@@ -33,8 +50,9 @@ class SyncUserUpdateInput(BaseModel):
     """
 
     credentials: dict
-    state: dict
+    state: dict | None = None
     email: str
+    status: str
 
 
 class SyncActiveSettings(BaseModel):
