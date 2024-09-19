@@ -51,7 +51,7 @@ def should_download_file(
     datetime_format: str,
 ) -> bool:
     file_last_modified_utc = datetime.strptime(
-        file.last_modified, datetime_format
+        file.last_modified_at, datetime_format
     ).replace(tzinfo=timezone.utc)
 
     should_download = (
@@ -61,7 +61,7 @@ def should_download_file(
 
     # TODO: Handle notion database
     if provider_name == "notion":
-        should_download &= file.mime_type != "db"
+        should_download &= file.extension != "db"
     else:
         should_download &= not file.is_folder
 

@@ -68,6 +68,17 @@ class KnowledgeService(BaseService[KnowledgeRepository]):
         except NoResultFound:
             raise FileNotFoundError(f"No knowledge for file_name: {file_name}")
 
+    async def map_syncs_knowledge_user(
+        self, sync_id: int, user_id: UUID
+    ) -> dict[str, Knowledge]:
+        list_kms = await self.repository.get_all_knowledge_sync_user(
+            sync_id=sync_id, user_id=user_id
+        )
+        return {
+            k.sync_file_id: k
+            for k in await asyncio.gather(*[k.to_dto() for k in list_kms])
+        }
+
     async def list_knowledge(
         self, knowledge_id: UUID | None, user_id: UUID | None = None
     ) -> list[KnowledgeDB]:

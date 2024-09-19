@@ -89,7 +89,7 @@ class SyncsService(BaseService[SyncsRepository]):
         recursive: bool = False,
     ):
         return await self.repository.get_files_folder_user_sync(
-            sync_active_id=sync_active_id,
+            sync_id=sync_active_id,
             user_id=user_id,
             folder_id=folder_id,
             recursive=recursive,

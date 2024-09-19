@@ -71,13 +71,17 @@ class SyncsRepository(BaseRepository):
             await self.session.rollback()
             raise
 
-    async def get_sync_id(self, sync_id: int) -> Sync:
+    async def get_sync_id(self, sync_id: int, user_id: UUID | None = None) -> Sync:
         """
         Retrieve sync users from the database.
         """
         query = select(Sync).where(Sync.id == sync_id)
+
+        if user_id:
+            query = query.where(Sync.user_id == user_id)
         result = await self.session.exec(query)
         sync = result.first()
+
         if not sync:
             logger.error(
                 f"No sync user found for sync_id:  {sync_id}",
@@ -105,7 +109,7 @@ class SyncsRepository(BaseRepository):
         if sync_id is not None:
             query = query.where(Sync.id == sync_id)
         result = await self.session.exec(query)
-        return result.all()
+        return list(result.all())
 
     async def get_sync_user_by_state(self, state: dict) -> Sync:
         """
@@ -133,7 +137,7 @@ class SyncsRepository(BaseRepository):
             "Deleting sync user with sync_id: %s, user_id: %s", sync_id, user_id
         )
         await self.session.execute(
-            delete(Sync).where(Sync.id == sync_id).where(Sync.user_id == user_id)
+            delete(Sync).where(Sync.id == sync_id).where(Sync.user_id == user_id)  # type: ignore
         )
         logger.info("Sync user deleted successfully")
 
@@ -180,35 +184,36 @@ class SyncsRepository(BaseRepository):
 
     async def get_files_folder_user_sync(
         self,
-        sync_active_id: int,
+        sync_id: int,
         user_id: UUID,
         folder_id: str | None = None,
         recursive: bool = False,
     ) -> List[SyncFile] | None:
         logger.info(
             "Retrieving files for user sync with sync_active_id: %s, user_id: %s, folder_id: %s",
-            sync_active_id,
+            sync_id,
             user_id,
             folder_id,
         )
-        sync_user = await self.get_syncs(user_id=user_id, sync_id=sync_active_id)
-        if not sync_user:
+        sync = await self.get_sync_id(sync_id=sync_id, user_id=user_id)
+        if not sync:
             logger.error(
                 "No sync user found for sync_active_id: %s, user_id: %s",
-                sync_active_id,
+                sync_id,
                 user_id,
             )
             return None
 
-        provider = sync_user.provider.lower()
         try:
-            sync_provider = self.sync_provider_mapping[SyncProvider(provider)]
+            sync_provider = self.sync_provider_mapping[
+                SyncProvider(sync.provider.lower())
+            ]
         except KeyError:
             raise SyncProviderError
 
-        if sync_user.credentials is None:
+        if sync.credentials is None:
             raise SyncEmptyCredentials
 
         return await sync_provider.aget_files(
-            sync_user.credentials, folder_id if folder_id else "", recursive
+            sync.credentials, folder_id if folder_id else "", recursive
         )

@@ -40,11 +40,10 @@ class SyncFile(BaseModel):
     id: str
     name: str
     is_folder: bool
-    last_modified: str
-    mime_type: str
+    last_modified_at: Optional[datetime]
+    extension: str
     web_view_link: str
     size: Optional[int] = None
-    notification_id: UUID | None = None
     icon: Optional[str] = None
     parent_id: Optional[str] = None
     type: Optional[str] = None
@@ -54,10 +53,10 @@ class Sync(SQLModel, table=True):
     __tablename__ = "syncs"  # type: ignore
 
     id: int | None = Field(default=None, primary_key=True)
-    email: str | None = Field(default=None)
-    user_id: UUID = Field(foreign_key="users.id", nullable=False)
     name: str
     provider: str
+    email: str | None = Field(default=None)
+    user_id: UUID = Field(foreign_key="users.id", nullable=False)
     credentials: Dict[str, str] | None = Field(
         default=None, sa_column=Column("credentials", JSON)
     )

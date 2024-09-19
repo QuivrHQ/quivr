@@ -1,11 +1,14 @@
+import asyncio
 import os
-from typing import List
+from typing import List, Tuple
 
 from fastapi import APIRouter, Depends, status
 
 from quivr_api.logger import get_logger
 from quivr_api.middlewares.auth import AuthBearer, get_current_user
 from quivr_api.modules.dependencies import get_service
+from quivr_api.modules.knowledge.entity.knowledge import Knowledge
+from quivr_api.modules.knowledge.service.knowledge_service import KnowledgeService
 from quivr_api.modules.notification.service.notification_service import (
     NotificationService,
 )
@@ -16,6 +19,7 @@ from quivr_api.modules.sync.controller.google_sync_routes import google_sync_rou
 from quivr_api.modules.sync.controller.notion_sync_routes import notion_sync_router
 from quivr_api.modules.sync.dto import SyncsDescription
 from quivr_api.modules.sync.dto.outputs import AuthMethodEnum
+from quivr_api.modules.sync.entity.sync_models import SyncFile
 from quivr_api.modules.sync.service.sync_service import SyncsService
 from quivr_api.modules.user.entity.user_identity import UserIdentity
 
@@ -28,7 +32,8 @@ os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
 logger = get_logger(__name__)
 
 # Initialize sync service
-syncs_service_dep = get_service(SyncsService)
+get_sync_service = get_service(SyncsService)
+get_knowledge_service = get_service(KnowledgeService)
 
 
 # Initialize API router
@@ -80,7 +85,7 @@ github_sync = SyncsDescription(
     dependencies=[Depends(AuthBearer())],
     tags=["Sync"],
 )
-async def get_syncs(current_user: UserIdentity = Depends(get_current_user)):
+async def get_all_sync_typs(current_user: UserIdentity = Depends(get_current_user)):
     """
     Get all available sync descriptions.
 
@@ -101,7 +106,7 @@ async def get_syncs(current_user: UserIdentity = Depends(get_current_user)):
 )
 async def get_user_syncs(
     current_user: UserIdentity = Depends(get_current_user),
-    syncs_service: SyncsService = Depends(syncs_service_dep),
+    syncs_service: SyncsService = Depends(get_sync_service),
 ):
     """
     Get syncs for the current user.
@@ -125,7 +130,7 @@ async def get_user_syncs(
 async def delete_user_sync(
     sync_id: int,
     current_user: UserIdentity = Depends(get_current_user),
-    syncs_service: SyncsService = Depends(syncs_service_dep),
+    syncs_service: SyncsService = Depends(get_sync_service),
 ):
     """
     Delete a sync for the current user.
@@ -146,14 +151,15 @@ async def delete_user_sync(
 
 @sync_router.get(
     "/sync/{sync_id}/files",
-    dependencies=[Depends(AuthBearer())],
+    response_model=List[Knowledge] | None,
     tags=["Sync"],
 )
-async def get_files_folder_user_sync(
-    user_sync_id: int,
+async def list_sync_files(
+    sync_id: int,
     folder_id: str | None = None,
     current_user: UserIdentity = Depends(get_current_user),
-    syncs_service: SyncsService = Depends(syncs_service_dep),
+    syncs_service: SyncsService = Depends(get_sync_service),
+    knowledge_service: KnowledgeService = Depends(get_knowledge_service),
 ):
     """
     Get files for an active sync.
@@ -166,11 +172,52 @@ async def get_files_folder_user_sync(
     Returns:
         SyncsActive: The active sync data.
     """
-    logger.debug(
-        f"Fetching files for user sync: {user_sync_id} for user: {current_user.id}"
-    )
-    return await syncs_service.get_files_folder_user_sync(
-        user_sync_id,
-        current_user.id,
-        folder_id,
-    )
+    logger.debug(f"Fetching files for user sync: {sync_id} for user: {current_user.id}")
+
+    # TODO: check to see if this is inefficient
+    # Gets knowledge for each call to list the files,
+    # The logic is that getting from DB will be faster than provider repsonse ?
+    # NOTE: asyncio.gather didn't correcly typecheck
+    async def fetch_data() -> Tuple[dict[str, Knowledge], List[SyncFile] | None]:
+        map_knowledges_task = knowledge_service.map_syncs_knowledge_user(
+            sync_id=sync_id, user_id=current_user.id
+        )
+        sync_files_task = syncs_service.get_files_folder_user_sync(
+            sync_id,
+            current_user.id,
+            folder_id,
+        )
+        return await asyncio.gather(map_knowledges_task, sync_files_task)
+
+    sync = await syncs_service.get_sync_by_id(sync_id=sync_id)
+    map_knowledges, sync_files = await fetch_data()
+    if not sync_files:
+        return None
+
+    kms = []
+    for file in sync_files:
+        existing_km = map_knowledges.get(file.id)
+        if existing_km:
+            kms.append(existing_km)
+        else:
+            kms.append(
+                Knowledge(
+                    id=None,
+                    file_name=file.name,
+                    is_folder=file.is_folder,
+                    extension=file.extension,
+                    source=sync.provider,
+                    source_link=file.web_view_link,
+                    user_id=current_user.id,
+                    brains=[],
+                    parent=None,
+                    children=None,
+                    status=None,  # TODO: Handle a sync not added status
+                    # TODO: retrieve created at from sync provider
+                    created_at=file.last_modified_at,
+                    updated_at=file.last_modified_at,
+                    sync_id=sync_id,
+                    sync_file_id=file.id,
+                )
+            )
+    return kms

@@ -323,8 +323,8 @@ class MockSyncCloud(BaseSync):
                 id=fid,
                 name=f"file_{fid}",
                 is_folder=False,
-                last_modified=datetime.now().strftime(self.datetime_format),
-                mime_type="txt",
+                last_modified_at=datetime.now().strftime(self.datetime_format),
+                extension="txt",
                 web_view_link=f"{self.name}/{fid}",
             )
             for fid in file_ids
@@ -339,8 +339,8 @@ class MockSyncCloud(BaseSync):
                 id=str(uuid4()),
                 name=f"file_in_{folder_id}",
                 is_folder=False,
-                last_modified=datetime.now().strftime(self.datetime_format),
-                mime_type="txt",
+                last_modified_at=datetime.now().strftime(self.datetime_format),
+                extension="txt",
                 web_view_link=f"{self.name}/{fid}",
             )
             for fid in range(n_files)

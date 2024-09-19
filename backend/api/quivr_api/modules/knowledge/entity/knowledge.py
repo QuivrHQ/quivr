@@ -17,15 +17,18 @@ from quivr_api.modules.sync.entity.sync_models import Sync
 class KnowledgeSource(str, Enum):
     LOCAL = "local"
     WEB = "web"
-    GDRIVE = "google drive"
+    NOTETAKER = "notetaker"
+    GOOGLE = "google"
+    AZURE = "azure"
     DROPBOX = "dropbox"
-    SHAREPOINT = "sharepoint"
+    NOTION = "notion"
+    GITHUB = "github"
 
 
 class Knowledge(BaseModel):
-    id: UUID
+    id: Optional[UUID]
     file_size: int = 0
-    status: KnowledgeStatus
+    status: Optional[KnowledgeStatus]
     file_name: Optional[str] = None
     url: Optional[str] = None
     extension: str = ".txt"
@@ -40,6 +43,8 @@ class Knowledge(BaseModel):
     brains: List[Dict[str, Any]]
     parent: Optional[Self]
     children: Optional[List[Self]]
+    sync_id: int | None
+    sync_file_id: str | None
 
 
 class KnowledgeUpdate(BaseModel):
@@ -120,6 +125,7 @@ class KnowledgeDB(AsyncAttrs, SQLModel, table=True):
     sync: Sync | None = Relationship(
         back_populates="knowledges", sa_relationship_kwargs={"lazy": "joined"}
     )
+    sync_file_id: str | None = Field(default=None)
 
     # TODO: nested folder search
     async def to_dto(self, get_children: bool = True) -> Knowledge:
@@ -154,4 +160,6 @@ class KnowledgeDB(AsyncAttrs, SQLModel, table=True):
             parent=parent,
             children=[await c.to_dto(get_children=False) for c in children],
             user_id=self.user_id,
+            sync_id=self.sync_id,
+            sync_file_id=self.sync_file_id,
         )

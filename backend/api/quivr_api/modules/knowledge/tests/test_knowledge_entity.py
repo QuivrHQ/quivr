@@ -9,6 +9,8 @@ from sqlmodel.ext.asyncio.session import AsyncSession
 
 from quivr_api.modules.brain.entity.brain_entity import Brain, BrainType
 from quivr_api.modules.knowledge.entity.knowledge import KnowledgeDB
+from quivr_api.modules.sync.dto.outputs import SyncProvider
+from quivr_api.modules.sync.entity.sync_models import Sync
 from quivr_api.modules.user.entity.user_identity import User
 
 TestData = Tuple[Brain, List[KnowledgeDB]]
@@ -36,6 +38,22 @@ async def user(session):
         await session.exec(select(User).where(User.email == "admin@quivr.app"))
     ).one()
     return user_1
+
+
+@pytest_asyncio.fixture(scope="function")
+async def sync(session: AsyncSession, user: User) -> User:
+    sync = Sync(
+        name="test_sync",
+        email="test@test.com",
+        user_id=user.id,
+        credentials={"test": "test"},
+        provider=SyncProvider.GOOGLE,
+    )
+
+    session.add(sync)
+    await session.commit()
+    await session.refresh(sync)
+    return sync
 
 
 @pytest_asyncio.fixture(scope="function")
@@ -175,7 +193,7 @@ async def test_knowledge_remove_folder_cascade(
 
 
 @pytest.mark.asyncio(loop_scope="session")
-async def test_knowledge_dto(session, user, brain):
+async def test_knowledge_dto(session, user, brain, sync):
     # add folder in brain
     folder = KnowledgeDB(
         file_name="folder_1",
@@ -201,6 +219,8 @@ async def test_knowledge_dto(session, user, brain):
         user_id=user.id,
         brains=[brain],
         parent=folder,
+        sync_file_id="file1",
+        sync=sync,
     )
     session.add(km)
     session.add(km)
@@ -223,6 +243,10 @@ async def test_knowledge_dto(session, user, brain):
     assert km_dto.metadata == km.metadata_  # type: ignor
     assert km_dto.parent
     assert km_dto.parent.id == folder.id
+    # Syncs
+
+    assert km_dto.sync_id == km.sync_id
+    assert km_dto.sync_file_id == km.sync_file_id
 
     folder_dto = await folder.to_dto()
     assert folder_dto.brains[0] == brain.model_dump()

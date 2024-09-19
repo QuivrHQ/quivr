@@ -1,4 +1,4 @@
-from typing import Any, Sequence
+from typing import Any, List, Sequence
 from uuid import UUID
 
 from fastapi import HTTPException
@@ -152,6 +152,16 @@ class KnowledgeRepository(BaseRepository):
             raise HTTPException(404, "Knowledge not found")
 
         return knowledge
+
+    async def get_all_knowledge_sync_user(
+        self, sync_id: int, user_id: UUID | None = None
+    ) -> List[KnowledgeDB]:
+        query = select(KnowledgeDB).where(KnowledgeDB.sync_id == sync_id)
+        if user_id:
+            query = query.where(KnowledgeDB.user_id == user_id)
+
+        result = await self.session.exec(query)
+        return list(result.all())
 
     async def get_knowledge_by_file_name_brain_id(
         self, file_name: str, brain_id: UUID
