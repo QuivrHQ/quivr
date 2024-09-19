@@ -31,7 +31,7 @@ export const ConnectionCards = ({
         fromAddKnowledge={fromAddKnowledge}
       />
       <ConnectionSection
-        label="Notion"
+        label="Notion (Beta)"
         provider="Notion"
         callback={(name: string) => syncNotion(name)}
         fromAddKnowledge={fromAddKnowledge}
