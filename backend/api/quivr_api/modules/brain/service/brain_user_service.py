@@ -2,10 +2,11 @@ from typing import List
 from uuid import UUID
 
 from fastapi import HTTPException
+
 from quivr_api.logger import get_logger
 from quivr_api.modules.brain.entity.brain_entity import (
     BrainEntity,
-    BrainUser,
+    BrainUserDB,
     MinimalUserBrainEntity,
     RoleEnum,
 )
@@ -73,7 +74,7 @@ class BrainUserService:
 
         return results  # type: ignore
 
-    def get_brain_users(self, brain_id: UUID) -> List[BrainUser]:
+    def get_brain_users(self, brain_id: UUID) -> List[BrainUserDB]:
         return self.brain_user_repository.get_brain_users(brain_id)
 
     def update_brain_user_rights(

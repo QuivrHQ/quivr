@@ -105,6 +105,7 @@ class KnowledgeDB(AsyncAttrs, SQLModel, table=True):
         children: list[KnowledgeDB] = (
             await self.awaitable_attrs.children if get_children else []
         )
+        children_dto = [await c.to_dto(get_children=False) for c in children]
         parent = await self.awaitable_attrs.parent
         parent = await parent.to_dto(get_children=False) if parent else None
 
@@ -124,7 +125,7 @@ class KnowledgeDB(AsyncAttrs, SQLModel, table=True):
             metadata=self.metadata_,  # type: ignore
             brains=[b.model_dump() for b in brains],
             parent=parent,
-            children=[await c.to_dto(get_children=False) for c in children],
+            children=children_dto,
             user_id=self.user_id,
             sync_id=self.sync_id,
             sync_file_id=self.sync_file_id,

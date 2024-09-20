@@ -201,6 +201,9 @@ async def list_sync_files(
         if existing_km:
             kms.append(existing_km)
         else:
+            last_modified_at = (
+                file.last_modified_at if file.last_modified_at else datetime.now()
+            )
             kms.append(
                 KnowledgeDTO(
                     id=None,
@@ -215,12 +218,8 @@ async def list_sync_files(
                     children=None,
                     status=None,  # TODO: Handle a sync not added status
                     # TODO: retrieve created at from sync provider
-                    created_at=file.last_modified_at
-                    if file.last_modified_at
-                    else datetime.now(),
-                    updated_at=file.last_modified_at
-                    if file.last_modified_at
-                    else datetime.now(),
+                    created_at=last_modified_at,
+                    updated_at=last_modified_at,
                     sync_id=sync_id,
                     sync_file_id=file.id,
                 )

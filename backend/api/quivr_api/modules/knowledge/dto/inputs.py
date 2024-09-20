@@ -1,4 +1,4 @@
-from typing import Dict, Optional
+from typing import Dict, List, Optional
 from uuid import UUID
 
 from pydantic import BaseModel
@@ -30,7 +30,9 @@ class AddKnowledge(BaseModel):
     source_link: Optional[str] = None
     metadata: Optional[Dict[str, str]] = None
     is_folder: bool = False
-    parent_id: Optional[UUID] = None
+    parent_id: UUID | None = None
+    sync_id: int | None = None
+    sync_file_id: str | None = None
 
 
 class KnowledgeUpdate(BaseModel):
@@ -45,5 +47,7 @@ class KnowledgeUpdate(BaseModel):
     metadata: Optional[Dict[str, str]] = None
 
 
-class LinkKnowledge(BaseModel):
+class LinkKnowledgeBrain(BaseModel):
+    bulk_id: UUID
     knowledge: KnowledgeDTO
+    brain_ids: List[UUID]

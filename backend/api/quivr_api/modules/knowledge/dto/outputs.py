@@ -29,6 +29,6 @@ class KnowledgeDTO(BaseModel):
     user_id: UUID
     brains: List[Dict[str, Any]]
     parent: Optional[Self]
-    children: Optional[List[Self]]
+    children: List[Self]
     sync_id: int | None
     sync_file_id: str | None

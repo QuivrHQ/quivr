@@ -79,6 +79,7 @@ class KnowledgeService(BaseService[KnowledgeRepository]):
         return {
             k.sync_file_id: k
             for k in await asyncio.gather(*[k.to_dto() for k in list_kms])
+            if k.sync_file_id
         }
 
     async def list_knowledge(
@@ -167,8 +168,12 @@ class KnowledgeService(BaseService[KnowledgeRepository]):
             metadata_=knowledge_to_add.metadata,  # type: ignore
             status=KnowledgeStatus.RESERVED,
             parent_id=knowledge_to_add.parent_id,
+            sync_id=knowledge_to_add.sync_id,
+            sync_file_id=knowledge_to_add.sync_file_id,
         )
+
         knowledge_db = await self.repository.create_knowledge(knowledgedb)
+
         try:
             if knowledgedb.source == KnowledgeSource.LOCAL and upload_file:
                 # NOTE(@aminediro): Unnecessary mem buffer because supabase doesnt accept FileIO..
@@ -177,10 +182,10 @@ class KnowledgeService(BaseService[KnowledgeRepository]):
                     knowledgedb, buff_reader
                 )
                 knowledgedb.source_link = storage_path
-            knowledge_db = await self.repository.update_knowledge(
-                knowledge_db,
-                KnowledgeUpdate(status=KnowledgeStatus.UPLOADED),  # type: ignore
-            )
+                knowledge_db = await self.repository.update_knowledge(
+                    knowledge_db,
+                    KnowledgeUpdate(status=KnowledgeStatus.UPLOADED),  # type: ignore
+                )
             return knowledge_db
         except Exception as e:
             logger.exception(
@@ -251,7 +256,7 @@ class KnowledgeService(BaseService[KnowledgeRepository]):
         try:
             # TODO:
             # - Notion folders are special, they are themselves files and should be removed from storage
-            children = await self.repository.get_all_children(knowledge.id)
+            children = await self.repository.get_knowledge_tree(knowledge.id)
             km_paths = [
                 self.storage.get_storage_path(k) for k in children if not k.is_folder
             ]
@@ -300,45 +305,11 @@ class KnowledgeService(BaseService[KnowledgeRepository]):
             f"All knowledge in brain {brain_id} removed successfully from table"
         )
 
-    # TODO: REDO THIS MESS !!!!
-    # REMOVE ALL SYNC TABLES and start from scratch
-    # async def update_or_create_knowledge_sync(
-    #     self,
-    #     brain_id: UUID,
-    #     user_id: UUID,
-    #     file: SyncFile,
-    #     new_sync_file: DBSyncFile | None,
-    #     prev_sync_file: DBSyncFile | None,
-    #     downloaded_file: DownloadedSyncFile,
-    #     source: str,
-    #     source_link: str,
-    # ) -> Knowledge:
-    #     sync_id = None
-    #     # TODO: THIS IS A HACK!! Remove all of this
-    #     if prev_sync_file:
-    #         prev_knowledge = await self.get_knowledge_sync(sync_id=prev_sync_file.id)
-    #         if len(prev_knowledge.brains) > 1:
-    #             await self.repository.remove_knowledge_from_brain(
-    #                 prev_knowledge.id, brain_id
-    #             )
-    #         else:
-    #             await self.repository.remove_knowledge_by_id(prev_knowledge.id)
-    #         sync_id = prev_sync_file.id
-
-    #     sync_id = new_sync_file.id if new_sync_file else sync_id
-    #     knowledge_to_add = CreateKnowledgeProperties(
-    #         brain_id=brain_id,
-    #         file_name=file.name,
-    #         extension=downloaded_file.extension,
-    #         source=source,
-    #         status=KnowledgeStatus.PROCESSING,
-    #         source_link=source_link,
-    #         file_size=file.size if file.size else 0,
-    #         # FIXME (@aminediro): This is a temporary fix, redo in KMS
-    #         file_sha1=None,
-    #         metadata={"sync_file_id": str(sync_id)},
-    #     )
-    #     added_knowledge = await self.insert_knowledge_brain(
-    #         knowledge_to_add=knowledge_to_add, user_id=user_id
-    #     )
-    #     return added_knowledge
+    async def link_knowledge_tree_brains(
+        self, knowledge: KnowledgeDB | UUID, brains_ids: List[UUID], user_id: UUID
+    ) -> List[KnowledgeDB]:
+        if isinstance(knowledge, UUID):
+            knowledge = await self.repository.get_knowledge_by_id(knowledge)
+        return await self.repository.link_knowledge_tree_brains(
+            knowledge, brains_ids=brains_ids, user_id=user_id
+        )

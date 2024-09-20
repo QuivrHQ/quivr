@@ -18,9 +18,7 @@ from quivr_api.modules.knowledge.service.knowledge_service import KnowledgeServi
 from quivr_api.modules.notification.service.notification_service import (
     NotificationService,
 )
-from quivr_api.modules.sync.repository.sync_files import SyncFilesRepository
 from quivr_api.modules.sync.service.sync_notion import SyncNotionService
-from quivr_api.modules.sync.service.sync_service import SyncsService
 from quivr_api.modules.vector.repository.vectors_repository import VectorRepository
 from quivr_api.modules.vector.service.vector_service import VectorService
 from quivr_api.utils.telemetry import maybe_send_telemetry
@@ -53,9 +51,6 @@ _patch_json()
 supabase_client = get_supabase_client()
 # document_vector_store = get_documents_vector_store()
 notification_service = NotificationService()
-sync_active_service = SyncsService()
-sync_user_service = SyncsService()
-sync_files_repo_service = SyncFilesRepository()
 brain_service = BrainService()
 brain_vectors = BrainsVectors()
 storage = SupabaseS3Storage()
@@ -99,11 +94,9 @@ def init_worker(**kwargs):
     dont_autoretry_for=(FileExistsError,),
 )
 def process_file_task(
-    file_name: str,
-    file_original_name: str,
-    brain_id: UUID,
-    notification_id: UUID,
     knowledge_id: UUID,
+    file_name: str,
+    notification_id: UUID,
     source: str | None = None,
     source_link: str | None = None,
     delete_file: bool = False,
@@ -119,8 +112,6 @@ def process_file_task(
     loop.run_until_complete(
         aprocess_file_task(
             file_name=file_name,
-            file_original_name=file_original_name,
-            brain_id=brain_id,
             notification_id=notification_id,
             knowledge_id=knowledge_id,
             source=source,
@@ -132,8 +123,6 @@ def process_file_task(
 
 async def aprocess_file_task(
     file_name: str,
-    file_original_name: str,
-    brain_id: UUID,
     notification_id: UUID,
     knowledge_id: UUID,
     source: str | None = None,
@@ -163,12 +152,9 @@ async def aprocess_file_task(
                     vector_service=vector_service,
                     knowledge_service=knowledge_service,
                     file_name=file_name,
-                    brain_id=brain_id,
-                    file_original_name=file_original_name,
                     knowledge_id=knowledge_id,
                     integration=source,
                     integration_link=source_link,
-                    delete_file=delete_file,
                 )
                 session.commit()
             await async_session.commit()

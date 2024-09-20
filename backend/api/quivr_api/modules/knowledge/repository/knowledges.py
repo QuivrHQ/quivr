@@ -5,11 +5,11 @@ from fastapi import HTTPException
 from quivr_core.models import KnowledgeStatus
 from sqlalchemy.exc import IntegrityError, NoResultFound
 from sqlalchemy.orm import joinedload
-from sqlmodel import select, text
+from sqlmodel import and_, col, select, text
 from sqlmodel.ext.asyncio.session import AsyncSession
 
 from quivr_api.logger import get_logger
-from quivr_api.modules.brain.entity.brain_entity import Brain
+from quivr_api.modules.brain.entity.brain_entity import Brain, BrainUserDB, RoleEnum
 from quivr_api.modules.dependencies import BaseRepository, get_supabase_client
 from quivr_api.modules.knowledge.dto.inputs import KnowledgeUpdate
 from quivr_api.modules.knowledge.dto.outputs import (
@@ -20,6 +20,7 @@ from quivr_api.modules.knowledge.entity.knowledge import (
     KnowledgeDB,
 )
 from quivr_api.modules.knowledge.service.knowledge_exceptions import (
+    KnowledgeCreationError,
     KnowledgeNotFoundException,
     KnowledgeUpdateError,
 )
@@ -68,6 +69,47 @@ class KnowledgeRepository(BaseRepository):
             await self.session.rollback()
             logger.error(f"Error updating knowledge {e}")
             raise KnowledgeUpdateError
+
+    async def link_knowledge_tree_brains(
+        self, knowledge: KnowledgeDB, brains_ids: List[UUID], user_id: UUID
+    ) -> list[KnowledgeDB]:
+        assert knowledge.id, "can't link knowledge not in db"
+        # TODO(@aminediro @StanGirard): verification should be done elsewhere
+        # should rewrite BrainService and Brain Authorization to be as middleware
+        try:
+            stmt = (
+                select(Brain)
+                .join(BrainUserDB, col(Brain.brain_id) == col(BrainUserDB.brain_id))
+                .where(
+                    and_(
+                        col(Brain.brain_id).in_(brains_ids),
+                        BrainUserDB.user_id == user_id,
+                        BrainUserDB.rights == RoleEnum.Owner,
+                    )
+                )
+            )
+            brains = list((await self.session.exec(stmt)).unique().all())
+            if len(brains) == 0:
+                logger.error(
+                    f"No brains for user_id={user_id}, brains_list={brains_ids}"
+                )
+                raise KnowledgeCreationError("can't associate knowledge to brains")
+            children = await self.get_knowledge_tree(knowledge.id)
+            all_kms = [knowledge, *children]
+            for k in all_kms:
+                for b in brains:
+                    k.brains.append(b)
+            for k in all_kms:
+                await self.session.merge(k)
+            await self.session.commit()
+            [await self.session.refresh(k) for k in all_kms]
+            return all_kms
+        except IntegrityError:
+            await self.session.rollback()
+            raise
+        except Exception:
+            await self.session.rollback()
+            raise
 
     async def insert_knowledge_brain(
         self, knowledge: KnowledgeDB, brain_id: UUID
@@ -191,44 +233,34 @@ class KnowledgeRepository(BaseRepository):
 
         return knowledge
 
-    async def get_all_children(self, parent_id: UUID) -> list[KnowledgeDB]:
-        query = text("""
-            WITH RECURSIVE knowledge_tree AS (
-                SELECT *
-                FROM knowledge
-                WHERE parent_id = :parent_id
-                UNION ALL
-                SELECT k.*
-                FROM knowledge k
-                JOIN knowledge_tree kt ON k.parent_id = kt.id
-            )
-            SELECT * FROM knowledge_tree
-            """)
+    async def get_knowledge_tree(self, parent_id: UUID) -> list[KnowledgeDB]:
+        from sqlalchemy.orm import aliased
 
-        result = await self.session.execute(query, params={"parent_id": parent_id})
-        rows = result.fetchall()
-        knowledge_list = []
-        for row in rows:
-            knowledge = KnowledgeDB(
-                id=row.id,
-                parent_id=row.parent_id,
-                file_name=row.file_name,
-                url=row.url,
-                extension=row.extension,
-                status=row.status,
-                source=row.source,
-                source_link=row.source_link,
-                file_size=row.file_size,
-                file_sha1=row.file_sha1,
-                created_at=row.created_at,
-                updated_at=row.updated_at,
-                metadata_=row.metadata,
-                is_folder=row.is_folder,
-                user_id=row.user_id,
-            )
-            knowledge_list.append(knowledge)
+        Knowledge = aliased(KnowledgeDB)
+        KnowledgeRecursive = aliased(KnowledgeDB)
 
-        return knowledge_list
+        recursive_cte = (
+            select(KnowledgeRecursive)
+            .where(KnowledgeRecursive.parent_id == parent_id)
+            .cte(name="knowledge_tree", recursive=True)
+        )
+
+        recursive_cte = recursive_cte.union_all(
+            select(Knowledge).join(
+                recursive_cte, col(Knowledge.parent_id) == col(recursive_cte.c.id)
+            )
+        )
+        # TODO(@AmineDiro): Optimize get_knowledge_tree
+        query = (
+            select(KnowledgeDB)
+            .join(recursive_cte, col(KnowledgeDB.id) == recursive_cte.c.id)
+            .options(joinedload(KnowledgeDB.brains))
+        )
+
+        result = await self.session.exec(query)
+        knowledge_list = result.unique().all()
+
+        return list(knowledge_list)
 
     async def get_root_knowledge_user(self, user_id: UUID) -> list[KnowledgeDB]:
         query = (
