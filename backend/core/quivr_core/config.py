@@ -33,7 +33,7 @@ class DefaultRerankers(str, Enum):
         }[self]
 
 
-class DefaultLLMs(str, Enum):
+class DefaultModelSuppliers(str, Enum):
     OPENAI = "openai"
     AZURE = "azure"
     ANTHROPIC = "anthropic"
@@ -48,8 +48,8 @@ class LLMConfig(QuivrBaseConfig):
 
 
 class LLMModelConfig:
-    _model_defaults: Dict[DefaultLLMs, Dict[str, LLMConfig]] = {
-        DefaultLLMs.OPENAI: {
+    _model_defaults: Dict[DefaultModelSuppliers, Dict[str, LLMConfig]] = {
+        DefaultModelSuppliers.OPENAI: {
             "gpt-4o": LLMConfig(context=128000, tokenizer_hub="Xenova/gpt-4o"),
             "gpt-4o-mini": LLMConfig(context=128000, tokenizer_hub="Xenova/gpt-4o"),
             "gpt-4-turbo": LLMConfig(context=128000, tokenizer_hub="Xenova/gpt-4"),
@@ -67,7 +67,7 @@ class LLMModelConfig:
                 context=8191, tokenizer_hub="Xenova/text-embedding-ada-002"
             ),
         },
-        DefaultLLMs.ANTHROPIC: {
+        DefaultModelSuppliers.ANTHROPIC: {
             "claude-3-5-sonnet": LLMConfig(
                 context=200000, tokenizer_hub="Xenova/claude-tokenizer"
             ),
@@ -90,7 +90,7 @@ class LLMModelConfig:
                 context=100000, tokenizer_hub="Xenova/claude-tokenizer"
             ),
         },
-        DefaultLLMs.META: {
+        DefaultModelSuppliers.META: {
             "llama-3.1": LLMConfig(
                 context=128000, tokenizer_hub="Xenova/Meta-Llama-3.1-Tokenizer"
             ),
@@ -102,7 +102,7 @@ class LLMModelConfig:
                 context=16384, tokenizer_hub="Xenova/llama-code-tokenizer"
             ),
         },
-        DefaultLLMs.GROQ: {
+        DefaultModelSuppliers.GROQ: {
             "llama-3.1": LLMConfig(
                 context=128000, tokenizer_hub="Xenova/Meta-Llama-3.1-Tokenizer"
             ),
@@ -114,7 +114,7 @@ class LLMModelConfig:
                 context=16384, tokenizer_hub="Xenova/llama-code-tokenizer"
             ),
         },
-        DefaultLLMs.MISTRAL: {
+        DefaultModelSuppliers.MISTRAL: {
             "mistral-large": LLMConfig(
                 context=128000, tokenizer_hub="Xenova/mistral-tokenizer-v3"
             ),
@@ -131,7 +131,7 @@ class LLMModelConfig:
     }
 
     @classmethod
-    def get_supplier_by_model_name(cls, model: str) -> DefaultLLMs | None:
+    def get_supplier_by_model_name(cls, model: str) -> DefaultModelSuppliers | None:
         # Iterate over the suppliers and their models
         for supplier, models in cls._model_defaults.items():
             # Check if the model name or a base part of the model name is in the supplier's models
@@ -143,7 +143,7 @@ class LLMModelConfig:
 
     @classmethod
     def get_llm_model_config(
-        cls, supplier: DefaultLLMs, model_name: str
+        cls, supplier: DefaultModelSuppliers, model_name: str
     ) -> Optional[LLMConfig]:
         """Retrieve the LLMConfig (context and tokenizer_hub) for a given supplier and model."""
         supplier_defaults = cls._model_defaults.get(supplier)
@@ -159,7 +159,7 @@ class LLMModelConfig:
 
 
 class LLMEndpointConfig(QuivrBaseConfig):
-    supplier: DefaultLLMs = DefaultLLMs.OPENAI
+    supplier: DefaultModelSuppliers = DefaultModelSuppliers.OPENAI
     model: str = "gpt-3.5-turbo-0125"
     context_length: int | None = None
     tokenizer_hub: str | None = None

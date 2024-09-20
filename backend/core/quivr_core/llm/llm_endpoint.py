@@ -11,7 +11,7 @@ from pydantic.v1 import SecretStr
 from transformers import AutoTokenizer
 
 from quivr_core.brain.info import LLMInfo
-from quivr_core.config import DefaultLLMs, LLMEndpointConfig
+from quivr_core.config import DefaultModelSuppliers, LLMEndpointConfig
 from quivr_core.utils import model_supports_function_calling
 
 logger = logging.getLogger("quivr_core")
@@ -49,7 +49,7 @@ class LLMEndpoint:
     def from_config(cls, config: LLMEndpointConfig = LLMEndpointConfig()):
         _llm: Union[AzureChatOpenAI, ChatOpenAI, ChatAnthropic]
         try:
-            if config.supplier == DefaultLLMs.AZURE:
+            if config.supplier == DefaultModelSuppliers.AZURE:
                 # Parse the URL
                 parsed_url = urlparse(config.llm_base_url)
                 deployment = parsed_url.path.split("/")[3]  # type: ignore
@@ -64,7 +64,7 @@ class LLMEndpoint:
                     azure_endpoint=azure_endpoint,
                     max_tokens=config.max_output_tokens,
                 )
-            elif config.supplier == DefaultLLMs.ANTHROPIC:
+            elif config.supplier == DefaultModelSuppliers.ANTHROPIC:
                 _llm = ChatAnthropic(
                     model_name=config.model,
                     api_key=SecretStr(config.llm_api_key)
@@ -73,7 +73,7 @@ class LLMEndpoint:
                     base_url=config.llm_base_url,
                     max_tokens=config.max_output_tokens,
                 )
-            elif config.supplier == DefaultLLMs.OPENAI:
+            elif config.supplier == DefaultModelSuppliers.OPENAI:
                 _llm = ChatOpenAI(
                     model=config.model,
                     api_key=SecretStr(config.llm_api_key)
