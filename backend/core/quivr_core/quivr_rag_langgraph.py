@@ -90,6 +90,8 @@ class QuivrQARAGLangGraph:
         self.vector_store = vector_store
         self.llm_endpoint = llm
 
+        self.graph = None
+
         if reranker is not None:
             self.reranker = reranker
         elif self.retrieval_config.reranker_config.supplier == DefaultRerankers.COHERE:
@@ -282,7 +284,10 @@ class QuivrQARAGLangGraph:
         Returns:
             Callable[[Dict], Dict]: The langchain chain.
         """
-        return self.create_graph()
+        if not self.graph:
+            self.graph = self.create_graph()
+
+        return self.graph
 
     def create_graph(self):
         """
