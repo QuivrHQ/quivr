@@ -1,6 +1,9 @@
 workflow_config:
   name: "standard RAG"
   nodes:
+    - name: "START"
+      edges: ["filter_history"]
+
     - name: "filter_history"
       edges: ["rewrite"]
 

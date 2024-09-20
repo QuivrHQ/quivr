@@ -1,6 +1,7 @@
 import logging
 from typing import Annotated, AsyncGenerator, Optional, Sequence, TypedDict
 from uuid import uuid4
+from enum import Enum
 
 # TODO(@aminediro): this is the only dependency to langchain package, we should remove it
 from langchain.retrievers import ContextualCompressionRetriever
@@ -11,7 +12,7 @@ from langchain_core.documents import BaseDocumentCompressor, Document
 from langchain_core.messages import BaseMessage
 from langchain_core.messages.ai import AIMessageChunk
 from langchain_core.vectorstores import VectorStore
-from langgraph.graph import END, StateGraph
+from langgraph.graph import START, END, StateGraph
 from langgraph.graph.message import add_messages
 
 from quivr_core.chat import ChatHistory
@@ -34,6 +35,11 @@ from quivr_core.utils import (
 )
 
 logger = logging.getLogger("quivr_core")
+
+
+class SpecialEdges(str, Enum):
+    START = "START"
+    END = "END"
 
 
 class AgentState(TypedDict):
@@ -302,15 +308,19 @@ class QuivrQARAGLangGraph:
         workflow = StateGraph(AgentState)
 
         if self.retrieval_config.workflow_config:
+            if SpecialEdges.START not in [
+                node.name for node in self.retrieval_config.workflow_config.nodes
+            ]:
+                raise ValueError("The workflow should contain a 'START' node")
             for node in self.retrieval_config.workflow_config.nodes:
-                workflow.add_node(node.name, getattr(self, node.name))
+                if node.name not in SpecialEdges._value2member_map_:
+                    workflow.add_node(node.name, getattr(self, node.name))
 
-            workflow.set_entry_point(
-                self.retrieval_config.workflow_config.nodes[0].name
-            )
             for node in self.retrieval_config.workflow_config.nodes:
                 for edge in node.edges:
-                    if edge == "END":
+                    if node.name == SpecialEdges.START:
+                        workflow.add_edge(START, edge)
+                    elif edge == SpecialEdges.END:
                         workflow.add_edge(node.name, END)
                     else:
                         workflow.add_edge(node.name, edge)

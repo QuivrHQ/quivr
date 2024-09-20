@@ -1,6 +1,9 @@
 workflow_config:
   name: "Chat LLM"
   nodes:
+    - name: "START"
+      edges: ["filter_history"]
+
     - name: "filter_history"
       edges: ["generate_chat_llm"]
 
