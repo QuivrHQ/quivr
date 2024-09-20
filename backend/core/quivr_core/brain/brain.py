@@ -441,7 +441,7 @@ class Brain:
 
         full_answer = ""
         async for response in rag_instance.answer_astream(
-            question=question, history=chat_history, list_files=[]
+            question=question, history=chat_history, list_files=list_files
         ):
             # Format output to be correct servicedf;j
             if not response.last_chunk:
