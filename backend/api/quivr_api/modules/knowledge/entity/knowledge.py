@@ -1,15 +1,15 @@
 from datetime import datetime
 from enum import Enum
-from typing import Any, Dict, List, Optional, Self
+from typing import Dict, List, Optional
 from uuid import UUID
 
-from pydantic import BaseModel
 from quivr_core.models import KnowledgeStatus
 from sqlalchemy import JSON, TIMESTAMP, Column, text
 from sqlalchemy.ext.asyncio import AsyncAttrs
 from sqlmodel import UUID as PGUUID
 from sqlmodel import Field, Relationship, SQLModel
 
+from quivr_api.modules.knowledge.dto.outputs import KnowledgeDTO
 from quivr_api.modules.knowledge.entity.knowledge_brain import KnowledgeBrain
 from quivr_api.modules.sync.entity.sync_models import Sync
 
@@ -23,40 +23,6 @@ class KnowledgeSource(str, Enum):
     DROPBOX = "dropbox"
     NOTION = "notion"
     GITHUB = "github"
-
-
-class Knowledge(BaseModel):
-    id: Optional[UUID]
-    file_size: int = 0
-    status: Optional[KnowledgeStatus]
-    file_name: Optional[str] = None
-    url: Optional[str] = None
-    extension: str = ".txt"
-    is_folder: bool = False
-    updated_at: datetime
-    created_at: datetime
-    source: Optional[str] = None
-    source_link: Optional[str] = None
-    file_sha1: Optional[str] = None
-    metadata: Optional[Dict[str, str]] = None
-    user_id: UUID
-    brains: List[Dict[str, Any]]
-    parent: Optional[Self]
-    children: Optional[List[Self]]
-    sync_id: int | None
-    sync_file_id: str | None
-
-
-class KnowledgeUpdate(BaseModel):
-    file_name: Optional[str] = None
-    status: Optional[KnowledgeStatus] = None
-    url: Optional[str] = None
-    file_sha1: Optional[str] = None
-    extension: Optional[str] = None
-    parent_id: Optional[UUID] = None
-    source: Optional[str] = None
-    source_link: Optional[str] = None
-    metadata: Optional[Dict[str, str]] = None
 
 
 class KnowledgeDB(AsyncAttrs, SQLModel, table=True):
@@ -128,7 +94,7 @@ class KnowledgeDB(AsyncAttrs, SQLModel, table=True):
     sync_file_id: str | None = Field(default=None)
 
     # TODO: nested folder search
-    async def to_dto(self, get_children: bool = True) -> Knowledge:
+    async def to_dto(self, get_children: bool = True) -> KnowledgeDTO:
         assert (
             self.updated_at
         ), "knowledge should be inserted before transforming to dto"
@@ -142,7 +108,7 @@ class KnowledgeDB(AsyncAttrs, SQLModel, table=True):
         parent = await self.awaitable_attrs.parent
         parent = await parent.to_dto(get_children=False) if parent else None
 
-        return Knowledge(
+        return KnowledgeDTO(
             id=self.id,  # type: ignore
             file_name=self.file_name,
             url=self.url,

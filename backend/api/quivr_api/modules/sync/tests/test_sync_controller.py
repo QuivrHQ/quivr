@@ -93,7 +93,7 @@ class BaseFakeSync(BaseSync):
     async def adownload_file(
         self, credentials: Dict, file: SyncFile
     ) -> Dict[str, Union[str, BytesIO]]:
-        pass
+        raise NotImplementedError
 
 
 @pytest_asyncio.fixture(scope="function")
@@ -106,7 +106,7 @@ async def user(session: AsyncSession) -> User:
 
 
 @pytest_asyncio.fixture(scope="function")
-async def sync(session: AsyncSession, user: User) -> User:
+async def sync(session: AsyncSession, user: User) -> Sync:
     sync = Sync(
         name="test_sync",
         email="test@test.com",
@@ -161,7 +161,9 @@ async def test_client(session: AsyncSession, user: User):
         return UserIdentity(email=user.email, id=user.id)
 
     async def _sync_service():
-        fake_provider = {provider: BaseFakeSync() for provider in list(SyncProvider)}
+        fake_provider: dict[SyncProvider, BaseSync] = {
+            provider: BaseFakeSync() for provider in list(SyncProvider)
+        }
         repository = SyncsRepository(session)
         repository.sync_provider_mapping = fake_provider
         return SyncsService(repository)
@@ -176,7 +178,8 @@ async def test_client(session: AsyncSession, user: User):
     app.dependency_overrides[get_sync_service] = _sync_service
 
     async with AsyncClient(
-        transport=ASGITransport(app=app), base_url="http://test"
+        transport=ASGITransport(app=app),  # type: ignore
+        base_url="http://test",
     ) as ac:
         yield ac
     app.dependency_overrides = {}

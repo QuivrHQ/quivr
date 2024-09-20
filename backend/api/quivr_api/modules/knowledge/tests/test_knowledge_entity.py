@@ -41,7 +41,8 @@ async def user(session):
 
 
 @pytest_asyncio.fixture(scope="function")
-async def sync(session: AsyncSession, user: User) -> User:
+async def sync(session: AsyncSession, user: User) -> Sync:
+    assert user.id
     sync = Sync(
         name="test_sync",
         email="test@test.com",

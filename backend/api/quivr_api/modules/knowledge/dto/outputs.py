@@ -12,10 +12,10 @@ class DeleteKnowledgeResponse(BaseModel):
     knowledge_id: UUID
 
 
-class KnowledgeOut(BaseModel):
-    id: UUID
+class KnowledgeDTO(BaseModel):
+    id: Optional[UUID]
     file_size: int = 0
-    status: KnowledgeStatus
+    status: Optional[KnowledgeStatus]
     file_name: Optional[str] = None
     url: Optional[str] = None
     extension: str = ".txt"
@@ -29,4 +29,6 @@ class KnowledgeOut(BaseModel):
     user_id: UUID
     brains: List[Dict[str, Any]]
     parent: Optional[Self]
-    children: Optional[list[Self]]
+    children: Optional[List[Self]]
+    sync_id: int | None
+    sync_file_id: str | None

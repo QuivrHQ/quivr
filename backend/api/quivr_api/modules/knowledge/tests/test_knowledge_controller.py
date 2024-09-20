@@ -8,7 +8,9 @@ from sqlmodel.ext.asyncio.session import AsyncSession
 
 from quivr_api.main import app
 from quivr_api.middlewares.auth.auth_bearer import get_current_user
-from quivr_api.modules.knowledge.controller.knowledge_routes import get_km_service
+from quivr_api.modules.knowledge.controller.knowledge_routes import (
+    get_knowledge_service,
+)
 from quivr_api.modules.knowledge.repository.knowledges import KnowledgeRepository
 from quivr_api.modules.knowledge.service.knowledge_service import KnowledgeService
 from quivr_api.modules.knowledge.tests.conftest import FakeStorage
@@ -36,7 +38,7 @@ async def test_client(session: AsyncSession, user: User):
         return KnowledgeService(repository, storage)
 
     app.dependency_overrides[get_current_user] = default_current_user
-    app.dependency_overrides[get_km_service] = test_service
+    app.dependency_overrides[get_knowledge_service] = test_service
     # app.dependency_overrides[get_async_session] = lambda: session
 
     async with AsyncClient(

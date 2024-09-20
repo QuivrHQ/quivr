@@ -12,13 +12,15 @@ from quivr_api.modules.dependencies import BaseService
 from quivr_api.modules.knowledge.dto.inputs import (
     AddKnowledge,
     CreateKnowledgeProperties,
+    KnowledgeUpdate,
 )
-from quivr_api.modules.knowledge.dto.outputs import DeleteKnowledgeResponse
+from quivr_api.modules.knowledge.dto.outputs import (
+    DeleteKnowledgeResponse,
+    KnowledgeDTO,
+)
 from quivr_api.modules.knowledge.entity.knowledge import (
-    Knowledge,
     KnowledgeDB,
     KnowledgeSource,
-    KnowledgeUpdate,
 )
 from quivr_api.modules.knowledge.repository.knowledges import KnowledgeRepository
 from quivr_api.modules.knowledge.repository.storage import SupabaseS3Storage
@@ -44,7 +46,7 @@ class KnowledgeService(BaseService[KnowledgeRepository]):
         self.repository = repository
         self.storage = storage
 
-    async def get_knowledge_sync(self, sync_id: int) -> Knowledge:
+    async def get_knowledge_sync(self, sync_id: int) -> KnowledgeDTO:
         km = await self.repository.get_knowledge_by_sync_id(sync_id)
         assert km.id, "Knowledge ID not generated"
         km = await km.to_dto()
@@ -70,7 +72,7 @@ class KnowledgeService(BaseService[KnowledgeRepository]):
 
     async def map_syncs_knowledge_user(
         self, sync_id: int, user_id: UUID
-    ) -> dict[str, Knowledge]:
+    ) -> dict[str, KnowledgeDTO]:
         list_kms = await self.repository.get_all_knowledge_sync_user(
             sync_id=sync_id, user_id=user_id
         )
@@ -100,7 +102,7 @@ class KnowledgeService(BaseService[KnowledgeRepository]):
     async def update_knowledge(
         self,
         knowledge: KnowledgeDB,
-        payload: Knowledge | KnowledgeUpdate | dict[str, Any],
+        payload: KnowledgeDTO | KnowledgeUpdate | dict[str, Any],
     ):
         return await self.repository.update_knowledge(knowledge, payload)
 
@@ -191,7 +193,7 @@ class KnowledgeService(BaseService[KnowledgeRepository]):
         self,
         user_id: UUID,
         knowledge_to_add: CreateKnowledgeProperties,  # FIXME: (later) @Amine brain id should not be in CreateKnowledgeProperties but since storage is brain_id/file_name
-    ) -> Knowledge:
+    ) -> KnowledgeDTO:
         knowledge = KnowledgeDB(
             file_name=knowledge_to_add.file_name,
             url=knowledge_to_add.url,
@@ -213,7 +215,7 @@ class KnowledgeService(BaseService[KnowledgeRepository]):
         inserted_knowledge = await knowledge_db.to_dto()
         return inserted_knowledge
 
-    async def get_all_knowledge_in_brain(self, brain_id: UUID) -> List[Knowledge]:
+    async def get_all_knowledge_in_brain(self, brain_id: UUID) -> List[KnowledgeDTO]:
         brain = await self.repository.get_brain_by_id(brain_id)
         all_knowledges: List[KnowledgeDB] = await brain.awaitable_attrs.knowledges
         knowledges = [await knowledge.to_dto() for knowledge in all_knowledges]

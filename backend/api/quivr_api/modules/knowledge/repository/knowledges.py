@@ -11,11 +11,13 @@ from sqlmodel.ext.asyncio.session import AsyncSession
 from quivr_api.logger import get_logger
 from quivr_api.modules.brain.entity.brain_entity import Brain
 from quivr_api.modules.dependencies import BaseRepository, get_supabase_client
-from quivr_api.modules.knowledge.dto.outputs import DeleteKnowledgeResponse
+from quivr_api.modules.knowledge.dto.inputs import KnowledgeUpdate
+from quivr_api.modules.knowledge.dto.outputs import (
+    DeleteKnowledgeResponse,
+    KnowledgeDTO,
+)
 from quivr_api.modules.knowledge.entity.knowledge import (
-    Knowledge,
     KnowledgeDB,
-    KnowledgeUpdate,
 )
 from quivr_api.modules.knowledge.service.knowledge_exceptions import (
     KnowledgeNotFoundException,
@@ -47,7 +49,7 @@ class KnowledgeRepository(BaseRepository):
     async def update_knowledge(
         self,
         knowledge: KnowledgeDB,
-        payload: Knowledge | KnowledgeUpdate | dict[str, Any],
+        payload: KnowledgeDTO | KnowledgeUpdate | dict[str, Any],
     ) -> KnowledgeDB:
         try:
             logger.debug(f"updating {knowledge.id} with payload {payload}")
@@ -161,7 +163,7 @@ class KnowledgeRepository(BaseRepository):
             query = query.where(KnowledgeDB.user_id == user_id)
 
         result = await self.session.exec(query)
-        return list(result.all())
+        return list(result.unique().all())
 
     async def get_knowledge_by_file_name_brain_id(
         self, file_name: str, brain_id: UUID

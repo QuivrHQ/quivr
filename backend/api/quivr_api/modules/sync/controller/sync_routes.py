@@ -1,5 +1,6 @@
 import asyncio
 import os
+from datetime import datetime
 from typing import List, Tuple
 
 from fastapi import APIRouter, Depends, status
@@ -7,7 +8,7 @@ from fastapi import APIRouter, Depends, status
 from quivr_api.logger import get_logger
 from quivr_api.middlewares.auth import AuthBearer, get_current_user
 from quivr_api.modules.dependencies import get_service
-from quivr_api.modules.knowledge.entity.knowledge import Knowledge
+from quivr_api.modules.knowledge.entity.knowledge import KnowledgeDTO
 from quivr_api.modules.knowledge.service.knowledge_service import KnowledgeService
 from quivr_api.modules.notification.service.notification_service import (
     NotificationService,
@@ -151,7 +152,7 @@ async def delete_user_sync(
 
 @sync_router.get(
     "/sync/{sync_id}/files",
-    response_model=List[Knowledge] | None,
+    response_model=List[KnowledgeDTO] | None,
     tags=["Sync"],
 )
 async def list_sync_files(
@@ -178,7 +179,7 @@ async def list_sync_files(
     # Gets knowledge for each call to list the files,
     # The logic is that getting from DB will be faster than provider repsonse ?
     # NOTE: asyncio.gather didn't correcly typecheck
-    async def fetch_data() -> Tuple[dict[str, Knowledge], List[SyncFile] | None]:
+    async def fetch_data() -> Tuple[dict[str, KnowledgeDTO], List[SyncFile] | None]:
         map_knowledges_task = knowledge_service.map_syncs_knowledge_user(
             sync_id=sync_id, user_id=current_user.id
         )
@@ -201,7 +202,7 @@ async def list_sync_files(
             kms.append(existing_km)
         else:
             kms.append(
-                Knowledge(
+                KnowledgeDTO(
                     id=None,
                     file_name=file.name,
                     is_folder=file.is_folder,
@@ -214,8 +215,12 @@ async def list_sync_files(
                     children=None,
                     status=None,  # TODO: Handle a sync not added status
                     # TODO: retrieve created at from sync provider
-                    created_at=file.last_modified_at,
-                    updated_at=file.last_modified_at,
+                    created_at=file.last_modified_at
+                    if file.last_modified_at
+                    else datetime.now(),
+                    updated_at=file.last_modified_at
+                    if file.last_modified_at
+                    else datetime.now(),
                     sync_id=sync_id,
                     sync_file_id=file.id,
                 )

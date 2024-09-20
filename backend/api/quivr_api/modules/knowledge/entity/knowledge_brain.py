@@ -1,7 +1,6 @@
 from datetime import datetime
 from uuid import UUID
 
-from sqlalchemy import TIMESTAMP, Column, text
 from sqlmodel import TIMESTAMP, Column, Field, SQLModel, text
 from sqlmodel import UUID as PGUUID
 

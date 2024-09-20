@@ -11,8 +11,12 @@ from sqlmodel import select, text
 from sqlmodel.ext.asyncio.session import AsyncSession
 
 from quivr_api.modules.brain.entity.brain_entity import Brain, BrainType
-from quivr_api.modules.knowledge.dto.inputs import AddKnowledge, KnowledgeStatus
-from quivr_api.modules.knowledge.entity.knowledge import KnowledgeDB, KnowledgeUpdate
+from quivr_api.modules.knowledge.dto.inputs import (
+    AddKnowledge,
+    KnowledgeStatus,
+    KnowledgeUpdate,
+)
+from quivr_api.modules.knowledge.entity.knowledge import KnowledgeDB
 from quivr_api.modules.knowledge.entity.knowledge_brain import KnowledgeBrain
 from quivr_api.modules.knowledge.repository.knowledges import KnowledgeRepository
 from quivr_api.modules.knowledge.service.knowledge_exceptions import (

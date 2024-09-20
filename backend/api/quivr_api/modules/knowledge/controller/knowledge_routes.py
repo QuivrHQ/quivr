@@ -1,5 +1,5 @@
 from http import HTTPStatus
-from typing import Annotated, List, Optional
+from typing import List, Optional
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, File, HTTPException, Query, UploadFile, status
@@ -12,8 +12,8 @@ from quivr_api.modules.brain.service.brain_authorization_service import (
     validate_brain_authorization,
 )
 from quivr_api.modules.dependencies import get_service
-from quivr_api.modules.knowledge.dto.inputs import AddKnowledge
-from quivr_api.modules.knowledge.entity.knowledge import Knowledge, KnowledgeUpdate
+from quivr_api.modules.knowledge.dto.inputs import AddKnowledge, KnowledgeUpdate
+from quivr_api.modules.knowledge.dto.outputs import KnowledgeDTO
 from quivr_api.modules.knowledge.service.knowledge_exceptions import (
     KnowledgeDeleteError,
     KnowledgeForbiddenAccess,
@@ -29,15 +29,14 @@ from quivr_api.modules.user.entity.user_identity import UserIdentity
 knowledge_router = APIRouter()
 logger = get_logger(__name__)
 
-get_km_service = get_service(KnowledgeService)
-KnowledgeServiceDep = Annotated[KnowledgeService, Depends(get_km_service)]
+get_knowledge_service = get_service(KnowledgeService)
 
 
 @knowledge_router.get(
     "/knowledge", dependencies=[Depends(AuthBearer())], tags=["Knowledge"]
 )
 async def list_knowledge_in_brain_endpoint(
-    knowledge_service: KnowledgeServiceDep,
+    knowledge_service: KnowledgeService = Depends(get_knowledge_service),
     brain_id: UUID = Query(..., description="The ID of the brain"),
     current_user: UserIdentity = Depends(get_current_user),
 ):
@@ -62,7 +61,7 @@ async def list_knowledge_in_brain_endpoint(
 )
 async def delete_knowledge_brain(
     knowledge_id: UUID,
-    knowledge_service: KnowledgeServiceDep,
+    knowledge_service: KnowledgeService = Depends(get_knowledge_service),
     current_user: UserIdentity = Depends(get_current_user),
     brain_id: UUID = Query(..., description="The ID of the brain"),
 ):
@@ -86,7 +85,7 @@ async def delete_knowledge_brain(
 )
 async def generate_signed_url_endpoint(
     knowledge_id: UUID,
-    knowledge_service: KnowledgeServiceDep,
+    knowledge_service: KnowledgeService = Depends(get_knowledge_service),
     current_user: UserIdentity = Depends(get_current_user),
 ):
     """
@@ -120,12 +119,12 @@ async def generate_signed_url_endpoint(
 @knowledge_router.post(
     "/knowledge/",
     tags=["Knowledge"],
-    response_model=Knowledge,
+    response_model=KnowledgeDTO,
 )
 async def create_knowledge(
     knowledge_data: str = File(...),
     file: Optional[UploadFile] = None,
-    knowledge_service: KnowledgeService = Depends(get_km_service),
+    knowledge_service: KnowledgeService = Depends(get_knowledge_service),
     current_user: UserIdentity = Depends(get_current_user),
 ):
     knowledge = AddKnowledge.model_validate_json(knowledge_data)
@@ -160,12 +159,12 @@ async def create_knowledge(
 
 @knowledge_router.get(
     "/knowledge/children",
-    response_model=List[Knowledge] | None,
+    response_model=List[KnowledgeDTO] | None,
     tags=["Knowledge"],
 )
 async def list_knowledge(
     parent_id: UUID | None = None,
-    knowledge_service: KnowledgeService = Depends(get_km_service),
+    knowledge_service: KnowledgeService = Depends(get_knowledge_service),
     current_user: UserIdentity = Depends(get_current_user),
 ):
     try:
@@ -186,12 +185,12 @@ async def list_knowledge(
 
 @knowledge_router.get(
     "/knowledge/{knowledge_id}",
-    response_model=Knowledge,
+    response_model=KnowledgeDTO,
     tags=["Knowledge"],
 )
 async def get_knowledge(
     knowledge_id: UUID,
-    knowledge_service: KnowledgeService = Depends(get_km_service),
+    knowledge_service: KnowledgeService = Depends(get_knowledge_service),
     current_user: UserIdentity = Depends(get_current_user),
 ):
     try:
@@ -213,13 +212,13 @@ async def get_knowledge(
 @knowledge_router.patch(
     "/knowledge/{knowledge_id}",
     status_code=status.HTTP_202_ACCEPTED,
-    response_model=Knowledge,
+    response_model=KnowledgeDTO,
     tags=["Knowledge"],
 )
 async def update_knowledge(
     knowledge_id: UUID,
     payload: KnowledgeUpdate,
-    knowledge_service: KnowledgeService = Depends(get_km_service),
+    knowledge_service: KnowledgeService = Depends(get_knowledge_service),
     current_user: UserIdentity = Depends(get_current_user),
 ):
     try:
@@ -246,7 +245,7 @@ async def update_knowledge(
 )
 async def delete_knowledge(
     knowledge_id: UUID,
-    knowledge_service: KnowledgeService = Depends(get_km_service),
+    knowledge_service: KnowledgeService = Depends(get_knowledge_service),
     current_user: UserIdentity = Depends(get_current_user),
 ):
     try:
@@ -265,3 +264,13 @@ async def delete_knowledge(
         )
     except KnowledgeDeleteError:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@knowledge_router.post("/link_to_brain/")
+async def link_knowledge_to_brain(
+    brain_id: UUID,
+    knowledge: KnowledgeDTO,
+    knowledge_service: KnowledgeService = Depends(get_knowledge_service),
+    current_user: UserIdentity = Depends(get_current_user),
+):
+    pass

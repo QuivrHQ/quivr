@@ -1,6 +1,7 @@
 from io import BufferedReader, FileIO
 
-from quivr_api.modules.knowledge.entity.knowledge import Knowledge, KnowledgeDB
+from quivr_api.modules.knowledge.dto.outputs import KnowledgeDTO
+from quivr_api.modules.knowledge.entity.knowledge import KnowledgeDB
 from quivr_api.modules.knowledge.repository.storage_interface import StorageInterface
 
 
@@ -15,7 +16,7 @@ class ErrorStorage(StorageInterface):
 
     def get_storage_path(
         self,
-        knowledge: KnowledgeDB | Knowledge,
+        knowledge: KnowledgeDB | KnowledgeDTO,
     ) -> str:
         if knowledge.id is None:
             raise ValueError("knowledge should have a valid id")
@@ -31,7 +32,7 @@ class FakeStorage(StorageInterface):
 
     def get_storage_path(
         self,
-        knowledge: KnowledgeDB | Knowledge,
+        knowledge: KnowledgeDB | KnowledgeDTO,
     ) -> str:
         if knowledge.id is None:
             raise ValueError("knowledge should have a valid id")
@@ -60,7 +61,7 @@ class FakeStorage(StorageInterface):
             raise FileNotFoundError(f"File not found at {storage_path}")
         return self.storage[storage_path]
 
-    def knowledge_exists(self, knowledge: KnowledgeDB | Knowledge) -> bool:
+    def knowledge_exists(self, knowledge: KnowledgeDB | KnowledgeDTO) -> bool:
         return self.get_storage_path(knowledge) in self.storage
 
     def clear_storage(self):
