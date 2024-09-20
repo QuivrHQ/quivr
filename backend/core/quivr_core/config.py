@@ -12,11 +12,11 @@ from quivr_core.prompts import CustomPromptsModel
 
 
 class BrainConfig(QuivrBaseConfig):
-    brain_id: UUID
+    brain_id: UUID | None = None
     name: str
 
     @property
-    def id(self) -> UUID:
+    def id(self) -> UUID | None:
         return self.brain_id
 
 

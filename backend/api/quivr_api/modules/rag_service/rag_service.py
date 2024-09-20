@@ -98,7 +98,7 @@ class RAGService:
         if self.retrieval_config:
             retrieval_config = self.retrieval_config
         else:
-            retrieval_config = self._build_retrieval_config()
+            retrieval_config = await self._build_retrieval_config()
 
         return retrieval_config
 
@@ -341,14 +341,13 @@ class RAGService:
         if streamed_chat_history.metadata:
             streamed_chat_history.metadata["sources"] = sources_urls
 
-        if self.brain_service:
-            self.save_answer(
-                question,
-                ParsedRAGResponse(
-                    answer=full_answer,
-                    metadata=RAGResponseMetadata.model_validate(
-                        streamed_chat_history.metadata
-                    ),
+        self.save_answer(
+            question,
+            ParsedRAGResponse(
+                answer=full_answer,
+                metadata=RAGResponseMetadata.model_validate(
+                    streamed_chat_history.metadata
                 ),
-            )
+            ),
+        )
         yield f"data: {streamed_chat_history.model_dump_json()}"

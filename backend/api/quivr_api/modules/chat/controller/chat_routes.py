@@ -282,7 +282,7 @@ async def create_stream_question_handler(
     for model in models:
         if brain_id == generate_uuid_from_string(model.name):
             model_to_use = model
-            _brain = {"brain_id": brain_id, "name": model.name}
+            _brain = {"name": model.name}
             brain = BrainEntity(**_brain)
             break
     try:
