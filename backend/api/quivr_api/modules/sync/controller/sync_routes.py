@@ -215,7 +215,7 @@ async def list_sync_files(
                     user_id=current_user.id,
                     brains=[],
                     parent=None,
-                    children=None,
+                    children=[],
                     status=None,  # TODO: Handle a sync not added status
                     # TODO: retrieve created at from sync provider
                     created_at=last_modified_at,
