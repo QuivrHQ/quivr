@@ -104,6 +104,8 @@ class RAGService:
 
     async def _build_retrieval_config(self) -> RetrievalConfig:
         model = await self.model_service.get_model(self.model_to_use)  # type: ignore
+        if model is None:
+            raise ValueError(f"Cannot get model {self.model_to_use}")
         api_key = os.getenv(model.env_variable_name, "not-defined")
 
         retrieval_config = RetrievalConfig(
