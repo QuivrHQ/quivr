@@ -243,8 +243,7 @@ async def test_knowledge_dto(session, user, brain, sync):
     assert km_dto.metadata == km.metadata_  # type: ignor
     assert km_dto.parent
     assert km_dto.parent.id == folder.id
-    # Syncs
-
+    # Syncs fields
     assert km_dto.sync_id == km.sync_id
     assert km_dto.sync_file_id == km.sync_file_id
 

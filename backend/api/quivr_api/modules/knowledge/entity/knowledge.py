@@ -103,7 +103,7 @@ class KnowledgeDB(AsyncAttrs, SQLModel, table=True):
     brains: List["Brain"] = Relationship(
         back_populates="knowledges",
         link_model=KnowledgeBrain,
-        sa_relationship_kwargs={"lazy": "select"},
+        sa_relationship_kwargs={"lazy": "joined"},
     )
 
     parent_id: UUID | None = Field(
