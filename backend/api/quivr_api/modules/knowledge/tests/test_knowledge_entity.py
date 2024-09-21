@@ -170,7 +170,7 @@ async def test_knowledge_remove_folder_cascade(
     await session.commit()
 
     statement = select(KnowledgeDB)
-    results = (await session.exec(statement)).all()
+    results = (await session.exec(statement)).unique().all()
     assert results == []
 
 
