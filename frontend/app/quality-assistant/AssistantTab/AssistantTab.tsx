@@ -25,12 +25,13 @@ const AssistantTab = (): JSX.Element => {
   >(undefined);
   const [assistants, setAssistants] = useState<Assistant[]>([]);
   const [booleanStates, setBooleanStates] = useState<{
-    [key: string]: boolean;
+    [key: string]: boolean | null;
   }>({});
   const [selectTextStates, setSelectTextStates] = useState<{
-    [key: string]: string;
+    [key: string]: string | null;
   }>({});
   const [fileStates, setFileStates] = useState<{ [key: string]: File }>({});
+  const [isFormValid, setIsFormValid] = useState<boolean>(false);
 
   const { getAssistants } = useAssistants();
 
@@ -47,6 +48,79 @@ const AssistantTab = (): JSX.Element => {
       [key]: checked,
     }));
   };
+
+  const handleSelectTextChange = (key: string, value: string) => {
+    setSelectTextStates((prevState) => ({
+      ...prevState,
+      [key]: value,
+    }));
+  };
+
+  const validateForm = () => {
+    if (!assistantChoosed) {
+      return false;
+    }
+
+    const allBooleansSet =
+      assistantChoosed.inputs.booleans?.every(
+        (input) =>
+          booleanStates[input.key] !== undefined &&
+          booleanStates[input.key] !== null
+      ) ?? true;
+
+    if (!allBooleansSet) {
+      return false;
+    }
+
+    const allFilesSet = assistantChoosed.inputs.files.every(
+      (input) => fileStates[input.key] !== undefined
+    );
+
+    if (!allFilesSet) {
+      return false;
+    }
+
+    return (
+      assistantChoosed.inputs.select_texts?.every(
+        (input) =>
+          selectTextStates[input.key] !== undefined &&
+          selectTextStates[input.key] !== null
+      ) ?? true
+    );
+  };
+
+  useEffect(() => {
+    setIsFormValid(validateForm());
+  }, [booleanStates, fileStates, selectTextStates, assistantChoosed]);
+
+  useEffect(() => {
+    void (async () => {
+      try {
+        const res = await getAssistants();
+        setAssistants(res);
+      } catch (error) {
+        console.error(error);
+      }
+    })();
+  }, [assistantChoosed]);
+
+  useEffect(() => {
+    if (assistantChoosed?.inputs.booleans) {
+      const initialBooleanStates = assistantChoosed.inputs.booleans.reduce(
+        (acc, input) => ({ ...acc, [input.key]: false }),
+        {}
+      );
+      setBooleanStates(initialBooleanStates);
+    }
+    if (assistantChoosed?.inputs.select_texts) {
+      const initialSelectTextStates =
+        assistantChoosed.inputs.select_texts.reduce(
+          (acc, input) => ({ ...acc, [input.key]: input.default }),
+          {}
+        );
+      setSelectTextStates(initialSelectTextStates);
+    }
+  }, [assistantChoosed]);
 
   const handleSubmit = () => {
     if (assistantChoosed) {
@@ -77,35 +151,6 @@ const AssistantTab = (): JSX.Element => {
       console.log(processAssistantInput);
     }
   };
-
-  useEffect(() => {
-    void (async () => {
-      try {
-        const res = await getAssistants();
-        setAssistants(res);
-      } catch (error) {
-        console.error(error);
-      }
-    })();
-  }, [assistantChoosed]);
-
-  useEffect(() => {
-    if (assistantChoosed?.inputs.booleans) {
-      const initialBooleanStates = assistantChoosed.inputs.booleans.reduce(
-        (acc, input) => ({ ...acc, [input.key]: false }),
-        {}
-      );
-      setBooleanStates(initialBooleanStates);
-    }
-    if (assistantChoosed?.inputs.select_texts) {
-      const initialSelectTextStates =
-        assistantChoosed.inputs.select_texts.reduce(
-          (acc, input) => ({ ...acc, [input.key]: input.default }),
-          {}
-        );
-      setSelectTextStates(initialSelectTextStates);
-    }
-  }, [assistantChoosed]);
 
   return (
     <div className={styles.assistant_tab_wrapper}>
@@ -147,12 +192,7 @@ const AssistantTab = (): JSX.Element => {
                   options={input.options.map((option) => {
                     return { label: option, value: option };
                   })}
-                  onChange={(value) =>
-                    setSelectTextStates((prevState) => ({
-                      ...prevState,
-                      [input.key]: value,
-                    }))
-                  }
+                  onChange={(value) => handleSelectTextChange(input.key, value)}
                   selectedOption={{
                     label: selectTextStates[input.key] ?? input.options[0],
                     value: selectTextStates[input.key] ?? input.options[0],
@@ -167,7 +207,7 @@ const AssistantTab = (): JSX.Element => {
               <div key={index} className={styles.boolean_input}>
                 <Checkbox
                   label={input.key}
-                  checked={booleanStates[input.key]}
+                  checked={!!booleanStates[input.key]}
                   setChecked={(checked) =>
                     handleCheckboxChange(input.key, checked)
                   }
@@ -191,6 +231,7 @@ const AssistantTab = (): JSX.Element => {
             color="primary"
             important={true}
             onClick={handleSubmit}
+            disabled={!isFormValid}
           />
         </div>
       )}

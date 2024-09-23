@@ -96,9 +96,9 @@ export interface ProcessAssistantData {
     files?: ProcessAssistantInputFile[];
     urls?: { key: string; value: string }[];
     texts?: { key: string; value: string }[];
-    booleans?: { key: string; value: boolean }[];
+    booleans?: { key: string; value: boolean | null }[];
     numbers?: { key: string; value: number }[];
-    select_texts?: { key: string; value: string }[];
+    select_texts?: { key: string; value: string | null }[];
     select_numbers?: { key: string; value: number }[];
     brain?: { value: string };
   };
