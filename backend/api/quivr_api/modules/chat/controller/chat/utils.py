@@ -14,7 +14,7 @@ logger = get_logger(__name__)
 
 
 class RetrievalConfigPathEnv(Enum):
-    CHAT_WITH_LLM = ("CHAT_LLM_CONFIG_PATH", "chat_llm_config.yaml")
+    CHAT_WITH_LLM = ("CHAT_LLM_CONFIG_PATH", "config/chat_llm_config.yaml")
     RAG = ("BRAIN_CONFIG_PATH", "config/retrieval_config_workflow.yaml")
 
     @property
