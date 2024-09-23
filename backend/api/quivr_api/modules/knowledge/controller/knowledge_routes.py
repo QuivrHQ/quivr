@@ -173,7 +173,7 @@ async def create_knowledge(
 
 
 @knowledge_router.get(
-    "/knowledge/children",
+    "/knowledge/files",
     response_model=List[KnowledgeDTO] | None,
     tags=["Knowledge"],
 )

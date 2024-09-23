@@ -162,8 +162,6 @@ class KnowledgeService(BaseService[KnowledgeRepository]):
                         "file_name": knowledge_db.file_name,
                         "source": knowledge_db.source,
                         "source_link": knowledge_db.source_link,
-                        # TODO: Notification on notification
-                        # "notification_id": upload_notification.id,
                     },
                 )
 
@@ -202,9 +200,12 @@ class KnowledgeService(BaseService[KnowledgeRepository]):
         return inserted_knowledge
 
     async def get_all_knowledge_in_brain(self, brain_id: UUID) -> List[KnowledgeDTO]:
-        brain = await self.repository.get_brain_by_id(brain_id)
+        brain = await self.repository.get_brain_by_id(brain_id, get_knowledge=True)
         all_knowledges: List[KnowledgeDB] = await brain.awaitable_attrs.knowledges
-        knowledges = [await knowledge.to_dto() for knowledge in all_knowledges]
+        knowledges = [
+            await knowledge.to_dto(get_children=False, get_parent=False)
+            for knowledge in all_knowledges
+        ]
 
         return knowledges
 

@@ -27,6 +27,7 @@ class KnowledgeDTO(BaseModel):
     file_sha1: Optional[str] = None
     metadata: Optional[Dict[str, str]] = None
     user_id: UUID
+    # TODO: brain dto here not the brain nor the model_dump
     brains: List[Dict[str, Any]]
     parent: Optional[Self]
     children: List[Self]

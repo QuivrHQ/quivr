@@ -96,7 +96,7 @@ def init_worker(**kwargs):
 def process_file_task(
     knowledge_id: UUID,
     file_name: str,
-    notification_id: UUID,
+    notification_id: UUID | None = None,
     source: str | None = None,
     source_link: str | None = None,
     delete_file: bool = False,

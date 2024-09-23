@@ -1,3 +1,4 @@
+import asyncio
 from datetime import datetime
 from enum import Enum
 from typing import Dict, List, Optional
@@ -94,7 +95,9 @@ class KnowledgeDB(AsyncAttrs, SQLModel, table=True):
     sync_file_id: str | None = Field(default=None)
 
     # TODO: nested folder search
-    async def to_dto(self, get_children: bool = True) -> KnowledgeDTO:
+    async def to_dto(
+        self, get_children: bool = True, get_parent: bool = True
+    ) -> KnowledgeDTO:
         assert (
             self.updated_at
         ), "knowledge should be inserted before transforming to dto"
@@ -105,9 +108,11 @@ class KnowledgeDB(AsyncAttrs, SQLModel, table=True):
         children: list[KnowledgeDB] = (
             await self.awaitable_attrs.children if get_children else []
         )
-        children_dto = [await c.to_dto(get_children=False) for c in children]
-        parent = await self.awaitable_attrs.parent
-        parent = await parent.to_dto(get_children=False) if parent else None
+        children_dto = await asyncio.gather(
+            *[c.to_dto(get_children=False) for c in children]
+        )
+        parent = await self.awaitable_attrs.parent if get_parent else None
+        parent_dto = await parent.to_dto(get_children=False) if parent else None
 
         return KnowledgeDTO(
             id=self.id,  # type: ignore
@@ -124,7 +129,7 @@ class KnowledgeDB(AsyncAttrs, SQLModel, table=True):
             created_at=self.created_at,
             metadata=self.metadata_,  # type: ignore
             brains=[b.model_dump() for b in brains],
-            parent=parent,
+            parent=parent_dto,
             children=children_dto,
             user_id=self.user_id,
             sync_id=self.sync_id,
