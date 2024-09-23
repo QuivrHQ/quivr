@@ -73,6 +73,9 @@ export const FileInput = (props: FileInputProps): JSX.Element => {
             </div>
             <span>or drag it here</span>
           </div>
+          {currentFile && (
+            <span className={styles.filename}>{currentFile.name}</span>
+          )}
         </div>
       </div>
       <input
@@ -83,9 +86,6 @@ export const FileInput = (props: FileInputProps): JSX.Element => {
         onChange={handleInputChange}
         style={{ display: "none" }}
       />
-      {currentFile && (
-        <span className={styles.filename}>{currentFile.name}</span>
-      )}
       {errorMessage !== "" && (
         <span className={styles.error_message}>{errorMessage}</span>
       )}

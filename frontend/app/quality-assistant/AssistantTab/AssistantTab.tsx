@@ -133,6 +133,7 @@ const AssistantTab = (): JSX.Element => {
                 <FileInput
                   label={input.key}
                   onFileChange={(file) => handleFileChange(input.key, file)}
+                  acceptedFileTypes={["pdf", "docx", "doc", "txt"]}
                 />
               </div>
             ))}
