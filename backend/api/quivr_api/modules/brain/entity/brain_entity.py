@@ -80,7 +80,7 @@ class BrainEntity(BrainConfig):
     brain_type: BrainType | None = None
     description: Optional[str] = None
     temperature: Optional[float] = None
-    meaning: Optional[float] = None
+    meaning: Optional[str] = None
     openai_api_key: Optional[str] = None
     tags: Optional[List[str]] = None
     model: Optional[str] = None
