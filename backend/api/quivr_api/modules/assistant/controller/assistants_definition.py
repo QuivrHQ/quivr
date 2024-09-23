@@ -199,7 +199,7 @@ assistant2 = AssistantOutput(
         ],
         select_texts=[
             InputSelectText(
-                key="Language",
+                key="DocumentsType",
                 description="Select Documents Type",
                 options=["Etiquettes VS Cahier des charges", "Fiche Dev VS Cahier des charges"],
             ),
@@ -226,7 +226,7 @@ assistant3 = AssistantOutput(
         ],
         select_texts=[
             InputSelectText(
-                key="Language",
+                key="DocumentsType",
                 description="Select Documents Type",
                 options=["Etiquettes", "Cahier des charges"],
             ),

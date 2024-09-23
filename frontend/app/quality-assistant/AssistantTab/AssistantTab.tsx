@@ -115,7 +115,7 @@ const AssistantTab = (): JSX.Element => {
     if (assistantChoosed?.inputs.select_texts) {
       const initialSelectTextStates =
         assistantChoosed.inputs.select_texts.reduce(
-          (acc, input) => ({ ...acc, [input.key]: input.default }),
+          (acc, input) => ({ ...acc, [input.key]: input.options[0] }),
           {}
         );
       setSelectTextStates(initialSelectTextStates);
@@ -150,6 +150,18 @@ const AssistantTab = (): JSX.Element => {
 
       console.log(processAssistantInput);
     }
+  };
+
+  const resetForm = () => {
+    setBooleanStates({});
+    setSelectTextStates({});
+    setFileStates({});
+    setIsFormValid(false);
+  };
+
+  const handleBack = () => {
+    resetForm();
+    setAssistantChoosed(undefined);
   };
 
   return (
@@ -223,7 +235,7 @@ const AssistantTab = (): JSX.Element => {
             iconName="chevronLeft"
             label="Back"
             color="primary"
-            onClick={() => setAssistantChoosed(undefined)}
+            onClick={() => handleBack()}
           />
           <QuivrButton
             iconName="chevronRight"
