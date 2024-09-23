@@ -40,7 +40,6 @@ def filter_on_supported_files(
         prev_file = existing_files.get(new_file.name, None)
         if (prev_file and prev_file.supported) or prev_file is None:
             res.append((new_file, prev_file))
-
     return res
 
 
@@ -71,18 +70,18 @@ def should_download_file(
 class SyncUtils:
     def __init__(
         self,
-        sync_user_service: ISyncUserService,
-        sync_active_service: ISyncService,
-        knowledge_service: KnowledgeService,
-        sync_files_repo: SyncFileInterface,
+        # sync_user_service: ISyncUserService,
+        # sync_active_service: ISyncService,
+        # sync_files_repo: SyncFileInterface,
         sync_cloud: BaseSync,
+        knowledge_service: KnowledgeService,
         notification_service: NotificationService,
         brain_vectors: BrainsVectors,
     ) -> None:
         self.sync_user_service = sync_user_service
         self.sync_active_service = sync_active_service
-        self.knowledge_service = knowledge_service
         self.sync_files_repo = sync_files_repo
+        self.knowledge_service = knowledge_service
         self.sync_cloud = sync_cloud
         self.notification_service = notification_service
         self.brain_vectors = brain_vectors

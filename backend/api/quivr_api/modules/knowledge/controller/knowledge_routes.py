@@ -301,10 +301,6 @@ async def link_knowledge_to_brain(
 
     async def _send_knowledge_process(knowledge: KnowledgeDB):
         assert knowledge.id
-        knowledge = await knowledge_service.update_knowledge(
-            knowledge=knowledge,
-            payload=KnowledgeUpdate(status=KnowledgeStatus.PROCESSING),
-        )
         upload_notification = notification_service.add_notification(
             CreateNotification(
                 user_id=current_user.id,
@@ -323,6 +319,10 @@ async def link_knowledge_to_brain(
                 "source": knowledge.source,
                 "source_link": knowledge.source_link,
             },
+        )
+        knowledge = await knowledge_service.update_knowledge(
+            knowledge=knowledge,
+            payload=KnowledgeUpdate(status=KnowledgeStatus.PROCESSING),
         )
 
     if knowledge_dto.id is None:

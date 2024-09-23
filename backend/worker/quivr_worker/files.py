@@ -23,33 +23,18 @@ def compute_sha1(content: bytes) -> str:
 @contextmanager
 def build_file(
     file_data: bytes,
-    knowledge_id: UUID,
-    file_name: str,
-    original_file_name: str | None = None,
+    file_name_ext: str,
 ):
     try:
         # TODO(@aminediro) : Maybe use fsspec file to be agnostic to where files are stored :?
         # We are reading the whole file to memory, which doesn't scale
-        tmp_name, base_file_name, file_extension = get_tmp_name(file_name)
+        tmp_name, _, _ = get_tmp_name(file_name_ext)
         tmp_file = NamedTemporaryFile(
             suffix="_" + tmp_name,  # pyright: ignore reportPrivateUsage=none
         )
         tmp_file.write(file_data)
         tmp_file.flush()
-        file_sha1 = compute_sha1(file_data)
-
-        file_instance = File(
-            knowledge_id=knowledge_id,
-            file_name=base_file_name,
-            original_file_name=(
-                original_file_name if original_file_name else base_file_name
-            ),
-            tmp_file_path=Path(tmp_file.name),
-            file_size=len(file_data),
-            file_extension=file_extension,
-            file_sha1=file_sha1,
-        )
-        yield file_instance
+        yield Path(tmp_file.name)
     finally:
         # Code to release resource, e.g.:
         tmp_file.close()
@@ -85,14 +70,13 @@ class File:
         self.original_file_name = original_file_name
 
     def is_empty(self):
-        return self.file_size < 1  # pyright: ignore reportPrivateUsage=none
+        return self.file_size < 1
 
-    def to_qfile(self, brain_id: UUID, metadata: dict[str, Any] = {}) -> QuivrFile:
+    def to_qfile(self, metadata: dict[str, Any] = {}) -> QuivrFile:
         return QuivrFile(
             id=self.id,
             original_filename=self.file_name,
             path=self.tmp_file_path,
-            brain_id=brain_id,
             file_sha1=self.file_sha1,
             file_extension=self.file_extension,
             file_size=self.file_size,

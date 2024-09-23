@@ -14,6 +14,12 @@ from quivr_api.modules.sync.service.sync_notion import (
     update_notion_pages,
 )
 from quivr_api.modules.sync.service.sync_service import SyncsService
+from quivr_api.modules.sync.utils.sync import (
+    AzureDriveSync,
+    DropboxSync,
+    GitHubSync,
+    GoogleDriveSync,
+)
 from quivr_api.modules.sync.utils.syncutils import SyncUtils
 from sqlalchemy.ext.asyncio import AsyncEngine
 from sqlmodel import text
@@ -24,6 +30,17 @@ from quivr_worker.syncs.utils import SyncServices, build_syncs_utils
 celery_inspector = celery.control.inspect()
 
 logger = get_logger("celery_worker")
+
+
+async def build_syncprovider_mapping():
+    mapping_sync_utils = {
+        "google": GoogleDriveSync(),
+        "azure": AzureDriveSync(),
+        "dropbox": DropboxSync(),
+        "github": GitHubSync(),
+        # "notion", NotionSync(notion_service=notion_service),
+    }
+    return mapping_sync_utils
 
 
 async def process_sync(

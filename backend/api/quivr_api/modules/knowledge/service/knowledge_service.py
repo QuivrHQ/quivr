@@ -42,7 +42,7 @@ class KnowledgeService(BaseService[KnowledgeRepository]):
     def __init__(
         self,
         repository: KnowledgeRepository,
-        storage: StorageInterface = SupabaseS3Storage(),
+        storage: StorageInterface = SupabaseS3Storage(client=None),
     ):
         self.repository = repository
         self.storage = storage
@@ -73,15 +73,11 @@ class KnowledgeService(BaseService[KnowledgeRepository]):
 
     async def map_syncs_knowledge_user(
         self, sync_id: int, user_id: UUID
-    ) -> dict[str, KnowledgeDTO]:
+    ) -> dict[str, KnowledgeDB]:
         list_kms = await self.repository.get_all_knowledge_sync_user(
             sync_id=sync_id, user_id=user_id
         )
-        return {
-            k.sync_file_id: k
-            for k in await asyncio.gather(*[k.to_dto() for k in list_kms])
-            if k.sync_file_id
-        }
+        return {k.sync_file_id: k for k in list_kms if k.sync_file_id}
 
     async def list_knowledge(
         self, knowledge_id: UUID | None, user_id: UUID | None = None
@@ -113,6 +109,7 @@ class KnowledgeService(BaseService[KnowledgeRepository]):
         user_id: UUID,
         knowledge_to_add: AddKnowledge,
         upload_file: UploadFile | None = None,
+        status: KnowledgeStatus = KnowledgeStatus.RESERVED,
     ) -> KnowledgeDB:
         brains = []
         if knowledge_to_add.parent_id:
@@ -128,7 +125,7 @@ class KnowledgeService(BaseService[KnowledgeRepository]):
             source_link=knowledge_to_add.source_link,
             file_size=upload_file.size if upload_file else 0,
             metadata_=knowledge_to_add.metadata,  # type: ignore
-            status=KnowledgeStatus.RESERVED,
+            status=status,
             parent_id=knowledge_to_add.parent_id,
             sync_id=knowledge_to_add.sync_id,
             sync_file_id=knowledge_to_add.sync_file_id,

@@ -1,7 +1,6 @@
-import asyncio
 import os
 from datetime import datetime
-from typing import List, Tuple
+from typing import List
 
 from fastapi import APIRouter, Depends, status
 
@@ -20,8 +19,8 @@ from quivr_api.modules.sync.controller.google_sync_routes import google_sync_rou
 from quivr_api.modules.sync.controller.notion_sync_routes import notion_sync_router
 from quivr_api.modules.sync.dto import SyncsDescription
 from quivr_api.modules.sync.dto.outputs import AuthMethodEnum
-from quivr_api.modules.sync.entity.sync_models import SyncFile
 from quivr_api.modules.sync.service.sync_service import SyncsService
+from quivr_api.modules.sync.utils.syncutils import fetch_sync_knowledge
 from quivr_api.modules.user.entity.user_identity import UserIdentity
 
 notification_service = NotificationService()
@@ -179,27 +178,23 @@ async def list_sync_files(
     # Gets knowledge for each call to list the files,
     # The logic is that getting from DB will be faster than provider repsonse ?
     # NOTE: asyncio.gather didn't correcly typecheck
-    async def fetch_data() -> Tuple[dict[str, KnowledgeDTO], List[SyncFile] | None]:
-        map_knowledges_task = knowledge_service.map_syncs_knowledge_user(
-            sync_id=sync_id, user_id=current_user.id
-        )
-        sync_files_task = syncs_service.get_files_folder_user_sync(
-            sync_id,
-            current_user.id,
-            folder_id,
-        )
-        return await asyncio.gather(map_knowledges_task, sync_files_task)
 
     sync = await syncs_service.get_sync_by_id(sync_id=sync_id)
-    map_knowledges, sync_files = await fetch_data()
+    syncfile_to_knowledge, sync_files = await fetch_sync_knowledge(
+        sync_id=sync_id,
+        user_id=current_user.id,
+        folder_id=folder_id,
+        knowledge_service=knowledge_service,
+        syncs_service=syncs_service,
+    )
     if not sync_files:
         return None
 
     kms = []
     for file in sync_files:
-        existing_km = map_knowledges.get(file.id)
+        existing_km = syncfile_to_knowledge.get(file.id)
         if existing_km:
-            kms.append(existing_km)
+            kms.append(await existing_km.to_dto(get_children=False, get_parent=False))
         else:
             last_modified_at = (
                 file.last_modified_at if file.last_modified_at else datetime.now()
@@ -216,7 +211,8 @@ async def list_sync_files(
                     brains=[],
                     parent=None,
                     children=[],
-                    status=None,  # TODO: Handle a sync not added status
+                    # TODO: Handle a sync not added status
+                    status=None,
                     # TODO: retrieve created at from sync provider
                     created_at=last_modified_at,
                     updated_at=last_modified_at,

@@ -112,7 +112,6 @@ def process_file_task(
     loop.run_until_complete(
         aprocess_file_task(
             file_name=file_name,
-            notification_id=notification_id,
             knowledge_id=knowledge_id,
             source=source,
             source_link=source_link,
@@ -123,7 +122,6 @@ def process_file_task(
 
 async def aprocess_file_task(
     file_name: str,
-    notification_id: UUID,
     knowledge_id: UUID,
     source: str | None = None,
     source_link: str | None = None,
@@ -136,34 +134,26 @@ async def aprocess_file_task(
             await async_session.execute(
                 text("SET SESSION idle_in_transaction_session_timeout = '5min';")
             )
-            with Session(engine, expire_on_commit=False, autoflush=False) as session:
-                session.execute(
-                    text("SET SESSION idle_in_transaction_session_timeout = '5min';")
-                )
-                vector_repository = VectorRepository(session)
-                vector_service = VectorService(
-                    vector_repository
-                )  # FIXME @amine: fix to need AsyncSession in vector Service
-                knowledge_repository = KnowledgeRepository(async_session)
-                knowledge_service = KnowledgeService(knowledge_repository)
-                await process_uploaded_file(
-                    supabase_client=supabase_client,
-                    brain_service=brain_service,
-                    vector_service=vector_service,
-                    knowledge_service=knowledge_service,
-                    file_name=file_name,
-                    knowledge_id=knowledge_id,
-                    integration=source,
-                    integration_link=source_link,
-                )
-                session.commit()
+            # FIXME @amine: fix to need AsyncSession in vector Service
+            vector_repository = VectorRepository(async_session.sync_session)
+            vector_service = VectorService(vector_repository)
+            knowledge_repository = KnowledgeRepository(async_session)
+            knowledge_service = KnowledgeService(knowledge_repository)
+            await process_uploaded_file(
+                supabase_client=supabase_client,
+                brain_service=brain_service,
+                vector_service=vector_service,
+                knowledge_service=knowledge_service,
+                file_name=file_name,
+                knowledge_id=knowledge_id,
+                integration=source,
+                integration_link=source_link,
+            )
             await async_session.commit()
         except Exception as e:
-            session.rollback()
             await async_session.rollback()
             raise e
         finally:
-            session.close()
             await async_session.close()
 
 

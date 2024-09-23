@@ -66,3 +66,7 @@ class FakeStorage(StorageInterface):
 
     def clear_storage(self):
         self.storage.clear()
+
+    async def download_file(self, knowledge: KnowledgeDB, **kwargs) -> bytes:
+        storage_path = self.get_storage_path(knowledge)
+        return self.storage[storage_path]
