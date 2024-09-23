@@ -13,7 +13,9 @@ from quivr_api.modules.brain.service.brain_authorization_service import (
 )
 from quivr_api.modules.brain.service.brain_service import BrainService
 from quivr_api.modules.chat.controller.chat.utils import (
+    RetrievalConfigPathEnv,
     check_and_update_user_usage,
+    get_config_file_path,
     load_and_merge_retrieval_configuration,
 )
 from quivr_api.modules.chat.dto.chats import ChatItem, ChatQuestion
@@ -296,10 +298,10 @@ async def create_stream_question_handler(
             assert model is not None
             brain.model = model.name
             validate_authorization(user_id=current_user.id, brain_id=brain_id)
-            if not os.getenv("BRAIN_CONFIG_PATH"):
-                raise ValueError("BRAIN_CONFIG_PATH not set")
             current_path = os.path.dirname(os.path.abspath(__file__))
-            file_path = os.path.join(current_path, os.getenv("BRAIN_CONFIG_PATH"))  # type: ignore
+            file_path = get_config_file_path(
+                RetrievalConfigPathEnv.RAG, current_path=current_path
+            )
             retrieval_config = load_and_merge_retrieval_configuration(
                 config_file_path=file_path, sqlmodel=model
             )
@@ -319,10 +321,10 @@ async def create_stream_question_handler(
             await check_and_update_user_usage(
                 current_user, model_to_use.name, model_service
             )  # type: ignore
-            if not os.getenv("CHAT_LLM_CONFIG_PATH"):
-                raise ValueError("CHAT_LLM_CONFIG_PATH not set")
             current_path = os.path.dirname(os.path.abspath(__file__))
-            file_path = os.path.join(current_path, os.getenv("CHAT_LLM_CONFIG_PATH"))  # type: ignore
+            file_path = get_config_file_path(
+                RetrievalConfigPathEnv.CHAT_WITH_LLM, current_path=current_path
+            )
             retrieval_config = load_and_merge_retrieval_configuration(
                 config_file_path=file_path, sqlmodel=model_to_use
             )

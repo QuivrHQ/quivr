@@ -1,4 +1,6 @@
 import time
+import os
+from enum import Enum
 
 from fastapi import HTTPException
 from quivr_api.logger import get_logger
@@ -9,6 +11,24 @@ from quivr_api.modules.user.service.user_usage import UserUsage
 from quivr_core.config import RetrievalConfig
 
 logger = get_logger(__name__)
+
+
+class RetrievalConfigPathEnv(str, Enum):
+    CHAT_WITH_LLM = "CHAT_LLM_CONFIG_PATH"
+    RAG = "BRAIN_CONFIG_PATH"
+
+
+def get_config_file_path(
+    config_path_env: RetrievalConfigPathEnv, current_path: str | None = None
+) -> str:
+    _path = os.getenv(config_path_env.value)
+    if not _path:
+        raise ValueError(f"{config_path_env.value} is not set.")
+
+    if not current_path:
+        return _path
+
+    return os.path.join(current_path, _path)
 
 
 def load_and_merge_retrieval_configuration(
