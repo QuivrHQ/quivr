@@ -12,7 +12,12 @@ import { SingleSelector } from "@/lib/components/ui/SingleSelector/SingleSelecto
 import AssistantCard from "./AssistantCard/AssistantCard";
 import styles from "./AssistantTab.module.scss";
 
-import { Assistant } from "../types/assistant";
+import { Assistant, ProcessAssistantData } from "../types/assistant";
+
+export interface ProcessAssistantInput {
+  input: ProcessAssistantData;
+  files: File[];
+}
 
 const AssistantTab = (): JSX.Element => {
   const [assistantChoosed, setAssistantChoosed] = useState<
@@ -25,11 +30,52 @@ const AssistantTab = (): JSX.Element => {
   const [selectTextStates, setSelectTextStates] = useState<{
     [key: string]: string;
   }>({});
+  const [fileStates, setFileStates] = useState<{ [key: string]: File }>({});
 
   const { getAssistants } = useAssistants();
 
-  const handleFileChange = (file: File) => {
-    console.log("Selected file:", file);
+  const handleFileChange = (key: string, file: File) => {
+    setFileStates((prevState) => ({
+      ...prevState,
+      [key]: file,
+    }));
+  };
+
+  const handleCheckboxChange = (key: string, checked: boolean) => {
+    setBooleanStates((prevState) => ({
+      ...prevState,
+      [key]: checked,
+    }));
+  };
+
+  const handleSubmit = () => {
+    if (assistantChoosed) {
+      const processAssistantData: ProcessAssistantData = {
+        id: assistantChoosed.id,
+        name: assistantChoosed.name,
+        inputs: {
+          files: Object.keys(fileStates).map((key) => ({
+            key,
+            value: fileStates[key].name,
+          })),
+          booleans: Object.keys(booleanStates).map((key) => ({
+            key,
+            value: booleanStates[key],
+          })),
+          select_texts: Object.keys(selectTextStates).map((key) => ({
+            key,
+            value: selectTextStates[key],
+          })),
+        },
+      };
+
+      const processAssistantInput: ProcessAssistantInput = {
+        input: processAssistantData,
+        files: Object.values(fileStates),
+      };
+
+      console.log(processAssistantInput);
+    }
   };
 
   useEffect(() => {
@@ -61,13 +107,6 @@ const AssistantTab = (): JSX.Element => {
     }
   }, [assistantChoosed]);
 
-  const handleCheckboxChange = (key: string, checked: boolean) => {
-    setBooleanStates((prevState) => ({
-      ...prevState,
-      [key]: checked,
-    }));
-  };
-
   return (
     <div className={styles.assistant_tab_wrapper}>
       {!assistantChoosed ? (
@@ -91,7 +130,10 @@ const AssistantTab = (): JSX.Element => {
                   <Icon name="file" color="black" size="small" />
                   <span>{input.key}</span>
                 </div>
-                <FileInput label={input.key} onFileChange={handleFileChange} />
+                <FileInput
+                  label={input.key}
+                  onFileChange={(file) => handleFileChange(input.key, file)}
+                />
               </div>
             ))}
           </div>
@@ -147,6 +189,7 @@ const AssistantTab = (): JSX.Element => {
             label="EXECUTE"
             color="primary"
             important={true}
+            onClick={handleSubmit}
           />
         </div>
       )}

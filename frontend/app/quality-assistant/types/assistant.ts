@@ -89,18 +89,22 @@ interface ProcessAssistantInputFile {
   value: string;
 }
 
-export interface ProcessAssistantInput {
+export interface ProcessAssistantData {
   id: number;
   name: string;
   inputs: {
-    files: ProcessAssistantInputFile[];
-    urls: { key: string; value: string }[];
-    texts: { key: string; value: string }[];
-    booleans: { key: string; value: boolean }[];
-    numbers: { key: string; value: number }[];
-    select_texts: { key: string; value: string }[];
-    select_numbers: { key: string; value: number }[];
-    brain: { value: string };
+    files?: ProcessAssistantInputFile[];
+    urls?: { key: string; value: string }[];
+    texts?: { key: string; value: string }[];
+    booleans?: { key: string; value: boolean }[];
+    numbers?: { key: string; value: number }[];
+    select_texts?: { key: string; value: string }[];
+    select_numbers?: { key: string; value: number }[];
+    brain?: { value: string };
   };
-  additional_files: File[];
+}
+
+export interface ProcessAssistantInput {
+  input: ProcessAssistantData;
+  files: File[];
 }
