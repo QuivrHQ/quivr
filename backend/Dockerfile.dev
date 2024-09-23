@@ -33,6 +33,8 @@ COPY core/pyproject.toml core/README.md ./core/
 COPY core/quivr_core/__init__.py ./core/quivr_core/__init__.py
 COPY worker/pyproject.toml worker/README.md ./worker/
 COPY worker/quivr_worker/__init__.py ./worker/quivr_worker/__init__.py
+COPY core/MegaParse/pyproject.toml core/MegaParse/README.md ./core/MegaParse/
+COPY core/MegaParse/megaparse/__init__.py ./core/MegaParse/megaparse/__init__.py
 
 RUN PYTHONDONTWRITEBYTECODE=1 pip install --no-cache-dir -r requirements.lock
 

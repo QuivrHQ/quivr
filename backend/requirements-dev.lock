@@ -18,6 +18,8 @@
 -e file:core
     # via quivr-api
     # via quivr-worker
+-e file:core/MegaParse
+    # via quivr-core
 -e file:worker
 aiofiles==23.2.1
     # via chainlit
@@ -404,6 +406,7 @@ langchain==0.2.14
     # via quivr-core
 langchain-anthropic==0.1.23
     # via quivr-core
+    # via quivr-monorepo
 langchain-cohere==0.2.2
     # via quivr-api
 langchain-community==0.2.12
@@ -543,8 +546,6 @@ mdit-py-plugins==0.4.1
     # via jupytext
 mdurl==0.1.2
     # via markdown-it-py
-megaparse==0.0.31
-    # via quivr-core
 mergedeep==1.3.4
     # via mkdocs
     # via mkdocs-get-deps
@@ -800,6 +801,7 @@ protobuf==4.25.4
     # via onnxruntime
     # via opentelemetry-proto
     # via proto-plus
+    # via transformers
 psutil==6.0.0
     # via ipykernel
     # via unstructured
@@ -1021,6 +1023,8 @@ safetensors==0.4.4
     # via transformers
 scipy==1.14.1
     # via layoutparser
+sentencepiece==0.2.0
+    # via transformers
 sentry-sdk==2.13.0
     # via quivr-api
 setuptools==70.0.0
@@ -1149,8 +1153,11 @@ traitlets==5.14.3
     # via nbclient
     # via nbconvert
     # via nbformat
-transformers==4.44.1
+transformers==4.44.2
+    # via quivr-core
     # via unstructured-inference
+types-pyyaml==6.0.12.20240808
+    # via quivr-core
 types-requests==2.31.0.6
     # via cohere
 types-urllib3==1.26.25.14

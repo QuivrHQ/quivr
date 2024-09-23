@@ -2,8 +2,8 @@ from datetime import datetime
 from enum import Enum
 from typing import Any, Dict, List, Optional
 from uuid import UUID
-
 from pydantic import BaseModel
+
 from quivr_core.models import KnowledgeStatus
 from sqlalchemy import JSON, TIMESTAMP, Column, text
 from sqlalchemy.ext.asyncio import AsyncAttrs
@@ -64,7 +64,7 @@ class KnowledgeDB(AsyncAttrs, SQLModel, table=True):
             primary_key=True,
         ),
     )
-    file_name: Optional[str] = Field(default=None, max_length=255)
+    file_name: str = Field(default="", max_length=255)
     url: Optional[str] = Field(default=None, max_length=2048)
     extension: str = Field(default=".txt", max_length=100)
     status: str = Field(max_length=50)
@@ -94,7 +94,7 @@ class KnowledgeDB(AsyncAttrs, SQLModel, table=True):
     )
     is_folder: bool = Field(default=False)
     user_id: UUID = Field(foreign_key="users.id", nullable=False)
-    brains: List["Brain"] = Relationship(
+    brains: List["Brain"] = Relationship(  # type: ignore # noqa: F821
         back_populates="knowledges",
         link_model=KnowledgeBrain,
         sa_relationship_kwargs={"lazy": "select"},

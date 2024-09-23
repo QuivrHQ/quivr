@@ -2,10 +2,12 @@ import datetime
 import os
 from uuid import UUID, uuid4
 
+from quivr_api.utils.uuid_generator import generate_uuid_from_string
+from quivr_core.brain import Brain as BrainCore
 from quivr_core.chat import ChatHistory as ChatHistoryCore
-from quivr_core.config import LLMEndpointConfig, RAGConfig
+from quivr_core.config import LLMEndpointConfig, RetrievalConfig
 from quivr_core.llm.llm_endpoint import LLMEndpoint
-from quivr_core.models import ParsedRAGResponse, RAGResponseMetadata
+from quivr_core.models import ChatLLMMetadata, ParsedRAGResponse, RAGResponseMetadata
 from quivr_core.quivr_rag_langgraph import QuivrQARAGLangGraph
 
 from quivr_api.logger import get_logger
@@ -38,14 +40,15 @@ class RAGService:
     def __init__(
         self,
         current_user: UserIdentity,
-        brain: BrainEntity,
         chat_id: UUID,
-        brain_service: BrainService,
-        prompt_service: PromptService,
-        chat_service: ChatService,
-        knowledge_service: KnowledgeService,
-        vector_service: VectorService,
         model_service: ModelService,
+        chat_service: ChatService,
+        brain: BrainEntity,
+        retrieval_config: RetrievalConfig | None = None,
+        brain_service: BrainService | None = None,
+        prompt_service: PromptService | None = None,
+        knowledge_service: KnowledgeService | None = None,
+        vector_service: VectorService | None = None,
     ):
         # Services
         self.brain_service = brain_service
@@ -59,13 +62,21 @@ class RAGService:
         self.current_user = current_user
         self.chat_id = chat_id
         self.brain = brain
-        self.prompt = self.get_brain_prompt(self.brain)
+        self.prompt = (
+            self.get_brain_prompt(self.brain)
+            if self.brain and self.brain_service
+            else None
+        )
+
+        self.retrieval_config = retrieval_config
 
         # check at init time
-        self.model_to_use = brain.model
-        assert self.model_to_use is not None
+        self.model_to_use = brain.model if brain else None
 
     def get_brain_prompt(self, brain: BrainEntity) -> Prompt | None:
+        if not self.prompt_service:
+            raise ValueError("PromptService not provided")
+
         return (
             self.prompt_service.get_prompt_by_id(brain.prompt_id)
             if brain.prompt_id
@@ -84,29 +95,42 @@ class RAGService:
         [chat_history.append(m) for m in transformed_history]
         return chat_history
 
-    async def _build_rag_config(self) -> RAGConfig:
+    async def _get_retrieval_config(self) -> RetrievalConfig:
+        if self.retrieval_config:
+            retrieval_config = self.retrieval_config
+        else:
+            retrieval_config = await self._build_retrieval_config()
+
+        return retrieval_config
+
+    async def _build_retrieval_config(self) -> RetrievalConfig:
         model = await self.model_service.get_model(self.model_to_use)  # type: ignore
+        if model is None:
+            raise ValueError(f"Cannot get model {self.model_to_use}")
         api_key = os.getenv(model.env_variable_name, "not-defined")
 
-        rag_config = RAGConfig(
+        retrieval_config = RetrievalConfig(
             llm_config=LLMEndpointConfig(
                 model=self.model_to_use,  # type: ignore
                 llm_base_url=model.endpoint_url,
                 llm_api_key=api_key,
                 temperature=(LLMEndpointConfig.model_fields["temperature"].default),
-                max_input=model.max_input,
-                max_tokens=model.max_output,
+                max_input_tokens=model.max_input,
+                max_output_tokens=model.max_output,
             ),
             prompt=self.prompt.content if self.prompt else None,
         )
-        return rag_config
+        return retrieval_config
 
-    def get_llm(self, rag_config: RAGConfig):
-        return LLMEndpoint.from_config(rag_config.llm_config)
+    def get_llm(self, retrieval_config: RetrievalConfig):
+        return LLMEndpoint.from_config(retrieval_config.llm_config)
 
     def create_vector_store(
         self, brain_id: UUID, max_input: int
     ) -> CustomSupabaseVectorStore:
+        if not self.vector_service:
+            raise ValueError("VectorService not provided")
+
         supabase_client = get_supabase_client()
         embeddings = get_embedding_client()
         return CustomSupabaseVectorStore(
@@ -144,29 +168,49 @@ class RAGService:
         logger.info(
             f"Creating question for chat {self.chat_id} with brain {self.brain.brain_id} "
         )
-        rag_config = await self._build_rag_config()
-        logger.debug(f"generate_answer with config : {rag_config.model_dump()}")
+        retrieval_config = await self._get_retrieval_config()
+        logger.debug(f"generate_answer with config : {retrieval_config.model_dump()}")
         history = await self.chat_service.get_chat_history(self.chat_id)
-        # Get list of files
-        list_files = await self.knowledge_service.get_all_knowledge_in_brain(
-            self.brain.brain_id
-        )
-        # Build RAG dependencies to inject
-        vector_store = self.create_vector_store(
-            self.brain.brain_id, rag_config.llm_config.max_input
-        )
-        llm = self.get_llm(rag_config)
-        # Initialize the RAG pipline
-        rag_pipeline = QuivrQARAGLangGraph(
-            rag_config=rag_config, llm=llm, vector_store=vector_store
-        )
         #  Format the history, sanitize the input
         chat_history = self._build_chat_history(history)
 
-        parsed_response = rag_pipeline.answer(question, chat_history, list_files)
+        # Get list of files
+        list_files = (
+            await self.knowledge_service.get_all_knowledge_in_brain(self.brain.brain_id)
+            if self.knowledge_service
+            else []
+        )
+
+        # Build RAG dependencies to inject
+        vector_store = (
+            self.create_vector_store(
+                self.brain.brain_id, retrieval_config.llm_config.max_input_tokens
+            )
+            if self.vector_service
+            else None
+        )
+
+        llm = self.get_llm(retrieval_config)
+
+        brain_core = BrainCore(
+            name=self.brain.name,
+            id=self.brain.id,
+            llm=llm,
+            vector_db=vector_store,
+            embedder=vector_store.embeddings if vector_store else None,
+        )
+
+        parsed_response = brain_core.ask(
+            question=question,
+            retrieval_config=retrieval_config,
+            rag_pipeline=QuivrQARAGLangGraph,
+            list_files=list_files,
+            chat_history=chat_history,
+        )
 
         # Save the answer to db
-        new_chat_entry = self.save_answer(question, parsed_response)
+        if self.brain_service:
+            new_chat_entry = self.save_answer(question, parsed_response)
 
         # Format output to be correct
         metadata = (
@@ -179,10 +223,10 @@ class RAGService:
                 "chat_id": self.chat_id,
                 "user_message": question,
                 "assistant": parsed_response.answer,
-                "message_time": new_chat_entry.message_time,
+                "message_time": new_chat_entry.message_time if new_chat_entry else None,
                 "prompt_title": (self.prompt.title if self.prompt else None),
                 "brain_name": self.brain.name if self.brain else None,
-                "message_id": new_chat_entry.message_id,
+                "message_id": new_chat_entry.message_id if new_chat_entry else None,
                 "brain_id": str(self.brain.brain_id) if self.brain else None,
                 "metadata": metadata,
             }
@@ -196,23 +240,38 @@ class RAGService:
             f"Creating question for chat {self.chat_id} with brain {self.brain.brain_id} "
         )
         # Build the rag config
-        rag_config = await self._build_rag_config()
+        retrieval_config = await self._get_retrieval_config()
         # Get chat history
         history = await self.chat_service.get_chat_history(self.chat_id)
         #  Format the history, sanitize the input
         chat_history = self._build_chat_history(history)
 
         # Get list of files urls
-        list_files = await self.knowledge_service.get_all_knowledge_in_brain(
-            self.brain.brain_id
+        list_files = (
+            await self.knowledge_service.get_all_knowledge_in_brain(self.brain.brain_id)
+            if self.knowledge_service
+            else []
         )
-        llm = self.get_llm(rag_config)
-        vector_store = self.create_vector_store(
-            self.brain.brain_id, rag_config.llm_config.max_input
+
+        vector_store = (
+            self.create_vector_store(
+                self.brain.brain_id, retrieval_config.llm_config.max_input_tokens
+            )
+            if self.vector_service
+            else None
         )
-        # Initialize the rag pipline
-        rag_pipeline = QuivrQARAGLangGraph(
-            rag_config=rag_config, llm=llm, vector_store=vector_store
+
+        llm = self.get_llm(retrieval_config)
+
+        # Get model metadata
+        model_metadata = await self.model_service.get_model(self.brain.name)
+
+        brain_core = BrainCore(
+            name=self.brain.name,
+            id=self.brain.id,
+            llm=llm,
+            vector_db=vector_store,
+            embedder=vector_store.embeddings if vector_store else None,
         )
 
         full_answer = ""
@@ -226,12 +285,28 @@ class RAGService:
             "user_message": question,  # TODO: define result
             "message_time": datetime.datetime.now(),  # TODO: define result
             "prompt_title": (self.prompt.title if self.prompt else ""),
-            "brain_name": self.brain.name if self.brain else None,
-            "brain_id": self.brain.brain_id if self.brain else None,
+            # brain_name and brain_id must be None in the chat-with-llm case, as this will force the front to look for the model_metadata
+            "brain_name": self.brain.name if self.brain_service else None,
+            "brain_id": self.brain.brain_id if self.brain_service else None,
         }
 
-        async for response in rag_pipeline.answer_astream(
-            question, chat_history, list_files
+        metadata_model = {}
+        if model_metadata:
+            metadata_model = ChatLLMMetadata(
+                name=self.brain.name,
+                description=model_metadata.description,
+                image_url=model_metadata.image_url,
+                display_name=model_metadata.display_name,
+                brain_id=str(generate_uuid_from_string(self.brain.name)),
+                brain_name=self.model_to_use,
+            )
+
+        async for response in brain_core.ask_streaming(
+            question=question,
+            retrieval_config=retrieval_config,
+            rag_pipeline=QuivrQARAGLangGraph,
+            chat_history=chat_history,
+            list_files=list_files,
         ):
             # Format output to be correct servicedf;j
             if not response.last_chunk:
@@ -247,6 +322,10 @@ class RAGService:
                     streamed_chat_history.metadata["snippet_emoji"] = (
                         self.brain.snippet_emoji if self.brain else None
                     )
+                    if metadata_model:
+                        streamed_chat_history.metadata["metadata_model"] = (
+                            metadata_model
+                        )
                 full_answer += response.answer
                 yield f"data: {streamed_chat_history.model_dump_json()}"
 
@@ -256,6 +335,7 @@ class RAGService:
             metadata=response.metadata.model_dump(),
             **message_metadata,
         )
+
         if streamed_chat_history.metadata:
             streamed_chat_history.metadata["snippet_color"] = (
                 self.brain.snippet_color if self.brain else None
@@ -263,16 +343,24 @@ class RAGService:
             streamed_chat_history.metadata["snippet_emoji"] = (
                 self.brain.snippet_emoji if self.brain else None
             )
-        sources_urls = await generate_source(
-            knowledge_service=self.knowledge_service,
-            brain_id=self.brain.brain_id,
-            source_documents=response.metadata.sources,
-            citations=(
-                streamed_chat_history.metadata["citations"]
-                if streamed_chat_history.metadata
-                else None
-            ),
+            if metadata_model:
+                streamed_chat_history.metadata["metadata_model"] = metadata_model
+
+        sources_urls = (
+            await generate_source(
+                knowledge_service=self.knowledge_service,
+                brain_id=self.brain.brain_id,
+                source_documents=response.metadata.sources,
+                citations=(
+                    streamed_chat_history.metadata["citations"]
+                    if streamed_chat_history.metadata
+                    else None
+                ),
+            )
+            if self.knowledge_service
+            else []
         )
+
         if streamed_chat_history.metadata:
             streamed_chat_history.metadata["sources"] = sources_urls
 

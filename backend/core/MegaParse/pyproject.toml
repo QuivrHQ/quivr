@@ -1,0 +1,53 @@
+[project]
+name = "megaparse"
+version = "0.0.31"
+description = "Parse complex files (PDF,Docx,PPTX) for LLM consumption"
+authors = [
+    { name = "Stan Girard", email = "stan@quivr.app" },
+    { name = "Chloé Daems", email = "chloe@quivr.app" }
+]
+readme = "README.md"
+dependencies = [
+    "python-docx>=1.1.0",
+    "mammoth>=1.8.0",
+    "python-pptx>=1.0.2",
+    "llama-parse>=0.4.0",
+    "pdf2docx>=0.5.0",
+    "unstructured[pdf]>=0.15.0",
+    "langchain>=0.2.0",
+    "langchain-community>=0.2.0",
+    "langchain-openai>=0.1.0",
+    "langchain-core>=0.2.0",
+    "python-dotenv>=1.0.0",
+    "pycryptodome>=3.20.0",
+    "llama-index>=0.10.0",
+    "pdfplumber>=0.11.0",
+]
+python = "^3.11"
+
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.rye]
+managed = true
+universal = true
+dev-dependencies = [
+    "mypy>=1.11.1",
+    "pre-commit>=3.8.0",
+    "ipykernel>=6.29.5",
+    "ruff>=0.6.0",
+    "flake8>=7.1.1",
+    "flake8-black>=0.3.6",
+    "pytest-asyncio>=0.23.8",
+    "pytest>=8.3.2",
+    "pytest-xdist>=3.6.1",
+    "pytest-cov>=5.0.0",
+]
+
+[tool.hatch.metadata]
+allow-direct-references = true
+
+[tool.hatch.build.targets.wheel]
+packages = ["megaparse"]

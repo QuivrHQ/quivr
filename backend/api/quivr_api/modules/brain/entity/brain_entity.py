@@ -4,6 +4,7 @@ from typing import List, Optional
 from uuid import UUID
 
 from pydantic import BaseModel
+from quivr_core.config import BrainConfig
 from sqlalchemy.dialects.postgresql import ENUM as PGEnum
 from sqlalchemy.ext.asyncio import AsyncAttrs
 from sqlmodel import TIMESTAMP, Column, Field, Relationship, SQLModel, text
@@ -58,42 +59,38 @@ class Brain(AsyncAttrs, SQLModel, table=True):
             default=BrainType.integration,
         ),
     )
-    brain_chat_history: List["ChatHistory"] = Relationship(  # noqa: F821
+    brain_chat_history: List["ChatHistory"] = Relationship(  # type: ignore # noqa: F821
         back_populates="brain", sa_relationship_kwargs={"lazy": "select"}
     )
     prompt_id: UUID | None = Field(default=None, foreign_key="prompts.id")
-    prompt: Prompt | None = Relationship(  # noqa: f821
+    prompt: Prompt | None = Relationship(  # noqa: F821
         back_populates="brain", sa_relationship_kwargs={"lazy": "joined"}
     )
     knowledges: List[KnowledgeDB] = Relationship(
         back_populates="brains", link_model=KnowledgeBrain
     )
 
-
     # TODO : add
     # "meaning" "public"."vector",
     # "tags" "public"."tags"[]
 
 
-class BrainEntity(BaseModel):
-    brain_id: UUID
-    name: str
+class BrainEntity(BrainConfig):
+    last_update: datetime | None = None
+    brain_type: BrainType | None = None
     description: Optional[str] = None
     temperature: Optional[float] = None
+    meaning: Optional[str] = None
+    openai_api_key: Optional[str] = None
+    tags: Optional[List[str]] = None
     model: Optional[str] = None
     max_tokens: Optional[int] = None
     status: Optional[str] = None
     prompt_id: Optional[UUID] = None
-    last_update: datetime
-    brain_type: BrainType
     integration: Optional[IntegrationEntity] = None
     integration_description: Optional[IntegrationDescriptionEntity] = None
     snippet_emoji: Optional[str] = None
     snippet_color: Optional[str] = None
-
-    @property
-    def id(self) -> UUID:
-        return self.brain_id
 
     def dict(self, **kwargs):
         data = super().dict(

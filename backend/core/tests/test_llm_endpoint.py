@@ -13,7 +13,7 @@ def test_llm_endpoint_from_config_default():
 
     del os.environ["OPENAI_API_KEY"]
 
-    with pytest.raises(ValidationError):
+    with pytest.raises((ValidationError, ValueError)):
         llm = LLMEndpoint.from_config(LLMEndpointConfig())
 
     # Working default

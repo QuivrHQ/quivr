@@ -12,7 +12,7 @@ from quivr_core.models import (
     RAGResponseMetadata,
     RawRAGResponse,
 )
-from quivr_core.prompts import DEFAULT_DOCUMENT_PROMPT
+from quivr_core.prompts import custom_prompts
 
 # TODO(@aminediro): define a types packages where we clearly define IO types
 # This should be used for serialization/deseriallization later
@@ -56,10 +56,10 @@ def cited_answer_filter(tool):
 
 
 def get_chunk_metadata(
-    msg: AIMessageChunk, sources: list[Any] = []
+    msg: AIMessageChunk, sources: list[Any] | None = None
 ) -> RAGResponseMetadata:
     # Initiate the source
-    metadata = {"sources": sources}
+    metadata = {"sources": sources} if sources else {"sources": []}
     if msg.tool_calls:
         cited_answer = next(x for x in msg.tool_calls if cited_answer_filter(x))
 
@@ -73,7 +73,7 @@ def get_chunk_metadata(
                 followup_questions = gathered_args["followup_questions"]
                 metadata["followup_questions"] = followup_questions
 
-    return RAGResponseMetadata(**metadata)
+    return RAGResponseMetadata(**metadata, metadata_model=None)
 
 
 def get_prev_message_str(msg: AIMessageChunk) -> str:
@@ -101,36 +101,32 @@ def parse_chunk_response(
         answer = raw_chunk
 
     rolling_msg += answer
-    if supports_func_calling:
-        if rolling_msg.tool_calls:
-            cited_answer = next(
-                x for x in rolling_msg.tool_calls if cited_answer_filter(x)
-            )
-            if "args" in cited_answer:
-                gathered_args = cited_answer["args"]
-                if "answer" in gathered_args:
-                    # Only send the difference between answer and response_tokens which was the previous answer
-                    answer_str = gathered_args["answer"]
-        return rolling_msg, answer_str
-    else:
-        return rolling_msg, answer.content
+    if supports_func_calling and rolling_msg.tool_calls:
+        cited_answer = next(x for x in rolling_msg.tool_calls if cited_answer_filter(x))
+        if "args" in cited_answer and "answer" in cited_answer["args"]:
+            gathered_args = cited_answer["args"]
+            # Only send the difference between answer and response_tokens which was the previous answer
+            answer_str = gathered_args["answer"]
+            return rolling_msg, answer_str
+
+    return rolling_msg, answer.content
 
 
 @no_type_check
 def parse_response(raw_response: RawRAGResponse, model_name: str) -> ParsedRAGResponse:
     answer = ""
-    sources = raw_response["docs"] or []
+    sources = raw_response["docs"] if "docs" in raw_response else []
 
     metadata = RAGResponseMetadata(
         sources=sources, metadata_model=ChatLLMMetadata(name=model_name)
     )
 
-    if model_supports_function_calling(model_name):
-        if (
-            "tool_calls" in raw_response["answer"]
-            and raw_response["answer"].tool_calls
-            and "citations" in raw_response["answer"].tool_calls[-1]["args"]
-        ):
+    if (
+        model_supports_function_calling(model_name)
+        and "tool_calls" in raw_response["answer"]
+        and raw_response["answer"].tool_calls
+    ):
+        if "citations" in raw_response["answer"].tool_calls[-1]["args"]:
             citations = raw_response["answer"].tool_calls[-1]["args"]["citations"]
             metadata.citations = citations
             followup_questions = raw_response["answer"].tool_calls[-1]["args"][
@@ -149,7 +145,9 @@ def parse_response(raw_response: RawRAGResponse, model_name: str) -> ParsedRAGRe
 
 
 def combine_documents(
-    docs, document_prompt=DEFAULT_DOCUMENT_PROMPT, document_separator="\n\n"
+    docs,
+    document_prompt=custom_prompts.DEFAULT_DOCUMENT_PROMPT,
+    document_separator="\n\n",
 ):
     # for each docs, add an index in the metadata to be able to cite the sources
     for doc, index in zip(docs, range(len(docs)), strict=False):

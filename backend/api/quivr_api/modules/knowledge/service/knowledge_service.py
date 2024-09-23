@@ -50,9 +50,9 @@ class KnowledgeService(BaseService[KnowledgeRepository]):
         self.storage = storage
 
     async def get_knowledge_sync(self, sync_id: int) -> Knowledge:
-        km = await self.repository.get_knowledge_by_sync_id(sync_id)
-        assert km.id, "Knowledge ID not generated"
-        km = await km.to_dto()
+        km_db = await self.repository.get_knowledge_by_sync_id(sync_id)
+        assert km_db.id, "Knowledge ID not generated"
+        km = await km_db.to_dto()
         return km
 
     # TODO: this is temporary fix for getting knowledge path.
