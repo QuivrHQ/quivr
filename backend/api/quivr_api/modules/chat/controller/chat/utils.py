@@ -13,17 +13,24 @@ from quivr_core.config import RetrievalConfig
 logger = get_logger(__name__)
 
 
-class RetrievalConfigPathEnv(str, Enum):
-    CHAT_WITH_LLM = "CHAT_LLM_CONFIG_PATH"
-    RAG = "BRAIN_CONFIG_PATH"
+class RetrievalConfigPathEnv(Enum):
+    CHAT_WITH_LLM = ("CHAT_LLM_CONFIG_PATH", "chat_llm_config.yaml")
+    RAG = ("BRAIN_CONFIG_PATH", "config/retrieval_config_workflow.yaml")
+
+    @property
+    def env_var(self) -> str:
+        return self.value[0]
+
+    @property
+    def default_path(self) -> str:
+        return self.value[1]
 
 
 def get_config_file_path(
     config_path_env: RetrievalConfigPathEnv, current_path: str | None = None
 ) -> str:
-    _path = os.getenv(config_path_env.value)
-    if not _path:
-        raise ValueError(f"{config_path_env.value} is not set.")
+    # Get the environment variable or fallback to the default path
+    _path = os.getenv(config_path_env.env_var, config_path_env.default_path)
 
     if not current_path:
         return _path
