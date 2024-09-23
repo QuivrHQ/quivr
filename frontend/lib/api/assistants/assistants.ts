@@ -22,6 +22,9 @@ export const processTask = async (
   processAssistantInput: ProcessAssistantInput
 ): Promise<string> => {
   return (
-    await axiosInstance.post<string>(`/assistants/task`, processAssistantInput)
+    await axiosInstance.post<string>(`/assistants/task`, {
+      files: processAssistantInput.files,
+      input: processAssistantInput.input,
+    })
   ).data;
 };

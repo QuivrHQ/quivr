@@ -33,7 +33,7 @@ const AssistantTab = (): JSX.Element => {
   const [fileStates, setFileStates] = useState<{ [key: string]: File }>({});
   const [isFormValid, setIsFormValid] = useState<boolean>(false);
 
-  const { getAssistants } = useAssistants();
+  const { getAssistants, processTask } = useAssistants();
 
   const handleFileChange = (key: string, file: File) => {
     setFileStates((prevState) => ({
@@ -122,7 +122,7 @@ const AssistantTab = (): JSX.Element => {
     }
   }, [assistantChoosed]);
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (assistantChoosed) {
       const processAssistantData: ProcessAssistantData = {
         id: assistantChoosed.id,
@@ -148,7 +148,10 @@ const AssistantTab = (): JSX.Element => {
         files: Object.values(fileStates),
       };
 
-      console.log(processAssistantInput);
+      console.info(processAssistantInput);
+
+      const res = await processTask(processAssistantInput);
+      console.info(res);
     }
   };
 
