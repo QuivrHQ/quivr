@@ -70,6 +70,7 @@ async def create_task(
     assistant = next(
         (assistant for assistant in assistants if assistant.id == input.id), None
     )
+
     if assistant is None:
         raise HTTPException(status_code=404, detail="Assistant not found")
 
