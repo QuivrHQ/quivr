@@ -1,6 +1,7 @@
+import { ProcessAssistantInput } from "@/app/quality-assistant/types/assistant";
 import { useAxios } from "@/lib/hooks";
 
-import { getAssistants, getTasks } from "./assistants";
+import { getAssistants, getTasks, processTask } from "./assistants";
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export const useAssistants = () => {
@@ -9,5 +10,7 @@ export const useAssistants = () => {
   return {
     getAssistants: async () => getAssistants(axiosInstance),
     getTasks: async () => getTasks(axiosInstance),
+    processTask: async (processAssistantInput: ProcessAssistantInput) =>
+      processTask(axiosInstance, processAssistantInput),
   };
 };

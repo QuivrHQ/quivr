@@ -12,7 +12,6 @@ import { SingleSelector } from "@/lib/components/ui/SingleSelector/SingleSelecto
 import AssistantCard from "./AssistantCard/AssistantCard";
 import styles from "./AssistantTab.module.scss";
 
-
 import { Assistant } from "../types/assistant";
 
 const AssistantTab = (): JSX.Element => {
@@ -45,14 +44,14 @@ const AssistantTab = (): JSX.Element => {
   }, [assistantChoosed]);
 
   useEffect(() => {
-    if (assistantChoosed && assistantChoosed.inputs.booleans) {
+    if (assistantChoosed?.inputs.booleans) {
       const initialBooleanStates = assistantChoosed.inputs.booleans.reduce(
         (acc, input) => ({ ...acc, [input.key]: false }),
         {}
       );
       setBooleanStates(initialBooleanStates);
     }
-    if (assistantChoosed && assistantChoosed.inputs.select_texts) {
+    if (assistantChoosed?.inputs.select_texts) {
       const initialSelectTextStates =
         assistantChoosed.inputs.select_texts.reduce(
           (acc, input) => ({ ...acc, [input.key]: input.default }),
@@ -96,46 +95,43 @@ const AssistantTab = (): JSX.Element => {
               </div>
             ))}
           </div>
-          {assistantChoosed.inputs.select_texts && (
-            <div className={styles.select_texts_wrapper}>
-              {assistantChoosed.inputs.select_texts.map((input, index) => (
-                <div key={index} className={styles.select_text}>
-                  <SingleSelector
-                    iconName="brain"
-                    placeholder={input.key}
-                    options={input.options.map((option) => {
-                      return { label: option, value: option };
-                    })}
-                    onChange={(value) =>
-                      setSelectTextStates((prevState) => ({
-                        ...prevState,
-                        [input.key]: value,
-                      }))
-                    }
-                    selectedOption={{
-                      label: input.options[0],
-                      value: input.options[0],
-                    }}
-                  />
-                </div>
-              ))}
-            </div>
-          )}
-          {assistantChoosed.inputs.booleans && (
-            <div className={styles.boolean_inputs_wrapper}>
-              {assistantChoosed.inputs.booleans.map((input, index) => (
-                <div key={index} className={styles.boolean_input}>
-                  <Checkbox
-                    label={input.key}
-                    checked={booleanStates[input.key]}
-                    setChecked={(checked) =>
-                      handleCheckboxChange(input.key, checked)
-                    }
-                  />
-                </div>
-              ))}
-            </div>
-          )}
+          <div className={styles.select_texts_wrapper}>
+            {assistantChoosed.inputs.select_texts?.map((input, index) => (
+              <div key={index} className={styles.select_text}>
+                <SingleSelector
+                  iconName="brain"
+                  placeholder={input.key}
+                  options={input.options.map((option) => {
+                    return { label: option, value: option };
+                  })}
+                  onChange={(value) =>
+                    setSelectTextStates((prevState) => ({
+                      ...prevState,
+                      [input.key]: value,
+                    }))
+                  }
+                  selectedOption={{
+                    label: selectTextStates[input.key] ?? input.options[0],
+                    value: selectTextStates[input.key] ?? input.options[0],
+                  }}
+                />
+              </div>
+            ))}
+          </div>
+
+          <div className={styles.boolean_inputs_wrapper}>
+            {assistantChoosed.inputs.booleans?.map((input, index) => (
+              <div key={index} className={styles.boolean_input}>
+                <Checkbox
+                  label={input.key}
+                  checked={booleanStates[input.key]}
+                  setChecked={(checked) =>
+                    handleCheckboxChange(input.key, checked)
+                  }
+                />
+              </div>
+            ))}
+          </div>
         </div>
       )}
       {assistantChoosed && (

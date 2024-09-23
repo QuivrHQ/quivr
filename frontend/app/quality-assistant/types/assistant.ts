@@ -65,9 +65,9 @@ interface Inputs {
   files: InputFile[];
   urls: InputUrl[];
   texts: InputText[];
-  booleans: InputBoolean[];
+  booleans?: InputBoolean[];
   numbers: InputNumber[];
-  select_texts: SelectText[];
+  select_texts?: SelectText[];
   select_numbers: SelectNumber[];
   brain: Brain;
 }
@@ -82,4 +82,25 @@ export interface Assistant {
   output_description: string;
   inputs: Inputs;
   icon_url: string;
+}
+
+interface ProcessAssistantInputFile {
+  key: string;
+  value: string;
+}
+
+export interface ProcessAssistantInput {
+  id: number;
+  name: string;
+  inputs: {
+    files: ProcessAssistantInputFile[];
+    urls: { key: string; value: string }[];
+    texts: { key: string; value: string }[];
+    booleans: { key: string; value: boolean }[];
+    numbers: { key: string; value: number }[];
+    select_texts: { key: string; value: string }[];
+    select_numbers: { key: string; value: number }[];
+    brain: { value: string };
+  };
+  additional_files: File[];
 }
