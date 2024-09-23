@@ -115,7 +115,9 @@ class KnowledgeDB(AsyncAttrs, SQLModel, table=True):
     )
 
     # TODO: nested folder search
-    async def to_dto(self, get_children: bool = True) -> Knowledge:
+    async def to_dto(
+        self, get_children: bool = True, get_parent: bool = True
+    ) -> Knowledge:
         assert (
             self.updated_at
         ), "knowledge should be inserted before transforming to dto"
@@ -126,7 +128,7 @@ class KnowledgeDB(AsyncAttrs, SQLModel, table=True):
         children: list[KnowledgeDB] = (
             await self.awaitable_attrs.children if get_children else []
         )
-        parent = await self.awaitable_attrs.parent
+        parent = await self.awaitable_attrs.parent if get_parent else None
         parent = await parent.to_dto(get_children=False) if parent else None
 
         return Knowledge(

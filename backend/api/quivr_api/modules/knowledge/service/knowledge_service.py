@@ -208,10 +208,12 @@ class KnowledgeService(BaseService[KnowledgeRepository]):
         return inserted_knowledge
 
     async def get_all_knowledge_in_brain(self, brain_id: UUID) -> List[Knowledge]:
-        brain = await self.repository.get_brain_by_id(brain_id)
-
-        all_knowledges = await brain.awaitable_attrs.knowledges
-        knowledges = [await knowledge.to_dto() for knowledge in all_knowledges]
+        brain = await self.repository.get_brain_by_id(brain_id, get_knowledge=True)
+        all_knowledges: List[KnowledgeDB] = await brain.awaitable_attrs.knowledges
+        knowledges = [
+            await knowledge.to_dto(get_children=False, get_parent=False)
+            for knowledge in all_knowledges
+        ]
 
         return knowledges
 
