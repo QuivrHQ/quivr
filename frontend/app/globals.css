@@ -3,9 +3,7 @@
 @import "tailwindcss/utilities";
 @import './colors.css';
 
-* {
-  @apply scrollbar;
-}
+
 
 main {
   @apply max-w-screen-xl mx-auto flex flex-col;

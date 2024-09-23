@@ -1,7 +1,7 @@
 export interface Process {
-  result: string;
+  answer: string;
   id: number;
   name: string;
-  datetime: string;
+  creation_time: string;
   status: "pending" | "processing" | "completed" | "error";
 }

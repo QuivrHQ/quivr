@@ -15,31 +15,8 @@ import styles from "./ProcessTab.module.scss";
 
 import { Process } from "../types/process";
 
-const mockProcesses: Process[] = [
-  {
-    id: 1,
-    name: "Consistency Check - Etiquette VS Fiche Dev",
-    datetime: new Date().toISOString(),
-    status: "pending",
-    result: "",
-  },
-  {
-    id: 2,
-    name: "Difference Detection - Cahier des charges 1 VS Cahier des charges 2",
-    datetime: new Date(Date.now() - 100000 * 1).toISOString(),
-    status: "processing",
-    result: "",
-  },
-  {
-    id: 3,
-    name: "Difference Detection - Etiquette 1 VS Etiquette 2",
-    datetime: new Date(Date.now() - 80430000 * 2).toISOString(),
-    status: "completed",
-    result: "",
-  },
-];
-
 const ProcessTab = (): JSX.Element => {
+  const [processes, setProcesses] = useState<Process[]>([]);
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [selectedProcess, setSelectedProcess] = useState<Process[]>([]);
   const [allChecked, setAllChecked] = useState<boolean>(false);
@@ -47,8 +24,7 @@ const ProcessTab = (): JSX.Element => {
     key: keyof Process;
     direction: "ascending" | "descending";
   }>({ key: "name", direction: "ascending" });
-  const [filteredProcess, setFilteredProcess] =
-    useState<Process[]>(mockProcesses);
+  const [filteredProcess, setFilteredProcess] = useState<Process[]>([]);
   const [lastSelectedIndex, setLastSelectedIndex] = useState<number | null>(
     null
   );
@@ -62,6 +38,8 @@ const ProcessTab = (): JSX.Element => {
       try {
         const res = await getTasks();
         console.info(res);
+        setProcesses(res);
+        setFilteredProcess(res);
       } catch (error) {
         console.error(error);
       }
@@ -71,7 +49,7 @@ const ProcessTab = (): JSX.Element => {
   useEffect(() => {
     setFilteredProcess(
       filterAndSort(
-        mockProcesses,
+        processes,
         searchQuery,
         sortConfig,
         (process) => process[sortConfig.key]
@@ -157,7 +135,7 @@ const ProcessTab = (): JSX.Element => {
               <>
                 <div
                   className={styles.date}
-                  onClick={() => handleSort("datetime")}
+                  onClick={() => handleSort("creation_time")}
                 >
                   Date
                   <div className={styles.icon}>

@@ -33,7 +33,7 @@ const ProcessLine = ({
   const [showResult, setShowResult] = useState(false);
   const { isMobile } = useDevice();
 
-  console.info(process.result);
+  console.info(process.answer);
 
   return (
     <>
@@ -58,9 +58,13 @@ const ProcessLine = ({
           {!isMobile && (
             <>
               <span className={styles.date}>
-                {format(new Date(process.datetime), " d MMMM yyyy '-' HH:mm", {
-                  locale: fr,
-                })}
+                {format(
+                  new Date(process.creation_time),
+                  " d MMMM yyyy '-' HH:mm",
+                  {
+                    locale: fr,
+                  }
+                )}
               </span>
               <div className={styles.status}>
                 <Tag
@@ -101,7 +105,7 @@ const ProcessLine = ({
       >
         <div className={styles.markdown}>
           <ReactMarkdown remarkPlugins={[gfm]}>
-            {process.result.replace(/\n/g, "\n")}
+            {process.answer.replace(/\n/g, "\n")}
           </ReactMarkdown>
         </div>
       </Modal>

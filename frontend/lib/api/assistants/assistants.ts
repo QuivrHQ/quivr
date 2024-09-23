@@ -4,6 +4,7 @@ import {
   Assistant,
   ProcessAssistantInput,
 } from "@/app/quality-assistant/types/assistant";
+import { Process } from "@/app/quality-assistant/types/process";
 
 export const getAssistants = async (
   axiosInstance: AxiosInstance
@@ -13,8 +14,8 @@ export const getAssistants = async (
 
 export const getTasks = async (
   axiosInstance: AxiosInstance
-): Promise<string> => {
-  return (await axiosInstance.get<string>(`/assistants/tasks`)).data;
+): Promise<Process[]> => {
+  return (await axiosInstance.get<Process[]>(`/assistants/tasks`)).data;
 };
 
 export const processTask = async (
