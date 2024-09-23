@@ -172,6 +172,12 @@ class LLMEndpointConfig(QuivrBaseConfig):
     streaming: bool = True
     prompt: CustomPromptsModel | None = None
 
+    _FALLBACK_TOKENIZER = "cl100k_base"
+
+    @property
+    def fallback_tokenizer(self) -> str:
+        return self._FALLBACK_TOKENIZER
+
     def __init__(self, **data):
         super().__init__(**data)
         self.set_llm_model_config()

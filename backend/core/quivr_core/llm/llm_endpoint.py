@@ -8,7 +8,6 @@ from langchain_anthropic import ChatAnthropic
 from langchain_core.language_models.chat_models import BaseChatModel
 from langchain_openai import AzureChatOpenAI, ChatOpenAI
 from pydantic.v1 import SecretStr
-from transformers import AutoTokenizer
 
 from quivr_core.brain.info import LLMInfo
 from quivr_core.config import DefaultModelSuppliers, LLMEndpointConfig
@@ -33,9 +32,17 @@ class LLMEndpoint:
                 if not os.environ.get("TOKENIZERS_PARALLELISM")
                 else os.environ["TOKENIZERS_PARALLELISM"]
             )
-            self.tokenizer = AutoTokenizer.from_pretrained(llm_config.tokenizer_hub)
+            try:
+                from transformers import AutoTokenizer
+
+                self.tokenizer = AutoTokenizer.from_pretrained(llm_config.tokenizer_hub)
+            except OSError:  # if we don't manage to connect to huggingface and/or no cached models are present
+                logger.warning(
+                    f"Cannot acces the configured tokenizer from {llm_config.tokenizer_hub}, using the default tokenizer {llm_config.fallback_tokenizer}"
+                )
+                self.tokenizer = tiktoken.get_encoding(llm_config.fallback_tokenizer)
         else:
-            self.tokenizer = tiktoken.get_encoding("cl100k_base")
+            self.tokenizer = tiktoken.get_encoding(llm_config.fallback_tokenizer)
 
     def count_tokens(self, text: str) -> int:
         # Tokenize the input text and return the token count
