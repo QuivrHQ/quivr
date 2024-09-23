@@ -23,23 +23,25 @@ export const processTask = async (
 ): Promise<string> => {
   const formData = new FormData();
 
-  // Créer un tableau pour stocker les fichiers (conserver leurs types natifs File/Blob)
-  const filesArray: File[] = [];
-  processAssistantInput.files.forEach((file) => {
-    filesArray.push(file);
-  });
-
-  // Ajout du tableau de fichiers sous une seule clé `files[]`
-  formData.append("files[]", JSON.stringify(filesArray));
-
-  // Ajouter les autres données
   formData.append("input", JSON.stringify(processAssistantInput.input));
 
-  return (
-    await axiosInstance.post<string>(`/assistants/task`, formData, {
+  processAssistantInput.files.forEach((file) => {
+    if (file instanceof File) {
+      formData.append("files", file);
+    } else {
+      console.error("L'élément n'est pas un fichier valide", file);
+    }
+  });
+
+  const response = await axiosInstance.post<string>(
+    `/assistants/task`,
+    formData,
+    {
       headers: {
         "Content-Type": "multipart/form-data",
       },
-    })
-  ).data;
+    }
+  );
+
+  return response.data;
 };

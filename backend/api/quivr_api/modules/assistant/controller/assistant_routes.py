@@ -2,7 +2,7 @@ import io
 from typing import Annotated, List
 from uuid import uuid4
 
-from fastapi import APIRouter, Depends, HTTPException, Request, UploadFile
+from fastapi import APIRouter, Depends, File, HTTPException, Request, UploadFile
 
 from quivr_api.celery_config import celery
 from quivr_api.logger import get_logger
@@ -64,9 +64,11 @@ async def create_task(
     current_user: UserIdentityDep,
     tasks_service: TasksServiceDep,
     request: Request,
-    input: InputAssistant,
+    input: str = File(...),
     files: List[UploadFile] = None,
 ):
+    input = InputAssistant.model_validate_json(input)
+
     assistant = next(
         (assistant for assistant in assistants if assistant.id == input.id), None
     )
