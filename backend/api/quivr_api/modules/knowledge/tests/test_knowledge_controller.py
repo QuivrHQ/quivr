@@ -270,11 +270,10 @@ async def test_link_knowledge_folder(
         content=json_data,
         headers={"Content-Type": "application/json"},
     )
-
     assert response.status_code == 201
-
     updated_kms = [KnowledgeDTO.model_validate(d) for d in response.json()]
 
+    # 3. Validate that created knowledges are correct
     assert len(updated_kms) == 2
     assert next(
         filter(lambda k: k.id == folder_km.id, updated_kms)
@@ -285,5 +284,5 @@ async def test_link_knowledge_folder(
     for km in updated_kms:
         assert len(km.brains) == 1
 
-    # Assert both files are being processed
+    # 4. Assert both files are being scheduled for processing
     assert len(tasks) == 2

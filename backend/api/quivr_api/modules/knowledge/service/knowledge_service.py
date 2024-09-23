@@ -7,6 +7,7 @@ from fastapi import UploadFile
 from quivr_core.models import KnowledgeStatus
 from sqlalchemy.exc import NoResultFound
 
+from quivr_api.celery_config import celery
 from quivr_api.logger import get_logger
 from quivr_api.modules.dependencies import BaseService
 from quivr_api.modules.knowledge.dto.inputs import (
@@ -107,55 +108,16 @@ class KnowledgeService(BaseService[KnowledgeRepository]):
     ):
         return await self.repository.update_knowledge(knowledge, payload)
 
-    # TODO: Remove all of this
-    # TODO (@aminediro): Replace with ON CONFLICT smarter query...
-    # there is a chance of race condition but for now we let it crash in worker
-    # the tasks will be dealt with on retry
-    async def update_sha1_conflict(
-        self, knowledge: KnowledgeDB, brain_id: UUID, file_sha1: str
-    ) -> bool:
-        assert knowledge.id
-        knowledge.file_sha1 = file_sha1
-
-        try:
-            existing_knowledge = await self.repository.get_knowledge_by_sha1(
-                knowledge.file_sha1
-            )
-            logger.debug("The content of the knowledge already exists in the brain. ")
-            # Get existing knowledge sha1 and brains
-            if (
-                existing_knowledge.status == KnowledgeStatus.UPLOADED
-                or existing_knowledge.status == KnowledgeStatus.PROCESSING
-            ):
-                existing_brains = await existing_knowledge.awaitable_attrs.brains
-                if brain_id in [b.brain_id for b in existing_brains]:
-                    logger.debug("Added file to brain that already has the knowledge")
-                    raise FileExistsError(
-                        f"Existing file in brain {brain_id} with name {existing_knowledge.file_name}"
-                    )
-                else:
-                    await self.repository.link_to_brain(existing_knowledge, brain_id)
-                    await self.remove_knowledge_brain(brain_id, knowledge.id)
-                    return False
-            else:
-                logger.debug(f"Removing previous errored file {existing_knowledge.id}")
-                assert existing_knowledge.id
-                await self.remove_knowledge_brain(brain_id, existing_knowledge.id)
-                await self.update_file_sha1_knowledge(knowledge.id, knowledge.file_sha1)
-                return True
-        except NoResultFound:
-            logger.debug(
-                f"First knowledge with sha1. Updating file_sha1 of  {knowledge.id}"
-            )
-            await self.update_file_sha1_knowledge(knowledge.id, knowledge.file_sha1)
-            return True
-
     async def create_knowledge(
         self,
         user_id: UUID,
         knowledge_to_add: AddKnowledge,
         upload_file: UploadFile | None = None,
     ) -> KnowledgeDB:
+        brains = []
+        if knowledge_to_add.parent_id:
+            parent_knowledge = await self.get_knowledge(knowledge_to_add.parent_id)
+            brains = await parent_knowledge.awaitable_attrs.brains
         knowledgedb = KnowledgeDB(
             user_id=user_id,
             file_name=knowledge_to_add.file_name,
@@ -170,6 +132,7 @@ class KnowledgeService(BaseService[KnowledgeRepository]):
             parent_id=knowledge_to_add.parent_id,
             sync_id=knowledge_to_add.sync_id,
             sync_file_id=knowledge_to_add.sync_file_id,
+            brains=brains,
         )
 
         knowledge_db = await self.repository.create_knowledge(knowledgedb)
@@ -184,8 +147,26 @@ class KnowledgeService(BaseService[KnowledgeRepository]):
                 knowledgedb.source_link = storage_path
                 knowledge_db = await self.repository.update_knowledge(
                     knowledge_db,
-                    KnowledgeUpdate(status=KnowledgeStatus.UPLOADED),  # type: ignore
+                    KnowledgeUpdate(status=KnowledgeStatus.UPLOADED),
                 )
+            if knowledge_db.brains and len(knowledge_db.brains) > 0:
+                # Schedule this new knowledge to be processed
+                knowledge_db = await self.repository.update_knowledge(
+                    knowledge_db,
+                    KnowledgeUpdate(status=KnowledgeStatus.PROCESSING),
+                )
+                celery.send_task(
+                    "process_file_task",
+                    kwargs={
+                        "knowledge_id": knowledge_db.id,
+                        "file_name": knowledge_db.file_name,
+                        "source": knowledge_db.source,
+                        "source_link": knowledge_db.source_link,
+                        # TODO: Notification on notification
+                        # "notification_id": upload_notification.id,
+                    },
+                )
+
             return knowledge_db
         except Exception as e:
             logger.exception(
