@@ -163,7 +163,7 @@ class RAGService:
         #  Format the history, sanitize the input
         chat_history = self._build_chat_history(history)
 
-        parsed_response = rag_pipeline.answer(question, chat_history, list_files)
+        parsed_response = rag_pipeline.answer(question, chat_history, list_files, str(self.brain.brain_id))
 
         # Save the answer to db
         new_chat_entry = self.save_answer(question, parsed_response)
@@ -212,7 +212,7 @@ class RAGService:
         )
         # Initialize the rag pipline
         rag_pipeline = QuivrQARAGLangGraph(
-            rag_config=rag_config, llm=llm, vector_store=vector_store
+            rag_config=rag_config, llm=llm, vector_store=vector_store, memory_id=str(self.brain.brain_id)
         )
 
         full_answer = ""

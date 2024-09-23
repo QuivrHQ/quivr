@@ -45,6 +45,7 @@ You have access to the files to answer the user question (limited to first 20 fi
 
 If not None, User instruction to follow to answer: {custom_instructions}
 Don't cite the source id in the answer objects, but you can use the source to answer the question.
+{memories}
 """
 
 

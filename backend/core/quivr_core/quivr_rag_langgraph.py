@@ -1,5 +1,9 @@
 import logging
 from typing import Annotated, AsyncGenerator, Optional, Sequence, TypedDict
+import os
+from urllib.parse import urlparse
+from mem0 import Memory
+
 
 # TODO(@aminediro): this is the only dependency to langchain package, we should remove it
 from langchain.retrievers import ContextualCompressionRetriever
@@ -23,7 +27,6 @@ from quivr_core.models import (
 )
 from quivr_core.prompts import ANSWER_PROMPT, CONDENSE_QUESTION_PROMPT
 from quivr_core.utils import (
-    combine_documents,
     format_file_list,
     get_chunk_metadata,
     parse_chunk_response,
@@ -31,6 +34,26 @@ from quivr_core.utils import (
 )
 
 logger = logging.getLogger("quivr_core")
+
+# Read the database URL from the environment
+database_url = os.getenv("PG_DATABASE_ASYNC_URL")
+parsed_url = urlparse(database_url)
+
+config = {
+    "vector_store": {
+        "provider": "pgvector",
+        "config": {
+            "user": parsed_url.username,
+            "password": parsed_url.password,
+            "host": parsed_url.hostname,
+            "port": parsed_url.port,
+            "dbname": parsed_url.path[1:],  # Remove leading '/'
+        }
+    }
+}
+
+m = Memory.from_config(config)
+
 
 
 class AgentState(TypedDict):
@@ -43,6 +66,7 @@ class AgentState(TypedDict):
     transformed_question: BaseMessage
     files: str
     final_response: dict
+    mem0_user_id: str
 
 
 class IdempotentCompressor(BaseDocumentCompressor):
@@ -69,6 +93,7 @@ class QuivrQARAGLangGraph:
         llm: LLMEndpoint,
         vector_store: VectorStore,
         reranker: BaseDocumentCompressor | None = None,
+        memory_id: str | None = None,
     ):
         """
         Construct a QuivrQARAGLangGraph object.
@@ -87,6 +112,8 @@ class QuivrQARAGLangGraph:
         self.compression_retriever = ContextualCompressionRetriever(
             base_compressor=self.reranker, base_retriever=self.retriever
         )
+        self.memory = Memory.from_config(config)
+        self.memory_id = memory_id
 
     @property
     def retriever(self):
@@ -181,15 +208,26 @@ class QuivrQARAGLangGraph:
         files = state["files"]
 
         docs = state["docs"]
+        
+        memories = self.memory.search(question, user_id=self.memory_id)
+        print(memories)
+        
+        context = "Memory and relevant information from previous conversations:\n"
+        for memory in memories:
+            context += f"- {memory['memory']}\n"
+        context += "End of memory"
+
+        print(context)
 
         # Prompt
         prompt = self.rag_config.prompt
 
         final_inputs = {
-            "context": combine_documents(docs),
+            "context": context,
             "question": question,
             "custom_instructions": prompt,
             "files": files,
+            "memories": context,
         }
 
         # LLM
@@ -209,6 +247,11 @@ class QuivrQARAGLangGraph:
             "answer": response,  # Assuming the last message contains the final answer
             "docs": docs,
         }
+        
+        print("Adding to memory")
+        result = self.memory.add(f"User: {question}\nAssistant: {response}", user_id=self.memory_id)
+        print("Added to memory")
+        print(result)
         return {"messages": [response], "final_response": formatted_response}
 
     def build_langgraph_chain(self):
@@ -266,6 +309,7 @@ class QuivrQARAGLangGraph:
         question: str,
         history: ChatHistory,
         list_files: list[QuivrKnowledge],
+        mem0_user_id: str | None = None,
         metadata: dict[str, str] = {},
     ) -> ParsedRAGResponse:
         """
@@ -288,6 +332,7 @@ class QuivrQARAGLangGraph:
             ],
             "chat_history": history,
             "files": concat_list_files,
+            "mem0_user_id": mem0_user_id,
         }
         raw_llm_response = conversational_qa_chain.invoke(
             inputs,
@@ -303,6 +348,7 @@ class QuivrQARAGLangGraph:
         question: str,
         history: ChatHistory,
         list_files: list[QuivrKnowledge],
+        mem0_user_id: str | None = None,
         metadata: dict[str, str] = {},
     ) -> AsyncGenerator[ParsedRAGChunkResponse, ParsedRAGChunkResponse]:
         """
@@ -324,6 +370,7 @@ class QuivrQARAGLangGraph:
         sources = []
         prev_answer = ""
         chunk_id = 0
+        
 
         async for event in conversational_qa_chain.astream_events(
             {
@@ -332,6 +379,7 @@ class QuivrQARAGLangGraph:
                 ],
                 "chat_history": history,
                 "files": concat_list_files,
+                "mem0_user_id": mem0_user_id,
             },
             version="v1",
             config={"metadata": metadata},
