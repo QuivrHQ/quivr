@@ -28,21 +28,24 @@ const ProcessTab = (): JSX.Element => {
   const [lastSelectedIndex, setLastSelectedIndex] = useState<number | null>(
     null
   );
+  const [loading, setLoading] = useState<boolean>(false);
 
-  const { getTasks } = useAssistants();
+  const { getTasks, deleteTask } = useAssistants();
 
   const { isMobile } = useDevice();
 
+  const loadTasks = async () => {
+    try {
+      const res = await getTasks();
+      setProcesses(res);
+      setFilteredProcess(res);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   useEffect(() => {
-    void (async () => {
-      try {
-        const res = await getTasks();
-        setProcesses(res);
-        setFilteredProcess(res);
-      } catch (error) {
-        console.error(error);
-      }
-    })();
+    void loadTasks();
   }, []);
 
   useEffect(() => {
@@ -54,10 +57,16 @@ const ProcessTab = (): JSX.Element => {
         (process) => process[sortConfig.key]
       )
     );
-  }, [searchQuery, sortConfig]);
+  }, [processes, searchQuery, sortConfig]);
 
-  const handleDelete = () => {
-    console.info("delete");
+  const handleDelete = async () => {
+    setLoading(true);
+    await Promise.all(
+      selectedProcess.map(async (process) => await deleteTask(process.id))
+    );
+    await loadTasks(); // Recharger les tâches après suppression
+    setSelectedProcess([]);
+    setLoading(false);
   };
 
   const handleSelect = (
@@ -110,6 +119,7 @@ const ProcessTab = (): JSX.Element => {
           color="dangerous"
           disabled={selectedProcess.length === 0}
           onClick={handleDelete}
+          isLoading={loading}
         />
       </div>
       <div>
