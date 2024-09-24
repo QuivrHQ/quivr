@@ -7,6 +7,7 @@ import { useState } from "react";
 import ReactMarkdown from "react-markdown";
 import gfm from "remark-gfm";
 
+import { useAssistants } from "@/lib/api/assistants/useAssistants";
 import { Checkbox } from "@/lib/components/ui/Checkbox/Checkbox";
 import { Icon } from "@/lib/components/ui/Icon/Icon";
 import { Modal } from "@/lib/components/ui/Modal/Modal";
@@ -32,6 +33,14 @@ const ProcessLine = ({
 }: ProcessLineProps): JSX.Element => {
   const [showResult, setShowResult] = useState(false);
   const { isMobile } = useDevice();
+  const { downloadTaskResult } = useAssistants();
+
+  const handleDownloadClick = async () => {
+    if (process.status === "completed") {
+      const res: string = await downloadTaskResult(process.id);
+      window.open(res, "_blank");
+    }
+  };
 
   return (
     <>
@@ -80,18 +89,25 @@ const ProcessLine = ({
               </div>
             </>
           )}
-          <Icon
-            name={
-              process.status === "completed"
-                ? "download"
-                : process.status === "error"
-                ? "warning"
-                : "waiting"
-            }
-            size="normal"
-            color="black"
-            handleHover={process.status === "completed"}
-          />
+          <div
+            onClick={(event: React.MouseEvent<HTMLDivElement>) => {
+              event.stopPropagation();
+              void handleDownloadClick();
+            }}
+          >
+            <Icon
+              name={
+                process.status === "completed"
+                  ? "download"
+                  : process.status === "error"
+                  ? "warning"
+                  : "waiting"
+              }
+              size="normal"
+              color="black"
+              handleHover={process.status === "completed"}
+            />
+          </div>
         </div>
       </div>
 

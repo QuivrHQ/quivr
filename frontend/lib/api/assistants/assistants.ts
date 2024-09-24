@@ -57,8 +57,7 @@ export const deleteTask = async (
 export const downloadTaskResult = async (
   axiosInstance: AxiosInstance,
   taskId: number
-): Promise<void> => {
-  await axiosInstance.get(`/assistants/task/${taskId}/download`, {
-    responseType: "blob",
-  });
+): Promise<string> => {
+  return (await axiosInstance<string>(`/assistants/task/${taskId}/download`))
+    .data;
 };
