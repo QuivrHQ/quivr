@@ -103,11 +103,13 @@ const ProcessLine = ({
         setOpen={setShowResult}
         CloseTrigger={<div />}
       >
-        <div className={styles.markdown}>
-          <ReactMarkdown remarkPlugins={[gfm]}>
-            {process.answer.replace(/\n/g, "\n")}
-          </ReactMarkdown>
-        </div>
+        {process.answer && (
+          <div className={styles.markdown}>
+            <ReactMarkdown remarkPlugins={[gfm]}>
+              {process.answer.replace(/\n/g, "\n")}
+            </ReactMarkdown>
+          </div>
+        )}
       </Modal>
     </>
   );

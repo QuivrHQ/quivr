@@ -37,7 +37,6 @@ const ProcessTab = (): JSX.Element => {
     void (async () => {
       try {
         const res = await getTasks();
-        console.info(res);
         setProcesses(res);
         setFilteredProcess(res);
       } catch (error) {

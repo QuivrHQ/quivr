@@ -35,7 +35,9 @@ const QualityAssistant = (): JSX.Element => {
       </div>
       <div className={styles.content_wrapper}>
         <Tabs tabList={qualityAssistantTab} />
-        {selectedTab === "Assistants" && <AssistantTab />}
+        {selectedTab === "Assistants" && (
+          <AssistantTab setSelectedTab={setSelectedTab} />
+        )}
         {selectedTab === "Process" && <ProcessTab />}
       </div>
     </div>
