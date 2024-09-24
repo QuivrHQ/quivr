@@ -263,6 +263,9 @@ class RAGService:
 
         llm = self.get_llm(retrieval_config)
 
+        if self.prompt:
+            retrieval_config.prompt = self.prompt.content
+
         # Get model metadata
         model_metadata = await self.model_service.get_model(self.brain.name)
 
