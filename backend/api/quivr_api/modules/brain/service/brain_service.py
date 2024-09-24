@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, Tuple, Dict
 from uuid import UUID
 
 from fastapi import HTTPException
@@ -54,7 +54,7 @@ class BrainService:
         chat_id: UUID,
         history,
         vector_store: CustomSupabaseVectorStore,
-    ) -> (Optional[BrainEntity], dict[str, str]):
+    ) -> Tuple[Optional[BrainEntity], Dict[str, str]]:
         """Find the brain to use for a question.
 
         Args:
@@ -106,12 +106,12 @@ class BrainService:
                 brain_id_to_use = list_brains[0]["id"]
                 brain_to_use = self.get_brain_by_id(brain_id_to_use)
 
-        return brain_to_use, metadata
+        return brain_to_use, metadata  # type: ignore
 
     def create_brain(
         self,
         user_id: UUID,
-        brain: Optional[CreateBrainProperties],
+        brain: CreateBrainProperties | None = None,
     ) -> BrainEntity:
         if brain is None:
             brain = CreateBrainProperties()
@@ -226,28 +226,3 @@ class BrainService:
                 )
 
         return brain
-
-    def get_connected_brains(self, brain_id: UUID) -> list[BrainEntity]:
-        return self.composite_brains_connections_repository.get_connected_brains(
-            brain_id
-        )
-
-    def update_secret_value(
-        self,
-        user_id: UUID,
-        brain_id: UUID,
-        secret_name: str,
-        secret_value: str,
-    ) -> None:
-        """Update an existing secret."""
-        self.external_api_secrets_repository.delete_secret(
-            user_id=user_id,
-            brain_id=brain_id,
-            secret_name=secret_name,
-        )
-        self.external_api_secrets_repository.create_secret(
-            user_id=user_id,
-            brain_id=brain_id,
-            secret_name=secret_name,
-            secret_value=secret_value,
-        )

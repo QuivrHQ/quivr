@@ -97,6 +97,7 @@ class NotionPage(BaseModel):
     cover: Cover | None
     icon: Icon | None
     properties: PageProps
+    sync_user_id: UUID | None = Field(default=None, foreign_key="syncs_user.id")  # type: ignore
 
     # TODO: Fix  UUID in table NOTION
     def _get_parent_id(self) -> UUID | None:
@@ -110,7 +111,7 @@ class NotionPage(BaseModel):
             case BlockParent():
                 return None
 
-    def to_syncfile(self, user_id: UUID):
+    def to_syncfile(self, user_id: UUID, sync_user_id: int) -> NotionSyncFile:
         name = (
             self.properties.title.title[0].text.content if self.properties.title else ""
         )
@@ -125,6 +126,7 @@ class NotionPage(BaseModel):
             last_modified=self.last_edited_time,
             type="page",
             user_id=user_id,
+            sync_user_id=sync_user_id,
         )
 
 

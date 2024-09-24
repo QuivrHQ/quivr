@@ -16,6 +16,8 @@ dependencies = [
     "aiofiles>=23.1.0",
     "langchain-community>=0.2.12",
     "langchain-anthropic>=0.1.23",
+    "types-pyyaml>=6.0.12.20240808",
+    "transformers[sentencepiece]>=4.44.2",
 ]
 readme = "README.md"
 requires-python = ">= 3.11"
@@ -25,7 +27,7 @@ all = [
     "unstructured[epub,docx,odt,doc,pptx,ppt,xlsx,md]>=0.15.5",
     "faiss-cpu>=1.8.0.post1",
     "docx2txt>=0.8",
-    "megaparse>=0.0.29",
+    "megaparse"
 ]
 
 [build-system]
@@ -62,3 +64,11 @@ markers = [
     "tika: these tests require a tika server to be running",
     "unstructured: these tests require `unstructured` dependency",
 ]
+
+[[tool.mypy.overrides]]
+module = "yaml"
+ignore_missing_imports = true
+
+[[tool.rye.sources]]
+name = "megaparse"
+path = "./MegaParse"

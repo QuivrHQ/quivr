@@ -20,6 +20,7 @@ from quivr_api.modules.knowledge.service.knowledge_service import KnowledgeServi
 from quivr_api.modules.notification.service.notification_service import (
     NotificationService,
 )
+from quivr_api.modules.sync.dto.inputs import SyncsUserStatus
 from quivr_api.modules.sync.repository.sync_files import SyncFilesRepository
 from quivr_api.modules.sync.service.sync_notion import SyncNotionService
 from quivr_api.modules.sync.service.sync_service import SyncService, SyncUserService
@@ -31,6 +32,7 @@ from sqlalchemy.ext.asyncio import AsyncEngine, create_async_engine
 from sqlmodel import Session, text
 from sqlmodel.ext.asyncio.session import AsyncSession
 
+from quivr_worker.celery_monitor import is_being_executed
 from quivr_worker.assistants.assistants import process_assistant
 from quivr_worker.check_premium import check_is_premium
 from quivr_worker.process.process_s3_file import process_uploaded_file
@@ -332,6 +334,11 @@ def process_sync_task(
 
 @celery.task(name="process_active_syncs_task")
 def process_active_syncs_task():
+    sync_already_running = is_being_executed("process_sync_task")
+
+    if sync_already_running:
+        logger.info("Sync already running, skipping")
+        return
     global async_engine
     assert async_engine
     loop = asyncio.get_event_loop()
@@ -359,15 +366,34 @@ def process_notion_sync_task():
 
 
 @celery.task(name="fetch_and_store_notion_files_task")
-def fetch_and_store_notion_files_task(access_token: str, user_id: UUID):
+def fetch_and_store_notion_files_task(
+    access_token: str, user_id: UUID, sync_user_id: int
+):
     if async_engine is None:
         init_worker()
     assert async_engine
-    logger.debug("Fetching and storing Notion files")
-    loop = asyncio.get_event_loop()
-    loop.run_until_complete(
-        fetch_and_store_notion_files_async(async_engine, access_token, user_id)
-    )
+    try:
+        logger.debug("Fetching and storing Notion files")
+        loop = asyncio.get_event_loop()
+        loop.run_until_complete(
+            fetch_and_store_notion_files_async(
+                async_engine, access_token, user_id, sync_user_id
+            )
+        )
+        sync_user_service.update_sync_user_status(
+            sync_user_id=sync_user_id, status=str(SyncsUserStatus.SYNCED)
+        )
+    except Exception:
+        logger.error("Error fetching and storing Notion files")
+        sync_user_service.update_sync_user_status(
+            sync_user_id=sync_user_id, status=str(SyncsUserStatus.ERROR)
+        )
+
+
+@celery.task(name="clean_notion_user_syncs")
+def clean_notion_user_syncs():
+    logger.debug("Cleaning Notion user syncs")
+    sync_user_service.clean_notion_user_syncs()
 
 
 celery.conf.beat_schedule = {
@@ -386,5 +412,9 @@ celery.conf.beat_schedule = {
     "process_notion_sync": {
         "task": "process_notion_sync_task",
         "schedule": crontab(minute="0", hour="*/6"),
+    },
+    "clean_notion_user_syncs": {
+        "task": "clean_notion_user_syncs",
+        "schedule": crontab(minute="0", hour="0"),
     },
 }

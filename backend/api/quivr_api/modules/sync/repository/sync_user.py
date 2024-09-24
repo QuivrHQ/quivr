@@ -4,7 +4,10 @@ from uuid import UUID
 
 from quivr_api.logger import get_logger
 from quivr_api.modules.dependencies import get_supabase_client
-from quivr_api.modules.sync.dto.inputs import SyncsUserInput, SyncUserUpdateInput
+from quivr_api.modules.sync.dto.inputs import (
+    SyncsUserInput,
+    SyncUserUpdateInput,
+)
 from quivr_api.modules.sync.entity.sync_models import SyncFile, SyncsUser
 from quivr_api.modules.sync.service.sync_notion import SyncNotionService
 from quivr_api.modules.sync.utils.sync import (
@@ -47,6 +50,7 @@ class SyncUserRepository:
             .insert(sync_user_input.model_dump(exclude_none=True, exclude_unset=True))
             .execute()
         )
+
         if response.data:
             logger.info("Sync user created successfully: %s", response.data[0])
             return response.data[0]
@@ -61,6 +65,16 @@ class SyncUserRepository:
             logger.info("Sync user found: %s", response.data[0])
             return SyncsUser.model_validate(response.data[0])
         logger.error("No sync user found for sync_id: %s", sync_id)
+
+    def clean_notion_user_syncs(self):
+        """
+        Clean all Removed Notion sync users from the database.
+        """
+        logger.info("Cleaning all Removed Notion sync users")
+        self.db.from_("syncs_user").delete().eq("provider", "Notion").eq(
+            "status", "REMOVED"
+        ).execute()
+        logger.info("Removed Notion sync users cleaned successfully")
 
     def get_syncs_user(self, user_id: UUID, sync_user_id: int | None = None):
         """
@@ -78,7 +92,12 @@ class SyncUserRepository:
             user_id,
             sync_user_id,
         )
-        query = self.db.from_("syncs_user").select("*").eq("user_id", user_id)
+        query = (
+            self.db.from_("syncs_user")
+            .select("*")
+            .eq("user_id", user_id)
+            # .neq("status", "REMOVED")
+        )
         if sync_user_id:
             query = query.eq("id", str(sync_user_id))
         response = query.execute()
@@ -129,6 +148,7 @@ class SyncUserRepository:
         self.db.from_("syncs_user").delete().eq("id", sync_id).eq(
             "user_id", user_id
         ).execute()
+
         logger.info("Sync user deleted successfully")
 
     def update_sync_user(
@@ -150,10 +170,29 @@ class SyncUserRepository:
         )
 
         state_str = json.dumps(state)
-        self.db.from_("syncs_user").update(sync_user_input.model_dump()).eq(
+        self.db.from_("syncs_user").update(sync_user_input.model_dump(exclude_unset=True)).eq(
             "user_id", str(sync_user_id)
         ).eq("state", state_str).execute()
         logger.info("Sync user updated successfully")
+
+    def update_sync_user_status(self, sync_user_id: int, status: str):
+        """
+        Update the status of a sync user in the database.
+
+        Args:
+            sync_user_id (str): The user ID of the sync user.
+            status (str): The new status of the sync user.
+        """
+        logger.info(
+            "Updating sync user status with user_id: %s, status: %s",
+            sync_user_id,
+            status,
+        )
+
+        self.db.from_("syncs_user").update({"status": status}).eq(
+            "id", str(sync_user_id)
+        ).execute()
+        logger.info("Sync user status updated successfully")
 
     def get_all_notion_user_syncs(self):
         """
@@ -236,7 +275,10 @@ class SyncUserRepository:
             sync = NotionSync(notion_service=notion_service)
             return {
                 "files": await sync.aget_files(
-                    sync_user["credentials"], folder_id if folder_id else "", recursive
+                    sync_user["credentials"],
+                    sync_active_id,
+                    folder_id if folder_id else "",
+                    recursive,
                 )
             }
         elif provider == "github":
@@ -253,3 +295,27 @@ class SyncUserRepository:
                 "No sync found for provider: %s", sync_user["provider"], recursive
             )
             return "No sync found"
+
+    def get_corresponding_deleted_sync(self, user_id: str) -> SyncsUser | None:
+        """
+        Retrieve the deleted sync user from the database.
+        """
+        logger.info(
+            "Retrieving notion deleted sync user for user_id: %s",
+            user_id,
+        )
+        response = (
+            self.db.from_("syncs_user")
+            .select("*")
+            .eq("user_id", user_id)
+            .eq("provider", "Notion")
+            .eq("status", "REMOVED")
+            .execute()
+        )
+        if response.data:
+            logger.info(
+                "Deleted sync user retrieved successfully: %s", response.data[0]
+            )
+            return SyncsUser.model_validate(response.data[0])
+        logger.error("No deleted notion sync user found for user_id: %s", user_id)
+        return None

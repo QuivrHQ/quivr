@@ -15,9 +15,10 @@
   justify-content: space-between;
   align-items: center;
   border-radius: Radius.$normal;
-  box-shadow: BoxShadow.$medium;
+  border: 1px solid var(--border-0);
   height: min-content;
   width: 100%;
+  max-width: 800px;
 
   @media (max-width: ScreenSizes.$small) {
     width: 100%;
@@ -50,6 +51,17 @@
 
       .label {
         @include Typography.H3;
+      }
+    }
+
+    .deleting_wrapper {
+      display: flex;
+      align-items: center;
+      gap: Spacings.$spacing02;
+
+      .deleting_mention {
+        color: var(--warning);
+        font-size: Typography.$tiny;
       }
     }
   }

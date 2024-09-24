@@ -245,8 +245,15 @@ class KnowledgeRepository(BaseRepository):
             raise KnowledgeNotFoundException("Knowledge not found")
         return knowledge
 
-    async def get_brain_by_id(self, brain_id: UUID) -> Brain:
+    async def get_brain_by_id(
+        self, brain_id: UUID, get_knowledge: bool = False
+    ) -> Brain:
         query = select(Brain).where(Brain.brain_id == brain_id)
+        if get_knowledge:
+            query = query.options(
+                joinedload(Brain.knowledges).joinedload(KnowledgeDB.brains)
+            )
+
         result = await self.session.exec(query)
         brain = result.first()
         if not brain:

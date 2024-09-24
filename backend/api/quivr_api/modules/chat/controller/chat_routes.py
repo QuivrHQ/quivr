@@ -1,17 +1,23 @@
 from typing import Annotated, List, Optional
 from uuid import UUID
+import os
 
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Query, Request
 from fastapi.responses import StreamingResponse
 
 from quivr_api.logger import get_logger
 from quivr_api.middlewares.auth import AuthBearer, get_current_user
-from quivr_api.modules.brain.entity.brain_entity import RoleEnum
+from quivr_api.modules.brain.entity.brain_entity import BrainEntity, RoleEnum
 from quivr_api.modules.brain.service.brain_authorization_service import (
     validate_brain_authorization,
 )
 from quivr_api.modules.brain.service.brain_service import BrainService
-from quivr_api.modules.chat.controller.chat.utils import check_and_update_user_usage
+from quivr_api.modules.chat.controller.chat.utils import (
+    RetrievalConfigPathEnv,
+    check_and_update_user_usage,
+    get_config_file_path,
+    load_and_merge_retrieval_configuration,
+)
 from quivr_api.modules.chat.dto.chats import ChatItem, ChatQuestion
 from quivr_api.modules.chat.dto.inputs import (
     ChatMessageProperties,
@@ -21,7 +27,6 @@ from quivr_api.modules.chat.dto.inputs import (
 )
 from quivr_api.modules.chat.entity.chat import Chat
 from quivr_api.modules.chat.service.chat_service import ChatService
-from quivr_api.modules.chat_llm_service.chat_llm_service import ChatLLMService
 from quivr_api.modules.dependencies import get_service
 from quivr_api.modules.knowledge.service.knowledge_service import KnowledgeService
 from quivr_api.modules.models.service.model_service import ModelService
@@ -31,6 +36,7 @@ from quivr_api.modules.user.entity.user_identity import UserIdentity
 from quivr_api.modules.vector.service.vector_service import VectorService
 from quivr_api.utils.telemetry import maybe_send_telemetry
 from quivr_api.utils.uuid_generator import generate_uuid_from_string
+from quivr_core.config import RetrievalConfig
 
 logger = get_logger(__name__)
 
@@ -185,10 +191,11 @@ async def create_question_handler(
     for model in models:
         if brain_id == generate_uuid_from_string(model.name):
             model_to_use = model
+            _brain = {"brain_id": brain_id, "name": model.name}
+            brain = BrainEntity(**_brain)
             break
 
     try:
-        service = None | RAGService | ChatLLMService
         if not model_to_use:
             brain = brain_service.get_brain_details(brain_id, current_user.id)  # type: ignore
             assert brain
@@ -201,26 +208,32 @@ async def create_question_handler(
             brain.model = model.name
             validate_authorization(user_id=current_user.id, brain_id=brain_id)
             service = RAGService(
-                current_user,
-                brain,
-                chat_id,
-                brain_service,
-                prompt_service,
-                chat_service,
-                knowledge_service,
-                vector_service,
-                model_service,
+                current_user=current_user,
+                chat_id=chat_id,
+                brain=brain,
+                model_service=model_service,
+                brain_service=brain_service,
+                prompt_service=prompt_service,
+                chat_service=chat_service,
+                knowledge_service=knowledge_service,
+                vector_service=vector_service,
             )
         else:
             await check_and_update_user_usage(
                 current_user, model_to_use.name, model_service
             )  # type: ignore
-            service = ChatLLMService(
-                current_user,
-                model_to_use.name,
-                chat_id,
-                chat_service,
-                model_service,
+            if not os.getenv("CHAT_LLM_CONFIG_PATH"):
+                raise ValueError("CHAT_LLM_CONFIG_PATH not set")
+            current_path = os.path.dirname(os.path.abspath(__file__))
+            file_path = os.path.join(current_path, os.getenv("CHAT_LLM_CONFIG_PATH"))  # type: ignore
+            retrieval_config = RetrievalConfig.from_yaml(file_path)
+            service = RAGService(
+                current_user=current_user,
+                chat_id=chat_id,
+                brain=brain,
+                retrieval_config=retrieval_config,
+                model_service=model_service,
+                chat_service=chat_service,
             )  # type: ignore
         assert service is not None  # type: ignore
         maybe_send_telemetry("question_asked", {"streaming": True}, request)
@@ -271,6 +284,8 @@ async def create_stream_question_handler(
     for model in models:
         if brain_id == generate_uuid_from_string(model.name):
             model_to_use = model
+            _brain = {"name": model.name}
+            brain = BrainEntity(**_brain)
             break
     try:
         if model_to_use is None:
@@ -283,27 +298,43 @@ async def create_stream_question_handler(
             assert model is not None
             brain.model = model.name
             validate_authorization(user_id=current_user.id, brain_id=brain_id)
+            current_path = os.path.dirname(os.path.abspath(__file__))
+            file_path = get_config_file_path(
+                RetrievalConfigPathEnv.RAG, current_path=current_path
+            )
+            retrieval_config = load_and_merge_retrieval_configuration(
+                config_file_path=file_path, sqlmodel=model
+            )
             service = RAGService(
-                current_user,
-                brain,
-                chat_id,
-                brain_service,
-                prompt_service,
-                chat_service,
-                knowledge_service,
-                vector_service,
-                model_service,
+                current_user=current_user,
+                chat_id=chat_id,
+                brain=brain,
+                retrieval_config=retrieval_config,
+                model_service=model_service,
+                brain_service=brain_service,
+                prompt_service=prompt_service,
+                chat_service=chat_service,
+                knowledge_service=knowledge_service,
+                vector_service=vector_service,
             )
         else:
             await check_and_update_user_usage(
                 current_user, model_to_use.name, model_service
             )  # type: ignore
-            service = ChatLLMService(
-                current_user,
-                model_to_use.name,
-                chat_id,
-                chat_service,
-                model_service,
+            current_path = os.path.dirname(os.path.abspath(__file__))
+            file_path = get_config_file_path(
+                RetrievalConfigPathEnv.CHAT_WITH_LLM, current_path=current_path
+            )
+            retrieval_config = load_and_merge_retrieval_configuration(
+                config_file_path=file_path, sqlmodel=model_to_use
+            )
+            service = RAGService(
+                current_user=current_user,
+                chat_id=chat_id,
+                brain=brain,
+                retrieval_config=retrieval_config,
+                model_service=model_service,
+                chat_service=chat_service,
             )  # type: ignore
 
         background_tasks.add_task(

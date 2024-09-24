@@ -1,6 +1,13 @@
 export type Provider = "Google" | "Azure" | "DropBox" | "Notion" | "GitHub";
 
-export type Integration = "Google Drive" | "Share Point" | "Dropbox"| "Notion" | "GitHub";
+export type Integration =
+  | "Google Drive"
+  | "Share Point"
+  | "Dropbox"
+  | "Notion"
+  | "GitHub";
+
+export type SyncStatus = "SYNCING" | "SYNCED" | "ERROR" | "REMOVED";
 
 export interface SyncElement {
   name?: string;
@@ -23,6 +30,7 @@ export interface Sync {
   id: number;
   credentials: Credentials;
   email: string;
+  status: SyncStatus;
 }
 
 export interface SyncSettings {
