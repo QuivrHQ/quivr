@@ -36,7 +36,6 @@ from quivr_api.modules.user.entity.user_identity import UserIdentity
 from quivr_api.modules.vector.service.vector_service import VectorService
 from quivr_api.utils.telemetry import maybe_send_telemetry
 from quivr_api.utils.uuid_generator import generate_uuid_from_string
-from quivr_core.config import RetrievalConfig
 
 logger = get_logger(__name__)
 
@@ -159,95 +158,6 @@ async def create_chat_handler(
     return await chat_service.create_chat(
         user_id=current_user.id, new_chat_data=chat_data
     )
-
-
-# add new question to chat
-@chat_router.post(
-    "/chat/{chat_id}/question",
-    dependencies=[
-        Depends(
-            AuthBearer(),
-        ),
-    ],
-    tags=["Chat"],
-)
-async def create_question_handler(
-    request: Request,
-    chat_question: ChatQuestion,
-    chat_id: UUID,
-    current_user: UserIdentityDep,
-    chat_service: ChatServiceDep,
-    knowledge_service: KnowledgeServiceDep,
-    model_service: ModelServiceDep,
-    vector_service: VectorServiceDep,
-    brain_id: Annotated[UUID | None, Query()] = None,
-):
-    models = await model_service.get_models()
-
-    model_to_use = None
-    # Check if the brain_id is a model name hashed to a uuid and then returns the model name
-    # if chat_question.brain_id in [generate_uuid_from_string(model.name) for model in models]:
-    #     mode
-    for model in models:
-        if brain_id == generate_uuid_from_string(model.name):
-            model_to_use = model
-            _brain = {"brain_id": brain_id, "name": model.name}
-            brain = BrainEntity(**_brain)
-            break
-
-    try:
-        if not model_to_use:
-            brain = brain_service.get_brain_details(brain_id, current_user.id)  # type: ignore
-            assert brain
-            model = await check_and_update_user_usage(
-                current_user, str(brain.model), model_service
-            )  # type: ignore
-            assert model is not None  # type: ignore
-            assert brain is not None  # type: ignore
-
-            brain.model = model.name
-            validate_authorization(user_id=current_user.id, brain_id=brain_id)
-            service = RAGService(
-                current_user=current_user,
-                chat_id=chat_id,
-                brain=brain,
-                model_service=model_service,
-                brain_service=brain_service,
-                prompt_service=prompt_service,
-                chat_service=chat_service,
-                knowledge_service=knowledge_service,
-                vector_service=vector_service,
-            )
-        else:
-            await check_and_update_user_usage(
-                current_user, model_to_use.name, model_service
-            )  # type: ignore
-            if not os.getenv("CHAT_LLM_CONFIG_PATH"):
-                raise ValueError("CHAT_LLM_CONFIG_PATH not set")
-            current_path = os.path.dirname(os.path.abspath(__file__))
-            file_path = os.path.join(current_path, os.getenv("CHAT_LLM_CONFIG_PATH"))  # type: ignore
-            retrieval_config = RetrievalConfig.from_yaml(file_path)
-            service = RAGService(
-                current_user=current_user,
-                chat_id=chat_id,
-                brain=brain,
-                retrieval_config=retrieval_config,
-                model_service=model_service,
-                chat_service=chat_service,
-            )  # type: ignore
-        assert service is not None  # type: ignore
-        maybe_send_telemetry("question_asked", {"streaming": True}, request)
-        chat_answer = await service.generate_answer(chat_question.question)
-
-        return chat_answer
-
-    except AssertionError:
-        raise HTTPException(
-            status_code=422,
-            detail="inprocessable entity",
-        )
-    except HTTPException as e:
-        raise e
 
 
 # stream new question response from chat

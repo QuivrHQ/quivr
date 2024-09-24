@@ -20,7 +20,6 @@ from quivr_core.config import DefaultRerankers, RetrievalConfig
 from quivr_core.llm import LLMEndpoint
 from quivr_core.models import (
     ParsedRAGChunkResponse,
-    ParsedRAGResponse,
     QuivrKnowledge,
     RAGResponseMetadata,
     cited_answer,
@@ -31,7 +30,6 @@ from quivr_core.utils import (
     format_file_list,
     get_chunk_metadata,
     parse_chunk_response,
-    parse_response,
 )
 
 logger = logging.getLogger("quivr_core")
@@ -349,45 +347,6 @@ class QuivrQARAGLangGraph:
         # Compile
         graph = workflow.compile()
         return graph
-
-    def answer(
-        self,
-        question: str,
-        history: ChatHistory,
-        list_files: list[QuivrKnowledge],
-        metadata: dict[str, str] = {},
-    ) -> ParsedRAGResponse:
-        """
-        Answer a question using the langgraph chain.
-
-        Args:
-            question (str): The question to answer.
-            history (ChatHistory): The chat history to use for context.
-            list_files (list[QuivrKnowledge]): The list of files to use for retrieval.
-            metadata (dict[str, str], optional): The metadata to pass to the langchain invocation. Defaults to {}.
-
-        Returns:
-            ParsedRAGResponse: The answer to the question.
-        """
-        concat_list_files = format_file_list(
-            list_files, self.retrieval_config.max_files
-        )
-        conversational_qa_chain = self.build_chain()
-        inputs = {
-            "messages": [
-                ("user", question),
-            ],
-            "chat_history": history,
-            "files": concat_list_files,
-        }
-        raw_llm_response = conversational_qa_chain.invoke(
-            inputs,
-            config={"metadata": metadata},
-        )
-        response = parse_response(
-            raw_llm_response["final_response"], self.retrieval_config.llm_config.model
-        )
-        return response
 
     async def answer_astream(
         self,
