@@ -53,3 +53,12 @@ export const deleteTask = async (
 ): Promise<void> => {
   await axiosInstance.delete(`/assistants/task/${taskId}`);
 };
+
+export const downloadTaskResult = async (
+  axiosInstance: AxiosInstance,
+  taskId: number
+): Promise<void> => {
+  await axiosInstance.get(`/assistants/task/${taskId}/download`, {
+    responseType: "blob",
+  });
+};

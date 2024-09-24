@@ -33,8 +33,6 @@ const ProcessLine = ({
   const [showResult, setShowResult] = useState(false);
   const { isMobile } = useDevice();
 
-  console.info(process.answer);
-
   return (
     <>
       <div
