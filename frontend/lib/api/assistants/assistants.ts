@@ -46,3 +46,10 @@ export const processTask = async (
 
   return response.data;
 };
+
+export const deleteTask = async (
+  axiosInstance: AxiosInstance,
+  taskId: number
+): Promise<void> => {
+  await axiosInstance.delete(`/assistants/task/${taskId}`);
+};

@@ -1,7 +1,7 @@
 import { ProcessAssistantInput } from "@/app/quality-assistant/types/assistant";
 import { useAxios } from "@/lib/hooks";
 
-import { getAssistants, getTasks, processTask } from "./assistants";
+import { deleteTask, getAssistants, getTasks, processTask } from "./assistants";
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export const useAssistants = () => {
@@ -12,5 +12,6 @@ export const useAssistants = () => {
     getTasks: async () => getTasks(axiosInstance),
     processTask: async (processAssistantInput: ProcessAssistantInput) =>
       processTask(axiosInstance, processAssistantInput),
+    deleteTask: async (taskId: number) => deleteTask(axiosInstance, taskId),
   };
 };

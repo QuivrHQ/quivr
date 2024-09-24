@@ -113,7 +113,11 @@ const ProcessTab = (): JSX.Element => {
         />
       </div>
       <div>
-        <div className={styles.first_line}>
+        <div
+          className={`${styles.first_line}  ${
+            !filteredProcess.length ? styles.empty : ""
+          }`}
+        >
           <div className={styles.left}>
             <Checkbox
               checked={allChecked}
