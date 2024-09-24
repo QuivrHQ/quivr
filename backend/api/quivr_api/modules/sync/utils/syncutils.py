@@ -31,40 +31,57 @@ logger = get_logger(__name__)
 celery_inspector = celery.control.inspect()
 
 
-# NOTE: we are filtering based on file path names in sync  !
-def filter_on_supported_files(
-    files: list[SyncFile], existing_files: dict[str, DBSyncFile]
-) -> list[Tuple[SyncFile, DBSyncFile | None]]:
-    res = []
-    for new_file in files:
-        prev_file = existing_files.get(new_file.name, None)
-        if (prev_file and prev_file.supported) or prev_file is None:
-            res.append((new_file, prev_file))
-    return res
-
-
-def should_download_file(
-    file: SyncFile,
-    last_updated_sync_active: datetime | None,
-    provider_name: str,
-    datetime_format: str,
-) -> bool:
-    file_last_modified_utc = datetime.strptime(
-        file.last_modified_at, datetime_format
-    ).replace(tzinfo=timezone.utc)
-
-    should_download = (
-        last_updated_sync_active is None
-        or file_last_modified_utc > last_updated_sync_active
+async def fetch_sync_knowledge(
+    self,
+    sync_id: int,
+    user_id: UUID,
+    folder_id: str | None,
+) -> Tuple[dict[str, KnowledgeDB], List[SyncFile] | None]:
+    map_knowledges_task = self.services.knowledge_service.map_syncs_knowledge_user(
+        sync_id=sync_id, user_id=user_id
     )
+    sync_files_task = self.services.sync_service.get_files_folder_user_sync(
+        sync_id,
+        user_id,
+        folder_id,
+    )
+    return await asyncio.gather(*[map_knowledges_task, sync_files_task])  # type: ignore  # noqa: F821
 
-    # TODO: Handle notion database
-    if provider_name == "notion":
-        should_download &= file.extension != "db"
-    else:
-        should_download &= not file.is_folder
 
-    return should_download
+# # NOTE: we are filtering based on file path names in sync  !
+# def filter_on_supported_files(
+#     files: list[SyncFile], existing_files: dict[str, DBSyncFile]
+# ) -> list[Tuple[SyncFile, DBSyncFile | None]]:
+#     res = []
+#     for new_file in files:
+#         prev_file = existing_files.get(new_file.name, None)
+#         if (prev_file and prev_file.supported) or prev_file is None:
+#             res.append((new_file, prev_file))
+#     return res
+
+
+# def should_download_file(
+#     file: SyncFile,
+#     last_updated_sync_active: datetime | None,
+#     provider_name: str,
+#     datetime_format: str,
+# ) -> bool:
+#     file_last_modified_utc = datetime.strptime(
+#         file.last_modified_at, datetime_format
+#     ).replace(tzinfo=timezone.utc)
+
+#     should_download = (
+#         last_updated_sync_active is None
+#         or file_last_modified_utc > last_updated_sync_active
+#     )
+
+#     # TODO: Handle notion database
+#     if provider_name == "notion":
+#         should_download &= file.extension != "db"
+#     else:
+#         should_download &= not file.is_folder
+
+#     return should_download
 
 
 class SyncUtils:

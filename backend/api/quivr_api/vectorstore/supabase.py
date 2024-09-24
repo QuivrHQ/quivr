@@ -69,18 +69,17 @@ class CustomSupabaseVectorStore(SupabaseVectorStore):
         ]
         return brain_details
 
-    def similarity_search(
+    async def asimilarity_search(
         self,
         query: str,
         k: int = 40,
-        table: str = "match_vectors",
         threshold: float = 0.5,
         **kwargs: Any,
     ) -> List[Document]:
         logger.debug(f"Similarity search for query: {query}")
         assert self.brain_id, "Brain ID is required for similarity search"
 
-        match_result = self.vector_service.similarity_search(
+        match_result = await self.vector_service.similarity_search(
             query, brain_id=self.brain_id, k=k
         )
 

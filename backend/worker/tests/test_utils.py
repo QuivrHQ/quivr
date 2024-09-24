@@ -4,7 +4,6 @@ from uuid import UUID
 
 import pytest
 from langchain_core.documents import Document
-
 from quivr_worker.utils import _patch_json
 
 

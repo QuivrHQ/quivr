@@ -1,13 +1,15 @@
+import asyncio
 import os
 from datetime import datetime
-from typing import List
+from typing import List, Tuple
+from uuid import UUID
 
 from fastapi import APIRouter, Depends, status
 
 from quivr_api.logger import get_logger
 from quivr_api.middlewares.auth import AuthBearer, get_current_user
 from quivr_api.modules.dependencies import get_service
-from quivr_api.modules.knowledge.entity.knowledge import KnowledgeDTO
+from quivr_api.modules.knowledge.entity.knowledge import KnowledgeDB, KnowledgeDTO
 from quivr_api.modules.knowledge.service.knowledge_service import KnowledgeService
 from quivr_api.modules.notification.service.notification_service import (
     NotificationService,
@@ -19,8 +21,8 @@ from quivr_api.modules.sync.controller.google_sync_routes import google_sync_rou
 from quivr_api.modules.sync.controller.notion_sync_routes import notion_sync_router
 from quivr_api.modules.sync.dto import SyncsDescription
 from quivr_api.modules.sync.dto.outputs import AuthMethodEnum
+from quivr_api.modules.sync.entity.sync_models import SyncFile
 from quivr_api.modules.sync.service.sync_service import SyncsService
-from quivr_api.modules.sync.utils.syncutils import fetch_sync_knowledge
 from quivr_api.modules.user.entity.user_identity import UserIdentity
 
 notification_service = NotificationService()
@@ -179,13 +181,26 @@ async def list_sync_files(
     # The logic is that getting from DB will be faster than provider repsonse ?
     # NOTE: asyncio.gather didn't correcly typecheck
 
+    async def fetch_sync_knowledge(
+        sync_id: int,
+        user_id: UUID,
+        folder_id: str | None,
+    ) -> Tuple[dict[str, KnowledgeDB], List[SyncFile] | None]:
+        map_knowledges_task = knowledge_service.map_syncs_knowledge_user(
+            sync_id=sync_id, user_id=user_id
+        )
+        sync_files_task = syncs_service.get_files_folder_user_sync(
+            sync_id,
+            user_id,
+            folder_id,
+        )
+        return await asyncio.gather(*[map_knowledges_task, sync_files_task])  # type: ignore  # noqa: F821
+
     sync = await syncs_service.get_sync_by_id(sync_id=sync_id)
     syncfile_to_knowledge, sync_files = await fetch_sync_knowledge(
         sync_id=sync_id,
         user_id=current_user.id,
         folder_id=folder_id,
-        knowledge_service=knowledge_service,
-        syncs_service=syncs_service,
     )
     if not sync_files:
         return None

@@ -47,7 +47,13 @@ class FakeStorage(StorageInterface):
         storage_path = f"{knowledge.id}"
         if not upsert and storage_path in self.storage:
             raise ValueError(f"File already exists at {storage_path}")
-        self.storage[storage_path] = knowledge_data
+        if isinstance(knowledge_data, FileIO) or isinstance(
+            knowledge_data, BufferedReader
+        ):
+            self.storage[storage_path] = knowledge_data.read()
+        else:
+            self.storage[storage_path] = knowledge_data
+
         return storage_path
 
     async def remove_file(self, storage_path: str):

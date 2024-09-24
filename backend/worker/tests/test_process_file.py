@@ -6,39 +6,21 @@ from uuid import uuid4
 import pytest
 from quivr_api.modules.brain.entity.brain_entity import BrainEntity, BrainType
 from quivr_core.files.file import FileExtension
-from quivr_worker.files import File, build_file
-from quivr_worker.parsers.crawler import URL, slugify
-from quivr_worker.process.process_file import parse_file
+from quivr_worker.process.process_file import parse_qfile
+from quivr_worker.process.utils import build_qfile
 
 
-def test_build_file():
+def test_build_qfile():
     random_bytes = os.urandom(128)
     brain_id = uuid4()
     file_name = f"{brain_id}/test_file.txt"
     knowledge_id = uuid4()
 
-    with build_file(random_bytes, knowledge_id, file_name) as file:
+    with build_qfile(random_bytes, file_name) as file:
         assert file.file_size == 128
         assert file.file_name == "test_file.txt"
         assert file.id == knowledge_id
         assert file.file_extension == FileExtension.txt
-
-
-def test_build_url():
-    random_bytes = os.urandom(128)
-    crawl_website = URL(url="http://url.url")
-    file_name = slugify(crawl_website.url) + ".txt"
-    knowledge_id = uuid4()
-
-    with build_file(
-        random_bytes,
-        knowledge_id,
-        file_name=file_name,
-        original_file_name=crawl_website.url,
-    ) as file:
-        qfile = file.to_qfile(brain_id=uuid4())
-        assert qfile.metadata["original_file_name"] == crawl_website.url
-        assert qfile.metadata["file_name"] == file_name
 
 
 @pytest.mark.asyncio
@@ -56,7 +38,7 @@ async def test_parse_audio(monkeypatch, audio_file):
         brain_type=BrainType.doc,
         last_update=datetime.datetime.now(),
     )
-    chunks = await parse_file(
+    chunks = await parse_qfile(
         file=audio_file,
         brain=brain,
     )
@@ -65,15 +47,15 @@ async def test_parse_audio(monkeypatch, audio_file):
 
 
 @pytest.mark.asyncio
-async def test_parse_file(file_instance):
+async def test_parse_file(qfile_instance):
     brain = BrainEntity(
         brain_id=uuid4(),
         name="test",
         brain_type=BrainType.doc,
         last_update=datetime.datetime.now(),
     )
-    chunks = await parse_file(
-        file=file_instance,
+    chunks = await parse_qfile(
+        file=qfile_instance,
         brain=brain,
     )
     assert len(chunks) > 0
@@ -96,7 +78,7 @@ async def test_parse_file_pdf():
         brain_type=BrainType.doc,
         last_update=datetime.datetime.now(),
     )
-    chunks = await parse_file(
+    chunks = await parse_qfile(
         file=file_instance,
         brain=brain,
     )

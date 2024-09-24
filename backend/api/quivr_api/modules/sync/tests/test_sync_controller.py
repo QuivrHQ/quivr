@@ -38,6 +38,11 @@ class BaseFakeSync(BaseSync):
     lower_name = "google"
     datetime_format: str = "%Y-%m-%dT%H:%M:%S.%fZ"
 
+    def __init__(self, provider_name: str | None = None):
+        super().__init__()
+        if provider_name:
+            self.lower_name = provider_name
+
     def get_files_by_id(self, credentials: Dict, file_ids: List[str]) -> List[SyncFile]:
         return [
             SyncFile(

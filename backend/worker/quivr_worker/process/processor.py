@@ -1,13 +1,12 @@
-import time
-from contextlib import asynccontextmanager, contextmanager
+from contextlib import asynccontextmanager
 from dataclasses import dataclass
 from io import BytesIO
-from typing import Any, AsyncGenerator, Generator, List, Tuple
+from typing import Any, AsyncGenerator, List, Optional, Tuple
 from uuid import UUID
 
 from quivr_api.logger import get_logger
 from quivr_api.modules.dependencies import get_supabase_async_client
-from quivr_api.modules.knowledge.dto.inputs import AddKnowledge
+from quivr_api.modules.knowledge.dto.inputs import AddKnowledge, KnowledgeUpdate
 from quivr_api.modules.knowledge.dto.outputs import KnowledgeDTO
 from quivr_api.modules.knowledge.entity.knowledge import KnowledgeDB, KnowledgeSource
 from quivr_api.modules.knowledge.repository.knowledges import KnowledgeRepository
@@ -18,38 +17,25 @@ from quivr_api.modules.sync.entity.sync_models import SyncFile
 from quivr_api.modules.sync.repository.sync_repository import SyncsRepository
 from quivr_api.modules.sync.service.sync_service import SyncsService
 from quivr_api.modules.sync.utils.sync import (
-    AzureDriveSync,
     BaseSync,
-    DropboxSync,
-    GitHubSync,
-    GoogleDriveSync,
 )
 from quivr_api.modules.vector.repository.vectors_repository import VectorRepository
 from quivr_api.modules.vector.service.vector_service import VectorService
-from quivr_core.files.file import FileExtension, QuivrFile
+from quivr_core.files.file import QuivrFile
 from quivr_core.models import KnowledgeStatus
 from sqlalchemy.ext.asyncio import AsyncEngine
 from sqlmodel import text
 from sqlmodel.ext.asyncio.session import AsyncSession
 
-from quivr_worker.files import build_file, compute_sha1
+from quivr_worker.process.process_file import parse_qfile, store_chunks
+from quivr_worker.process.utils import (
+    build_qfile,
+    build_syncprovider_mapping,
+    compute_sha1,
+    skip_process,
+)
 
 logger = get_logger("celery_worker")
-
-
-def skip_process(knowledge: KnowledgeDTO) -> bool:
-    return knowledge.is_folder and knowledge.source != KnowledgeSource.NOTION
-
-
-def build_syncprovider_mapping() -> dict[str, BaseSync]:
-    mapping_sync_utils = {
-        "google": GoogleDriveSync(),
-        "azure": AzureDriveSync(),
-        "dropbox": DropboxSync(),
-        "github": GitHubSync(),
-        # "notion", NotionSync(notion_service=notion_service),
-    }
-    return mapping_sync_utils
 
 
 @dataclass
@@ -57,7 +43,7 @@ class ProcessorServices:
     sync_service: SyncsService
     vector_service: VectorService
     knowledge_service: KnowledgeService
-    syncprovider_mapping: dict[str, BaseSync]
+    syncprovider_mapping: dict[SyncProvider, BaseSync]
 
 
 @asynccontextmanager
@@ -81,12 +67,12 @@ async def build_processor_services(engine: AsyncEngine):
     async_client = await get_supabase_async_client()
     storage = SupabaseS3Storage(async_client)
     try:
-        async with _start_session(engine) as async_session:
-            vector_repository = VectorRepository(async_session.sync_session)
+        async with _start_session(engine) as session:
+            vector_repository = VectorRepository(session)
             vector_service = VectorService(vector_repository)
-            knowledge_repository = KnowledgeRepository(async_session)
+            knowledge_repository = KnowledgeRepository(session)
             knowledge_service = KnowledgeService(knowledge_repository, storage=storage)
-            sync_repository = SyncsRepository(async_session)
+            sync_repository = SyncsRepository(session)
             sync_service = SyncsService(sync_repository)
             yield ProcessorServices(
                 knowledge_service=knowledge_service,
@@ -113,37 +99,6 @@ async def download_sync_file(
     return file_data
 
 
-@contextmanager
-def build_qfile(
-    knowledge: KnowledgeDB, file_data: bytes
-) -> Generator[QuivrFile, None, None]:
-    assert knowledge.id
-    assert knowledge.file_name
-    assert knowledge.file_sha1
-    with build_file(
-        file_data=file_data, file_name_ext=knowledge.file_name
-    ) as tmp_file_path:
-        qfile = QuivrFile(
-            id=knowledge.id,
-            original_filename=knowledge.file_name,
-            path=tmp_file_path,
-            file_sha1=knowledge.file_sha1,
-            file_extension=FileExtension(knowledge.extension),
-            file_size=knowledge.file_size,
-            metadata={
-                "date": time.strftime("%Y%m%d"),
-                "file_name": knowledge.file_name,
-                "knowledge_id": knowledge.id,
-            },
-        )
-        if knowledge.metadata_:
-            qfile.additional_metadata = {
-                **qfile.metadata,
-                **knowledge.metadata_,
-            }
-        yield qfile
-
-
 class KnowledgeProcessor:
     def __init__(self, services: ProcessorServices):
         self.services = services
@@ -164,12 +119,11 @@ class KnowledgeProcessor:
         )
         return await asyncio.gather(*[map_knowledges_task, sync_files_task])  # type: ignore  # noqa: F821
 
-    @asynccontextmanager
-    async def build_processable(
+    async def yield_processable_kms(
         self, knowledge: KnowledgeDTO
     ) -> AsyncGenerator[Tuple[KnowledgeDB, QuivrFile] | None, None]:
         if knowledge.source == KnowledgeSource.LOCAL:
-            async with self._build_local(knowledge) as to_process:
+            async for to_process in self._build_local(knowledge):
                 yield to_process
         elif knowledge.source in (
             KnowledgeSource.AZURE,
@@ -177,7 +131,7 @@ class KnowledgeProcessor:
             KnowledgeSource.GOOGLE,
             KnowledgeSource.NOTION,
         ):
-            async with self._build_sync(knowledge) as to_process:
+            async for to_process in self._build_sync(knowledge):
                 yield to_process
         elif knowledge.source == KnowledgeSource.WEB:
             raise NotImplementedError
@@ -187,7 +141,6 @@ class KnowledgeProcessor:
             )
             raise ValueError("Unknown knowledge source : {knoledge.source}")
 
-    @asynccontextmanager
     async def _build_local(
         self, knowledge: KnowledgeDTO
     ) -> AsyncGenerator[Tuple[KnowledgeDB, QuivrFile] | None, None]:
@@ -204,10 +157,9 @@ class KnowledgeProcessor:
         with build_qfile(knowledge_db, file_data) as qfile:
             yield (knowledge_db, qfile)
 
-    @asynccontextmanager
     async def _build_sync(
         self, knowledge_dto: KnowledgeDTO
-    ) -> AsyncGenerator[Tuple[KnowledgeDB, QuivrFile] | None, None]:
+    ) -> AsyncGenerator[Optional[Tuple[KnowledgeDB, QuivrFile]], None]:
         if knowledge_dto.id is None:
             logger.error(f"received unprocessable knowledge: {knowledge_dto.id} ")
             raise ValueError
@@ -247,7 +199,7 @@ class KnowledgeProcessor:
         if not sync_files:
             return
 
-        # Yield parent knowledge to process
+        # Yield parent_knowledge as the first knowledge to process
         file_data = await download_sync_file(
             sync_provider=sync_provider,
             file=SyncFile(
@@ -296,5 +248,20 @@ class KnowledgeProcessor:
                 yield (file_knowledge, qfile)
 
     async def process_knowledge(self, knowledge_dto: KnowledgeDTO):
-        async for (knowledge, qfile) in self.build_processable(knowledge_dto):
-            pass
+        async for knowledge_tuple in self.yield_processable_kms(knowledge_dto):
+            if knowledge_tuple is None:
+                continue
+            knowledge, qfile = knowledge_tuple
+            if not skip_process(knowledge):
+                chunks = await parse_qfile(qfile=qfile)
+                await store_chunks(
+                    knowledge=knowledge,
+                    chunks=chunks,
+                    vector_service=self.services.vector_service,
+                )
+            await self.services.knowledge_service.update_knowledge(
+                knowledge,
+                KnowledgeUpdate(
+                    status=KnowledgeStatus.PROCESSED, file_sha1=knowledge.file_sha1
+                ),
+            )

@@ -153,7 +153,6 @@ class QuivrFile:
     def serialize(self) -> QuivrFileSerialized:
         return QuivrFileSerialized(
             id=self.id,
-            brain_id=self.brain_id,
             path=self.path.absolute(),
             original_filename=self.original_filename,
             file_size=self.file_size,
