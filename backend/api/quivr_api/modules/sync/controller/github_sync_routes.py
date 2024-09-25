@@ -7,7 +7,7 @@ from fastapi.responses import HTMLResponse
 from quivr_api.logger import get_logger
 from quivr_api.middlewares.auth import AuthBearer, get_current_user
 from quivr_api.modules.dependencies import get_service
-from quivr_api.modules.sync.dto.inputs import SyncUpdateInput
+from quivr_api.modules.sync.dto.inputs import SyncStatus, SyncUpdateInput
 from quivr_api.modules.sync.service.sync_service import SyncsService
 from quivr_api.modules.sync.utils.oauth2 import parse_oauth2_state
 from quivr_api.modules.user.entity.user_identity import UserIdentity
@@ -133,7 +133,12 @@ async def oauth2callback_github(
 
     logger.info(f"Retrieved email for user: {state.user_id} - {user_email}")
 
-    sync_user_input = SyncUpdateInput(credentials=result, state={}, email=user_email)
+    sync_user_input = SyncUpdateInput(
+        credentials=result,
+        state={},
+        email=user_email,
+        status=SyncStatus.SYNCED,
+    )
 
     # TODO: This an additional select query :(
     await syncs_service.update_sync(sync.id, sync_user_input)

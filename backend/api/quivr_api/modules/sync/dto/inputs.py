@@ -1,6 +1,14 @@
+import enum
 from uuid import UUID
 
 from pydantic import BaseModel
+
+
+class SyncStatus(str, enum.Enum):
+    SYNCED = "SYNCED"
+    SYNCING = "SYNCING"
+    ERROR = "ERROR"
+    REMOVED = "REMOVED"
 
 
 class SyncCreateInput(BaseModel):
@@ -38,4 +46,4 @@ class SyncUpdateInput(BaseModel):
     credentials: dict | None = None
     state: dict | None = None
     email: str | None = None
-    status: str | None = None
+    status: SyncStatus

@@ -121,26 +121,33 @@ class KnowledgeProcessor:
         return await asyncio.gather(*[map_knowledges_task, sync_files_task])  # type: ignore  # noqa: F821
 
     async def yield_processable_kms(
-        self, knowledge: KnowledgeDTO
+        self, knowledge_dto: KnowledgeDTO
     ) -> AsyncGenerator[Tuple[KnowledgeDB, QuivrFile] | None, None]:
-        if knowledge.source == KnowledgeSource.LOCAL:
-            async for to_process in self._yield_local(knowledge):
+        """Should only yield ready to process knowledges:
+        Knowledge ready to process:
+            - Is either Local or Sync
+            - Is in a status: PROCESSING | ERROR
+            - Has an associated QuivrFile that is parsable
+        """
+        if knowledge_dto.source == KnowledgeSource.LOCAL:
+            async for to_process in self._yield_local(knowledge_dto):
                 yield to_process
-        elif knowledge.source in (
+        elif knowledge_dto.source in (
             KnowledgeSource.AZURE,
-            KnowledgeSource.GITHUB,
             KnowledgeSource.GOOGLE,
+            KnowledgeSource.DROPBOX,
+            KnowledgeSource.GITHUB,
             KnowledgeSource.NOTION,
         ):
-            async for to_process in self._yield_syncs(knowledge):
+            async for to_process in self._yield_syncs(knowledge_dto):
                 yield to_process
-        elif knowledge.source == KnowledgeSource.WEB:
+        elif knowledge_dto.source == KnowledgeSource.WEB:
             raise NotImplementedError
         else:
             logger.error(
-                f"received knowledge : {knowledge.id} with unknown source: {knowledge.source}"
+                f"received knowledge : {knowledge_dto.id} with unknown source: {knowledge_dto.source}"
             )
-            raise ValueError("Unknown knowledge source : {knoledge.source}")
+            raise ValueError(f"Unknown knowledge source : {knowledge_dto.source}")
 
     async def _yield_local(
         self, knowledge: KnowledgeDTO
@@ -218,6 +225,7 @@ class KnowledgeProcessor:
         if not sync_files:
             return
 
+        breakpoint()
         for sync_file in sync_files:
             existing_km = syncfile_to_knowledge.get(sync_file.id)
             if existing_km:
@@ -228,7 +236,7 @@ class KnowledgeProcessor:
                     await self.services.knowledge_service.repository.link_to_brain(
                         existing_km, brain_id=brain.brain_id
                     )
-                # Don't reprocess already added syncs
+                # Don't reprocess already added syncs knowledges
                 if existing_km.status == KnowledgeStatus.PROCESSED:
                     continue
             else:
@@ -249,7 +257,6 @@ class KnowledgeProcessor:
                     status=KnowledgeStatus.PROCESSING,
                     upload_file=None,
                 )
-            # TODO: cache maybe processed files or skip them ?
             file_data = await download_sync_file(
                 sync_provider=sync_provider,
                 file=sync_file,
@@ -261,19 +268,22 @@ class KnowledgeProcessor:
 
     async def process_knowledge(self, knowledge_dto: KnowledgeDTO):
         async for knowledge_tuple in self.yield_processable_kms(knowledge_dto):
-            if knowledge_tuple is None:
-                continue
-            knowledge, qfile = knowledge_tuple
-            if not skip_process(knowledge):
-                chunks = await parse_qfile(qfile=qfile)
-                await store_chunks(
-                    knowledge=knowledge,
-                    chunks=chunks,
-                    vector_service=self.services.vector_service,
+            try:
+                if knowledge_tuple is None:
+                    continue
+                knowledge, qfile = knowledge_tuple
+                if not skip_process(knowledge):
+                    chunks = await parse_qfile(qfile=qfile)
+                    await store_chunks(
+                        knowledge=knowledge,
+                        chunks=chunks,
+                        vector_service=self.services.vector_service,
+                    )
+                await self.services.knowledge_service.update_knowledge(
+                    knowledge,
+                    KnowledgeUpdate(
+                        status=KnowledgeStatus.PROCESSED, file_sha1=knowledge.file_sha1
+                    ),
                 )
-            await self.services.knowledge_service.update_knowledge(
-                knowledge,
-                KnowledgeUpdate(
-                    status=KnowledgeStatus.PROCESSED, file_sha1=knowledge.file_sha1
-                ),
-            )
+            except Exception as e:
+                logger.error(f"Error processing knowledge {knowledge_dto.id} : {e}")

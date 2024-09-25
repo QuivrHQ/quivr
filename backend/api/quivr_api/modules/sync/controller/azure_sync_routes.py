@@ -8,7 +8,7 @@ from msal import ConfidentialClientApplication
 from quivr_api.logger import get_logger
 from quivr_api.middlewares.auth import AuthBearer, get_current_user
 from quivr_api.modules.dependencies import get_service
-from quivr_api.modules.sync.dto.inputs import SyncUpdateInput
+from quivr_api.modules.sync.dto.inputs import SyncStatus, SyncUpdateInput
 from quivr_api.modules.sync.service.sync_service import SyncsService
 from quivr_api.modules.sync.utils.oauth2 import parse_oauth2_state
 from quivr_api.modules.user.entity.user_identity import UserIdentity
@@ -74,7 +74,9 @@ async def authorize_azure(
     # Azure needs additional data
     await syncs_service.update_sync(
         sync_id=state.sync_id,
-        sync_user_input=SyncUpdateInput(additional_data={"flow": flow}),
+        sync_user_input=SyncUpdateInput(
+            additional_data={"flow": flow}, status=SyncStatus.SYNCED
+        ),
     )
     return {"authorization_url": flow["auth_uri"]}
 
@@ -131,7 +133,9 @@ async def oauth2callback_azure(
     user_email = user_info.get("mail") or user_info.get("userPrincipalName")
     logger.info(f"Retrieved email for user: {state.user_id} - {user_email}")
 
-    sync_user_input = SyncUpdateInput(credentials=flow_data, state={}, email=user_email)
+    sync_user_input = SyncUpdateInput(
+        credentials=flow_data, state={}, email=user_email, status=SyncStatus.SYNCED
+    )
     await syncs_service.update_sync(state.sync_id, sync_user_input)
     logger.info(f"Azure sync created successfully for user: {state.user_id}")
     return HTMLResponse(successfullConnectionPage)

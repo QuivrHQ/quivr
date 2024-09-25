@@ -88,3 +88,44 @@ async def test_process_sync_file(
     )
     assert len(vecs) > 0
     assert vecs[0].metadata_ is not None
+
+
+@pytest.mark.asyncio(loop_scope="session")
+@pytest.mark.parametrize("proc_services", [2], indirect=True)
+async def test_process_sync_folder(
+    monkeypatch,
+    session: AsyncSession,
+    proc_services: ProcessorServices,
+    sync_knowledge_folder: KnowledgeDB,
+):
+    async def _parse_file_mock(
+        qfile: QuivrFile,
+        **processor_kwargs: dict[str, Any],
+    ) -> list[Document]:
+        with open(qfile.path, "rb") as f:
+            return [Document(page_content=str(f.read()), metadata={})]
+
+    km_processor = KnowledgeProcessor(proc_services)
+    monkeypatch.setattr("quivr_worker.process.processor.parse_qfile", _parse_file_mock)
+    km_dto = await sync_knowledge_folder.to_dto(get_children=False, get_parent=False)
+    await km_processor.process_knowledge(km_dto)
+
+    # Check knowledge set to processed
+    assert km_dto.id
+    assert km_dto.brains
+    assert km_dto.brains[0]
+    knowledge_service = km_processor.services.knowledge_service
+    # FIXME (@AmineDiro): brain dto!!
+    kms = await knowledge_service.get_all_knowledge_in_brain(
+        km_dto.brains[0]["brain_id"]
+    )
+
+    for km in kms:
+        assert km.status == KnowledgeStatus.PROCESSED
+        assert km.brains[0]["brain_id"]
+        assert km.brains[0]["brain_id"] == km_dto.brains[0]["brain_id"]
+
+    # Check vectors where added
+    vecs = list((await session.exec(select(Vector))).all())
+    assert len(vecs) > 0
+    assert vecs[0].metadata_ is not None

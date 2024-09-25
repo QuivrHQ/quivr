@@ -7,6 +7,7 @@ from quivr_api.logger import get_logger
 from quivr_api.modules.dependencies import BaseService
 from quivr_api.modules.sync.dto.inputs import (
     SyncCreateInput,
+    SyncStatus,
     SyncUpdateInput,
 )
 from quivr_api.modules.sync.dto.outputs import SyncsOutput
@@ -67,6 +68,7 @@ class SyncsService(BaseService[SyncsRepository]):
             credentials={},
             state={"state": state},
             additional_data=additional_data,
+            status=SyncStatus.SYNCING,
         )
         sync = await self.create_sync_user(sync_user_input)
         return Oauth2State(sync_id=sync.id, **state_struct.model_dump())
