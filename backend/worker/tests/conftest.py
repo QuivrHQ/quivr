@@ -28,7 +28,7 @@ from quivr_api.modules.vector.repository.vectors_repository import VectorReposit
 from quivr_api.modules.vector.service.vector_service import VectorService
 from quivr_core.files.file import QuivrFile
 from quivr_core.models import KnowledgeStatus
-from quivr_worker.process.processor import KnowledgeProcessor, ProcessorServices
+from quivr_worker.process.processor import ProcessorServices
 from sqlalchemy.ext.asyncio import create_async_engine
 from sqlmodel import select
 from sqlmodel.ext.asyncio.session import AsyncSession
@@ -128,11 +128,6 @@ async def proc_services(session: AsyncSession, request) -> ProcessorServices:
         sync_service=sync_service,
         syncprovider_mapping=sync_provider_mapping,
     )
-
-
-@pytest_asyncio.fixture(scope="function")
-async def km_processor(proc_services: ProcessorServices):
-    return KnowledgeProcessor(proc_services)
 
 
 @pytest_asyncio.fixture(scope="function")

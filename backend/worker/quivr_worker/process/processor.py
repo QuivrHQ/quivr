@@ -8,7 +8,6 @@ from uuid import UUID
 from quivr_api.logger import get_logger
 from quivr_api.modules.dependencies import get_supabase_async_client
 from quivr_api.modules.knowledge.dto.inputs import AddKnowledge, KnowledgeUpdate
-from quivr_api.modules.knowledge.dto.outputs import KnowledgeDTO
 from quivr_api.modules.knowledge.entity.knowledge import KnowledgeDB, KnowledgeSource
 from quivr_api.modules.knowledge.repository.knowledges import KnowledgeRepository
 from quivr_api.modules.knowledge.repository.storage import SupabaseS3Storage
@@ -64,7 +63,9 @@ async def _start_session(engine: AsyncEngine) -> AsyncGenerator[AsyncSession, No
 
 
 @asynccontextmanager
-async def build_processor_services(engine: AsyncEngine):
+async def build_processor_services(
+    engine: AsyncEngine,
+) -> AsyncGenerator[ProcessorServices, None]:
     async_client = await get_supabase_async_client()
     storage = SupabaseS3Storage(async_client)
     try:
@@ -121,7 +122,7 @@ class KnowledgeProcessor:
         return await asyncio.gather(*[map_knowledges_task, sync_files_task])  # type: ignore  # noqa: F821
 
     async def yield_processable_kms(
-        self, knowledge_dto: KnowledgeDTO
+        self, knowledge_id: UUID
     ) -> AsyncGenerator[Tuple[KnowledgeDB, QuivrFile] | None, None]:
         """Should only yield ready to process knowledges:
         Knowledge ready to process:
@@ -129,35 +130,35 @@ class KnowledgeProcessor:
             - Is in a status: PROCESSING | ERROR
             - Has an associated QuivrFile that is parsable
         """
-        if knowledge_dto.source == KnowledgeSource.LOCAL:
-            async for to_process in self._yield_local(knowledge_dto):
+        knowledge = await self.services.knowledge_service.get_knowledge(knowledge_id)
+        if knowledge.source == KnowledgeSource.LOCAL:
+            async for to_process in self._yield_local(knowledge):
                 yield to_process
-        elif knowledge_dto.source in (
+        elif knowledge.source in (
             KnowledgeSource.AZURE,
             KnowledgeSource.GOOGLE,
             KnowledgeSource.DROPBOX,
             KnowledgeSource.GITHUB,
             KnowledgeSource.NOTION,
         ):
-            async for to_process in self._yield_syncs(knowledge_dto):
+            async for to_process in self._yield_syncs(knowledge):
                 yield to_process
-        elif knowledge_dto.source == KnowledgeSource.WEB:
+        elif knowledge.source == KnowledgeSource.WEB:
             raise NotImplementedError
         else:
             logger.error(
-                f"received knowledge : {knowledge_dto.id} with unknown source: {knowledge_dto.source}"
+                f"received knowledge : {knowledge.id} with unknown source: {knowledge.source}"
             )
-            raise ValueError(f"Unknown knowledge source : {knowledge_dto.source}")
+            raise ValueError(f"Unknown knowledge source : {knowledge.source}")
 
     async def _yield_local(
-        self, knowledge: KnowledgeDTO
+        self, knowledge_db: KnowledgeDB
     ) -> AsyncGenerator[Tuple[KnowledgeDB, QuivrFile] | None, None]:
-        if knowledge.id is None or knowledge.file_name is None:
-            logger.error(f"received unprocessable local knowledge : {knowledge.id} ")
+        if knowledge_db.id is None or knowledge_db.file_name is None:
+            logger.error(f"received unprocessable local knowledge : {knowledge_db.id} ")
             raise ValueError(
-                f"received unprocessable local knowledge : {knowledge.id} "
+                f"received unprocessable local knowledge : {knowledge_db.id} "
             )
-        knowledge_db = await self.services.knowledge_service.get_knowledge(knowledge.id)
         file_data = await self.services.knowledge_service.storage.download_file(
             knowledge_db
         )
@@ -166,15 +167,12 @@ class KnowledgeProcessor:
             yield (knowledge_db, qfile)
 
     async def _yield_syncs(
-        self, knowledge_dto: KnowledgeDTO
+        self, parent_knowledge: KnowledgeDB
     ) -> AsyncGenerator[Optional[Tuple[KnowledgeDB, QuivrFile]], None]:
-        if knowledge_dto.id is None:
-            logger.error(f"received unprocessable knowledge: {knowledge_dto.id} ")
+        if parent_knowledge.id is None:
+            logger.error(f"received unprocessable knowledge: {parent_knowledge.id} ")
             raise ValueError
 
-        parent_knowledge = await self.services.knowledge_service.get_knowledge(
-            knowledge_dto.id
-        )
         if parent_knowledge.file_name is None:
             logger.error(f"received unprocessable knowledge : {parent_knowledge.id} ")
             raise ValueError(
@@ -269,8 +267,8 @@ class KnowledgeProcessor:
             with build_qfile(file_knowledge, file_data) as qfile:
                 yield (file_knowledge, qfile)
 
-    async def process_knowledge(self, knowledge_dto: KnowledgeDTO):
-        async for knowledge_tuple in self.yield_processable_kms(knowledge_dto):
+    async def process_knowledge(self, knowledge_id: UUID):
+        async for knowledge_tuple in self.yield_processable_kms(knowledge_id):
             try:
                 if knowledge_tuple is None:
                     continue
@@ -289,4 +287,4 @@ class KnowledgeProcessor:
                     ),
                 )
             except Exception as e:
-                logger.error(f"Error processing knowledge {knowledge_dto.id} : {e}")
+                logger.error(f"Error processing knowledge {knowledge_id} : {e}")

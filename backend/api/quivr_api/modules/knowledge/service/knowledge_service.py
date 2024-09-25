@@ -175,6 +175,7 @@ class KnowledgeService(BaseService[KnowledgeRepository]):
         user_id: UUID,
         knowledge_to_add: CreateKnowledgeProperties,  # FIXME: (later) @Amine brain id should not be in CreateKnowledgeProperties but since storage is brain_id/file_name
     ) -> KnowledgeDTO:
+        # TODO: check input
         knowledge = KnowledgeDB(
             file_name=knowledge_to_add.file_name,
             url=knowledge_to_add.url,

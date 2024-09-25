@@ -314,10 +314,7 @@ async def link_knowledge_to_brain(
             "process_file_task",
             kwargs={
                 "knowledge_id": knowledge.id,
-                "file_name": knowledge.file_name,
                 "notification_id": upload_notification.id,
-                "source": knowledge.source,
-                "source_link": knowledge.source_link,
             },
         )
         knowledge = await knowledge_service.update_knowledge(
