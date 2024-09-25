@@ -20,6 +20,7 @@
     # via quivr-worker
 -e file:core/MegaParse
     # via quivr-core
+    # via quivr-diff-assistant
 -e file:worker
 -e file:worker/diff-assistant
     # via quivr-worker
@@ -570,9 +571,6 @@ mdit-py-plugins==0.4.1
     # via jupytext
 mdurl==0.1.2
     # via markdown-it-py
-megaparse==0.0.31
-    # via quivr-core
-    # via quivr-diff-assistant
 mergedeep==1.3.4
     # via mkdocs
     # via mkdocs-get-deps
