@@ -242,7 +242,7 @@ assistant3 = AssistantOutput(
                 key="DocumentsType",
                 conditional_key="Hard-to-Read Document?",
                 condition="equals",
-                value="True",
+                value="Etiquettes",
             ),
         ],
     ),

@@ -70,6 +70,7 @@ interface Inputs {
   select_texts?: SelectText[];
   select_numbers: SelectNumber[];
   brain: Brain;
+  conditional_inputs?: ConditionalInput[];
 }
 
 export interface Assistant {
@@ -89,6 +90,13 @@ interface ProcessAssistantInputFile {
   value: string;
 }
 
+export interface ConditionalInput {
+  key: string;
+  conditional_key: string;
+  condition: "equals" | "not_equals";
+  value: string;
+}
+
 export interface ProcessAssistantData {
   id: number;
   name: string;
@@ -101,6 +109,7 @@ export interface ProcessAssistantData {
     select_texts?: { key: string; value: string | null }[];
     select_numbers?: { key: string; value: number }[];
     brain?: { value: string };
+    conditional_inputs?: ConditionalInput[];
   };
 }
 

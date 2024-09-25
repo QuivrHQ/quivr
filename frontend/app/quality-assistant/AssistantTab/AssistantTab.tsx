@@ -3,14 +3,14 @@
 import { useEffect, useState } from "react";
 
 import { useAssistants } from "@/lib/api/assistants/useAssistants";
-import { Checkbox } from "@/lib/components/ui/Checkbox/Checkbox";
 import { FileInput } from "@/lib/components/ui/FileInput/FileInput";
 import { Icon } from "@/lib/components/ui/Icon/Icon";
 import QuivrButton from "@/lib/components/ui/QuivrButton/QuivrButton";
-import { SingleSelector } from "@/lib/components/ui/SingleSelector/SingleSelector";
 
 import AssistantCard from "./AssistantCard/AssistantCard";
 import styles from "./AssistantTab.module.scss";
+import BooleansInputs from "./BooleansInputs/BooleansInputs";
+import SelectorsInputs from "./SelectorsInput/SelectorsInputs";
 
 import { Assistant, ProcessAssistantData } from "../types/assistant";
 
@@ -47,20 +47,6 @@ const AssistantTab = ({ setSelectedTab }: AssistantTabProps): JSX.Element => {
     }));
   };
 
-  const handleCheckboxChange = (key: string, checked: boolean) => {
-    setBooleanStates((prevState) => ({
-      ...prevState,
-      [key]: checked,
-    }));
-  };
-
-  const handleSelectTextChange = (key: string, value: string) => {
-    setSelectTextStates((prevState) => ({
-      ...prevState,
-      [key]: value,
-    }));
-  };
-
   const validateForm = () => {
     if (!assistantChoosed) {
       return false;
@@ -85,13 +71,18 @@ const AssistantTab = ({ setSelectedTab }: AssistantTabProps): JSX.Element => {
       return false;
     }
 
-    return (
+    const allSelectTextsSet =
       assistantChoosed.inputs.select_texts?.every(
         (input) =>
           selectTextStates[input.key] !== undefined &&
           selectTextStates[input.key] !== null
-      ) ?? true
-    );
+      ) ?? true;
+
+    if (!allSelectTextsSet) {
+      return false;
+    }
+
+    return true;
   };
 
   useEffect(() => {
@@ -139,7 +130,7 @@ const AssistantTab = ({ setSelectedTab }: AssistantTabProps): JSX.Element => {
           })),
           booleans: Object.keys(booleanStates).map((key) => ({
             key,
-            value: booleanStates[key],
+            value: booleanStates[key] ?? null,
           })),
           select_texts: Object.keys(selectTextStates).map((key) => ({
             key,
@@ -203,38 +194,18 @@ const AssistantTab = ({ setSelectedTab }: AssistantTabProps): JSX.Element => {
               </div>
             ))}
           </div>
-          <div className={styles.select_texts_wrapper}>
-            {assistantChoosed.inputs.select_texts?.map((input, index) => (
-              <div key={index} className={styles.select_text}>
-                <SingleSelector
-                  iconName="brain"
-                  placeholder={input.key}
-                  options={input.options.map((option) => {
-                    return { label: option, value: option };
-                  })}
-                  onChange={(value) => handleSelectTextChange(input.key, value)}
-                  selectedOption={{
-                    label: selectTextStates[input.key] ?? input.options[0],
-                    value: selectTextStates[input.key] ?? input.options[0],
-                  }}
-                />
-              </div>
-            ))}
-          </div>
-
-          <div className={styles.boolean_inputs_wrapper}>
-            {assistantChoosed.inputs.booleans?.map((input, index) => (
-              <div key={index} className={styles.boolean_input}>
-                <Checkbox
-                  label={input.key}
-                  checked={!!booleanStates[input.key]}
-                  setChecked={(checked) =>
-                    handleCheckboxChange(input.key, checked)
-                  }
-                />
-              </div>
-            ))}
-          </div>
+          <SelectorsInputs
+            selectTexts={assistantChoosed.inputs.select_texts ?? []}
+            selectTextStates={selectTextStates}
+            setSelectTextStates={setSelectTextStates}
+          />
+          <BooleansInputs
+            booleans={assistantChoosed.inputs.booleans ?? []}
+            conditionalInputs={assistantChoosed.inputs.conditional_inputs}
+            booleanStates={booleanStates}
+            setBooleanStates={setBooleanStates}
+            selectTextStates={selectTextStates}
+          />
         </div>
       )}
       {assistantChoosed && (
