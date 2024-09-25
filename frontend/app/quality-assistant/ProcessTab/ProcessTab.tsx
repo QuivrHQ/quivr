@@ -7,6 +7,7 @@ import { Checkbox } from "@/lib/components/ui/Checkbox/Checkbox";
 import { Icon } from "@/lib/components/ui/Icon/Icon";
 import { QuivrButton } from "@/lib/components/ui/QuivrButton/QuivrButton";
 import { TextInput } from "@/lib/components/ui/TextInput/TextInput";
+import { useSupabase } from "@/lib/context/SupabaseProvider";
 import { filterAndSort, updateSelectedItems } from "@/lib/helpers/table";
 import { useDevice } from "@/lib/hooks/useDevice";
 
@@ -31,7 +32,7 @@ const ProcessTab = (): JSX.Element => {
   const [loading, setLoading] = useState<boolean>(false);
 
   const { getTasks, deleteTask } = useAssistants();
-
+  const { supabase } = useSupabase();
   const { isMobile } = useDevice();
 
   const loadTasks = async () => {
@@ -44,8 +45,27 @@ const ProcessTab = (): JSX.Element => {
     }
   };
 
+  const handleStatusChange = () => {
+    void loadTasks();
+  };
+
   useEffect(() => {
     void loadTasks();
+  }, []);
+
+  useEffect(() => {
+    const channel = supabase
+      .channel("tasks")
+      .on(
+        "postgres_changes",
+        { event: "UPDATE", schema: "public", table: "tasks" },
+        handleStatusChange
+      )
+      .subscribe();
+
+    return () => {
+      void supabase.removeChannel(channel);
+    };
   }, []);
 
   useEffect(() => {
