@@ -305,7 +305,11 @@ class GoogleDriveSync(BaseSync):
             raise Exception("Failed to retrieve files")
 
     async def aget_files(
-        self, credentials: Dict, folder_id: str | None = None, recursive: bool = False
+        self,
+        credentials: Dict,
+        folder_id: str | None = None,
+        recursive: bool = False,
+        sync_user_id: int | None = None,
     ) -> List[SyncFile]:
         return self.get_files(credentials, folder_id, recursive)
 
@@ -476,7 +480,11 @@ class AzureDriveSync(BaseSync):
         return files
 
     async def aget_files(
-        self, credentials: Dict, folder_id: str | None = None, recursive: bool = False
+        self,
+        credentials: Dict,
+        folder_id: str | None = None,
+        recursive: bool = False,
+        sync_user_id: int | None = None,
     ) -> List[SyncFile]:
         return self.get_files(credentials, folder_id, recursive)
 
@@ -670,7 +678,11 @@ class DropboxSync(BaseSync):
             raise Exception("Failed to retrieve files")
 
     async def aget_files(
-        self, credentials: Dict, folder_id: str | None = None, recursive: bool = False
+        self,
+        credentials: Dict,
+        folder_id: str | None = None,
+        recursive: bool = False,
+        sync_user_id: int | None = None,
     ) -> List[SyncFile]:
         return self.get_files(credentials, folder_id, recursive)
 
@@ -788,10 +800,11 @@ class NotionSync(BaseSync):
     async def aget_files(
         self,
         credentials: Dict,
-        sync_user_id: int,
         folder_id: str | None = None,
         recursive: bool = False,
+        sync_user_id: int | None = None,
     ) -> List[SyncFile]:
+        assert sync_user_id, "should not be optional for notion"
         pages = []
 
         if not self.notion:
@@ -818,7 +831,12 @@ class NotionSync(BaseSync):
             pages.append(page_info)
 
             if recursive:
-                sub_pages = await self.aget_files(credentials=credentials, sync_user_id=sync_user_id, folder_id=str(page.id), recursive=recursive)
+                sub_pages = await self.aget_files(
+                    credentials=credentials,
+                    sync_user_id=sync_user_id,
+                    folder_id=str(page.id),
+                    recursive=recursive,
+                )
                 pages.extend(sub_pages)
         return pages
 
@@ -1035,7 +1053,11 @@ class GitHubSync(BaseSync):
             return self.list_github_repos(credentials, recursive=recursive)
 
     async def aget_files(
-        self, credentials: Dict, folder_id: str | None = None, recursive: bool = False
+        self,
+        credentials: Dict,
+        folder_id: str | None = None,
+        recursive: bool = False,
+        sync_user_id: int | None = None,
     ) -> List[SyncFile]:
         return self.get_files(credentials, folder_id, recursive)
 
