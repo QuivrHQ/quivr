@@ -3,11 +3,12 @@ import time
 from langchain.schema import Document
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from openai import OpenAI
+from quivr_core.files.file import QuivrFile
 
-from quivr_worker.files import File, compute_sha1
+from quivr_worker.process.utils import compute_sha1
 
 
-def process_audio(file: File, model: str = "whisper=1"):
+def process_audio(file: QuivrFile, model: str = "whisper=1"):
     # TODO(@aminediro): These should apear in the class processor
     # Should be instanciated once per Processor
     chunk_size = 500
@@ -19,7 +20,8 @@ def process_audio(file: File, model: str = "whisper=1"):
 
     dateshort = time.strftime("%Y%m%d-%H%M%S")
     file_meta_name = f"audiotranscript_{dateshort}.txt"
-    with open(file.tmp_file_path, "rb") as audio_file:
+    # TODO: This reopens the file adding an additional FD
+    with open(file.path, "rb") as audio_file:
         transcript = client.audio.transcriptions.create(model=model, file=audio_file)
         transcript_txt = transcript.text.encode("utf-8")
 

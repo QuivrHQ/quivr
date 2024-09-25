@@ -2,13 +2,22 @@ import hashlib
 import io
 from dataclasses import dataclass
 from datetime import datetime
-from typing import Optional
+from typing import Dict, List, Optional
 from uuid import UUID
 
 from pydantic import BaseModel
-from sqlmodel import TIMESTAMP, Column, Field, Relationship, SQLModel, text
+from sqlmodel import (  # noqa: F811
+    JSON,
+    TIMESTAMP,
+    Column,
+    Field,
+    Relationship,
+    SQLModel,
+    text,
+)
 from sqlmodel import UUID as PGUUID
 
+from quivr_api.modules.sync.dto.outputs import SyncProvider, SyncsOutput
 from quivr_api.modules.user.entity.user_identity import User
 
 
@@ -27,57 +36,63 @@ class DownloadedSyncFile:
         return m.hexdigest()
 
 
-class DBSyncFile(BaseModel):
-    id: int
-    path: str
-    syncs_active_id: int
-    last_modified: str
-    brain_id: str
-    supported: bool
-
-
 class SyncFile(BaseModel):
     id: str
     name: str
     is_folder: bool
-    last_modified: str
-    mime_type: str
+    last_modified_at: Optional[datetime]
+    extension: str
     web_view_link: str
     size: Optional[int] = None
-    notification_id: UUID | None = None
     icon: Optional[str] = None
     parent_id: Optional[str] = None
     type: Optional[str] = None
 
 
-class SyncsUser(BaseModel):
-    id: int
-    user_id: UUID
+class Sync(SQLModel, table=True):
+    __tablename__ = "syncs"  # type: ignore
+
+    id: int | None = Field(default=None, primary_key=True)
     name: str
     email: str | None = None
     provider: str
-    credentials: dict
-    state: dict
-    additional_data: dict
-    status: str
+    email: str | None = Field(default=None)
+    user_id: UUID = Field(foreign_key="users.id", nullable=False)
+    credentials: Dict[str, str] | None = Field(
+        default=None, sa_column=Column("credentials", JSON)
+    )
+    state: Dict[str, str] | None = Field(default=None, sa_column=Column("state", JSON))
+    created_at: datetime | None = Field(
+        default=None,
+        sa_column=Column(
+            TIMESTAMP(timezone=False),
+            server_default=text("CURRENT_TIMESTAMP"),
+        ),
+    )
+    updated_at: datetime | None = Field(
+        default=None,
+        sa_column=Column(
+            TIMESTAMP(timezone=False),
+            server_default=text("CURRENT_TIMESTAMP"),
+            onupdate=datetime.utcnow,
+        ),
+    )
+    last_synced_at: datetime | None = Field(default=None)
+    additional_data: dict | None = Field(
+        default=None, sa_column=Column("additional_data", JSON)
+    )
+    knowledges: List["KnowledgeDB"] | None = Relationship(back_populates="sync")
 
-
-class SyncsActive(BaseModel):
-    id: int
-    name: str
-    syncs_user_id: int
-    user_id: UUID
-    settings: dict
-    last_synced: str
-    sync_interval_minutes: int
-    brain_id: UUID
-    syncs_user: Optional[SyncsUser] = None
-    notification_id: Optional[str] = None
-
-
-# TODO: all of this should be rewritten
-class SyncsActiveDetails(BaseModel):
-    pass
+    def to_dto(self) -> SyncsOutput:
+        assert self.id, "can't create create output if sync isn't inserted"
+        return SyncsOutput(
+            id=self.id,
+            user_id=self.user_id,
+            provider=SyncProvider(self.provider.lower()),
+            credentials=self.credentials,
+            state=self.state,
+            additional_data=self.additional_data,
+        )
 
 
 class NotionSyncFile(SQLModel, table=True):

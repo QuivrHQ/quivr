@@ -3,7 +3,7 @@ from uuid import UUID
 
 from notion_client import Client
 from quivr_api.logger import get_logger
-from quivr_api.modules.sync.repository.sync_repository import NotionRepository
+from quivr_api.modules.sync.repository.notion_repository import NotionRepository
 from quivr_api.modules.sync.service.sync_notion import (
     SyncNotionService,
     fetch_limit_notion_pages,

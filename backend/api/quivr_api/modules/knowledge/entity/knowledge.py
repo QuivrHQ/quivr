@@ -1,8 +1,8 @@
+import asyncio
 from datetime import datetime
 from enum import Enum
-from typing import Any, Dict, List, Optional
+from typing import Dict, List, Optional
 from uuid import UUID
-from pydantic import BaseModel
 
 from quivr_core.models import KnowledgeStatus
 from sqlalchemy import JSON, TIMESTAMP, Column, text
@@ -10,47 +10,20 @@ from sqlalchemy.ext.asyncio import AsyncAttrs
 from sqlmodel import UUID as PGUUID
 from sqlmodel import Field, Relationship, SQLModel
 
+from quivr_api.modules.knowledge.dto.outputs import KnowledgeDTO
 from quivr_api.modules.knowledge.entity.knowledge_brain import KnowledgeBrain
+from quivr_api.modules.sync.entity.sync_models import Sync
 
 
 class KnowledgeSource(str, Enum):
     LOCAL = "local"
     WEB = "web"
-    GDRIVE = "google drive"
+    NOTETAKER = "notetaker"
+    GOOGLE = "google"
+    AZURE = "azure"
     DROPBOX = "dropbox"
-    SHAREPOINT = "sharepoint"
-
-
-class Knowledge(BaseModel):
-    id: UUID
-    file_size: int = 0
-    status: KnowledgeStatus
-    file_name: Optional[str] = None
-    url: Optional[str] = None
-    extension: str = ".txt"
-    is_folder: bool = False
-    updated_at: datetime
-    created_at: datetime
-    source: Optional[str] = None
-    source_link: Optional[str] = None
-    file_sha1: Optional[str] = None
-    metadata: Optional[Dict[str, str]] = None
-    user_id: Optional[UUID] = None
-    brains: List[Dict[str, Any]]
-    parent: Optional["Knowledge"]
-    children: Optional[list["Knowledge"]]
-
-
-class KnowledgeUpdate(BaseModel):
-    file_name: Optional[str] = None
-    status: Optional[KnowledgeStatus] = None
-    url: Optional[str] = None
-    file_sha1: Optional[str] = None
-    extension: Optional[str] = None
-    parent_id: Optional[UUID] = None
-    source: Optional[str] = None
-    source_link: Optional[str] = None
-    metadata: Optional[Dict[str, str]] = None
+    NOTION = "notion"
+    GITHUB = "github"
 
 
 class KnowledgeDB(AsyncAttrs, SQLModel, table=True):
@@ -64,7 +37,7 @@ class KnowledgeDB(AsyncAttrs, SQLModel, table=True):
             primary_key=True,
         ),
     )
-    file_name: str = Field(default="", max_length=255)
+    file_name: Optional[str] = Field(default=None, max_length=255)
     url: Optional[str] = Field(default=None, max_length=2048)
     extension: str = Field(default=".txt", max_length=100)
     status: str = Field(max_length=50)
@@ -97,7 +70,7 @@ class KnowledgeDB(AsyncAttrs, SQLModel, table=True):
     brains: List["Brain"] = Relationship(  # type: ignore # noqa: F821
         back_populates="knowledges",
         link_model=KnowledgeBrain,
-        sa_relationship_kwargs={"lazy": "select"},
+        sa_relationship_kwargs={"lazy": "joined"},
     )
 
     parent_id: UUID | None = Field(
@@ -113,11 +86,18 @@ class KnowledgeDB(AsyncAttrs, SQLModel, table=True):
             "cascade": "all, delete-orphan",
         },
     )
+    sync_id: int | None = Field(
+        default=None, foreign_key="syncs.id", ondelete="CASCADE"
+    )
+    sync: Sync | None = Relationship(
+        back_populates="knowledges", sa_relationship_kwargs={"lazy": "joined"}
+    )
+    sync_file_id: str | None = Field(default=None)
 
     # TODO: nested folder search
     async def to_dto(
         self, get_children: bool = True, get_parent: bool = True
-    ) -> Knowledge:
+    ) -> KnowledgeDTO:
         assert (
             self.updated_at
         ), "knowledge should be inserted before transforming to dto"
@@ -128,10 +108,13 @@ class KnowledgeDB(AsyncAttrs, SQLModel, table=True):
         children: list[KnowledgeDB] = (
             await self.awaitable_attrs.children if get_children else []
         )
+        children_dto = await asyncio.gather(
+            *[c.to_dto(get_children=False) for c in children]
+        )
         parent = await self.awaitable_attrs.parent if get_parent else None
-        parent = await parent.to_dto(get_children=False) if parent else None
+        parent_dto = await parent.to_dto(get_children=False) if parent else None
 
-        return Knowledge(
+        return KnowledgeDTO(
             id=self.id,  # type: ignore
             file_name=self.file_name,
             url=self.url,
@@ -146,7 +129,9 @@ class KnowledgeDB(AsyncAttrs, SQLModel, table=True):
             created_at=self.created_at,
             metadata=self.metadata_,  # type: ignore
             brains=[b.model_dump() for b in brains],
-            parent=parent,
-            children=[await c.to_dto(get_children=False) for c in children],
+            parent=parent_dto,
+            children=children_dto,
             user_id=self.user_id,
+            sync_id=self.sync_id,
+            sync_file_id=self.sync_file_id,
         )

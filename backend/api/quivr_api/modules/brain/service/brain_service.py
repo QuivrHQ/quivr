@@ -1,4 +1,4 @@
-from typing import Optional, Tuple, Dict
+from typing import Optional, Tuple
 from uuid import UUID
 
 from fastapi import HTTPException
@@ -54,7 +54,7 @@ class BrainService:
         chat_id: UUID,
         history,
         vector_store: CustomSupabaseVectorStore,
-    ) -> Tuple[Optional[BrainEntity], Dict[str, str]]:
+    ) -> Tuple[Optional[BrainEntity], dict[str, str]]:
         """Find the brain to use for a question.
 
         Args:

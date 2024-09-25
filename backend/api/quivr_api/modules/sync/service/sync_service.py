@@ -1,119 +1,86 @@
-from abc import ABC, abstractmethod
-from typing import Dict, List, Union
+from typing import Any
 from uuid import UUID
 
+from fastapi import HTTPException
+
 from quivr_api.logger import get_logger
+from quivr_api.modules.dependencies import BaseService
 from quivr_api.modules.sync.dto.inputs import (
-    SyncsActiveInput,
-    SyncsActiveUpdateInput,
-    SyncsUserInput,
-    SyncsUserStatus,
-    SyncUserUpdateInput,
+    SyncCreateInput,
+    SyncStatus,
+    SyncUpdateInput,
 )
-from quivr_api.modules.sync.entity.sync_models import SyncsActive, SyncsUser
-from quivr_api.modules.sync.repository.sync_repository import Sync
-from quivr_api.modules.sync.repository.sync_user import SyncUserRepository
-from quivr_api.modules.sync.service.sync_notion import SyncNotionService
+from quivr_api.modules.sync.dto.outputs import SyncsOutput
+from quivr_api.modules.sync.repository.sync_repository import SyncsRepository
+from quivr_api.modules.sync.utils.oauth2 import Oauth2BaseState, Oauth2State
 
 logger = get_logger(__name__)
 
 
-class ISyncUserService(ABC):
-    @abstractmethod
-    def get_syncs_user(self, user_id: UUID, sync_user_id: Union[int, None] = None):
-        pass
+class SyncsService(BaseService[SyncsRepository]):
+    repository_cls = SyncsRepository
 
-    @abstractmethod
-    def create_sync_user(self, sync_user_input: SyncsUserInput):
-        pass
+    def __init__(self, repository: SyncsRepository):
+        self.repository = repository
 
-    @abstractmethod
-    def delete_sync_user(self, sync_id: int, user_id: str):
-        pass
+    async def create_sync_user(self, sync_user_input: SyncCreateInput) -> SyncsOutput:
+        sync = await self.repository.create_sync(sync_user_input)
+        return sync.to_dto()
 
-    @abstractmethod
-    def get_sync_user_by_state(self, state: Dict) -> Union["SyncsUser", None]:
-        pass
+    async def get_user_syncs(self, user_id: UUID, sync_id: int | None = None):
+        return await self.repository.get_syncs(user_id=user_id, sync_id=sync_id)
 
-    @abstractmethod
-    def get_sync_user_by_id(self, sync_id: int):
-        pass
+    async def delete_sync(self, sync_id: int, user_id: UUID):
+        await self.repository.delete_sync(sync_id, user_id)
 
-    @abstractmethod
-    def update_sync_user(
-        self, sync_user_id: UUID, state: Dict, sync_user_input: SyncUserUpdateInput
-    ):
-        pass
+    async def get_sync_by_id(self, sync_id: int):
+        return await self.repository.get_sync_id(sync_id)
 
-    @abstractmethod
-    def get_all_notion_user_syncs(self):
-        pass
+    async def get_from_oauth2_state(self, state: Oauth2State) -> SyncsOutput:
+        assert state.sync_id, "state should have associated sync_id"
+        sync = await self.get_sync_by_id(state.sync_id)
 
-    @abstractmethod
-    async def get_files_folder_user_sync(
+        # TODO: redo these exceptions
+        if (
+            not sync
+            or not sync.state
+            or state.model_dump_json(exclude={"sync_id"}) != sync.state["state"]
+        ):
+            logger.error("Invalid state parameter")
+            raise HTTPException(status_code=400, detail="Invalid state parameter")
+        if sync.user_id != state.user_id:
+            raise HTTPException(status_code=400, detail="Invalid user")
+        return sync.to_dto()
+
+    async def create_oauth2_state(
         self,
-        sync_active_id: int,
+        provider: str,
+        name: str,
         user_id: UUID,
-        folder_id: Union[str, None] = None,
-        recursive: bool = False,
-        notion_service: Union["SyncNotionService", None] = None,
-    ):
-        pass
+        additional_data: dict[str, Any] = {},
+    ) -> Oauth2State:
+        state_struct = Oauth2BaseState(name=name, user_id=user_id)
+        state = state_struct.model_dump_json()
+        sync_user_input = SyncCreateInput(
+            name=name,
+            user_id=user_id,
+            provider=provider,
+            credentials={},
+            state={"state": state},
+            additional_data=additional_data,
+            status=SyncStatus.SYNCING,
+        )
+        sync = await self.create_sync_user(sync_user_input)
+        return Oauth2State(sync_id=sync.id, **state_struct.model_dump())
 
+    async def update_sync(
+        self, sync_id: int, sync_user_input: SyncUpdateInput
+    ) -> SyncsOutput:
+        sync = await self.repository.get_sync_id(sync_id)
+        sync = await self.repository.update_sync(sync, sync_user_input)
+        return sync.to_dto()
 
-class SyncUserService(ISyncUserService):
-    def __init__(self):
-        self.repository = SyncUserRepository()
-
-    def get_syncs_user(self, user_id: UUID, sync_user_id: int | None = None):
-        return self.repository.get_syncs_user(user_id, sync_user_id)
-
-    def create_sync_user(self, sync_user_input: SyncsUserInput):
-        if sync_user_input.provider == "Notion":
-            response = self.repository.get_corresponding_deleted_sync(
-                user_id=sync_user_input.user_id
-            )
-            if response:
-                raise ValueError("User removed this connection less than 24 hours ago")
-
-        return self.repository.create_sync_user(sync_user_input)
-
-    def delete_sync_user(self, sync_id: int, user_id: str):
-        sync_user = self.repository.get_sync_user_by_id(sync_id)
-        if sync_user and sync_user.provider == "Notion":
-            sync_user_input = SyncUserUpdateInput(
-                email=str(sync_user.email),
-                credentials=sync_user.credentials,
-                state=sync_user.state,
-                status=str(SyncsUserStatus.REMOVED),
-            )
-            self.repository.update_sync_user(
-                sync_user_id=sync_user.user_id,
-                state=sync_user.state,
-                sync_user_input=sync_user_input,
-            )
-            return None
-        else:
-            return self.repository.delete_sync_user(sync_id, user_id)
-
-    def clean_notion_user_syncs(self):
-        return self.repository.clean_notion_user_syncs()
-
-    def get_sync_user_by_state(self, state: dict) -> SyncsUser | None:
-        return self.repository.get_sync_user_by_state(state)
-
-    def get_sync_user_by_id(self, sync_id: int):
-        return self.repository.get_sync_user_by_id(sync_id)
-
-    def update_sync_user(
-        self, sync_user_id: UUID, state: dict, sync_user_input: SyncUserUpdateInput
-    ):
-        return self.repository.update_sync_user(sync_user_id, state, sync_user_input)
-
-    def update_sync_user_status(self, sync_user_id: int, status: str):
-        return self.repository.update_sync_user_status(sync_user_id, status)
-
-    def get_all_notion_user_syncs(self):
+    async def get_all_notion_user_syncs(self):
         return self.repository.get_all_notion_user_syncs()
 
     async def get_files_folder_user_sync(
@@ -122,69 +89,10 @@ class SyncUserService(ISyncUserService):
         user_id: UUID,
         folder_id: str | None = None,
         recursive: bool = False,
-        notion_service: SyncNotionService | None = None,
     ):
         return await self.repository.get_files_folder_user_sync(
-            sync_active_id=sync_active_id,
+            sync_id=sync_active_id,
             user_id=user_id,
             folder_id=folder_id,
             recursive=recursive,
-            notion_service=notion_service,
         )
-
-
-class ISyncService(ABC):
-    @abstractmethod
-    def create_sync_active(
-        self, sync_active_input: SyncsActiveInput, user_id: str
-    ) -> Union["SyncsActive", None]:
-        pass
-
-    @abstractmethod
-    def get_syncs_active(self, user_id: str) -> List[SyncsActive]:
-        pass
-
-    @abstractmethod
-    def update_sync_active(
-        self, sync_id: int, sync_active_input: SyncsActiveUpdateInput
-    ):
-        pass
-
-    @abstractmethod
-    def delete_sync_active(self, sync_active_id: int, user_id: UUID):
-        pass
-
-    @abstractmethod
-    async def get_syncs_active_in_interval(self) -> List[SyncsActive]:
-        pass
-
-    @abstractmethod
-    def get_details_sync_active(self, sync_active_id: int):
-        pass
-
-
-class SyncService(ISyncService):
-    def __init__(self):
-        self.repository = Sync()
-
-    def create_sync_active(
-        self, sync_active_input: SyncsActiveInput, user_id: str
-    ) -> SyncsActive | None:
-        return self.repository.create_sync_active(sync_active_input, user_id)
-
-    def get_syncs_active(self, user_id: str) -> List[SyncsActive]:
-        return self.repository.get_syncs_active(user_id)
-
-    def update_sync_active(
-        self, sync_id: int, sync_active_input: SyncsActiveUpdateInput
-    ):
-        return self.repository.update_sync_active(sync_id, sync_active_input)
-
-    def delete_sync_active(self, sync_active_id: int, user_id: UUID):
-        return self.repository.delete_sync_active(sync_active_id, user_id)
-
-    async def get_syncs_active_in_interval(self) -> List[SyncsActive]:
-        return await self.repository.get_syncs_active_in_interval()
-
-    def get_details_sync_active(self, sync_active_id: int):
-        return self.repository.get_details_sync_active(sync_active_id)
