@@ -31,6 +31,7 @@ export const Toolbar = ({
 }: ToolbarProps): JSX.Element => {
   const [linkModalOpen, setLinkModalOpen] = useState(false);
   const [urlInp, setUrlInp] = useState("");
+  const [searchBarEditorOpen, setSearchBarEditorOpen] = useState(false);
 
   const setLink = () => {
     const editorChain = editor.chain().extendMarkRange("link").focus();
@@ -46,6 +47,16 @@ export const Toolbar = ({
     const prevUrl = editor.getAttributes("link").href as string;
     setUrlInp(prevUrl || "");
     setLinkModalOpen(true);
+  };
+
+  const toggleSearchBarEditor = () => {
+    if (searchBarEditorOpen) {
+      setSearchBarEditorOpen(false);
+      editor.commands.focus();
+    } else {
+      setSearchBarEditorOpen(true);
+      searchBarEditor?.commands.focus();
+    }
   };
 
   return (
@@ -178,7 +189,7 @@ export const Toolbar = ({
 
       <Button
         className={styles.focusSearchBarBtn}
-        onClick={() => searchBarEditor?.commands.focus()}
+        onClick={toggleSearchBarEditor}
         variant={"primary"}
       >
         Ask Brain
