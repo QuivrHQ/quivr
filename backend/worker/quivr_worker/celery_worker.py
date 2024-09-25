@@ -122,6 +122,7 @@ def process_assistant_task(
             user_id,
         )
     )
+    
 
 
 async def aprocess_assistant_task(

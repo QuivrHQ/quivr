@@ -53,7 +53,7 @@ services:
     volumes:
       - ./backend/:/app/
     command: >
-      /bin/bash -c "python -m celery -A quivr_worker.celery_worker worker -l info -E -P solo"
+      /bin/bash -c "python -m celery -A quivr_worker.celery_worker worker -l info -E"
     restart: always
     depends_on:
       - redis

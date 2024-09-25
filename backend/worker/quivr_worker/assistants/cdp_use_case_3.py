@@ -8,6 +8,7 @@ from pathlib import Path
 
 from diff_match_patch import diff_match_patch
 import os
+import torch
 
 from quivr_api.modules.assistant.services.tasks_service import TasksService
 
@@ -110,6 +111,8 @@ async def create_modification_report(
     use_llm_comparator: bool = False,
     parser=DeadlyParser(),
 ) -> str:
+    
+    torch.set_num_threads(1)
     if type == DocumentType.ETIQUETTE:
         logger.debug("parsing before file")
         before_text = parser.deep_parse(before_file, partition=partition, llm=llm)
