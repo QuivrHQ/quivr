@@ -7,6 +7,7 @@ from pydantic import BaseModel, root_validator
 class CreateTask(BaseModel):
     pretty_id: str
     assistant_id: int
+    assistant_name: str
     settings: dict
 
 
