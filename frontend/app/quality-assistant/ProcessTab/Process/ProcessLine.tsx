@@ -10,6 +10,7 @@ import gfm from "remark-gfm";
 import { useAssistants } from "@/lib/api/assistants/useAssistants";
 import { Checkbox } from "@/lib/components/ui/Checkbox/Checkbox";
 import { Icon } from "@/lib/components/ui/Icon/Icon";
+import { LoaderIcon } from "@/lib/components/ui/LoaderIcon/LoaderIcon";
 import { Modal } from "@/lib/components/ui/Modal/Modal";
 import { Tag } from "@/lib/components/ui/Tag/Tag";
 import { useDevice } from "@/lib/hooks/useDevice";
@@ -104,18 +105,22 @@ const ProcessLine = ({
               void handleDownloadClick();
             }}
           >
-            <Icon
-              name={
-                process.status === "completed"
-                  ? "download"
-                  : process.status === "error"
-                  ? "warning"
-                  : "waiting"
-              }
-              size="normal"
-              color="black"
-              handleHover={process.status === "completed"}
-            />
+            {process.status === "processing" ? (
+              <LoaderIcon size="normal" color="primary" />
+            ) : (
+              <Icon
+                name={
+                  process.status === "completed"
+                    ? "download"
+                    : process.status === "error"
+                    ? "warning"
+                    : "waiting"
+                }
+                size="normal"
+                color="black"
+                handleHover={process.status === "completed"}
+              />
+            )}
           </div>
         </div>
       </div>
