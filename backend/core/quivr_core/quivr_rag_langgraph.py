@@ -1,7 +1,6 @@
 import logging
-from typing import Annotated, AsyncGenerator, Optional, Sequence, TypedDict
+from typing import Annotated, AsyncGenerator, List, Optional, Sequence, TypedDict
 from uuid import uuid4
-from enum import Enum
 
 # TODO(@aminediro): this is the only dependency to langchain package, we should remove it
 from langchain.retrievers import ContextualCompressionRetriever
@@ -14,6 +13,9 @@ from langchain_core.messages.ai import AIMessageChunk
 from langchain_core.vectorstores import VectorStore
 from langgraph.graph import START, END, StateGraph
 from langgraph.graph.message import add_messages
+
+from pydantic import BaseModel, Field
+import openai
 
 from quivr_core.chat import ChatHistory
 from quivr_core.config import DefaultRerankers, RetrievalConfig
@@ -35,9 +37,8 @@ from quivr_core.utils import (
 logger = logging.getLogger("quivr_core")
 
 
-class SpecialEdges(str, Enum):
-    START = "START"
-    END = "END"
+class UserIntent(BaseModel):
+    intent: str = Field(description="The user intent")
 
 
 class AgentState(TypedDict):
@@ -125,6 +126,58 @@ class QuivrQARAGLangGraph:
         else:
             raise ValueError("No vector store provided")
 
+    def routing(self, state: AgentState) -> str:
+        """
+        The routing function for the RAG model.
+
+        Args:
+            state (AgentState): The current state of the agent.
+
+        Returns:
+            dict: The next state of the agent.
+        """
+
+        msg = custom_prompts.USER_INTENT_PROMPT.format(
+            question=state["messages"][0].content,
+        )
+
+        try:
+            structured_llm = self.llm_endpoint._llm.with_structured_output(
+                UserIntent, method="json_schema"
+            )
+            response = structured_llm.invoke(msg)
+
+        except openai.BadRequestError:
+            structured_llm = self.llm_endpoint._llm.with_structured_output(UserIntent)
+            response = structured_llm.invoke(msg)
+
+        return response.intent
+
+    def edit_system_prompt(self, state: AgentState) -> dict:
+        user_instruction = state["messages"][0].content
+        prompt = self.retrieval_config.prompt
+
+        inputs = {
+            "instruction": user_instruction,
+            "system_prompt": prompt if prompt else "None",
+        }
+
+        llm = self.llm_endpoint._llm
+
+        chain = custom_prompts.UPDATE_PROMPT | llm
+
+        response = chain.invoke(inputs)
+
+        self.retrieval_config.prompt = response.content
+
+        message = f"Updated system prompt: {response.content}"
+
+        formatted_response = {
+            "answer": message,  # Assuming the last message contains the final answer
+        }
+
+        return {"messages": [message], "final_response": formatted_response}
+
     def filter_history(self, state: AgentState) -> dict:
         """
         Filter out the chat history to only include the messages that are relevant to the current question
@@ -162,7 +215,7 @@ class QuivrQARAGLangGraph:
         return {"chat_history": _chat_history}
 
     ### Nodes
-    def rewrite(self, state):
+    def rewrite(self, state: AgentState) -> dict:
         """
         Transform the query to produce a better question.
 
@@ -173,7 +226,6 @@ class QuivrQARAGLangGraph:
             dict: The updated state with re-phrased question
         """
 
-        # Grader
         msg = custom_prompts.CONDENSE_QUESTION_PROMPT.format(
             chat_history=state["chat_history"],
             question=state["messages"][0].content,
@@ -183,7 +235,7 @@ class QuivrQARAGLangGraph:
         response = model.invoke(msg)
         return {"messages": [response]}
 
-    def retrieve(self, state):
+    def retrieve(self, state: AgentState) -> dict:
         """
         Retrieve relevent chunks
 
@@ -197,7 +249,7 @@ class QuivrQARAGLangGraph:
         docs = self.compression_retriever.invoke(question)
         return {"docs": docs}
 
-    def generate_rag(self, state):
+    def generate_rag(self, state: AgentState) -> dict:
         """
         Generate answer
 
@@ -241,7 +293,7 @@ class QuivrQARAGLangGraph:
         }
         return {"messages": [response], "final_response": formatted_response}
 
-    def generate_chat_llm(self, state):
+    def generate_chat_llm(self, state: AgentState) -> dict:
         """
         Generate answer
 
@@ -310,23 +362,32 @@ class QuivrQARAGLangGraph:
         """
         workflow = StateGraph(AgentState)
 
+        self.final_nodes: List[str] = []
+
         if self.retrieval_config.workflow_config:
-            if SpecialEdges.START not in [
-                node.name for node in self.retrieval_config.workflow_config.nodes
-            ]:
-                raise ValueError("The workflow should contain a 'START' node")
             for node in self.retrieval_config.workflow_config.nodes:
-                if node.name not in SpecialEdges._value2member_map_:
+                if node.name not in [START, END]:
                     workflow.add_node(node.name, getattr(self, node.name))
 
             for node in self.retrieval_config.workflow_config.nodes:
-                for edge in node.edges:
-                    if node.name == SpecialEdges.START:
-                        workflow.add_edge(START, edge)
-                    elif edge == SpecialEdges.END:
-                        workflow.add_edge(node.name, END)
-                    else:
+                if node.edges:
+                    for edge in node.edges:
                         workflow.add_edge(node.name, edge)
+                        if edge == END:
+                            self.final_nodes.append(node.name)
+                elif node.conditional_edge:
+                    routing_function = getattr(
+                        self, node.conditional_edge.routing_function
+                    )
+                    workflow.add_conditional_edges(
+                        node.name, routing_function, node.conditional_edge.conditions
+                    )
+                    if END in node.conditional_edge.conditions.values():
+                        self.final_nodes.append(node.name)
+                else:
+                    raise ValueError(
+                        "Node should have at least one edge or conditional_edge"
+                    )
         else:
             # Define the nodes we will cycle between
             workflow.add_node("filter_history", self.filter_history)
@@ -388,19 +449,26 @@ class QuivrQARAGLangGraph:
             version="v1",
             config={"metadata": metadata},
         ):
-            kind = event["event"]
             if (
                 not sources
                 and "output" in event["data"]
+                and event["data"]["output"] is not None
                 and "docs" in event["data"]["output"]
             ):
                 sources = event["data"]["output"]["docs"]
 
+            # if (
+            # "langgraph_node" in event["metadata"] and
+            # event["metadata"]["langgraph_node"] in self.final_nodes):
+            #     print("\n\n data: ", event["data"])
+
             if (
-                kind == "on_chat_model_stream"
-                and "generate" in event["metadata"]["langgraph_node"]
+                event["event"] == "on_chat_model_stream"
+                and "langgraph_node" in event["metadata"]
+                and event["metadata"]["langgraph_node"] in self.final_nodes
             ):
                 chunk = event["data"]["chunk"]
+                # print("\n\n chunk: ", chunk)
                 rolling_message, answer_str = parse_chunk_response(
                     rolling_message,
                     chunk,

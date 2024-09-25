@@ -10,6 +10,7 @@ from quivr_core.llm.llm_endpoint import LLMEndpoint
 from quivr_core.models import ChatLLMMetadata, ParsedRAGResponse, RAGResponseMetadata
 from quivr_core.quivr_rag_langgraph import QuivrQARAGLangGraph
 
+from quivr_api.modules.prompt.entity.prompt import Prompt
 from quivr_api.logger import get_logger
 from quivr_api.modules.brain.entity.brain_entity import BrainEntity
 from quivr_api.modules.brain.service.brain_service import BrainService
@@ -25,7 +26,6 @@ from quivr_api.modules.dependencies import (
 )
 from quivr_api.modules.knowledge.service.knowledge_service import KnowledgeService
 from quivr_api.modules.models.service.model_service import ModelService
-from quivr_api.modules.prompt.entity.prompt import Prompt
 from quivr_api.modules.prompt.service.prompt_service import PromptService
 from quivr_api.modules.user.entity.user_identity import UserIdentity
 from quivr_api.modules.vector.service.vector_service import VectorService
@@ -295,6 +295,10 @@ class RAGService:
 
         if streamed_chat_history.metadata:
             streamed_chat_history.metadata["sources"] = sources_urls
+
+        if self.prompt_service:
+            prompt = Prompt(content=retrieval_config.prompt)
+            self.prompt_service.update_prompt_by_id(self.brain.prompt_id, prompt)
 
         self.save_answer(
             question,
