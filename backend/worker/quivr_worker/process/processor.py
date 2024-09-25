@@ -269,6 +269,7 @@ class KnowledgeProcessor:
 
     async def process_knowledge(self, knowledge_id: UUID):
         async for knowledge_tuple in self.yield_processable_kms(knowledge_id):
+            # FIXME
             savepoint = (
                 await self.services.knowledge_service.repository.session.begin_nested()
             )
