@@ -7,7 +7,7 @@ authors = [
 ]
 
 dependencies = [
-    "python-doctr[torch]>=0.9.0",
+    "python-doctr>=0.9.0",
     "matplotlib>=3.9.2",
     "mplcursors>=0.5.3",
     "diff-match-patch>=20230430",
