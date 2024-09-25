@@ -96,10 +96,11 @@ async def create_task(
             raise HTTPException(
                 status_code=500, detail=f"Failed to upload file to storage. {e}"
             )
-
+            
     task = CreateTask(
         assistant_id=input.id,
-        pretty_id=str(notification_uuid),
+        assistant_name=assistant.name,
+        pretty_id=f"{assistant.name}-{str(notification_uuid)[:8]}",
         settings=input.model_dump(mode="json"),
     )
 

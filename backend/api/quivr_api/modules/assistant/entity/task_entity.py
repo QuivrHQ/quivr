@@ -17,6 +17,7 @@ class Task(SQLModel, table=True):
         ),
     )
     assistant_id: int
+    assistant_name: str
     pretty_id: str
     user_id: UUID
     status: str = Field(default="pending")

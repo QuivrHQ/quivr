@@ -21,6 +21,7 @@ class TasksRepository(BaseRepository):
         try:
             task_to_create = Task(
                 assistant_id=task.assistant_id,
+                assistant_name=task.assistant_name,
                 pretty_id=task.pretty_id,
                 user_id=user_id,
                 settings=task.settings,
