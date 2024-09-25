@@ -54,6 +54,7 @@ class Sync(SQLModel, table=True):
 
     id: int | None = Field(default=None, primary_key=True)
     name: str
+    email: str | None = None
     provider: str
     email: str | None = Field(default=None)
     user_id: UUID = Field(foreign_key="users.id", nullable=False)
@@ -130,3 +131,7 @@ class NotionSyncFile(SQLModel, table=True):
         description="The ID of the user who owns the file",
     )
     user: User = Relationship(back_populates="notion_syncs")
+    sync_user_id: int = Field(
+        # foreign_key="syncs_user.id",
+        description="The ID of the sync user associated with the file",
+    )

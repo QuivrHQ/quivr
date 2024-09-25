@@ -65,24 +65,28 @@ async def generate_source(
                 source_url = doc.metadata["original_file_name"]
             else:
                 # Check if the URL has already been generated
-                file_name = doc.metadata["file_name"]
-                file_path = await knowledge_service.get_knowledge_storage_path(
+                try:
+                    file_name = doc.metadata["file_name"]
+                    file_path = await knowledge_service.get_knowledge_storage_path(
                     file_name=file_name, brain_id=brain_id
-                )
-                if file_path in generated_urls:
-                    source_url = generated_urls[file_path]
-                else:
-                    # Generate the URL
-                    if file_path in sources_url_cache:
-                        source_url = sources_url_cache[file_path]
+                    )
+                    if file_path in generated_urls:
+                        source_url = generated_urls[file_path]
                     else:
-                        generated_url = generate_file_signed_url(file_path)
-                        if generated_url is not None:
-                            source_url = generated_url.get("signedURL", "")
+                        # Generate the URL
+                        if file_path in sources_url_cache:
+                            source_url = sources_url_cache[file_path]
                         else:
-                            source_url = ""
-                    # Store the generated URL
-                    generated_urls[file_path] = source_url
+                            generated_url = generate_file_signed_url(file_path)
+                            if generated_url is not None:
+                                source_url = generated_url.get("signedURL", "")
+                            else:
+                                source_url = ""
+                        # Store the generated URL
+                        generated_urls[file_path] = source_url
+                except Exception as e:
+                    logger.error(f"Error generating file signed URL: {e}")
+                    continue
 
             # Append a new Sources object to the list
             sources_list.append(

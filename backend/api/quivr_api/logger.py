@@ -4,7 +4,7 @@ from logging.handlers import RotatingFileHandler
 
 from colorlog import (
     ColoredFormatter,
-)  # You need to install this package: pip install colorlog
+)
 
 
 def get_logger(logger_name, log_file="application.log"):

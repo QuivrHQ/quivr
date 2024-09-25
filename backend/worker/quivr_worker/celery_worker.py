@@ -7,6 +7,8 @@ from dotenv import load_dotenv
 from quivr_api.celery_config import celery
 from quivr_api.logger import get_logger
 from quivr_api.models.settings import settings
+from quivr_api.modules.assistant.repository.tasks import TasksRepository
+from quivr_api.modules.assistant.services.tasks_service import TasksService
 from quivr_api.modules.brain.integrations.Notion.Notion_connector import NotionConnector
 from quivr_api.modules.brain.repository.brains_vectors import BrainsVectors
 from quivr_api.modules.brain.service.brain_service import BrainService
@@ -20,13 +22,14 @@ from quivr_api.modules.sync.service.sync_notion import SyncNotionService
 from quivr_api.utils.telemetry import maybe_send_telemetry
 from sqlalchemy.ext.asyncio import AsyncEngine, create_async_engine
 
+from quivr_worker.assistants.assistants import process_assistant
 from quivr_worker.check_premium import check_is_premium
 from quivr_worker.process.processor import KnowledgeProcessor, build_processor_services
 from quivr_worker.syncs.process_active_syncs import (
     process_notion_sync,
 )
 from quivr_worker.syncs.store_notion import fetch_and_store_notion_files_async
-from quivr_worker.utils import _patch_json
+from quivr_worker.utils.utils import _patch_json
 
 load_dotenv()
 
@@ -60,6 +63,63 @@ def init_worker(**kwargs):
             pool_size=10,  # NOTE: no bouncer for now, if 6 process workers => 6
             pool_recycle=1800,
         )
+
+
+@celery.task(
+    retries=3,
+    default_retry_delay=1,
+    name="process_assistant_task",
+    autoretry_for=(Exception,),
+)
+def process_assistant_task(
+    assistant_id: str,
+    notification_uuid: str,
+    task_id: int,
+    user_id: str,
+):
+    logger.info(
+        f"process_assistant_task started for assistant_id={assistant_id}, notification_uuid={notification_uuid}, task_id={task_id}"
+    )
+    print("process_assistant_task")
+
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(
+        aprocess_assistant_task(
+            assistant_id,
+            notification_uuid,
+            task_id,
+            user_id,
+        )
+    )
+
+
+async def aprocess_assistant_task(
+    assistant_id: str,
+    notification_uuid: str,
+    task_id: int,
+    user_id: str,
+):
+    async with AsyncSession(async_engine) as async_session:
+        try:
+            await async_session.execute(
+                text("SET SESSION idle_in_transaction_session_timeout = '5min';")
+            )
+            tasks_repository = TasksRepository(async_session)
+            tasks_service = TasksService(tasks_repository)
+
+            await process_assistant(
+                assistant_id,
+                notification_uuid,
+                task_id,
+                tasks_service,
+                user_id,
+            )
+
+        except Exception as e:
+            await async_session.rollback()
+            raise e
+        finally:
+            await async_session.close()
 
 
 @celery.task(
@@ -124,15 +184,34 @@ def process_notion_sync_task():
 
 
 @celery.task(name="fetch_and_store_notion_files_task")
-def fetch_and_store_notion_files_task(access_token: str, user_id: UUID):
+def fetch_and_store_notion_files_task(
+    access_token: str, user_id: UUID, sync_user_id: int
+):
     if async_engine is None:
         init_worker()
     assert async_engine
-    logger.debug("Fetching and storing Notion files")
-    loop = asyncio.get_event_loop()
-    loop.run_until_complete(
-        fetch_and_store_notion_files_async(async_engine, access_token, user_id)
-    )
+    try:
+        logger.debug("Fetching and storing Notion files")
+        loop = asyncio.get_event_loop()
+        loop.run_until_complete(
+            fetch_and_store_notion_files_async(
+                async_engine, access_token, user_id, sync_user_id
+            )
+        )
+        sync_user_service.update_sync_user_status(
+            sync_user_id=sync_user_id, status=str(SyncsUserStatus.SYNCED)
+        )
+    except Exception:
+        logger.error("Error fetching and storing Notion files")
+        sync_user_service.update_sync_user_status(
+            sync_user_id=sync_user_id, status=str(SyncsUserStatus.ERROR)
+        )
+
+
+@celery.task(name="clean_notion_user_syncs")
+def clean_notion_user_syncs():
+    logger.debug("Cleaning Notion user syncs")
+    sync_user_service.clean_notion_user_syncs()
 
 
 # from celery.schedules import crontab

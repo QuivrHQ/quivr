@@ -1,6 +1,7 @@
 from typing import Annotated, List
 
 from fastapi import APIRouter, Depends
+
 from quivr_api.logger import get_logger
 from quivr_api.middlewares.auth import AuthBearer, get_current_user
 from quivr_api.modules.dependencies import get_service

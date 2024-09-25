@@ -3,6 +3,12 @@ from typing import List, Optional
 from pydantic import BaseModel
 
 
+class BrainInput(BaseModel):
+    required: Optional[bool] = True
+    description: str
+    type: str
+
+
 class InputFile(BaseModel):
     key: str
     allowed_extensions: Optional[List[str]] = ["pdf"]
@@ -63,23 +69,7 @@ class Inputs(BaseModel):
     numbers: Optional[List[InputNumber]] = None
     select_texts: Optional[List[InputSelectText]] = None
     select_numbers: Optional[List[InputSelectNumber]] = None
-
-
-class OutputEmail(BaseModel):
-    required: Optional[bool] = True
-    description: str
-    type: str
-
-
-class OutputBrain(BaseModel):
-    required: Optional[bool] = True
-    description: str
-    type: str
-
-
-class Outputs(BaseModel):
-    email: Optional[OutputEmail] = None
-    brain: Optional[OutputBrain] = None
+    brain: Optional[BrainInput] = None
 
 
 class Pricing(BaseModel):
@@ -88,6 +78,7 @@ class Pricing(BaseModel):
 
 
 class AssistantOutput(BaseModel):
+    id: int
     name: str
     description: str
     pricing: Optional[Pricing] = Pricing()
@@ -95,5 +86,4 @@ class AssistantOutput(BaseModel):
     input_description: str
     output_description: str
     inputs: Inputs
-    outputs: Outputs
     icon_url: Optional[str] = None

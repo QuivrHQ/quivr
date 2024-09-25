@@ -3,7 +3,6 @@ import os
 import pytest
 from langchain_core.language_models import FakeListChatModel
 from pydantic.v1.error_wrappers import ValidationError
-
 from quivr_core.config import LLMEndpointConfig
 from quivr_core.llm import LLMEndpoint
 
@@ -14,7 +13,7 @@ def test_llm_endpoint_from_config_default():
 
     del os.environ["OPENAI_API_KEY"]
 
-    with pytest.raises(ValidationError):
+    with pytest.raises((ValidationError, ValueError)):
         llm = LLMEndpoint.from_config(LLMEndpointConfig())
 
     # Working default

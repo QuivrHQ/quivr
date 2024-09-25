@@ -108,7 +108,6 @@ async def oauth2callback_github(
             detail=f"Failed to acquire token: {result}",
         )
 
-    creds = result
     logger.info(f"Fetched OAuth2 token for user: {state.user_id}")
 
     # Fetch user email from GitHub API

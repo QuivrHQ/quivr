@@ -3,6 +3,7 @@ from typing import List
 from uuid import uuid4
 
 from fastapi import APIRouter, Depends
+
 from quivr_api.logger import get_logger
 from quivr_api.middlewares.auth import AuthBearer, get_current_user
 from quivr_api.modules.api_key.dto.outputs import ApiKeyInfo

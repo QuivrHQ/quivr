@@ -323,7 +323,7 @@ class MockSyncCloud(BaseSync):
                 id=fid,
                 name=f"file_{fid}",
                 is_folder=False,
-                last_modified_at=datetime.now().strftime(self.datetime_format),
+                last_modified_at=datetime.now(),
                 extension="txt",
                 web_view_link=f"{self.name}/{fid}",
             )
@@ -331,7 +331,11 @@ class MockSyncCloud(BaseSync):
         ]
 
     async def aget_files(
-        self, credentials: Dict, folder_id: str | None = None, recursive: bool = False
+        self,
+        credentials: Dict,
+        sync_user_id=int,
+        folder_id: str | None = None,
+        recursive: bool = False,
     ) -> List[SyncFile]:
         n_files = 1
         return [
@@ -339,7 +343,7 @@ class MockSyncCloud(BaseSync):
                 id=str(uuid4()),
                 name=f"file_in_{folder_id}",
                 is_folder=False,
-                last_modified_at=datetime.now().strftime(self.datetime_format),
+                last_modified_at=datetime.now(),
                 extension="txt",
                 web_view_link=f"{self.name}/{fid}",
             )

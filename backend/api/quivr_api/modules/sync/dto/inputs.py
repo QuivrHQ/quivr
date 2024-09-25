@@ -17,10 +17,12 @@ class SyncCreateInput(BaseModel):
 
     user_id: UUID
     name: str
+    email: str | None = None
     provider: str
     credentials: dict
     state: dict
     additional_data: dict = {}
+    status: str
 
 
 class SyncUpdateInput(BaseModel):
@@ -36,3 +38,4 @@ class SyncUpdateInput(BaseModel):
     credentials: dict | None = None
     state: dict | None = None
     email: str | None = None
+    status: str | None = None

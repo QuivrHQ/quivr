@@ -295,7 +295,10 @@ class SyncUtils:
         files_ids = sync_active.settings.get("files", [])
 
         files = await self.get_syncfiles_from_ids(
-            user_sync.credentials, files_ids=files_ids, folder_ids=folders
+            user_sync.credentials,
+            files_ids=files_ids,
+            folder_ids=folders,
+            sync_user_id=user_sync.id,
         )
 
         logger.debug(f"original files to download for {sync_active.id} : {files}")
@@ -325,6 +328,7 @@ class SyncUtils:
         credentials: dict[str, Any],
         files_ids: list[str],
         folder_ids: list[str],
+        sync_user_id: int,
     ) -> list[SyncFile]:
         files = []
         if self.sync_cloud.lower_name == "notion":
@@ -337,6 +341,7 @@ class SyncUtils:
             files.extend(
                 await self.sync_cloud.aget_files(
                     credentials=credentials,
+                    sync_user_id=sync_user_id,
                     folder_id=folder_id,
                     recursive=True,
                 )

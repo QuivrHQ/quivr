@@ -1,18 +1,22 @@
 import logging
 from typing import Annotated, AsyncGenerator, Optional, Sequence, TypedDict
+from uuid import uuid4
+from enum import Enum
 
 # TODO(@aminediro): this is the only dependency to langchain package, we should remove it
 from langchain.retrievers import ContextualCompressionRetriever
+from langchain_cohere import CohereRerank
+from langchain_community.document_compressors import JinaRerank
 from langchain_core.callbacks import Callbacks
 from langchain_core.documents import BaseDocumentCompressor, Document
-from langchain_core.messages import AIMessage, BaseMessage, HumanMessage
+from langchain_core.messages import BaseMessage
 from langchain_core.messages.ai import AIMessageChunk
 from langchain_core.vectorstores import VectorStore
-from langgraph.graph import END, StateGraph
+from langgraph.graph import START, END, StateGraph
 from langgraph.graph.message import add_messages
 
 from quivr_core.chat import ChatHistory
-from quivr_core.config import RAGConfig
+from quivr_core.config import DefaultRerankers, RetrievalConfig
 from quivr_core.llm import LLMEndpoint
 from quivr_core.models import (
     ParsedRAGChunkResponse,
@@ -21,7 +25,7 @@ from quivr_core.models import (
     RAGResponseMetadata,
     cited_answer,
 )
-from quivr_core.prompts import ANSWER_PROMPT, CONDENSE_QUESTION_PROMPT
+from quivr_core.prompts import custom_prompts
 from quivr_core.utils import (
     combine_documents,
     format_file_list,
@@ -33,14 +37,17 @@ from quivr_core.utils import (
 logger = logging.getLogger("quivr_core")
 
 
+class SpecialEdges(str, Enum):
+    START = "START"
+    END = "END"
+
+
 class AgentState(TypedDict):
     # The add_messages function defines how an update should be processed
     # Default is to replace. add_messages says "append"
     messages: Annotated[Sequence[BaseMessage], add_messages]
     chat_history: ChatHistory
-    filtered_chat_history: list[AIMessage | HumanMessage]
     docs: list[Document]
-    transformed_question: BaseMessage
     files: str
     final_response: dict
 
@@ -65,28 +72,47 @@ class QuivrQARAGLangGraph:
     def __init__(
         self,
         *,
-        rag_config: RAGConfig,
+        retrieval_config: RetrievalConfig,
         llm: LLMEndpoint,
-        vector_store: VectorStore,
+        vector_store: VectorStore | None = None,
         reranker: BaseDocumentCompressor | None = None,
     ):
         """
         Construct a QuivrQARAGLangGraph object.
 
         Args:
-            rag_config (RAGConfig): The configuration for the RAG model.
+            retrieval_config (RetrievalConfig): The configuration for the RAG model.
             llm (LLMEndpoint): The LLM to use for generating text.
             vector_store (VectorStore): The vector store to use for storing and retrieving documents.
             reranker (BaseDocumentCompressor | None): The document compressor to use for re-ranking documents. Defaults to IdempotentCompressor if not provided.
         """
-        self.rag_config = rag_config
+        self.retrieval_config = retrieval_config
         self.vector_store = vector_store
         self.llm_endpoint = llm
-        self.reranker = reranker if reranker is not None else IdempotentCompressor()
 
-        self.compression_retriever = ContextualCompressionRetriever(
-            base_compressor=self.reranker, base_retriever=self.retriever
-        )
+        self.graph = None
+
+        if reranker is not None:
+            self.reranker = reranker
+        elif self.retrieval_config.reranker_config.supplier == DefaultRerankers.COHERE:
+            self.reranker = CohereRerank(
+                model=self.retrieval_config.reranker_config.model,
+                top_n=self.retrieval_config.reranker_config.top_n,
+                cohere_api_key=self.retrieval_config.reranker_config.api_key,
+            )
+        elif self.retrieval_config.reranker_config.supplier == DefaultRerankers.JINA:
+            self.reranker = JinaRerank(
+                model=self.retrieval_config.reranker_config.model,
+                top_n=self.retrieval_config.reranker_config.top_n,
+                jina_api_key=self.retrieval_config.reranker_config.api_key,
+            )
+        else:
+            self.reranker = IdempotentCompressor()
+
+        if self.vector_store:
+            self.compression_retriever = ContextualCompressionRetriever(
+                base_compressor=self.reranker, base_retriever=self.retriever
+            )
 
     @property
     def retriever(self):
@@ -96,9 +122,12 @@ class QuivrQARAGLangGraph:
         Returns:
             VectorStoreRetriever: The retriever.
         """
-        return self.vector_store.as_retriever()
+        if self.vector_store:
+            return self.vector_store.as_retriever()
+        else:
+            raise ValueError("No vector store provided")
 
-    def filter_history(self, state):
+    def filter_history(self, state: AgentState) -> dict:
         """
         Filter out the chat history to only include the messages that are relevant to the current question
 
@@ -114,21 +143,25 @@ class QuivrQARAGLangGraph:
         chat_history = state["chat_history"]
         total_tokens = 0
         total_pairs = 0
-        filtered_chat_history: list[AIMessage | HumanMessage] = []
+        _chat_id = uuid4()
+        _chat_history = ChatHistory(chat_id=_chat_id, brain_id=chat_history.brain_id)
         for human_message, ai_message in reversed(list(chat_history.iter_pairs())):
             # TODO: replace with tiktoken
-            message_tokens = (len(human_message.content) + len(ai_message.content)) // 4
+            message_tokens = self.llm_endpoint.count_tokens(
+                human_message.content
+            ) + self.llm_endpoint.count_tokens(ai_message.content)
             if (
-                total_tokens + message_tokens > self.rag_config.llm_config.max_tokens
-                or total_pairs >= self.rag_config.max_history
+                total_tokens + message_tokens
+                > self.retrieval_config.llm_config.max_output_tokens
+                or total_pairs >= self.retrieval_config.max_history
             ):
                 break
-            filtered_chat_history.append(human_message)
-            filtered_chat_history.append(ai_message)
+            _chat_history.append(human_message)
+            _chat_history.append(ai_message)
             total_tokens += message_tokens
             total_pairs += 1
 
-        return {"filtered_chat_history": filtered_chat_history}
+        return {"chat_history": _chat_history}
 
     ### Nodes
     def rewrite(self, state):
@@ -143,14 +176,14 @@ class QuivrQARAGLangGraph:
         """
 
         # Grader
-        msg = CONDENSE_QUESTION_PROMPT.format(
-            chat_history=state["filtered_chat_history"],
+        msg = custom_prompts.CONDENSE_QUESTION_PROMPT.format(
+            chat_history=state["chat_history"],
             question=state["messages"][0].content,
         )
 
         model = self.llm_endpoint._llm
         response = model.invoke(msg)
-        return {"transformed_question": response}
+        return {"messages": [response]}
 
     def retrieve(self, state):
         """
@@ -162,11 +195,11 @@ class QuivrQARAGLangGraph:
         Returns:
             dict: The retrieved chunks
         """
-
-        docs = self.compression_retriever.invoke(state["transformed_question"].content)
+        question = state["messages"][-1].content
+        docs = self.compression_retriever.invoke(question)
         return {"docs": docs}
 
-    def generate(self, state):
+    def generate_rag(self, state):
         """
         Generate answer
 
@@ -177,20 +210,19 @@ class QuivrQARAGLangGraph:
             dict: The updated state with re-phrased question
         """
         messages = state["messages"]
-        question = messages[0].content
+        user_question = messages[0].content
         files = state["files"]
 
         docs = state["docs"]
 
         # Prompt
-        prompt = self.rag_config.prompt
+        prompt = self.retrieval_config.prompt
 
-        final_inputs = {
-            "context": combine_documents(docs),
-            "question": question,
-            "custom_instructions": prompt,
-            "files": files,
-        }
+        final_inputs = {}
+        final_inputs["context"] = combine_documents(docs) if docs else "None"
+        final_inputs["question"] = user_question
+        final_inputs["custom_instructions"] = prompt if prompt else "None"
+        final_inputs["files"] = files if files else "None"
 
         # LLM
         llm = self.llm_endpoint._llm
@@ -201,7 +233,7 @@ class QuivrQARAGLangGraph:
             )
 
         # Chain
-        rag_chain = ANSWER_PROMPT | llm
+        rag_chain = custom_prompts.RAG_ANSWER_PROMPT | llm
 
         # Run
         response = rag_chain.invoke(final_inputs)
@@ -211,14 +243,51 @@ class QuivrQARAGLangGraph:
         }
         return {"messages": [response], "final_response": formatted_response}
 
-    def build_langgraph_chain(self):
+    def generate_chat_llm(self, state):
+        """
+        Generate answer
+
+        Args:
+            state (messages): The current state
+
+        Returns:
+            dict: The updated state with re-phrased question
+        """
+        messages = state["messages"]
+        user_question = messages[0].content
+
+        # Prompt
+        prompt = self.retrieval_config.prompt
+
+        final_inputs = {}
+        final_inputs["question"] = user_question
+        final_inputs["custom_instructions"] = prompt if prompt else "None"
+        final_inputs["chat_history"] = state["chat_history"].to_list()
+
+        # LLM
+        llm = self.llm_endpoint._llm
+
+        # Chain
+        rag_chain = custom_prompts.CHAT_LLM_PROMPT | llm
+
+        # Run
+        response = rag_chain.invoke(final_inputs)
+        formatted_response = {
+            "answer": response,  # Assuming the last message contains the final answer
+        }
+        return {"messages": [response], "final_response": formatted_response}
+
+    def build_chain(self):
         """
         Builds the langchain chain for the given configuration.
 
         Returns:
             Callable[[Dict], Dict]: The langchain chain.
         """
-        return self.create_graph()
+        if not self.graph:
+            self.graph = self.create_graph()
+
+        return self.graph
 
     def create_graph(self):
         """
@@ -243,19 +312,39 @@ class QuivrQARAGLangGraph:
         """
         workflow = StateGraph(AgentState)
 
-        # Define the nodes we will cycle between
-        workflow.add_node("filter_history", self.filter_history)
-        workflow.add_node("rewrite", self.rewrite)  # Re-writing the question
-        workflow.add_node("retrieve", self.retrieve)  # retrieval
-        workflow.add_node("generate", self.generate)
+        if self.retrieval_config.workflow_config:
+            if SpecialEdges.START not in [
+                node.name for node in self.retrieval_config.workflow_config.nodes
+            ]:
+                raise ValueError("The workflow should contain a 'START' node")
+            for node in self.retrieval_config.workflow_config.nodes:
+                if node.name not in SpecialEdges._value2member_map_:
+                    workflow.add_node(node.name, getattr(self, node.name))
 
-        # Add node for filtering history
+            for node in self.retrieval_config.workflow_config.nodes:
+                for edge in node.edges:
+                    if node.name == SpecialEdges.START:
+                        workflow.add_edge(START, edge)
+                    elif edge == SpecialEdges.END:
+                        workflow.add_edge(node.name, END)
+                    else:
+                        workflow.add_edge(node.name, edge)
+        else:
+            # Define the nodes we will cycle between
+            workflow.add_node("filter_history", self.filter_history)
+            workflow.add_node("rewrite", self.rewrite)  # Re-writing the question
+            workflow.add_node("retrieve", self.retrieve)  # retrieval
+            workflow.add_node("generate", self.generate_rag)
 
-        workflow.set_entry_point("filter_history")
-        workflow.add_edge("filter_history", "rewrite")
-        workflow.add_edge("rewrite", "retrieve")
-        workflow.add_edge("retrieve", "generate")
-        workflow.add_edge("generate", END)  # Add edge from generate to format_response
+            # Add node for filtering history
+
+            workflow.set_entry_point("filter_history")
+            workflow.add_edge("filter_history", "rewrite")
+            workflow.add_edge("rewrite", "retrieve")
+            workflow.add_edge("retrieve", "generate")
+            workflow.add_edge(
+                "generate", END
+            )  # Add edge from generate to format_response
 
         # Compile
         graph = workflow.compile()
@@ -280,8 +369,10 @@ class QuivrQARAGLangGraph:
         Returns:
             ParsedRAGResponse: The answer to the question.
         """
-        concat_list_files = format_file_list(list_files, self.rag_config.max_files)
-        conversational_qa_chain = self.build_langgraph_chain()
+        concat_list_files = format_file_list(
+            list_files, self.retrieval_config.max_files
+        )
+        conversational_qa_chain = self.build_chain()
         inputs = {
             "messages": [
                 ("user", question),
@@ -294,7 +385,7 @@ class QuivrQARAGLangGraph:
             config={"metadata": metadata},
         )
         response = parse_response(
-            raw_llm_response["final_response"], self.rag_config.llm_config.model
+            raw_llm_response["final_response"], self.retrieval_config.llm_config.model
         )
         return response
 
@@ -317,11 +408,13 @@ class QuivrQARAGLangGraph:
         Yields:
             ParsedRAGChunkResponse: Each chunk of the answer.
         """
-        concat_list_files = format_file_list(list_files, self.rag_config.max_files)
-        conversational_qa_chain = self.build_langgraph_chain()
+        concat_list_files = format_file_list(
+            list_files, self.retrieval_config.max_files
+        )
+        conversational_qa_chain = self.build_chain()
 
         rolling_message = AIMessageChunk(content="")
-        sources = []
+        sources: list[Document] | None = None
         prev_answer = ""
         chunk_id = 0
 
@@ -337,7 +430,6 @@ class QuivrQARAGLangGraph:
             config={"metadata": metadata},
         ):
             kind = event["event"]
-
             if (
                 not sources
                 and "output" in event["data"]
@@ -347,18 +439,19 @@ class QuivrQARAGLangGraph:
 
             if (
                 kind == "on_chat_model_stream"
-                and event["metadata"]["langgraph_node"] == "generate"
+                and "generate" in event["metadata"]["langgraph_node"]
             ):
                 chunk = event["data"]["chunk"]
-
                 rolling_message, answer_str = parse_chunk_response(
                     rolling_message,
                     chunk,
                     self.llm_endpoint.supports_func_calling(),
                 )
-
                 if len(answer_str) > 0:
-                    if self.llm_endpoint.supports_func_calling():
+                    if (
+                        self.llm_endpoint.supports_func_calling()
+                        and rolling_message.tool_calls
+                    ):
                         diff_answer = answer_str[len(prev_answer) :]
                         if len(diff_answer) > 0:
                             parsed_chunk = ParsedRAGChunkResponse(

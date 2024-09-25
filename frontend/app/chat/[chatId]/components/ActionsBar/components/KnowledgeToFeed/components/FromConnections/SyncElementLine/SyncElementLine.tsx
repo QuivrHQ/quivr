@@ -41,7 +41,7 @@ export const SyncElementLine = ({
 
   const [checked, setChecked] = useState<boolean>(initialChecked);
 
-  const showCheckbox: boolean = isAlsoFile ?? !isFolder;
+  const showCheckbox: boolean = isAlsoFile ?? selectable;
 
   const handleSetChecked = () => {
     setOpenedConnections((prevState) => {
@@ -82,11 +82,7 @@ export const SyncElementLine = ({
         }
       }}
     >
-      <div
-        className={`${styles.left} ${
-          !isAlsoFile && isFolder ? styles.folder : ""
-        }`}
-      >
+      <div className={`${styles.left} ${!showCheckbox ? styles.folder : ""}`}>
         {showCheckbox && (
           <div
             onMouseEnter={() => setIsCheckboxHovered(true)}

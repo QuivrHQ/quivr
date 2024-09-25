@@ -1,4 +1,6 @@
 import time
+import os
+from enum import Enum
 
 from fastapi import HTTPException
 from quivr_api.logger import get_logger
@@ -6,8 +8,52 @@ from quivr_api.modules.models.entity.model import Model
 from quivr_api.modules.models.service.model_service import ModelService
 from quivr_api.modules.user.entity.user_identity import UserIdentity
 from quivr_api.modules.user.service.user_usage import UserUsage
+from quivr_core.config import RetrievalConfig
 
 logger = get_logger(__name__)
+
+
+class RetrievalConfigPathEnv(Enum):
+    CHAT_WITH_LLM = ("CHAT_LLM_CONFIG_PATH", "config/chat_llm_config.yaml")
+    RAG = ("BRAIN_CONFIG_PATH", "config/retrieval_config_workflow.yaml")
+
+    @property
+    def env_var(self) -> str:
+        return self.value[0]
+
+    @property
+    def default_path(self) -> str:
+        return self.value[1]
+
+
+def get_config_file_path(
+    config_path_env: RetrievalConfigPathEnv, current_path: str | None = None
+) -> str:
+    # Get the environment variable or fallback to the default path
+    _path = os.getenv(config_path_env.env_var, config_path_env.default_path)
+
+    if not current_path:
+        return _path
+
+    return os.path.join(current_path, _path)
+
+
+def load_and_merge_retrieval_configuration(
+    config_file_path: str, sqlmodel: Model
+) -> RetrievalConfig:
+    retrieval_config = RetrievalConfig.from_yaml(config_file_path)
+    field_mapping = {
+        "env_variable_name": "env_variable_name",
+        "endpoint_url": "llm_base_url",
+    }
+
+    retrieval_config.llm_config.set_from_sqlmodel(
+        sqlmodel=sqlmodel, mapping=field_mapping
+    )
+
+    retrieval_config.llm_config.set_llm_model(sqlmodel.name)
+
+    return retrieval_config
 
 
 # TODO: rewrite
