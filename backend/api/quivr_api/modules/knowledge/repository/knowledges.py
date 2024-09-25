@@ -97,7 +97,11 @@ class KnowledgeRepository(BaseRepository):
             children = await self.get_knowledge_tree(knowledge.id)
             all_kms = [knowledge, *children]
             for k in all_kms:
-                for b in brains:
+                km_brains = {km_brain.brain_id for km_brain in k.brains}
+                for b in filter(
+                    lambda b: b.brain_id not in km_brains,
+                    brains,
+                ):
                     k.brains.append(b)
             for k in all_kms:
                 await self.session.merge(k)
