@@ -269,6 +269,10 @@ class KnowledgeProcessor:
 
     async def process_knowledge(self, knowledge_id: UUID):
         async for knowledge_tuple in self.yield_processable_kms(knowledge_id):
+            savepoint = (
+                await self.services.knowledge_service.repository.session.begin_nested()
+            )
+
             try:
                 if knowledge_tuple is None:
                     continue
@@ -287,4 +291,5 @@ class KnowledgeProcessor:
                     ),
                 )
             except Exception as e:
+                await savepoint.rollback()
                 logger.error(f"Error processing knowledge {knowledge_id} : {e}")

@@ -25,7 +25,7 @@ class VectorService(BaseService[VectorRepository]):
         self.repository = repository
 
     async def create_vectors(
-        self, chunks: List[Document], knowledge_id: UUID
+        self, chunks: List[Document], knowledge_id: UUID, autocommit: bool = True
     ) -> List[UUID]:
         # Vector is created upon the user's first question asked
         logger.info(
@@ -44,7 +44,7 @@ class VectorService(BaseService[VectorRepository]):
             )
             for i, chunk in enumerate(chunks)
         ]
-        created_vector = await self.repository.create_vectors(new_vectors)
+        created_vector = await self.repository.create_vectors(new_vectors, autocommit)
 
         return [vector.id for vector in created_vector if vector.id]
 

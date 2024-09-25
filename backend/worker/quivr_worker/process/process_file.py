@@ -30,7 +30,9 @@ async def store_chunks(
     vector_service: VectorService,
 ):
     assert knowledge.id
-    vector_ids = await vector_service.create_vectors(chunks, knowledge.id)
+    vector_ids = await vector_service.create_vectors(
+        chunks, knowledge.id, autocommit=False
+    )
     logger.debug(
         f"Inserted {len(chunks)} chunks in vectors table for knowledge: {knowledge.id}"
     )

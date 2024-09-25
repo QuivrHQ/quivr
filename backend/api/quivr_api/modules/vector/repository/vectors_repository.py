@@ -16,12 +16,17 @@ class VectorRepository(BaseRepository):
         super().__init__(session)
         self.session = session
 
-    async def create_vectors(self, new_vectors: List[Vector]) -> List[Vector]:
+    async def create_vectors(
+        self, new_vectors: List[Vector], autocommit: bool
+    ) -> List[Vector]:
         try:
             self.session.add_all(new_vectors)
-            await self.session.commit()
-            for vector in new_vectors:
-                await self.session.refresh(vector)
+            # FIXME: @AmineDiro : check if this is possible with nested transactions
+            if autocommit:
+                await self.session.commit()
+                for vector in new_vectors:
+                    await self.session.refresh(vector)
+            await self.session.flush()
             return new_vectors
         except exc.IntegrityError:
             # Rollback the session if there’s an IntegrityError

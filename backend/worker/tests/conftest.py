@@ -12,7 +12,7 @@ from quivr_api.models.settings import settings
 from quivr_api.modules.brain.entity.brain_entity import Brain, BrainType
 from quivr_api.modules.brain.entity.brain_user import BrainUserDB
 from quivr_api.modules.dependencies import get_supabase_client
-from quivr_api.modules.knowledge.dto.inputs import AddKnowledge
+from quivr_api.modules.knowledge.dto.inputs import AddKnowledge, KnowledgeUpdate
 from quivr_api.modules.knowledge.entity.knowledge import KnowledgeDB
 from quivr_api.modules.knowledge.repository.knowledges import KnowledgeRepository
 from quivr_api.modules.knowledge.service.knowledge_service import KnowledgeService
@@ -166,10 +166,13 @@ async def local_knowledge_file(
         knowledge_to_add=km_to_add,
         upload_file=UploadFile(file=km_data, size=128, filename=km_to_add.file_name),
     )
-
     # Link it to the brain
     await service.link_knowledge_tree_brains(
         km, brains_ids=[brain_user.brain_id], user_id=user.id
+    )
+    km = await service.update_knowledge(
+        knowledge=km,
+        payload=KnowledgeUpdate(status=KnowledgeStatus.PROCESSING),
     )
     return km
 

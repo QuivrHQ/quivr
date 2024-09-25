@@ -34,11 +34,12 @@ async def test_process_local_file(
     km_processor = KnowledgeProcessor(proc_services)
     await km_processor.process_knowledge(input_km.id)
 
-    # Check knowledge set to processed
+    # Check knowledge processed
     knowledge_service = km_processor.services.knowledge_service
     km = await knowledge_service.get_knowledge(input_km.id)
     assert km.status == KnowledgeStatus.PROCESSED
     assert km.brains[0].brain_id == input_km.brains[0].brain_id
+    assert km.file_sha1 is not None
 
     # Check vectors where added
     vecs = list(
@@ -80,6 +81,7 @@ async def test_process_sync_file(
     km = await knowledge_service.get_knowledge(input_km.id)
     assert km.status == KnowledgeStatus.PROCESSED
     assert km.brains[0].brain_id == input_km.brains[0].brain_id
+    assert km.file_sha1 is not None
 
     # Check vectors where added
     vecs = list(
@@ -132,6 +134,7 @@ async def test_process_sync_folder(
         assert km.status == KnowledgeStatus.PROCESSED
         assert km.brains[0]["brain_id"]
         assert km.brains[0]["brain_id"] == input_km.brains[0].brain_id
+        assert km.file_sha1 is not None
 
     # Check vectors where added
     vecs = list((await session.exec(select(Vector))).all())
@@ -220,7 +223,7 @@ async def test_process_km_rollback(
     # Check knowledge set to processed
     knowledge_service = km_processor.services.knowledge_service
     km = await knowledge_service.get_knowledge(input_km.id)
-    assert km.status == KnowledgeStatus.PROCESSING
+    assert km.status == KnowledgeStatus.PROCESSING  # tests are just uploaded
     vecs = list((await session.exec(select(Vector))).all())
     # Check we remove the vectors
     assert len(vecs) == 0
