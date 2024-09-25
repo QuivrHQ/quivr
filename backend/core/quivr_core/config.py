@@ -1,14 +1,20 @@
 import os
 from enum import Enum
-from typing import Dict, List, Optional
+from typing import Dict, Hashable, List, Optional
 from uuid import UUID
 from sqlmodel import SQLModel
+from langgraph.graph import START, END
 
 from megaparse.config import MegaparseConfig
 
 from quivr_core.base_config import QuivrBaseConfig
 from quivr_core.processor.splitter import SplitterConfig
 from quivr_core.prompts import CustomPromptsModel
+
+
+class SpecialEdges(str, Enum):
+    start = "START"
+    end = "END"
 
 
 class BrainConfig(QuivrBaseConfig):
@@ -260,15 +266,61 @@ class RerankerConfig(QuivrBaseConfig):
                 )
 
 
+class ConditionalEdgeConfig(QuivrBaseConfig):
+    routing_function: str
+    conditions: Dict[Hashable, str]
+
+    def __init__(self, **data):
+        super().__init__(**data)
+        self.resolve_special_edges()
+
+    def resolve_special_edges(self):
+        """Replace SpecialEdges enum values with their corresponding langgraph values."""
+        for key, value in self.conditions.items():
+            if value == SpecialEdges.end:
+                self.conditions[key] = END
+            elif value == SpecialEdges.start:
+                self.conditions[key] = START
+
+
 class NodeConfig(QuivrBaseConfig):
     name: str
     # config: QuivrBaseConfig  # This can be any config like RerankerConfig or LLMEndpointConfig
-    edges: List[str]  # List of names of other nodes this node links to
+    edges: List[str] | None = None  # List of names of other nodes this node links to
+    conditional_edge: ConditionalEdgeConfig | None = None
+
+    def __init__(self, **data):
+        super().__init__(**data)
+        self.resolve_special_edges_in_name_and_edges()
+
+    def resolve_special_edges_in_name_and_edges(self):
+        """Replace SpecialEdges enum values in name and edges with corresponding langgraph values."""
+        # Replace in name
+        if self.name == SpecialEdges.start:
+            self.name = START
+        elif self.name == SpecialEdges.end:
+            self.name = END
+
+        # Replace in edges
+        if self.edges:
+            for i, edge in enumerate(self.edges):
+                if edge == SpecialEdges.start:
+                    self.edges[i] = START
+                elif edge == SpecialEdges.end:
+                    self.edges[i] = END
 
 
 class WorkflowConfig(QuivrBaseConfig):
     name: str
     nodes: List[NodeConfig]
+
+    def __init__(self, **data):
+        super().__init__(**data)
+        self.check_start_node_exists()
+
+    def check_start_node_exists(self):
+        if START not in [node.name for node in self.nodes]:
+            raise ValueError(f"The workflow should contain a {SpecialEdges.start} node")
 
 
 class RetrievalConfig(QuivrBaseConfig):
