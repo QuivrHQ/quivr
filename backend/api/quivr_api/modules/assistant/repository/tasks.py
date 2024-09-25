@@ -3,7 +3,7 @@ from uuid import UUID
 
 from sqlalchemy import exc
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlmodel import select
+from sqlmodel import select, col
 
 from quivr_api.modules.assistant.dto.inputs import CreateTask
 from quivr_api.modules.assistant.entity.task_entity import Task
@@ -41,7 +41,7 @@ class TasksRepository(BaseRepository):
         return response.one()
 
     async def get_tasks_by_user_id(self, user_id: UUID) -> Sequence[Task]:
-        query = select(Task).where(Task.user_id == user_id)
+        query = select(Task).where(Task.user_id == user_id).order_by(col(Task.id).desc())
         response = await self.session.exec(query)
         return response.all()
 
