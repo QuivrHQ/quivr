@@ -130,6 +130,8 @@ async def aprocess_assistant_task(
     task_id: int,
     user_id: str,
 ):
+    global async_engine
+    assert async_engine
     async with AsyncSession(async_engine) as async_session:
         try:
             await async_session.execute(

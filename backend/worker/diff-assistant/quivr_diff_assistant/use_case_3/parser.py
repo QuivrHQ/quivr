@@ -18,7 +18,11 @@ from langchain_core.language_models.chat_models import BaseChatModel
 from langchain_core.messages import HumanMessage
 from megaparse import MegaParse  # FIXME: @chloedia Version problems
 
-os.environ["USE_TORCH"] = "1"
+
+from quivr_api.logger import get_logger
+
+logger = get_logger(__name__)
+
 
 """
 This needs to be in megaparse @chloedia
@@ -40,57 +44,61 @@ class DeadlyParser:
         """
         Parse the OCR output from the input file and return the extracted text.
         """
-        docs = DocumentFile.from_pdf(file, scale=int(500 / 72))
-        if partition:
-            cropped_image = crop_to_content(docs[0])
-            # cv2.imshow("cropped", cropped_image)
-            # cv2.waitKey(0)  # Wait for a key press
+        try:
+            docs = DocumentFile.from_pdf(file, scale=int(500 / 72))
+            if partition:
+                cropped_image = crop_to_content(docs[0])
+                # cv2.imshow("cropped", cropped_image)
+                # cv2.waitKey(0)  # Wait for a key press
 
-            docs = split_image(cropped_image)
-            # for i, sub_image in enumerate(docs):
-            #     cv2.imshow(f"sub_image_{i}", sub_image)
-            #     cv2.waitKey(0)  # Wait for a key press
-            #     cv2.destroyAllWindows()
+                docs = split_image(cropped_image)
+                # for i, sub_image in enumerate(docs):
+                #     cv2.imshow(f"sub_image_{i}", sub_image)
+                #     cv2.waitKey(0)  # Wait for a key press
+                #     cv2.destroyAllWindows()
 
-        print("ocr start")
-        raw_results: doctrDocument = self.predictor(docs)
-        print("ocr done")
-        if llm:
-            entire_content = ""
-            print("ocr llm start")
-            for raw_result, img in zip(raw_results.pages, docs, strict=False):
-                if raw_result.render() == "":
-                    continue
-                _, buffer = cv2.imencode(".png", img)
-                img_str64 = base64.b64encode(buffer.tobytes()).decode("utf-8")
+            print("ocr start")
+            raw_results: doctrDocument = self.predictor(docs)
+            print("ocr done")
+            if llm:
+                entire_content = ""
+                print("ocr llm start")
+                for raw_result, img in zip(raw_results.pages, docs, strict=False):
+                    if raw_result.render() == "":
+                        continue
+                    _, buffer = cv2.imencode(".png", img)
+                    img_str64 = base64.b64encode(buffer.tobytes()).decode("utf-8")
 
-                processed_result = llm.invoke(
-                    [
-                        HumanMessage(
-                            content=[
-                                {
-                                    "type": "text",
-                                    "text": f"Can you correct this entire text retranscription, respond only with the corrected transcription: {raw_result.render()},\n\n do not transcribe logos or images.",
-                                },
-                                {
-                                    "type": "image_url",
-                                    "image_url": {
-                                        "url": f"data:image/jpeg;base64,{img_str64}",
-                                        "detail": "auto",
+                    processed_result = llm.invoke(
+                        [
+                            HumanMessage(
+                                content=[
+                                    {
+                                        "type": "text",
+                                        "text": f"Can you correct this entire text retranscription, respond only with the corrected transcription: {raw_result.render()},\n\n do not transcribe logos or images.",
                                     },
-                                },
-                            ]
-                        )
-                    ]
-                )
-                assert isinstance(
-                    processed_result.content, str
-                ), "The LVM did not return a string"
-                entire_content += processed_result.content
-            print("ocr llm done")
-            return Document(page_content=entire_content)
+                                    {
+                                        "type": "image_url",
+                                        "image_url": {
+                                            "url": f"data:image/jpeg;base64,{img_str64}",
+                                            "detail": "auto",
+                                        },
+                                    },
+                                ]
+                            )
+                        ]
+                    )
+                    assert isinstance(
+                        processed_result.content, str
+                    ), "The LVM did not return a string"
+                    entire_content += processed_result.content
+                print("ocr llm done")
+                return Document(page_content=entire_content)
 
-        return Document(page_content=raw_results.render())
+            return Document(page_content=raw_results.render())
+        except Exception as e:
+            print(e)
+            return Document(page_content=raw_results.render())
 
     def deep_parse(
         self,
@@ -101,57 +109,61 @@ class DeadlyParser:
         """
         Parse the OCR output from the input file and return the extracted text.
         """
-        docs = DocumentFile.from_pdf(file, scale=int(500 / 72))
-        if partition:
-            cropped_image = crop_to_content(docs[0])
-            # cv2.imshow("cropped", cropped_image)
-            # cv2.waitKey(0)  # Wait for a key press
+        try:
+            logger.info("Starting document processing")
+            
+            # Reduce image scale to lower memory usage
+            docs = DocumentFile.from_pdf(file, scale=int(300 / 72))
+            logger.info("Document loaded")
 
-            docs = split_image(cropped_image)
-            # for i, sub_image in enumerate(docs):
-            #     cv2.imshow(f"sub_image_{i}", sub_image)
-            #     cv2.waitKey(0)  # Wait for a key press
-            #     cv2.destroyAllWindows()
+            if partition:
+                logger.info("Partitioning document")
+                cropped_image = crop_to_content(docs[0])
+                docs = split_image(cropped_image)
 
-        print("ocr start")
-        raw_results: doctrDocument = self.predictor(docs)
-        print("ocr done")
-        if llm:
-            entire_content = ""
-            print("ocr llm start")
-            for raw_result, img in zip(raw_results.pages, docs, strict=False):
-                if raw_result.render() == "":
-                    continue
-                _, buffer = cv2.imencode(".png", img)
-                img_str64 = base64.b64encode(buffer.tobytes()).decode("utf-8")
+            logger.info("Starting OCR")
+            raw_results: doctrDocument = self.predictor(docs)
+            logger.info("OCR completed")
 
-                processed_result = llm.invoke(
-                    [
-                        HumanMessage(
-                            content=[
-                                {
-                                    "type": "text",
-                                    "text": f"Can you correct this entire text retranscription, respond only with the corrected transcription: {raw_result.render()},\n\n do not transcribe logos or images.",
-                                },
-                                {
-                                    "type": "image_url",
-                                    "image_url": {
-                                        "url": f"data:image/jpeg;base64,{img_str64}",
-                                        "detail": "auto",
+            if llm:
+                entire_content = ""
+                logger.info("Starting LLM processing")
+                for i, (raw_result, img) in enumerate(zip(raw_results.pages, docs, strict=False)):
+                    if raw_result.render() == "":
+                        continue
+                    _, buffer = cv2.imencode(".png", img)
+                    img_str64 = base64.b64encode(buffer.tobytes()).decode("utf-8")
+
+                    processed_result = llm.invoke(
+                        [
+                            HumanMessage(
+                                content=[
+                                    {
+                                        "type": "text",
+                                        "text": f"Can you correct this entire text retranscription, respond only with the corrected transcription: {raw_result.render()},\n\n do not transcribe logos or images.",
                                     },
-                                },
-                            ]
-                        )
-                    ]
-                )
-                assert isinstance(
-                    processed_result.content, str
-                ), "The LVM did not return a string"
-                entire_content += processed_result.content
-            print("ocr llm done")
-            return Document(page_content=entire_content)
+                                    {
+                                        "type": "image_url",
+                                        "image_url": {
+                                            "url": f"data:image/jpeg;base64,{img_str64}",
+                                            "detail": "auto",
+                                        },
+                                    },
+                                ]
+                            )
+                        ]
+                    )
+                    assert isinstance(
+                        processed_result.content, str
+                    ), "The LLM did not return a string"
+                    entire_content += processed_result.content
+                logger.info("LLM processing completed")
+                return Document(page_content=entire_content)
 
-        return Document(page_content=raw_results.render())
+            return Document(page_content=raw_results.render())
+        except Exception as e:
+            logger.error(f"Error in deep_parse: {str(e)}", exc_info=True)
+            raise 
 
     def parse(self, file_path) -> Document:
         """

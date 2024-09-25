@@ -59,7 +59,7 @@ async def create_modification_report(
         main_diff: list[tuple[int, str]] = dmp.diff_main(after_section, before_section)
         section_diffs.append(DiffResult(main_diff))
 
-    print(section_diffs)
+    print("🔥 section_diffs")
     return redact_report(section_diffs, llm=llm)
 
 

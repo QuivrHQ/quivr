@@ -2,7 +2,7 @@ from typing import List
 
 from langchain_core.language_models.chat_models import BaseChatModel
 from langchain_core.prompts.prompt import PromptTemplate
-from use_case_3.diff_type import DiffResult
+from quivr_diff_assistant.use_case_3.diff_type import DiffResult
 
 REPORT_PROMPT = PromptTemplate.from_template(
     template="""You are tasked with analyzing and reporting differences in text for a Quality engineer. The input text contains differences marked with special tokens. Your job is to parse these differences and create a clear, concise report.
@@ -54,6 +54,7 @@ REPORT_PROMPT = PromptTemplate.from_template(
 
 
 def redact_report(difference_per_section: List[DiffResult], llm: BaseChatModel) -> str:
+    print(f"🔥 difference_per_section: {difference_per_section}")
     report_per_section = []
     combined_diffs = ""
     for section in difference_per_section:
@@ -70,5 +71,5 @@ def redact_report(difference_per_section: List[DiffResult], llm: BaseChatModel) 
 
     for rep in report_per_section:
         report_text += "\n".join(rep.split("\n")[1:-1]) + "\n\n"
-
+    print(f"🔥 report_text: {report_text}")
     return report_text
