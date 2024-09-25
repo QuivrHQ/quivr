@@ -7,6 +7,7 @@ import { Checkbox } from "@/lib/components/ui/Checkbox/Checkbox";
 import { Icon } from "@/lib/components/ui/Icon/Icon";
 import { QuivrButton } from "@/lib/components/ui/QuivrButton/QuivrButton";
 import { TextInput } from "@/lib/components/ui/TextInput/TextInput";
+import { useSupabase } from "@/lib/context/SupabaseProvider";
 import { filterAndSort, updateSelectedItems } from "@/lib/helpers/table";
 import { useDevice } from "@/lib/hooks/useDevice";
 
@@ -28,22 +29,43 @@ const ProcessTab = (): JSX.Element => {
   const [lastSelectedIndex, setLastSelectedIndex] = useState<number | null>(
     null
   );
+  const [loading, setLoading] = useState<boolean>(false);
 
-  const { getTasks } = useAssistants();
-
+  const { getTasks, deleteTask } = useAssistants();
+  const { supabase } = useSupabase();
   const { isMobile } = useDevice();
 
+  const loadTasks = async () => {
+    try {
+      const res = await getTasks();
+      setProcesses(res);
+      setFilteredProcess(res);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const handleStatusChange = () => {
+    void loadTasks();
+  };
+
   useEffect(() => {
-    void (async () => {
-      try {
-        const res = await getTasks();
-        console.info(res);
-        setProcesses(res);
-        setFilteredProcess(res);
-      } catch (error) {
-        console.error(error);
-      }
-    })();
+    void loadTasks();
+  }, []);
+
+  useEffect(() => {
+    const channel = supabase
+      .channel("tasks")
+      .on(
+        "postgres_changes",
+        { event: "UPDATE", schema: "public", table: "tasks" },
+        handleStatusChange
+      )
+      .subscribe();
+
+    return () => {
+      void supabase.removeChannel(channel);
+    };
   }, []);
 
   useEffect(() => {
@@ -55,10 +77,16 @@ const ProcessTab = (): JSX.Element => {
         (process) => process[sortConfig.key]
       )
     );
-  }, [searchQuery, sortConfig]);
+  }, [processes, searchQuery, sortConfig]);
 
-  const handleDelete = () => {
-    console.info("delete");
+  const handleDelete = async () => {
+    setLoading(true);
+    await Promise.all(
+      selectedProcess.map(async (process) => await deleteTask(process.id))
+    );
+    await loadTasks(); // Recharger les tâches après suppression
+    setSelectedProcess([]);
+    setLoading(false);
   };
 
   const handleSelect = (
@@ -111,10 +139,15 @@ const ProcessTab = (): JSX.Element => {
           color="dangerous"
           disabled={selectedProcess.length === 0}
           onClick={handleDelete}
+          isLoading={loading}
         />
       </div>
       <div>
-        <div className={styles.first_line}>
+        <div
+          className={`${styles.first_line}  ${
+            !filteredProcess.length ? styles.empty : ""
+          }`}
+        >
           <div className={styles.left}>
             <Checkbox
               checked={allChecked}

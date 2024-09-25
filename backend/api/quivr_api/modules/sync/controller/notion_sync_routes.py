@@ -10,7 +10,11 @@ from notion_client import Client
 from quivr_api.celery_config import celery
 from quivr_api.logger import get_logger
 from quivr_api.middlewares.auth import AuthBearer, get_current_user
-from quivr_api.modules.sync.dto.inputs import SyncsUserInput, SyncUserUpdateInput
+from quivr_api.modules.sync.dto.inputs import (
+    SyncsUserInput,
+    SyncsUserStatus,
+    SyncUserUpdateInput,
+)
 from quivr_api.modules.sync.service.sync_service import SyncService, SyncUserService
 from quivr_api.modules.user.entity.user_identity import UserIdentity
 
@@ -65,6 +69,7 @@ def authorize_notion(
         provider="Notion",
         credentials={},
         state={"state": state},
+        status=str(SyncsUserStatus.SYNCING),
     )
     sync_user_service.create_sync_user(sync_user_input)
     return {"authorization_url": authorize_url}
@@ -145,15 +150,20 @@ def oauth2callback_notion(request: Request, background_tasks: BackgroundTasks):
 
         sync_user_input = SyncUserUpdateInput(
             credentials=result,
-            state={},
+            # state={},
             email=user_email,
+            status=str(SyncsUserStatus.SYNCING),
         )
         sync_user_service.update_sync_user(current_user, state_dict, sync_user_input)
         logger.info(f"Notion sync created successfully for user: {current_user}")
         # launch celery task to sync notion data
         celery.send_task(
             "fetch_and_store_notion_files_task",
-            kwargs={"access_token": access_token, "user_id": current_user},
+            kwargs={
+                "access_token": access_token,
+                "user_id": current_user,
+                "sync_user_id": sync_user_state.id,
+            },
         )
         return HTMLResponse(successfullConnectionPage)
 

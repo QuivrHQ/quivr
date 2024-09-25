@@ -16,7 +16,6 @@
     "**/.docusaurus/": true,
     "**/node_modules/": true
   },
-  "json.sortOnSave.enable": true,
   "[python]": {
     "editor.defaultFormatter": "charliermarsh.ruff",
     "editor.formatOnSave": true,
@@ -25,19 +24,10 @@
       "source.fixAll": "explicit"
     }
   },
-  "python.formatting.provider": "black",
   "python.analysis.extraPaths": [
     "./backend"
   ],
-  "python.sortImports.path": "isort",
-  "python.linting.mypyEnabled": true,
   "python.defaultInterpreterPath": "python3",
-  "python.linting.enabled": true,
-  "python.linting.flake8Enabled": true,
-  "python.linting.pycodestyleEnabled": true,
-  "python.linting.pylintEnabled": true,
-  "python.linting.pycodestyleCategorySeverity.W": "Error",
-  "python.linting.flake8CategorySeverity.W": "Error",
   "python.testing.pytestArgs": [
     "-v",
     "--color=yes",
@@ -53,5 +43,6 @@
     "reportMissingImports": "error",
     "reportUnusedImport": "warning",
     "reportGeneralTypeIssues": "warning"
-  }
+  },
+  "makefile.configureOnOpen": false
 }

@@ -38,9 +38,25 @@ export const FileInput = (props: FileInputProps): JSX.Element => {
     fileInputRef.current?.click();
   };
 
+  const mimeTypes: { [key: string]: string } = {
+    pdf: "application/pdf",
+    doc: "application/msword",
+    docx: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    xls: "application/vnd.ms-excel",
+    xlsx: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    csv: "text/csv",
+    txt: "text/plain",
+    jpg: "image/jpeg",
+    jpeg: "image/jpeg",
+    png: "image/png",
+  };
+
   const accept: Accept | undefined = props.acceptedFileTypes?.reduce(
     (acc, type) => {
-      acc[`.${type}`] = [];
+      const mimeType = mimeTypes[type];
+      if (mimeType) {
+        acc[mimeType] = [];
+      }
 
       return acc;
     },

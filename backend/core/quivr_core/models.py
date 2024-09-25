@@ -92,9 +92,10 @@ class ParsedRAGChunkResponse(BaseModel):
 
 class QuivrKnowledge(BaseModel):
     id: UUID
-    brain_id: UUID
-    file_name: Optional[str] = None
+    file_name: str
+    brain_ids: list[UUID] | None = None
     url: Optional[str] = None
+    extension: str = ".txt"
     mime_type: str = "txt"
     status: KnowledgeStatus = KnowledgeStatus.PROCESSING
     source: Optional[str] = None

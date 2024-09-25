@@ -22,7 +22,7 @@ class ModelRepository(BaseRepository):
         response = await self.session.exec(query)
         return response.first()
 
-    async def get_default_model(self) -> Model:
+    async def get_default_model(self) -> Model | None:
         query = select(Model).where(Model.default == True)  # noqa: E712
         response = await self.session.exec(query)
         return response.first()

@@ -19,7 +19,11 @@ export interface ProcessAssistantInput {
   files: File[];
 }
 
-const AssistantTab = (): JSX.Element => {
+interface AssistantTabProps {
+  setSelectedTab: (tab: string) => void;
+}
+
+const AssistantTab = ({ setSelectedTab }: AssistantTabProps): JSX.Element => {
   const [assistantChoosed, setAssistantChoosed] = useState<
     Assistant | undefined
   >(undefined);
@@ -32,6 +36,7 @@ const AssistantTab = (): JSX.Element => {
   }>({});
   const [fileStates, setFileStates] = useState<{ [key: string]: File }>({});
   const [isFormValid, setIsFormValid] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(false);
 
   const { getAssistants, processTask } = useAssistants();
 
@@ -148,10 +153,10 @@ const AssistantTab = (): JSX.Element => {
         files: Object.values(fileStates),
       };
 
-      console.info(processAssistantInput);
-
-      const res = await processTask(processAssistantInput);
-      console.info(res);
+      setLoading(true);
+      await processTask(processAssistantInput);
+      setSelectedTab("Process");
+      setLoading(false);
     }
   };
 
@@ -246,6 +251,7 @@ const AssistantTab = (): JSX.Element => {
             color="primary"
             important={true}
             onClick={handleSubmit}
+            isLoading={loading}
             disabled={!isFormValid}
           />
         </div>

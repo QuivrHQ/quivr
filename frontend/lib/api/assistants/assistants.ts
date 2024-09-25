@@ -46,3 +46,18 @@ export const processTask = async (
 
   return response.data;
 };
+
+export const deleteTask = async (
+  axiosInstance: AxiosInstance,
+  taskId: number
+): Promise<void> => {
+  await axiosInstance.delete(`/assistants/task/${taskId}`);
+};
+
+export const downloadTaskResult = async (
+  axiosInstance: AxiosInstance,
+  taskId: number
+): Promise<string> => {
+  return (await axiosInstance<string>(`/assistants/task/${taskId}/download`))
+    .data;
+};

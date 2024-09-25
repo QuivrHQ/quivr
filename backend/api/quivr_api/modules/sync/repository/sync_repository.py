@@ -212,8 +212,13 @@ class NotionRepository(BaseRepository):
         self.session = session
         self.db = get_supabase_client()
 
-    async def get_user_notion_files(self, user_id: UUID) -> Sequence[NotionSyncFile]:
-        query = select(NotionSyncFile).where(NotionSyncFile.user_id == user_id)
+    async def get_user_notion_files(
+        self, user_id: UUID, sync_user_id: int
+    ) -> Sequence[NotionSyncFile]:
+        query = select(NotionSyncFile).where(
+            NotionSyncFile.user_id == user_id
+            and NotionSyncFile.sync_user_id == sync_user_id
+        )
         response = await self.session.exec(query)
         return response.all()
 
@@ -275,9 +280,13 @@ class NotionRepository(BaseRepository):
         return response.all()
 
     async def get_notion_files_by_parent_id(
-        self, parent_id: str | None
+        self, parent_id: str | None, sync_user_id: int
     ) -> Sequence[NotionSyncFile]:
-        query = select(NotionSyncFile).where(NotionSyncFile.parent_id == parent_id)
+        query = (
+            select(NotionSyncFile)
+            .where(NotionSyncFile.parent_id == parent_id)
+            .where(NotionSyncFile.sync_user_id == sync_user_id)
+        )
         response = await self.session.exec(query)
         return response.all()
 

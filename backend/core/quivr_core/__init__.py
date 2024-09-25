@@ -1,10 +1,9 @@
 from importlib.metadata import entry_points
 
 from .brain import Brain
-from .chat_llm import ChatLLM
 from .processor.registry import register_processor, registry
 
-__all__ = ["Brain", "ChatLLM", "registry", "register_processor"]
+__all__ = ["Brain", "registry", "register_processor"]
 
 
 def register_entries():

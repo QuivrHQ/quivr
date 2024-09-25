@@ -108,3 +108,7 @@ export interface ProcessAssistantInput {
   input: ProcessAssistantData;
   files: File[];
 }
+
+export interface ResultDownload {
+  data: string;
+}
