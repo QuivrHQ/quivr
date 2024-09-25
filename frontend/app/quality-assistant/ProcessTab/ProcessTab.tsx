@@ -84,7 +84,24 @@ const ProcessTab = (): JSX.Element => {
     await Promise.all(
       selectedProcess.map(async (process) => await deleteTask(process.id))
     );
+
+    const remainingProcesses = processes.filter(
+      (process) =>
+        !selectedProcess.some((selected) => selected.id === process.id)
+    );
+
+    setProcesses(remainingProcesses);
+    setFilteredProcess(
+      filterAndSort(
+        remainingProcesses,
+        searchQuery,
+        sortConfig,
+        (process) => process[sortConfig.key]
+      )
+    );
+
     setSelectedProcess([]);
+    setAllChecked(false);
     setLoading(false);
   };
 
@@ -156,7 +173,10 @@ const ProcessTab = (): JSX.Element => {
               }}
             />
             <div className={styles.left_fields}>
-              <div className={`${styles.field} ${styles.assistant}`}>
+              <div
+                className={`${styles.field} ${styles.assistant}`}
+                onClick={() => handleSort("assistant_name")}
+              >
                 Assistant
                 <div className={styles.icon}>
                   <Icon name="sort" size="small" color="black" />
