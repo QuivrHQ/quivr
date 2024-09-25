@@ -17,6 +17,7 @@ from quivr_api.modules.knowledge.repository.knowledges import KnowledgeRepositor
 from quivr_api.modules.knowledge.service.knowledge_service import KnowledgeService
 from quivr_api.modules.knowledge.tests.conftest import FakeStorage
 from quivr_api.modules.sync.dto.outputs import SyncProvider
+from quivr_api.modules.sync.entity.sync_models import Sync
 from quivr_api.modules.sync.repository.sync_repository import SyncsRepository
 from quivr_api.modules.sync.service.sync_service import SyncsService
 from quivr_api.modules.sync.tests.test_sync_controller import BaseFakeSync
@@ -25,6 +26,7 @@ from quivr_api.modules.user.entity.user_identity import User
 from quivr_api.modules.vector.repository.vectors_repository import VectorRepository
 from quivr_api.modules.vector.service.vector_service import VectorService
 from quivr_core.files.file import QuivrFile
+from quivr_core.models import KnowledgeStatus
 from quivr_worker.process.processor import KnowledgeProcessor, ProcessorServices
 from sqlalchemy.ext.asyncio import create_async_engine
 from sqlmodel import select
@@ -99,19 +101,22 @@ async def brain_user(session, user: User) -> Brain:
     return brain_1
 
 
+# NOTE: param sets the number of sync file the provider returns
 @pytest_asyncio.fixture(scope="function")
-async def proc_services(session: AsyncSession) -> ProcessorServices:
+async def proc_services(session: AsyncSession, request) -> ProcessorServices:
     storage = FakeStorage()
     embedder = DeterministicFakeEmbedding(size=settings.embedding_dim)
-    sync_provider_mapping: dict[SyncProvider, BaseSync] = {
-        provider: BaseFakeSync(provider_name=str(provider))
-        for provider in list(SyncProvider)
-    }
     vector_repository = VectorRepository(session)
     vector_service = VectorService(vector_repository, embedder=embedder)
     knowledge_repository = KnowledgeRepository(session)
     knowledge_service = KnowledgeService(knowledge_repository, storage=storage)
-    sync_repository = SyncsRepository(session)
+    sync_provider_mapping: dict[SyncProvider, BaseSync] = {
+        provider: BaseFakeSync(provider_name=str(provider), n_get_files=request.param)
+        for provider in list(SyncProvider)
+    }
+    sync_repository = SyncsRepository(
+        session, sync_provider_mapping=sync_provider_mapping
+    )
     sync_service = SyncsService(sync_repository)
 
     return ProcessorServices(
@@ -128,6 +133,23 @@ async def km_processor(proc_services: ProcessorServices):
 
 
 @pytest_asyncio.fixture(scope="function")
+async def sync(session: AsyncSession, user: User) -> Sync:
+    assert user.id
+    sync = Sync(
+        name="test_sync",
+        email="test@test.com",
+        user_id=user.id,
+        credentials={"test": "test"},
+        provider=SyncProvider.GOOGLE,
+    )
+
+    session.add(sync)
+    await session.commit()
+    await session.refresh(sync)
+    return sync
+
+
+@pytest_asyncio.fixture(scope="function")
 async def local_knowledge_file(
     proc_services: ProcessorServices, user: User, brain_user: Brain
 ) -> KnowledgeDB:
@@ -141,7 +163,6 @@ async def local_knowledge_file(
         parent_id=None,
     )
     km_data = BytesIO(os.urandom(24))
-
     km = await service.create_knowledge(
         user_id=user.id,
         knowledge_to_add=km_to_add,
@@ -152,6 +173,73 @@ async def local_knowledge_file(
     await service.link_knowledge_tree_brains(
         km, brains_ids=[brain_user.brain_id], user_id=user.id
     )
+    return km
+
+
+@pytest_asyncio.fixture(scope="function")
+async def sync_knowledge_file(
+    session: AsyncSession,
+    proc_services: ProcessorServices,
+    user: User,
+    brain_user: Brain,
+    sync: Sync,
+) -> KnowledgeDB:
+    assert user.id
+    assert brain_user.brain_id
+
+    km = KnowledgeDB(
+        file_name="test_file_1.txt",
+        extension=".txt",
+        status=KnowledgeStatus.PROCESSING,
+        source=SyncProvider.GOOGLE,
+        source_link="drive://test/test",
+        file_size=0,
+        file_sha1=None,
+        user_id=user.id,
+        brains=[brain_user],
+        parent=None,
+        sync_file_id="id1",
+        sync=sync,
+    )
+
+    session.add(km)
+    await session.commit()
+    await session.refresh(km)
+
+    return km
+
+
+@pytest_asyncio.fixture(scope="function")
+async def sync_knowledge_folder(
+    session: AsyncSession,
+    proc_services: ProcessorServices,
+    user: User,
+    brain_user: Brain,
+    sync: Sync,
+) -> KnowledgeDB:
+    assert user.id
+    assert brain_user.brain_id
+
+    km = KnowledgeDB(
+        file_name="folder1",
+        extension=".txt",
+        status=KnowledgeStatus.PROCESSING,
+        source=SyncProvider.GOOGLE,
+        source_link="drive://test/folder1",
+        file_size=0,
+        file_sha1=None,
+        user_id=user.id,
+        brains=[brain_user],
+        parent=None,
+        is_folder=True,
+        sync_file_id="id1",
+        sync=sync,
+    )
+
+    session.add(km)
+    await session.commit()
+    await session.refresh(km)
+
     return km
 
 

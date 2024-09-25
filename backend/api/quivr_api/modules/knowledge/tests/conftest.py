@@ -25,6 +25,9 @@ class ErrorStorage(StorageInterface):
     async def remove_file(self, storage_path: str):
         raise SystemError
 
+    async def download_file(self, knowledge: KnowledgeDB, **kwargs) -> bytes:
+        raise NotImplementedError
+
 
 class FakeStorage(StorageInterface):
     def __init__(self):

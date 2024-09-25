@@ -1,3 +1,4 @@
+import asyncio
 from contextlib import asynccontextmanager
 from dataclasses import dataclass
 from io import BytesIO
@@ -123,7 +124,7 @@ class KnowledgeProcessor:
         self, knowledge: KnowledgeDTO
     ) -> AsyncGenerator[Tuple[KnowledgeDB, QuivrFile] | None, None]:
         if knowledge.source == KnowledgeSource.LOCAL:
-            async for to_process in self._build_local(knowledge):
+            async for to_process in self._yield_local(knowledge):
                 yield to_process
         elif knowledge.source in (
             KnowledgeSource.AZURE,
@@ -131,7 +132,7 @@ class KnowledgeProcessor:
             KnowledgeSource.GOOGLE,
             KnowledgeSource.NOTION,
         ):
-            async for to_process in self._build_sync(knowledge):
+            async for to_process in self._yield_syncs(knowledge):
                 yield to_process
         elif knowledge.source == KnowledgeSource.WEB:
             raise NotImplementedError
@@ -141,7 +142,7 @@ class KnowledgeProcessor:
             )
             raise ValueError("Unknown knowledge source : {knoledge.source}")
 
-    async def _build_local(
+    async def _yield_local(
         self, knowledge: KnowledgeDTO
     ) -> AsyncGenerator[Tuple[KnowledgeDB, QuivrFile] | None, None]:
         if knowledge.id is None or knowledge.file_name is None:
@@ -157,7 +158,7 @@ class KnowledgeProcessor:
         with build_qfile(knowledge_db, file_data) as qfile:
             yield (knowledge_db, qfile)
 
-    async def _build_sync(
+    async def _yield_syncs(
         self, knowledge_dto: KnowledgeDTO
     ) -> AsyncGenerator[Optional[Tuple[KnowledgeDB, QuivrFile]], None]:
         if knowledge_dto.id is None:
@@ -191,14 +192,6 @@ class KnowledgeProcessor:
         provider_name = SyncProvider(sync.provider.lower())
         sync_provider = self.services.syncprovider_mapping[provider_name]
 
-        syncfile_to_knowledge, sync_files = await self.fetch_sync_knowledge(
-            sync_id=parent_knowledge.sync_id,
-            user_id=parent_knowledge.user_id,
-            folder_id=parent_knowledge.sync_file_id,
-        )
-        if not sync_files:
-            return
-
         # Yield parent_knowledge as the first knowledge to process
         file_data = await download_sync_file(
             sync_provider=sync_provider,
@@ -216,10 +209,28 @@ class KnowledgeProcessor:
         with build_qfile(parent_knowledge, file_data) as qfile:
             yield (parent_knowledge, qfile)
 
+        # Fetch children
+        syncfile_to_knowledge, sync_files = await self.fetch_sync_knowledge(
+            sync_id=parent_knowledge.sync_id,
+            user_id=parent_knowledge.user_id,
+            folder_id=parent_knowledge.sync_file_id,
+        )
+        if not sync_files:
+            return
+
         for sync_file in sync_files:
             existing_km = syncfile_to_knowledge.get(sync_file.id)
             if existing_km:
-                file_knowledge = existing_km
+                # SyncKnowledge already exists =>
+                # It's already processed in some other brain so just link it and move on if it is Processed
+                # ELSE reprocess the file
+                for brain in parent_knowledge.brains:
+                    await self.services.knowledge_service.repository.link_to_brain(
+                        existing_km, brain_id=brain.brain_id
+                    )
+                # Don't reprocess already added syncs
+                if existing_km.status == KnowledgeStatus.PROCESSED:
+                    continue
             else:
                 # create sync file knowledge
                 # automagically gets the brains associated with the parent
@@ -238,6 +249,7 @@ class KnowledgeProcessor:
                     status=KnowledgeStatus.PROCESSING,
                     upload_file=None,
                 )
+            # TODO: cache maybe processed files or skip them ?
             file_data = await download_sync_file(
                 sync_provider=sync_provider,
                 file=sync_file,

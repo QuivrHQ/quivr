@@ -31,19 +31,26 @@ logger = get_logger(__name__)
 
 
 class SyncsRepository(BaseRepository):
-    def __init__(self, session: AsyncSession):
+    def __init__(
+        self,
+        session: AsyncSession,
+        sync_provider_mapping: dict[SyncProvider, BaseSync] | None = None,
+    ):
         self.session = session
         self.db = get_supabase_client()
 
-        self.sync_provider_mapping: dict[SyncProvider, BaseSync] = {
-            SyncProvider.GOOGLE: GoogleDriveSync(),
-            SyncProvider.DROPBOX: DropboxSync(),
-            SyncProvider.AZURE: AzureDriveSync(),
-            SyncProvider.NOTION: NotionSync(
-                notion_service=SyncNotionService(NotionRepository(self.session))
-            ),
-            SyncProvider.GITHUB: GitHubSync(),
-        }
+        if sync_provider_mapping is None:
+            self.sync_provider_mapping: dict[SyncProvider, BaseSync] = {
+                SyncProvider.GOOGLE: GoogleDriveSync(),
+                SyncProvider.DROPBOX: DropboxSync(),
+                SyncProvider.AZURE: AzureDriveSync(),
+                SyncProvider.NOTION: NotionSync(
+                    notion_service=SyncNotionService(NotionRepository(self.session))
+                ),
+                SyncProvider.GITHUB: GitHubSync(),
+            }
+        else:
+            self.sync_provider_mapping = sync_provider_mapping
 
     async def create_sync(
         self,

@@ -1,3 +1,4 @@
+import os
 from datetime import datetime
 from io import BytesIO
 from typing import Dict, List, Union
@@ -28,9 +29,9 @@ from quivr_api.modules.sync.service.sync_service import SyncsService
 from quivr_api.modules.sync.utils.sync import BaseSync
 from quivr_api.modules.user.entity.user_identity import User, UserIdentity
 
+MAX_SYNC_FILES = 1000
 N_GET_FILES = 2
-
-FOLDER_SYNC_FILE_IDS = [str(uuid4())[:8] for _ in range(N_GET_FILES)]
+FOLDER_SYNC_FILE_IDS = [str(uuid4())[:8] for _ in range(MAX_SYNC_FILES)]
 
 
 class BaseFakeSync(BaseSync):
@@ -38,8 +39,12 @@ class BaseFakeSync(BaseSync):
     lower_name = "google"
     datetime_format: str = "%Y-%m-%dT%H:%M:%S.%fZ"
 
-    def __init__(self, provider_name: str | None = None):
+    def __init__(self, provider_name: str | None = None, n_get_files: int = 2):
         super().__init__()
+        self.n_get_files = n_get_files
+        if n_get_files > MAX_SYNC_FILES:
+            raise ValueError("can't create fake sync")
+        self.folder_sync_file_ids = FOLDER_SYNC_FILE_IDS[:n_get_files]
         if provider_name:
             self.lower_name = provider_name
 
@@ -77,7 +82,7 @@ class BaseFakeSync(BaseSync):
                 is_folder=idx % 2 == 0,
                 last_modified_at=datetime.now(),
             )
-            for idx, fid in enumerate(FOLDER_SYNC_FILE_IDS)
+            for idx, fid in enumerate(self.folder_sync_file_ids)
         ]
 
     async def aget_files(
@@ -98,7 +103,7 @@ class BaseFakeSync(BaseSync):
     async def adownload_file(
         self, credentials: Dict, file: SyncFile
     ) -> Dict[str, Union[str, BytesIO]]:
-        raise NotImplementedError
+        return {"content": str(os.urandom(24))}
 
 
 @pytest_asyncio.fixture(scope="function")
@@ -112,6 +117,7 @@ async def user(session: AsyncSession) -> User:
 
 @pytest_asyncio.fixture(scope="function")
 async def sync(session: AsyncSession, user: User) -> Sync:
+    assert user.id
     sync = Sync(
         name="test_sync",
         email="test@test.com",
@@ -140,6 +146,7 @@ async def brain(session):
 
 @pytest_asyncio.fixture(scope="function")
 async def knowledge_sync(session, user: User, sync: Sync, brain: Brain):
+    assert user.id
     km = KnowledgeDB(
         file_name="sync_file_1.txt",
         extension=".txt",
@@ -167,7 +174,8 @@ async def test_client(session: AsyncSession, user: User):
 
     async def _sync_service():
         fake_provider: dict[SyncProvider, BaseSync] = {
-            provider: BaseFakeSync() for provider in list(SyncProvider)
+            provider: BaseFakeSync(n_get_files=N_GET_FILES)
+            for provider in list(SyncProvider)
         }
         repository = SyncsRepository(session)
         repository.sync_provider_mapping = fake_provider
