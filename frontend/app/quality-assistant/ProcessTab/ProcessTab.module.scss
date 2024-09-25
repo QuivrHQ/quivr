@@ -47,19 +47,25 @@
       align-items: center;
       gap: calc(Spacings.$spacing06 + 6px);
 
-      .name {
+      .left_fields {
         display: flex;
         align-items: center;
-        gap: Spacings.$spacing02;
-        cursor: pointer;
+        gap: Spacings.$spacing11;
 
-        .icon {
-          visibility: hidden;
-        }
+        .field {
+          display: flex;
+          align-items: center;
+          gap: Spacings.$spacing02;
+          cursor: pointer;
 
-        &:hover {
           .icon {
-            visibility: visible;
+            visibility: hidden;
+          }
+
+          &:hover {
+            .icon {
+              visibility: visible;
+            }
           }
         }
       }

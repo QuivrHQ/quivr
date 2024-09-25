@@ -24,7 +24,7 @@ const ProcessTab = (): JSX.Element => {
   const [sortConfig, setSortConfig] = useState<{
     key: keyof Process;
     direction: "ascending" | "descending";
-  }>({ key: "assistant_name", direction: "ascending" });
+  }>({ key: "creation_time", direction: "descending" });
   const [filteredProcess, setFilteredProcess] = useState<Process[]>([]);
   const [lastSelectedIndex, setLastSelectedIndex] = useState<number | null>(
     null
@@ -84,7 +84,6 @@ const ProcessTab = (): JSX.Element => {
     await Promise.all(
       selectedProcess.map(async (process) => await deleteTask(process.id))
     );
-    await loadTasks(); // Recharger les tâches après suppression
     setSelectedProcess([]);
     setLoading(false);
   };
@@ -156,16 +155,18 @@ const ProcessTab = (): JSX.Element => {
                 setSelectedProcess(checked ? filteredProcess : []);
               }}
             />
-            <div className={styles.name}>
-              Assistant
-              <div className={styles.icon}>
-                <Icon name="sort" size="small" color="black" />
+            <div className={styles.left_fields}>
+              <div className={styles.field}>
+                Assistant
+                <div className={styles.icon}>
+                  <Icon name="sort" size="small" color="black" />
+                </div>
               </div>
-            </div>
-            <div className={styles.name} onClick={() => handleSort("name")}>
-              Name
-              <div className={styles.icon}>
-                <Icon name="sort" size="small" color="black" />
+              <div className={styles.field} onClick={() => handleSort("name")}>
+                Name
+                <div className={styles.icon}>
+                  <Icon name="sort" size="small" color="black" />
+                </div>
               </div>
             </div>
           </div>

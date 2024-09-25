@@ -35,8 +35,9 @@
     gap: calc(Spacings.$spacing06 + 6px);
     overflow: hidden;
 
-    .name {
+    .assistant {
       @include Typography.EllipsisOverflow;
+      font-size: Typography.$tiny;
     }
   }
 
