@@ -24,7 +24,7 @@ const ProcessTab = (): JSX.Element => {
   const [sortConfig, setSortConfig] = useState<{
     key: keyof Process;
     direction: "ascending" | "descending";
-  }>({ key: "name", direction: "ascending" });
+  }>({ key: "assistant_name", direction: "ascending" });
   const [filteredProcess, setFilteredProcess] = useState<Process[]>([]);
   const [lastSelectedIndex, setLastSelectedIndex] = useState<number | null>(
     null
@@ -156,8 +156,14 @@ const ProcessTab = (): JSX.Element => {
                 setSelectedProcess(checked ? filteredProcess : []);
               }}
             />
+            <div className={styles.name}>
+              Assistant
+              <div className={styles.icon}>
+                <Icon name="sort" size="small" color="black" />
+              </div>
+            </div>
             <div className={styles.name} onClick={() => handleSort("name")}>
-              Nom
+              Name
               <div className={styles.icon}>
                 <Icon name="sort" size="small" color="black" />
               </div>

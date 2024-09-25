@@ -4,4 +4,5 @@ export interface Process {
   name: string;
   creation_time: string;
   status: "pending" | "processing" | "completed" | "error";
+  assistant_name: string;
 }

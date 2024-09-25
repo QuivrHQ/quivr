@@ -59,7 +59,7 @@ const ProcessLine = ({
             checked={selected}
             setChecked={(checked, event) => setSelected(checked, event)}
           />
-          <span className={styles.name}>{process.name}</span>
+          <span className={styles.assistant}>{process.assistant_name}</span>
         </div>
         <div className={styles.right}>
           {!isMobile && (
