@@ -3,6 +3,7 @@ from uuid import uuid4
 
 import pytest
 from quivr_api.modules.knowledge.entity.knowledge import KnowledgeDB
+from quivr_worker.parsers.crawler import slugify
 from quivr_worker.process.process_file import parse_qfile
 from quivr_worker.process.utils import build_qfile
 
@@ -20,10 +21,20 @@ def test_build_qfile_fail(local_knowledge_file: KnowledgeDB):
             pass
 
     local_knowledge_file.id = uuid4()
-    local_knowledge_file.file_name = None
-    with pytest.raises(AssertionError):
-        with build_qfile(knowledge=local_knowledge_file, file_data=random_bytes) as _:
-            pass
+
+
+def test_build_qfile_web(web_knowledge: KnowledgeDB):
+    random_bytes = os.urandom(128)
+    web_knowledge.file_sha1 = "sha1"
+
+    with build_qfile(knowledge=web_knowledge, file_data=random_bytes) as file:
+        assert file.id == web_knowledge.id
+        assert file.file_size == 128
+        assert file.original_filename == slugify(web_knowledge.url) + ".txt"
+        assert file.file_extension == ".txt"
+        if web_knowledge.metadata_:
+            assert web_knowledge.metadata_.items() <= file.metadata.items()
+        assert file.brain_id is None
 
 
 def test_build_qfile(local_knowledge_file: KnowledgeDB):

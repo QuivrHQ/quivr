@@ -27,6 +27,7 @@ from sqlalchemy.ext.asyncio import AsyncEngine
 from sqlmodel import text
 from sqlmodel.ext.asyncio.session import AsyncSession
 
+from quivr_worker.parsers.crawler import URL, extract_from_url
 from quivr_worker.process.process_file import parse_qfile, store_chunks
 from quivr_worker.process.utils import (
     build_qfile,
@@ -144,7 +145,8 @@ class KnowledgeProcessor:
             async for to_process in self._yield_syncs(knowledge):
                 yield to_process
         elif knowledge.source == KnowledgeSource.WEB:
-            raise NotImplementedError
+            async for to_process in self._yield_web(knowledge):
+                yield to_process
         else:
             logger.error(
                 f"received knowledge : {knowledge.id} with unknown source: {knowledge.source}"
@@ -164,6 +166,22 @@ class KnowledgeProcessor:
         )
         knowledge_db.file_sha1 = compute_sha1(file_data)
         with build_qfile(knowledge_db, file_data) as qfile:
+            yield (knowledge_db, qfile)
+
+    async def _yield_web(
+        self, knowledge_db: KnowledgeDB
+    ) -> AsyncGenerator[Tuple[KnowledgeDB, QuivrFile] | None, None]:
+        if knowledge_db.id is None or knowledge_db.url is None:
+            logger.error(f"received unprocessable web knowledge : {knowledge_db.id} ")
+            raise ValueError(
+                f"received unprocessable web knowledge : {knowledge_db.id} "
+            )
+        crawl_website = URL(url=knowledge_db.url)
+        extracted_content = await extract_from_url(crawl_website)
+        extracted_content_bytes = extracted_content.encode("utf-8")
+        knowledge_db.file_sha1 = compute_sha1(extracted_content_bytes)
+        knowledge_db.file_size = len(extracted_content_bytes)
+        with build_qfile(knowledge_db, extracted_content_bytes) as qfile:
             yield (knowledge_db, qfile)
 
     async def _yield_syncs(
@@ -192,8 +210,11 @@ class KnowledgeProcessor:
         # Get associated sync
         sync = await self.services.sync_service.get_sync_by_id(parent_knowledge.sync_id)
         if sync.credentials is None:
-            logger.error(f"can't process sync file. sync {sync.id} has no credentials")
-            return
+            logger.error(
+                f"can't process knowledge: {parent_knowledge.id}. sync {sync.id} has no credentials"
+            )
+            raise ValueError("no associated credentials")
+
         provider_name = SyncProvider(sync.provider.lower())
         sync_provider = self.services.syncprovider_mapping[provider_name]
 
@@ -228,7 +249,8 @@ class KnowledgeProcessor:
             if existing_km is not None:
                 # SyncKnowledge already exists =>
                 # It's already processed in some other brain so just link it and move on if it is Processed
-                # ELSE reprocess the file
+                # ELSE
+                # reprocess the file
                 km_brains = {km_brain.brain_id for km_brain in existing_km.brains}
                 for brain in filter(
                     lambda b: b.brain_id not in km_brains,
@@ -264,6 +286,7 @@ class KnowledgeProcessor:
                 credentials=sync.credentials,
             )
             file_knowledge.file_sha1 = compute_sha1(file_data)
+            file_knowledge.file_size = len(file_data)
             with build_qfile(file_knowledge, file_data) as qfile:
                 yield (file_knowledge, qfile)
 
@@ -273,7 +296,6 @@ class KnowledgeProcessor:
             savepoint = (
                 await self.services.knowledge_service.repository.session.begin_nested()
             )
-
             try:
                 if knowledge_tuple is None:
                     continue
@@ -288,7 +310,8 @@ class KnowledgeProcessor:
                 await self.services.knowledge_service.update_knowledge(
                     knowledge,
                     KnowledgeUpdate(
-                        status=KnowledgeStatus.PROCESSED, file_sha1=knowledge.file_sha1
+                        status=KnowledgeStatus.PROCESSED,
+                        file_sha1=knowledge.file_sha1,
                     ),
                 )
             except Exception as e:

@@ -20,6 +20,8 @@ from quivr_api.modules.sync.utils.sync import (
 )
 from quivr_core.files.file import FileExtension, QuivrFile
 
+from quivr_worker.parsers.crawler import slugify
+
 celery_inspector = celery.control.inspect()
 
 logger = get_logger("celery_worker")
@@ -79,18 +81,25 @@ def build_qfile(
     knowledge: KnowledgeDB, file_data: bytes
 ) -> Generator[QuivrFile, None, None]:
     assert knowledge.id
-    assert knowledge.file_name
     assert knowledge.file_sha1
+    if knowledge.source == KnowledgeSource.WEB:
+        file_name = slugify(knowledge.url) + ".txt"
+        extension = FileExtension.txt
+    else:
+        assert knowledge.file_name
+        file_name = knowledge.file_name
+        extension = FileExtension(knowledge.extension)
+
     with create_temp_file(
-        file_data=file_data, file_name_ext=knowledge.file_name
+        file_data=file_data, file_name_ext=file_name
     ) as tmp_file_path:
         qfile = QuivrFile(
             id=knowledge.id,
-            original_filename=knowledge.file_name,
+            original_filename=file_name,
             path=tmp_file_path,
             file_sha1=knowledge.file_sha1,
-            file_extension=FileExtension(knowledge.extension),
-            file_size=knowledge.file_size,
+            file_extension=extension,
+            file_size=len(file_data),
             metadata={
                 "date": time.strftime("%Y%m%d"),
                 "file_name": knowledge.file_name,

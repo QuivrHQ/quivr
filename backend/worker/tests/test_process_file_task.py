@@ -55,6 +55,52 @@ async def test_process_local_file(
 
 @pytest.mark.asyncio(loop_scope="session")
 @pytest.mark.parametrize("proc_services", [0], indirect=True)
+async def test_process_web_file(
+    monkeypatch,
+    session: AsyncSession,
+    proc_services: ProcessorServices,
+    web_knowledge: KnowledgeDB,
+):
+    input_km = web_knowledge
+
+    async def _extract_url(url: str) -> str:
+        return "quivr has the best rag"
+
+    async def _parse_file_mock(
+        qfile: QuivrFile,
+        **processor_kwargs: dict[str, Any],
+    ) -> list[Document]:
+        with open(qfile.path, "rb") as f:
+            return [Document(page_content=str(f.read()), metadata={})]
+
+    monkeypatch.setattr("quivr_worker.process.processor.parse_qfile", _parse_file_mock)
+    monkeypatch.setattr("quivr_worker.process.processor.extract_from_url", _extract_url)
+    assert input_km.id
+    assert input_km.brains
+    km_processor = KnowledgeProcessor(proc_services)
+    await km_processor.process_knowledge(input_km.id)
+
+    # Check knowledge processed
+    knowledge_service = km_processor.services.knowledge_service
+    km = await knowledge_service.get_knowledge(input_km.id)
+    assert km.status == KnowledgeStatus.PROCESSED
+    assert km.brains[0].brain_id == input_km.brains[0].brain_id
+    assert km.file_sha1 is not None
+
+    # Check vectors where added
+    vecs = list(
+        (
+            await session.exec(
+                select(Vector).where(col(Vector.knowledge_id) == input_km.id)
+            )
+        ).all()
+    )
+    assert len(vecs) > 0
+    assert vecs[0].metadata_ is not None
+
+
+@pytest.mark.asyncio(loop_scope="session")
+@pytest.mark.parametrize("proc_services", [0], indirect=True)
 async def test_process_sync_file(
     monkeypatch,
     session: AsyncSession,

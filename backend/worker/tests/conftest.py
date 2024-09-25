@@ -13,7 +13,7 @@ from quivr_api.modules.brain.entity.brain_entity import Brain, BrainType
 from quivr_api.modules.brain.entity.brain_user import BrainUserDB
 from quivr_api.modules.dependencies import get_supabase_client
 from quivr_api.modules.knowledge.dto.inputs import AddKnowledge, KnowledgeUpdate
-from quivr_api.modules.knowledge.entity.knowledge import KnowledgeDB
+from quivr_api.modules.knowledge.entity.knowledge import KnowledgeDB, KnowledgeSource
 from quivr_api.modules.knowledge.repository.knowledges import KnowledgeRepository
 from quivr_api.modules.knowledge.service.knowledge_service import KnowledgeService
 from quivr_api.modules.knowledge.tests.conftest import FakeStorage
@@ -288,6 +288,36 @@ async def sync_knowledge_folder_with_file_in_brain(
     )
 
     session.add(file)
+    session.add(km)
+    await session.commit()
+    await session.refresh(km)
+
+    return km
+
+
+@pytest_asyncio.fixture(scope="function")
+async def web_knowledge(
+    session: AsyncSession,
+    user: User,
+    brain_user: Brain,
+) -> KnowledgeDB:
+    assert user.id
+    assert brain_user.brain_id
+
+    km = KnowledgeDB(
+        file_name=None,
+        url="www.quivr.app",
+        extension=".html",
+        status=KnowledgeStatus.PROCESSING,
+        source=KnowledgeSource.WEB,
+        source_link="www.quivr.app",
+        file_size=0,
+        file_sha1=None,
+        user_id=user.id,
+        brains=[brain_user],
+        is_folder=False,
+    )
+
     session.add(km)
     await session.commit()
     await session.refresh(km)
