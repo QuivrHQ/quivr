@@ -6,6 +6,7 @@ from quivr_api.modules.assistant.dto.outputs import (
     Inputs,
     InputSelectText,
     Pricing,
+    ConditionalInput,
 )
 
 
@@ -234,6 +235,14 @@ assistant3 = AssistantOutput(
                 key="DocumentsType",
                 description="Select Documents Type",
                 options=["Etiquettes", "Cahier des charges"],
+            ),
+        ],
+        conditional_inputs=[
+            ConditionalInput(
+                key="DocumentsType",
+                conditional_key="Hard-to-Read Document?",
+                condition="equals",
+                value="Yes",
             ),
         ],
     ),
