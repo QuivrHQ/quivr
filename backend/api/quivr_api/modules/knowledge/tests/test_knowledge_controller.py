@@ -88,7 +88,8 @@ async def test_client(session: AsyncSession, user: User):
     # app.dependency_overrides[get_async_session] = lambda: session
 
     async with AsyncClient(
-        transport=ASGITransport(app=app), base_url="http://test"
+        transport=ASGITransport(app=app),  # type: ignore
+        base_url="http://test",
     ) as ac:
         yield ac
     app.dependency_overrides = {}
