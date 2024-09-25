@@ -35,9 +35,21 @@
     gap: calc(Spacings.$spacing06 + 6px);
     overflow: hidden;
 
-    .assistant {
-      @include Typography.EllipsisOverflow;
-      font-size: Typography.$tiny;
+    .left_fields {
+      display: flex;
+      align-items: center;
+      overflow: hidden;
+
+      .assistant {
+        font-size: Typography.$tiny;
+        min-width: 150px;
+        max-width: 150px;
+      }
+
+      .files {
+        @include Typography.EllipsisOverflow;
+        font-size: Typography.$tiny;
+      }
     }
   }
 

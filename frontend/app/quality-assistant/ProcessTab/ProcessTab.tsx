@@ -156,14 +156,14 @@ const ProcessTab = (): JSX.Element => {
               }}
             />
             <div className={styles.left_fields}>
-              <div className={styles.field}>
+              <div className={`${styles.field} ${styles.assistant}`}>
                 Assistant
                 <div className={styles.icon}>
                   <Icon name="sort" size="small" color="black" />
                 </div>
               </div>
               <div className={styles.field} onClick={() => handleSort("name")}>
-                Name
+                Files
                 <div className={styles.icon}>
                   <Icon name="sort" size="small" color="black" />
                 </div>

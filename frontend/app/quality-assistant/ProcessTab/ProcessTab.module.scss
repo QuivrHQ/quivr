@@ -28,7 +28,7 @@
     display: flex;
     justify-content: space-between;
     padding-left: calc(Spacings.$spacing06);
-    padding-right: calc(Spacings.$spacing10 + 6px);
+    padding-right: calc(Spacings.$spacing11 + 6px);
     padding-block: Spacings.$spacing02;
     font-weight: 500;
     background-color: var(--background-1);
@@ -50,7 +50,6 @@
       .left_fields {
         display: flex;
         align-items: center;
-        gap: Spacings.$spacing11;
 
         .field {
           display: flex;
@@ -67,13 +66,17 @@
               visibility: visible;
             }
           }
+
+          &.assistant {
+            width: 150px;
+          }
         }
       }
     }
 
     .right {
       display: flex;
-      gap: calc(Spacings.$spacing11 + 6px);
+      gap: calc(Spacings.$spacing12 + Spacings.$spacing06 + 2px);
 
       .status {
         display: flex;
