@@ -365,7 +365,7 @@ langchain-community==0.2.12
     # via megaparse
     # via quivr-api
     # via quivr-core
-langchain-core==0.2.38
+langchain-core==0.2.41
     # via langchain
     # via langchain-anthropic
     # via langchain-cohere
@@ -386,11 +386,12 @@ langchain-text-splitters==0.2.2
     # via langchain
 langdetect==1.0.9
     # via unstructured
-langgraph==0.2.19
+langgraph==0.2.27
     # via quivr-core
+    # via quivr-monorepo
 langgraph-checkpoint==1.0.9
     # via langgraph
-langsmith==0.1.100
+langsmith==0.1.128
     # via langchain
     # via langchain-community
     # via langchain-core
