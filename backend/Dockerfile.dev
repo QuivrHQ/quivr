@@ -33,6 +33,8 @@ COPY core/pyproject.toml core/README.md ./core/
 COPY core/quivr_core/__init__.py ./core/quivr_core/__init__.py
 COPY worker/pyproject.toml worker/README.md ./worker/
 COPY worker/quivr_worker/__init__.py ./worker/quivr_worker/__init__.py
+COPY worker/diff-assistant/pyproject.toml worker/diff-assistant/README.md ./worker/diff-assistant/
+COPY worker/diff-assistant/quivr_diff_assistant/__init__.py ./worker/diff-assistant/quivr_diff_assistant/__init__.py
 
 RUN PYTHONDONTWRITEBYTECODE=1 pip install --no-cache-dir -r requirements.lock
 

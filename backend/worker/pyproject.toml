@@ -52,4 +52,4 @@ path = "../quivr-api"
 
 [[tool.rye.sources]]
 name = "quivr-diff-assistant"
-path = "../diff-assistant"
+path = "./diff-assistant"
