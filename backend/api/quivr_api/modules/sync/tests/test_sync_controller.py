@@ -2,7 +2,6 @@ import os
 from datetime import datetime
 from io import BytesIO
 from typing import Dict, List, Union
-from uuid import uuid4
 
 import pytest
 import pytest_asyncio
@@ -29,12 +28,13 @@ from quivr_api.modules.sync.service.sync_service import SyncsService
 from quivr_api.modules.sync.utils.sync import BaseSync
 from quivr_api.modules.user.entity.user_identity import User, UserIdentity
 
+# TODO: move to top layer
 MAX_SYNC_FILES = 1000
 N_GET_FILES = 2
-FOLDER_SYNC_FILE_IDS = [str(uuid4())[:8] for _ in range(MAX_SYNC_FILES)]
+FOLDER_SYNC_FILE_IDS = [f"file-{str(idx)}" for idx in range(MAX_SYNC_FILES)]
 
 
-class BaseFakeSync(BaseSync):
+class FakeSync(BaseSync):
     name = "FakeProvider"
     lower_name = "google"
     datetime_format: str = "%Y-%m-%dT%H:%M:%S.%fZ"
@@ -79,7 +79,7 @@ class BaseFakeSync(BaseSync):
                 extension=".txt",
                 web_view_link=f"test.com/{fid}",
                 parent_id=folder_id,
-                is_folder=idx % 2 == 0,
+                is_folder=idx % 2 == 1,
                 last_modified_at=datetime.now(),
             )
             for idx, fid in enumerate(self.folder_sync_file_ids)
@@ -174,7 +174,7 @@ async def test_client(session: AsyncSession, user: User):
 
     async def _sync_service():
         fake_provider: dict[SyncProvider, BaseSync] = {
-            provider: BaseFakeSync(n_get_files=N_GET_FILES)
+            provider: FakeSync(n_get_files=N_GET_FILES)
             for provider in list(SyncProvider)
         }
         repository = SyncsRepository(session)

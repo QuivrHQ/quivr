@@ -20,7 +20,7 @@ from quivr_api.modules.sync.dto.outputs import SyncProvider
 from quivr_api.modules.sync.entity.sync_models import Sync
 from quivr_api.modules.sync.repository.sync_repository import SyncsRepository
 from quivr_api.modules.sync.service.sync_service import SyncsService
-from quivr_api.modules.sync.tests.test_sync_controller import BaseFakeSync
+from quivr_api.modules.sync.tests.test_sync_controller import FakeSync
 from quivr_api.modules.sync.utils.sync import BaseSync
 from quivr_api.modules.user.entity.user_identity import User
 from quivr_api.modules.vector.repository.vectors_repository import VectorRepository
@@ -111,7 +111,7 @@ async def proc_services(session: AsyncSession, request) -> ProcessorServices:
     knowledge_repository = KnowledgeRepository(session)
     knowledge_service = KnowledgeService(knowledge_repository, storage=storage)
     sync_provider_mapping: dict[SyncProvider, BaseSync] = {
-        provider: BaseFakeSync(provider_name=str(provider), n_get_files=request.param)
+        provider: FakeSync(provider_name=str(provider), n_get_files=request.param)
         for provider in list(SyncProvider)
     }
     sync_repository = SyncsRepository(
@@ -236,6 +236,57 @@ async def sync_knowledge_folder(
         sync=sync,
     )
 
+    session.add(km)
+    await session.commit()
+    await session.refresh(km)
+
+    return km
+
+
+@pytest_asyncio.fixture(scope="function")
+async def sync_knowledge_folder_with_file_in_brain(
+    session: AsyncSession,
+    proc_services: ProcessorServices,
+    user: User,
+    brain_user: Brain,
+    sync: Sync,
+) -> KnowledgeDB:
+    assert user.id
+    assert brain_user.brain_id
+    file = KnowledgeDB(
+        file_name="file",
+        extension=".txt",
+        status=KnowledgeStatus.PROCESSED,
+        source=SyncProvider.GOOGLE,
+        source_link="drive://test/file1",
+        file_size=10,
+        file_sha1="test",
+        user_id=user.id,
+        brains=[brain_user],
+        parent=None,
+        is_folder=False,
+        # NOTE: See FakeSync Implementation
+        sync_file_id="file-0",
+        sync=sync,
+    )
+
+    km = KnowledgeDB(
+        file_name="folder1",
+        extension=".txt",
+        status=KnowledgeStatus.PROCESSING,
+        source=SyncProvider.GOOGLE,
+        source_link="drive://test/folder1",
+        file_size=0,
+        file_sha1=None,
+        user_id=user.id,
+        brains=[brain_user],
+        parent=None,
+        is_folder=True,
+        sync_file_id="id1",
+        sync=sync,
+    )
+
+    session.add(file)
     session.add(km)
     await session.commit()
     await session.refresh(km)

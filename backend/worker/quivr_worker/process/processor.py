@@ -225,14 +225,17 @@ class KnowledgeProcessor:
         if not sync_files:
             return
 
-        breakpoint()
         for sync_file in sync_files:
             existing_km = syncfile_to_knowledge.get(sync_file.id)
-            if existing_km:
+            if existing_km is not None:
                 # SyncKnowledge already exists =>
                 # It's already processed in some other brain so just link it and move on if it is Processed
                 # ELSE reprocess the file
-                for brain in parent_knowledge.brains:
+                km_brains = {km_brain.brain_id for km_brain in existing_km.brains}
+                for brain in filter(
+                    lambda b: b.brain_id not in km_brains,
+                    parent_knowledge.brains,
+                ):
                     await self.services.knowledge_service.repository.link_to_brain(
                         existing_km, brain_id=brain.brain_id
                     )
