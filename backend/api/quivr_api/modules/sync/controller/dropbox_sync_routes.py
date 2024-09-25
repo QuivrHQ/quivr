@@ -1,8 +1,10 @@
 import os
+from uuid import UUID
 
 from dropbox import Dropbox, DropboxOAuth2Flow
 from fastapi import APIRouter, Depends, HTTPException, Request
 from fastapi.responses import HTMLResponse
+
 from quivr_api.logger import get_logger
 from quivr_api.middlewares.auth import AuthBearer, get_current_user
 from quivr_api.modules.sync.dto.inputs import SyncsUserInput, SyncUserUpdateInput
@@ -98,22 +100,21 @@ def oauth2callback_dropbox(request: Request):
     state = state.split("|")[1] if "|" in state else state  # type: ignore
     state_dict = {"state": state}
     state_split = state.split(",")  # type: ignore
-    current_user = state_split[0].split("=")[1] if state else None
-    name = state_split[1].split("=")[1] if state else None
+    current_user = UUID(state_split[0].split("=")[1]) if state else None
     logger.debug(
         f"Handling OAuth2 callback for user: {current_user} with state: {state} and state_dict: {state_dict}"
     )
     sync_user_state = sync_user_service.get_sync_user_by_state(state_dict)
 
-    if not sync_user_state or state_dict != sync_user_state.get("state"):
+    if not sync_user_state or state_dict != sync_user_state.state:
         logger.error("Invalid state parameter")
         raise HTTPException(status_code=400, detail="Invalid state parameter")
     else:
         logger.info(
-            f"CURRENT USER: {current_user}, SYNC USER STATE USER: {sync_user_state.get('user_id')}"
+            f"CURRENT USER: {current_user}, SYNC USER STATE USER: {sync_user_state.user_id}"
         )
 
-    if sync_user_state.get("user_id") != current_user:
+    if sync_user_state.user_id != current_user:
         raise HTTPException(status_code=400, detail="Invalid user")
 
     auth_flow = DropboxOAuth2Flow(
@@ -149,9 +150,7 @@ def oauth2callback_dropbox(request: Request):
             state={},
             email=user_email,
         )
-        sync_user_service.update_sync_user(
-            str(current_user), state_dict, sync_user_input
-        )
+        sync_user_service.update_sync_user(current_user, state_dict, sync_user_input)
         logger.info(f"DropBox sync created successfully for user: {current_user}")
         return HTMLResponse(successfullConnectionPage)
     except Exception as e:

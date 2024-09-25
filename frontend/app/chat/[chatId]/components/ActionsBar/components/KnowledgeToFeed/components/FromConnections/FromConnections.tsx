@@ -19,6 +19,8 @@ export const FromConnections = (): JSX.Element => {
     setCurrentSyncElements,
     currentSyncId,
     loadingFirstList,
+    setCurrentSyncId,
+    currentProvider,
   } = useFromConnectionsContext();
   const [currentFiles, setCurrentFiles] = useState<SyncElement[]>([]);
   const [currentFolders, setCurrentFolders] = useState<SyncElement[]>([]);
@@ -85,10 +87,14 @@ export const FromConnections = (): JSX.Element => {
               iconName="chevronLeft"
               color="black"
               onClick={() => {
-                void handleBackClick();
+                if (folderStack.length) {
+                  void handleBackClick();
+                } else {
+                  setCurrentSyncId(undefined);
+                }
               }}
               small={true}
-              disabled={!folderStack.length}
+              disabled={loading || loadingFirstList}
             />
           </div>
           <div className={styles.connection_content}>
@@ -109,8 +115,10 @@ export const FromConnections = (): JSX.Element => {
                   >
                     <FolderLine
                       name={folder.name ?? ""}
-                      selectable={!!isPremium}
+                      selectable={!!isPremium || currentProvider === "Notion"}
                       id={folder.id}
+                      icon={folder.icon}
+                      isAlsoFile={currentProvider === "Notion"}
                     />
                   </div>
                 ))}
@@ -120,14 +128,18 @@ export const FromConnections = (): JSX.Element => {
                       name={file.name ?? ""}
                       selectable={true}
                       id={file.id}
+                      icon={file.icon}
                     />
                   </div>
                 ))}
               </>
             )}
-            {!currentFiles.length && !currentFolders.length && (
-              <span className={styles.empty_folder}>Empty folder</span>
-            )}
+            {!currentFiles.length &&
+              !currentFolders.length &&
+              !loading &&
+              !loadingFirstList && (
+                <span className={styles.empty_folder}>Empty folder</span>
+              )}
           </div>
         </div>
       )}

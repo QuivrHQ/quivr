@@ -1,6 +1,7 @@
 from quivr_api.logger import get_logger
 from quivr_api.models.databases.supabase.supabase import SupabaseDB
-from quivr_api.models.settings import PostHogSettings, get_supabase_db
+from quivr_api.models.settings import PostHogSettings
+from quivr_api.modules.dependencies import get_supabase_db
 from quivr_api.modules.user.entity.user_identity import UserIdentity
 
 logger = get_logger(__name__)

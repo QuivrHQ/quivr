@@ -3,6 +3,7 @@ from typing import Optional
 
 from fastapi import Depends, HTTPException, Request
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
+
 from quivr_api.middlewares.auth.jwt_token_handler import (
     decode_access_token,
     verify_token,
@@ -57,9 +58,13 @@ class AuthBearer(HTTPBearer):
 
     def get_test_user(self) -> UserIdentity:
         return UserIdentity(
-            email="admin@quivr.app", id="39418e3b-0258-4452-af60-7acfcc1263ff"  # type: ignore
+            email="admin@quivr.app",
+            id="39418e3b-0258-4452-af60-7acfcc1263ff",  # type: ignore
         )  # replace with test user information
 
 
-def get_current_user(user: UserIdentity = Depends(AuthBearer())) -> UserIdentity:
+auth_bearer = AuthBearer()
+
+
+def get_current_user(user: UserIdentity = Depends(auth_bearer)) -> UserIdentity:
     return user

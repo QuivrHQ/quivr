@@ -113,7 +113,7 @@ export const Select = <T extends string | number>({
             </button>
           </PopoverTrigger>
           <PopoverContent
-            className={cn("max-h-[200px] overflow-scroll", popoverClassName)}
+            className={cn("max-h-[200px] overflow-auto", popoverClassName)}
             side={popoverSide ?? "top"}
           >
             <ul role="listbox">

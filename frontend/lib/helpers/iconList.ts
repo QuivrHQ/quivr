@@ -2,7 +2,6 @@ import { AiOutlineLoading3Quarters } from "react-icons/ai";
 import { BiCode, BiCoin } from "react-icons/bi";
 import {
   BsArrowRightShort,
-  BsChatLeftText,
   BsFiletypeCsv,
   BsFiletypeDocx,
   BsFiletypeHtml,
@@ -57,6 +56,7 @@ import {
 import {
   IoArrowUpCircleOutline,
   IoBookOutline,
+  IoChatbubbleEllipsesOutline,
   IoCloudDownloadOutline,
   IoFootsteps,
   IoHelp,
@@ -117,7 +117,7 @@ import {
   RiHashtag,
   RiNotification2Line,
 } from "react-icons/ri";
-import { SlOptions } from "react-icons/sl";
+import { SlOptionsVertical } from "react-icons/sl";
 import { TbNetwork, TbRobot } from "react-icons/tb";
 import { VscGraph } from "react-icons/vsc";
 
@@ -133,7 +133,7 @@ export const iconList: { [name: string]: IconType } = {
   brainCircuit: LuBrainCircuit,
   calendar: FaCalendar,
   chair: PiOfficeChairFill,
-  chat: BsChatLeftText,
+  chat: IoChatbubbleEllipsesOutline,
   check: FaCheck,
   checkCircle: FaCheckCircle,
   chevronDown: LuChevronDown,
@@ -199,8 +199,8 @@ export const iconList: { [name: string]: IconType } = {
   notifications: RiNotification2Line,
   office: HiBuildingOffice,
   odt: BsFiletypeDocx,
-  options: SlOptions,
   orderedList: MdFormatListNumbered,
+  options: SlOptionsVertical,
   paragraph: BsTextParagraph,
   pen: LuPen,
   pptx: BsFiletypePptx,

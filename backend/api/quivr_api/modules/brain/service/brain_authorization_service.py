@@ -2,6 +2,7 @@ from typing import List, Optional, Union
 from uuid import UUID
 
 from fastapi import Depends, HTTPException, status
+
 from quivr_api.middlewares.auth.auth_bearer import get_current_user
 from quivr_api.modules.brain.entity.brain_entity import RoleEnum
 from quivr_api.modules.brain.service.brain_service import BrainService
@@ -13,7 +14,7 @@ brain_service = BrainService()
 
 
 def has_brain_authorization(
-    required_roles: Optional[Union[RoleEnum, List[RoleEnum]]] = RoleEnum.Owner
+    required_roles: Optional[Union[RoleEnum, List[RoleEnum]]] = RoleEnum.Owner,
 ):
     """
     Decorator to check if the user has the required role(s) for the brain

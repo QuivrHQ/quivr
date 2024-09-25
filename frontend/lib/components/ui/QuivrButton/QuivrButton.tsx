@@ -27,7 +27,8 @@ export const QuivrButton = ({
   const handleMouseEnter = () => setHovered(true);
   const handleMouseLeave = () => setHovered(false);
 
-  const handleClick = () => {
+  const handleClick = (event: React.MouseEvent<HTMLDivElement>) => {
+    event.nativeEvent.stopImmediatePropagation();
     if (!disabled) {
       void onClick?.();
     }
@@ -35,7 +36,7 @@ export const QuivrButton = ({
 
   const useIconColor = () => {
     if ((hovered && !disabled) || (important && !disabled)) {
-      return "white";
+      return isDarkMode ? "black" : "white";
     }
     if (disabled) {
       return "grey";

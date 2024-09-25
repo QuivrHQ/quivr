@@ -1,4 +1,11 @@
-from fastapi import APIRouter
+
+from fastapi import APIRouter, Depends, HTTPException
+from quivr_api.logger import get_logger
+from quivr_api.modules.dependencies import get_async_session
+from sqlmodel.ext.asyncio.session import AsyncSession
+from sqlmodel import text
+
+logger = get_logger(__name__)
 
 misc_router = APIRouter()
 
@@ -12,5 +19,14 @@ async def root():
 
 
 @misc_router.get("/healthz", tags=["Health"])
-async def healthz():
+async def healthz(session: AsyncSession = Depends(get_async_session)):
+
+    try:
+        result = await session.execute(text("SELECT 1"))
+        if not result:
+            raise HTTPException(status_code=500, detail="Database is not healthy")
+    except Exception as e:
+        logger.error(f"Error checking database health: {e}")
+        raise HTTPException(status_code=500, detail="Database is not healthy")
+
     return {"status": "ok"}

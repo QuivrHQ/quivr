@@ -1,9 +1,10 @@
 import os
 import shutil
 from pathlib import Path
-from typing import Set
+from typing import Self, Set
 from uuid import UUID
 
+from quivr_core.brain.serialization import LocalStorageConfig, TransparentStorageConfig
 from quivr_core.files.file import QuivrFile
 from quivr_core.storage.storage_base import StorageBase
 
@@ -39,7 +40,7 @@ class LocalStorage(StorageBase):
             self.dir_path, str(file.brain_id), f"{file.id}{file.file_extension}"
         )
 
-        if file.file_md5 in self.hashes and not exists_ok:
+        if file.file_sha1 in self.hashes and not exists_ok:
             raise FileExistsError(f"file {file.original_filename} already uploaded")
 
         if self.copy_flag:
@@ -49,13 +50,19 @@ class LocalStorage(StorageBase):
 
         file.path = Path(dst_path)
         self.files.append(file)
-        self.hashes.add(file.file_md5)
+        self.hashes.add(file.file_sha1)
 
     async def get_files(self) -> list[QuivrFile]:
         return self.files
 
     async def remove_file(self, file_id: UUID) -> None:
         raise NotImplementedError
+
+    @classmethod
+    def load(cls, config: LocalStorageConfig) -> Self:
+        tstorage = cls(dir_path=config.storage_path)
+        tstorage.files = [QuivrFile.deserialize(f) for f in config.files.values()]
+        return tstorage
 
 
 class TransparentStorage(StorageBase):
@@ -77,3 +84,11 @@ class TransparentStorage(StorageBase):
 
     async def get_files(self) -> list[QuivrFile]:
         return list(self.id_files.values())
+
+    @classmethod
+    def load(cls, config: TransparentStorageConfig) -> Self:
+        tstorage = cls()
+        tstorage.id_files = {
+            i: QuivrFile.deserialize(f) for i, f in config.files.items()
+        }
+        return tstorage

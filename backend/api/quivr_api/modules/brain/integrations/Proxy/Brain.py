@@ -4,6 +4,7 @@ from uuid import UUID
 
 from langchain_community.chat_models import ChatLiteLLM
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
+
 from quivr_api.logger import get_logger
 from quivr_api.modules.brain.knowledge_brain_qa import KnowledgeBrainQA
 from quivr_api.modules.chat.dto.chats import ChatQuestion

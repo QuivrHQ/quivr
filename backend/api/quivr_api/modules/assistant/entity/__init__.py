@@ -1,1 +1,0 @@
-from .assistant import AssistantEntity

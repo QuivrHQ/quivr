@@ -43,7 +43,7 @@ async def load_qfile(brain_id: UUID, path: str | Path):
     file_size = os.stat(path).st_size
 
     async with aiofiles.open(path, mode="rb") as f:
-        file_md5 = hashlib.md5(await f.read()).hexdigest()
+        file_sha1 = hashlib.sha1(await f.read()).hexdigest()
 
     try:
         # NOTE: when loading from existing storage, file name will be uuid
@@ -58,7 +58,7 @@ async def load_qfile(brain_id: UUID, path: str | Path):
         original_filename=path.name,
         file_extension=get_file_extension(path),
         file_size=file_size,
-        file_md5=file_md5,
+        file_sha1=file_sha1,
     )
 
 
@@ -70,7 +70,7 @@ class QuivrFile:
         "original_filename",
         "file_size",
         "file_extension",
-        "file_md5",
+        "file_sha1",
     ]
 
     def __init__(
@@ -79,7 +79,7 @@ class QuivrFile:
         original_filename: str,
         path: Path,
         brain_id: UUID,
-        file_md5: str,
+        file_sha1: str,
         file_extension: FileExtension | str,
         file_size: int | None = None,
     ) -> None:
@@ -89,7 +89,7 @@ class QuivrFile:
         self.original_filename = original_filename
         self.file_size = file_size
         self.file_extension = file_extension
-        self.file_md5 = file_md5
+        self.file_sha1 = file_sha1
 
     @asynccontextmanager
     async def open(self) -> AsyncGenerator[AsyncIterable[bytes], None]:
@@ -106,6 +106,6 @@ class QuivrFile:
             "qfile_id": self.id,
             "qfile_path": self.path,
             "original_file_name": self.original_filename,
-            "file_md4": self.file_md5,
+            "file_md4": self.file_sha1,
             "file_size": self.file_size,
         }

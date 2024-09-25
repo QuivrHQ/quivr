@@ -48,6 +48,16 @@ export const syncDropbox = async (
   ).data;
 };
 
+export const syncNotion = async (
+  name: string,
+  axiosInstance: AxiosInstance
+): Promise<{ authorization_url: string }> => {
+  return (
+    await axiosInstance.post<{ authorization_url: string }>(
+      `/sync/notion/authorize?name=${name}`
+    )
+  ).data;
+}
 
 export const getUserSyncs = async (
   axiosInstance: AxiosInstance

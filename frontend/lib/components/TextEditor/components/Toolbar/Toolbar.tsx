@@ -22,11 +22,16 @@ export const ToolbarSectionSeparator = (): JSX.Element => {
 
 type ToolbarProps = {
   editor: Editor;
+  searchBarEditor: Editor | null;
 };
 
-export const Toolbar = ({ editor }: ToolbarProps): JSX.Element => {
+export const Toolbar = ({
+  editor,
+  searchBarEditor,
+}: ToolbarProps): JSX.Element => {
   const [linkModalOpen, setLinkModalOpen] = useState(false);
   const [urlInp, setUrlInp] = useState("");
+  const [searchBarEditorOpen, setSearchBarEditorOpen] = useState(false);
 
   const setLink = () => {
     const editorChain = editor.chain().extendMarkRange("link").focus();
@@ -42,6 +47,16 @@ export const Toolbar = ({ editor }: ToolbarProps): JSX.Element => {
     const prevUrl = editor.getAttributes("link").href as string;
     setUrlInp(prevUrl || "");
     setLinkModalOpen(true);
+  };
+
+  const toggleSearchBarEditor = () => {
+    if (searchBarEditorOpen) {
+      setSearchBarEditorOpen(false);
+      editor.commands.focus();
+    } else {
+      setSearchBarEditorOpen(true);
+      searchBarEditor?.commands.focus();
+    }
   };
 
   return (
@@ -171,6 +186,14 @@ export const Toolbar = ({ editor }: ToolbarProps): JSX.Element => {
           editor.chain().toggleHeading({ level: 6 }).focus().run()
         }
       />
+
+      <Button
+        className={styles.focusSearchBarBtn}
+        onClick={toggleSearchBarEditor}
+        variant={"primary"}
+      >
+        Ask Brain
+      </Button>
     </div>
   );
 };

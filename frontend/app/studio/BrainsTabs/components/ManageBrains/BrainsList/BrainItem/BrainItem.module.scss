@@ -7,7 +7,6 @@
 
 .brain_item_wrapper {
   padding-inline: Spacings.$spacing05;
-  overflow: hidden;
   display: flex;
   flex-direction: column;
   gap: Spacings.$spacing03;
@@ -18,13 +17,18 @@
   padding-block: Spacings.$spacing04;
   position: relative;
   overflow: visible;
-  overflow: hidden;
   height: 100%;
   box-shadow: BoxShadow.$small;
 
   &:hover {
     border-color: var(--primary-0);
     color: var(--text-3);
+  }
+
+  &.not_hovered {
+    &:hover {
+      border-color: var(--border-1);
+    }
   }
 
   .brain_header {
@@ -43,8 +47,10 @@
       overflow: hidden;
 
       .brain_snippet {
-        width: 24px;
-        height: 24px;
+        min-width: 24px;
+        min-height: 24px;
+        max-width: 24px;
+        max-height: 24px;
         border-radius: Radius.$normal;
         display: flex;
         justify-content: center;

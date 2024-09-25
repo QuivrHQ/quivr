@@ -1,25 +1,31 @@
+import asyncio
 import json
 import os
 import time
 from abc import ABC, abstractmethod
 from datetime import datetime
 from io import BytesIO
-from typing import Any, Dict, List, Union
+from typing import Any, Dict, List, Optional, Union
 
 import dropbox
+import markdownify
 import msal
-import requests
+import redis  # type: ignore
+import requests  # type: ignore
 from fastapi import HTTPException
 from google.auth.transport.requests import Request as GoogleRequest
 from google.oauth2.credentials import Credentials
 from googleapiclient.discovery import build
+from notion_client import Client
 from requests import HTTPError
 
 from quivr_api.logger import get_logger
-from quivr_api.modules.sync.entity.sync import SyncFile
+from quivr_api.modules.sync.entity.sync_models import SyncFile
+from quivr_api.modules.sync.service.sync_notion import SyncNotionService
 from quivr_api.modules.sync.utils.normalize import remove_special_characters
 
 logger = get_logger(__name__)
+redis_client = redis.Redis(host="redis", port=int(os.getenv("REDIS_PORT", 6379)), db=0)
 
 
 class BaseSync(ABC):
@@ -32,10 +38,22 @@ class BaseSync(ABC):
         raise NotImplementedError
 
     @abstractmethod
+    async def aget_files_by_id(
+        self, credentials: Dict, file_ids: List[str]
+    ) -> List[SyncFile]:
+        pass
+
+    @abstractmethod
     def get_files(
         self, credentials: Dict, folder_id: str | None = None, recursive: bool = False
     ) -> List[SyncFile]:
         raise NotImplementedError
+
+    @abstractmethod
+    async def aget_files(
+        self, credentials: Dict, folder_id: str | None = None, recursive: bool = False
+    ) -> List[SyncFile]:
+        pass
 
     @abstractmethod
     def check_and_refresh_access_token(self, credentials: dict) -> Dict:
@@ -46,6 +64,12 @@ class BaseSync(ABC):
         self, credentials: Dict, file: SyncFile
     ) -> Dict[str, Union[str, BytesIO]]:
         raise NotImplementedError
+
+    @abstractmethod
+    async def adownload_file(
+        self, credentials: Dict, file: SyncFile
+    ) -> Dict[str, Union[str, BytesIO]]:
+        pass
 
 
 class GoogleDriveSync(BaseSync):
@@ -75,7 +99,7 @@ class GoogleDriveSync(BaseSync):
 
         # Convert Google Docs files to appropriate formats before downloading
         if mime_type == "application/vnd.google-apps.document":
-            logger.debug(
+            logger.info(
                 "Converting Google Docs file with file_id: %s to DOCX.",
                 file_id,
             )
@@ -85,7 +109,7 @@ class GoogleDriveSync(BaseSync):
             )
             file_name += ".docx"
         elif mime_type == "application/vnd.google-apps.spreadsheet":
-            logger.debug(
+            logger.info(
                 "Converting Google Sheets file with file_id: %s to XLSX.",
                 file_id,
             )
@@ -95,7 +119,7 @@ class GoogleDriveSync(BaseSync):
             )
             file_name += ".xlsx"
         elif mime_type == "application/vnd.google-apps.presentation":
-            logger.debug(
+            logger.info(
                 "Converting Google Slides file with file_id: %s to PPTX.",
                 file_id,
             )
@@ -127,6 +151,11 @@ class GoogleDriveSync(BaseSync):
         file_data = request.execute()
         return {"file_name": file_name, "content": BytesIO(file_data)}
 
+    async def adownload_file(
+        self, credentials: Dict, file: SyncFile
+    ) -> Dict[str, Union[str, BytesIO]]:
+        return self.download_file(credentials, file)
+
     def get_files_by_id(self, credentials: Dict, file_ids: List[str]) -> List[SyncFile]:
         """
         Retrieve files from Google Drive by their IDs.
@@ -150,7 +179,7 @@ class GoogleDriveSync(BaseSync):
                     service.files()
                     .get(
                         fileId=file_id,
-                        fields="id, name, mimeType, modifiedTime, webViewLink",
+                        fields="id, name, mimeType, modifiedTime, webViewLink, size",
                     )
                     .execute()
                 )
@@ -165,6 +194,7 @@ class GoogleDriveSync(BaseSync):
                         last_modified=result["modifiedTime"],
                         mime_type=result["mimeType"],
                         web_view_link=result["webViewLink"],
+                        size=result.get("size", None),
                     )
                 )
 
@@ -178,6 +208,11 @@ class GoogleDriveSync(BaseSync):
                 "An error occurred while retrieving Google Drive files: %s", error
             )
             raise Exception("Failed to retrieve files")
+
+    async def aget_files_by_id(
+        self, credentials: Dict, file_ids: List[str]
+    ) -> List[SyncFile]:
+        return self.get_files_by_id(credentials, file_ids)
 
     def get_files(
         self, credentials: dict, folder_id: str | None = None, recursive: bool = False
@@ -213,7 +248,7 @@ class GoogleDriveSync(BaseSync):
                     .list(
                         q=query,
                         pageSize=100,
-                        fields="nextPageToken, files(id, name, mimeType, modifiedTime, webViewLink)",
+                        fields="nextPageToken, files(id, name, mimeType, modifiedTime, webViewLink, size)",
                         pageToken=page_token,
                     )
                     .execute()
@@ -235,6 +270,7 @@ class GoogleDriveSync(BaseSync):
                             last_modified=item["modifiedTime"],
                             mime_type=item["mimeType"],
                             web_view_link=item["webViewLink"],
+                            size=item.get("size", None),
                         )
                     )
 
@@ -263,6 +299,11 @@ class GoogleDriveSync(BaseSync):
                 "An error occurred while retrieving Google Drive files: %s", error
             )
             raise Exception("Failed to retrieve files")
+
+    async def aget_files(
+        self, credentials: Dict, folder_id: str | None = None, recursive: bool = False
+    ) -> List[SyncFile]:
+        return self.get_files(credentials, folder_id, recursive)
 
 
 class AzureDriveSync(BaseSync):
@@ -394,13 +435,16 @@ class AzureDriveSync(BaseSync):
         for item in items:
             file_data = SyncFile(
                 name=item.get("name") if site_folder_id else item.get("displayName"),
-                id=f'{item.get("id", {}).split(",")[1]}:'
-                if not site_folder_id
-                else f'{site_id}:{item.get("id")}',
+                id=(
+                    f'{item.get("id", {}).split(",")[1]}:'
+                    if not site_folder_id
+                    else f'{site_id}:{item.get("id")}'
+                ),
                 is_folder="folder" in item or not site_folder_id,
                 last_modified=item.get("lastModifiedDateTime"),
                 mime_type=item.get("file", {}).get("mimeType", "folder"),
                 web_view_link=item.get("webUrl"),
+                size=item.get("size", None),
             )
             files.append(file_data)
 
@@ -426,6 +470,11 @@ class AzureDriveSync(BaseSync):
             file.name = remove_special_characters(file.name)
         logger.info("Azure Drive files retrieved successfully: %s", len(files))
         return files
+
+    async def aget_files(
+        self, credentials: Dict, folder_id: str | None = None, recursive: bool = False
+    ) -> List[SyncFile]:
+        return self.get_files(credentials, folder_id, recursive)
 
     def get_files_by_id(self, credentials: dict, file_ids: List[str]) -> List[SyncFile]:
         """
@@ -474,6 +523,7 @@ class AzureDriveSync(BaseSync):
                     last_modified=result.get("lastModifiedDateTime"),
                     mime_type=result.get("file", {}).get("mimeType", "folder"),
                     web_view_link=result.get("webUrl"),
+                    size=result.get("size", None),
                 )
             )
 
@@ -481,6 +531,11 @@ class AzureDriveSync(BaseSync):
             file.name = remove_special_characters(file.name)
         logger.info("Azure Drive files retrieved successfully: %s", len(files))
         return files
+
+    async def aget_files_by_id(
+        self, credentials: Dict, file_ids: List[str]
+    ) -> List[SyncFile]:
+        return self.get_files_by_id(credentials, file_ids)
 
     def download_file(
         self, credentials: Dict, file: SyncFile
@@ -502,6 +557,11 @@ class AzureDriveSync(BaseSync):
             download_endpoint, headers=headers, stream=True
         )
         return {"file_name": file_name, "content": BytesIO(download_response.content)}
+
+    async def adownload_file(
+        self, credentials: Dict, file: SyncFile
+    ) -> Dict[str, Union[str, BytesIO]]:
+        return self.download_file(credentials, file)
 
 
 class DropboxSync(BaseSync):
@@ -528,7 +588,7 @@ class DropboxSync(BaseSync):
         return credentials
 
     def get_files(
-        self, credentials: Dict, folder_id: str = "", recursive: bool = False
+        self, credentials: Dict, folder_id: str | None = "", recursive: bool = False
     ) -> List[SyncFile]:
         """
         Retrieve files from Dropbox.
@@ -605,6 +665,11 @@ class DropboxSync(BaseSync):
             logger.error("Unexpected error: %s", e)
             raise Exception("Failed to retrieve files")
 
+    async def aget_files(
+        self, credentials: Dict, folder_id: str | None = None, recursive: bool = False
+    ) -> List[SyncFile]:
+        return self.get_files(credentials, folder_id, recursive)
+
     def get_files_by_id(
         self, credentials: Dict[str, str], file_ids: List[str]
     ) -> List[SyncFile]:
@@ -648,6 +713,7 @@ class DropboxSync(BaseSync):
                             metadata.path_lower.split(".")[-1] if not is_folder else ""
                         ),
                         web_view_link=shared_link,
+                        size=metadata.size,
                     )
 
                     files.append(file_info)
@@ -673,6 +739,11 @@ class DropboxSync(BaseSync):
             logger.error("Unexpected error: %s", e)
             raise Exception("Failed to retrieve files")
 
+    async def aget_files_by_id(
+        self, credentials: Dict, file_ids: List[str]
+    ) -> List[SyncFile]:
+        return self.get_files_by_id(credentials, file_ids)
+
     def download_file(
         self, credentials: Dict, file: SyncFile
     ) -> Dict[str, Union[str, BytesIO]]:
@@ -683,6 +754,230 @@ class DropboxSync(BaseSync):
 
         metadata, file_data = self.dbx.files_download(file_id)  # type: ignore
         return {"file_name": file_name, "content": BytesIO(file_data.content)}
+
+    async def adownload_file(
+        self, credentials: Dict, file: SyncFile
+    ) -> Dict[str, Union[str, BytesIO]]:
+        return self.download_file(credentials, file)
+
+
+class NotionSync(BaseSync):
+    name = "Notion"
+    lower_name = "notion"
+    notion: Optional[Client] = None
+    datetime_format: str = "%Y-%m-%d %H:%M:%S%z"
+    notion_service: SyncNotionService
+
+    def __init__(self, notion_service: SyncNotionService):
+        self.notion_service = notion_service
+        super().__init__()
+
+    def link_notion(self, credentials) -> Client:
+        return Client(auth=credentials["access_token"])
+
+    def check_and_refresh_access_token(self, credentials: Dict) -> Dict:
+        if not self.notion:
+            self.notion = self.link_notion(credentials)
+        # no need to refresh token for notion
+        return credentials
+
+    async def aget_files(
+        self, credentials: Dict, folder_id: str | None = None, recursive: bool = False
+    ) -> List[SyncFile]:
+        pages = []
+
+        if not self.notion:
+            self.link_notion(credentials)
+
+        if not folder_id or folder_id == "":
+            folder_id = None  # ROOT FOLDER HAVE A TRUE PARENT ID
+
+        children = await self.notion_service.get_notion_files_by_parent_id(folder_id)
+        for page in children:
+            page_info = SyncFile(
+                name=page.name,
+                id=str(page.notion_id),
+                is_folder=await self.notion_service.is_folder_page(page.notion_id),
+                last_modified=str(page.last_modified),
+                mime_type=page.mime_type,
+                web_view_link=page.web_view_link,
+                icon=page.icon,
+            )
+            redis_client.set(str(page.id), json.dumps(page_info.model_dump_json()))
+
+            pages.append(page_info)
+
+            if recursive:
+                sub_pages = await self.aget_files(credentials, str(page.id), recursive)
+                pages.extend(sub_pages)
+        return pages
+
+    def get_files(
+        self, credentials: Dict, folder_id: str | None = None, recursive: bool = False
+    ) -> List[SyncFile]:
+        loop = asyncio.get_event_loop()
+        result = loop.run_until_complete(
+            self.aget_files(credentials, folder_id, recursive)
+        )
+
+        loop.close()
+
+        return result
+
+    async def aget_files_by_id(
+        self, credentials: Dict, file_ids: List[str]
+    ) -> List[SyncFile]:
+        logger.info("Retrieving Notion files by file_ids: %s", file_ids)
+        files = []
+        pages = await self.notion_service.get_notion_files_by_ids(file_ids)
+
+        for page in pages:
+            try:
+                page_info = SyncFile(
+                    name=page.name,
+                    id=str(page.notion_id),
+                    is_folder=await self.notion_service.is_folder_page(page.notion_id),
+                    last_modified=str(page.last_modified),
+                    mime_type=page.mime_type,
+                    web_view_link=page.web_view_link,
+                    icon=page.icon,
+                )
+                files.append(page_info)
+
+            except Exception as e:
+                logger.error("Error retrieving Notion file with ID %s: %s", page.id, e)
+                continue  # Skip this file and proceed with the next one
+
+        logger.info("Notion files retrieved successfully by IDs: %d", len(files))
+        return files
+
+    def get_files_by_id(self, credentials: Dict, file_ids: List[str]) -> List[SyncFile]:
+        loop = asyncio.get_event_loop()
+        result = loop.run_until_complete(self.aget_files_by_id(credentials, file_ids))
+        loop.close()
+        return result
+
+    def get_block_content(self, block):
+        block_type = block["type"]
+        result = ""
+
+        if block_type == "image":
+            return "![Image](%s)" % block["image"]["file"]["url"]
+        if "rich_text" not in block[block_type]:
+            if "title" not in block[block_type]:
+                return "--- ---"
+            return f'{block[block_type]["title"]} {": database" if block_type == "child_database" else ": linked page"}'
+
+        if len(block[block_type]["rich_text"]) == 0:
+            return ""
+
+        if block_type == "paragraph":
+            result = markdownify.markdownify(
+                block["paragraph"]["rich_text"][0]["plain_text"]
+            )
+
+        elif block_type == "heading_1":
+            result = "# " + markdownify.markdownify(
+                block["heading_1"]["rich_text"][0]["plain_text"]
+            )
+
+        elif block_type == "heading_2":
+            result = "## " + markdownify.markdownify(
+                block["heading_2"]["rich_text"][0]["plain_text"]
+            )
+        elif block_type == "heading_3":
+            result = "### " + markdownify.markdownify(
+                block["heading_3"]["rich_text"][0]["plain_text"]
+            )
+        elif block_type == "bulleted_list_item":
+            result = "* " + markdownify.markdownify(
+                block["bulleted_list_item"]["rich_text"][0]["plain_text"]
+            )
+
+        elif block_type == "numbered_list_item":
+            result = "1. " + markdownify.markdownify(
+                block["numbered_list_item"]["rich_text"][0]["plain_text"]
+            )
+        elif block_type == "to_do":
+            checked = "x" if block["to_do"]["checked"] else " "
+            result = f"- [{checked}] " + markdownify.markdownify(
+                block["to_do"]["rich_text"][0]["plain_text"]
+            )
+        elif block_type == "toggle":
+            result = "> " + markdownify.markdownify(
+                block["toggle"]["rich_text"][0]["plain_text"]
+            )
+
+        elif block_type == "quote":
+            result = "> " + markdownify.markdownify(
+                block["quote"]["rich_text"][0]["plain_text"]
+            )
+        elif block_type == "code":
+            result = (
+                "```"
+                + block["code"]["language"]
+                + "\n"
+                + markdownify.markdownify(block["code"]["rich_text"][0]["plain_text"])
+                + "\n```"
+            )
+
+        elif block_type == "callout":
+            result = "> " + markdownify.markdownify(
+                block["callout"]["rich_text"][0]["plain_text"]
+            )
+        else:
+            result = markdownify.markdownify(
+                block[block_type]["rich_text"][0]["plain_text"]
+            )
+
+        return result
+
+    async def adownload_file(
+        self, credentials: Dict, file: SyncFile
+    ) -> Dict[str, Union[str, BytesIO]]:
+        if not self.notion:
+            self.notion = self.link_notion(credentials)
+
+        logger.info("Downloading Notion file (page) with ID %s", file.id)
+
+        try:
+
+            async def retrieve_page_content(page_id) -> List[str]:
+                blocks = self.notion.blocks.children.list(page_id)  # type: ignore
+
+                blocks = blocks["results"]  # type: ignore
+                if not blocks:
+                    raise Exception("Page does not exist")
+
+                markdown_content = []
+                for block in blocks:
+                    markdown_content.append(self.get_block_content(block))
+                    if block["has_children"]:
+                        sub_elements = [
+                            f"\t{content}"
+                            for content in await retrieve_page_content(block["id"])
+                        ]
+                        markdown_content.extend(sub_elements)
+                return markdown_content
+
+            markdown_content = await retrieve_page_content(file.id)
+            markdown_text = "\n\n".join(markdown_content)
+
+            markdown_bytes = BytesIO(markdown_text.encode("utf-8"))
+
+            return {"file_name": f"{file.name}", "content": markdown_bytes}
+
+        except Exception as e:
+            logger.error(
+                "Error downloading Notion file (page) with ID %s: %s", file.id, e
+            )
+            raise Exception("Failed to download file")
+
+    def download_file(
+        self, credentials: Dict, file: SyncFile
+    ) -> Dict[str, Union[str, BytesIO]]:
+        loop = asyncio.get_event_loop()
+        return loop.run_until_complete(self.adownload_file(credentials, file))
 
 
 class GitHubSync(BaseSync):
@@ -725,6 +1020,11 @@ class GitHubSync(BaseSync):
         else:
             return self.list_github_repos(credentials, recursive=recursive)
 
+    async def aget_files(
+        self, credentials: Dict, folder_id: str | None = None, recursive: bool = False
+    ) -> List[SyncFile]:
+        return self.get_files(credentials, folder_id, recursive)
+
     def get_files_by_id(self, credentials: Dict, file_ids: List[str]) -> List[SyncFile]:
         token_data = self.get_github_token_data(credentials)
         headers = self.get_github_headers(token_data)
@@ -752,11 +1052,17 @@ class GitHubSync(BaseSync):
                     last_modified=datetime.now().strftime(self.datetime_format),
                     mime_type=result.get("type"),
                     web_view_link=result.get("html_url"),
+                    size=result.get("size", None),
                 )
             )
 
         logger.info("GitHub files retrieved successfully: %s", len(files))
         return files
+
+    async def aget_files_by_id(
+        self, credentials: Dict, file_ids: List[str]
+    ) -> List[SyncFile]:
+        return self.get_files_by_id(credentials, file_ids)
 
     def download_file(
         self, credentials: Dict, file: SyncFile
@@ -784,6 +1090,9 @@ class GitHubSync(BaseSync):
         file_content = base64.b64decode(content)
 
         return {"file_name": file.name, "content": BytesIO(file_content)}
+
+    async def adownload_file(self, credentials: Dict, file: SyncFile):
+        return self.download_file(credentials, file)
 
     def list_github_repos(self, credentials, recursive=False):
         def fetch_repos(endpoint, headers):
@@ -817,6 +1126,7 @@ class GitHubSync(BaseSync):
                 last_modified=str(item.get("updated_at")),
                 mime_type="repository",
                 web_view_link=item.get("html_url"),
+                size=item.get("size", None),
             )
             repos.append(repo_data)
 
@@ -863,6 +1173,7 @@ class GitHubSync(BaseSync):
                 last_modified=str(item.get("updated_at")),
                 mime_type=item.get("type"),
                 web_view_link=item.get("html_url"),
+                size=item.get("size", None),
             )
             files.append(file_data)
 

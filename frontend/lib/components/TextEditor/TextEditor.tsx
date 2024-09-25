@@ -66,7 +66,7 @@ export const TextEditor = (): JSX.Element => {
   return (
     <div className={styles.main_container}>
       <div className={styles.editor_wrapper}>
-        <Toolbar editor={editor} />
+        <Toolbar searchBarEditor={searchEditorRef.current} editor={editor} />
         <EditorContent className={styles.content_wrapper} editor={editor} />
       </div>
       <div className={styles.search_bar_wrapper}>

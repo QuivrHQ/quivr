@@ -40,26 +40,17 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: backend/core
+        working-directory: backend/
     steps:
       - uses: actions/checkout@v4
-      - name: Set up Python
-        uses: actions/setup-python@v3
+      - name: Install Rye
+        uses: eifinger/setup-rye@v2
         with:
-          python-version: '3.11'
-      - name: Check working directory
-        run: pwd
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install poetry
-      - name: Install project dependencies
-        run: poetry install
-      - name: Build package
-        run: poetry build
-      - name: Publish package
-        uses: pypa/gh-action-pypi-publish@27b31702a0e7fc50959f5ad993c78deac1bdfc29
-        with:
-          user: __token__
-          password: ${{ secrets.PYPI_API_TOKEN }}
-          packages_dir: backend/core/dist
+          enable-cache: true
+          working-directory: backend/
+      - name: Rye Sync
+        run: cd core/ && UV_INDEX_STRATEGY=unsafe-first-match rye sync --no-lock
+      - name: Rye Build
+        run: cd core/ && rye build
+      - name: Rye Publish
+        run: rye publish --token ${{ secrets.PYPI_API_TOKEN }} --yes --skip-existing

@@ -9,7 +9,6 @@ from langchain_core.language_models import FakeListChatModel
 from langchain_core.messages.ai import AIMessageChunk
 from langchain_core.runnables.utils import AddableDict
 from langchain_core.vectorstores import InMemoryVectorStore
-
 from quivr_core.config import LLMEndpointConfig
 from quivr_core.files.file import FileExtension, QuivrFile
 from quivr_core.llm import LLMEndpoint
@@ -31,7 +30,7 @@ def quivr_txt(temp_data_file):
         original_filename=temp_data_file.name,
         path=temp_data_file,
         file_extension=FileExtension.txt,
-        file_md5="123",
+        file_sha1="123",
     )
 
 
@@ -43,7 +42,7 @@ def quivr_pdf():
         original_filename="dummy.pdf",
         path=Path("./tests/processor/data/dummy.pdf"),
         file_extension=FileExtension.pdf,
-        file_md5="13bh234jh234",
+        file_sha1="13bh234jh234",
     )
 
 

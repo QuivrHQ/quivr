@@ -5,7 +5,7 @@
 
 .brain_button_container {
   display: flex;
-  padding: Spacings.$spacing03;
+  padding: Spacings.$spacing04;
   border: 1px solid var(--border-0);
   border-radius: Radius.$normal;
   cursor: pointer;
@@ -19,30 +19,47 @@
     border-color: var(--primary-0);
   }
 
+  &.not_hovered {
+    &:hover {
+      border-color: var(--border-0);
+    }
+  }
+
   .header {
     display: flex;
-    gap: Spacings.$spacing03;
+    gap: Spacings.$spacing05;
     width: 100%;
     align-items: center;
+    overflow: hidden;
+    justify-content: space-between;
 
-    .brain_image {
-      border-radius: Radius.$normal;
-    }
-
-    .name {
-      @include Typography.EllipsisOverflow;
-      font-size: Typography.$small;
-      font-weight: 500;
-    }
-
-    .brain_snippet {
-      width: 24px;
-      height: 24px;
-      border-radius: Radius.$normal;
+    .left {
       display: flex;
-      justify-content: center;
+      gap: Spacings.$spacing03;
       align-items: center;
-      font-size: Typography.$tiny;
+      overflow: hidden;
+
+      .brain_image {
+        border-radius: Radius.$normal;
+      }
+
+      .name {
+        @include Typography.EllipsisOverflow;
+        font-size: Typography.$small;
+        font-weight: 500;
+      }
+
+      .brain_snippet {
+        min-width: 24px;
+        min-height: 24px;
+        max-width: 24px;
+        max-height: 24px;
+        border-radius: Radius.$normal;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: Typography.$tiny;
+      }
     }
   }
 

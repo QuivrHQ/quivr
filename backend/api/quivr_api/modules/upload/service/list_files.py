@@ -1,6 +1,6 @@
 from multiprocessing import get_logger
 
-from quivr_api.models.settings import get_supabase_client
+from quivr_api.modules.dependencies import get_supabase_client
 from supabase.client import Client
 
 logger = get_logger()

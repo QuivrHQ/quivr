@@ -15,5 +15,7 @@ def get_prompt_to_use_id(
     return (
         prompt_id
         if prompt_id
-        else brain_service.get_brain_prompt_id(brain_id) if brain_id else None
+        else brain_service.get_brain_prompt_id(brain_id)
+        if brain_id
+        else None
     )
