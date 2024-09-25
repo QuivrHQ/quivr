@@ -18,9 +18,9 @@
 -e file:core
     # via quivr-api
     # via quivr-worker
--e file:diff-assistant
-    # via quivr-worker
 -e file:worker
+-e file:worker/diff-assistant
+    # via quivr-worker
 aiofiles==23.2.1
     # via chainlit
     # via quivr-core
