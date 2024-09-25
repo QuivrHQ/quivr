@@ -2,27 +2,21 @@
 All of this needs to be in MegaParse, this is just a placeholder for now.
 """
 
-from typing import List
-from doctr.io import DocumentFile
-from doctr.models import ocr_predictor
-from doctr.utils.common_types import AbstractFile
-import os
-from doctr.io.elements import Document as doctrDocument
-from langchain_core.documents import Document
-from llama_index.core import SimpleDirectoryReader, VectorStoreIndex
-
-from numba import njit
-
-
-from langchain_core.language_models.chat_models import BaseChatModel
-from megaparse import MegaParse  # FIXME: @chloedia Version problems
-
-
-from doctr.models.predictor.pytorch import OCRPredictor
-from langchain_core.messages import HumanMessage
 import base64
-import numpy as np
+import os
+from typing import List
+
 import cv2
+import numpy as np
+from doctr.io import DocumentFile
+from doctr.io.elements import Document as doctrDocument
+from doctr.models import ocr_predictor
+from doctr.models.predictor.pytorch import OCRPredictor
+from doctr.utils.common_types import AbstractFile
+from langchain_core.documents import Document
+from langchain_core.language_models.chat_models import BaseChatModel
+from langchain_core.messages import HumanMessage
+from megaparse import MegaParse  # FIXME: @chloedia Version problems
 
 os.environ["USE_TORCH"] = "1"
 
@@ -64,7 +58,7 @@ class DeadlyParser:
         if llm:
             entire_content = ""
             print("ocr llm start")
-            for raw_result, img in zip(raw_results.pages, docs):
+            for raw_result, img in zip(raw_results.pages, docs, strict=False):
                 if raw_result.render() == "":
                     continue
                 _, buffer = cv2.imencode(".png", img)
@@ -125,7 +119,7 @@ class DeadlyParser:
         if llm:
             entire_content = ""
             print("ocr llm start")
-            for raw_result, img in zip(raw_results.pages, docs):
+            for raw_result, img in zip(raw_results.pages, docs, strict=False):
                 if raw_result.render() == "":
                     continue
                 _, buffer = cv2.imencode(".png", img)

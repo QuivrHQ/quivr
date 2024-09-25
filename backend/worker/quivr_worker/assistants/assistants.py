@@ -1,6 +1,6 @@
 import os
-import time
 import random
+import time
 
 from quivr_api.modules.assistant.services.tasks_service import TasksService
 from quivr_api.modules.upload.service.upload_file import (
@@ -22,7 +22,7 @@ async def process_assistant(
     await tasks_service.update_task(task_id, {"status": "processing"})
 
     print(task)
-    
+
     # Add a random delay of 10 to 20 seconds
     time.sleep(random.randint(10, 20))
 

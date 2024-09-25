@@ -271,7 +271,10 @@ async def test_process_sync_file_not_supported(syncutils: SyncUtils):
             sync_active=sync_active,
         )
 
-@pytest.mark.skip(reason="Bug: UnboundLocalError: cannot access local variable 'response'")
+
+@pytest.mark.skip(
+    reason="Bug: UnboundLocalError: cannot access local variable 'response'"
+)
 @pytest.mark.asyncio(loop_scope="session")
 async def test_process_sync_file_noprev(
     monkeypatch,
@@ -327,8 +330,8 @@ async def test_process_sync_file_noprev(
     assert created_km.file_sha1 is None
     assert created_km.created_at is not None
     assert created_km.metadata == {"sync_file_id": "1"}
-    assert len(created_km.brains)> 0 
-    assert created_km.brains[0]["brain_id"]== brain_1.brain_id
+    assert len(created_km.brains) > 0
+    assert created_km.brains[0]["brain_id"] == brain_1.brain_id
 
     # Assert celery task in correct
     assert task["args"] == ("process_file_task",)
@@ -345,8 +348,9 @@ async def test_process_sync_file_noprev(
     )
 
 
-
-@pytest.mark.skip(reason="Bug: UnboundLocalError: cannot access local variable 'response'")
+@pytest.mark.skip(
+    reason="Bug: UnboundLocalError: cannot access local variable 'response'"
+)
 @pytest.mark.asyncio(loop_scope="session")
 async def test_process_sync_file_with_prev(
     monkeypatch,
@@ -424,7 +428,7 @@ async def test_process_sync_file_with_prev(
     assert created_km.created_at
     assert created_km.updated_at == created_km.created_at  # new line
     assert created_km.metadata == {"sync_file_id": str(dbfiles[0].id)}
-    assert created_km.brains[0]["brain_id"]== brain_1.brain_id
+    assert created_km.brains[0]["brain_id"] == brain_1.brain_id
 
     # Check file content changed
     assert check_file_exists(str(brain_1.brain_id), sync_file.name)

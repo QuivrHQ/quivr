@@ -1,4 +1,3 @@
-import pytest
 from use_case_3 import hello
 
 

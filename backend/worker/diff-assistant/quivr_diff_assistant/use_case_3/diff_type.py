@@ -1,4 +1,5 @@
 from typing import List, Tuple
+
 from langchain_core.language_models.chat_models import BaseChatModel
 from langchain_core.prompts.prompt import PromptTemplate
 

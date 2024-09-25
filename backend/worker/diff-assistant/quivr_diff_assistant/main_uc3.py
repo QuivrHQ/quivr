@@ -1,19 +1,19 @@
 import asyncio
-import streamlit as st
-from langchain_openai import ChatOpenAI
-import tempfile
 import os
+import tempfile
 from enum import Enum
-from use_case_3.diff_type import DiffResult, llm_comparator
-from use_case_3.parser import DeadlyParser
-from use_case_3.llm_reporter import redact_report
 from pathlib import Path
+
+import streamlit as st
 from diff_match_patch import diff_match_patch
-from langchain_core.language_models.chat_models import BaseChatModel
-from langchain_openai import ChatOpenAI
 
 # get environment variables
 from dotenv import load_dotenv
+from langchain_core.language_models.chat_models import BaseChatModel
+from langchain_openai import ChatOpenAI
+from use_case_3.diff_type import DiffResult, llm_comparator
+from use_case_3.llm_reporter import redact_report
+from use_case_3.parser import DeadlyParser
 
 load_dotenv()
 
@@ -55,7 +55,7 @@ async def create_modification_report(
     print("using diff match patch")
     dmp = diff_match_patch()
     section_diffs = []
-    for after_section, before_section in zip(text_after_sections, text_before_sections):
+    for after_section, before_section in zip(text_after_sections, text_before_sections, strict=False):
         main_diff: list[tuple[int, str]] = dmp.diff_main(after_section, before_section)
         section_diffs.append(DiffResult(main_diff))
 

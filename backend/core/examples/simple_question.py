@@ -2,7 +2,6 @@ import tempfile
 
 from quivr_core import Brain
 from quivr_core.quivr_rag_langgraph import QuivrQARAGLangGraph
-    
 
 if __name__ == "__main__":
     with tempfile.NamedTemporaryFile(mode="w", suffix=".txt") as temp_file:

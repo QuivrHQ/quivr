@@ -32,8 +32,8 @@ from sqlalchemy.ext.asyncio import AsyncEngine, create_async_engine
 from sqlmodel import Session, text
 from sqlmodel.ext.asyncio.session import AsyncSession
 
-from quivr_worker.celery_monitor import is_being_executed
 from quivr_worker.assistants.assistants import process_assistant
+from quivr_worker.celery_monitor import is_being_executed
 from quivr_worker.check_premium import check_is_premium
 from quivr_worker.process.process_s3_file import process_uploaded_file
 from quivr_worker.process.process_url import process_url_func

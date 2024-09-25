@@ -22,6 +22,7 @@ from quivr_api.modules.upload.service.upload_file import (
     upload_file_storage,
 )
 from quivr_api.modules.user.entity.user_identity import UserIdentity
+from quivr_api.modules.assistant.entity.task_entity import TaskMetadata
 
 logger = get_logger(__name__)
 
@@ -83,7 +84,7 @@ async def create_task(
             raise HTTPException(status_code=400, detail=error)
     else:
         print("Assistant input is valid.")
-    notification_uuid = uuid4()
+    notification_uuid = f"{assistant.name}-{str(uuid4())[:8]}"
 
     # Process files dynamically
     for upload_file in files:
@@ -96,12 +97,13 @@ async def create_task(
             raise HTTPException(
                 status_code=500, detail=f"Failed to upload file to storage. {e}"
             )
-            
+
     task = CreateTask(
         assistant_id=input.id,
         assistant_name=assistant.name,
-        pretty_id=f"{assistant.name}-{str(notification_uuid)[:8]}",
+        pretty_id=notification_uuid,
         settings=input.model_dump(mode="json"),
+        task_metadata=TaskMetadata(input_files=[file.filename for file in files]).model_dump(mode="json") if files else None, # type: ignore
     )
 
     task_created = await tasks_service.create_task(task, current_user.id)

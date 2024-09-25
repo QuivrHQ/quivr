@@ -818,7 +818,12 @@ class NotionSync(BaseSync):
             pages.append(page_info)
 
             if recursive:
-                sub_pages = await self.aget_files(credentials=credentials, sync_user_id=sync_user_id, folder_id=str(page.id), recursive=recursive)
+                sub_pages = await self.aget_files(
+                    credentials=credentials,
+                    sync_user_id=sync_user_id,
+                    folder_id=str(page.id),
+                    recursive=recursive,
+                )
                 pages.extend(sub_pages)
         return pages
 

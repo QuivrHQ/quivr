@@ -1,13 +1,12 @@
 from langchain_core.prompts.prompt import PromptTemplate
 
-
 COMPARISON_PROMPT = PromptTemplate.from_template(
     template="""
     You are provided with two texts <text 1> and <text 2>. You need to consider the information contained in \
             <text 1> and compare it with the corresponding information contained in <text 2>. \
             Keep in mind that <text 2> contains non-relevant information for this task, and that in <text 2> you \
                  should only focus on the information correspnding to the information contained in <text 1>. \
-                    You need to report all the differences between the information contained in <text 1> and <text 2>. \ 
+                    You need to report all the differences between the information contained in <text 1> and <text 2>. \\ 
                     Your job is to parse these differences and create a clear, concise report. \
         Organize the report by sections and provide a detailed explanation of each difference. \
             Be specific on difference, it will be reviewed and verified by a highly-trained quality engineer.

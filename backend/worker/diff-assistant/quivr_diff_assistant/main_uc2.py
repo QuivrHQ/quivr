@@ -1,22 +1,21 @@
-import streamlit as st
 import asyncio
 from enum import Enum
-from langchain_openai import ChatOpenAI
-from langchain_core.language_models.chat_models import BaseChatModel
-from langchain_core.output_parsers import StrOutputParser
-
 
 import pandas as pd
+import streamlit as st
+from dotenv import load_dotenv
+from langchain_core.language_models.chat_models import BaseChatModel
+from langchain_core.output_parsers import StrOutputParser
+from langchain_openai import ChatOpenAI
 from llama_index.core import SimpleDirectoryReader, VectorStoreIndex
 from llama_index.core.node_parser import UnstructuredElementNodeParser
-from llama_index.core.retrievers import RecursiveRetriever
 from llama_index.core.query_engine import RetrieverQueryEngine
-from llama_index.llms.openai import OpenAI
-from quivr_diff_assistant.use_case_3.parser import DeadlyParser
+from llama_index.core.retrievers import RecursiveRetriever
 from llama_index.core.schema import Document
+from llama_index.llms.openai import OpenAI
 from utils.utils import COMPARISON_PROMPT
 
-from dotenv import load_dotenv
+from quivr_diff_assistant.use_case_3.parser import DeadlyParser
 
 load_dotenv()
 
@@ -80,7 +79,6 @@ class ComparisonTypes(str, Enum):
 def llm_comparator(
     document: str, cdc: str, llm: BaseChatModel, comparison_type: ComparisonTypes
 ):
-
     chain = COMPARISON_PROMPT | llm | StrOutputParser()
 
     if comparison_type == ComparisonTypes.CDC_ETIQUETTE:
@@ -99,7 +97,6 @@ def llm_comparator(
 
 
 async def test_main():
-
     cdc_doc = "/Users/jchevall/Coding/diff-assistant/data/Use case #2/Cas2-2-1_Mendiant Lait_QD PC F03 - FR Cahier des charges produit -rev 2021-v2.pdf"
     doc = "/Users/jchevall/Coding/diff-assistant/data/Use case #2/Cas2-2-1_Proposition étiquette Mendiant Lait croustillant.pdf"
 
@@ -152,7 +149,6 @@ def get_document_path(doc):
 
 
 async def parse_documents(cdc_doc, doc, comparison_type: ComparisonTypes, llm):
-
     parser = DeadlyParser()
 
     # Schedule the coroutines as tasks
@@ -199,7 +195,6 @@ def main():
             return
 
         with st.spinner("Processing files..."):
-
             llm = ChatOpenAI(
                 model="gpt-4o",
                 temperature=0.1,
