@@ -1,5 +1,6 @@
 import os
 from io import BytesIO
+from pathlib import Path
 from uuid import uuid4
 
 import pytest
@@ -104,6 +105,8 @@ async def brain_user(session, user: User) -> Brain:
 # NOTE: param sets the number of sync file the provider returns
 @pytest_asyncio.fixture(scope="function")
 async def proc_services(session: AsyncSession, request) -> ProcessorServices:
+    n_get_files = getattr(request, "param", 0)
+
     storage = FakeStorage()
     embedder = DeterministicFakeEmbedding(size=settings.embedding_dim)
     vector_repository = VectorRepository(session)
@@ -111,7 +114,7 @@ async def proc_services(session: AsyncSession, request) -> ProcessorServices:
     knowledge_repository = KnowledgeRepository(session)
     knowledge_service = KnowledgeService(knowledge_repository, storage=storage)
     sync_provider_mapping: dict[SyncProvider, BaseSync] = {
-        provider: FakeSync(provider_name=str(provider), n_get_files=request.param)
+        provider: FakeSync(provider_name=str(provider), n_get_files=n_get_files)
         for provider in list(SyncProvider)
     }
     sync_repository = SyncsRepository(
@@ -311,7 +314,7 @@ def qfile_instance(tmp_path) -> QuivrFile:
 
 
 @pytest.fixture
-def audio_file(tmp_path) -> QuivrFile:
+def audio_qfile(tmp_path) -> QuivrFile:
     data = os.urandom(128)
     temp_file = tmp_path / "data.mp4"
     temp_file.write_bytes(data)
@@ -323,4 +326,19 @@ def audio_file(tmp_path) -> QuivrFile:
         original_filename="data.mp4",
         path=temp_file.absolute(),
         file_size=len(data),
+    )
+
+
+@pytest.fixture
+def pdf_qfile(tmp_path) -> QuivrFile:
+    data = "This is some test data."
+    temp_file = tmp_path / "data.txt"
+    temp_file.write_text(data)
+    return QuivrFile(
+        id=uuid4(),
+        file_extension=".pdf",
+        original_filename="sample.pdf",
+        file_sha1="124",
+        file_size=1000,
+        path=Path("./tests/sample.pdf"),
     )
