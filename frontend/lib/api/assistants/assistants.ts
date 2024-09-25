@@ -23,7 +23,6 @@ export const processTask = async (
   processAssistantInput: ProcessAssistantInput
 ): Promise<string> => {
   const formData = new FormData();
-  console.info(processAssistantInput);
 
   formData.append("input", JSON.stringify(processAssistantInput.input));
 

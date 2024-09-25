@@ -64,7 +64,7 @@ const ProcessLine = ({
             <span className={styles.assistant}>{process.assistant_name}</span>
             <span className={styles.files}>
               {process.task_metadata.input_files.map((file, index) => (
-                <div key={index}>
+                <div className={styles.filename} key={index}>
                   <span>{file}</span>
                 </div>
               ))}

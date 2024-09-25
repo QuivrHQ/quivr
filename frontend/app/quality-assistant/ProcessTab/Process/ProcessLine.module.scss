@@ -48,9 +48,13 @@
       }
 
       .files {
-        @include Typography.EllipsisOverflow;
         font-size: Typography.$tiny;
         color: var(--text-4);
+        overflow: hidden;
+
+        .filename {
+          @include Typography.EllipsisOverflow;
+        }
       }
     }
   }
