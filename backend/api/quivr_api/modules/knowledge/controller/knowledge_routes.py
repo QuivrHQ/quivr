@@ -265,7 +265,6 @@ async def delete_knowledge(
 ):
     try:
         km = await knowledge_service.get_knowledge(knowledge_id)
-
         if km.user_id != current_user.id:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,

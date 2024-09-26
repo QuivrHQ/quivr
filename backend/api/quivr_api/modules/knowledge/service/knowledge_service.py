@@ -245,8 +245,8 @@ class KnowledgeService(BaseService[KnowledgeRepository]):
 
             # recursively deletes files
             deleted_km = await self.repository.remove_knowledge(knowledge)
+            # TODO: remove storage asynchronously in background task or in some task
             await asyncio.gather(*[self.storage.remove_file(p) for p in km_paths])
-
             return deleted_km
         except Exception as e:
             logger.error(f"Error while remove knowledge : {e}")
