@@ -9,33 +9,37 @@
     - Matches based on the knowledge source:
       - **local**:
         - Downloads the knowledge data from S3 storage and writes it to tempfile
-        - Yields the
+        - Yields the [Knowledge,QuivrFile]
     - **web**: works a lot like **local**...
-    - **syncs**:
+    - **[syncs]**:
       - Get the associated sync and checks the credentials
-      - Concurrently fetch all knowledges for user that are in db associated with this sync and the tree of sync files which the knowledge is the parent (using the sync provider)
-      - Downloads knowledge and yields the [knowledge,QuivrFile]
-      - For all children of this knowledges (those fetched from the sync):
+      - Concurrently fetches all knowledges for user that are in db associated with this sync and the tree of sync files this knowledge is the parent of (using the sync provider)
+      - Downloads knowledge and yields the first [knowledge,QuivrFile]. This is the one this task received
+      - For all children of this knowledges (ie: those fetched from the sync):
         - If child in db (ie we have knowledge where `knowledge.sync_id == sync_file.id`):
           - Implies that we could have sync children that were processed before in some other brain
-          - Link it to the parent brains and move on if it is PROCESSED ELSE Reprocess the file
-          - We are done here
+          - if it is PROCESSED Link it to the parent brains and move on
+          - ELSE reprocess the file
         - Else:
           - Create the knowledge associated with this sync file and set it to Processing
           - Downloads syncfile data and yield the [knowledge,quivr_file]
+  - Skip processing of the tuple if the knowledge is folder
+  - Parse the QuivrFile using `quivr-core`
+  - Store the chunks in the DB
+  - Update knowledge status to PROCESSED
 
-In the processing loop for each processable [KnowledgeDB,Quivrfile], if an exception raised we need to deal with this:
+If an exception occurs during the parsing loop we do the following:
 
 ### Catchable error:
 
-1. Rollback (only affects the vectors) if they were set.
+1. We first the current transaction Rollback (only affects the vectors) if they were set. The processing loop has the following stateful operations in this order:
 
-- Stateful operations are in order:
+- Creating knowledges (with processing status)
+- Updating knowledges: linking to brains
+- Creating vectors
+- Updating knowledges
 
-  - Creating knowledges (with processing status)
-  - Updating knowledges: linking to brains
-  - Creating vectors
-  - Updating knowledges
+Here is the transaction SAFETY for each operation. These could change and we need to keep the transactional garantees in mind:
 
 - Creation operations and linking to brains can be retried safely. Knowledge is only recreated if they do not exist in DB. Which means we get we can safely retry this operation
 
@@ -45,7 +49,7 @@ In the processing loop for each processable [KnowledgeDB,Quivrfile], if an excep
 
   - This operation should be rollback if we have an error after. Because we would have a knowledge in Processing/ ERROR status with associated vectors.
 
-  - Reprocessing the knowledge would mean reinserting vectors in the db. which would insert duplicate vectors !
+  - Reprocessing the knowledge would mean reinserting vectors in the db. This means ending up with duplicate vectors for the same knowledge !
 
 2. Set knowledge to error
 
@@ -55,7 +59,7 @@ In the processing loop for each processable [KnowledgeDB,Quivrfile], if an excep
 
 ### Uncatchable error ie worker process fails:
 
-- The task will be automatically retried 3 times handled by celery
+- The task will be automatically retried 3 times -> handled by celery
 - Notifier will receive event task as failed
 - Notifier sets knowledge status to ERROR for the task
 
