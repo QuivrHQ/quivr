@@ -1,77 +1,79 @@
-# Processing Knowledges
+Here's the grammar correction and a more explicit version of your markdown, keeping the original logic intact:
 
-## Processing steps
+---
 
-- Task receives a `knowledge_id : UUID`.
-- `KnowledgeProcessor.process_knowlege` processes the knowledge:
-  - Builds a processable tuple of [Knowledge,QuivrFile] stream:
-    - Gets the `KnowledgeDB` object from db:
-    - Matches based on the knowledge source:
-      - **local**:
-        - Downloads the knowledge data from S3 storage and writes it to tempfile
-        - Yields the [Knowledge,QuivrFile]
-      - **web**: works a lot like **local**...
-      - **[syncs]**:
-        - Get the associated sync and checks the credentials
-        - Concurrently fetches all knowledges for user that are in db associated with this sync and the tree of sync files this knowledge is the parent of (using the sync provider)
-        - Downloads knowledge and yields the first [knowledge,QuivrFile]. This is the one this task received
-        - For all children of this knowledges (ie: those fetched from the sync):
-          - If child in db (ie we have knowledge where `knowledge.sync_id == sync_file.id`):
-            - Implies that we could have sync children that were processed before in some other brain
-            - if it is PROCESSED Link it to the parent brains and move on
-            - ELSE reprocess the file
-          - Else:
-            - Create the knowledge associated with this sync file and set it to Processing
-            - Downloads syncfile data and yield the [knowledge,quivr_file]
-  - Skip processing of the tuple if the knowledge is folder
-  - Parse the QuivrFile using `quivr-core`
-  - Store the chunks in the DB
-  - Update knowledge status to PROCESSED
+# Knowledge Processing
 
-If an exception occurs during the parsing loop we do the following:
+## Steps for Processing
 
-### Catchable error:
+1. The task receives a `knowledge_id: UUID`.
+2. The `KnowledgeProcessor.process_knowledge` method processes the knowledge:
+    - It constructs a processable tuple of `[Knowledge, QuivrFile]` stream:
+        - Retrieves the `KnowledgeDB` object from the database.
+        - Determines the processing steps based on the knowledge source:
+            - **Local**:
+                - Downloads the knowledge data from S3 storage and writes it to a temporary file.
+                - Yields the `[Knowledge, QuivrFile]`.
+            - **Web**: Processes similarly to the **Local** method.
+            - **[Syncs]**:
+                - Fetches the associated sync and verifies the credentials.
+                - Concurrently retrieves all knowledges for the user from the database associated with this sync, as well as the tree of sync files where this knowledge is the parent (using the sync provider).
+                - Downloads the knowledge and yields the initial `[Knowledge, QuivrFile]` that the task received.
+                - For all children of this knowledge (i.e., those fetched from the sync):
+                    - If the child exists in the database (i.e., knowledge where `knowledge.sync_id == sync_file.id`):
+                        - This implies that the sync's child knowledge might have been processed earlier in another brain.
+                        - If the knowledge has been PROCESSED, link it to the parent brains and continue.
+                        - If not, reprocess the file.
+                    - If the child does not exist:
+                        - Create the knowledge associated with the sync file and set it to `Processing`.
+                        - Download the sync file's data and yield the `[Knowledge, QuivrFile]`.
+    - Skip processing of the tuple if the knowledge is a folder.
+    - Parse the `QuivrFile` using `quivr-core`.
+    - Store the resulting chunks in the database.
+    - Update the knowledge status to `PROCESSED`.
 
-1. We first the current transaction Rollback (only affects the vectors) if they were set. The processing loop has the following stateful operations in this order:
+### Handling Exceptions During Parsing Loop
 
-- Creating knowledges (with processing status)
-- Updating knowledges: linking to brains
-- Creating vectors
-- Updating knowledges
+#### Catchable Errors:
 
-Here is the transaction SAFETY for each operation. These could change and we need to keep the transactional garantees in mind:
+If an exception occurs during the parsing loop, the following steps are taken:
 
-- Creation operations and linking to brains can be retried safely. Knowledge is only recreated if they do not exist in DB. Which means we get we can safely retry this operation
+1. Roll back the current transaction (this only affects the vectors) if they were set. The processing loop performs the following stateful operations in this order:
+    - Creating knowledges (with `Processing` status).
+    - Updating knowledges: linking them to brains.
+    - Creating vectors.
+    - Updating knowledges.
+  
+   **Transaction Safety for Each Operation:**
+   - **Creating knowledge and linking to brains**: These operations can be retried safely. Knowledge is only recreated if it does not already exist in the database, allowing for safe retry.
+   - **Linking knowledge to brains**: Only links the brain if it is not already associated with the knowledge. Safe for retry.
+   - **Creating vectors**:
+     - This operation should be rolled back if an error occurs afterward. Otherwise, the knowledge could remain in `Processing` or `ERROR` status with associated vectors.
+     - Reprocessing the knowledge would result in reinserting the vectors into the database, leading to duplicate vectors for the same knowledge.
 
-- Linking km to brain only link brain if it's not already associated with km. Safe for retry
+2. Set the knowledge status to `ERROR`.
+3. Continue processing.
 
-- Creating vectors :
+| Note: This means that some knowledges will remain in an errored state. Currently, they are not automatically rescheduled for processing.
 
-  - This operation should be rollback if we have an error after. Because we would have a knowledge in Processing/ ERROR status with associated vectors.
+#### Uncatchable Errors (e.g., worker process fails):
 
-  - Reprocessing the knowledge would mean reinserting vectors in the db. This means ending up with duplicate vectors for the same knowledge !
+- The task will be automatically retried three times, handled by Celery.
+- The notifier will receive an event indicating the task has failed.
+- The notifier will set the knowledge status to `ERROR` for the task.
 
-2. Set knowledge to error
+---
 
-3. Continue processing
+🔴 **NOTE: Sync Error Handling for Version v0.1:**
 
-| This would mean that some knowledges would be errored. For now we don't automatically reschedule them for processing right after.
+For `process_knowledge` tasks involving the processing of a sync folder, the folder's status will be set to `ERROR`. If child knowledges associated with the sync have already been created, their status cannot be set to `ERROR`. This would leave them stuck in `PROCESSING` status while their parent has an `ERROR` status.
 
-### Uncatchable error ie worker process fails:
+Why can’t we set all children to `ERROR`? This introduces a potential race condition: Sync knowledge can be added to a brain independently from its parent, so it’s unclear if the `PROCESSING` status is tied to the failed task. Although keeping a `task_id` associated with `knowledge_id` could help, it’s error-prone and impacts the database schema, which would have significant consequences.
 
-- The task will be automatically retried 3 times -> handled by celery
-- Notifier will receive event task as failed
-- Notifier sets knowledge status to ERROR for the task
+However, sync knowledge added to a brain will be reprocessed after some time through the sync update task, ensuring that their status will eventually be set to the correct state.
 
-🔴 **NOTE: Sync error handling for the v0.1 version:**
+---
 
-`process_knowledge` tasks that need to process a sync folder, the folder will be set to ERROR.
-If we have created child knowledges associated with sync, we can't really set their status to ERROR. This would mean that they will be stuck at status PROCESSING with their parent with an ERROR status.
+## Notification Steps
 
-Why can't we set all children to ERROR? This could introduce a subtle race condition: sync knowledge can be added to brain independently from their parent so we can't know for sure if the status PROCESSING is associated with the task that just failed. We could keep a `task_id` associated with knowledge_id but this is bug prone and impacts the db schema which has a large impact.
-
-The knowledge (syncs) that are added to some brain will be reprocessed after some period of time in the update sync task so their status will be eventually set to the correct state.
-
-## Notification steps
-
-TO discuss @StanGirard @Zewed
+To discuss: @StanGirard @Zewed
