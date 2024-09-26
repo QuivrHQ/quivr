@@ -77,7 +77,7 @@ const ProcessLine = ({
               <span className={styles.date}>
                 {format(
                   new Date(process.creation_time),
-                  " d MMMM yyyy '-' HH:mm",
+                  " d MMMM yyyy '-' HH:mm:ss",
                   {
                     locale: fr,
                   }
