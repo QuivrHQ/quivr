@@ -51,3 +51,8 @@ class LinkKnowledgeBrain(BaseModel):
     bulk_id: UUID
     knowledge: KnowledgeDTO
     brain_ids: List[UUID]
+
+
+class UnlinkKnowledgeBrain(BaseModel):
+    knowledge_id: UUID
+    brain_ids: List[UUID]

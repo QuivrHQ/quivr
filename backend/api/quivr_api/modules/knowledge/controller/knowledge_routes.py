@@ -19,9 +19,9 @@ from quivr_api.modules.knowledge.dto.inputs import (
     AddKnowledge,
     KnowledgeUpdate,
     LinkKnowledgeBrain,
+    UnlinkKnowledgeBrain,
 )
 from quivr_api.modules.knowledge.dto.outputs import KnowledgeDTO
-from quivr_api.modules.knowledge.entity.knowledge import KnowledgeDB
 from quivr_api.modules.knowledge.service.knowledge_exceptions import (
     KnowledgeDeleteError,
     KnowledgeForbiddenAccess,
@@ -64,33 +64,6 @@ async def list_knowledge_in_brain_endpoint(
     knowledges = await knowledge_service.get_all_knowledge_in_brain(brain_id)
 
     return {"knowledges": knowledges}
-
-
-@knowledge_router.delete(
-    "/knowledge/{knowledge_id}",
-    dependencies=[
-        Depends(AuthBearer()),
-        Depends(has_brain_authorization(RoleEnum.Owner)),
-    ],
-    tags=["Knowledge"],
-)
-async def delete_knowledge_brain(
-    knowledge_id: UUID,
-    knowledge_service: KnowledgeService = Depends(get_knowledge_service),
-    current_user: UserIdentity = Depends(get_current_user),
-    brain_id: UUID = Query(..., description="The ID of the brain"),
-):
-    """
-    Delete a specific knowledge from a brain.
-    """
-
-    knowledge = await knowledge_service.get_knowledge(knowledge_id)
-    file_name = knowledge.file_name if knowledge.file_name else knowledge.url
-    await knowledge_service.remove_knowledge_brain(brain_id, knowledge_id)
-
-    return {
-        "message": f"{file_name} of brain {brain_id} has been deleted by user {current_user.email}."
-    }
 
 
 @knowledge_router.get(
@@ -255,6 +228,33 @@ async def update_knowledge(
 
 @knowledge_router.delete(
     "/knowledge/{knowledge_id}",
+    dependencies=[
+        Depends(AuthBearer()),
+        Depends(has_brain_authorization(RoleEnum.Owner)),
+    ],
+    tags=["Knowledge"],
+)
+async def delete_knowledge_brain(
+    knowledge_id: UUID,
+    knowledge_service: KnowledgeService = Depends(get_knowledge_service),
+    current_user: UserIdentity = Depends(get_current_user),
+    brain_id: UUID = Query(..., description="The ID of the brain"),
+):
+    """
+    Delete a specific knowledge from a brain.
+    """
+
+    knowledge = await knowledge_service.get_knowledge(knowledge_id)
+    file_name = knowledge.file_name if knowledge.file_name else knowledge.url
+    await knowledge_service.remove_knowledge_brain(brain_id, knowledge_id)
+
+    return {
+        "message": f"{file_name} of brain {brain_id} has been deleted by user {current_user.email}."
+    }
+
+
+@knowledge_router.delete(
+    "/knowledge/{knowledge_id}",
     status_code=status.HTTP_202_ACCEPTED,
     tags=["Knowledge"],
 )
@@ -284,6 +284,7 @@ async def delete_knowledge(
     "/knowledge/link_to_brains/",
     status_code=status.HTTP_201_CREATED,
     response_model=List[KnowledgeDTO],
+    tags=["Knowledge"],
 )
 async def link_knowledge_to_brain(
     link_request: LinkKnowledgeBrain,
@@ -297,29 +298,6 @@ async def link_knowledge_to_brain(
     )
     if len(brains_ids) == 0:
         return "empty brain list"
-
-    async def _send_knowledge_process(knowledge: KnowledgeDB):
-        assert knowledge.id
-        upload_notification = notification_service.add_notification(
-            CreateNotification(
-                user_id=current_user.id,
-                bulk_id=bulk_id,
-                status=NotificationsStatusEnum.INFO,
-                title=f"{knowledge.file_name}",
-                category="process",
-            )
-        )
-        celery.send_task(
-            "process_file_task",
-            kwargs={
-                "knowledge_id": knowledge.id,
-                "notification_id": upload_notification.id,
-            },
-        )
-        knowledge = await knowledge_service.update_knowledge(
-            knowledge=knowledge,
-            payload=KnowledgeUpdate(status=KnowledgeStatus.PROCESSING),
-        )
 
     if knowledge_dto.id is None:
         if knowledge_dto.sync_file_id is None:
@@ -344,6 +322,58 @@ async def link_knowledge_to_brain(
     for knowledge in filter(
         lambda k: k.status != KnowledgeStatus.PROCESSED, linked_kms
     ):
-        await _send_knowledge_process(knowledge=knowledge)
+        assert knowledge.id
+        upload_notification = notification_service.add_notification(
+            CreateNotification(
+                user_id=current_user.id,
+                bulk_id=bulk_id,
+                status=NotificationsStatusEnum.INFO,
+                title=f"{knowledge.file_name}",
+                category="process",
+            )
+        )
+        celery.send_task(
+            "process_file_task",
+            kwargs={
+                "knowledge_id": knowledge.id,
+                "notification_id": upload_notification.id,
+            },
+        )
+        knowledge = await knowledge_service.update_knowledge(
+            knowledge=knowledge,
+            payload=KnowledgeUpdate(status=KnowledgeStatus.PROCESSING),
+        )
 
     return await asyncio.gather(*[k.to_dto() for k in linked_kms])
+
+
+@knowledge_router.delete(
+    "/knowledge/unlink_from_brains/",
+    response_model=List[KnowledgeDTO] | None,
+    tags=["Knowledge"],
+)
+async def unlink_knowledge_from_brain(
+    unlink_request: UnlinkKnowledgeBrain,
+    knowledge_service: KnowledgeService = Depends(get_knowledge_service),
+    current_user: UserIdentity = Depends(get_current_user),
+):
+    brains_ids, knowledge_id = unlink_request.brain_ids, unlink_request.knowledge_id
+
+    if len(brains_ids) == 0:
+        raise HTTPException(
+            status_code=status.HTTP_204_NO_CONTENT,
+        )
+
+    km = await knowledge_service.get_knowledge(knowledge_id)
+    if km.user_id != current_user.id:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="You do not have permission to remove this knowledge.",
+        )
+
+    unlinked_kms = await knowledge_service.unlink_knowledge_tree_brains(
+        knowledge=knowledge_id, brains_ids=brains_ids, user_id=current_user.id
+    )
+
+    if unlinked_kms:
+        return await asyncio.gather(*[k.to_dto() for k in unlinked_kms])

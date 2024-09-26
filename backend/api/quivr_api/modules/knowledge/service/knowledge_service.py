@@ -293,3 +293,12 @@ class KnowledgeService(BaseService[KnowledgeRepository]):
         return await self.repository.link_knowledge_tree_brains(
             knowledge, brains_ids=brains_ids, user_id=user_id
         )
+
+    async def unlink_knowledge_tree_brains(
+        self, knowledge: KnowledgeDB | UUID, brains_ids: List[UUID], user_id: UUID
+    ) -> List[KnowledgeDB] | None:
+        if isinstance(knowledge, UUID):
+            knowledge = await self.repository.get_knowledge_by_id(knowledge)
+        return await self.repository.unlink_knowledge_tree_brains(
+            knowledge, brains_ids=brains_ids, user_id=user_id
+        )

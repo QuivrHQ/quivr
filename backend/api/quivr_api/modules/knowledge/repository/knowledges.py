@@ -70,6 +70,48 @@ class KnowledgeRepository(BaseRepository):
             logger.error(f"Error updating knowledge {e}")
             raise KnowledgeUpdateError
 
+    async def unlink_knowledge_tree_brains(
+        self, knowledge: KnowledgeDB, brains_ids: List[UUID], user_id: UUID
+    ) -> list[KnowledgeDB] | None:
+        assert knowledge.id, "can't link knowledge not in db"
+        try:
+            # TODO: Move check somewhere else
+            stmt = (
+                select(Brain)
+                .join(BrainUserDB, col(Brain.brain_id) == col(BrainUserDB.brain_id))
+                .where(
+                    and_(
+                        col(Brain.brain_id).in_(brains_ids),
+                        BrainUserDB.user_id == user_id,
+                        BrainUserDB.rights == RoleEnum.Owner,
+                    )
+                )
+            )
+            unlink_brains = list((await self.session.exec(stmt)).unique().all())
+            unlink_brain_ids = {b.brain_id for b in unlink_brains}
+
+            if len(unlink_brains) == 0:
+                logger.info(
+                    f"No brains for user_id={user_id}, brains_list={brains_ids}"
+                )
+                return
+            children = await self.get_knowledge_tree(knowledge.id)
+            all_kms = [knowledge, *children]
+            for k in all_kms:
+                k.brains = list(
+                    filter(lambda b: b.brain_id not in unlink_brain_ids, k.brains)
+                )
+            [self.session.add(k) for k in all_kms]
+            await self.session.commit()
+            [await self.session.refresh(k) for k in all_kms]
+            return all_kms
+        except IntegrityError:
+            await self.session.rollback()
+            raise
+        except Exception:
+            await self.session.rollback()
+            raise
+
     async def link_knowledge_tree_brains(
         self, knowledge: KnowledgeDB, brains_ids: List[UUID], user_id: UUID
     ) -> list[KnowledgeDB]:
