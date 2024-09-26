@@ -80,6 +80,46 @@ async def brain_user(session, user: User) -> Brain:
 
 
 @pytest_asyncio.fixture(scope="function")
+async def brain_user2(session, user: User) -> Brain:
+    assert user.id
+    brain = Brain(
+        name="test_brain2",
+        description="this is a test brain",
+        brain_type=BrainType.integration,
+    )
+    session.add(brain)
+    await session.commit()
+    await session.refresh(brain)
+    assert brain.brain_id
+    brain_user = BrainUserDB(
+        brain_id=brain.brain_id, user_id=user.id, default_brain=True, rights="Owner"
+    )
+    session.add(brain_user)
+    await session.commit()
+    return brain
+
+
+@pytest_asyncio.fixture(scope="function")
+async def brain_user3(session, user: User) -> Brain:
+    assert user.id
+    brain = Brain(
+        name="test_brain2",
+        description="this is a test brain",
+        brain_type=BrainType.integration,
+    )
+    session.add(brain)
+    await session.commit()
+    await session.refresh(brain)
+    assert brain.brain_id
+    brain_user = BrainUserDB(
+        brain_id=brain.brain_id, user_id=user.id, default_brain=True, rights="Owner"
+    )
+    session.add(brain_user)
+    await session.commit()
+    return brain
+
+
+@pytest_asyncio.fixture(scope="function")
 async def test_data(session: AsyncSession) -> TestData:
     user_1 = (
         await session.exec(select(User).where(User.email == "admin@quivr.app"))
@@ -1012,5 +1052,72 @@ async def test_link_knowledge_brain(
 
 
 @pytest.mark.asyncio(loop_scope="session")
-async def test_link_knowledge_brain_existing_brains():
+async def test_link_knowledge_brain_existing_brains(
+    session: AsyncSession, user: User, brain_user: Brain
+):
     """test knowledge already in brain and we add it to the same brain because we added his parent"""
+
+
+@pytest.mark.asyncio(loop_scope="session")
+async def test_unlink_knowledge_brain(
+    session: AsyncSession,
+    user: User,
+    brain_user: Brain,
+    brain_user2: Brain,
+    brain_user3: Brain,
+):
+    assert user.id
+    assert brain_user.brain_id
+    assert brain_user2.brain_id
+    assert brain_user3.brain_id
+
+    root_folder = KnowledgeDB(
+        file_name="folder",
+        extension="",
+        status="UPLOADED",
+        source="local",
+        source_link="local",
+        file_size=4,
+        file_sha1=None,
+        brains=[brain_user, brain_user2],
+        children=[],
+        user_id=user.id,
+        is_folder=True,
+    )
+    file = KnowledgeDB(
+        file_name="file_2",
+        extension="",
+        status="UPLOADED",
+        source="local",
+        source_link="local",
+        file_size=10,
+        file_sha1=None,
+        user_id=user.id,
+        parent=root_folder,
+        # 1 additional brain
+        brains=[brain_user, brain_user2, brain_user3],
+    )
+    session.add(file)
+    session.add(root_folder)
+    await session.commit()
+    await session.refresh(root_folder)
+    await session.refresh(file)
+
+    storage = FakeStorage()
+    repository = KnowledgeRepository(session)
+    service = KnowledgeService(repository, storage)
+
+    await service.unlink_knowledge_tree_brains(
+        root_folder,
+        brains_ids=[brain_user.brain_id, brain_user2.brain_id],
+        user_id=user.id,
+    )
+    kms = await service.get_all_knowledge_in_brain(brain_id=brain_user.brain_id)
+    assert len(kms) == 0
+
+    kms = await service.get_all_knowledge_in_brain(brain_id=brain_user2.brain_id)
+    assert len(kms) == 0
+
+    kms = await service.get_all_knowledge_in_brain(brain_id=brain_user3.brain_id)
+    assert len(kms) == 1
+    assert kms[0].id == file.id

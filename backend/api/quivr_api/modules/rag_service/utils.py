@@ -68,7 +68,7 @@ async def generate_source(
                 try:
                     file_name = doc.metadata["file_name"]
                     file_path = await knowledge_service.get_knowledge_storage_path(
-                    file_name=file_name, brain_id=brain_id
+                        file_name=file_name, brain_id=brain_id
                     )
                     if file_path in generated_urls:
                         source_url = generated_urls[file_path]

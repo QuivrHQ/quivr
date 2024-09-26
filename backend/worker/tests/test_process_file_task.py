@@ -236,6 +236,53 @@ async def test_process_sync_folder_with_file_in_brain(
 
 
 @pytest.mark.asyncio(loop_scope="session")
+@pytest.mark.parametrize("proc_services", [1], indirect=True)
+async def test_process_sync_folder_with_file_in_other_brain(
+    monkeypatch,
+    session: AsyncSession,
+    proc_services: ProcessorServices,
+    sync_knowledge_folder_with_file_in_other_brain: KnowledgeDB,
+):
+    input_km = sync_knowledge_folder_with_file_in_other_brain
+    assert input_km.id
+    assert input_km.brains
+
+    async def _parse_file_mock(
+        qfile: QuivrFile,
+        **processor_kwargs: dict[str, Any],
+    ) -> list[Document]:
+        with open(qfile.path, "rb") as f:
+            return [Document(page_content=str(f.read()), metadata={})]
+
+    km_processor = KnowledgeProcessor(proc_services)
+    monkeypatch.setattr("quivr_worker.process.processor.parse_qfile", _parse_file_mock)
+    await km_processor.process_knowledge(input_km.id)
+
+    # Check knowledge set to processed
+    assert input_km.id
+    assert input_km.brains
+    assert input_km.brains[0]
+    knowledge_service = km_processor.services.knowledge_service
+    # FIXME (@AmineDiro): brain dto!!
+    kms = await knowledge_service.get_all_knowledge_in_brain(
+        input_km.brains[0].brain_id
+    )
+
+    assert len(kms) == 2
+    for km in kms:
+        assert km.status == KnowledgeStatus.PROCESSED
+        assert len(km.brains) >= 1, "File added to the same brain multiple times"
+        assert km.brains[0]["brain_id"]
+        assert input_km.brains[0].brain_id in {b["brain_id"] for b in km.brains}
+        if len(km.brains) > 1:
+            assert len({b["brain_id"] for b in km.brains}) == 2
+
+    # Check vectors
+    vecs = list((await session.exec(select(Vector))).all())
+    assert len(vecs) == 0, "File reprocessed, or folder processed "
+
+
+@pytest.mark.asyncio(loop_scope="session")
 @pytest.mark.parametrize("proc_services", [0], indirect=True)
 async def test_process_km_rollback(
     monkeypatch,

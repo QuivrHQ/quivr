@@ -247,10 +247,11 @@ class KnowledgeProcessor:
         for sync_file in sync_files:
             existing_km = syncfile_to_knowledge.get(sync_file.id)
             if existing_km is not None:
-                # SyncKnowledge already exists =>
-                # It's already processed in some other brain so just link it and move on if it is Processed
-                # ELSE
-                # reprocess the file
+                # NOTE:
+                # The parent_knowledge was just added (we are processing it)
+                # This implies that we could have sync children that were processed before
+                # IF SyncKnowledge already exists =>  It's already processed in some other brain
+                # => Link it to the parent brains and move on if it is PROCESSED ELSE Reprocess the file
                 km_brains = {km_brain.brain_id for km_brain in existing_km.brains}
                 for brain in filter(
                     lambda b: b.brain_id not in km_brains,

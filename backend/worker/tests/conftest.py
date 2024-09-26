@@ -102,6 +102,26 @@ async def brain_user(session, user: User) -> Brain:
     return brain_1
 
 
+@pytest_asyncio.fixture(scope="function")
+async def brain_user2(session, user: User) -> Brain:
+    assert user.id
+    brain = Brain(
+        name="test_brain2",
+        description="this is a test brain",
+        brain_type=BrainType.integration,
+    )
+    session.add(brain)
+    await session.commit()
+    await session.refresh(brain)
+    assert brain.brain_id
+    brain_user = BrainUserDB(
+        brain_id=brain.brain_id, user_id=user.id, default_brain=True, rights="Owner"
+    )
+    session.add(brain_user)
+    await session.commit()
+    return brain
+
+
 # NOTE: param sets the number of sync file the provider returns
 @pytest_asyncio.fixture(scope="function")
 async def proc_services(session: AsyncSession, request) -> ProcessorServices:
@@ -237,6 +257,57 @@ async def sync_knowledge_folder(
         sync=sync,
     )
 
+    session.add(km)
+    await session.commit()
+    await session.refresh(km)
+
+    return km
+
+
+@pytest_asyncio.fixture(scope="function")
+async def sync_knowledge_folder_with_file_in_other_brain(
+    session: AsyncSession,
+    user: User,
+    brain_user: Brain,
+    brain_user2: Brain,
+    sync: Sync,
+) -> KnowledgeDB:
+    assert user.id
+    assert brain_user.brain_id
+    file = KnowledgeDB(
+        file_name="file",
+        extension=".txt",
+        status=KnowledgeStatus.PROCESSED,
+        source=SyncProvider.GOOGLE,
+        source_link="drive://test/file1",
+        file_size=10,
+        file_sha1="test",
+        user_id=user.id,
+        brains=[brain_user2],
+        parent=None,
+        is_folder=False,
+        # NOTE: See FakeSync Implementation
+        sync_file_id="file-0",
+        sync=sync,
+    )
+
+    km = KnowledgeDB(
+        file_name="folder1",
+        extension=".txt",
+        status=KnowledgeStatus.PROCESSING,
+        source=SyncProvider.GOOGLE,
+        source_link="drive://test/folder1",
+        file_size=0,
+        file_sha1=None,
+        user_id=user.id,
+        brains=[brain_user],
+        parent=None,
+        is_folder=True,
+        sync_file_id="id1",
+        sync=sync,
+    )
+
+    session.add(file)
     session.add(km)
     await session.commit()
     await session.refresh(km)

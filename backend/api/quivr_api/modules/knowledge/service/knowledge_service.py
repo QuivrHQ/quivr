@@ -245,8 +245,8 @@ class KnowledgeService(BaseService[KnowledgeRepository]):
 
             # recursively deletes files
             deleted_km = await self.repository.remove_knowledge(knowledge)
+            # TODO: remove storage asynchronously in background task or in some task
             await asyncio.gather(*[self.storage.remove_file(p) for p in km_paths])
-
             return deleted_km
         except Exception as e:
             logger.error(f"Error while remove knowledge : {e}")
@@ -291,5 +291,14 @@ class KnowledgeService(BaseService[KnowledgeRepository]):
         if isinstance(knowledge, UUID):
             knowledge = await self.repository.get_knowledge_by_id(knowledge)
         return await self.repository.link_knowledge_tree_brains(
+            knowledge, brains_ids=brains_ids, user_id=user_id
+        )
+
+    async def unlink_knowledge_tree_brains(
+        self, knowledge: KnowledgeDB | UUID, brains_ids: List[UUID], user_id: UUID
+    ) -> List[KnowledgeDB] | None:
+        if isinstance(knowledge, UUID):
+            knowledge = await self.repository.get_knowledge_by_id(knowledge)
+        return await self.repository.unlink_knowledge_tree_brains(
             knowledge, brains_ids=brains_ids, user_id=user_id
         )
