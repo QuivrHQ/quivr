@@ -234,7 +234,7 @@ assistant3 = AssistantOutput(
             InputSelectText(
                 key="DocumentsType",
                 description="Select Documents Type",
-                options=["Etiquette", "Cahier des charges"],
+                options=["Etiquettes", "Cahier des charges"],
             ),
         ],
         conditional_inputs=[
