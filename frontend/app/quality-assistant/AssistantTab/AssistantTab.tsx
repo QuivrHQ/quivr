@@ -23,71 +23,14 @@ interface AssistantTabProps {
   setSelectedTab: (tab: string) => void;
 }
 
-const AssistantTab = ({ setSelectedTab }: AssistantTabProps): JSX.Element => {
+const FILE_TYPES = ["pdf", "docx", "doc", "txt"];
+
+const useAssistantData = () => {
+  const [assistants, setAssistants] = useState<Assistant[]>([]);
   const [assistantChoosed, setAssistantChoosed] = useState<
     Assistant | undefined
   >(undefined);
-  const [assistants, setAssistants] = useState<Assistant[]>([]);
-  const [booleanStates, setBooleanStates] = useState<{
-    [key: string]: boolean | null;
-  }>({});
-  const [selectTextStates, setSelectTextStates] = useState<{
-    [key: string]: string | null;
-  }>({});
-  const [fileStates, setFileStates] = useState<{ [key: string]: File }>({});
-  const [isFormValid, setIsFormValid] = useState<boolean>(false);
-  const [loading, setLoading] = useState<boolean>(false);
-
-  const { getAssistants, processTask } = useAssistants();
-
-  const handleFileChange = (key: string, file: File) => {
-    setFileStates((prevState) => ({
-      ...prevState,
-      [key]: file,
-    }));
-  };
-
-  const validateForm = () => {
-    if (!assistantChoosed) {
-      return false;
-    }
-
-    const allBooleansSet =
-      assistantChoosed.inputs.booleans?.every(
-        (input) =>
-          booleanStates[input.key] !== undefined &&
-          booleanStates[input.key] !== null
-      ) ?? true;
-
-    if (!allBooleansSet) {
-      return false;
-    }
-
-    const allFilesSet = assistantChoosed.inputs.files.every(
-      (input) => fileStates[input.key] !== undefined
-    );
-
-    if (!allFilesSet) {
-      return false;
-    }
-
-    const allSelectTextsSet =
-      assistantChoosed.inputs.select_texts?.every(
-        (input) =>
-          selectTextStates[input.key] !== undefined &&
-          selectTextStates[input.key] !== null
-      ) ?? true;
-
-    if (!allSelectTextsSet) {
-      return false;
-    }
-
-    return true;
-  };
-
-  useEffect(() => {
-    setIsFormValid(validateForm());
-  }, [booleanStates, fileStates, selectTextStates, assistantChoosed]);
+  const { getAssistants } = useAssistants();
 
   useEffect(() => {
     void (async () => {
@@ -98,7 +41,20 @@ const AssistantTab = ({ setSelectedTab }: AssistantTabProps): JSX.Element => {
         console.error(error);
       }
     })();
-  }, [assistantChoosed]);
+  }, []);
+
+  return { assistants, assistantChoosed, setAssistantChoosed };
+};
+
+const useFormStates = (assistantChoosed: Assistant | undefined) => {
+  const [booleanStates, setBooleanStates] = useState<{
+    [key: string]: boolean | null;
+  }>({});
+  const [selectTextStates, setSelectTextStates] = useState<{
+    [key: string]: string | null;
+  }>({});
+  const [fileStates, setFileStates] = useState<{ [key: string]: File }>({});
+  const [isFormValid, setIsFormValid] = useState<boolean>(false);
 
   useEffect(() => {
     if (assistantChoosed?.inputs.booleans) {
@@ -117,6 +73,83 @@ const AssistantTab = ({ setSelectedTab }: AssistantTabProps): JSX.Element => {
       setSelectTextStates(initialSelectTextStates);
     }
   }, [assistantChoosed]);
+
+  return {
+    booleanStates,
+    setBooleanStates,
+    selectTextStates,
+    setSelectTextStates,
+    fileStates,
+    setFileStates,
+    isFormValid,
+    setIsFormValid,
+  };
+};
+
+const validateForm = (
+  assistantChoosed: Assistant | undefined,
+  booleanStates: { [x: string]: boolean | null },
+  fileStates: { [x: string]: File | undefined },
+  selectTextStates: { [x: string]: string | null }
+) => {
+  if (!assistantChoosed) {
+    return false;
+  }
+
+  const allBooleansSet =
+    assistantChoosed.inputs.booleans?.every(
+      (input) =>
+        booleanStates[input.key] !== undefined &&
+        booleanStates[input.key] !== null
+    ) ?? true;
+
+  const allFilesSet = assistantChoosed.inputs.files.every(
+    (input) => fileStates[input.key] !== undefined
+  );
+
+  const allSelectTextsSet =
+    assistantChoosed.inputs.select_texts?.every(
+      (input) =>
+        selectTextStates[input.key] !== undefined &&
+        selectTextStates[input.key] !== null
+    ) ?? true;
+
+  return allBooleansSet && allFilesSet && allSelectTextsSet;
+};
+
+const AssistantTab = ({ setSelectedTab }: AssistantTabProps): JSX.Element => {
+  const { assistants, assistantChoosed, setAssistantChoosed } =
+    useAssistantData();
+  const {
+    booleanStates,
+    setBooleanStates,
+    selectTextStates,
+    setSelectTextStates,
+    fileStates,
+    setFileStates,
+    isFormValid,
+    setIsFormValid,
+  } = useFormStates(assistantChoosed);
+  const { processTask } = useAssistants();
+  const [loading, setLoading] = useState<boolean>(false);
+
+  const handleFileChange = (key: string, file: File) => {
+    setFileStates((prevState) => ({
+      ...prevState,
+      [key]: file,
+    }));
+  };
+
+  useEffect(() => {
+    setIsFormValid(
+      validateForm(
+        assistantChoosed,
+        booleanStates,
+        fileStates,
+        selectTextStates
+      )
+    );
+  }, [booleanStates, fileStates, selectTextStates, assistantChoosed]);
 
   const handleSubmit = async () => {
     if (assistantChoosed) {
@@ -189,7 +222,7 @@ const AssistantTab = ({ setSelectedTab }: AssistantTabProps): JSX.Element => {
                 <FileInput
                   label={input.key}
                   onFileChange={(file) => handleFileChange(input.key, file)}
-                  acceptedFileTypes={["pdf", "docx", "doc", "txt"]}
+                  acceptedFileTypes={FILE_TYPES}
                 />
               </div>
             ))}
