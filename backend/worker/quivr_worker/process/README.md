@@ -3,7 +3,7 @@
 ## Processing steps
 
 - Task received a `knowledge_id : UUID`.
-- `KnowledgeProcessor.porcess_knowlege` processes the knowledge:
+- `KnowledgeProcessor.process_knowlege` processes the knowledge:
   - Builds a processable tuple of [Knowledge,QuivrFile] stream:
     - Gets the `KnowledgeDB` object from db:
     - Matches based on the knowledge source:
