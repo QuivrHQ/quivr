@@ -35,6 +35,7 @@ dev-dependencies = [
     "pytest-cov>=5.0.0",
     "tox>=4.0.0",
     "chainlit>=1.1.306",
+    "pytest-profiling>=1.7.0",
 ]
 
 [tool.rye.workspace]

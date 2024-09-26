@@ -1,4 +1,4 @@
-import os
+from random import randbytes
 from uuid import uuid4
 
 import pytest
@@ -9,7 +9,7 @@ from quivr_worker.process.utils import build_qfile
 
 
 def test_build_qfile_fail(local_knowledge_file: KnowledgeDB):
-    random_bytes = os.urandom(128)
+    random_bytes = randbytes(128)
     local_knowledge_file.file_sha1 = None
     with pytest.raises(AssertionError):
         with build_qfile(knowledge=local_knowledge_file, file_data=random_bytes) as _:
@@ -24,7 +24,7 @@ def test_build_qfile_fail(local_knowledge_file: KnowledgeDB):
 
 
 def test_build_qfile_web(web_knowledge: KnowledgeDB):
-    random_bytes = os.urandom(128)
+    random_bytes = randbytes(128)
     web_knowledge.file_sha1 = "sha1"
 
     with build_qfile(knowledge=web_knowledge, file_data=random_bytes) as file:
@@ -38,7 +38,7 @@ def test_build_qfile_web(web_knowledge: KnowledgeDB):
 
 
 def test_build_qfile(local_knowledge_file: KnowledgeDB):
-    random_bytes = os.urandom(128)
+    random_bytes = randbytes(128)
     local_knowledge_file.file_sha1 = "sha1"
 
     with build_qfile(knowledge=local_knowledge_file, file_data=random_bytes) as file:
