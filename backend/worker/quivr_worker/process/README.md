@@ -2,7 +2,7 @@
 
 ## Processing steps
 
-- Task received a `knowledge_id : UUID`.
+- Task receives a `knowledge_id : UUID`.
 - `KnowledgeProcessor.process_knowlege` processes the knowledge:
   - Builds a processable tuple of [Knowledge,QuivrFile] stream:
     - Gets the `KnowledgeDB` object from db:
@@ -10,19 +10,19 @@
       - **local**:
         - Downloads the knowledge data from S3 storage and writes it to tempfile
         - Yields the [Knowledge,QuivrFile]
-    - **web**: works a lot like **local**...
-    - **[syncs]**:
-      - Get the associated sync and checks the credentials
-      - Concurrently fetches all knowledges for user that are in db associated with this sync and the tree of sync files this knowledge is the parent of (using the sync provider)
-      - Downloads knowledge and yields the first [knowledge,QuivrFile]. This is the one this task received
-      - For all children of this knowledges (ie: those fetched from the sync):
-        - If child in db (ie we have knowledge where `knowledge.sync_id == sync_file.id`):
-          - Implies that we could have sync children that were processed before in some other brain
-          - if it is PROCESSED Link it to the parent brains and move on
-          - ELSE reprocess the file
-        - Else:
-          - Create the knowledge associated with this sync file and set it to Processing
-          - Downloads syncfile data and yield the [knowledge,quivr_file]
+      - **web**: works a lot like **local**...
+      - **[syncs]**:
+        - Get the associated sync and checks the credentials
+        - Concurrently fetches all knowledges for user that are in db associated with this sync and the tree of sync files this knowledge is the parent of (using the sync provider)
+        - Downloads knowledge and yields the first [knowledge,QuivrFile]. This is the one this task received
+        - For all children of this knowledges (ie: those fetched from the sync):
+          - If child in db (ie we have knowledge where `knowledge.sync_id == sync_file.id`):
+            - Implies that we could have sync children that were processed before in some other brain
+            - if it is PROCESSED Link it to the parent brains and move on
+            - ELSE reprocess the file
+          - Else:
+            - Create the knowledge associated with this sync file and set it to Processing
+            - Downloads syncfile data and yield the [knowledge,quivr_file]
   - Skip processing of the tuple if the knowledge is folder
   - Parse the QuivrFile using `quivr-core`
   - Store the chunks in the DB
