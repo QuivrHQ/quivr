@@ -7,8 +7,9 @@ from enum import Enum
 from pathlib import Path
 
 from diff_match_patch import diff_match_patch
-import os
 import torch
+import random
+import string
 
 from quivr_api.modules.assistant.services.tasks_service import TasksService
 
@@ -68,6 +69,19 @@ async def process_cdp_use_case_3(
     before_file_data = supabase_client.storage.from_("quivr").download(f"{path}{before_file_value}")
     after_file_data = supabase_client.storage.from_("quivr").download(f"{path}{after_file_value}")
     
+
+    # Generate a random string of 8 characters
+    random_string = ''.join(random.choices(string.ascii_letters + string.digits, k=8))
+
+    # Write temp files with the original name without using save_uploaded_file
+    # because the file is already in the quivr bucket
+    before_file_path = f"/tmp/{random_string}_{before_file_value}"
+    after_file_path = f"/tmp/{random_string}_{after_file_value}"
+    with open(before_file_path, "wb") as f:
+        f.write(before_file_data)
+    with open(after_file_path, "wb") as f:
+        f.write(after_file_data)
+    
     assert input_assistant.inputs.select_texts is not None
     value_use_case = input_assistant.inputs.select_texts[0].value
     
@@ -98,8 +112,10 @@ async def process_cdp_use_case_3(
     
     logger.debug(f"🔥 document_type: {document_type}")
     llm_comparator = True if document_type == DocumentType.ETIQUETTE else False
-    report = await create_modification_report(before_file=before_file_data,after_file=after_file_data, type=document_type, llm=openai_gpt4o, partition=hard_to_read_document, use_llm_comparator=llm_comparator)
+    report = await create_modification_report(before_file=before_file_path,after_file=after_file_path, type=document_type, llm=openai_gpt4o, partition=hard_to_read_document, use_llm_comparator=llm_comparator)
     
+    os.unlink(before_file_path)
+    os.unlink(after_file_path)
     return report
 
 async def create_modification_report(
@@ -119,13 +135,8 @@ async def create_modification_report(
         logger.debug("parsing after file")
         after_text = parser.deep_parse(after_file, partition=partition, llm=llm)
     elif type == DocumentType.CAHIER_DES_CHARGES:
-        # We need to write the file locally and pass the path to the parser
-        before_file_path = save_uploaded_file(before_file)
-        after_file_path = save_uploaded_file(after_file)
-        before_text = await parser.aparse(before_file_path)
-        after_text = await parser.aparse(after_file_path)
-        os.unlink(before_file_path)
-        os.unlink(after_file_path)
+        before_text = await parser.aparse(before_file)
+        after_text = await parser.aparse(after_file)
 
     logger.debug(before_text.page_content)
     logger.debug(after_text.page_content)
