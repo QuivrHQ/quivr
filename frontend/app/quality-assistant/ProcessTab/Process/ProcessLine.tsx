@@ -33,13 +33,14 @@ const ProcessLine = ({
   setSelected,
 }: ProcessLineProps): JSX.Element => {
   const [showResult, setShowResult] = useState(false);
+  const [downloadUrl, setDownloadUrl] = useState<string | null>(null);
   const { isMobile } = useDevice();
   const { downloadTaskResult } = useAssistants();
 
-  const handleDownloadClick = async () => {
-    if (process.status === "completed") {
+  const handleMouseEnter = async () => {
+    if (process.status === "completed" && !downloadUrl) {
       const res: string = await downloadTaskResult(process.id);
-      window.open(res, "_blank");
+      setDownloadUrl(res);
     }
   };
 
@@ -54,6 +55,7 @@ const ProcessLine = ({
             setShowResult(!showResult);
           }
         }}
+        onMouseEnter={() => void handleMouseEnter()}
       >
         <div className={styles.left}>
           <Checkbox
@@ -77,7 +79,7 @@ const ProcessLine = ({
               <span className={styles.date}>
                 {format(
                   new Date(process.creation_time),
-                  " d MMMM yyyy '-' HH:mm:ss",
+                  "d MMMM yyyy '-' HH:mm:ss",
                   {
                     locale: fr,
                   }
@@ -102,11 +104,19 @@ const ProcessLine = ({
           <div
             onClick={(event: React.MouseEvent<HTMLDivElement>) => {
               event.stopPropagation();
-              void handleDownloadClick();
             }}
           >
             {process.status === "processing" ? (
               <LoaderIcon size="normal" color="primary" />
+            ) : downloadUrl ? (
+              <a href={downloadUrl} target="_blank" rel="noopener noreferrer">
+                <Icon
+                  name="download"
+                  size="normal"
+                  color="black"
+                  handleHover={process.status === "completed"}
+                />
+              </a>
             ) : (
               <Icon
                 name={
