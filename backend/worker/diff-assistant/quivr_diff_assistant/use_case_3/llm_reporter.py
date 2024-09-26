@@ -2,6 +2,7 @@ from typing import List
 
 from langchain_core.language_models.chat_models import BaseChatModel
 from langchain_core.prompts.prompt import PromptTemplate
+
 from quivr_diff_assistant.use_case_3.diff_type import DiffResult
 
 REPORT_PROMPT = PromptTemplate.from_template(

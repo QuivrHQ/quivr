@@ -45,6 +45,10 @@ from quivr_worker.syncs.process_active_syncs import (
 )
 from quivr_worker.syncs.store_notion import fetch_and_store_notion_files_async
 from quivr_worker.utils.utils import _patch_json
+import torch
+
+torch.set_num_threads(1)
+
 
 load_dotenv()
 
@@ -122,7 +126,6 @@ def process_assistant_task(
             user_id,
         )
     )
-    
 
 
 async def aprocess_assistant_task(

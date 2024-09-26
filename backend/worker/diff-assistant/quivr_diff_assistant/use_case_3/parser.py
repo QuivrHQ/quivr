@@ -3,7 +3,6 @@ All of this needs to be in MegaParse, this is just a placeholder for now.
 """
 
 import base64
-import os
 from typing import List
 
 import cv2
@@ -17,8 +16,6 @@ from langchain_core.documents import Document
 from langchain_core.language_models.chat_models import BaseChatModel
 from langchain_core.messages import HumanMessage
 from megaparse import MegaParse  # FIXME: @chloedia Version problems
-
-
 from quivr_api.logger import get_logger
 
 logger = get_logger(__name__)
@@ -111,7 +108,7 @@ class DeadlyParser:
         """
         try:
             logger.info("Starting document processing")
-            
+
             # Reduce image scale to lower memory usage
             docs = DocumentFile.from_pdf(file, scale=int(300 / 72))
             logger.info("Document loaded")
@@ -128,7 +125,9 @@ class DeadlyParser:
             if llm:
                 entire_content = ""
                 logger.info("Starting LLM processing")
-                for i, (raw_result, img) in enumerate(zip(raw_results.pages, docs, strict=False)):
+                for i, (raw_result, img) in enumerate(
+                    zip(raw_results.pages, docs, strict=False)
+                ):
                     if raw_result.render() == "":
                         continue
                     _, buffer = cv2.imencode(".png", img)
@@ -163,7 +162,7 @@ class DeadlyParser:
             return Document(page_content=raw_results.render())
         except Exception as e:
             logger.error(f"Error in deep_parse: {str(e)}", exc_info=True)
-            raise 
+            raise
 
     def parse(self, file_path) -> Document:
         """
@@ -176,6 +175,7 @@ class DeadlyParser:
         """
         Parse with megaparse
         """
+        print("🔥🔥🔥🔥")
         mp = MegaParse(file_path)
         return await mp.aload()
         # except:

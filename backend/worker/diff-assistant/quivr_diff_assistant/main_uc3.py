@@ -55,7 +55,9 @@ async def create_modification_report(
     print("using diff match patch")
     dmp = diff_match_patch()
     section_diffs = []
-    for after_section, before_section in zip(text_after_sections, text_before_sections, strict=False):
+    for after_section, before_section in zip(
+        text_after_sections, text_before_sections, strict=False
+    ):
         main_diff: list[tuple[int, str]] = dmp.diff_main(after_section, before_section)
         section_diffs.append(DiffResult(main_diff))
 

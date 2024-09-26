@@ -38,10 +38,13 @@ DIFF_PROMPT = PromptTemplate.from_template(
     Notes: 
      -> Coup de Pates: Tradition & Innovation, est l'entreprise productrice / marque du produit.
 
-    Chaque sections doivent être organisées comme suit :
+    Chaque sections doivent être organisées comme suit et séparées par des lignes entre chaque avant et après:
     ## section_name
+    
     *Avant* : ...
+    
     *Après* : ...
+    
     *Modifications*: 
         * ...
         * ...
