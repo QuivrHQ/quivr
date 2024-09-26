@@ -328,22 +328,20 @@ async def test_process_km_rollback(
     assert input_km.id
     assert input_km.brains
 
-    async def _update_km_error(*args, **kwargs):
-        raise Exception("Error")
+    async def _store_chunks_error(*args, **kwargs):
+        raise Exception("mock error")
 
-    monkeypatch.setattr("quivr_worker.process.processor.parse_qfile", _parse_file_mock)
+    monkeypatch.setattr(
+        "quivr_worker.process.processor.store_chunks", _store_chunks_error
+    )
 
     km_processor = KnowledgeProcessor(proc_services)
-
-    # Set error at the end
-    km_processor.services.knowledge_service.update_knowledge = _update_km_error
-
     await km_processor.process_knowledge(input_km.id)
 
     # Check knowledge set to processed
     knowledge_service = km_processor.services.knowledge_service
     km = await knowledge_service.get_knowledge(input_km.id)
-    assert km.status == KnowledgeStatus.PROCESSING  # tests are just uploaded
+    assert km.status == KnowledgeStatus.ERROR
     vecs = list((await session.exec(select(Vector))).all())
     # Check we remove the vectors
     assert len(vecs) == 0

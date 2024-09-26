@@ -265,10 +265,10 @@ class KnowledgeProcessor:
             savepoint = (
                 await self.services.knowledge_service.repository.session.begin_nested()
             )
+            if knowledge_tuple is None:
+                continue
+            knowledge, qfile = knowledge_tuple
             try:
-                if knowledge_tuple is None:
-                    continue
-                knowledge, qfile = knowledge_tuple
                 if not skip_process(knowledge):
                     chunks = await parse_qfile(qfile=qfile)
                     await store_chunks(
@@ -283,6 +283,7 @@ class KnowledgeProcessor:
                         file_sha1=knowledge.file_sha1,
                     ),
                 )
+
             except Exception as e:
                 await savepoint.rollback()
                 logger.error(f"Error processing knowledge {knowledge_id} : {e}")

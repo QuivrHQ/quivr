@@ -51,16 +51,22 @@ In the processing loop for each processable [KnowledgeDB,Quivrfile], if an excep
 
 3. Continue processing
 
-| This would mean that some knowledges would be errored. For now we don't automatically reprocess the knowledge right after.
+| This would mean that some knowledges would be errored. For now we don't automatically reschedule them for processing right after.
 
 ### Uncatchable error ie worker process fails:
 
-- The task will be automatically retried 3 times.
+- The task will be automatically retried 3 times handled by celery
 - Notifier will receive event task as failed
 - Notifier sets knowledge status to ERROR for the task
 
-**NOTE**: for the v0.1 version:
-For `process_knowledge` tasks that need to process a sync folder, the folder will be set to ERROR. If we have created child knowledges associated with sync, we can't really set their status to ERROR. This would mean that they are showed as PROCESSING.
+🔴 **NOTE: Sync error handling for the v0.1 version:**
+
+`process_knowledge` tasks that need to process a sync folder, the folder will be set to ERROR.
+If we have created child knowledges associated with sync, we can't really set their status to ERROR. This would mean that they will be stuck at status PROCESSING with their parent with an ERROR status.
+
+Why can't we set all children to ERROR? This could introduce a subtle race condition: sync knowledge can be added to brain independently from their parent so we can't know for sure if the status PROCESSING is associated with the task that just failed. We could keep a `task_id` associated with knowledge_id but this is bug prone and impacts the db schema which has a large impact.
+
+The knowledge (syncs) that are added to some brain will be reprocessed after some period of time in the update sync task so their status will be eventually set to the correct state.
 
 ## Notification steps
 
