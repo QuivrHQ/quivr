@@ -87,7 +87,7 @@ async def process_cdp_use_case_3(
     
     ## Get the document type
     document_type = None
-    if value_use_case == "Etiquette":
+    if value_use_case == "Etiquettes":
         document_type = DocumentType.ETIQUETTE
     elif value_use_case == "Cahier des charges":
         document_type = DocumentType.CAHIER_DES_CHARGES
