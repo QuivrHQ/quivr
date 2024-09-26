@@ -1,13 +1,12 @@
 import asyncio
 from contextlib import asynccontextmanager
 from dataclasses import dataclass
-from io import BytesIO
-from typing import Any, AsyncGenerator, List, Optional, Tuple
+from typing import AsyncGenerator, List, Optional, Tuple
 from uuid import UUID
 
 from quivr_api.logger import get_logger
 from quivr_api.modules.dependencies import get_supabase_async_client
-from quivr_api.modules.knowledge.dto.inputs import AddKnowledge, KnowledgeUpdate
+from quivr_api.modules.knowledge.dto.inputs import KnowledgeUpdate
 from quivr_api.modules.knowledge.entity.knowledge import KnowledgeDB, KnowledgeSource
 from quivr_api.modules.knowledge.repository.knowledges import KnowledgeRepository
 from quivr_api.modules.knowledge.repository.storage import SupabaseS3Storage
@@ -31,6 +30,7 @@ from quivr_worker.parsers.crawler import URL, extract_from_url
 from quivr_worker.process.process_file import parse_qfile, store_chunks
 from quivr_worker.process.utils import (
     build_qfile,
+    build_sync_file,
     build_syncprovider_mapping,
     compute_sha1,
     skip_process,
@@ -85,21 +85,6 @@ async def build_processor_services(
             )
     finally:
         logger.info("Closing processor services")
-
-
-async def download_sync_file(
-    sync_provider: BaseSync, file: SyncFile, credentials: dict[str, Any]
-) -> bytes:
-    logger.info(f"Downloading {file} using {sync_provider}")
-    file_response = await sync_provider.adownload_file(credentials, file)
-    logger.debug(f"Fetch sync file response: {file_response}")
-    raw_data = file_response["content"]
-    if isinstance(raw_data, BytesIO):
-        file_data = raw_data.read()
-    else:
-        file_data = raw_data.encode("utf-8")
-    logger.debug(f"Successfully downloaded sync file : {file}")
-    return file_data
 
 
 class KnowledgeProcessor:
@@ -219,9 +204,11 @@ class KnowledgeProcessor:
         sync_provider = self.services.syncprovider_mapping[provider_name]
 
         # Yield parent_knowledge as the first knowledge to process
-        file_data = await download_sync_file(
+        async with build_sync_file(
+            file_knowledge=parent_knowledge,
+            sync=sync,
             sync_provider=sync_provider,
-            file=SyncFile(
+            sync_file=SyncFile(
                 id=parent_knowledge.sync_file_id,
                 name=parent_knowledge.file_name,
                 extension=parent_knowledge.extension,
@@ -229,11 +216,8 @@ class KnowledgeProcessor:
                 is_folder=parent_knowledge.is_folder,
                 last_modified_at=parent_knowledge.updated_at,
             ),
-            credentials=sync.credentials,
-        )
-        parent_knowledge.file_sha1 = compute_sha1(file_data)
-        with build_qfile(parent_knowledge, file_data) as qfile:
-            yield (parent_knowledge, qfile)
+        ) as f:
+            yield f
 
         # Fetch children
         syncfile_to_knowledge, sync_files = await self.fetch_sync_knowledge(
@@ -245,51 +229,22 @@ class KnowledgeProcessor:
             return
 
         for sync_file in sync_files:
-            existing_km = syncfile_to_knowledge.get(sync_file.id)
-            if existing_km is not None:
-                # NOTE:
-                # The parent_knowledge was just added (we are processing it)
-                # This implies that we could have sync children that were processed before
-                # IF SyncKnowledge already exists =>  It's already processed in some other brain
-                # => Link it to the parent brains and move on if it is PROCESSED ELSE Reprocess the file
-                km_brains = {km_brain.brain_id for km_brain in existing_km.brains}
-                for brain in filter(
-                    lambda b: b.brain_id not in km_brains,
-                    parent_knowledge.brains,
-                ):
-                    await self.services.knowledge_service.repository.link_to_brain(
-                        existing_km, brain_id=brain.brain_id
-                    )
-                # Don't reprocess already added syncs knowledges
-                if existing_km.status == KnowledgeStatus.PROCESSED:
-                    continue
-            else:
-                # create sync file knowledge
-                # automagically gets the brains associated with the parent
-                file_knowledge = await self.services.knowledge_service.create_knowledge(
-                    user_id=parent_knowledge.user_id,
-                    knowledge_to_add=AddKnowledge(
-                        file_name=sync_file.name,
-                        is_folder=sync_file.is_folder,
-                        extension=sync_file.extension,
-                        source=parent_knowledge.source,  # same as parent
-                        source_link=sync_file.web_view_link,
-                        parent_id=parent_knowledge.id,
-                        sync_id=parent_knowledge.sync_id,
-                        sync_file_id=sync_file.id,
-                    ),
-                    status=KnowledgeStatus.PROCESSING,
-                    upload_file=None,
+            file_knowledge = (
+                await self.services.knowledge_service.create_or_update_sync_knowledge(
+                    syncfile_to_knowledge=syncfile_to_knowledge,
+                    parent_knowledge=parent_knowledge,
+                    sync_file=sync_file,
                 )
-            file_data = await download_sync_file(
-                sync_provider=sync_provider,
-                file=sync_file,
-                credentials=sync.credentials,
             )
-            file_knowledge.file_sha1 = compute_sha1(file_data)
-            file_knowledge.file_size = len(file_data)
-            with build_qfile(file_knowledge, file_data) as qfile:
-                yield (file_knowledge, qfile)
+            if file_knowledge.status == KnowledgeStatus.PROCESSED:
+                continue
+            async with build_sync_file(
+                file_knowledge=file_knowledge,
+                sync=sync,
+                sync_provider=sync_provider,
+                sync_file=sync_file,
+            ) as f:
+                yield f
 
     async def process_knowledge(self, knowledge_id: UUID):
         async for knowledge_tuple in self.yield_processable_kms(knowledge_id):
