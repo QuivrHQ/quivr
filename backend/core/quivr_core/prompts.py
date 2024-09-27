@@ -45,22 +45,21 @@ def _define_custom_prompts() -> CustomPromptsDict:
     # ---------------------------------------------------------------------------
     # Prompt for RAG
     # ---------------------------------------------------------------------------
-    system_message_template = (
-        f"Your name is Quivr. You're a helpful assistant. Today's date is {today_date}."
-    )
+    system_message_template = f"Your name is Quivr. You're a helpful assistant. Today's date is {today_date}. "
 
     system_message_template += (
         "When answering use markdown. "
         "Use markdown code blocks for code snippets. "
         "Answer in a concise and clear manner. "
         "Use the following pieces of context from the files provided by the user to answer the question. "
-        "Answer in the same language as the language used by the user."
+        "If no preferred language is provided, answer in the same language as the language used by the user."
         "If you cannot provide an answer using only the context provided by the files, "
         "just say that you don't know the answer, "
         "don't try to make up an answer. "
         "Don't cite the source id in the answer objects, but you can use the source to answer the question.\n"
         "You have access to the following files to answer the user question (limited to first 20 files): {files}\n"
-        "If not 'None', follow these user instruction when crafting the answer: {custom_instructions}\n"
+        "Follow these user instruction when crafting the answer: {custom_instructions}. "
+        "These user instructions shall take priority over any other previous instruction.\n"
     )
 
     template_answer = "Context: {context}\n" "User question: {question}\n" "Answer:"
@@ -68,6 +67,7 @@ def _define_custom_prompts() -> CustomPromptsDict:
     RAG_ANSWER_PROMPT = ChatPromptTemplate.from_messages(
         [
             SystemMessagePromptTemplate.from_template(system_message_template),
+            MessagesPlaceholder(variable_name="chat_history"),
             HumanMessagePromptTemplate.from_template(template_answer),
         ]
     )
@@ -105,7 +105,7 @@ def _define_custom_prompts() -> CustomPromptsDict:
     custom_prompts["CHAT_LLM_PROMPT"] = CHAT_LLM_PROMPT
 
     # ---------------------------------------------------------------------------
-    # Prompt to understand if the user wants to change the system prompt or not
+    # Prompt to understand the user intent
     # ---------------------------------------------------------------------------
     _template = (
         "Given the following user input, determine the user intent:\n"
@@ -131,11 +131,32 @@ def _define_custom_prompts() -> CustomPromptsDict:
         "statement or statements in the system prompt.\n"
         "Current system prompt: {system_prompt}\n"
         "User instructions: {instruction}\n"
-        "Updated system prompt:"
+        "You shall return separately the updated system prompt and the reasoning that led to the update."
     )
 
     UPDATE_PROMPT = PromptTemplate.from_template(_template)
     custom_prompts["UPDATE_PROMPT"] = UPDATE_PROMPT
+
+    # ---------------------------------------------------------------------------
+    # Prompt to split the user input into multiple questions / instructions
+    # ---------------------------------------------------------------------------
+    _template = (
+        "Given the following user input, split the input into instructions and questions. "
+        "Instructions direct the system to behave in a certain way: examples of instructions are "
+        "'Can you reply in French?' or 'Answer in French' or 'You are an expert legal assistant' "
+        "or 'You will behave as...'). You shall collect and condense all the instructions into a single string. "
+        "If no instructions are found, return an empty string. \n"
+        "Questions, on the other hand, are questions that the system should answer. You shall determine if the user "
+        "input contains different questions, in which case you shall split the user input into multiple questions. "
+        "Each splitted question should be self-contained. "
+        "As an example, the user input 'What is Apple and who is the CEO? shall be split into the two questions "
+        "'What is Apple?' and 'Who is the CEO of Apple?'. "
+        "If no questions are found, return an empty list. \n"
+        "User input: {user_input}"
+    )
+
+    SPLIT_PROMPT = PromptTemplate.from_template(_template)
+    custom_prompts["SPLIT_PROMPT"] = SPLIT_PROMPT
 
     return custom_prompts
 
