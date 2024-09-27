@@ -1,6 +1,8 @@
 import logging
 from typing import Annotated, AsyncGenerator, List, Optional, Sequence, TypedDict
 from uuid import uuid4
+import operator
+import asyncio
 
 # TODO(@aminediro): this is the only dependency to langchain package, we should remove it
 from langchain.retrievers import ContextualCompressionRetriever
@@ -13,6 +15,8 @@ from langchain_core.messages.ai import AIMessageChunk
 from langchain_core.vectorstores import VectorStore
 from langgraph.graph import START, END, StateGraph
 from langgraph.graph.message import add_messages
+from langgraph.types import Send
+
 
 from pydantic import BaseModel, Field
 import openai
@@ -41,14 +45,43 @@ class UserIntent(BaseModel):
     intent: str = Field(description="The user intent")
 
 
+class SplittedInput(BaseModel):
+    instructions: str = Field(description="The user instructions to the system")
+    questions: List[str] = Field(
+        description="The user questions, where each question in the list is a self-contained question."
+    )
+
+
+class UpdatedPrompt(BaseModel):
+    prompt: str = Field(description="The updated system prompt")
+    reasoning: str = Field(
+        description="The reasoning that led to the updated system prompt"
+    )
+
+
 class AgentState(TypedDict):
     # The add_messages function defines how an update should be processed
     # Default is to replace. add_messages says "append"
     messages: Annotated[Sequence[BaseMessage], add_messages]
     chat_history: ChatHistory
-    docs: list[Document]
+    docs: Annotated[list[Document], operator.add]
     files: str
     final_response: dict
+    questions: List[str]
+    instructions: str
+
+
+class InstructionsState(TypedDict):
+    instructions: str
+
+
+class QuestionsState(TypedDict):
+    individual_chat_history: ChatHistory
+    question: str
+
+
+class GenerateInputState(AgentState, QuestionsState):
+    pass
 
 
 class IdempotentCompressor(BaseDocumentCompressor):
@@ -126,7 +159,34 @@ class QuivrQARAGLangGraph:
         else:
             raise ValueError("No vector store provided")
 
-    def routing(self, state: AgentState) -> str:
+    # def routing(self, state: AgentState) -> str:
+    #     """
+    #     The routing function for the RAG model.
+
+    #     Args:
+    #         state (AgentState): The current state of the agent.
+
+    #     Returns:
+    #         dict: The next state of the agent.
+    #     """
+
+    #     msg = custom_prompts.USER_INTENT_PROMPT.format(
+    #         question=state["messages"][0].content,
+    #     )
+
+    #     try:
+    #         structured_llm = self.llm_endpoint._llm.with_structured_output(
+    #             UserIntent, method="json_schema"
+    #         )
+    #         response = structured_llm.invoke(msg)
+
+    #     except openai.BadRequestError:
+    #         structured_llm = self.llm_endpoint._llm.with_structured_output(UserIntent)
+    #         response = structured_llm.invoke(msg)
+
+    #     return response.intent
+
+    def routing(self, state: AgentState) -> List[Send]:
         """
         The routing function for the RAG model.
 
@@ -137,48 +197,125 @@ class QuivrQARAGLangGraph:
             dict: The next state of the agent.
         """
 
-        msg = custom_prompts.USER_INTENT_PROMPT.format(
-            question=state["messages"][0].content,
+        msg = custom_prompts.SPLIT_PROMPT.format(
+            user_input=state["messages"][0].content,
         )
 
         try:
             structured_llm = self.llm_endpoint._llm.with_structured_output(
-                UserIntent, method="json_schema"
+                SplittedInput, method="json_schema"
             )
             response = structured_llm.invoke(msg)
 
         except openai.BadRequestError:
-            structured_llm = self.llm_endpoint._llm.with_structured_output(UserIntent)
+            structured_llm = self.llm_endpoint._llm.with_structured_output(
+                SplittedInput
+            )
             response = structured_llm.invoke(msg)
 
-        return response.intent
+        send_list: List[Send] = []
 
-    def edit_system_prompt(self, state: AgentState) -> dict:
-        user_instruction = state["messages"][0].content
+        if response.instructions:
+            send_list.append(
+                Send("edit_system_prompt", {"instructions": response.instructions})
+            )
+        elif response.questions:
+            chat_history = state["chat_history"]
+            send_list.append(
+                Send(
+                    "filter_history",
+                    {"chat_history": chat_history, "questions": response.questions},
+                )
+            )
+
+        return send_list
+
+    def routing_split(self, state: AgentState):
+        msg = custom_prompts.SPLIT_PROMPT.format(
+            user_input=state["messages"][0].content,
+        )
+
+        try:
+            structured_llm = self.llm_endpoint._llm.with_structured_output(
+                SplittedInput, method="json_schema"
+            )
+            response = structured_llm.invoke(msg)
+
+        except openai.BadRequestError:
+            structured_llm = self.llm_endpoint._llm.with_structured_output(
+                SplittedInput
+            )
+            response = structured_llm.invoke(msg)
+
+        send_list: List[Send] = []
+
+        if response.instructions:
+            payload = {
+                **state,
+                "instructions": response.instructions,
+                "questions": response.questions if response.questions else [],
+            }
+            send_list.append(Send("edit_system_prompt", payload))
+        elif response.questions:
+            chat_history = state["chat_history"]
+            payload = {
+                **state,
+                "chat_history": chat_history,
+                "questions": response.questions,
+            }
+            send_list.append(Send("filter_history", payload))
+
+        return send_list
+
+    # Here we generate a joke, given a subject
+    # def generate_joke(state: JokeState):
+    #     prompt = joke_prompt.format(subject=state["subject"])
+    #     response = model.with_structured_output(Joke).invoke(prompt)
+    #     return {"jokes": [response.joke]}
+
+    # # Here we define the logic to map out over the generated subjects
+    # # We will use this an edge in the graph
+    # def continue_to_jokes(state: OverallState):
+    #     # We will return a list of `Send` objects
+    #     # Each `Send` object consists of the name of a node in the graph
+    #     # as well as the state to send to that node
+    #     return [Send("generate_joke", {"subject": s}) for s in state["subjects"]]
+
+    def edit_system_prompt(self, state: AgentState) -> AgentState:
+        user_instruction = state["instructions"]
         prompt = self.retrieval_config.prompt
 
         inputs = {
             "instruction": user_instruction,
-            "system_prompt": prompt if prompt else "None",
+            "system_prompt": prompt if prompt else "",
         }
 
-        llm = self.llm_endpoint._llm
+        msg = custom_prompts.UPDATE_PROMPT.format(**inputs)
 
-        chain = custom_prompts.UPDATE_PROMPT | llm
+        try:
+            structured_llm = self.llm_endpoint._llm.with_structured_output(
+                UpdatedPrompt, method="json_schema"
+            )
+            response = structured_llm.invoke(msg)
 
-        response = chain.invoke(inputs)
+        except openai.BadRequestError:
+            structured_llm = self.llm_endpoint._llm.with_structured_output(
+                UpdatedPrompt
+            )
+            response = structured_llm.invoke(msg)
 
-        self.retrieval_config.prompt = response.content
+        self.retrieval_config.prompt = response.prompt
 
-        message = f"Updated system prompt: {response.content}"
+        # message = f"Updated system prompt: {response.content}"
 
-        formatted_response = {
-            "answer": message,  # Assuming the last message contains the final answer
-        }
+        # formatted_response = {
+        #     "answer": message,  # Assuming the last message contains the final answer
+        # }
+        # return {"messages": [message], "final_response": formatted_response}
 
-        return {"messages": [message], "final_response": formatted_response}
+        return {**state, "messages": []}
 
-    def filter_history(self, state: AgentState) -> dict:
+    def filter_history(self, state: AgentState) -> AgentState:
         """
         Filter out the chat history to only include the messages that are relevant to the current question
 
@@ -191,6 +328,7 @@ class QuivrQARAGLangGraph:
         Returns a filtered chat_history with in priority: first max_tokens, then max_history where a Human message and an AI message count as one pair
         a token is 4 characters
         """
+
         chat_history = state["chat_history"]
         total_tokens = 0
         total_pairs = 0
@@ -212,10 +350,10 @@ class QuivrQARAGLangGraph:
             total_tokens += message_tokens
             total_pairs += 1
 
-        return {"chat_history": _chat_history}
+        return {**state, "chat_history": _chat_history}
 
     ### Nodes
-    def rewrite(self, state: AgentState) -> dict:
+    async def rewrite(self, state: AgentState) -> AgentState:
         """
         Transform the query to produce a better question.
 
@@ -226,16 +364,31 @@ class QuivrQARAGLangGraph:
             dict: The updated state with re-phrased question
         """
 
-        msg = custom_prompts.CONDENSE_QUESTION_PROMPT.format(
-            chat_history=state["chat_history"],
-            question=state["messages"][0].content,
-        )
+        questions = state["questions"]
 
-        model = self.llm_endpoint._llm
-        response = model.invoke(msg)
-        return {"messages": [response]}
+        # Prepare the async tasks for all questions
+        tasks = []
+        for question in questions:
+            msg = custom_prompts.CONDENSE_QUESTION_PROMPT.format(
+                chat_history=state["chat_history"].to_list(),
+                question=question,
+            )
 
-    def retrieve(self, state: AgentState) -> dict:
+            model = self.llm_endpoint._llm
+            # Asynchronously invoke the model for each question
+            tasks.append(model.ainvoke(msg))
+
+        # Gather all the responses asynchronously
+        responses = await asyncio.gather(*tasks) if tasks else []
+
+        # Replace each question with its condensed version
+        condensed_questions = []
+        for response in responses:
+            condensed_questions.append(response.content)
+
+        return {**state, "questions": condensed_questions}
+
+    async def retrieve(self, state: AgentState) -> AgentState:
         """
         Retrieve relevent chunks
 
@@ -245,11 +398,26 @@ class QuivrQARAGLangGraph:
         Returns:
             dict: The retrieved chunks
         """
-        question = state["messages"][-1].content
-        docs = self.compression_retriever.invoke(question)
-        return {"docs": docs}
 
-    def generate_rag(self, state: AgentState) -> dict:
+        questions = state["questions"]
+
+        # Prepare the async tasks for all questions
+        tasks = []
+        for question in questions:
+            # Asynchronously invoke the model for each question
+            tasks.append(self.compression_retriever.ainvoke(question))
+
+        # Gather all the responses asynchronously
+        responses = await asyncio.gather(*tasks) if tasks else []
+
+        # Replace each question with its condensed version
+        docs = []
+        for response in responses:
+            docs += response
+
+        return {**state, "docs": docs}
+
+    def generate_rag(self, state: AgentState) -> AgentState:
         """
         Generate answer
 
@@ -259,6 +427,7 @@ class QuivrQARAGLangGraph:
         Returns:
             dict: The updated state with re-phrased question
         """
+
         messages = state["messages"]
         user_question = messages[0].content
         files = state["files"]
@@ -273,6 +442,7 @@ class QuivrQARAGLangGraph:
         final_inputs["question"] = user_question
         final_inputs["custom_instructions"] = prompt if prompt else "None"
         final_inputs["files"] = files if files else "None"
+        final_inputs["chat_history"] = state["chat_history"].to_list()
 
         # LLM
         llm = self.llm_endpoint._llm
@@ -291,9 +461,9 @@ class QuivrQARAGLangGraph:
             "answer": response,  # Assuming the last message contains the final answer
             "docs": docs,
         }
-        return {"messages": [response], "final_response": formatted_response}
+        return {**state, "messages": [response], "final_response": formatted_response}
 
-    def generate_chat_llm(self, state: AgentState) -> dict:
+    def generate_chat_llm(self, state: AgentState) -> AgentState:
         """
         Generate answer
 
@@ -325,7 +495,7 @@ class QuivrQARAGLangGraph:
         formatted_response = {
             "answer": response,  # Assuming the last message contains the final answer
         }
-        return {"messages": [response], "final_response": formatted_response}
+        return {**state, "messages": [response], "final_response": formatted_response}
 
     def build_chain(self):
         """
@@ -382,7 +552,11 @@ class QuivrQARAGLangGraph:
                     workflow.add_conditional_edges(
                         node.name, routing_function, node.conditional_edge.conditions
                     )
-                    if END in node.conditional_edge.conditions.values():
+                    if isinstance(node.conditional_edge.conditions, dict):
+                        values = node.conditional_edge.conditions.values()
+                    else:
+                        values = node.conditional_edge.conditions
+                    if END in values:
                         self.final_nodes.append(node.name)
                 else:
                     raise ValueError(
