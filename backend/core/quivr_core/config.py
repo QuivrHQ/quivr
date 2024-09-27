@@ -1,6 +1,6 @@
 import os
 from enum import Enum
-from typing import Dict, Hashable, List, Optional
+from typing import Dict, Hashable, List, Optional, Union
 from uuid import UUID
 from sqlmodel import SQLModel
 from langgraph.graph import START, END
@@ -268,7 +268,7 @@ class RerankerConfig(QuivrBaseConfig):
 
 class ConditionalEdgeConfig(QuivrBaseConfig):
     routing_function: str
-    conditions: Dict[Hashable, str]
+    conditions: Union[list, Dict[Hashable, str]]
 
     def __init__(self, **data):
         super().__init__(**data)
@@ -276,11 +276,21 @@ class ConditionalEdgeConfig(QuivrBaseConfig):
 
     def resolve_special_edges(self):
         """Replace SpecialEdges enum values with their corresponding langgraph values."""
-        for key, value in self.conditions.items():
-            if value == SpecialEdges.end:
-                self.conditions[key] = END
-            elif value == SpecialEdges.start:
-                self.conditions[key] = START
+
+        if isinstance(self.conditions, dict):
+            # If conditions is a dictionary, iterate through the key-value pairs
+            for key, value in self.conditions.items():
+                if value == SpecialEdges.end:
+                    self.conditions[key] = END
+                elif value == SpecialEdges.start:
+                    self.conditions[key] = START
+        elif isinstance(self.conditions, list):
+            # If conditions is a list, iterate through the values
+            for index, value in enumerate(self.conditions):
+                if value == SpecialEdges.end:
+                    self.conditions[index] = END
+                elif value == SpecialEdges.start:
+                    self.conditions[index] = START
 
 
 class NodeConfig(QuivrBaseConfig):
