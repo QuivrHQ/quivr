@@ -313,7 +313,7 @@ class KnowledgeRepository(BaseRepository):
             select(KnowledgeDB)
             .where(KnowledgeDB.parent_id.is_(None))  # type: ignore
             .where(KnowledgeDB.user_id == user_id)
-            .options(joinedload(KnowledgeDB.parent), joinedload(KnowledgeDB.children))  # type: ignore
+            .options(joinedload(KnowledgeDB.children))  # type: ignore
         )
         result = await self.session.exec(query)
         kms = result.unique().all()
