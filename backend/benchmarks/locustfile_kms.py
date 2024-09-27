@@ -123,16 +123,17 @@ class QuivrUser(FastHttpUser):
 
     list_knowledge_files.__name__ = "list_knowledge_files"
 
-    # @task(load_params["delete_km_rate"])
-    # def delete_knowledge_files(self):
-    #     only_files = [idx for idx, km in enumerate(all_kms) if not km.is_folder]
-    #     if len(only_files) == 0:
-    #         return
-    #     random_index = random.choice(only_files)
-    #     random_km = all_kms.pop(random_index)
-    #     self.client.delete(
-    #         f"/knowledge/{str(random_km.id)}",
-    #         headers=self.auth_headers,
-    #     )
+    @task(load_params["delete_km_rate"])
+    def delete_knowledge_files(self):
+        only_files = [idx for idx, km in enumerate(all_kms) if not km.is_folder]
+        if len(only_files) == 0:
+            return
+        random_index = random.choice(only_files)
+        random_km = all_kms.pop(random_index)
+        self.client.delete(
+            f"/knowledge/{str(random_km.id)}",
+            headers=self.auth_headers,
+            name="/knowledge/delete",
+        )
 
-    # delete_knowledge_files.__name__ = "delete_knowledge_file"
+    delete_knowledge_files.__name__ = "delete_knowledge_file"
