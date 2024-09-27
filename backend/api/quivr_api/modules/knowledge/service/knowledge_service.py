@@ -31,6 +31,7 @@ from quivr_api.modules.knowledge.service.knowledge_exceptions import (
     KnowledgeForbiddenAccess,
     UploadError,
 )
+from quivr_api.modules.sync.entity.sync_models import SyncFile
 from quivr_api.modules.upload.service.upload_file import check_file_exists
 
 logger = get_logger(__name__)
@@ -52,6 +53,48 @@ class KnowledgeService(BaseService[KnowledgeRepository]):
         assert km.id, "Knowledge ID not generated"
         km = await km.to_dto()
         return km
+
+    async def create_or_link_sync_knowledge(
+        self,
+        syncfile_to_knowledge: dict[str, KnowledgeDB],
+        parent_knowledge: KnowledgeDB,
+        sync_file: SyncFile,
+    ):
+        existing_km = syncfile_to_knowledge.get(sync_file.id)
+        if existing_km is not None:
+            # NOTE: function called in worker processor
+            # The parent_knowledge was just added (we are processing it)
+            # This implies that we could have sync children that were processed before
+            # IF SyncKnowledge already exists =>  It's already processed in some other brain
+            # => Link it to the parent brains and move on if it is PROCESSED ELSE Reprocess the file
+            km_brains = {km_brain.brain_id for km_brain in existing_km.brains}
+            for brain in filter(
+                lambda b: b.brain_id not in km_brains,
+                parent_knowledge.brains,
+            ):
+                await self.repository.link_to_brain(
+                    existing_km, brain_id=brain.brain_id
+                )
+            return existing_km
+        else:
+            # create sync file knowledge
+            # automagically gets the brains associated with the parent
+            file_knowledge = await self.create_knowledge(
+                user_id=parent_knowledge.user_id,
+                knowledge_to_add=AddKnowledge(
+                    file_name=sync_file.name,
+                    is_folder=sync_file.is_folder,
+                    extension=sync_file.extension,
+                    source=parent_knowledge.source,  # same as parent
+                    source_link=sync_file.web_view_link,
+                    parent_id=parent_knowledge.id,
+                    sync_id=parent_knowledge.sync_id,
+                    sync_file_id=sync_file.id,
+                ),
+                status=KnowledgeStatus.PROCESSING,
+                upload_file=None,
+            )
+            return file_knowledge
 
     # TODO: this is temporary fix for getting knowledge path.
     # KM storage path should be unrelated to brain

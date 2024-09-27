@@ -320,7 +320,9 @@ async def link_knowledge_to_brain(
         )
 
     for knowledge in filter(
-        lambda k: k.status != KnowledgeStatus.PROCESSED, linked_kms
+        lambda k: k.status
+        not in [KnowledgeStatus.PROCESSED, KnowledgeStatus.PROCESSING],
+        linked_kms,
     ):
         assert knowledge.id
         upload_notification = notification_service.add_notification(

@@ -168,6 +168,72 @@ async def sync(session: AsyncSession, user: User) -> Sync:
 
 
 @pytest_asyncio.fixture(scope="function")
+async def local_knowledge_folder(
+    proc_services: ProcessorServices, user: User, brain_user: Brain
+) -> KnowledgeDB:
+    assert user.id
+    assert brain_user.brain_id
+    service = proc_services.knowledge_service
+    km_to_add = AddKnowledge(
+        file_name="test",
+        source="local",
+        is_folder=True,
+        parent_id=None,
+    )
+    km = await service.create_knowledge(
+        user_id=user.id, knowledge_to_add=km_to_add, upload_file=None
+    )
+    # Link it to the brain
+    await service.link_knowledge_tree_brains(
+        km, brains_ids=[brain_user.brain_id], user_id=user.id
+    )
+    km = await service.update_knowledge(
+        knowledge=km,
+        payload=KnowledgeUpdate(status=KnowledgeStatus.PROCESSING),
+    )
+    return km
+
+
+@pytest_asyncio.fixture(scope="function")
+async def local_knowledge_folder_with_file(
+    proc_services: ProcessorServices, user: User, brain_user: Brain
+) -> KnowledgeDB:
+    assert user.id
+    assert brain_user.brain_id
+    service = proc_services.knowledge_service
+    km_to_add = AddKnowledge(
+        file_name="test",
+        source="local",
+        is_folder=True,
+        parent_id=None,
+    )
+    folder_km = await service.create_knowledge(
+        user_id=user.id, knowledge_to_add=km_to_add, upload_file=None
+    )
+    km_to_add = AddKnowledge(
+        file_name="test_file",
+        source=KnowledgeSource.LOCAL,
+        is_folder=False,
+        parent_id=folder_km.id,
+    )
+    km_data = BytesIO(os.urandom(24))
+    km = await service.create_knowledge(
+        user_id=user.id,
+        knowledge_to_add=km_to_add,
+        upload_file=UploadFile(file=km_data, size=24, filename=km_to_add.file_name),
+    )
+    # Link it to the brain
+    await service.link_knowledge_tree_brains(
+        folder_km, brains_ids=[brain_user.brain_id], user_id=user.id
+    )
+    await service.update_knowledge(
+        knowledge=folder_km,
+        payload=KnowledgeUpdate(status=KnowledgeStatus.PROCESSING),
+    )
+    return folder_km
+
+
+@pytest_asyncio.fixture(scope="function")
 async def local_knowledge_file(
     proc_services: ProcessorServices, user: User, brain_user: Brain
 ) -> KnowledgeDB:
