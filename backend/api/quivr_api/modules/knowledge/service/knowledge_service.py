@@ -185,10 +185,6 @@ class KnowledgeService(BaseService[KnowledgeRepository]):
                     knowledgedb, buff_reader
                 )
                 knowledgedb.source_link = storage_path
-                knowledge_db = await self.repository.update_knowledge(
-                    knowledge_db,
-                    KnowledgeUpdate(status=KnowledgeStatus.UPLOADED),
-                )
             if knowledge_db.brains and len(knowledge_db.brains) > 0:
                 # Schedule this new knowledge to be processed
                 knowledge_db = await self.repository.update_knowledge(
@@ -199,13 +195,16 @@ class KnowledgeService(BaseService[KnowledgeRepository]):
                     "process_file_task",
                     kwargs={
                         "knowledge_id": knowledge_db.id,
-                        "file_name": knowledge_db.file_name,
-                        "source": knowledge_db.source,
-                        "source_link": knowledge_db.source_link,
                     },
                 )
+                return knowledge_db
+            else:
+                knowledge_db = await self.repository.update_knowledge(
+                    knowledge_db,
+                    KnowledgeUpdate(status=KnowledgeStatus.UPLOADED),
+                )
+                return knowledge_db
 
-            return knowledge_db
         except Exception as e:
             logger.exception(
                 f"Error uploading knowledge {knowledgedb.id} to storage : {e}"
