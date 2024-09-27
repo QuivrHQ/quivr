@@ -3,7 +3,16 @@ from http import HTTPStatus
 from typing import List, Optional
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, File, HTTPException, Query, UploadFile, status
+from fastapi import (
+    APIRouter,
+    Depends,
+    File,
+    HTTPException,
+    Query,
+    Response,
+    UploadFile,
+    status,
+)
 from quivr_core.models import KnowledgeStatus
 
 from quivr_api.celery_config import celery
@@ -297,7 +306,7 @@ async def link_knowledge_to_brain(
         link_request.bulk_id,
     )
     if len(brains_ids) == 0:
-        return "empty brain list"
+        return Response(status_code=status.HTTP_204_NO_CONTENT)
 
     if knowledge_dto.id is None:
         if knowledge_dto.sync_file_id is None:
@@ -319,34 +328,38 @@ async def link_knowledge_to_brain(
             knowledge_dto.id, brains_ids=brains_ids, user_id=current_user.id
         )
 
-    for knowledge in filter(
-        lambda k: k.status
-        not in [KnowledgeStatus.PROCESSED, KnowledgeStatus.PROCESSING],
-        linked_kms,
-    ):
-        assert knowledge.id
-        upload_notification = notification_service.add_notification(
-            CreateNotification(
-                user_id=current_user.id,
-                bulk_id=bulk_id,
-                status=NotificationsStatusEnum.INFO,
-                title=f"{knowledge.file_name}",
-                category="process",
+    if len(linked_kms) > 0:
+        for knowledge in filter(
+            lambda k: k.status
+            not in [KnowledgeStatus.PROCESSED, KnowledgeStatus.PROCESSING],
+            linked_kms,
+        ):
+            assert knowledge.id
+            upload_notification = notification_service.add_notification(
+                CreateNotification(
+                    user_id=current_user.id,
+                    bulk_id=bulk_id,
+                    status=NotificationsStatusEnum.INFO,
+                    title=f"{knowledge.file_name}",
+                    category="process",
+                )
             )
-        )
-        celery.send_task(
-            "process_file_task",
-            kwargs={
-                "knowledge_id": knowledge.id,
-                "notification_id": upload_notification.id,
-            },
-        )
-        knowledge = await knowledge_service.update_knowledge(
-            knowledge=knowledge,
-            payload=KnowledgeUpdate(status=KnowledgeStatus.PROCESSING),
-        )
+            celery.send_task(
+                "process_file_task",
+                kwargs={
+                    "knowledge_id": knowledge.id,
+                    "notification_id": upload_notification.id,
+                },
+            )
+            knowledge = await knowledge_service.update_knowledge(
+                knowledge=knowledge,
+                payload=KnowledgeUpdate(status=KnowledgeStatus.PROCESSING),
+            )
 
-    return await asyncio.gather(*[k.to_dto() for k in linked_kms])
+        return await asyncio.gather(*[k.to_dto() for k in linked_kms])
+
+    else:
+        return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 
 @knowledge_router.delete(

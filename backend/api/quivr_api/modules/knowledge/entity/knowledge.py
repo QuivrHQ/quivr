@@ -99,10 +99,10 @@ class KnowledgeDB(AsyncAttrs, SQLModel, table=True):
         self, get_children: bool = True, get_parent: bool = True
     ) -> KnowledgeDTO:
         assert (
-            self.updated_at
+            await self.awaitable_attrs.updated_at
         ), "knowledge should be inserted before transforming to dto"
         assert (
-            self.created_at
+            await self.awaitable_attrs.created_at
         ), "knowledge should be inserted before transforming to dto"
         brains = await self.awaitable_attrs.brains
         children: list[KnowledgeDB] = (
@@ -125,8 +125,8 @@ class KnowledgeDB(AsyncAttrs, SQLModel, table=True):
             is_folder=self.is_folder,
             file_size=self.file_size or 0,
             file_sha1=self.file_sha1,
-            updated_at=self.updated_at,
-            created_at=self.created_at,
+            updated_at=await self.awaitable_attrs.updated_at,
+            created_at=await self.awaitable_attrs.created_at,
             metadata=self.metadata_,  # type: ignore
             brains=[b.model_dump() for b in brains],
             parent=parent_dto,
