@@ -56,6 +56,7 @@ const ContentSecurityPolicy = {
     "*.intercomcdn.com",
     "https://*.vercel.app",
     process.env.NEXT_PUBLIC_FRONTEND_URL,
+    "http://host.docker.internal:54321",
   ],
   "connect-src": [
     "'self'",
@@ -72,7 +73,8 @@ const ContentSecurityPolicy = {
     "https://vitals.vercel-insights.com/v1/vitals",
     "https://us.posthog.com",
     "*.posthog.com",
-    "https://us.i.posthog.com"
+    "https://us.i.posthog.com",
+    "http://host.docker.internal:54321",
   ],
   "img-src": [
     "'self'",

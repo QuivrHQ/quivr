@@ -3,6 +3,7 @@
 import { capitalCase } from "change-case";
 import format from "date-fns/format";
 import { fr } from "date-fns/locale";
+import { saveAs } from "file-saver";
 import { useState } from "react";
 import ReactMarkdown from "react-markdown";
 import gfm from "remark-gfm";
@@ -41,6 +42,16 @@ const ProcessLine = ({
     if (process.status === "completed" && !downloadUrl) {
       const res: string = await downloadTaskResult(process.id);
       setDownloadUrl(res);
+    }
+  };
+
+  const handleDownload = async () => {
+    if (downloadUrl) {
+      const response = await fetch(
+        downloadUrl.replace("host.docker.internal", "localhost")
+      );
+      const blob = await response.blob();
+      saveAs(blob, "document.pdf"); // Utilisez le nom de fichier souhaité
     }
   };
 
@@ -109,14 +120,14 @@ const ProcessLine = ({
             {process.status === "processing" ? (
               <LoaderIcon size="normal" color="primary" />
             ) : downloadUrl ? (
-              <a href={downloadUrl} target="_blank" rel="noopener noreferrer">
+              <div onClick={() => void handleDownload()}>
                 <Icon
                   name="download"
                   size="normal"
                   color="black"
                   handleHover={process.status === "completed"}
                 />
-              </a>
+              </div>
             ) : (
               <Icon
                 name={
