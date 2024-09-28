@@ -123,6 +123,8 @@ class BrainSettings(BaseSettings):
     pg_database_url: str
     pg_database_async_url: str
     embedding_dim: int
+    sqlalchemy_pool_size: int
+    sqlalchemy_max_pool_overflow: int
 
 
 class ResendSettings(BaseSettings):

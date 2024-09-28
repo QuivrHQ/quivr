@@ -61,16 +61,20 @@ sync_engine = create_engine(
     future=True,
     # NOTE: pessimistic bound on
     pool_pre_ping=True,
-    pool_size=10,  # NOTE: no bouncer for now, if 6 process workers => 6
+    pool_size=1,  # NOTE: no bouncer for now, if 6 process workers => 6
+    max_overflow=0,
     pool_recycle=1800,
 )
 async_engine = create_async_engine(
     settings.pg_database_async_url,
-    connect_args={"server_settings": {"application_name": "quivr-api-async"}},
+    connect_args={
+        "server_settings": {"application_name": "quivr-api-async"},
+    },
     echo=True if os.getenv("ORM_DEBUG") else False,
     future=True,
     pool_pre_ping=True,
-    pool_size=5,  # NOTE: no bouncer for now, if 6 process workers => 6
+    pool_size=settings.sqlalchemy_pool_size,  # NOTE: no bouncer for now, if 6 process workers => 6
+    max_overflow=settings.sqlalchemy_max_pool_overflow,
     pool_recycle=1800,
     isolation_level="AUTOCOMMIT",
 )
