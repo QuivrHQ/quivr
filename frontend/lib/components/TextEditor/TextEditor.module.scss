@@ -27,10 +27,27 @@
 .editor_wrapper {
   min-height: 100vh;
 
+  .bubble_menu {
+    background-color: var(--background-3);
+    // padding: Spacings.$spacing03 Spacings.$spacing05;
+    border: solid 1px var(--border-0);
+    border-radius: Radius.$normal;
+  }
+
   .content_wrapper {
     color: var(--text-3);
     width: 100%;
     position: relative;
+
+    .ai_highlight {
+      background-color: var(--primary-0);
+      color: white;
+      padding: 2px 0 3px 0;
+    }
+
+    ::selection {
+      @extend .ai_highlight;
+    }
 
     .has_focus {
       position: relative;

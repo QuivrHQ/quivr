@@ -1,6 +1,7 @@
 "use client";
 import { Editor, Extension } from "@tiptap/core";
 import Focus from "@tiptap/extension-focus";
+import Highlight from "@tiptap/extension-highlight";
 import { Link } from "@tiptap/extension-link";
 import { EditorContent, useEditor } from "@tiptap/react";
 import { StarterKit } from "@tiptap/starter-kit";
@@ -30,8 +31,21 @@ export const TextEditor = (): JSX.Element => {
   const FocusSearchBar = Extension.create().extend({
     addKeyboardShortcuts: () => {
       return {
-        "Mod-f": () => {
-          searchEditorRef.current?.commands.focus();
+        "Mod-f": ({ editor }) => {
+          const selection = editor.state.doc.textBetween(
+            editor.state.selection.from,
+            editor.state.selection.to
+          );
+
+          if (selection) {
+            editor.commands.setHighlight();
+          }
+
+          searchEditorRef.current
+            ?.chain()
+            .focus()
+            .setContent(selection, undefined, { preserveWhitespace: true })
+            .run();
 
           return true;
         },
@@ -52,6 +66,11 @@ export const TextEditor = (): JSX.Element => {
         }),
         BrainMention,
         FocusSearchBar,
+        Highlight.configure({
+          HTMLAttributes: {
+            class: styles.ai_highlight,
+          },
+        }),
       ],
       content: defaultContent,
       immediatelyRender: false,
@@ -59,6 +78,7 @@ export const TextEditor = (): JSX.Element => {
     },
     [items.length]
   );
+
   if (!editor) {
     return <></>;
   }
@@ -67,10 +87,31 @@ export const TextEditor = (): JSX.Element => {
     <div className={styles.main_container}>
       <div className={styles.editor_wrapper}>
         <Toolbar searchBarEditor={searchEditorRef.current} editor={editor} />
+        {/* {JSON.stringify(selectedContent)} */}
+        {/* <BubbleMenu
+          shouldShow={() => true}
+          className={styles.bubble_menu}
+          editor={editor}
+        >
+        </BubbleMenu> */}
         <EditorContent className={styles.content_wrapper} editor={editor} />
       </div>
       <div className={styles.search_bar_wrapper}>
-        <TextEditorSearchBar ref={searchEditorRef} editor={editor} />
+        <TextEditorSearchBar
+          onSearch={() => {
+            // editor
+            //   .chain()
+            //   .selectAll()
+            //   .unsetHighlight()
+            //   .setTextSelection({
+            //     from: editor.state.doc.content.size - 1,
+            //     to: editor.state.doc.content.size,
+            //   })
+            // .run();
+          }}
+          ref={searchEditorRef}
+          editor={editor}
+        />
       </div>
     </div>
   );
