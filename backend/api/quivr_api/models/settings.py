@@ -1,15 +1,7 @@
-from typing import Optional
 from uuid import UUID
 
 from posthog import Posthog
 from pydantic_settings import BaseSettings, SettingsConfigDict
-from sqlalchemy import Engine
-
-from quivr_api.logger import get_logger
-from quivr_api.models.databases.supabase.supabase import SupabaseDB
-from supabase.client import AsyncClient, Client
-
-logger = get_logger(__name__)
 
 
 class BrainRateLimiting(BaseSettings):
@@ -136,11 +128,11 @@ class ResendSettings(BaseSettings):
     quivr_smtp_password: str = ""
 
 
-# Global variables to store the Supabase client and database instances
-_supabase_client: Optional[Client] = None
-_supabase_async_client: Optional[AsyncClient] = None
-_supabase_db: Optional[SupabaseDB] = None
-_db_engine: Optional[Engine] = None
-_embedding_service = None
+class ParseableSettings(BaseSettings):
+    model_config = SettingsConfigDict(validate_default=False)
+    parseable_url: str | None = None
+    parseable_auth: str | None = None
+
 
 settings = BrainSettings()  # type: ignore
+parseable_settings = ParseableSettings()

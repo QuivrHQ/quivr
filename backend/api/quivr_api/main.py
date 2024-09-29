@@ -1,17 +1,19 @@
 import logging
 import os
+import traceback
 
 import litellm
 import sentry_sdk
 from dotenv import load_dotenv  # type: ignore
-from fastapi import FastAPI, HTTPException, Request
+from fastapi import FastAPI, Request
 from fastapi.responses import HTMLResponse, JSONResponse
 from pyinstrument import Profiler
 from sentry_sdk.integrations.fastapi import FastApiIntegration
 from sentry_sdk.integrations.starlette import StarletteIntegration
 
-from quivr_api.logger import get_logger
+from quivr_api.logger import get_logger, stop_log_queue
 from quivr_api.middlewares.cors import add_cors_middleware
+from quivr_api.middlewares.logger_middleware import LoggingMiddleware
 from quivr_api.modules.analytics.controller.analytics_routes import analytics_router
 from quivr_api.modules.api_key.controller import api_key_router
 from quivr_api.modules.assistant.controller import assistant_router
@@ -27,7 +29,6 @@ from quivr_api.modules.upload.controller import upload_router
 from quivr_api.modules.user.controller import user_router
 from quivr_api.routes.crawl_routes import crawl_router
 from quivr_api.routes.subscription_routes import subscription_router
-from quivr_api.utils import handle_request_validation_error
 from quivr_api.utils.telemetry import maybe_send_telemetry
 
 load_dotenv()
@@ -38,6 +39,9 @@ logging.getLogger("httpx").setLevel(logging.WARNING)
 logging.getLogger("LiteLLM").setLevel(logging.WARNING)
 logging.getLogger("litellm").setLevel(logging.WARNING)
 get_logger("quivr_core")
+get_logger("uvicorn")
+get_logger("uvicorn.access")
+
 litellm.set_verbose = False  # type: ignore
 
 
@@ -70,7 +74,9 @@ if sentry_dsn:
     )
 
 app = FastAPI()
+app.add_middleware(LoggingMiddleware)
 add_cors_middleware(app)
+
 
 app.include_router(brain_router)
 app.include_router(chat_router)
@@ -89,8 +95,6 @@ app.include_router(knowledge_router)
 app.include_router(model_router)
 
 PROFILING = os.getenv("PROFILING", "false").lower() == "true"
-
-
 if PROFILING:
 
     @app.middleware("http")
@@ -106,15 +110,35 @@ if PROFILING:
             return await call_next(request)
 
 
-@app.exception_handler(HTTPException)
-async def http_exception_handler(_, exc):
-    return JSONResponse(
-        status_code=exc.status_code,
-        content={"detail": exc.detail},
+# Set the exception handeling
+@app.exception_handler(Exception)
+async def http_exception_handler(request: Request, exc: Exception):
+    # Log request details and exception
+    request_info = {
+        "request_id": request.headers.get("X-Request-ID"),
+        "method": request.method,
+        "url": str(request.url),
+        "headers": dict(request.headers),
+        "query_params": dict(request.query_params),
+        "client": f"{request.client.host}:{request.client.port}"
+        if request.client
+        else None,
+    }
+
+    # Get traceback details
+    tb_str = traceback.format_exc()
+    logger.error(
+        f"Exception occurred during request processing: {exc}\n\nTraceback:\n{tb_str}",
+        extra=request_info,
     )
 
+    return JSONResponse(status_code=500, content={"message": "Internal Server Error"})
 
-handle_request_validation_error(app)
+
+@app.on_event("shutdown")
+def shutdown_event():
+    stop_log_queue.set()
+
 
 if os.getenv("TELEMETRY_ENABLED") == "true":
     logger.info("Telemetry enabled, we use telemetry to collect anonymous usage data.")

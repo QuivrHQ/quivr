@@ -795,6 +795,8 @@ python-iso639==2024.4.27
     # via unstructured
 python-jose==3.3.0
     # via quivr-api
+python-json-logger==2.0.7
+    # via quivr-api
 python-magic==0.4.27
     # via unstructured
 python-multipart==0.0.9

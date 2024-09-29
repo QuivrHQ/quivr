@@ -31,7 +31,7 @@ UVICORN_PID=$!
 sleep 1
 
 # Run Locust for benchmarking
-rye run locust -f benchmarks/locustfile_kms.py -H http://localhost:5050
+rye run locust -f benchmarks/locustfile_kms.py -H http://localhost:5050 --processes 4
 
 # Wait for all background processes (including Uvicorn) to finish
 wait "$UVICORN_PID"
