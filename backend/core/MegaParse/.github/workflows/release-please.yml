@@ -39,7 +39,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Install Rye
-        uses: eifinger/setup-rye@v2
+        uses: eifinger/setup-rye@7a63de08e2d7838e4025dab04ef2a99f67ad2eaf # v3
         with:
           enable-cache: true
       - name: Rye Sync
