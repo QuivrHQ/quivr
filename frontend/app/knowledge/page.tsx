@@ -7,6 +7,7 @@ import PageHeader from "@/lib/components/PageHeader/PageHeader";
 import ConnectionsKnowledges from "./ConnectionsKnowledge/ConnectionsKnowledges";
 import CurrentFolderExplorer from "./CurrentFolderExplorer/CurrentFolderExplorer";
 import { KnowledgeProvider } from "./KnowledgeProvider/knowledge-provider";
+import QuivrKnowledges from "./QuivrKnowledge/QuivrKnowledges";
 import styles from "./page.module.scss";
 
 const Knowledge = (): JSX.Element => {
@@ -56,6 +57,7 @@ const Knowledge = (): JSX.Element => {
             style={{ minWidth: `${foldersWidth}px` }}
           >
             <div className={styles.folders}>
+              <QuivrKnowledges />
               <ConnectionsKnowledges />
             </div>
           </div>
