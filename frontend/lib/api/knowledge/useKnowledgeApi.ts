@@ -6,7 +6,7 @@ import {
   deleteKnowledge,
   DeleteKnowledgeInputProps,
   generateSignedUrlKnowledge,
-  getAllKnowledge,
+  getAllBrainKnowledge,
   GetAllKnowledgeInputProps,
 } from "./knowledge";
 
@@ -15,8 +15,8 @@ export const useKnowledgeApi = () => {
   const { axiosInstance } = useAxios();
 
   return {
-    getAllKnowledge: async (props: GetAllKnowledgeInputProps) =>
-      getAllKnowledge(props, axiosInstance),
+    getAllBrainKnowledge: async (props: GetAllKnowledgeInputProps) =>
+      getAllBrainKnowledge(props, axiosInstance),
     deleteKnowledge: async (props: DeleteKnowledgeInputProps) =>
       deleteKnowledge(props, axiosInstance),
     generateSignedUrlKnowledge: async (props: { knowledgeId: UUID }) =>

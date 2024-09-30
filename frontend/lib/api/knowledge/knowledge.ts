@@ -22,7 +22,7 @@ interface BEKnowledge {
   integration_link: string;
 }
 
-export const getAllKnowledge = async (
+export const getAllBrainKnowledge = async (
   { brainId }: GetAllKnowledgeInputProps,
   axiosInstance: AxiosInstance
 ): Promise<Knowledge[]> => {

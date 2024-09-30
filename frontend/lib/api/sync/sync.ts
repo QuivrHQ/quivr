@@ -4,10 +4,10 @@ import { UUID } from "crypto";
 import { ActiveSync, OpenedConnection, Sync, SyncElement } from "./types";
 
 const createFilesSettings = (files: SyncElement[]) =>
-  files.filter((file) => !file.is_folder).map((file) => file.id);
+  files.filter((file) => !file.is_folder).map((file) => file.sync_file_id);
 
 const createFoldersSettings = (files: SyncElement[]) =>
-  files.filter((file) => file.is_folder).map((file) => file.id);
+  files.filter((file) => file.is_folder).map((file) => file.sync_file_id);
 
 export const syncGoogleDrive = async (
   name: string,
