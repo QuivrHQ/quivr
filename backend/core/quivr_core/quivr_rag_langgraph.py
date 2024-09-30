@@ -341,7 +341,7 @@ class QuivrQARAGLangGraph:
             ) + self.llm_endpoint.count_tokens(ai_message.content)
             if (
                 total_tokens + message_tokens
-                > self.retrieval_config.llm_config.max_output_tokens
+                > self.retrieval_config.llm_config.max_context_tokens
                 or total_pairs >= self.retrieval_config.max_history
             ):
                 break

@@ -1,4 +1,4 @@
-from typing import Any, List
+from typing import Any, List, Optional, Dict
 from uuid import UUID
 
 from langchain.docstore.document import Document
@@ -71,13 +71,11 @@ class CustomSupabaseVectorStore(SupabaseVectorStore):
         self,
         query: str,
         k: int = 40,
-        table: str = "match_vectors",
-        threshold: float = 0.5,
+        filter: Optional[Dict[str, Any]] = None,
         **kwargs: Any,
     ) -> List[Document]:
         logger.debug(f"Similarity search for query: {query}")
         assert self.brain_id, "Brain ID is required for similarity search"
-
         match_result = self.vector_service.similarity_search(
             query, brain_id=self.brain_id, k=k
         )
