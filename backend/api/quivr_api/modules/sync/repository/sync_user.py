@@ -276,9 +276,9 @@ class SyncUserRepository:
             return {
                 "files": await sync.aget_files(
                     sync_user["credentials"],
-                    sync_active_id,
                     folder_id if folder_id else "",
                     recursive,
+                    sync_user["id"],
                 )
             }
         elif provider == "github":
