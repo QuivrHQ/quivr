@@ -59,7 +59,7 @@ class SyncsUser(BaseModel):
     credentials: dict
     state: dict
     additional_data: dict
-    status: str
+    status: Optional[str] = None
 
 
 class SyncsActive(BaseModel):
