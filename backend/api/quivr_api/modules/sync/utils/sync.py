@@ -6,12 +6,10 @@ from abc import ABC, abstractmethod
 from datetime import datetime
 from io import BytesIO
 from typing import Any, Dict, List, Optional, Union
-from urllib.parse import urlparse
 
 import dropbox
 import markdownify
 import msal
-import redis  # type: ignore
 import requests  # type: ignore
 from fastapi import HTTPException
 from google.auth.transport.requests import Request as GoogleRequest
@@ -26,18 +24,6 @@ from quivr_api.modules.sync.service.sync_notion import SyncNotionService
 from quivr_api.modules.sync.utils.normalize import remove_special_characters
 
 logger = get_logger(__name__)
-
-# Parse the CELERY_BROKER_URL
-broker_url = os.getenv("CELERY_BROKER_URL", "redis://redis:6379/0")
-parsed_url = urlparse(broker_url)
-
-# Create the Redis client using the parsed URL
-redis_client = redis.Redis(
-    host=parsed_url.hostname,
-    port=parsed_url.port,
-    password=parsed_url.password,
-    db=int(parsed_url.path.lstrip('/'))
-)
 
 
 class BaseSync(ABC):
@@ -838,7 +824,6 @@ class NotionSync(BaseSync):
                 web_view_link=page.web_view_link,
                 icon=page.icon,
             )
-            redis_client.set(str(page.id), json.dumps(page_info.model_dump_json()))
 
             pages.append(page_info)
 
