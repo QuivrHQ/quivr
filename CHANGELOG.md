@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.0.317 (2024-09-30)
+
+## What's Changed
+* feat: update SyncsUser status field to be optional by @StanGirard in https://github.com/QuivrHQ/quivr/pull/3284
+* fix(frontend): onboarding modal by @Zewed in https://github.com/QuivrHQ/quivr/pull/3286
+* feat: Remove syncNotion from ConnectionCards by @StanGirard in https://github.com/QuivrHQ/quivr/pull/3289
+
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.316...v0.0.317
+
 ## 0.0.316 (2024-09-30)
 
 ## What's Changed
