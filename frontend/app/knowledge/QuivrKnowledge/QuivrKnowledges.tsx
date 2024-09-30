@@ -20,7 +20,6 @@ const QuivrKnowledges = (): JSX.Element => {
     void (async () => {
       try {
         const res = await getFiles(null);
-        console.info(res);
         setCurrentFolder(undefined);
         setQuivrRootSelected(true);
       } catch (error) {
