@@ -79,3 +79,12 @@ export const generateSignedUrlKnowledge = async (
 
   return response.data.signedURL;
 };
+
+export const getFiles = async (
+  parentId: UUID,
+  axiosInstance: AxiosInstance
+): Promise<BEKnowledge[]> => {
+  return (
+    await axiosInstance.get<BEKnowledge[]>(`/knowledge/${parentId}/files`)
+  ).data;
+};

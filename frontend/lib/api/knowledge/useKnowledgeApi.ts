@@ -8,6 +8,7 @@ import {
   generateSignedUrlKnowledge,
   getAllBrainKnowledge,
   GetAllKnowledgeInputProps,
+  getFiles,
 } from "./knowledge";
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
@@ -21,5 +22,6 @@ export const useKnowledgeApi = () => {
       deleteKnowledge(props, axiosInstance),
     generateSignedUrlKnowledge: async (props: { knowledgeId: UUID }) =>
       generateSignedUrlKnowledge(props, axiosInstance),
+    getFiles: async (parentId: UUID) => getFiles(parentId, axiosInstance),
   };
 };
