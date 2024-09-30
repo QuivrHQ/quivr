@@ -45,6 +45,7 @@ def load_and_merge_retrieval_configuration(
     field_mapping = {
         "env_variable_name": "env_variable_name",
         "endpoint_url": "llm_base_url",
+        "max_output_tokens": "max_output_tokens",
     }
 
     retrieval_config.llm_config.set_from_sqlmodel(

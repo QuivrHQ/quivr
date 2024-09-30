@@ -18,9 +18,5 @@ max_history: 10
 llm_config:
   max_context_tokens: 2000
 
-  # Maximum number of tokens to pass to the LLM
-  # as a context to generate the answer
-  max_output_tokens: 2000
-
   temperature: 0.7
   streaming: true
