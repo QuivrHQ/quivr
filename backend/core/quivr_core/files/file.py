@@ -5,10 +5,22 @@ import warnings
 from contextlib import asynccontextmanager
 from enum import Enum
 from pathlib import Path
-from typing import Any, AsyncGenerator, AsyncIterable
+from typing import Any, AsyncGenerator, AsyncIterable, Self
 from uuid import UUID, uuid4
 
 import aiofiles
+from openai import BaseModel
+
+
+class QuivrFileSerialized(BaseModel):
+    id: UUID
+    brain_id: UUID
+    path: Path
+    original_filename: str
+    file_size: int | None
+    file_extension: str
+    file_sha1: str
+    additional_metadata: dict[str, Any]
 
 
 class FileExtension(str, Enum):
@@ -100,9 +112,9 @@ class QuivrFile:
         id: UUID,
         original_filename: str,
         path: Path,
-        brain_id: UUID,
         file_sha1: str,
         file_extension: FileExtension | str,
+        brain_id: UUID | None = None,
         file_size: int | None = None,
         metadata: dict[str, Any] | None = None,
     ) -> None:
@@ -137,3 +149,27 @@ class QuivrFile:
             "file_size": self.file_size,
             **self.additional_metadata,
         }
+
+    def serialize(self) -> QuivrFileSerialized:
+        return QuivrFileSerialized(
+            id=self.id,
+            path=self.path.absolute(),
+            original_filename=self.original_filename,
+            file_size=self.file_size,
+            file_extension=self.file_extension,
+            file_sha1=self.file_sha1,
+            additional_metadata=self.additional_metadata,
+        )
+
+    @classmethod
+    def deserialize(cls, serialized: QuivrFileSerialized) -> Self:
+        return cls(
+            id=serialized.id,
+            brain_id=serialized.brain_id,
+            path=serialized.path,
+            original_filename=serialized.original_filename,
+            file_size=serialized.file_size,
+            file_extension=serialized.file_extension,
+            file_sha1=serialized.file_sha1,
+            metadata=serialized.additional_metadata,
+        )

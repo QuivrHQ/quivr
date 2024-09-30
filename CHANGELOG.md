@@ -1,5 +1,69 @@
 # Changelog
 
+## 0.0.315 (2024-09-17)
+
+## What's Changed
+* chore(main): release core 0.0.15 by @StanGirard in https://github.com/QuivrHQ/quivr/pull/3203
+* fix: knowledge user_id fix by @AmineDiro in https://github.com/QuivrHQ/quivr/pull/3216
+
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.314...v0.0.315
+
+## 0.0.314 (2024-09-16)
+
+## What's Changed
+* feat:  CRUD KMS (no syncs)  by @AmineDiro in https://github.com/QuivrHQ/quivr/pull/3162
+
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.313...v0.0.314
+
+## 0.0.313 (2024-09-13)
+
+## What's Changed
+* feat: save and load brain by @AmineDiro in https://github.com/QuivrHQ/quivr/pull/3202
+
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.312...v0.0.313
+
+## 0.0.312 (2024-09-13)
+
+## What's Changed
+* fix: Update LLMEndpoint to include max_tokens parameter by @StanGirard in https://github.com/QuivrHQ/quivr/pull/3201
+
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.311...v0.0.312
+
+## 0.0.311 (2024-09-12)
+
+## What's Changed
+* chore(embeddings): added tests for embeddings by @StanGirard in https://github.com/QuivrHQ/quivr/pull/3183
+* feat(uptime): check if connection to db works by @StanGirard in https://github.com/QuivrHQ/quivr/pull/3199
+
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.310...v0.0.311
+
+## 0.0.310 (2024-09-10)
+
+## What's Changed
+* feat: Add Azure OpenAI embeddings support by @StanGirard in https://github.com/QuivrHQ/quivr/pull/3182
+
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.309...v0.0.310
+
+## 0.0.309 (2024-09-10)
+
+## What's Changed
+* chore: Add initial documentation files and configuration by @StanGirard in https://github.com/QuivrHQ/quivr/pull/3126
+* chore: Add .readthedocs.yaml configuration file by @StanGirard in https://github.com/QuivrHQ/quivr/pull/3172
+* fix(frontend): notion integration in front end by @Zewed in https://github.com/QuivrHQ/quivr/pull/3175
+* chore(main): release core 0.0.14 by @StanGirard in https://github.com/QuivrHQ/quivr/pull/2945
+* ci(rye): now core is built with rye by @StanGirard in https://github.com/QuivrHQ/quivr/pull/3177
+* feat: Add external Supabase URL support for generating file signed URL by @StanGirard in https://github.com/QuivrHQ/quivr/pull/3179
+* fix(onboarding): keeps setting it at false by @StanGirard in https://github.com/QuivrHQ/quivr/pull/3180
+
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.308...v0.0.309
+
 ## 0.0.308 (2024-09-06)
 
 ## What's Changed

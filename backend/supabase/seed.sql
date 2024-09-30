@@ -331,20 +331,6 @@ SELECT pg_catalog.setval('"public"."product_to_features_id_seq"', 1, false);
 
 
 --
--- Name: syncs_active_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
---
-
-SELECT pg_catalog.setval('"public"."syncs_active_id_seq"', 1, false);
-
-
---
--- Name: syncs_files_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
---
-
-SELECT pg_catalog.setval('"public"."syncs_files_id_seq"', 1, false);
-
-
---
 -- Name: syncs_user_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 

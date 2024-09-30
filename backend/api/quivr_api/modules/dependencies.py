@@ -1,12 +1,13 @@
 import os
 from typing import AsyncGenerator, Callable, Generator, Generic, Optional, Type, TypeVar
+from urllib.parse import urlparse
 
 from fastapi import Depends
 from langchain.embeddings.base import Embeddings
 from langchain_community.embeddings.ollama import OllamaEmbeddings
 
 # from langchain_community.vectorstores.supabase import SupabaseVectorStore
-from langchain_openai import OpenAIEmbeddings
+from langchain_openai import AzureOpenAIEmbeddings, OpenAIEmbeddings
 
 # from quivr_api.modules.vector.service.vector_service import VectorService
 # from quivr_api.modules.vectorstore.supabase import CustomSupabaseVectorStore
@@ -60,16 +61,20 @@ sync_engine = create_engine(
     future=True,
     # NOTE: pessimistic bound on
     pool_pre_ping=True,
-    pool_size=10,  # NOTE: no bouncer for now, if 6 process workers => 6
+    pool_size=1,  # NOTE: no bouncer for now, if 6 process workers => 6
+    max_overflow=0,
     pool_recycle=1800,
 )
 async_engine = create_async_engine(
     settings.pg_database_async_url,
-    connect_args={"server_settings": {"application_name": "quivr-api-async"}},
+    connect_args={
+        "server_settings": {"application_name": "quivr-api-async"},
+    },
     echo=True if os.getenv("ORM_DEBUG") else False,
     future=True,
     pool_pre_ping=True,
-    pool_size=5,  # NOTE: no bouncer for now, if 6 process workers => 6
+    pool_size=settings.sqlalchemy_pool_size,  # NOTE: no bouncer for now, if 6 process workers => 6
+    max_overflow=settings.sqlalchemy_max_pool_overflow,
     pool_recycle=1800,
     isolation_level="AUTOCOMMIT",
 )
@@ -125,6 +130,20 @@ def get_embedding_client() -> Embeddings:
         embeddings = OllamaEmbeddings(
             base_url=settings.ollama_api_base_url,
         )  # pyright: ignore reportPrivateUsage=none
+    elif settings.azure_openai_embeddings_url:
+        # https://quivr-test.openai.azure.com/openai/deployments/embedding/embeddings?api-version=2023-05-15
+        # parse the url to get the deployment name
+        deployment = settings.azure_openai_embeddings_url.split("/")[5]
+        netloc = "https://" + urlparse(settings.azure_openai_embeddings_url).netloc
+        api_version = settings.azure_openai_embeddings_url.split("=")[1]
+        logger.debug(f"Using Azure OpenAI embeddings: {deployment}")
+        logger.debug(f"Using Azure OpenAI embeddings: {netloc}")
+        logger.debug(f"Using Azure OpenAI embeddings: {api_version}")
+        embeddings = AzureOpenAIEmbeddings(
+            azure_deployment=deployment,
+            azure_endpoint=netloc,
+            api_version=api_version,
+        )
     else:
         embeddings = OpenAIEmbeddings()  # pyright: ignore reportPrivateUsage=none
     return embeddings

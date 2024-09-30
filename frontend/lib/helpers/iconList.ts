@@ -105,7 +105,7 @@ import {
   RiNotification2Line,
 } from "react-icons/ri";
 import { SlOptionsVertical } from "react-icons/sl";
-import { TbNetwork, TbRobot } from "react-icons/tb";
+import { TbNetwork, TbProgress, TbRobot } from "react-icons/tb";
 import { VscGraph } from "react-icons/vsc";
 
 export const iconList: { [name: string]: IconType } = {
@@ -212,6 +212,7 @@ export const iconList: { [name: string]: IconType } = {
   upload: FiUpload,
   uploadFile: MdUploadFile,
   user: FaRegUserCircle,
+  waiting: TbProgress,
   warning: IoWarningOutline,
   wav: FaRegFileAudio,
   webm: LiaFileVideo,

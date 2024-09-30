@@ -1,6 +1,7 @@
 from typing import List, Tuple
 
 from langchain_core.messages import AIMessage, BaseMessage, HumanMessage, SystemMessage
+
 from quivr_api.modules.chat.dto.outputs import GetChatHistoryOutput
 
 

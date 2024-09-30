@@ -40,16 +40,17 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: backend/core
+        working-directory: backend/
     steps:
       - uses: actions/checkout@v4
       - name: Install Rye
         uses: eifinger/setup-rye@v2
         with:
           enable-cache: true
+          working-directory: backend/
       - name: Rye Sync
-        run: UV_INDEX_STRATEGY=unsafe-first-match rye sync --no-lock
+        run: cd core/ && UV_INDEX_STRATEGY=unsafe-first-match rye sync --no-lock
       - name: Rye Build
-        run: rye build
+        run: cd core/ && rye build
       - name: Rye Publish
-        run: rye publish --token ${{ secrets.PYPI_API_TOKEN }} --yes
+        run: rye publish --token ${{ secrets.PYPI_API_TOKEN }} --yes --skip-existing

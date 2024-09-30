@@ -1,27 +1,41 @@
 import asyncio
 import logging
+import os
 from pathlib import Path
 from pprint import PrettyPrinter
-from typing import Any, AsyncGenerator, Callable, Dict, Self, Union, Type
+from typing import Any, AsyncGenerator, Callable, Dict, Self, Type, Union
 from uuid import UUID, uuid4
 
 from langchain_core.documents import Document
 from langchain_core.embeddings import Embeddings
 from langchain_core.messages import AIMessage, HumanMessage
 from langchain_core.vectorstores import VectorStore
+from langchain_openai import OpenAIEmbeddings
 from rich.console import Console
 from rich.panel import Panel
 
 from quivr_core.brain.info import BrainInfo, ChatHistoryInfo
+from quivr_core.brain.serialization import (
+    BrainSerialized,
+    EmbedderConfig,
+    FAISSConfig,
+    LocalStorageConfig,
+    TransparentStorageConfig,
+)
 from quivr_core.chat import ChatHistory
-from quivr_core.config import RAGConfig
+from quivr_core.config import RetrievalConfig
 from quivr_core.files.file import load_qfile
 from quivr_core.llm import LLMEndpoint
-from quivr_core.models import ParsedRAGChunkResponse, ParsedRAGResponse, SearchResult
+from quivr_core.models import (
+    ParsedRAGChunkResponse,
+    ParsedRAGResponse,
+    QuivrKnowledge,
+    SearchResult,
+)
 from quivr_core.processor.registry import get_processor_class
 from quivr_core.quivr_rag import QuivrQARAG
-from quivr_core.quivr_rag_langgraph import QuivrQARAGLangGraph 
-from quivr_core.storage.local_storage import TransparentStorage
+from quivr_core.quivr_rag_langgraph import QuivrQARAGLangGraph
+from quivr_core.storage.local_storage import LocalStorage, TransparentStorage
 from quivr_core.storage.storage_base import StorageBase
 
 from .brain_defaults import build_default_vectordb, default_embedder, default_llm
@@ -62,10 +76,10 @@ class Brain:
         *,
         name: str,
         id: UUID,
-        vector_db: VectorStore,
         llm: LLMEndpoint,
-        embedder: Embeddings,
-        storage: StorageBase,
+        vector_db: VectorStore | None = None,
+        embedder: Embeddings | None = None,
+        storage: StorageBase | None = None,
     ):
         self.id = id
         self.name = name
@@ -90,6 +104,110 @@ class Brain:
         panel = Panel(tree, title="Brain Info", expand=False, border_style="bold")
         console.print(panel)
 
+    @classmethod
+    def load(cls, folder_path: str | Path) -> Self:
+        if isinstance(folder_path, str):
+            folder_path = Path(folder_path)
+        if not folder_path.exists():
+            raise ValueError(f"path {folder_path} doesn't exist")
+
+        # Load brainserialized
+        with open(os.path.join(folder_path, "config.json"), "r") as f:
+            bserialized = BrainSerialized.model_validate_json(f.read())
+
+        storage: StorageBase | None = None
+        # Loading storage
+        if bserialized.storage_config.storage_type == "transparent_storage":
+            storage = TransparentStorage.load(bserialized.storage_config)
+        elif bserialized.storage_config.storage_type == "local_storage":
+            storage = LocalStorage.load(bserialized.storage_config)
+        else:
+            raise ValueError("unknown storage")
+
+        # Load Embedder
+        if bserialized.embedding_config.embedder_type == "openai_embedding":
+            from langchain_openai import OpenAIEmbeddings
+
+            embedder = OpenAIEmbeddings(**bserialized.embedding_config.config)
+        else:
+            raise ValueError("unknown embedder")
+
+        # Load vector db
+        if bserialized.vectordb_config.vectordb_type == "faiss":
+            from langchain_community.vectorstores import FAISS
+
+            vector_db = FAISS.load_local(
+                folder_path=bserialized.vectordb_config.vectordb_folder_path,
+                embeddings=embedder,
+                allow_dangerous_deserialization=True,
+            )
+        else:
+            raise ValueError("Unsupported vectordb")
+
+        return cls(
+            id=bserialized.id,
+            name=bserialized.name,
+            embedder=embedder,
+            llm=LLMEndpoint.from_config(bserialized.llm_config),
+            storage=storage,
+            vector_db=vector_db,
+        )
+
+    async def save(self, folder_path: str | Path):
+        if isinstance(folder_path, str):
+            folder_path = Path(folder_path)
+
+        brain_path = os.path.join(folder_path, f"brain_{self.id}")
+        os.makedirs(brain_path, exist_ok=True)
+
+        from langchain_community.vectorstores import FAISS
+
+        if isinstance(self.vector_db, FAISS):
+            vectordb_path = os.path.join(brain_path, "vector_store")
+            os.makedirs(vectordb_path, exist_ok=True)
+            self.vector_db.save_local(folder_path=vectordb_path)
+            vector_store = FAISSConfig(vectordb_folder_path=vectordb_path)
+        else:
+            raise Exception("can't serialize other vector stores for now")
+
+        if isinstance(self.embedder, OpenAIEmbeddings):
+            embedder_config = EmbedderConfig(
+                config=self.embedder.dict(exclude={"openai_api_key"})
+            )
+        else:
+            raise Exception("can't serialize embedder other than openai for now")
+
+        storage_config: Union[LocalStorageConfig, TransparentStorageConfig]
+        # TODO : each instance should know how to serialize/deserialize itself
+        if isinstance(self.storage, LocalStorage):
+            serialized_files = {
+                f.id: f.serialize() for f in await self.storage.get_files()
+            }
+            storage_config = LocalStorageConfig(
+                storage_path=self.storage.dir_path, files=serialized_files
+            )
+        elif isinstance(self.storage, TransparentStorage):
+            serialized_files = {
+                f.id: f.serialize() for f in await self.storage.get_files()
+            }
+            storage_config = TransparentStorageConfig(files=serialized_files)
+        else:
+            raise Exception("can't serialize storage. not supported for now")
+
+        bserialized = BrainSerialized(
+            id=self.id,
+            name=self.name,
+            chat_history=self.chat_history.get_chat_history(),
+            llm_config=self.llm.get_config(),
+            vectordb_config=vector_store,
+            embedding_config=embedder_config,
+            storage_config=storage_config,
+        )
+
+        with open(os.path.join(brain_path, "config.json"), "w") as f:
+            f.write(bserialized.model_dump_json())
+        return brain_path
+
     def info(self) -> BrainInfo:
         # TODO: dim of embedding
         # "embedder": {},
@@ -102,7 +220,7 @@ class Brain:
         return BrainInfo(
             brain_id=self.id,
             brain_name=self.name,
-            files_info=self.storage.info(),
+            files_info=self.storage.info() if self.storage else None,
             chats_info=chats_info,
             llm_info=self.llm.info(),
         )
@@ -127,12 +245,15 @@ class Brain:
         llm: LLMEndpoint | None = None,
         embedder: Embeddings | None = None,
         skip_file_error: bool = False,
+        processor_kwargs: dict[str, Any] | None = None,
     ):
         if llm is None:
             llm = default_llm()
 
         if embedder is None:
             embedder = default_embedder()
+
+        processor_kwargs = processor_kwargs or {}
 
         brain_id = uuid4()
 
@@ -148,6 +269,7 @@ class Brain:
         docs = await process_files(
             storage=storage,
             skip_file_error=skip_file_error,
+            **processor_kwargs,
         )
 
         # Building brain's vectordb
@@ -177,7 +299,8 @@ class Brain:
         storage: StorageBase = TransparentStorage(),
         llm: LLMEndpoint | None = None,
         embedder: Embeddings | None = None,
-        skip_file_error: bool = False
+        skip_file_error: bool = False,
+        processor_kwargs: dict[str, Any] | None = None,
     ) -> Self:
         loop = asyncio.get_event_loop()
         return loop.run_until_complete(
@@ -189,6 +312,7 @@ class Brain:
                 llm=llm,
                 embedder=embedder,
                 skip_file_error=skip_file_error,
+                processor_kwargs=processor_kwargs,
             )
         )
 
@@ -223,7 +347,7 @@ class Brain:
             storage=storage,
             llm=llm,
             embedder=embedder,
-            vector_db=vector_db
+            vector_db=vector_db,
         )
 
     async def asearch(
@@ -233,6 +357,9 @@ class Brain:
         filter: Callable | Dict[str, Any] | None = None,
         fetch_n_neighbors: int = 20,
     ) -> list[SearchResult]:
+        if not self.vector_db:
+            raise ValueError("No vector db configured for this brain")
+
         result = await self.vector_db.asimilarity_search_with_score(
             query, k=n_results, filter=filter, fetch_k=fetch_n_neighbors
         )
@@ -251,28 +378,33 @@ class Brain:
     def ask(
         self,
         question: str,
-        rag_config: RAGConfig | None = None,
+        retrieval_config: RetrievalConfig | None = None,
         rag_pipeline: Type[Union[QuivrQARAG, QuivrQARAGLangGraph]] | None = None,
+        list_files: list[QuivrKnowledge] | None = None,
+        chat_history: ChatHistory | None = None,
     ) -> ParsedRAGResponse:
         llm = self.llm
 
         # If you passed a different llm model we'll override the brain  one
-        if rag_config:
-            if rag_config.llm_config != self.llm.get_config():
-                llm = LLMEndpoint.from_config(config=rag_config.llm_config)
+        if retrieval_config:
+            if retrieval_config.llm_config != self.llm.get_config():
+                llm = LLMEndpoint.from_config(config=retrieval_config.llm_config)
         else:
-            rag_config = RAGConfig(llm_config=self.llm.get_config())
+            retrieval_config = RetrievalConfig(llm_config=self.llm.get_config())
 
         if rag_pipeline is None:
-            rag_pipeline = QuivrQARAG
+            rag_pipeline = QuivrQARAGLangGraph
 
         rag_instance = rag_pipeline(
-            rag_config=rag_config, llm=llm, vector_store=self.vector_db
+            retrieval_config=retrieval_config, llm=llm, vector_store=self.vector_db
         )
 
-        chat_history = self.default_chat
+        chat_history = self.default_chat if chat_history is None else chat_history
+        list_files = [] if list_files is None else list_files
 
-        parsed_response = rag_instance.answer(question, chat_history, [])
+        parsed_response = rag_instance.answer(
+            question=question, history=chat_history, list_files=list_files
+        )
 
         chat_history.append(HumanMessage(content=question))
         chat_history.append(AIMessage(content=parsed_response.answer))
@@ -283,30 +415,34 @@ class Brain:
     async def ask_streaming(
         self,
         question: str,
-        rag_config: RAGConfig | None = None,
+        retrieval_config: RetrievalConfig | None = None,
         rag_pipeline: Type[Union[QuivrQARAG, QuivrQARAGLangGraph]] | None = None,
+        list_files: list[QuivrKnowledge] | None = None,
+        chat_history: ChatHistory | None = None,
     ) -> AsyncGenerator[ParsedRAGChunkResponse, ParsedRAGChunkResponse]:
         llm = self.llm
 
         # If you passed a different llm model we'll override the brain  one
-        if rag_config:
-            if rag_config.llm_config != self.llm.get_config():
-                llm = LLMEndpoint.from_config(config=rag_config.llm_config)
+        if retrieval_config:
+            if retrieval_config.llm_config != self.llm.get_config():
+                llm = LLMEndpoint.from_config(config=retrieval_config.llm_config)
         else:
-            rag_config = RAGConfig(llm_config=self.llm.get_config())
+            retrieval_config = RetrievalConfig(llm_config=self.llm.get_config())
 
         if rag_pipeline is None:
-            rag_pipeline = QuivrQARAG
+            rag_pipeline = QuivrQARAGLangGraph
 
         rag_instance = rag_pipeline(
-            rag_config=rag_config, llm=llm, vector_store=self.vector_db
+            retrieval_config=retrieval_config, llm=llm, vector_store=self.vector_db
         )
 
-        chat_history = self.default_chat
+        chat_history = self.default_chat if chat_history is None else chat_history
+        list_files = [] if list_files is None else list_files
 
-        # TODO: List of files
         full_answer = ""
-        async for response in rag_instance.answer_astream(question, chat_history, []):
+        async for response in rag_instance.answer_astream(
+            question=question, history=chat_history, list_files=list_files
+        ):
             # Format output to be correct servicedf;j
             if not response.last_chunk:
                 yield response

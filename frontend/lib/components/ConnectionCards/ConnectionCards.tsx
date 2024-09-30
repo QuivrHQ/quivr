@@ -15,32 +15,32 @@ export const ConnectionCards = ({
 
   return (
     <div
-      className={`${styles.connection_cards} ${
-        fromAddKnowledge ? styles.spaced : ""
-      }`}
+      className={`${styles.connection_cards} ${fromAddKnowledge ? styles.spaced : ""
+        }`}
     >
+      <ConnectionSection
+        label="Dropbox"
+        provider="DropBox"
+        callback={(name: string) => syncDropbox(name)}
+        fromAddKnowledge={fromAddKnowledge}
+      />
       <ConnectionSection
         label="Google Drive"
         provider="Google"
-        callback={(name) => syncGoogleDrive(name)}
+        callback={(name: string) => syncGoogleDrive(name)}
         fromAddKnowledge={fromAddKnowledge}
+      />
+      <ConnectionSection
+        label="Notion (Beta)"
+        provider="Notion"
+        callback={(name: string) => syncNotion(name)}
+        fromAddKnowledge={fromAddKnowledge}
+        oneAccountLimitation={true}
       />
       <ConnectionSection
         label="Sharepoint"
         provider="Azure"
-        callback={(name) => syncSharepoint(name)}
-        fromAddKnowledge={fromAddKnowledge}
-      />
-      <ConnectionSection
-        label="Dropbox"
-        provider="DropBox"
-        callback={(name) => syncDropbox(name)}
-        fromAddKnowledge={fromAddKnowledge}
-      />
-      <ConnectionSection
-        label="Notion"
-        provider="Notion"
-        callback={(name) => syncNotion(name)}
+        callback={(name: string) => syncSharepoint(name)}
         fromAddKnowledge={fromAddKnowledge}
       />
     </div>

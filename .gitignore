@@ -102,3 +102,5 @@ backend/core/examples/chatbot/.chainlit/translations/en-US.json
 # Tox
 .tox
 Pipfile
+*.pkl
+backend/benchmarks/data.json

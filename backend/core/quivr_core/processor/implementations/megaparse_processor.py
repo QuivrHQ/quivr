@@ -4,6 +4,7 @@ import tiktoken
 from langchain_core.documents import Document
 from langchain_text_splitters import RecursiveCharacterTextSplitter, TextSplitter
 from megaparse import MegaParse
+from megaparse.config import MegaparseConfig
 
 from quivr_core.files.file import QuivrFile
 from quivr_core.processor.processor_base import ProcessorBase
@@ -14,35 +15,32 @@ logger = logging.getLogger("quivr_core")
 
 
 class MegaparseProcessor(ProcessorBase):
-    '''
+    """
     Megaparse processor for PDF files.
-    
+
     It can be used to parse PDF files and split them into chunks.
-    
+
     It comes from the megaparse library.
-    
+
     ## Installation
     ```bash
     pip install megaparse
     ```
-    
-    '''
+
+    """
+
     supported_extensions = [FileExtension.pdf]
 
     def __init__(
         self,
         splitter: TextSplitter | None = None,
         splitter_config: SplitterConfig = SplitterConfig(),
-        llama_parse_api_key: str | None = None,
-        strategy: str = "fast",
+        megaparse_config: MegaparseConfig = MegaparseConfig(),
     ) -> None:
         self.loader_cls = MegaParse
         self.enc = tiktoken.get_encoding("cl100k_base")
         self.splitter_config = splitter_config
-        self.megaparse_kwargs = {
-            "llama_parse_api_key": llama_parse_api_key,
-            "strategy": strategy,
-        }
+        self.megaparse_config = megaparse_config
 
         if splitter:
             self.text_splitter = splitter
@@ -59,11 +57,14 @@ class MegaparseProcessor(ProcessorBase):
         }
 
     async def process_file_inner(self, file: QuivrFile) -> list[Document]:
-        mega_parse = MegaParse(file_path=file.path, **self.megaparse_kwargs)  # type: ignore
+        mega_parse = MegaParse(file_path=file.path, config=self.megaparse_config)  # type: ignore
         document: Document = await mega_parse.aload()
+        print("\n\n document: ", document.page_content)
         if len(document.page_content) > self.splitter_config.chunk_size:
             docs = self.text_splitter.split_documents([document])
             for doc in docs:
+                # if "Production Fonts (maximum)" in doc.page_content:
+                #    print('Doc: ', doc.page_content)
                 doc.metadata = {"chunk_size": len(self.enc.encode(doc.page_content))}
             return docs
         return [document]

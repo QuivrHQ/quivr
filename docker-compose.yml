@@ -23,7 +23,7 @@ services:
       - 3000:3000
 
   backend-api:
-    image: quivr-backend-api:latest
+    image: stangirard/quivr-backend-prebuilt:latest
     pull_policy: if_not_present
     env_file:
       - .env
@@ -43,7 +43,7 @@ services:
 
   worker:
     pull_policy: if_not_present
-    image: quivr-backend-api:latest
+    image: stangirard/quivr-backend-prebuilt:latest
     env_file:
       - .env
     container_name: worker
@@ -57,7 +57,7 @@ services:
 
   notifier:
     pull_policy: never
-    image: quivr-backend-api:latest
+    image: stangirard/quivr-backend-prebuilt:latest
     extra_hosts:
       - "host.docker.internal:host-gateway"
     env_file:
@@ -71,7 +71,7 @@ services:
       - worker
 
   beat:
-    image: quivr-backend-api:latest
+    image: stangirard/quivr-backend-prebuilt:latest
     pull_policy: if_not_present
     env_file:
       - .env
@@ -86,7 +86,7 @@ services:
       - redis
 
   flower:
-    image: quivr-backend-api:latest
+    image: stangirard/quivr-backend-prebuilt:latest
     pull_policy: if_not_present
     env_file:
       - .env

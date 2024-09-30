@@ -33,7 +33,6 @@ class LLMInfo:
         llm_tree.add(f"Base URL: [underline]{self.llm_base_url}[/underline]")
         llm_tree.add(f"Temperature: [bold]{self.temperature}[/bold]")
         llm_tree.add(f"Max Tokens: [bold]{self.max_tokens}[/bold]")
-
         func_call_color = "green" if self.supports_function_calling else "red"
         llm_tree.add(
             f"Supports Function Calling: [bold {func_call_color}]{self.supports_function_calling}[/bold {func_call_color}]"
@@ -54,17 +53,18 @@ class StorageInfo:
 class BrainInfo:
     brain_id: UUID
     brain_name: str
-    files_info: StorageInfo
     chats_info: ChatHistoryInfo
     llm_info: LLMInfo
+    files_info: StorageInfo | None = None
 
     def to_tree(self):
         tree = Tree("📊 Brain Information")
         tree.add(f"🆔 ID: [bold cyan]{self.brain_id}[/bold cyan]")
         tree.add(f"🧠 Brain Name: [bold green]{self.brain_name}[/bold green]")
 
-        files_tree = tree.add("📁 Files")
-        self.files_info.add_to_tree(files_tree)
+        if self.files_info:
+            files_tree = tree.add("📁 Files")
+            self.files_info.add_to_tree(files_tree)
 
         chats_tree = tree.add("💬 Chats")
         self.chats_info.add_to_tree(chats_tree)

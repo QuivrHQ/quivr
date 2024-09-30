@@ -1,17 +1,29 @@
-from typing import Sequence
+from typing import Any, List, Sequence
 from uuid import UUID
 
 from fastapi import HTTPException
 from quivr_core.models import KnowledgeStatus
 from sqlalchemy.exc import IntegrityError, NoResultFound
-from sqlmodel import select, text
+from sqlalchemy.orm import joinedload
+from sqlmodel import and_, col, select, text
 from sqlmodel.ext.asyncio.session import AsyncSession
 
 from quivr_api.logger import get_logger
-from quivr_api.modules.brain.entity.brain_entity import Brain
+from quivr_api.modules.brain.entity.brain_entity import Brain, BrainUserDB, RoleEnum
 from quivr_api.modules.dependencies import BaseRepository, get_supabase_client
-from quivr_api.modules.knowledge.dto.outputs import DeleteKnowledgeResponse
-from quivr_api.modules.knowledge.entity.knowledge import KnowledgeDB
+from quivr_api.modules.knowledge.dto.inputs import KnowledgeUpdate
+from quivr_api.modules.knowledge.dto.outputs import (
+    DeleteKnowledgeResponse,
+    KnowledgeDTO,
+)
+from quivr_api.modules.knowledge.entity.knowledge import (
+    KnowledgeDB,
+)
+from quivr_api.modules.knowledge.service.knowledge_exceptions import (
+    KnowledgeCreationError,
+    KnowledgeNotFoundException,
+    KnowledgeUpdateError,
+)
 
 logger = get_logger(__name__)
 
@@ -22,7 +34,130 @@ class KnowledgeRepository(BaseRepository):
         supabase_client = get_supabase_client()
         self.db = supabase_client
 
-    async def insert_knowledge(
+    async def create_knowledge(self, knowledge: KnowledgeDB) -> KnowledgeDB:
+        try:
+            self.session.add(knowledge)
+            await self.session.commit()
+            await self.session.refresh(knowledge)
+        except IntegrityError:
+            await self.session.rollback()
+            raise
+        except Exception:
+            await self.session.rollback()
+            raise
+        return knowledge
+
+    async def update_knowledge(
+        self,
+        knowledge: KnowledgeDB,
+        payload: KnowledgeDTO | KnowledgeUpdate | dict[str, Any],
+    ) -> KnowledgeDB:
+        try:
+            logger.debug(f"updating {knowledge.id} with payload {payload}")
+            if isinstance(payload, dict):
+                update_data = payload
+            else:
+                update_data = payload.model_dump(exclude_unset=True)
+            for field in update_data:
+                setattr(knowledge, field, update_data[field])
+
+            self.session.add(knowledge)
+            await self.session.commit()
+            await self.session.refresh(knowledge)
+            return knowledge
+        except IntegrityError as e:
+            await self.session.rollback()
+            logger.error(f"Error updating knowledge {e}")
+            raise KnowledgeUpdateError
+
+    async def unlink_knowledge_tree_brains(
+        self, knowledge: KnowledgeDB, brains_ids: List[UUID], user_id: UUID
+    ) -> list[KnowledgeDB] | None:
+        assert knowledge.id, "can't link knowledge not in db"
+        try:
+            # TODO: Move check somewhere else
+            stmt = (
+                select(Brain)
+                .join(BrainUserDB, col(Brain.brain_id) == col(BrainUserDB.brain_id))
+                .where(
+                    and_(
+                        col(Brain.brain_id).in_(brains_ids),
+                        BrainUserDB.user_id == user_id,
+                        BrainUserDB.rights == RoleEnum.Owner,
+                    )
+                )
+            )
+            unlink_brains = list((await self.session.exec(stmt)).unique().all())
+            unlink_brain_ids = {b.brain_id for b in unlink_brains}
+
+            if len(unlink_brains) == 0:
+                logger.info(
+                    f"No brains for user_id={user_id}, brains_list={brains_ids}"
+                )
+                return
+            children = await self.get_knowledge_tree(knowledge.id)
+            all_kms = [knowledge, *children]
+            for k in all_kms:
+                k.brains = list(
+                    filter(lambda b: b.brain_id not in unlink_brain_ids, k.brains)
+                )
+            [self.session.add(k) for k in all_kms]
+            await self.session.commit()
+            [await self.session.refresh(k) for k in all_kms]
+            return all_kms
+        except IntegrityError:
+            await self.session.rollback()
+            raise
+        except Exception:
+            await self.session.rollback()
+            raise
+
+    async def link_knowledge_tree_brains(
+        self, knowledge: KnowledgeDB, brains_ids: List[UUID], user_id: UUID
+    ) -> list[KnowledgeDB]:
+        assert knowledge.id, "can't link knowledge not in db"
+        # TODO(@aminediro @StanGirard): verification should be done elsewhere
+        # should rewrite BrainService and Brain Authorization to be as middleware
+        try:
+            stmt = (
+                select(Brain)
+                .join(BrainUserDB, col(Brain.brain_id) == col(BrainUserDB.brain_id))
+                .where(
+                    and_(
+                        col(Brain.brain_id).in_(brains_ids),
+                        BrainUserDB.user_id == user_id,
+                        BrainUserDB.rights == RoleEnum.Owner,
+                    )
+                )
+            )
+            brains = list((await self.session.exec(stmt)).unique().all())
+            if len(brains) == 0:
+                logger.error(
+                    f"No brains for user_id={user_id}, brains_list={brains_ids}"
+                )
+                raise KnowledgeCreationError("can't associate knowledge to brains")
+            children = await self.get_knowledge_tree(knowledge.id)
+            all_kms = [knowledge, *children]
+            for k in all_kms:
+                km_brains = {km_brain.brain_id for km_brain in k.brains}
+                for b in filter(
+                    lambda b: b.brain_id not in km_brains,
+                    brains,
+                ):
+                    k.brains.append(b)
+            for k in all_kms:
+                await self.session.merge(k)
+            await self.session.commit()
+            [await self.session.refresh(k) for k in all_kms]
+            return all_kms
+        except IntegrityError:
+            await self.session.rollback()
+            raise
+        except Exception:
+            await self.session.rollback()
+            raise
+
+    async def insert_knowledge_brain(
         self, knowledge: KnowledgeDB, brain_id: UUID
     ) -> KnowledgeDB:
         logger.debug(f"Inserting knowledge {knowledge}")
@@ -69,6 +204,14 @@ class KnowledgeRepository(BaseRepository):
         await self.session.refresh(knowledge)
         return knowledge
 
+    async def remove_knowledge(self, knowledge: KnowledgeDB) -> DeleteKnowledgeResponse:
+        assert knowledge.id
+        await self.session.delete(knowledge)
+        await self.session.commit()
+        return DeleteKnowledgeResponse(
+            status="deleted", knowledge_id=knowledge.id, file_name=knowledge.file_name
+        )
+
     async def remove_knowledge_by_id(
         self, knowledge_id: UUID
     ) -> DeleteKnowledgeResponse:
@@ -100,6 +243,16 @@ class KnowledgeRepository(BaseRepository):
 
         return knowledge
 
+    async def get_all_knowledge_sync_user(
+        self, sync_id: int, user_id: UUID | None = None
+    ) -> List[KnowledgeDB]:
+        query = select(KnowledgeDB).where(KnowledgeDB.sync_id == sync_id)
+        if user_id:
+            query = query.where(KnowledgeDB.user_id == user_id)
+
+        result = await self.session.exec(query)
+        return list(result.unique().all())
+
     async def get_knowledge_by_file_name_brain_id(
         self, file_name: str, brain_id: UUID
     ) -> KnowledgeDB:
@@ -126,18 +279,70 @@ class KnowledgeRepository(BaseRepository):
 
         return knowledge
 
-    async def get_knowledge_by_id(self, knowledge_id: UUID) -> KnowledgeDB:
-        query = select(KnowledgeDB).where(KnowledgeDB.id == knowledge_id)
+    async def get_knowledge_tree(self, parent_id: UUID) -> list[KnowledgeDB]:
+        from sqlalchemy.orm import aliased
+
+        Knowledge = aliased(KnowledgeDB)
+        KnowledgeRecursive = aliased(KnowledgeDB)
+
+        recursive_cte = (
+            select(KnowledgeRecursive)
+            .where(KnowledgeRecursive.parent_id == parent_id)
+            .cte(name="knowledge_tree", recursive=True)
+        )
+
+        recursive_cte = recursive_cte.union_all(
+            select(Knowledge).join(
+                recursive_cte, col(Knowledge.parent_id) == col(recursive_cte.c.id)
+            )
+        )
+        # TODO(@AmineDiro): Optimize get_knowledge_tree
+        query = (
+            select(KnowledgeDB)
+            .join(recursive_cte, col(KnowledgeDB.id) == recursive_cte.c.id)
+            .options(joinedload(KnowledgeDB.brains))
+        )
+
+        result = await self.session.exec(query)
+        knowledge_list = result.unique().all()
+
+        return list(knowledge_list)
+
+    async def get_root_knowledge_user(self, user_id: UUID) -> list[KnowledgeDB]:
+        query = (
+            select(KnowledgeDB)
+            .where(KnowledgeDB.parent_id.is_(None))  # type: ignore
+            .where(KnowledgeDB.user_id == user_id)
+            .options(joinedload(KnowledgeDB.children))  # type: ignore
+        )
+        result = await self.session.exec(query)
+        kms = result.unique().all()
+        return list(kms)
+
+    async def get_knowledge_by_id(
+        self, knowledge_id: UUID, user_id: UUID | None = None
+    ) -> KnowledgeDB:
+        query = (
+            select(KnowledgeDB)
+            .where(KnowledgeDB.id == knowledge_id)
+            .options(joinedload(KnowledgeDB.parent), joinedload(KnowledgeDB.children))  # type: ignore
+        )
+        if user_id:
+            query = query.where(KnowledgeDB.user_id == user_id)
         result = await self.session.exec(query)
         knowledge = result.first()
-
         if not knowledge:
-            raise NoResultFound("Knowledge not found")
-
+            raise KnowledgeNotFoundException("Knowledge not found")
         return knowledge
 
-    async def get_brain_by_id(self, brain_id: UUID) -> Brain:
+    async def get_brain_by_id(
+        self, brain_id: UUID, get_knowledge: bool = True
+    ) -> Brain:
         query = select(Brain).where(Brain.brain_id == brain_id)
+        if get_knowledge:
+            query = query.options(
+                joinedload(Brain.knowledges).joinedload(KnowledgeDB.brains)
+            )
         result = await self.session.exec(query)
         brain = result.first()
         if not brain:

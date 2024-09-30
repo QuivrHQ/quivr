@@ -3,7 +3,7 @@ from uuid import UUID
 
 from notion_client import Client
 from quivr_api.logger import get_logger
-from quivr_api.modules.sync.repository.sync_repository import NotionRepository
+from quivr_api.modules.sync.repository.notion_repository import NotionRepository
 from quivr_api.modules.sync.service.sync_notion import (
     SyncNotionService,
     fetch_limit_notion_pages,
@@ -17,7 +17,7 @@ logger = get_logger("celery_worker")
 
 
 async def fetch_and_store_notion_files_async(
-    async_engine: AsyncEngine, access_token: str, user_id: UUID
+    async_engine: AsyncEngine, access_token: str, user_id: UUID, sync_user_id: int
 ):
     try:
         async with AsyncSession(
@@ -34,12 +34,16 @@ async def fetch_and_store_notion_files_async(
                 last_sync_time=datetime(1970, 1, 1, 0, 0, 0),  # UNIX EPOCH
             )
             logger.debug(f"Notion fetched {len(all_search_result)} pages")
-            pages = await store_notion_pages(all_search_result, notion_service, user_id)
+            pages = await store_notion_pages(
+                all_search_result, notion_service, user_id, sync_user_id
+            )
             if pages:
                 logger.info(f"stored {len(pages)} from notion for {user_id}")
             else:
                 logger.warn("No notion page fetched")
 
+            # Commit all before exiting
+            await session.commit()
     except Exception as e:
         await session.rollback()
         raise e

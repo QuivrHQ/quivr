@@ -21,24 +21,19 @@ repos:
     hooks:
       # Run the linter.
       - id: ruff
-        args: [--fix]
+        args: [--fix, --isolated]
         additional_dependencies: []
       # Run the formatter.
       - id: ruff-format
+        args: [--isolated]
         additional_dependencies: []
   - repo: https://github.com/pre-commit/mirrors-mypy
     rev: v1.10.1
     hooks:
       - id: mypy
         name: mypy
-        additional_dependencies: ["types-aiofiles"]
-  - repo: https://github.com/python-poetry/poetry
-    rev: "1.8.0"
-    hooks:
-      - id: poetry-check
-        args: ["-C", "./backend/core"]
-      - id: poetry-lock
-        args: ["-C", "./backend/core"]
+        args: ["--ignore-missing-imports", "--no-incremental", "--follow-imports=skip"]
+        additional_dependencies: ["types-aiofiles", "types-pyyaml", "pydantic", "sqlmodel"]
 ci:
   autofix_commit_msg: |
     [pre-commit.ci] auto fixes from pre-commit.com hooks

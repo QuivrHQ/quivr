@@ -18,6 +18,8 @@
 -e file:core
     # via quivr-api
     # via quivr-worker
+-e file:core/MegaParse
+    # via quivr-core
 -e file:worker
 aiofiles==23.2.1
     # via chainlit
@@ -80,11 +82,15 @@ black==24.8.0
     # via flake8-black
 bleach==6.1.0
     # via nbconvert
+blinker==1.8.2
+    # via flask
 boto3==1.35.2
     # via cohere
 botocore==1.35.2
     # via boto3
     # via s3transfer
+brotli==1.1.0
+    # via geventhttpclient
 cachetools==5.5.0
     # via google-auth
     # via tox
@@ -93,6 +99,7 @@ celery==5.4.0
     # via quivr-api
     # via quivr-worker
 certifi==2022.12.7
+    # via geventhttpclient
     # via httpcore
     # via httpx
     # via requests
@@ -100,6 +107,7 @@ certifi==2022.12.7
     # via unstructured-client
 cffi==1.17.0 ; platform_python_implementation != 'PyPy' or implementation_name == 'pypy'
     # via cryptography
+    # via gevent
     # via pyzmq
 cfgv==3.4.0
     # via pre-commit
@@ -120,6 +128,7 @@ click==8.1.7
     # via click-didyoumean
     # via click-plugins
     # via click-repl
+    # via flask
     # via litellm
     # via mkdocs
     # via mkdocstrings
@@ -151,6 +160,8 @@ colorlog==6.8.2
     # via quivr-api
 comm==0.2.2
     # via ipykernel
+configargparse==1.7
+    # via locust
 contourpy==1.2.1
     # via matplotlib
 coverage==7.6.1
@@ -173,6 +184,7 @@ debugpy==1.8.5
 decorator==5.1.1
     # via ipython
 defusedxml==0.7.1
+    # via fpdf2
     # via langchain-anthropic
     # via nbconvert
 deprecated==1.2.14
@@ -233,15 +245,24 @@ fire==0.6.0
 flake8==7.1.1
     # via flake8-black
 flake8-black==0.3.6
+flask==3.0.3
+    # via flask-cors
+    # via flask-login
+    # via locust
+flask-cors==5.0.0
+    # via locust
+flask-login==0.6.3
+    # via locust
 flatbuffers==24.3.25
     # via onnxruntime
 flower==2.0.1
     # via quivr-worker
 fonttools==4.53.1
+    # via fpdf2
     # via matplotlib
     # via pdf2docx
-fpdf==1.7.2
-    # via quivr-api
+fpdf2==2.7.9
+    # via quivr-worker
 frozenlist==1.4.1
     # via aiohttp
     # via aiosignal
@@ -250,6 +271,11 @@ fsspec==2024.2.0
     # via llama-index-core
     # via llama-index-legacy
     # via torch
+gevent==24.2.1
+    # via geventhttpclient
+    # via locust
+geventhttpclient==2.3.1
+    # via locust
 ghp-import==2.1.0
     # via mkdocs
 google-api-core==2.19.1
@@ -277,7 +303,10 @@ googleapis-common-protos==1.63.2
     # via opentelemetry-exporter-otlp-proto-http
 gotrue==2.7.0
     # via supabase
+gprof2dot==2024.6.6
+    # via pytest-profiling
 greenlet==3.0.3
+    # via gevent
     # via playwright
     # via sqlalchemy
 griffe==1.2.0
@@ -350,9 +379,12 @@ ipykernel==6.29.5
     # via mkdocs-jupyter
 ipython==8.26.0
     # via ipykernel
+itsdangerous==2.2.0
+    # via flask
 jedi==0.19.1
     # via ipython
 jinja2==3.1.3
+    # via flask
     # via litellm
     # via mkdocs
     # via mkdocs-material
@@ -402,6 +434,7 @@ langchain==0.2.14
     # via quivr-core
 langchain-anthropic==0.1.23
     # via quivr-core
+    # via quivr-monorepo
 langchain-cohere==0.2.2
     # via quivr-api
 langchain-community==0.2.12
@@ -497,6 +530,7 @@ llama-parse==0.4.9
     # via llama-index-readers-llama-parse
     # via megaparse
     # via quivr-api
+locust==2.31.7
 lxml==5.3.0
     # via pikepdf
     # via python-docx
@@ -523,6 +557,7 @@ markupsafe==2.1.5
     # via mkdocs-autorefs
     # via mkdocstrings
     # via nbconvert
+    # via werkzeug
 marshmallow==3.22.0
     # via dataclasses-json
     # via marshmallow-enum
@@ -541,8 +576,6 @@ mdit-py-plugins==0.4.1
     # via jupytext
 mdurl==0.1.2
     # via markdown-it-py
-megaparse==0.0.31
-    # via quivr-core
 mergedeep==1.3.4
     # via mkdocs
     # via mkdocs-get-deps
@@ -577,6 +610,8 @@ mpmath==1.3.0
     # via sympy
 msal==1.30.0
     # via quivr-api
+msgpack==1.1.0
+    # via locust
 multidict==6.0.5
     # via aiohttp
     # via yarl
@@ -747,6 +782,7 @@ pgvector==0.3.2
 pikepdf==9.1.1
     # via unstructured
 pillow==10.2.0
+    # via fpdf2
     # via layoutparser
     # via llama-index-core
     # via matplotlib
@@ -797,8 +833,10 @@ protobuf==4.25.4
     # via onnxruntime
     # via opentelemetry-proto
     # via proto-plus
+    # via transformers
 psutil==6.0.0
     # via ipykernel
+    # via locust
     # via unstructured
 psycopg2-binary==2.9.9
     # via quivr-api
@@ -887,12 +925,14 @@ pytest==8.3.2
     # via pytest-cov
     # via pytest-dotenv
     # via pytest-mock
+    # via pytest-profiling
     # via pytest-xdist
 pytest-asyncio==0.24.0
 pytest-benchmark==4.0.0
 pytest-cov==5.0.0
 pytest-dotenv==0.5.2
 pytest-mock==3.14.0
+pytest-profiling==1.7.0
 pytest-xdist==3.6.1
 python-dateutil==2.9.0.post0
     # via botocore
@@ -937,8 +977,9 @@ python-socketio==5.11.3
 pytz==2024.1
     # via flower
     # via pandas
-pywin32==306 ; (platform_python_implementation != 'PyPy' and sys_platform == 'win32') or platform_system == 'Windows'
+pywin32==306 ; sys_platform == 'win32' or platform_system == 'Windows'
     # via jupyter-core
+    # via locust
     # via portalocker
 pyyaml==6.0.2
     # via huggingface-hub
@@ -961,6 +1002,7 @@ pyyaml-env-tag==0.1
 pyzmq==26.1.1
     # via ipykernel
     # via jupyter-client
+    # via locust
 rapidfuzz==3.9.6
     # via unstructured
     # via unstructured-inference
@@ -988,6 +1030,7 @@ requests==2.32.3
     # via litellm
     # via llama-index-core
     # via llama-index-legacy
+    # via locust
     # via mkdocs-material
     # via msal
     # via opentelemetry-exporter-otlp-proto-http
@@ -1018,10 +1061,14 @@ safetensors==0.4.4
     # via transformers
 scipy==1.14.1
     # via layoutparser
+sentencepiece==0.2.0
+    # via transformers
 sentry-sdk==2.13.0
     # via quivr-api
 setuptools==70.0.0
     # via opentelemetry-instrumentation
+    # via zope-event
+    # via zope-interface
 simple-websocket==1.0.0
     # via python-engineio
 six==1.16.0
@@ -1033,6 +1080,7 @@ six==1.16.0
     # via langdetect
     # via markdownify
     # via posthog
+    # via pytest-profiling
     # via python-dateutil
     # via stone
     # via unstructured-client
@@ -1146,8 +1194,11 @@ traitlets==5.14.3
     # via nbclient
     # via nbconvert
     # via nbformat
-transformers==4.44.1
+transformers==4.44.2
+    # via quivr-core
     # via unstructured-inference
+types-pyyaml==6.0.12.20240808
+    # via quivr-core
 types-requests==2.31.0.6
     # via cohere
 types-urllib3==1.26.25.14
@@ -1204,6 +1255,7 @@ uritemplate==4.1.1
     # via google-api-python-client
 urllib3==1.26.13
     # via botocore
+    # via geventhttpclient
     # via requests
     # via sentry-sdk
     # via unstructured-client
@@ -1230,6 +1282,10 @@ webencodings==0.5.1
     # via tinycss2
 websockets==12.0
     # via realtime
+werkzeug==3.0.4
+    # via flask
+    # via flask-login
+    # via locust
 wrapt==1.16.0
     # via deprecated
     # via llama-index-core
@@ -1245,3 +1301,7 @@ yarl==1.9.4
     # via aiohttp
 zipp==3.20.0
     # via importlib-metadata
+zope-event==5.0
+    # via gevent
+zope-interface==7.0.3
+    # via gevent

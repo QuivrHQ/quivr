@@ -2,7 +2,6 @@ import logging
 from abc import ABC, abstractmethod
 from importlib.metadata import PackageNotFoundError, version
 from typing import Any
-from uuid import uuid4
 
 from langchain_core.documents import Document
 
@@ -13,7 +12,6 @@ logger = logging.getLogger("quivr_core")
 
 # TODO: processors should be cached somewhere ?
 # The processor should be cached by processor type
-# The cache should use a single
 class ProcessorBase(ABC):
     supported_extensions: list[FileExtension | str]
 
@@ -43,7 +41,6 @@ class ProcessorBase(ABC):
                 "utf-8"
             )
             doc.metadata = {
-                "id": uuid4(),
                 "chunk_index": idx,
                 "quivr_core_version": qvr_version,
                 **file.metadata,

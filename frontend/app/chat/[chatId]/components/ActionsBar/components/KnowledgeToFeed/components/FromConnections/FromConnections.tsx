@@ -118,7 +118,9 @@ export const FromConnections = (): JSX.Element => {
                       selectable={!!isPremium || currentProvider === "Notion"}
                       id={folder.id}
                       icon={folder.icon}
-                      isAlsoFile={currentProvider === "Notion"}
+                      isAlsoFile={
+                        currentProvider === "Notion" ? true : undefined
+                      }
                     />
                   </div>
                 ))}
