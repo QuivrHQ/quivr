@@ -16,6 +16,7 @@ RUN apt-get clean && apt-get update && apt-get install -y \
     libtool \
     python-dev \
     build-essential \
+    wget \
     # Additional dependencies for document handling
     libmagic-dev \
     poppler-utils \
