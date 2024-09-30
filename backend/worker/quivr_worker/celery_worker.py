@@ -16,6 +16,7 @@ from sqlalchemy.ext.asyncio import AsyncEngine, create_async_engine
 from quivr_worker.assistants.assistants import aprocess_assistant_task
 from quivr_worker.check_premium import check_is_premium
 from quivr_worker.process import aprocess_file_task
+from quivr_worker.syncs.update_syncs import update_sync_files
 from quivr_worker.utils.utils import _patch_json
 
 load_dotenv()
@@ -68,6 +69,22 @@ def process_file_task(
     loop.run_until_complete(
         aprocess_file_task(async_engine=async_engine, knowledge_id=knowledge_id)
     )
+
+
+@celery.task(
+    retries=3,
+    default_retry_delay=1,
+    name="process_file_task",
+    autoretry_for=(Exception,),
+    dont_autoretry_for=(FileExistsError,),
+)
+def update_sync_task():
+    if async_engine is None:
+        init_worker()
+    assert async_engine
+    logger.info("Update sync task started")
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(update_sync_files(async_engine=async_engine))
 
 
 @celery.task(

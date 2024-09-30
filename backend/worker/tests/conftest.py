@@ -28,7 +28,7 @@ from quivr_api.modules.vector.repository.vectors_repository import VectorReposit
 from quivr_api.modules.vector.service.vector_service import VectorService
 from quivr_core.files.file import QuivrFile
 from quivr_core.models import KnowledgeStatus
-from quivr_worker.process.processor import ProcessorServices
+from quivr_worker.utils.services import ProcessorServices
 from sqlalchemy.ext.asyncio import create_async_engine
 from sqlmodel import select
 from sqlmodel.ext.asyncio.session import AsyncSession

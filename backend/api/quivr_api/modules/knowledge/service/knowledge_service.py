@@ -66,12 +66,15 @@ class KnowledgeService(BaseService[KnowledgeRepository]):
             # The parent_knowledge was just added (we are processing it)
             # This implies that we could have sync children that were processed before
             # IF SyncKnowledge already exists =>  It's already processed in some other brain
-            # => Link it to the parent brains and move on if it is PROCESSED ELSE Reprocess the file
+            # => Link it to the parent and add its  brains and move on if it is PROCESSED ELSE Reprocess the file
             km_brains = {km_brain.brain_id for km_brain in existing_km.brains}
             for brain in filter(
                 lambda b: b.brain_id not in km_brains,
                 parent_knowledge.brains,
             ):
+                await self.repository.update_knowledge(
+                    existing_km, KnowledgeUpdate(parent_id=parent_knowledge.id)
+                )
                 await self.repository.link_to_brain(
                     existing_km, brain_id=brain.brain_id
                 )

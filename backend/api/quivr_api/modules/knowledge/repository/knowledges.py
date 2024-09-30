@@ -435,3 +435,14 @@ class KnowledgeRepository(BaseRepository):
         query = select(KnowledgeDB)
         result = await self.session.exec(query)
         return result.all()
+
+    async def get_sync_knowledges_to_update(self,batch_size: int = 1) -> Sequence[KnowledgeDB]:
+        query = select(KnowledgeDB)
+                .where(
+                    and_(
+                        col(KnowledgeDB.sync_id).in_(brains_ids),
+                    )
+                )
+
+        result = await self.session.exec(query)
+        return result.all()

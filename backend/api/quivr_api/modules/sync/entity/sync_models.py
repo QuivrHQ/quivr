@@ -77,7 +77,6 @@ class Sync(SQLModel, table=True):
             onupdate=datetime.utcnow,
         ),
     )
-    last_synced_at: datetime | None = Field(default=None)
     additional_data: dict | None = Field(
         default=None, sa_column=Column("additional_data", JSON)
     )
