@@ -7,6 +7,8 @@ import {
   UploadedKnowledge,
 } from "@/lib/types/Knowledge";
 
+import { KMSElement } from "../sync/types";
+
 export type GetAllKnowledgeInputProps = {
   brainId: UUID;
 };
@@ -83,9 +85,9 @@ export const generateSignedUrlKnowledge = async (
 export const getFiles = async (
   parentId: UUID | null,
   axiosInstance: AxiosInstance
-): Promise<BEKnowledge[]> => {
+): Promise<KMSElement[]> => {
   return (
-    await axiosInstance.get<BEKnowledge[]>(`/knowledge/files`, {
+    await axiosInstance.get<KMSElement[]>(`/knowledge/files`, {
       params: { parent_id: parentId },
     })
   ).data;

@@ -12,7 +12,7 @@ import { useKnowledgeContext } from "../KnowledgeProvider/hooks/useKnowledgeCont
 const QuivrKnowledges = (): JSX.Element => {
   const [folded, setFolded] = useState(true);
   const { isDarkMode } = useUserSettingsContext();
-  const { setCurrentFolder } = useKnowledgeContext();
+  const { setQuivrRootSelected, setCurrentFolder } = useKnowledgeContext();
 
   const { getFiles } = useKnowledgeApi();
 
@@ -21,6 +21,8 @@ const QuivrKnowledges = (): JSX.Element => {
       try {
         const res = await getFiles(null);
         console.info(res);
+        setCurrentFolder(undefined);
+        setQuivrRootSelected(true);
       } catch (error) {
         console.error("Failed to get files:", error);
       }

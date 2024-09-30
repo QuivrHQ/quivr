@@ -7,6 +7,8 @@ type KnowledgeContextType = {
   setCurrentFolder: React.Dispatch<
     React.SetStateAction<KMSElement | undefined>
   >;
+  quivrRootSelected: boolean;
+  setQuivrRootSelected: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
 export const KnowledgeContext = createContext<KnowledgeContextType | undefined>(
@@ -21,12 +23,15 @@ export const KnowledgeProvider = ({
   const [currentFolder, setCurrentFolder] = useState<KMSElement | undefined>(
     undefined
   );
+  const [quivrRootSelected, setQuivrRootSelected] = useState<boolean>(false);
 
   return (
     <KnowledgeContext.Provider
       value={{
         currentFolder,
         setCurrentFolder,
+        quivrRootSelected,
+        setQuivrRootSelected,
       }}
     >
       {children}

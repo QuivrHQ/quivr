@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 
+import { useKnowledgeApi } from "@/lib/api/knowledge/useKnowledgeApi";
 import { KMSElement } from "@/lib/api/sync/types";
 import { useSync } from "@/lib/api/sync/useSync";
 import { Icon } from "@/lib/components/ui/Icon/Icon";
@@ -13,8 +14,10 @@ import { useKnowledgeContext } from "../KnowledgeProvider/hooks/useKnowledgeCont
 const CurrentFolderExplorer = (): JSX.Element => {
   const [loading, setLoading] = useState(false);
   const [syncElements, setKMSElements] = useState<KMSElement[]>();
-  const { currentFolder, setCurrentFolder } = useKnowledgeContext();
+  const { currentFolder, setCurrentFolder, quivrRootSelected } =
+    useKnowledgeContext();
   const { getSyncFiles } = useSync();
+  const { getFiles } = useKnowledgeApi();
 
   const fetchSyncFiles = async (folderId: string) => {
     setLoading(true);
@@ -30,9 +33,20 @@ const CurrentFolderExplorer = (): JSX.Element => {
     }
   };
 
+  const fetchQuivrFiles = async () => {
+    try {
+      const res = await getFiles(null);
+      setKMSElements(res);
+    } catch (error) {
+      console.error("Failed to get files:", error);
+    }
+  };
+
   useEffect(() => {
     if (currentFolder?.sync_id && currentFolder.sync_file_id) {
       void fetchSyncFiles(currentFolder.sync_file_id);
+    } else if (quivrRootSelected) {
+      void fetchQuivrFiles();
     }
   }, [currentFolder]);
 
