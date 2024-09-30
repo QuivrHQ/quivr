@@ -125,7 +125,7 @@ class MinimalUserBrainEntity(BaseModel):
     max_files: int
     price: Optional[int] = None
     max_context_tokens: Optional[int] = None
-    max_output: Optional[int] = None
+    max_output_tokens: Optional[int] = None
     display_name: Optional[str] = None
     image_url: Optional[str] = None
     model: bool = False

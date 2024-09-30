@@ -10,4 +10,4 @@ class LLMModel(BaseModel):
     name: str = "gpt-3.5-turbo-0125"
     price: int = 1
     max_context_tokens: int = 512
-    max_output: int = 512
+    max_output_tokens: int = 512

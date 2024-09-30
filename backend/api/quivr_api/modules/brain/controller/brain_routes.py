@@ -90,7 +90,7 @@ async def retrieve_all_brains_for_user(
                 model=True,
                 price=model.price,
                 max_context_tokens=model.max_context_tokens,
-                max_output=model.max_output,
+                max_output_tokens=model.max_output_tokens,
                 display_name=model.display_name,
                 image_url=model.image_url,
                 description=model.description,

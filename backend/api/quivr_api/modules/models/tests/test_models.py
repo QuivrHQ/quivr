@@ -4,11 +4,13 @@ from quivr_api.modules.models.entity.model import Model
 
 
 def test_model_creation():
-    model = Model(name="test-model", price=2, max_context_tokens=1000, max_output=500)
+    model = Model(
+        name="test-model", price=2, max_context_tokens=1000, max_output_tokens=500
+    )
     assert model.name == "test-model"
     assert model.price == 2
     assert model.max_context_tokens == 1000
-    assert model.max_output == 500
+    assert model.max_output_tokens == 500
 
 
 @pytest.mark.asyncio(loop_scope="session")  # noqa: F821
@@ -25,13 +27,19 @@ def test_model_default_values():
     assert default_model.name == "default-model"
     assert default_model.price == 1
     assert default_model.max_context_tokens == 2000
-    assert default_model.max_output == 1000
+    assert default_model.max_output_tokens == 1000
 
 
 def test_model_comparison():
-    model1 = Model(name="model1", price=2, max_context_tokens=3000, max_output=1500)
-    model2 = Model(name="model2", price=3, max_context_tokens=4000, max_output=2000)
-    model3 = Model(name="model1", price=2, max_context_tokens=3000, max_output=1500)
+    model1 = Model(
+        name="model1", price=2, max_context_tokens=3000, max_output_tokens=1500
+    )
+    model2 = Model(
+        name="model2", price=3, max_context_tokens=4000, max_output_tokens=2000
+    )
+    model3 = Model(
+        name="model1", price=2, max_context_tokens=3000, max_output_tokens=1500
+    )
 
     assert model1 != model2
     assert model1 == model3

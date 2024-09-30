@@ -7,7 +7,7 @@ class Model(SQLModel, table=True):  # type: ignore
     name: str = Field(primary_key=True)
     price: int = Field(default=1)
     max_context_tokens: int = Field(default=2000)
-    max_output: int = Field(default=1000)
+    max_output_tokens: int = Field(default=1000)
     description: str = Field(default="")
     display_name: str = Field(default="")
     image_url: str = Field(default="")

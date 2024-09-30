@@ -135,7 +135,7 @@ class RAGService:
                 llm_api_key=api_key,
                 temperature=(LLMEndpointConfig.model_fields["temperature"].default),
                 max_context_tokens=model.max_context_tokens,
-                max_output_tokens=model.max_output,
+                max_output_tokens=model.max_output_tokens,
             ),
             prompt=self.prompt.content if self.prompt else None,
         )
