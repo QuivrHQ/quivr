@@ -1,0 +1,8 @@
+@use "styles/Spacings.module.scss";
+
+.header_section_wrapper {
+  display: flex;
+  align-items: center;
+  gap: Spacings.$spacing03;
+  font-weight: 500;
+}

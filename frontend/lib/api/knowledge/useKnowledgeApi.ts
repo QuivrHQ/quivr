@@ -22,6 +22,7 @@ export const useKnowledgeApi = () => {
       deleteKnowledge(props, axiosInstance),
     generateSignedUrlKnowledge: async (props: { knowledgeId: UUID }) =>
       generateSignedUrlKnowledge(props, axiosInstance),
-    getFiles: async (parentId: UUID) => getFiles(parentId, axiosInstance),
+    getFiles: async (parentId: UUID | null) =>
+      getFiles(parentId, axiosInstance),
   };
 };
