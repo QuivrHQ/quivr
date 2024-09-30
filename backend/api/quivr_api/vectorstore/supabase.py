@@ -28,13 +28,11 @@ class CustomSupabaseVectorStore(SupabaseVectorStore):
         brain_id: UUID | None = None,
         user_id: UUID | None = None,
         number_docs: int = 35,
-        max_input: int = 2000,
     ):
         super().__init__(client, embedding, table_name)
         self.brain_id = brain_id
         self.user_id = user_id
         self.number_docs = number_docs
-        self.max_input = max_input
         self.vector_service = vector_service
 
     def find_brain_closest_query(

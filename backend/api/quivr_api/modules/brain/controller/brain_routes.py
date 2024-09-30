@@ -89,7 +89,7 @@ async def retrieve_all_brains_for_user(
                 rights=RoleEnum.Viewer,
                 model=True,
                 price=model.price,
-                max_input=model.max_input,
+                max_context_tokens=model.max_context_tokens,
                 max_output=model.max_output,
                 display_name=model.display_name,
                 image_url=model.image_url,

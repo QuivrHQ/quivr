@@ -248,7 +248,7 @@ INSERT INTO "public"."users" ("id", "email", "onboarded") VALUES
 -- Data for Name: models; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-INSERT INTO "public"."models" ("name", "price", "max_input", "max_output", "description", "display_name", "image_url", "default", "endpoint_url", "env_variable_name") VALUES
+INSERT INTO "public"."models" ("name", "price", "max_context_tokens", "max_output", "description", "display_name", "image_url", "default", "endpoint_url", "env_variable_name") VALUES
 	('gpt-4-0125-preview', 1, 4000, 4000, 'Default Description', 'GPT4', 'https://quivr-cms.s3.eu-west-3.amazonaws.com/logo_quivr_white_7e3c72620f.png', false, 'https://api.openai.com/v1', 'OPENAI_API_KEY'),
 	('gpt-3.5-turbo-0125', 1, 10000, 1000, 'Default Description', 'GPT-3.5', 'https://quivr-cms.s3.eu-west-3.amazonaws.com/logo_quivr_white_7e3c72620f.png', true, 'https://api.openai.com/v1', 'OPENAI_API_KEY');
 

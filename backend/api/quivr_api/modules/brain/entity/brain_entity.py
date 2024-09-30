@@ -124,7 +124,7 @@ class MinimalUserBrainEntity(BaseModel):
     integration_logo_url: str
     max_files: int
     price: Optional[int] = None
-    max_input: Optional[int] = None
+    max_context_tokens: Optional[int] = None
     max_output: Optional[int] = None
     display_name: Optional[str] = None
     image_url: Optional[str] = None

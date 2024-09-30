@@ -172,7 +172,7 @@ class LLMEndpointConfig(QuivrBaseConfig):
     llm_base_url: str | None = None
     env_variable_name: str = f"{supplier.upper()}_API_KEY"
     llm_api_key: str | None = None
-    max_input_tokens: int = 2000
+    max_context_tokens: int = 2000
     max_output_tokens: int = 2000
     temperature: float = 0.7
     streaming: bool = True

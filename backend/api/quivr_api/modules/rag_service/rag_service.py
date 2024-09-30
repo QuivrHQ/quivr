@@ -134,7 +134,7 @@ class RAGService:
                 llm_base_url=model.endpoint_url,
                 llm_api_key=api_key,
                 temperature=(LLMEndpointConfig.model_fields["temperature"].default),
-                max_input_tokens=model.max_input,
+                max_context_tokens=model.max_context_tokens,
                 max_output_tokens=model.max_output,
             ),
             prompt=self.prompt.content if self.prompt else None,
@@ -144,9 +144,7 @@ class RAGService:
     def get_llm(self, retrieval_config: RetrievalConfig):
         return LLMEndpoint.from_config(retrieval_config.llm_config)
 
-    def create_vector_store(
-        self, brain_id: UUID, max_input: int
-    ) -> CustomSupabaseVectorStore:
+    def create_vector_store(self, brain_id: UUID) -> CustomSupabaseVectorStore:
         if not self.vector_service:
             raise ValueError("VectorService not provided")
 
@@ -157,7 +155,6 @@ class RAGService:
             embeddings,
             table_name="vectors",
             brain_id=brain_id,
-            max_input=max_input,
             vector_service=self.vector_service,
         )
 
@@ -201,10 +198,11 @@ class RAGService:
             else []
         )
 
+        if not self.brain.brain_id:
+            raise ValueError(f"Brain ID not present for brain {self.brain.name}")
+
         vector_store = (
-            self.create_vector_store(
-                self.brain.brain_id, retrieval_config.llm_config.max_input_tokens
-            )
+            self.create_vector_store(self.brain.brain_id)
             if self.vector_service
             else None
         )

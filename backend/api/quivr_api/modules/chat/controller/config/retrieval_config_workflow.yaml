@@ -33,7 +33,7 @@ reranker_config:
   top_n: 5
 llm_config:
 
-  max_input_tokens: 2000
+  max_context_tokens: 2000
 
   # Maximum number of tokens to pass to the LLM
   # as a context to generate the answer
