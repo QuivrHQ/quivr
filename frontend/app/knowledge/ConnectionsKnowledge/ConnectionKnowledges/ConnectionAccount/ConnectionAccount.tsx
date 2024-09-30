@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-import { Sync, SyncElements } from "@/lib/api/sync/types"; // Assurez-vous que SyncElement est bien importé
+import { Sync, SyncElement } from "@/lib/api/sync/types"; // Assurez-vous que SyncElement est bien importé
 import { useSync } from "@/lib/api/sync/useSync";
 import { ConnectionIcon } from "@/lib/components/ui/ConnectionIcon/ConnectionIcon";
 import { Icon } from "@/lib/components/ui/Icon/Icon";
@@ -23,7 +23,7 @@ const ConnectionAccount = ({
 }: ConnectionAccountProps): JSX.Element => {
   const { getSyncFiles } = useSync();
   const [loading, setLoading] = useState(false);
-  const [syncElements, setSyncElements] = useState<SyncElements>();
+  const [syncElements, setSyncElements] = useState<SyncElement[]>();
   const [folded, setFolded] = useState(true);
 
   const getFiles = () => {
@@ -31,13 +31,7 @@ const ConnectionAccount = ({
     void (async () => {
       try {
         const res = await getSyncFiles(sync.id);
-        setSyncElements((prevState) => ({
-          ...prevState,
-          files: res.files.map((syncElement) => ({
-            ...syncElement,
-            syncId: sync.id,
-          })),
-        }));
+        setSyncElements(res);
         setLoading(false);
       } catch (error) {
         console.error("Failed to get sync files:", error);
@@ -78,13 +72,13 @@ const ConnectionAccount = ({
         ) : (
           <div
             className={`${styles.sync_elements_wrapper} ${
-              !syncElements?.files.filter((file) => file.is_folder).length
+              !syncElements?.filter((file) => file.is_folder).length
                 ? styles.empty
                 : ""
             } ${singleAccount ? styles.single_account : ""}`}
           >
-            {syncElements?.files
-              .filter((file) => file.is_folder)
+            {syncElements
+              ?.filter((file) => file.is_folder)
               .map((element, id) => (
                 <div key={id}>
                   <SyncFolder element={element} />

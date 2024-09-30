@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 
 import { useKnowledgeContext } from "@/app/knowledge/KnowledgeProvider/hooks/useKnowledgeContext";
-import { SyncElement, SyncElements } from "@/lib/api/sync/types";
+import { SyncElement } from "@/lib/api/sync/types";
 import { useSync } from "@/lib/api/sync/useSync";
 import { Icon } from "@/lib/components/ui/Icon/Icon";
 import { LoaderIcon } from "@/lib/components/ui/LoaderIcon/LoaderIcon";
@@ -16,17 +16,13 @@ const SyncFolder = ({ element }: SyncFolderProps): JSX.Element => {
   const [folded, setFolded] = useState(true);
   const [loading, setLoading] = useState(false);
   const { getSyncFiles } = useSync();
-  const [syncElements, setSyncElements] = useState<SyncElements>();
+  const [syncElements, setSyncElements] = useState<SyncElement[]>();
   const [selectedFolder, setSelectedFolder] = useState<boolean>(false);
 
   const { currentFolder, setCurrentFolder } = useKnowledgeContext();
 
-  const setAncestors = () => {
-    console.info("ey");
-  };
-
   useEffect(() => {
-    setSelectedFolder(currentFolder?.id === element.id);
+    setSelectedFolder(currentFolder?.sync_file_id === element.sync_file_id);
   }, [currentFolder]);
 
   useEffect(() => {
@@ -34,14 +30,8 @@ const SyncFolder = ({ element }: SyncFolderProps): JSX.Element => {
       setLoading(true);
       void (async () => {
         try {
-          const res = await getSyncFiles(element.syncId, element.id);
-          setSyncElements((prevState) => ({
-            ...prevState,
-            files: res.files.map((syncElement) => ({
-              ...syncElement,
-              syncId: element.syncId,
-            })),
-          }));
+          const res = await getSyncFiles(element.sync_id, element.sync_file_id);
+          setSyncElements(res);
           setLoading(false);
         } catch (error) {
           console.error("Failed to get sync files:", error);
@@ -53,7 +43,7 @@ const SyncFolder = ({ element }: SyncFolderProps): JSX.Element => {
   return (
     <div
       className={`${styles.folder_wrapper} ${
-        !syncElements?.files.filter((file) => file.is_folder).length && !loading
+        !syncElements?.filter((file) => file.is_folder).length && !loading
           ? styles.empty
           : ""
       }`}
@@ -69,16 +59,15 @@ const SyncFolder = ({ element }: SyncFolderProps): JSX.Element => {
         <span
           className={`${styles.name} ${selectedFolder ? styles.selected : ""}`}
           onClick={() => {
-            setAncestors();
             setCurrentFolder({
               ...element,
               parentSyncElement: element.parentSyncElement,
             });
           }}
         >
-          {element.name?.includes(".")
-            ? element.name.split(".").slice(0, -1).join(".")
-            : element.name}
+          {element.file_name?.includes(".")
+            ? element.file_name.split(".").slice(0, -1).join(".")
+            : element.file_name}
         </span>
       </div>
       {!folded &&
@@ -88,8 +77,8 @@ const SyncFolder = ({ element }: SyncFolderProps): JSX.Element => {
           </div>
         ) : (
           <div className={styles.sync_elements_wrapper}>
-            {syncElements?.files
-              .filter((file) => file.is_folder)
+            {syncElements
+              ?.filter((file) => file.is_folder)
               .map((folder, id) => (
                 <div key={id}>
                   <SyncFolder

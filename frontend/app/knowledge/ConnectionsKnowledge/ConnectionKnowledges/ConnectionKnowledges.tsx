@@ -6,7 +6,7 @@ import { useSync } from "@/lib/api/sync/useSync";
 import { Icon } from "@/lib/components/ui/Icon/Icon";
 
 import ConnectionAccount from "./ConnectionAccount/ConnectionAccount";
-import styles from "./ConnectionKnowledge.module.scss";
+import styles from "./ConnectionKnowledges.module.scss";
 
 interface ConnectionKnowledgeProps {
   providerGroup: SyncsByProvider;

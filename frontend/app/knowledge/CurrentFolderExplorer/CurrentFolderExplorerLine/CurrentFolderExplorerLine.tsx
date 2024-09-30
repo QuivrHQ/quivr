@@ -15,8 +15,8 @@ const CurrentFolderExplorerLine = ({
 }: CurrentFolderExplorerLineProps): JSX.Element => {
   const { setCurrentFolder } = useKnowledgeContext();
 
-  const fileType = element.name?.includes(".")
-    ? element.name.split(".").pop()?.toLowerCase() ?? "default"
+  const fileType = element.file_name?.includes(".")
+    ? element.file_name.split(".").pop()?.toLowerCase() ?? "default"
     : "default";
 
   const getIconColor = (): string => {
@@ -78,7 +78,7 @@ const CurrentFolderExplorerLine = ({
             color={element.is_folder ? "black" : undefined}
           />
         }
-        <span className={styles.name}>{element.name}</span>
+        <span className={styles.name}>{element.file_name}</span>
       </div>
       {element.is_folder && (
         <Icon

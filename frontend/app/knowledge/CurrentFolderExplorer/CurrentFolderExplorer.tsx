@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-import { SyncElements } from "@/lib/api/sync/types";
+import { SyncElement } from "@/lib/api/sync/types";
 import { useSync } from "@/lib/api/sync/useSync";
 import { Icon } from "@/lib/components/ui/Icon/Icon";
 import { LoaderIcon } from "@/lib/components/ui/LoaderIcon/LoaderIcon";
@@ -12,7 +12,7 @@ import { useKnowledgeContext } from "../KnowledgeProvider/hooks/useKnowledgeCont
 
 const CurrentFolderExplorer = (): JSX.Element => {
   const [loading, setLoading] = useState(false);
-  const [syncElements, setSyncElements] = useState<SyncElements>();
+  const [syncElements, setSyncElements] = useState<SyncElement[]>();
   const { currentFolder, setCurrentFolder } = useKnowledgeContext();
   const { getSyncFiles } = useSync();
 
@@ -20,15 +20,8 @@ const CurrentFolderExplorer = (): JSX.Element => {
     setLoading(true);
     if (currentFolder) {
       try {
-        const res = await getSyncFiles(currentFolder.syncId, folderId);
-        setSyncElements((prevState) => ({
-          ...prevState,
-          files: res.files.map((syncElement) => ({
-            ...syncElement,
-            syncId: currentFolder.syncId,
-            parentSyncElement: currentFolder,
-          })),
-        }));
+        const res = await getSyncFiles(currentFolder.sync_id, folderId);
+        setSyncElements(res);
       } catch (error) {
         console.error("Failed to get sync files:", error);
       } finally {
@@ -38,14 +31,13 @@ const CurrentFolderExplorer = (): JSX.Element => {
   };
 
   useEffect(() => {
-    if (currentFolder?.syncId && currentFolder.id) {
-      void fetchSyncFiles(currentFolder.id);
+    if (currentFolder?.sync_id && currentFolder.sync_file_id) {
+      void fetchSyncFiles(currentFolder.sync_file_id);
     }
   }, [currentFolder]);
 
   const loadParentFolder = () => {
     if (currentFolder?.parentSyncElement) {
-      console.info(currentFolder.parentSyncElement);
       setCurrentFolder({
         ...currentFolder.parentSyncElement,
         parentSyncElement: currentFolder.parentSyncElement.parentSyncElement,
@@ -68,7 +60,10 @@ const CurrentFolderExplorer = (): JSX.Element => {
                 className={styles.name}
                 onClick={() => void loadParentFolder()}
               >
-                {currentFolder.parentSyncElement.name?.replace(/(\..+)$/, "")}
+                {currentFolder.parentSyncElement.file_name?.replace(
+                  /(\..+)$/,
+                  ""
+                )}
               </span>
               <Icon name="chevronRight" size="normal" color="black" />
             </div>
@@ -82,7 +77,7 @@ const CurrentFolderExplorer = (): JSX.Element => {
                 currentFolder?.parentSyncElement ? styles.selected : ""
               }`}
             >
-              {currentFolder?.name?.replace(/(\..+)$/, "")}
+              {currentFolder?.file_name?.replace(/(\..+)$/, "")}
             </span>
           </div>
         </div>
@@ -92,8 +87,8 @@ const CurrentFolderExplorer = (): JSX.Element => {
               <LoaderIcon size="large" color="primary" />
             </div>
           ) : (
-            syncElements?.files
-              .sort((a, b) => Number(b.is_folder) - Number(a.is_folder))
+            syncElements
+              ?.sort((a, b) => Number(b.is_folder) - Number(a.is_folder))
               .map((syncElement, index) => (
                 <div key={index}>
                   <CurrentFolderExplorerLine element={syncElement} />

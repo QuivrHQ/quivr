@@ -10,16 +10,12 @@ export type Integration =
 export type SyncStatus = "SYNCING" | "SYNCED" | "ERROR" | "REMOVED";
 
 export interface SyncElement {
-  name?: string;
-  id: string;
+  file_name?: string;
+  sync_file_id: string;
   is_folder: boolean;
   icon?: string;
-  syncId: number;
+  sync_id: number;
   parentSyncElement?: SyncElement;
-}
-
-export interface SyncElements {
-  files: SyncElement[];
 }
 
 interface Credentials {
@@ -64,7 +60,7 @@ export interface OpenedConnection {
   id: number | undefined;
   provider: Provider;
   submitted: boolean;
-  selectedFiles: SyncElements;
+  selectedFiles: SyncElement[];
   name: string;
   last_synced: string;
   cleaned?: boolean;
