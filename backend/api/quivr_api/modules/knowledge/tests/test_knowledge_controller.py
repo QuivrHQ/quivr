@@ -96,6 +96,28 @@ async def test_client(session: AsyncSession, user: User):
 
 
 @pytest.mark.asyncio(loop_scope="session")
+async def test_post_knowledge(test_client: AsyncClient):
+    km_data = {
+        "file_name": "test_file.txt",
+        "source": "local",
+        "is_folder": False,
+        "parent_id": None,
+    }
+
+    multipart_data = {
+        "knowledge_data": (None, json.dumps(km_data), "application/json"),
+        "file": ("test_file.txt", b"Test file content", "application/octet-stream"),
+    }
+
+    response = await test_client.post(
+        "/knowledge/",
+        files=multipart_data,
+    )
+
+    assert response.status_code == 200
+
+
+@pytest.mark.asyncio(loop_scope="session")
 async def test_post_knowledge_folder(test_client: AsyncClient):
     km_data = {
         "file_name": "test_file.txt",
@@ -120,28 +142,6 @@ async def test_post_knowledge_folder(test_client: AsyncClient):
     assert km.is_folder
     assert km.parent is None
     assert km.children == []
-
-
-@pytest.mark.asyncio(loop_scope="session")
-async def test_post_knowledge(test_client: AsyncClient):
-    km_data = {
-        "file_name": "test_file.txt",
-        "source": "local",
-        "is_folder": False,
-        "parent_id": None,
-    }
-
-    multipart_data = {
-        "knowledge_data": (None, json.dumps(km_data), "application/json"),
-        "file": ("test_file.txt", b"Test file content", "application/octet-stream"),
-    }
-
-    response = await test_client.post(
-        "/knowledge/",
-        files=multipart_data,
-    )
-
-    assert response.status_code == 200
 
 
 @pytest.mark.asyncio(loop_scope="session")

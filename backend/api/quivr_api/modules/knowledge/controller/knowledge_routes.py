@@ -3,15 +3,22 @@ from http import HTTPStatus
 from typing import List, Optional
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, File, HTTPException, Query, UploadFile, status
+from fastapi import (
+    APIRouter,
+    Depends,
+    File,
+    HTTPException,
+    Query,
+    Response,
+    UploadFile,
+    status,
+)
 from quivr_core.models import KnowledgeStatus
 
 from quivr_api.celery_config import celery
 from quivr_api.logger import get_logger
 from quivr_api.middlewares.auth import AuthBearer, get_current_user
-from quivr_api.modules.brain.entity.brain_entity import RoleEnum
 from quivr_api.modules.brain.service.brain_authorization_service import (
-    has_brain_authorization,
     validate_brain_authorization,
 )
 from quivr_api.modules.dependencies import get_service
@@ -228,33 +235,6 @@ async def update_knowledge(
 
 @knowledge_router.delete(
     "/knowledge/{knowledge_id}",
-    dependencies=[
-        Depends(AuthBearer()),
-        Depends(has_brain_authorization(RoleEnum.Owner)),
-    ],
-    tags=["Knowledge"],
-)
-async def delete_knowledge_brain(
-    knowledge_id: UUID,
-    knowledge_service: KnowledgeService = Depends(get_knowledge_service),
-    current_user: UserIdentity = Depends(get_current_user),
-    brain_id: UUID = Query(..., description="The ID of the brain"),
-):
-    """
-    Delete a specific knowledge from a brain.
-    """
-
-    knowledge = await knowledge_service.get_knowledge(knowledge_id)
-    file_name = knowledge.file_name if knowledge.file_name else knowledge.url
-    await knowledge_service.remove_knowledge_brain(brain_id, knowledge_id)
-
-    return {
-        "message": f"{file_name} of brain {brain_id} has been deleted by user {current_user.email}."
-    }
-
-
-@knowledge_router.delete(
-    "/knowledge/{knowledge_id}",
     status_code=status.HTTP_202_ACCEPTED,
     tags=["Knowledge"],
 )
@@ -297,7 +277,7 @@ async def link_knowledge_to_brain(
         link_request.bulk_id,
     )
     if len(brains_ids) == 0:
-        return "empty brain list"
+        return Response(status_code=status.HTTP_204_NO_CONTENT)
 
     if knowledge_dto.id is None:
         if knowledge_dto.sync_file_id is None:
@@ -319,25 +299,25 @@ async def link_knowledge_to_brain(
             knowledge_dto.id, brains_ids=brains_ids, user_id=current_user.id
         )
 
-    for knowledge in filter(
-        lambda k: k.status
-        not in [KnowledgeStatus.PROCESSED, KnowledgeStatus.PROCESSING],
-        linked_kms,
-    ):
-        assert knowledge.id
+    for knowledge in [
+        k
+        for k in linked_kms
+        if await k.awaitable_attrs.status
+        not in [KnowledgeStatus.PROCESSED, KnowledgeStatus.PROCESSING]
+    ]:
         upload_notification = notification_service.add_notification(
             CreateNotification(
                 user_id=current_user.id,
                 bulk_id=bulk_id,
                 status=NotificationsStatusEnum.INFO,
-                title=f"{knowledge.file_name}",
+                title=f"{await knowledge.awaitable_attrs.file_name}",
                 category="process",
             )
         )
         celery.send_task(
             "process_file_task",
             kwargs={
-                "knowledge_id": knowledge.id,
+                "knowledge_id": await knowledge.awaitable_attrs.id,
                 "notification_id": upload_notification.id,
             },
         )

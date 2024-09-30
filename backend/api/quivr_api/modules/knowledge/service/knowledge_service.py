@@ -142,9 +142,11 @@ class KnowledgeService(BaseService[KnowledgeRepository]):
 
     async def update_knowledge(
         self,
-        knowledge: KnowledgeDB,
+        knowledge: KnowledgeDB | UUID,
         payload: KnowledgeDTO | KnowledgeUpdate | dict[str, Any],
     ):
+        if isinstance(knowledge, UUID):
+            knowledge = await self.repository.get_knowledge_by_id(knowledge)
         return await self.repository.update_knowledge(knowledge, payload)
 
     async def create_knowledge(
