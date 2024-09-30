@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.0.318 (2024-09-30)
+
+## What's Changed
+* feat: add syncNotion from ConnectionCards by @StanGirard in https://github.com/QuivrHQ/quivr/pull/3292
+
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.317...v0.0.318
+
 ## 0.0.317 (2024-09-30)
 
 ## What's Changed
