@@ -608,7 +608,7 @@ class QuivrQARAGLangGraph:
         conversational_qa_chain = self.build_chain()
 
         rolling_message = AIMessageChunk(content="")
-        sources: list[Document] | None = None
+        docs: list[Document] | None = None
         prev_answer = ""
         chunk_id = 0
 
@@ -624,12 +624,12 @@ class QuivrQARAGLangGraph:
             config={"metadata": metadata},
         ):
             if (
-                not sources
+                not docs
                 and "output" in event["data"]
                 and event["data"]["output"] is not None
                 and "docs" in event["data"]["output"]
             ):
-                sources = event["data"]["output"]["docs"]
+                docs = event["data"]["output"]["docs"]
 
             # if (
             # "langgraph_node" in event["metadata"] and
@@ -680,7 +680,7 @@ class QuivrQARAGLangGraph:
         # Last chunk provides metadata
         last_chunk = ParsedRAGChunkResponse(
             answer="",
-            metadata=get_chunk_metadata(rolling_message, sources),
+            metadata=get_chunk_metadata(rolling_message, docs),
             last_chunk=True,
         )
         logger.debug(
