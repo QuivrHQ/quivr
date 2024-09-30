@@ -242,8 +242,10 @@ class LLMEndpointConfig(QuivrBaseConfig):
 class RerankerConfig(QuivrBaseConfig):
     supplier: DefaultRerankers | None = None
     model: str | None = None
-    top_n: int = 5
+    top_n: int = 5  # Number of chunks returned by the re-ranker
     api_key: str | None = None
+    relevance_score_threshold: float | None = None
+    relevance_score_key: str = "relevance_score"
 
     def __init__(self, **data):
         super().__init__(**data)  # Call Pydantic's BaseModel init
@@ -338,8 +340,25 @@ class RetrievalConfig(QuivrBaseConfig):
     llm_config: LLMEndpointConfig = LLMEndpointConfig()
     max_history: int = 10
     max_files: int = 20
+    k: int = 40  # Number of chunks returned by the retriever
     prompt: str | None = None
     workflow_config: WorkflowConfig | None = None
+    dynamic_chunk_retrieval: bool = False
+
+    def validate_dynamic_chunk_retrieval(self):
+        # Ensure that dynamic_chunk_retrieval can only be True if reranker_config is validated
+        if self.dynamic_chunk_retrieval:
+            if not self.reranker_config.supplier:
+                raise ValueError(
+                    "Dynamic chunk retrieval requires a valid supplier in RerankerConfig."
+                )
+
+            # Check that the RerankerConfig has been validated correctly (i.e., has a model and API key)
+            self.reranker_config.validate_model()
+
+    def __init__(self, **data):
+        super().__init__(**data)
+        self.validate_dynamic_chunk_retrieval()
 
 
 class ParserConfig(QuivrBaseConfig):

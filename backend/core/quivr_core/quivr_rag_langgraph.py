@@ -107,7 +107,6 @@ class QuivrQARAGLangGraph:
         retrieval_config: RetrievalConfig,
         llm: LLMEndpoint,
         vector_store: VectorStore | None = None,
-        reranker: BaseDocumentCompressor | None = None,
     ):
         """
         Construct a QuivrQARAGLangGraph object.
@@ -124,30 +123,31 @@ class QuivrQARAGLangGraph:
 
         self.graph = None
 
-        if reranker is not None:
-            self.reranker = reranker
-        elif self.retrieval_config.reranker_config.supplier == DefaultRerankers.COHERE:
-            self.reranker = CohereRerank(
-                model=self.retrieval_config.reranker_config.model,
-                top_n=self.retrieval_config.reranker_config.top_n,
-                cohere_api_key=self.retrieval_config.reranker_config.api_key,
+    def get_reranker(self, **kwargs):
+        # Extract the reranker configuration from self
+        config = self.retrieval_config.reranker_config
+
+        # Allow kwargs to override specific config values
+        supplier = kwargs.get("supplier", config.supplier)
+        model = kwargs.get("model", config.model)
+        top_n = kwargs.get("top_n", config.top_n)
+        api_key = kwargs.get("api_key", config.api_key)
+
+        # Instantiate reranker based on the supplier
+        if supplier == DefaultRerankers.COHERE:
+            reranker = CohereRerank(
+                model=model, top_n=top_n, cohere_api_key=api_key, **kwargs
             )
-        elif self.retrieval_config.reranker_config.supplier == DefaultRerankers.JINA:
-            self.reranker = JinaRerank(
-                model=self.retrieval_config.reranker_config.model,
-                top_n=self.retrieval_config.reranker_config.top_n,
-                jina_api_key=self.retrieval_config.reranker_config.api_key,
+        elif supplier == DefaultRerankers.JINA:
+            reranker = JinaRerank(
+                model=model, top_n=top_n, jina_api_key=api_key, **kwargs
             )
         else:
-            self.reranker = IdempotentCompressor()
+            reranker = IdempotentCompressor()
 
-        if self.vector_store:
-            self.compression_retriever = ContextualCompressionRetriever(
-                base_compressor=self.reranker, base_retriever=self.retriever
-            )
+        return reranker
 
-    @property
-    def retriever(self):
+    def get_retriever(self, **kwargs):
         """
         Returns a retriever that can retrieve documents from the vector store.
 
@@ -155,9 +155,11 @@ class QuivrQARAGLangGraph:
             VectorStoreRetriever: The retriever.
         """
         if self.vector_store:
-            return self.vector_store.as_retriever()
+            retriever = self.vector_store.as_retriever(**kwargs)
         else:
             raise ValueError("No vector store provided")
+
+        return retriever
 
     # def routing(self, state: AgentState) -> str:
     #     """
@@ -388,6 +390,29 @@ class QuivrQARAGLangGraph:
 
         return {**state, "questions": condensed_questions}
 
+    def filter_chunks_by_relevance(self, chunks: List[Document], **kwargs):
+        config = self.retrieval_config.reranker_config
+        relevance_score_threshold = kwargs.get(
+            "relevance_score_threshold", config.relevance_score_threshold
+        )
+
+        if relevance_score_threshold is None:
+            return chunks
+
+        filtered_chunks = []
+        for chunk in chunks:
+            if config.relevance_score_key not in chunk.metadata:
+                logger.warning(
+                    f"Relevance score key {config.relevance_score_key} not found in metadata, cannot filter chunks by relevance"
+                )
+                filtered_chunks.append(chunk)
+            elif (
+                chunk.metadata[config.relevance_score_key] >= relevance_score_threshold
+            ):
+                filtered_chunks.append(chunk)
+
+        return filtered_chunks
+
     async def retrieve(self, state: AgentState) -> AgentState:
         """
         Retrieve relevent chunks
@@ -401,19 +426,30 @@ class QuivrQARAGLangGraph:
 
         questions = state["questions"]
 
+        kwargs = {
+            "search_kwargs": {
+                "k": self.retrieval_config.k,
+            }
+        }
+        base_retriever = self.get_retriever(**kwargs)
+        reranker = self.get_reranker()
+        compression_retriever = ContextualCompressionRetriever(
+            base_compressor=reranker, base_retriever=base_retriever
+        )
+
         # Prepare the async tasks for all questions
         tasks = []
         for question in questions:
             # Asynchronously invoke the model for each question
-            tasks.append(self.compression_retriever.ainvoke(question))
+            tasks.append(compression_retriever.ainvoke(question))
 
         # Gather all the responses asynchronously
         responses = await asyncio.gather(*tasks) if tasks else []
 
-        # Replace each question with its condensed version
         docs = []
         for response in responses:
-            docs += response
+            _docs = self.filter_chunks_by_relevance(response)
+            docs += _docs
 
         return {**state, "docs": docs}
 
@@ -642,7 +678,6 @@ class QuivrQARAGLangGraph:
                 and event["metadata"]["langgraph_node"] in self.final_nodes
             ):
                 chunk = event["data"]["chunk"]
-                # print("\n\n chunk: ", chunk)
                 rolling_message, answer_str = parse_chunk_response(
                     rolling_message,
                     chunk,

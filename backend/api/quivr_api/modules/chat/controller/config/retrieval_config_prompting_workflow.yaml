@@ -24,7 +24,12 @@ workflow_config:
 # to include in the context of the answer
 max_history: 10
 
-prompt: "my prompt"
+# Number of chunks returned by the retriever
+k: 40
+
+# Whether to dynamically determine the number of chunks (from their relevance score)
+# to be returned to the LLM for the answer generation
+dynamic_chunk_retrieval: true
 
 max_files: 20
 reranker_config:
@@ -34,8 +39,12 @@ reranker_config:
   # The model to use for the reranker for the given supplier
   model: "rerank-multilingual-v3.0"
 
+  # Only chunks with relevance scores equal or above this threshold will be
+  # returned to the LLM to generate the answer (allowed values are between 0 and 1)
+  relevance_score_threshold: 0.4
+
   # Number of chunks returned by the reranker
-  top_n: 5
+  top_n: 20
 llm_config:
 
   # Maximum number of tokens to pass to the LLM
