@@ -8,10 +8,11 @@ export enum CompanySize {
   Two = "10-25",
   Three = "25-50",
   Four = "50-100",
-  Five = "100-500",
-  Six = "500-1000",
-  Seven = "1000-5000",
-  Eight = "+5000",
+  Five = "100-250",
+  Six = "250-500",
+  Seven = "500-1000",
+  Eight = "1000-5000",
+  Nine = "+5000",
 }
 
 export enum UsagePurpose {
