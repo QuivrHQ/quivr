@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 
 import { useKnowledgeContext } from "@/app/knowledge/KnowledgeProvider/hooks/useKnowledgeContext";
-import { SyncElement } from "@/lib/api/sync/types";
+import { KMSElement } from "@/lib/api/sync/types";
 import { useSync } from "@/lib/api/sync/useSync";
 import { Icon } from "@/lib/components/ui/Icon/Icon";
 import { LoaderIcon } from "@/lib/components/ui/LoaderIcon/LoaderIcon";
@@ -9,14 +9,14 @@ import { LoaderIcon } from "@/lib/components/ui/LoaderIcon/LoaderIcon";
 import styles from "./SyncFolder.module.scss";
 
 interface SyncFolderProps {
-  element: SyncElement;
+  element: KMSElement;
 }
 
 const SyncFolder = ({ element }: SyncFolderProps): JSX.Element => {
   const [folded, setFolded] = useState(true);
   const [loading, setLoading] = useState(false);
   const { getSyncFiles } = useSync();
-  const [syncElements, setSyncElements] = useState<SyncElement[]>();
+  const [syncElements, setKMSElements] = useState<KMSElement[]>();
   const [selectedFolder, setSelectedFolder] = useState<boolean>(false);
 
   const { currentFolder, setCurrentFolder } = useKnowledgeContext();
@@ -26,15 +26,19 @@ const SyncFolder = ({ element }: SyncFolderProps): JSX.Element => {
   }, [currentFolder]);
 
   useEffect(() => {
-    if (!folded) {
+    if (!folded && element.sync_id !== null) {
       setLoading(true);
       void (async () => {
         try {
+          if (element.sync_id === null || element.sync_file_id === null) {
+            throw new Error("sync_id is null");
+          }
           const res = await getSyncFiles(element.sync_id, element.sync_file_id);
-          setSyncElements(res);
+          setKMSElements(res);
           setLoading(false);
         } catch (error) {
           console.error("Failed to get sync files:", error);
+          setLoading(false);
         }
       })();
     }
@@ -61,7 +65,7 @@ const SyncFolder = ({ element }: SyncFolderProps): JSX.Element => {
           onClick={() => {
             setCurrentFolder({
               ...element,
-              parentSyncElement: element.parentSyncElement,
+              parentKMSElement: element.parentKMSElement,
             });
           }}
         >
@@ -84,7 +88,7 @@ const SyncFolder = ({ element }: SyncFolderProps): JSX.Element => {
                   <SyncFolder
                     element={{
                       ...folder,
-                      parentSyncElement: element,
+                      parentKMSElement: element,
                     }}
                   />
                 </div>

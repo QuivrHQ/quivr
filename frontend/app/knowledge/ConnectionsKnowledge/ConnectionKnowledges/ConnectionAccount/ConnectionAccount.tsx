@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-import { Sync, SyncElement } from "@/lib/api/sync/types"; // Assurez-vous que SyncElement est bien importé
+import { KMSElement, Sync } from "@/lib/api/sync/types"; // Assurez-vous que KMSElement est bien importé
 import { useSync } from "@/lib/api/sync/useSync";
 import { ConnectionIcon } from "@/lib/components/ui/ConnectionIcon/ConnectionIcon";
 import { Icon } from "@/lib/components/ui/Icon/Icon";
@@ -23,7 +23,7 @@ const ConnectionAccount = ({
 }: ConnectionAccountProps): JSX.Element => {
   const { getSyncFiles } = useSync();
   const [loading, setLoading] = useState(false);
-  const [syncElements, setSyncElements] = useState<SyncElement[]>();
+  const [syncElements, setKMSElements] = useState<KMSElement[]>();
   const [folded, setFolded] = useState(true);
 
   const getFiles = () => {
@@ -31,7 +31,7 @@ const ConnectionAccount = ({
     void (async () => {
       try {
         const res = await getSyncFiles(sync.id);
-        setSyncElements(res);
+        setKMSElements(res);
         setLoading(false);
       } catch (error) {
         console.error("Failed to get sync files:", error);

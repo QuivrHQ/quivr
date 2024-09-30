@@ -1,11 +1,11 @@
 import { createContext, useState } from "react";
 
-import { SyncElement } from "@/lib/api/sync/types";
+import { KMSElement } from "@/lib/api/sync/types";
 
 type KnowledgeContextType = {
-  currentFolder: SyncElement | undefined;
+  currentFolder: KMSElement | undefined;
   setCurrentFolder: React.Dispatch<
-    React.SetStateAction<SyncElement | undefined>
+    React.SetStateAction<KMSElement | undefined>
   >;
 };
 
@@ -18,7 +18,7 @@ export const KnowledgeProvider = ({
 }: {
   children: React.ReactNode;
 }): JSX.Element => {
-  const [currentFolder, setCurrentFolder] = useState<SyncElement | undefined>(
+  const [currentFolder, setCurrentFolder] = useState<KMSElement | undefined>(
     undefined
   );
 

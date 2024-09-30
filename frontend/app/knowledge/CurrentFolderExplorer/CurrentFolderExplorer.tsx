@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-import { SyncElement } from "@/lib/api/sync/types";
+import { KMSElement } from "@/lib/api/sync/types";
 import { useSync } from "@/lib/api/sync/useSync";
 import { Icon } from "@/lib/components/ui/Icon/Icon";
 import { LoaderIcon } from "@/lib/components/ui/LoaderIcon/LoaderIcon";
@@ -12,16 +12,16 @@ import { useKnowledgeContext } from "../KnowledgeProvider/hooks/useKnowledgeCont
 
 const CurrentFolderExplorer = (): JSX.Element => {
   const [loading, setLoading] = useState(false);
-  const [syncElements, setSyncElements] = useState<SyncElement[]>();
+  const [syncElements, setKMSElements] = useState<KMSElement[]>();
   const { currentFolder, setCurrentFolder } = useKnowledgeContext();
   const { getSyncFiles } = useSync();
 
   const fetchSyncFiles = async (folderId: string) => {
     setLoading(true);
-    if (currentFolder) {
+    if (currentFolder?.sync_id) {
       try {
         const res = await getSyncFiles(currentFolder.sync_id, folderId);
-        setSyncElements(res);
+        setKMSElements(res);
       } catch (error) {
         console.error("Failed to get sync files:", error);
       } finally {
@@ -37,10 +37,10 @@ const CurrentFolderExplorer = (): JSX.Element => {
   }, [currentFolder]);
 
   const loadParentFolder = () => {
-    if (currentFolder?.parentSyncElement) {
+    if (currentFolder?.parentKMSElement) {
       setCurrentFolder({
-        ...currentFolder.parentSyncElement,
-        parentSyncElement: currentFolder.parentSyncElement.parentSyncElement,
+        ...currentFolder.parentKMSElement,
+        parentKMSElement: currentFolder.parentKMSElement.parentKMSElement,
       });
     }
   };
@@ -49,18 +49,18 @@ const CurrentFolderExplorer = (): JSX.Element => {
     <div className={styles.current_folder_explorer_container}>
       <div className={styles.current_folder_explorer_wrapper}>
         <div className={styles.header}>
-          {currentFolder?.parentSyncElement && (
+          {currentFolder?.parentKMSElement && (
             <div className={styles.parent_folder}>
-              {currentFolder.parentSyncElement.icon && (
+              {currentFolder.parentKMSElement.icon && (
                 <div className={styles.icon}>
-                  {currentFolder.parentSyncElement.icon}
+                  {currentFolder.parentKMSElement.icon}
                 </div>
               )}
               <span
                 className={styles.name}
                 onClick={() => void loadParentFolder()}
               >
-                {currentFolder.parentSyncElement.file_name?.replace(
+                {currentFolder.parentKMSElement.file_name?.replace(
                   /(\..+)$/,
                   ""
                 )}
@@ -74,7 +74,7 @@ const CurrentFolderExplorer = (): JSX.Element => {
             )}
             <span
               className={`${styles.name} ${
-                currentFolder?.parentSyncElement ? styles.selected : ""
+                currentFolder?.parentKMSElement ? styles.selected : ""
               }`}
             >
               {currentFolder?.file_name?.replace(/(\..+)$/, "")}

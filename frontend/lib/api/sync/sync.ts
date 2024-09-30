@@ -1,12 +1,12 @@
 import { AxiosInstance } from "axios";
 import { UUID } from "crypto";
 
-import { ActiveSync, OpenedConnection, Sync, SyncElement } from "./types";
+import { ActiveSync, KMSElement, OpenedConnection, Sync } from "./types";
 
-const createFilesSettings = (files: SyncElement[]) =>
+const createFilesSettings = (files: KMSElement[]) =>
   files.filter((file) => !file.is_folder).map((file) => file.sync_file_id);
 
-const createFoldersSettings = (files: SyncElement[]) =>
+const createFoldersSettings = (files: KMSElement[]) =>
   files.filter((file) => file.is_folder).map((file) => file.sync_file_id);
 
 export const syncGoogleDrive = async (
@@ -63,12 +63,12 @@ export const getSyncFiles = async (
   axiosInstance: AxiosInstance,
   userSyncId: number,
   folderId?: string
-): Promise<SyncElement[]> => {
+): Promise<KMSElement[]> => {
   const url = folderId
     ? `/sync/${userSyncId}/files?user_sync_id=${userSyncId}&folder_id=${folderId}`
     : `/sync/${userSyncId}/files?user_sync_id=${userSyncId}`;
 
-  return (await axiosInstance.get<SyncElement[]>(url)).data;
+  return (await axiosInstance.get<KMSElement[]>(url)).data;
 };
 
 export const syncFiles = async (

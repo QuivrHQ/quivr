@@ -33,7 +33,7 @@ export const ConnectionSection = ({
 }: ConnectionSectionProps): JSX.Element => {
   const { providerIconUrls, getUserSyncs, getSyncFiles } = useSync();
   const {
-    setCurrentSyncElements,
+    setCurrentKMSElements,
     setCurrentSyncId,
     setOpenedConnections,
     openedConnections,
@@ -128,7 +128,7 @@ export const ConnectionSection = ({
       setLoadingFirstList(true);
       const res = await getSyncFiles(userSyncId);
       setLoadingFirstList(false);
-      setCurrentSyncElements(res);
+      setCurrentKMSElements(res);
       setCurrentSyncId(userSyncId);
       handleOpenedConnections(userSyncId);
     } catch (error) {

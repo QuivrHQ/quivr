@@ -1,11 +1,11 @@
 import { createContext, useState } from "react";
 
-import { OpenedConnection, Provider, SyncElements } from "@/lib/api/sync/types";
+import { KMSElements, OpenedConnection, Provider } from "@/lib/api/sync/types";
 
 export type FromConnectionsContextType = {
-  currentSyncElements: SyncElements | undefined;
-  setCurrentSyncElements: React.Dispatch<
-    React.SetStateAction<SyncElements | undefined>
+  currentKMSElements: KMSElements | undefined;
+  setCurrentKMSElements: React.Dispatch<
+    React.SetStateAction<KMSElements | undefined>
   >;
   currentSyncId: number | undefined;
   setCurrentSyncId: React.Dispatch<React.SetStateAction<number | undefined>>;
@@ -30,8 +30,8 @@ export const FromConnectionsProvider = ({
 }: {
   children: React.ReactNode;
 }): JSX.Element => {
-  const [currentSyncElements, setCurrentSyncElements] = useState<
-    SyncElements | undefined
+  const [currentKMSElements, setCurrentKMSElements] = useState<
+    KMSElements | undefined
   >(undefined);
   const [currentSyncId, setCurrentSyncId] = useState<number | undefined>(
     undefined
@@ -46,8 +46,8 @@ export const FromConnectionsProvider = ({
   return (
     <FromConnectionsContext.Provider
       value={{
-        currentSyncElements,
-        setCurrentSyncElements,
+        currentKMSElements,
+        setCurrentKMSElements,
         currentSyncId,
         setCurrentSyncId,
         openedConnections,

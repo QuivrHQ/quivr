@@ -1,4 +1,4 @@
-import { SyncElement } from "@/lib/api/sync/types";
+import { KMSElement } from "@/lib/api/sync/types";
 import { Icon } from "@/lib/components/ui/Icon/Icon";
 import { iconList } from "@/lib/helpers/iconList";
 
@@ -7,7 +7,7 @@ import styles from "./CurrentFolderExplorerLine.module.scss";
 import { useKnowledgeContext } from "../../KnowledgeProvider/hooks/useKnowledgeContext";
 
 interface CurrentFolderExplorerLineProps {
-  element: SyncElement;
+  element: KMSElement;
 }
 
 const CurrentFolderExplorerLine = ({

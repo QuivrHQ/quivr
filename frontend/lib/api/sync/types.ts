@@ -9,13 +9,13 @@ export type Integration =
 
 export type SyncStatus = "SYNCING" | "SYNCED" | "ERROR" | "REMOVED";
 
-export interface SyncElement {
+export interface KMSElement {
   file_name?: string;
-  sync_file_id: string;
+  sync_file_id: string | null;
   is_folder: boolean;
   icon?: string;
-  sync_id: number;
-  parentSyncElement?: SyncElement;
+  sync_id: number | null;
+  parentKMSElement?: KMSElement;
 }
 
 interface Credentials {
@@ -60,7 +60,7 @@ export interface OpenedConnection {
   id: number | undefined;
   provider: Provider;
   submitted: boolean;
-  selectedFiles: SyncElement[];
+  selectedFiles: KMSElement[];
   name: string;
   last_synced: string;
   cleaned?: boolean;
