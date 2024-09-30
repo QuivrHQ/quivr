@@ -57,7 +57,9 @@ const Knowledge = (): JSX.Element => {
             style={{ minWidth: `${foldersWidth}px` }}
           >
             <div className={styles.folders}>
-              <QuivrKnowledges />
+              <div className={styles.quivr_folder}>
+                <QuivrKnowledges />
+              </div>
               <ConnectionsKnowledges />
             </div>
           </div>

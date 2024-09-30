@@ -26,6 +26,11 @@
         flex-direction: column;
         gap: Spacings.$spacing04;
         overflow-x: hidden;
+
+        .quivr_folder {
+          padding-bottom: Spacings.$spacing05;
+          border-bottom: 1px solid var(--border-0);
+        }
       }
     }
 
