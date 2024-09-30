@@ -1,3 +1,4 @@
+from datetime import datetime, timedelta, timezone
 from typing import Any, List, Sequence
 from uuid import UUID
 
@@ -5,7 +6,8 @@ from fastapi import HTTPException
 from quivr_core.models import KnowledgeStatus
 from sqlalchemy.exc import IntegrityError, NoResultFound
 from sqlalchemy.orm import joinedload
-from sqlmodel import and_, col, select, text
+from sqlalchemy.sql.functions import random
+from sqlmodel import and_, col, not_, select, text
 from sqlmodel.ext.asyncio.session import AsyncSession
 
 from quivr_api.logger import get_logger
@@ -436,13 +438,23 @@ class KnowledgeRepository(BaseRepository):
         result = await self.session.exec(query)
         return result.all()
 
-    async def get_sync_knowledges_to_update(self,batch_size: int = 1) -> Sequence[KnowledgeDB]:
-        query = select(KnowledgeDB)
-                .where(
-                    and_(
-                        col(KnowledgeDB.sync_id).in_(brains_ids),
-                    )
-                )
+    async def get_sync_knowledges_files_to_update(
+        self, timedelta_hour: int, batch_size: int
+    ) -> List[KnowledgeDB]:
+        time_delta = datetime.now(timezone.utc) - timedelta(hours=timedelta_hour)
+        query = (
+            select(KnowledgeDB)
+            .where(
+                not_(KnowledgeDB.is_folder),
+                col(KnowledgeDB.sync_id).isnot(None),
+                col(KnowledgeDB.last_synced_at) < time_delta,
+                col(KnowledgeDB.brains).any(),
+            )
+            # Oldest first
+            .order_by(col(KnowledgeDB.last_synced_at).asc(), random())
+            .limit(batch_size)
+        )
 
+        # Execute the query (assuming you have a session)
         result = await self.session.exec(query)
-        return result.all()
+        return list(result.unique().all())

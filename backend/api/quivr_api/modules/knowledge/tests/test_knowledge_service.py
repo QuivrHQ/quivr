@@ -1,4 +1,5 @@
 import os
+from datetime import datetime, timedelta
 from io import BytesIO
 from typing import List, Tuple
 from uuid import uuid4
@@ -17,7 +18,7 @@ from quivr_api.modules.knowledge.dto.inputs import (
     KnowledgeStatus,
     KnowledgeUpdate,
 )
-from quivr_api.modules.knowledge.entity.knowledge import KnowledgeDB
+from quivr_api.modules.knowledge.entity.knowledge import KnowledgeDB, KnowledgeSource
 from quivr_api.modules.knowledge.entity.knowledge_brain import KnowledgeBrain
 from quivr_api.modules.knowledge.repository.knowledges import KnowledgeRepository
 from quivr_api.modules.knowledge.service.knowledge_exceptions import (
@@ -27,6 +28,8 @@ from quivr_api.modules.knowledge.service.knowledge_exceptions import (
 )
 from quivr_api.modules.knowledge.service.knowledge_service import KnowledgeService
 from quivr_api.modules.knowledge.tests.conftest import ErrorStorage, FakeStorage
+from quivr_api.modules.sync.dto.outputs import SyncProvider
+from quivr_api.modules.sync.entity.sync_models import Sync
 from quivr_api.modules.upload.service.upload_file import upload_file_storage
 from quivr_api.modules.user.entity.user_identity import User
 from quivr_api.modules.vector.entity.vector import Vector
@@ -1121,3 +1124,143 @@ async def test_unlink_knowledge_brain(
     kms = await service.get_all_knowledge_in_brain(brain_id=brain_user3.brain_id)
     assert len(kms) == 1
     assert kms[0].id == file.id
+
+
+@pytest.mark.asyncio(loop_scope="session")
+async def test_get_sync_km_files_to_update_date(
+    session: AsyncSession, user: User, brain_user: Brain, sync: Sync
+):
+    assert user.id
+    assert brain_user.brain_id
+
+    file1 = KnowledgeDB(
+        file_name="folder",
+        extension="",
+        status=KnowledgeStatus.PROCESSED,
+        source=SyncProvider.GOOGLE,
+        source_link="drive://file2",
+        file_size=4,
+        file_sha1="",
+        brains=[brain_user],
+        user_id=user.id,
+        sync_id=sync.id,
+        sync_file_id="file2",
+        last_synced_at=datetime.now() - timedelta(days=2),
+    )
+    file2 = KnowledgeDB(
+        file_name="file_2",
+        extension=".txt",
+        status=KnowledgeStatus.PROCESSED,
+        source=SyncProvider.GOOGLE,
+        source_link="drive://file2",
+        file_size=10,
+        file_sha1=None,
+        brains=[brain_user],
+        user_id=user.id,
+        sync_id=sync.id,
+        sync_file_id="file2",
+        last_synced_at=datetime.now(),
+    )
+    session.add(file2)
+    session.add(file1)
+    await session.commit()
+    await session.refresh(file1)
+    await session.refresh(file2)
+
+    storage = FakeStorage()
+    repository = KnowledgeRepository(session)
+    service = KnowledgeService(repository, storage)
+
+    kms = await service.get_sync_knowledges_files_to_update(
+        timedelta_hour=4,
+        batch_size=10,
+    )
+    assert len(kms) == 1
+    assert kms[0].id == file1.id
+
+
+@pytest.mark.asyncio(loop_scope="session")
+async def test_get_sync_km_files_to_update_brains(
+    session: AsyncSession, user: User, brain_user: Brain, sync: Sync
+):
+    assert user.id
+    assert brain_user.brain_id
+
+    file2 = KnowledgeDB(
+        file_name="file",
+        extension=".txt",
+        status=KnowledgeStatus.PROCESSED,
+        source=KnowledgeSource.LOCAL,
+        source_link="path",
+        file_size=4,
+        file_sha1="",
+        brains=[],
+        user_id=user.id,
+    )
+
+    file1 = KnowledgeDB(
+        file_name="file",
+        extension=".txt",
+        status=KnowledgeStatus.PROCESSED,
+        source=SyncProvider.GOOGLE,
+        source_link="drive://file2",
+        file_size=4,
+        file_sha1="",
+        brains=[],
+        user_id=user.id,
+        sync_id=sync.id,
+        sync_file_id="file2",
+        last_synced_at=datetime.now() - timedelta(days=2),
+    )
+    session.add(file1)
+    session.add(file2)
+    await session.commit()
+    await session.refresh(file1)
+    await session.refresh(file2)
+
+    storage = FakeStorage()
+    repository = KnowledgeRepository(session)
+    service = KnowledgeService(repository, storage)
+
+    kms = await service.get_sync_knowledges_files_to_update(
+        timedelta_hour=4,
+        batch_size=10,
+    )
+    assert len(kms) == 0
+
+
+@pytest.mark.asyncio(loop_scope="session")
+async def test_get_sync_km_files_to_update_file_only(
+    session: AsyncSession, user: User, brain_user: Brain, sync: Sync
+):
+    assert user.id
+    assert brain_user.brain_id
+
+    file1 = KnowledgeDB(
+        file_name="folder",
+        extension="",
+        status=KnowledgeStatus.PROCESSED,
+        source=SyncProvider.GOOGLE,
+        source_link="drive://file2",
+        file_size=4,
+        file_sha1="",
+        brains=[brain_user],
+        user_id=user.id,
+        sync_id=sync.id,
+        sync_file_id="file2",
+        is_folder=True,
+        last_synced_at=datetime.now() - timedelta(days=2),
+    )
+    session.add(file1)
+    await session.commit()
+    await session.refresh(file1)
+
+    storage = FakeStorage()
+    repository = KnowledgeRepository(session)
+    service = KnowledgeService(repository, storage)
+
+    kms = await service.get_sync_knowledges_files_to_update(
+        timedelta_hour=4,
+        batch_size=10,
+    )
+    assert len(kms) == 0

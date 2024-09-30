@@ -350,3 +350,10 @@ class KnowledgeService(BaseService[KnowledgeRepository]):
         return await self.repository.unlink_knowledge_tree_brains(
             knowledge, brains_ids=brains_ids, user_id=user_id
         )
+
+    async def get_sync_knowledges_files_to_update(
+        self, timedelta_hour: int, batch_size: int = 1
+    ) -> List[KnowledgeDB]:
+        return await self.repository.get_sync_knowledges_files_to_update(
+            timedelta_hour, batch_size
+        )
