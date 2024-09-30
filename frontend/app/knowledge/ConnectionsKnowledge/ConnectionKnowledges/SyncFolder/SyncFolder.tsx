@@ -65,6 +65,7 @@ const SyncFolder = ({ element }: SyncFolderProps): JSX.Element => {
         <span
           className={`${styles.name} ${selectedFolder ? styles.selected : ""}`}
           onClick={() => {
+            console.info(element);
             setCurrentFolder({
               ...element,
               parentKMSElement: element.parentKMSElement,

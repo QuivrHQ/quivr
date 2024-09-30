@@ -22,6 +22,7 @@ const SyncCurrentFolder = (): JSX.Element => {
       try {
         const res = await getSyncFiles(currentFolder.sync_id, folderId);
         setKMSElements(res);
+        console.info("res", res);
       } catch (error) {
         console.error("Failed to get sync files:", error);
       } finally {
@@ -87,7 +88,12 @@ const SyncCurrentFolder = (): JSX.Element => {
             ?.sort((a, b) => Number(b.is_folder) - Number(a.is_folder))
             .map((syncElement, index) => (
               <div key={index}>
-                <CurrentFolderExplorerLine element={syncElement} />
+                <CurrentFolderExplorerLine
+                  element={{
+                    ...syncElement,
+                    parentKMSElement: currentFolder,
+                  }}
+                />
               </div>
             ))
         )}

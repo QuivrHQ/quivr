@@ -57,7 +57,11 @@ const CurrentFolderExplorerLine = ({
       }`}
       onClick={() => {
         if (element.is_folder) {
-          setCurrentFolder(element);
+          console.info(element);
+          setCurrentFolder({
+            ...element,
+            parentKMSElement: element.parentKMSElement,
+          });
         }
       }}
     >
