@@ -1,4 +1,5 @@
 import asyncio
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import AsyncGenerator, List, Optional, Tuple
 from uuid import UUID
@@ -28,7 +29,7 @@ class KnowledgeProcessor:
     def __init__(self, services: ProcessorServices):
         self.services = services
 
-    async def fetch_sync_knowledge(
+    async def fetch_db_knowledges_and_syncprovider(
         self,
         sync_id: int,
         user_id: UUID,
@@ -169,7 +170,10 @@ class KnowledgeProcessor:
             yield f
 
         # Fetch children
-        syncfile_to_knowledge, sync_files = await self.fetch_sync_knowledge(
+        (
+            syncfile_to_knowledge,
+            sync_files,
+        ) = await self.fetch_db_knowledges_and_syncprovider(
             sync_id=parent_knowledge.sync_id,
             user_id=parent_knowledge.user_id,
             folder_id=parent_knowledge.sync_file_id,
@@ -180,7 +184,7 @@ class KnowledgeProcessor:
         for sync_file in sync_files:
             file_knowledge = (
                 await self.services.knowledge_service.create_or_link_sync_knowledge(
-                    syncfile_to_knowledge=syncfile_to_knowledge,
+                    syncfile_id_to_knowledge=syncfile_to_knowledge,
                     parent_knowledge=parent_knowledge,
                     sync_file=sync_file,
                 )
@@ -212,11 +216,14 @@ class KnowledgeProcessor:
                         chunks=chunks,
                         vector_service=self.services.vector_service,
                     )
+
+                last_synced_at = datetime.now(timezone.utc)
                 await self.services.knowledge_service.update_knowledge(
                     knowledge,
                     KnowledgeUpdate(
                         status=KnowledgeStatus.PROCESSED,
                         file_sha1=knowledge.file_sha1,
+                        last_synced_at=last_synced_at if knowledge.sync_id else None,
                     ),
                 )
 

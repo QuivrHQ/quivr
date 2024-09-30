@@ -438,8 +438,33 @@ class KnowledgeRepository(BaseRepository):
         result = await self.session.exec(query)
         return result.all()
 
-    async def get_sync_knowledges_files_to_update(
-        self, timedelta_hour: int, batch_size: int
+    async def get_outdated_sync_files(
+        self,
+        timedelta_hour: int,
+        batch_size: int,
+    ) -> List[KnowledgeDB]:
+        time_delta = datetime.now(timezone.utc) - timedelta(hours=timedelta_hour)
+        query = (
+            select(KnowledgeDB)
+            .where(
+                not_(KnowledgeDB.is_folder),
+                col(KnowledgeDB.sync_id).isnot(None),
+                col(KnowledgeDB.last_synced_at) < time_delta,
+                col(KnowledgeDB.brains).any(),
+            )
+            # Oldest first
+            .order_by(col(KnowledgeDB.last_synced_at).asc(), random())
+            .limit(batch_size)
+        )
+
+        # Execute the query (assuming you have a session)
+        result = await self.session.exec(query)
+        return list(result.unique().all())
+
+    async def get_outdated_sync_folders(
+        self,
+        timedelta_hour: int,
+        batch_size: int,
     ) -> List[KnowledgeDB]:
         time_delta = datetime.now(timezone.utc) - timedelta(hours=timedelta_hour)
         query = (

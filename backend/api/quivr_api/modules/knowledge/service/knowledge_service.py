@@ -56,17 +56,20 @@ class KnowledgeService(BaseService[KnowledgeRepository]):
 
     async def create_or_link_sync_knowledge(
         self,
-        syncfile_to_knowledge: dict[str, KnowledgeDB],
+        syncfile_id_to_knowledge: dict[str, KnowledgeDB],
         parent_knowledge: KnowledgeDB,
         sync_file: SyncFile,
     ):
-        existing_km = syncfile_to_knowledge.get(sync_file.id)
+        existing_km = syncfile_id_to_knowledge.get(sync_file.id)
         if existing_km is not None:
             # NOTE: function called in worker processor
-            # The parent_knowledge was just added (we are processing it)
-            # This implies that we could have sync children that were processed before
-            # IF SyncKnowledge already exists =>  It's already processed in some other brain
-            # => Link it to the parent and add its  brains and move on if it is PROCESSED ELSE Reprocess the file
+            # The parent_knowledge was just added to db (we are processing it)
+            # This implies that we could have sync children files and folders that were processed before
+            # If SyncKnowledge already exists
+            #   IF STATUS == PROCESSED:
+            #   => It's already processed in some other brain !
+            #   => Link it to the parent and update its brains to the correct ones
+            #   ELSE Reprocess the file
             km_brains = {km_brain.brain_id for km_brain in existing_km.brains}
             for brain in filter(
                 lambda b: b.brain_id not in km_brains,
@@ -354,6 +357,4 @@ class KnowledgeService(BaseService[KnowledgeRepository]):
     async def get_sync_knowledges_files_to_update(
         self, timedelta_hour: int, batch_size: int = 1
     ) -> List[KnowledgeDB]:
-        return await self.repository.get_sync_knowledges_files_to_update(
-            timedelta_hour, batch_size
-        )
+        return await self.repository.get_outdated_sync_files(timedelta_hour, batch_size)
