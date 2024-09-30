@@ -17,6 +17,7 @@ from sqlmodel import (  # noqa: F811
 )
 from sqlmodel import UUID as PGUUID
 
+from quivr_api.modules.sync.dto.inputs import SyncStatus
 from quivr_api.modules.sync.dto.outputs import SyncProvider, SyncsOutput
 from quivr_api.modules.user.entity.user_identity import User
 
@@ -62,6 +63,7 @@ class Sync(SQLModel, table=True):
         default=None, sa_column=Column("credentials", JSON)
     )
     state: Dict[str, str] | None = Field(default=None, sa_column=Column("state", JSON))
+    status: str = Field(default=SyncStatus.SYNCING)
     created_at: datetime | None = Field(
         default=None,
         sa_column=Column(
