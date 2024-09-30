@@ -11,7 +11,11 @@ from quivr_api.modules.sync.dto.outputs import SyncProvider
 from quivr_api.modules.sync.repository.sync_repository import SyncsRepository
 from quivr_api.modules.sync.service.sync_service import SyncsService
 from quivr_api.modules.sync.utils.sync import (
+    AzureDriveSync,
     BaseSync,
+    DropboxSync,
+    GitHubSync,
+    GoogleDriveSync,
 )
 from quivr_api.modules.vector.repository.vectors_repository import VectorRepository
 from quivr_api.modules.vector.service.vector_service import VectorService
@@ -19,11 +23,18 @@ from sqlalchemy.ext.asyncio import AsyncEngine
 from sqlmodel import text
 from sqlmodel.ext.asyncio.session import AsyncSession
 
-from quivr_worker.process.utils import (
-    build_syncprovider_mapping,
-)
-
 logger = get_logger("celery_worker")
+
+
+def build_syncprovider_mapping() -> dict[SyncProvider, BaseSync]:
+    mapping_sync_utils = {
+        SyncProvider.GOOGLE: GoogleDriveSync(),
+        SyncProvider.AZURE: AzureDriveSync(),
+        SyncProvider.DROPBOX: DropboxSync(),
+        SyncProvider.GITHUB: GitHubSync(),
+        # SyncProvider.NOTION: NotionSync(notion_service=notion_service),
+    }
+    return mapping_sync_utils
 
 
 @dataclass

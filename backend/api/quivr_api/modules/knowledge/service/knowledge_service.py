@@ -1,5 +1,6 @@
 import asyncio
 import io
+from datetime import datetime
 from typing import Any, List
 from uuid import UUID
 
@@ -31,7 +32,7 @@ from quivr_api.modules.knowledge.service.knowledge_exceptions import (
     KnowledgeForbiddenAccess,
     UploadError,
 )
-from quivr_api.modules.sync.entity.sync_models import SyncFile
+from quivr_api.modules.sync.entity.sync_models import SyncFile, SyncType
 from quivr_api.modules.upload.service.upload_file import check_file_exists
 
 logger = get_logger(__name__)
@@ -354,7 +355,12 @@ class KnowledgeService(BaseService[KnowledgeRepository]):
             knowledge, brains_ids=brains_ids, user_id=user_id
         )
 
-    async def get_sync_knowledges_files_to_update(
-        self, timedelta_hour: int, batch_size: int = 1
+    async def get_outdated_syncs(
+        self,
+        limit_time: datetime,
+        km_sync_type: SyncType,
+        batch_size: int = 1,
     ) -> List[KnowledgeDB]:
-        return await self.repository.get_outdated_sync_files(timedelta_hour, batch_size)
+        return await self.repository.get_outdated_syncs(
+            limit_time=limit_time, batch_size=batch_size, km_sync_type=km_sync_type
+        )

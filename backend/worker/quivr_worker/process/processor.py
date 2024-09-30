@@ -1,5 +1,5 @@
 import asyncio
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import AsyncGenerator, List, Optional, Tuple
 from uuid import UUID
@@ -8,7 +8,7 @@ from quivr_api.logger import get_logger
 from quivr_api.modules.knowledge.dto.inputs import KnowledgeUpdate
 from quivr_api.modules.knowledge.entity.knowledge import KnowledgeDB, KnowledgeSource
 from quivr_api.modules.sync.dto.outputs import SyncProvider
-from quivr_api.modules.sync.entity.sync_models import SyncFile
+from quivr_api.modules.sync.entity.sync_models import Sync, SyncFile, SyncType
 from quivr_core.files.file import QuivrFile
 from quivr_core.models import KnowledgeStatus
 
@@ -63,7 +63,7 @@ class KnowledgeProcessor:
             KnowledgeSource.GOOGLE,
             KnowledgeSource.DROPBOX,
             KnowledgeSource.GITHUB,
-            KnowledgeSource.NOTION,
+            # KnowledgeSource.NOTION,
         ):
             async for to_process in self._yield_syncs(knowledge):
                 yield to_process
@@ -209,30 +209,87 @@ class KnowledgeProcessor:
                 continue
             knowledge, qfile = knowledge_tuple
             try:
-                if not skip_process(knowledge):
-                    chunks = await parse_qfile(qfile=qfile)
-                    await store_chunks(
-                        knowledge=knowledge,
-                        chunks=chunks,
-                        vector_service=self.services.vector_service,
-                    )
-
-                last_synced_at = datetime.now(timezone.utc)
-                await self.services.knowledge_service.update_knowledge(
-                    knowledge,
-                    KnowledgeUpdate(
-                        status=KnowledgeStatus.PROCESSED,
-                        file_sha1=knowledge.file_sha1,
-                        last_synced_at=last_synced_at if knowledge.sync_id else None,
-                    ),
-                )
-
+                await self._process_inner(knowledge=knowledge, qfile=qfile)
             except Exception as e:
                 await savepoint.rollback()
                 logger.error(f"Error processing knowledge {knowledge_id} : {e}")
+                # FIXME: This one can also fail if knowledge was deleted
                 await self.services.knowledge_service.update_knowledge(
                     knowledge,
                     KnowledgeUpdate(
                         status=KnowledgeStatus.ERROR,
                     ),
                 )
+
+    async def _process_inner(self, knowledge: KnowledgeDB, qfile: QuivrFile):
+        if not skip_process(knowledge):
+            chunks = await parse_qfile(qfile=qfile)
+            await store_chunks(
+                knowledge=knowledge,
+                chunks=chunks,
+                vector_service=self.services.vector_service,
+            )
+        last_synced_at = datetime.now(timezone.utc)
+        await self.services.knowledge_service.update_knowledge(
+            knowledge,
+            KnowledgeUpdate(
+                status=KnowledgeStatus.PROCESSED,
+                file_sha1=knowledge.file_sha1,
+                # Update sync
+                last_synced_at=last_synced_at if knowledge.sync_id else None,
+            ),
+        )
+
+    async def update_outdated_syncs_files(
+        self, timedelta_hour: int = 8, batch_size: int = 1000
+    ):
+        last_time = datetime.now(timezone.utc) - timedelta(hours=timedelta_hour)
+        km_sync_files = await self.services.knowledge_service.get_outdated_syncs(
+            limit_time=last_time,
+            batch_size=batch_size,
+            km_sync_type=SyncType.FILE,
+        )
+        sync_cache: dict[int, Sync] = {}
+        for km in km_sync_files:
+            assert km.sync_id, "can only update sync files with sync_id"
+            assert km.sync_file_id, "can only update sync files with sync_file_id "
+            assert (
+                km.last_synced_at
+            ), "can only update sync files without a last_synced_at"
+            if km.sync_id in sync_cache:
+                sync = sync_cache[km.sync_id]
+            else:
+                sync = await self.services.sync_service.get_sync_by_id(km.sync_id)
+                assert sync.id
+                sync_cache[sync.id] = sync
+
+            if sync.credentials is None:
+                logger.error(
+                    f"can't process knowledge: {km.id}. sync {sync.id} has no credentials"
+                )
+                raise ValueError("no associated credentials")
+            provider_name = SyncProvider(sync.provider.lower())
+            sync_provider = self.services.syncprovider_mapping[provider_name]
+            try:
+                new_sync_file = (
+                    await sync_provider.aget_files_by_id(
+                        credentials=sync.credentials, file_ids=[km.sync_file_id]
+                    )
+                )[0]
+                if (
+                    new_sync_file.last_modified_at
+                    and new_sync_file.last_modified_at < km.last_synced_at
+                ) or new_sync_file.last_modified_at is None:
+                    # Create transaction
+                    #   - Create new knowledge with brains and parent like the old one
+                    # _process_knowledge
+                    #   - Parse it + store the chunks
+                    #   - Update the knowledge
+                    #   - Remove the older knowledge
+                    pass
+                else:
+                    continue
+
+            except FileNotFoundError:
+                # Remove has been deleted
+                pass

@@ -290,6 +290,7 @@ async def link_knowledge_to_brain(
             knowledge_to_add=AddKnowledge(**knowledge_dto.model_dump()),
             upload_file=None,
         )
+        # TODO (@AmineDiro): Check if tree is necessary or updating this knowledge suffice
         linked_kms = await knowledge_service.link_knowledge_tree_brains(
             knowledge, brains_ids=brains_ids, user_id=current_user.id
         )

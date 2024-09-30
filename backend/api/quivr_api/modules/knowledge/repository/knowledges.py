@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta, timezone
+from datetime import datetime
 from typing import Any, List, Sequence
 from uuid import UUID
 
@@ -7,7 +7,7 @@ from quivr_core.models import KnowledgeStatus
 from sqlalchemy.exc import IntegrityError, NoResultFound
 from sqlalchemy.orm import joinedload
 from sqlalchemy.sql.functions import random
-from sqlmodel import and_, col, not_, select, text
+from sqlmodel import and_, col, select, text
 from sqlmodel.ext.asyncio.session import AsyncSession
 
 from quivr_api.logger import get_logger
@@ -26,6 +26,7 @@ from quivr_api.modules.knowledge.service.knowledge_exceptions import (
     KnowledgeNotFoundException,
     KnowledgeUpdateError,
 )
+from quivr_api.modules.sync.entity.sync_models import SyncType
 
 logger = get_logger(__name__)
 
@@ -438,41 +439,20 @@ class KnowledgeRepository(BaseRepository):
         result = await self.session.exec(query)
         return result.all()
 
-    async def get_outdated_sync_files(
+    async def get_outdated_syncs(
         self,
-        timedelta_hour: int,
+        limit_time: datetime,
         batch_size: int,
+        km_sync_type: SyncType,
     ) -> List[KnowledgeDB]:
-        time_delta = datetime.now(timezone.utc) - timedelta(hours=timedelta_hour)
+        is_folder_check = km_sync_type == SyncType.FOLDER
         query = (
             select(KnowledgeDB)
             .where(
-                not_(KnowledgeDB.is_folder),
+                KnowledgeDB.is_folder == is_folder_check,
                 col(KnowledgeDB.sync_id).isnot(None),
-                col(KnowledgeDB.last_synced_at) < time_delta,
-                col(KnowledgeDB.brains).any(),
-            )
-            # Oldest first
-            .order_by(col(KnowledgeDB.last_synced_at).asc(), random())
-            .limit(batch_size)
-        )
-
-        # Execute the query (assuming you have a session)
-        result = await self.session.exec(query)
-        return list(result.unique().all())
-
-    async def get_outdated_sync_folders(
-        self,
-        timedelta_hour: int,
-        batch_size: int,
-    ) -> List[KnowledgeDB]:
-        time_delta = datetime.now(timezone.utc) - timedelta(hours=timedelta_hour)
-        query = (
-            select(KnowledgeDB)
-            .where(
-                not_(KnowledgeDB.is_folder),
-                col(KnowledgeDB.sync_id).isnot(None),
-                col(KnowledgeDB.last_synced_at) < time_delta,
+                col(KnowledgeDB.sync_file_id).isnot(None),
+                col(KnowledgeDB.last_synced_at) < limit_time,
                 col(KnowledgeDB.brains).any(),
             )
             # Oldest first
