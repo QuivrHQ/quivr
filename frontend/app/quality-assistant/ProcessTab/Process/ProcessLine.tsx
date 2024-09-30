@@ -51,7 +51,13 @@ const ProcessLine = ({
         downloadUrl.replace("host.docker.internal", "localhost")
       );
       const blob = await response.blob();
-      saveAs(blob, "document.pdf"); // Utilisez le nom de fichier souhaité
+      const formattedDate = format(
+        new Date(process.creation_time),
+        "yyyy-MM-dd",
+        { locale: fr }
+      );
+      const fileName = `${process.assistant_name}_${formattedDate}.pdf`;
+      saveAs(blob, fileName);
     }
   };
 
