@@ -355,4 +355,3 @@ class KnowledgeProcessor:
                     f"Rolling back. Error occured updating sync {old_km.id}: {e}"
                 )
                 await savepoint.rollback()
-                raise

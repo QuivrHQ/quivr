@@ -8,29 +8,29 @@ Here's the grammar correction and a more explicit version of your markdown, keep
 
 1. The task receives a `knowledge_id: UUID`.
 2. The `KnowledgeProcessor.process_knowledge` method processes the knowledge:
-    - It constructs a processable tuple of `[Knowledge, QuivrFile]` stream:
-        - Retrieves the `KnowledgeDB` object from the database.
-        - Determines the processing steps based on the knowledge source:
-            - **Local**:
-                - Downloads the knowledge data from S3 storage and writes it to a temporary file.
-                - Yields the `[Knowledge, QuivrFile]`.
-            - **Web**: Processes similarly to the **Local** method.
-            - **[Syncs]**:
-                - Fetches the associated sync and verifies the credentials.
-                - Concurrently retrieves all knowledges for the user from the database associated with this sync, as well as the tree of sync files where this knowledge is the parent (using the sync provider).
-                - Downloads the knowledge and yields the initial `[Knowledge, QuivrFile]` that the task received.
-                - For all children of this knowledge (i.e., those fetched from the sync):
-                    - If the child exists in the database (i.e., knowledge where `knowledge.sync_id == sync_file.id`):
-                        - This implies that the sync's child knowledge might have been processed earlier in another brain.
-                        - If the knowledge has been PROCESSED, link it to the parent brains and continue.
-                        - If not, reprocess the file.
-                    - If the child does not exist:
-                        - Create the knowledge associated with the sync file and set it to `Processing`.
-                        - Download the sync file's data and yield the `[Knowledge, QuivrFile]`.
-    - Skip processing of the tuple if the knowledge is a folder.
-    - Parse the `QuivrFile` using `quivr-core`.
-    - Store the resulting chunks in the database.
-    - Update the knowledge status to `PROCESSED`.
+   - It constructs a processable tuple of `[Knowledge, QuivrFile]` stream:
+     - Retrieves the `KnowledgeDB` object from the database.
+     - Determines the processing steps based on the knowledge source:
+       - **Local**:
+         - Downloads the knowledge data from S3 storage and writes it to a temporary file.
+         - Yields the `[Knowledge, QuivrFile]`.
+       - **Web**: Processes similarly to the **Local** method.
+       - **[Syncs]**:
+         - Fetches the associated sync and verifies the credentials.
+         - Concurrently retrieves all knowledges for the user from the database associated with this sync, as well as the tree of sync files where this knowledge is the parent (using the sync provider).
+         - Downloads the knowledge and yields the initial `[Knowledge, QuivrFile]` that the task received.
+         - For all children of this knowledge (i.e., those fetched from the sync):
+           - If the child exists in the database (i.e., knowledge where `knowledge.sync_id == sync_file.id`):
+             - This implies that the sync's child knowledge might have been processed earlier in another brain.
+             - If the knowledge has been PROCESSED, link it to the parent brains and continue.
+             - If not, reprocess the file.
+           - If the child does not exist:
+             - Create the knowledge associated with the sync file and set it to `Processing`.
+             - Download the sync file's data and yield the `[Knowledge, QuivrFile]`.
+   - Skip processing of the tuple if the knowledge is a folder.
+   - Parse the `QuivrFile` using `quivr-core`.
+   - Store the resulting chunks in the database.
+   - Update the knowledge status to `PROCESSED`.
 
 ### Handling Exceptions During Parsing Loop
 
@@ -39,12 +39,14 @@ Here's the grammar correction and a more explicit version of your markdown, keep
 If an exception occurs during the parsing loop, the following steps are taken:
 
 1. Roll back the current transaction (this only affects the vectors) if they were set. The processing loop performs the following stateful operations in this order:
-    - Creating knowledges (with `Processing` status).
-    - Updating knowledges: linking them to brains.
-    - Creating vectors.
-    - Updating knowledges.
-  
+
+   - Creating knowledges (with `Processing` status).
+   - Updating knowledges: linking them to brains.
+   - Creating vectors.
+   - Updating knowledges.
+
    **Transaction Safety for Each Operation:**
+
    - **Creating knowledge and linking to brains**: These operations can be retried safely. Knowledge is only recreated if it does not already exist in the database, allowing for safe retry.
    - **Linking knowledge to brains**: Only links the brain if it is not already associated with the knowledge. Safe for retry.
    - **Creating vectors**:
@@ -77,3 +79,9 @@ However, sync knowledge added to a brain will be reprocessed after some time thr
 ## Notification Steps
 
 To discuss: @StanGirard @Zewed
+
+# Sync update
+
+- Task to update all files
+- Task to get all folders and proceess
+- Rollback doesnt modify the original knowledge

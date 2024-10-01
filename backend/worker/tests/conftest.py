@@ -25,6 +25,7 @@ from quivr_api.modules.sync.service.sync_service import SyncsService
 from quivr_api.modules.sync.tests.test_sync_controller import FakeSync
 from quivr_api.modules.sync.utils.sync import BaseSync
 from quivr_api.modules.user.entity.user_identity import User
+from quivr_api.modules.vector.entity.vector import Vector
 from quivr_api.modules.vector.repository.vectors_repository import VectorRepository
 from quivr_api.modules.vector.service.vector_service import VectorService
 from quivr_core.files.file import QuivrFile
@@ -294,6 +295,57 @@ async def sync_knowledge_file(
     session.add(km)
     await session.commit()
     await session.refresh(km)
+
+    return km
+
+
+@pytest.fixture(scope="module")
+def embedder():
+    return DeterministicFakeEmbedding(size=settings.embedding_dim)
+
+
+@pytest_asyncio.fixture(scope="function")
+async def sync_knowledge_file_processed(
+    session: AsyncSession,
+    proc_services: ProcessorServices,
+    user: User,
+    brain_user: Brain,
+    sync: Sync,
+    embedder: DeterministicFakeEmbedding,
+) -> KnowledgeDB:
+    assert user.id
+    assert brain_user.brain_id
+
+    km = KnowledgeDB(
+        file_name="test_file_1.txt",
+        extension=".txt",
+        status=KnowledgeStatus.PROCESSED,
+        source=SyncProvider.GOOGLE,
+        source_link="drive://test/test",
+        file_size=1233,
+        file_sha1="1234kj",
+        user_id=user.id,
+        brains=[brain_user],
+        parent=None,
+        sync_file_id="id1",
+        sync=sync,
+        last_synced_at=datetime.now(timezone.utc) - timedelta(days=2),
+    )
+
+    session.add(km)
+    await session.commit()
+    await session.refresh(km)
+
+    assert km.id
+
+    vec = Vector(
+        content="test",
+        metadata_={},
+        embedding=embedder.embed_query("test"),  # type: ignore
+        knowledge_id=km.id,
+    )
+    session.add(vec)
+    await session.commit()
 
     return km
 

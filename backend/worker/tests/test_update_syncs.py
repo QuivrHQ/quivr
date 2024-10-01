@@ -86,3 +86,66 @@ async def test_update_sync_file(
     )
     assert len(vecs) > 0
     assert vecs[0].metadata_ is not None
+
+
+@pytest.mark.asyncio(loop_scope="session")
+@pytest.mark.parametrize("proc_services", [0], indirect=True)
+async def test_update_sync_file_rollback(
+    monkeypatch,
+    session: AsyncSession,
+    proc_services: ProcessorServices,
+    sync_knowledge_file_processed: KnowledgeDB,
+):
+    input_km = sync_knowledge_file_processed
+    assert input_km.id
+    assert input_km.brains
+    assert input_km.sync_file_id
+    assert input_km.file_name
+    assert input_km.source_link
+    assert input_km.last_synced_at
+
+    async def _parse_file_mock_error(
+        qfile: QuivrFile,
+        **processor_kwargs: dict[str, Any],
+    ) -> list[Document]:
+        raise Exception("error")
+
+    km_processor = KnowledgeProcessor(proc_services)
+    monkeypatch.setattr(
+        "quivr_worker.process.processor.parse_qfile", _parse_file_mock_error
+    )
+    new_sync_file = SyncFile(
+        id=input_km.sync_file_id,
+        name=input_km.file_name,
+        extension=input_km.extension,
+        is_folder=False,
+        web_view_link=input_km.source_link,
+        last_modified_at=datetime.now(timezone.utc) - timedelta(hours=1),
+    )
+    sync_provider = FakeSync(provider_name=input_km.source, n_get_files=0)
+    new_km = await km_processor.update_outdated_km(
+        old_km=input_km,
+        new_sync_file=new_sync_file,
+        sync_provider=sync_provider,
+        sync_credentials={},
+    )
+
+    # Check knowledge was not removed
+    assert new_km is None
+
+    # Check vectors where not removed
+    vecs = list(
+        (
+            await session.exec(
+                select(Vector).where(col(Vector.knowledge_id) == input_km.id)
+            )
+        ).all()
+    )
+    # Check nothing was added
+    assert len(vecs) == 1
+
+    # Check kms statyed correct
+    all_kms = list((await session.exec(select(KnowledgeDB))).unique().all())
+    assert len(all_kms) == 1
+    assert all_kms[0].id == input_km.id
+    assert all_kms[0].last_synced_at == input_km.last_synced_at
