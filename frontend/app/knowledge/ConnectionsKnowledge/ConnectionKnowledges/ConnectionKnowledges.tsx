@@ -33,25 +33,25 @@ const ConnectionKnowledges = ({
 
   return (
     <div className={styles.connection_knowledges_wrapper}>
-      <div
-        className={styles.provider_line_wrapper}
-        onClick={() => setFolded(!folded)}
-      >
+      <div className={styles.provider_line_wrapper}>
         <Icon
           name={folded ? "chevronRight" : "chevronDown"}
           size="normal"
           color="dark-grey"
           handleHover={true}
+          onClick={() => setFolded(!folded)}
         />
-        <Image
-          src={providerIconUrls[providerGroup.provider]}
-          alt={providerGroup.provider}
-          width={18}
-          height={18}
-        />
-        <span className={styles.provider_title}>
-          {transformConnectionLabel(providerGroup.provider)}
-        </span>
+        <div className={styles.hoverable}>
+          <Image
+            src={providerIconUrls[providerGroup.provider]}
+            alt={providerGroup.provider}
+            width={18}
+            height={18}
+          />
+          <span className={styles.provider_title}>
+            {transformConnectionLabel(providerGroup.provider)}
+          </span>
+        </div>
       </div>
       <div className={`${styles.accounts} ${folded ? styles.folded : ""}`}>
         {providerGroup.syncs.map((sync, index) => (

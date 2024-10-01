@@ -4,12 +4,20 @@
 .header_section_wrapper {
   display: flex;
   align-items: center;
-  gap: Spacings.$spacing03;
+  gap: Spacings.$spacing02;
   font-weight: 500;
 
-  &:hover {
-    background-color: var(--background-3);
-    cursor: pointer;
-    border-radius: Radius.$small;
+  .hoverable {
+    display: flex;
+    align-items: center;
+    gap: Spacings.$spacing03;
+    width: 100%;
+    padding-inline: Spacings.$spacing02;
+
+    &:hover {
+      background-color: var(--background-3);
+      cursor: pointer;
+      border-radius: Radius.$small;
+    }
   }
 }

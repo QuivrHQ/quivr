@@ -1,3 +1,4 @@
+@use "styles/Radius.module.scss";
 @use "styles/Spacings.module.scss";
 
 .connection_knowledges_wrapper {
@@ -8,10 +9,24 @@
   .provider_line_wrapper {
     display: flex;
     align-items: center;
-    gap: Spacings.$spacing03;
+    gap: Spacings.$spacing02;
 
-    .provider_title {
-      font-weight: 500;
+    .hoverable {
+      display: flex;
+      align-items: center;
+      gap: Spacings.$spacing03;
+      padding-inline: Spacings.$spacing02;
+      width: 100%;
+
+      .provider_title {
+        font-weight: 500;
+      }
+
+      &:hover {
+        background-color: var(--background-3);
+        cursor: pointer;
+        border-radius: Radius.$small;
+      }
     }
   }
 

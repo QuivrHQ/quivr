@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 import { useKnowledgeApi } from "@/lib/api/knowledge/useKnowledgeApi";
 import { QuivrLogo } from "@/lib/assets/QuivrLogo";
@@ -16,32 +16,30 @@ const QuivrKnowledges = (): JSX.Element => {
 
   const { getFiles } = useKnowledgeApi();
 
-  useEffect(() => {
-    void (async () => {
-      try {
-        const res = await getFiles(null);
-        console.info(res);
-        setCurrentFolder(undefined);
-        setQuivrRootSelected(true);
-      } catch (error) {
-        console.error("Failed to get files:", error);
-      }
-    })();
-  }, [folded]);
+  const fetchFiles = async () => {
+    try {
+      const res = await getFiles(null);
+      console.info(res);
+      setCurrentFolder(undefined);
+      setQuivrRootSelected(true);
+    } catch (error) {
+      console.error("Failed to get files:", error);
+    }
+  };
 
   return (
-    <div
-      className={styles.header_section_wrapper}
-      onClick={() => setFolded(!folded)}
-    >
+    <div className={styles.header_section_wrapper}>
       <Icon
         name={folded ? "chevronRight" : "chevronDown"}
         size="normal"
         color="dark-grey"
         handleHover={true}
+        onClick={() => setFolded(!folded)}
       />
-      <QuivrLogo size={18} color={isDarkMode ? "white" : "black"} />
-      <span className={styles.provider_title}>Quivr</span>
+      <div className={styles.hoverable} onClick={() => void fetchFiles()}>
+        <QuivrLogo size={18} color={isDarkMode ? "white" : "black"} />
+        <span className={styles.provider_title}>Quivr</span>
+      </div>
     </div>
   );
 };
