@@ -198,14 +198,16 @@ class RAGService:
             else []
         )
 
-        if not self.brain.brain_id:
-            raise ValueError(f"Brain ID not present for brain {self.brain.name}")
+        vector_store = None
+        if self.vector_service:
+            if not self.brain.brain_id:
+                raise ValueError(f"Brain ID not present for brain {self.brain.name}")
 
-        vector_store = (
-            self.create_vector_store(self.brain.brain_id)
-            if self.vector_service
-            else None
-        )
+            vector_store = (
+                self.create_vector_store(self.brain.brain_id)
+                if self.vector_service
+                else None
+            )
 
         llm = self.get_llm(retrieval_config)
 
