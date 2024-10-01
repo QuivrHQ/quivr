@@ -438,6 +438,10 @@ class QuivrQARAGLangGraph:
         return filtered_chunks
 
     def websearch_split(self, state: AgentState):
+        questions = state["questions"]
+        if not questions:
+            return [Send("generate_rag", state)]
+
         input = {
             "chat_history": state["chat_history"].to_list(),
             "questions": state["questions"],
@@ -520,6 +524,8 @@ class QuivrQARAGLangGraph:
         """
 
         questions = state["questions"]
+        if not questions:
+            return {**state, "docs": []}
 
         kwargs = {
             "search_kwargs": {
@@ -563,6 +569,8 @@ class QuivrQARAGLangGraph:
         """
 
         questions = state["questions"]
+        if not questions:
+            return {**state, "docs": []}
 
         k = self.retrieval_config.k
         top_n = self.retrieval_config.reranker_config.top_n
