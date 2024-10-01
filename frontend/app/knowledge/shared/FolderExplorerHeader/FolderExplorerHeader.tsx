@@ -7,7 +7,8 @@ import styles from "./FolderExplorerHeader.module.scss";
 import { useKnowledgeContext } from "../../KnowledgeProvider/hooks/useKnowledgeContext";
 
 const FolderExplorerHeader = (): JSX.Element => {
-  const { currentFolder, setCurrentFolder } = useKnowledgeContext();
+  const { currentFolder, setCurrentFolder, quivrRootSelected } =
+    useKnowledgeContext();
 
   const loadParentFolder = () => {
     if (currentFolder?.parentKMSElement) {
@@ -20,18 +21,20 @@ const FolderExplorerHeader = (): JSX.Element => {
 
   return (
     <div className={styles.header_wrapper}>
-      {currentFolder?.parentKMSElement && (
-        <div className={styles.parent_folder}>
-          {currentFolder.parentKMSElement.icon && (
-            <div className={styles.icon}>
-              {currentFolder.parentKMSElement.icon}
-            </div>
-          )}
-          <span className={styles.name} onClick={() => void loadParentFolder()}>
-            {currentFolder.parentKMSElement.file_name?.replace(/(\..+)$/, "")}
-          </span>
-          <Icon name="chevronRight" size="normal" color="black" />
-        </div>
+      {quivrRootSelected ? (
+        <span className={styles.name}>Quivr</span>
+      ) : (
+        currentFolder?.parentKMSElement && (
+          <div className={styles.parent_folder}>
+            <span
+              className={styles.name}
+              onClick={() => void loadParentFolder()}
+            >
+              {currentFolder.parentKMSElement.file_name?.replace(/(\..+)$/, "")}
+            </span>
+            <Icon name="chevronRight" size="normal" color="black" />
+          </div>
+        )
       )}
       <div className={styles.current_folder}>
         {currentFolder?.icon && (
