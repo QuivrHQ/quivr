@@ -21,7 +21,6 @@ const QuivrCurrentFolder = (): JSX.Element => {
     setLoading(true);
     try {
       const res = await getFiles(folderId);
-      console.info(res);
       setQuivrElements(res);
     } catch (error) {
       console.error("Failed to get sync files:", error);
@@ -31,6 +30,7 @@ const QuivrCurrentFolder = (): JSX.Element => {
   };
 
   useEffect(() => {
+    console.info("hey");
     void fetchQuivrFiles(currentFolder?.id ?? null);
   }, [currentFolder]);
 
@@ -45,11 +45,11 @@ const QuivrCurrentFolder = (): JSX.Element => {
         ) : (
           quivrElements
             ?.sort((a, b) => Number(b.is_folder) - Number(a.is_folder))
-            .map((syncElement, index) => (
+            .map((element, index) => (
               <div key={index}>
                 <CurrentFolderExplorerLine
                   element={{
-                    ...syncElement,
+                    ...element,
                     parentKMSElement: currentFolder,
                   }}
                 />
