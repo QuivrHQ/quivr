@@ -11,7 +11,6 @@ from typing import (
     Any,
 )
 from uuid import uuid4
-import operator
 import asyncio
 from copy import deepcopy
 
@@ -79,9 +78,8 @@ class AgentState(TypedDict):
     # Default is to replace. add_messages says "append"
     messages: Annotated[Sequence[BaseMessage], add_messages]
     chat_history: ChatHistory
-    docs: Annotated[list[Document], operator.add]
+    docs: list[Document]
     files: str
-    final_response: dict
     questions: List[str]
     instructions: str
 
@@ -563,7 +561,7 @@ class QuivrQARAGLangGraph:
         SECURITY_FACTOR = 0.85
         iteration = 0
 
-        msg = custom_prompts.RAG_ANSWER_PROMPT.format(**inputs)
+        msg = prompt.format(**inputs)
         n = self.llm_endpoint.count_tokens(msg)
         reduced_inputs = deepcopy(inputs)
 
@@ -611,7 +609,7 @@ class QuivrQARAGLangGraph:
         user_question = messages[0].content
         files = state["files"]
 
-        docs = state["docs"]
+        docs: List[Document] | None = state["docs"]
 
         # Prompt
         prompt = self.retrieval_config.prompt
@@ -631,7 +629,7 @@ class QuivrQARAGLangGraph:
                 tool_choice="any",
             )
 
-        reduced_inputs, reduced_docs = self.reduce_rag_context(
+        reduced_inputs, docs = self.reduce_rag_context(
             final_inputs, prompt=custom_prompts.RAG_ANSWER_PROMPT, docs=docs
         )
 
@@ -640,11 +638,7 @@ class QuivrQARAGLangGraph:
 
         # Run
         response = llm.invoke(msg)
-        formatted_response = {
-            "answer": response,  # Assuming the last message contains the final answer
-            "docs": reduced_docs,
-        }
-        return {**state, "messages": [response], "final_response": formatted_response}
+        return {**state, "messages": [response], "docs": docs if docs else []}
 
     def generate_chat_llm(self, state: AgentState) -> AgentState:
         """
@@ -678,10 +672,7 @@ class QuivrQARAGLangGraph:
 
         # Run
         response = llm.invoke(msg)
-        formatted_response = {
-            "answer": response,  # Assuming the last message contains the final answer
-        }
-        return {**state, "messages": [response], "final_response": formatted_response}
+        return {**state, "messages": [response]}
 
     def build_chain(self):
         """
@@ -814,13 +805,9 @@ class QuivrQARAGLangGraph:
                 and "output" in event["data"]
                 and event["data"]["output"] is not None
                 and "docs" in event["data"]["output"]
+                and event["metadata"]["langgraph_node"] in self.final_nodes
             ):
                 docs = event["data"]["output"]["docs"]
-
-            # if (
-            # "langgraph_node" in event["metadata"] and
-            # event["metadata"]["langgraph_node"] in self.final_nodes):
-            #     print("\n\n data: ", event["data"])
 
             if (
                 event["event"] == "on_chat_model_stream"
