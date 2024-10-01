@@ -1,10 +1,11 @@
 "use client";
 import { Editor, Extension } from "@tiptap/core";
 import Focus from "@tiptap/extension-focus";
+import Highlight from "@tiptap/extension-highlight";
 import { Link } from "@tiptap/extension-link";
 import { EditorContent, useEditor } from "@tiptap/react";
 import { StarterKit } from "@tiptap/starter-kit";
-import { useRef } from "react";
+import { useRef, useState } from "react";
 
 import { useBrainMention } from "@/app/chat/[chatId]/components/ActionsBar/components/ChatInput/components/ChatEditor/Editor/hooks/useBrainMention";
 
@@ -25,13 +26,28 @@ const defaultContent = `
 
 export const TextEditor = (): JSX.Element => {
   const { BrainMention, items } = useBrainMention();
+  const [searchBarOpen, setSearchBarOpen] = useState(true);
   const searchEditorRef = useRef<Editor>(null);
 
   const FocusSearchBar = Extension.create().extend({
     addKeyboardShortcuts: () => {
       return {
-        "Mod-f": () => {
-          searchEditorRef.current?.commands.focus();
+        "Mod-f": ({ editor }) => {
+          const selection = editor.state.doc.textBetween(
+            editor.state.selection.from,
+            editor.state.selection.to
+          );
+
+          if (selection) {
+            editor.commands.setHighlight();
+          }
+
+          setSearchBarOpen(true);
+          searchEditorRef.current
+            ?.chain()
+            .focus()
+            .setContent(selection, undefined, { preserveWhitespace: true })
+            .run();
 
           return true;
         },
@@ -52,6 +68,11 @@ export const TextEditor = (): JSX.Element => {
         }),
         BrainMention,
         FocusSearchBar,
+        Highlight.configure({
+          HTMLAttributes: {
+            class: styles.ai_highlight,
+          },
+        }),
       ],
       content: defaultContent,
       immediatelyRender: false,
@@ -59,6 +80,17 @@ export const TextEditor = (): JSX.Element => {
     },
     [items.length]
   );
+
+  const toggleSearchBar = () => {
+    if (searchBarOpen) {
+      setSearchBarOpen(false);
+      editor?.commands.focus();
+    } else {
+      setSearchBarOpen(true);
+      searchEditorRef.current?.commands.focus();
+    }
+  };
+
   if (!editor) {
     return <></>;
   }
@@ -66,10 +98,14 @@ export const TextEditor = (): JSX.Element => {
   return (
     <div className={styles.main_container}>
       <div className={styles.editor_wrapper}>
-        <Toolbar searchBarEditor={searchEditorRef.current} editor={editor} />
+        <Toolbar toggleSearchBar={toggleSearchBar} editor={editor} />
         <EditorContent className={styles.content_wrapper} editor={editor} />
       </div>
-      <div className={styles.search_bar_wrapper}>
+      <div
+        className={`${styles.search_bar_wrapper} ${
+          searchBarOpen ? styles.active : ""
+        }`}
+      >
         <TextEditorSearchBar ref={searchEditorRef} editor={editor} />
       </div>
     </div>
