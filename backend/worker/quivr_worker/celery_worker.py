@@ -2,6 +2,7 @@ import asyncio
 import os
 from uuid import UUID
 
+from celery.exceptions import SoftTimeLimitExceeded, TimeLimitExceeded
 from celery.schedules import crontab
 from celery.signals import worker_process_init
 from dotenv import load_dotenv
@@ -52,7 +53,10 @@ def init_worker(**kwargs):
     retries=3,
     default_retry_delay=1,
     name="process_file_task",
-    autoretry_for=(Exception,),
+    time_limit=600,  # 10 min
+    soft_time_limit=300,
+    autoretry_for=(Exception,),  # SoftTimeLimitExceeded  should not included?
+    dont_autoretry_for=(SoftTimeLimitExceeded, TimeLimitExceeded),
 )
 def process_file_task(
     knowledge_id: UUID,
@@ -74,6 +78,7 @@ def process_file_task(
     retries=3,
     default_retry_delay=1,
     name="refresh_sync_files_task",
+    soft_time_limit=3600,
     autoretry_for=(Exception,),
 )
 def refresh_sync_files_task():
