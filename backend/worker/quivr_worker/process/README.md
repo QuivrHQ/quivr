@@ -72,11 +72,6 @@ However, sync knowledge added to a brain will be reprocessed after some time thr
 
 # Syncing Knowledge task
 
-- Task to update all files
-- Task to get all folders and proceess
-- Rollback doesnt modify the original knowledge
-- If we don't find a folder we will delete it -> deleting all the knowledges associated with it !
-
 1. **Syncing Knowledge Syncs of Type Files:**
    - Outdated file syncs are fetched in batches.
    - For each file, if the remote file's `last_modified_at` is newer than the local `last_synced_at`, the file is updated.
