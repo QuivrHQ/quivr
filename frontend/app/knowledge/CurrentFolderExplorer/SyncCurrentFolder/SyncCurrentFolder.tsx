@@ -8,7 +8,7 @@ import { LoaderIcon } from "@/lib/components/ui/LoaderIcon/LoaderIcon";
 import styles from "./SyncCurrentFolder.module.scss";
 
 import { useKnowledgeContext } from "../../KnowledgeProvider/hooks/useKnowledgeContext";
-import CurrentFolderExplorerLine from "../CurrentFolderExplorerLine/CurrentFolderExplorerLine";
+import CurrentFolderExplorerLine from "../../shared/CurrentFolderExplorerLine/CurrentFolderExplorerLine";
 
 const SyncCurrentFolder = (): JSX.Element => {
   const [loading, setLoading] = useState(false);

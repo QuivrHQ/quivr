@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 
 import styles from "./CurrentFolderExplorer.module.scss";
+import QuivrCurrentFolder from "./QuivrCurrentFolder/QuivrCurrentFolder";
 import SyncCurrentFolder from "./SyncCurrentFolder/SyncCurrentFolder";
 
 import { useKnowledgeContext } from "../KnowledgeProvider/hooks/useKnowledgeContext";
@@ -14,7 +15,7 @@ const CurrentFolderExplorer = (): JSX.Element => {
 
   return (
     <div className={styles.current_folder_explorer_container}>
-      {!quivrRootSelected ? <SyncCurrentFolder /> : <div> HAHA</div>}
+      {!quivrRootSelected ? <SyncCurrentFolder /> : <QuivrCurrentFolder />}
     </div>
   );
 };
