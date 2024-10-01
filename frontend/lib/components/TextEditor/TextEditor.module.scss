@@ -18,7 +18,8 @@
   transition: transform 0.2s ease-out, opacity 0.2s ease-out;
 
   &:focus-within,
-  &:hover {
+  &:hover,
+  &.active {
     transform: translateY(0%);
     opacity: 1;
   }
