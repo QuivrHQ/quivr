@@ -1,8 +1,19 @@
 import logging
-from typing import Annotated, AsyncGenerator, List, Optional, Sequence, TypedDict
+from typing import (
+    Annotated,
+    AsyncGenerator,
+    List,
+    Optional,
+    Sequence,
+    Tuple,
+    TypedDict,
+    Dict,
+    Any,
+)
 from uuid import uuid4
 import operator
 import asyncio
+from copy import deepcopy
 
 # TODO(@aminediro): this is the only dependency to langchain package, we should remove it
 from langchain.retrievers import ContextualCompressionRetriever
@@ -13,6 +24,7 @@ from langchain_core.documents import BaseDocumentCompressor, Document
 from langchain_core.messages import BaseMessage
 from langchain_core.messages.ai import AIMessageChunk
 from langchain_core.vectorstores import VectorStore
+from langchain_core.prompts.base import BasePromptTemplate
 from langgraph.graph import START, END, StateGraph
 from langgraph.graph.message import add_messages
 from langgraph.types import Send
@@ -46,9 +58,12 @@ class UserIntent(BaseModel):
 
 
 class SplittedInput(BaseModel):
-    instructions: str = Field(description="The user instructions to the system")
-    questions: List[str] = Field(
-        description="The user questions, where each question in the list is a self-contained question."
+    instructions: Optional[str] = Field(
+        default=None, description="The user instructions to the system"
+    )
+    questions: Optional[List[str]] = Field(
+        default=None,
+        description="The user questions, where each question in the list is a self-contained question.",
     )
 
 
@@ -128,12 +143,11 @@ class QuivrQARAGLangGraph:
         config = self.retrieval_config.reranker_config
 
         # Allow kwargs to override specific config values
-        supplier = kwargs.get("supplier", config.supplier)
-        model = kwargs.get("model", config.model)
-        top_n = kwargs.get("top_n", config.top_n)
-        api_key = kwargs.get("api_key", config.api_key)
+        supplier = kwargs.pop("supplier", config.supplier)
+        model = kwargs.pop("model", config.model)
+        top_n = kwargs.pop("top_n", config.top_n)
+        api_key = kwargs.pop("api_key", config.api_key)
 
-        # Instantiate reranker based on the supplier
         if supplier == DefaultRerankers.COHERE:
             reranker = CohereRerank(
                 model=model, top_n=top_n, cohere_api_key=api_key, **kwargs
@@ -432,7 +446,10 @@ class QuivrQARAGLangGraph:
             }
         }
         base_retriever = self.get_retriever(**kwargs)
-        reranker = self.get_reranker()
+
+        kwargs = {"top_n": self.retrieval_config.reranker_config.top_n}
+        reranker = self.get_reranker(**kwargs)
+
         compression_retriever = ContextualCompressionRetriever(
             base_compressor=reranker, base_retriever=base_retriever
         )
@@ -452,6 +469,132 @@ class QuivrQARAGLangGraph:
             docs += _docs
 
         return {**state, "docs": docs}
+
+    async def dynamic_retrieve(self, state: AgentState) -> AgentState:
+        """
+        Retrieve relevent chunks
+
+        Args:
+            state (messages): The current state
+
+        Returns:
+            dict: The retrieved chunks
+        """
+
+        questions = state["questions"]
+
+        k = self.retrieval_config.k
+        top_n = self.retrieval_config.reranker_config.top_n
+        number_of_relevant_chunks = top_n
+        i = 1
+
+        while number_of_relevant_chunks == top_n:
+            top_n = self.retrieval_config.reranker_config.top_n * i
+            kwargs = {"top_n": top_n}
+            reranker = self.get_reranker(**kwargs)
+
+            k = top_n * 2
+            kwargs = {"search_kwargs": {"k": k}}
+            base_retriever = self.get_retriever(**kwargs)
+
+            if i > 1:
+                logging.info(
+                    f"Increasing top_n to {top_n} and k to {k} to retrieve more relevant chunks"
+                )
+
+            compression_retriever = ContextualCompressionRetriever(
+                base_compressor=reranker, base_retriever=base_retriever
+            )
+
+            # Prepare the async tasks for all questions
+            tasks = []
+            for question in questions:
+                # Asynchronously invoke the model for each question
+                tasks.append(compression_retriever.ainvoke(question))
+
+            # Gather all the responses asynchronously
+            responses = await asyncio.gather(*tasks) if tasks else []
+
+            docs = []
+            _n = []
+            for response in responses:
+                _docs = self.filter_chunks_by_relevance(response)
+                _n.append(len(_docs))
+                docs += _docs
+
+            context_length = self.get_rag_context_length(state, docs)
+            if context_length >= self.retrieval_config.llm_config.max_context_tokens:
+                logging.warning(
+                    f"The context length is {context_length} which is greater than "
+                    f"the max context tokens of {self.retrieval_config.llm_config.max_context_tokens}"
+                )
+                break
+
+            number_of_relevant_chunks = max(_n)
+            i += 1
+
+        return {**state, "docs": docs}
+
+    def get_rag_context_length(self, state: AgentState, docs: List[Document]) -> int:
+        messages = state["messages"]
+        user_question = messages[0].content
+        files = state["files"]
+
+        prompt = self.retrieval_config.prompt
+
+        final_inputs = {}
+        final_inputs["question"] = user_question
+        final_inputs["custom_instructions"] = prompt if prompt else "None"
+        final_inputs["files"] = files if files else "None"
+        final_inputs["chat_history"] = state["chat_history"].to_list()
+
+        final_inputs["context"] = combine_documents(docs) if docs else "None"
+        msg = custom_prompts.RAG_ANSWER_PROMPT.format(**final_inputs)
+
+        return self.llm_endpoint.count_tokens(msg)
+
+    def reduce_rag_context(
+        self,
+        inputs: Dict[str, Any],
+        prompt: BasePromptTemplate,
+        docs: List[Document] | None = None,
+    ) -> Tuple[Dict[str, Any], List[Document] | None]:
+        MAX_ITERATION = 100
+        SECURITY_FACTOR = 0.85
+        iteration = 0
+
+        msg = custom_prompts.RAG_ANSWER_PROMPT.format(**inputs)
+        n = self.llm_endpoint.count_tokens(msg)
+        reduced_inputs = deepcopy(inputs)
+
+        while n > self.retrieval_config.llm_config.max_context_tokens * SECURITY_FACTOR:
+            chat_history = reduced_inputs["chat_history"]
+
+            if len(chat_history) > 0:
+                reduced_inputs["chat_history"] = chat_history[2:]
+            elif docs and len(docs) > 1:
+                docs = docs[:-1]
+            else:
+                logging.warning(
+                    f"Not enough context to reduce. The context length is {n} "
+                    f"which is greater than the max context tokens of {self.retrieval_config.llm_config.max_context_tokens}"
+                )
+                break
+
+            if docs:
+                reduced_inputs["context"] = combine_documents(docs)
+
+            msg = prompt.format(**reduced_inputs)
+            n = self.llm_endpoint.count_tokens(msg)
+
+            iteration += 1
+            if iteration > MAX_ITERATION:
+                logging.warning(
+                    f"Attained the maximum number of iterations ({MAX_ITERATION})"
+                )
+                break
+
+        return reduced_inputs, docs
 
     def generate_rag(self, state: AgentState) -> AgentState:
         """
@@ -488,14 +631,18 @@ class QuivrQARAGLangGraph:
                 tool_choice="any",
             )
 
+        reduced_inputs, reduced_docs = self.reduce_rag_context(
+            final_inputs, prompt=custom_prompts.RAG_ANSWER_PROMPT, docs=docs
+        )
+
         # Chain
-        rag_chain = custom_prompts.RAG_ANSWER_PROMPT | llm
+        msg = custom_prompts.RAG_ANSWER_PROMPT.format(**reduced_inputs)
 
         # Run
-        response = rag_chain.invoke(final_inputs)
+        response = llm.invoke(msg)
         formatted_response = {
             "answer": response,  # Assuming the last message contains the final answer
-            "docs": docs,
+            "docs": reduced_docs,
         }
         return {**state, "messages": [response], "final_response": formatted_response}
 
@@ -523,11 +670,14 @@ class QuivrQARAGLangGraph:
         # LLM
         llm = self.llm_endpoint._llm
 
-        # Chain
-        rag_chain = custom_prompts.CHAT_LLM_PROMPT | llm
+        reduced_inputs, _ = self.reduce_rag_context(
+            final_inputs, prompt=custom_prompts.CHAT_LLM_PROMPT
+        )
+
+        msg = custom_prompts.CHAT_LLM_PROMPT.format(**reduced_inputs)
 
         # Run
-        response = rag_chain.invoke(final_inputs)
+        response = llm.invoke(msg)
         formatted_response = {
             "answer": response,  # Assuming the last message contains the final answer
         }
