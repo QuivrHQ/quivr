@@ -1,3 +1,5 @@
+import { UUID } from "crypto";
+
 export type Provider = "Google" | "Azure" | "DropBox" | "Notion" | "GitHub";
 
 export type Integration =
@@ -10,6 +12,7 @@ export type Integration =
 export type SyncStatus = "SYNCING" | "SYNCED" | "ERROR" | "REMOVED";
 
 export interface KMSElement {
+  id: UUID;
   file_name?: string;
   sync_file_id: string | null;
   is_folder: boolean;
