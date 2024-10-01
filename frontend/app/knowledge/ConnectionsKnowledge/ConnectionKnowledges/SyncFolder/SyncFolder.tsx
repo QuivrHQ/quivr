@@ -24,7 +24,9 @@ const SyncFolder = ({ element }: SyncFolderProps): JSX.Element => {
 
   useEffect(() => {
     setSelectedFolder(currentFolder?.sync_file_id === element.sync_file_id);
-    setQuivrRootSelected(false);
+    if (currentFolder) {
+      setQuivrRootSelected(false);
+    }
   }, [currentFolder]);
 
   useEffect(() => {
@@ -65,7 +67,6 @@ const SyncFolder = ({ element }: SyncFolderProps): JSX.Element => {
         <span
           className={`${styles.name} ${selectedFolder ? styles.selected : ""}`}
           onClick={() => {
-            console.info(element);
             setCurrentFolder({
               ...element,
               parentKMSElement: element.parentKMSElement,

@@ -17,6 +17,7 @@ const QuivrKnowledges = (): JSX.Element => {
   const { getFiles } = useKnowledgeApi();
 
   useEffect(() => {
+    console.info("hey");
     void (async () => {
       try {
         const res = await getFiles(null);

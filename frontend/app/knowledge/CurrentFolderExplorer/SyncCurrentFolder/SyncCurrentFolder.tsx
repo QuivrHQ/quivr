@@ -22,7 +22,6 @@ const SyncCurrentFolder = (): JSX.Element => {
       try {
         const res = await getSyncFiles(currentFolder.sync_id, folderId);
         setKMSElements(res);
-        console.info("res", res);
       } catch (error) {
         console.error("Failed to get sync files:", error);
       } finally {
