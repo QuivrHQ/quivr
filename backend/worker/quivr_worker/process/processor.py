@@ -1,16 +1,19 @@
 import asyncio
 from datetime import datetime, timedelta, timezone
+from functools import lru_cache
 from pathlib import Path
-from typing import AsyncGenerator, List, Optional, Tuple
+from typing import Any, AsyncGenerator, List, Optional, Tuple
 from uuid import UUID
 
 from quivr_api.logger import get_logger
-from quivr_api.modules.knowledge.dto.inputs import KnowledgeUpdate
+from quivr_api.modules.knowledge.dto.inputs import AddKnowledge, KnowledgeUpdate
 from quivr_api.modules.knowledge.entity.knowledge import KnowledgeDB, KnowledgeSource
 from quivr_api.modules.sync.dto.outputs import SyncProvider
 from quivr_api.modules.sync.entity.sync_models import Sync, SyncFile, SyncType
+from quivr_api.modules.sync.utils.sync import BaseSync
 from quivr_core.files.file import QuivrFile
 from quivr_core.models import KnowledgeStatus
+from sqlalchemy.ext.asyncio import AsyncSessionTransaction
 
 from quivr_worker.parsers.crawler import URL, extract_from_url
 from quivr_worker.process.process_file import parse_qfile, store_chunks
@@ -156,7 +159,7 @@ class KnowledgeProcessor:
         # Yield parent_knowledge as the first knowledge to process
         async with build_sync_file(
             file_knowledge=parent_knowledge,
-            sync=sync,
+            credentials=sync.credentials,
             sync_provider=sync_provider,
             sync_file=SyncFile(
                 id=parent_knowledge.sync_file_id,
@@ -193,23 +196,28 @@ class KnowledgeProcessor:
                 continue
             async with build_sync_file(
                 file_knowledge=file_knowledge,
-                sync=sync,
+                credentials=sync.credentials,
                 sync_provider=sync_provider,
                 sync_file=sync_file,
             ) as f:
                 yield f
 
+    async def create_savepoint(self) -> AsyncSessionTransaction:
+        savepoint = (
+            await self.services.knowledge_service.repository.session.begin_nested()
+        )
+        return savepoint
+
     async def process_knowledge(self, knowledge_id: UUID):
         async for knowledge_tuple in self.yield_processable_knowledge(knowledge_id):
             # FIXME(@AmineDiro) : nested transaction for making
-            savepoint = (
-                await self.services.knowledge_service.repository.session.begin_nested()
-            )
+            savepoint = await self.create_savepoint()
             if knowledge_tuple is None:
                 continue
             knowledge, qfile = knowledge_tuple
             try:
                 await self._process_inner(knowledge=knowledge, qfile=qfile)
+                await savepoint.commit()
             except Exception as e:
                 await savepoint.rollback()
                 logger.error(f"Error processing knowledge {knowledge_id} : {e}")
@@ -238,7 +246,13 @@ class KnowledgeProcessor:
                 # Update sync
                 last_synced_at=last_synced_at if knowledge.sync_id else None,
             ),
+            autocommit=False,
         )
+
+    @lru_cache(maxsize=50)  # noqa: B019
+    async def get_sync_provider(self, sync_id: int) -> Sync:
+        sync = await self.services.sync_service.get_sync_by_id(sync_id)
+        return sync
 
     async def update_outdated_syncs_files(
         self, timedelta_hour: int = 8, batch_size: int = 1000
@@ -249,47 +263,96 @@ class KnowledgeProcessor:
             batch_size=batch_size,
             km_sync_type=SyncType.FILE,
         )
-        sync_cache: dict[int, Sync] = {}
-        for km in km_sync_files:
-            assert km.sync_id, "can only update sync files with sync_id"
-            assert km.sync_file_id, "can only update sync files with sync_file_id "
-            assert (
-                km.last_synced_at
-            ), "can only update sync files without a last_synced_at"
-            if km.sync_id in sync_cache:
-                sync = sync_cache[km.sync_id]
-            else:
-                sync = await self.services.sync_service.get_sync_by_id(km.sync_id)
-                assert sync.id
-                sync_cache[sync.id] = sync
-
-            if sync.credentials is None:
-                logger.error(
-                    f"can't process knowledge: {km.id}. sync {sync.id} has no credentials"
-                )
-                raise ValueError("no associated credentials")
-            provider_name = SyncProvider(sync.provider.lower())
-            sync_provider = self.services.syncprovider_mapping[provider_name]
+        for old_km in km_sync_files:
             try:
+                assert old_km.sync_id, "can only update sync files with sync_id"
+                assert (
+                    old_km.sync_file_id
+                ), "can only update sync files with sync_file_id "
+                sync = await self.get_sync_provider(old_km.sync_id)
+                if sync.credentials is None:
+                    logger.error(
+                        f"can't process knowledge: {old_km.id}. sync {sync.id} has no credentials"
+                    )
+                    raise ValueError(
+                        f"no associated credentials with knowledge {old_km}"
+                    )
+                provider_name = SyncProvider(sync.provider.lower())
+                sync_provider = self.services.syncprovider_mapping[provider_name]
                 new_sync_file = (
                     await sync_provider.aget_files_by_id(
-                        credentials=sync.credentials, file_ids=[km.sync_file_id]
+                        credentials=sync.credentials, file_ids=[old_km.sync_file_id]
                     )
                 )[0]
-                if (
-                    new_sync_file.last_modified_at
-                    and new_sync_file.last_modified_at < km.last_synced_at
-                ) or new_sync_file.last_modified_at is None:
-                    # Create transaction
-                    #   - Create new knowledge with brains and parent like the old one
-                    # _process_knowledge
-                    #   - Parse it + store the chunks
-                    #   - Update the knowledge
-                    #   - Remove the older knowledge
-                    pass
-                else:
-                    continue
-
+                await self.update_outdated_km(
+                    old_km=old_km,
+                    new_sync_file=new_sync_file,
+                    sync_provider=sync_provider,
+                    sync_credentials=sync.credentials,
+                )
             except FileNotFoundError:
-                # Remove has been deleted
-                pass
+                logger.info(
+                    f"Knowledge {old_km.id} not found in remote sync. Removing the knowledge"
+                )
+                await self.services.knowledge_service.remove_knowledge(
+                    old_km, autocommit=True
+                )
+            except Exception:
+                logger.exception(f"Exception occured processing km: {old_km.id}")
+
+    async def update_outdated_km(
+        self,
+        old_km: KnowledgeDB,
+        new_sync_file: SyncFile,
+        sync_provider: BaseSync,
+        sync_credentials: dict[str, Any],
+    ) -> KnowledgeDB | None:
+        assert (
+            old_km.last_synced_at
+        ), "can only update sync files without a last_synced_at"
+        if (
+            new_sync_file.last_modified_at
+            and new_sync_file.last_modified_at > old_km.last_synced_at
+        ) or new_sync_file.last_modified_at is None:
+            savepoint = await self.create_savepoint()
+            try:
+                new_km = await self.services.knowledge_service.create_knowledge(
+                    user_id=old_km.user_id,
+                    knowledge_to_add=AddKnowledge(
+                        file_name=new_sync_file.name,
+                        is_folder=new_sync_file.is_folder,
+                        extension=new_sync_file.extension,
+                        source=old_km.source,
+                        source_link=new_sync_file.web_view_link,
+                        parent_id=old_km.parent_id,
+                        sync_id=old_km.sync_id,
+                        sync_file_id=new_sync_file.id,
+                    ),
+                    status=KnowledgeStatus.PROCESSING,
+                    add_brains=await old_km.awaitable_attrs.brains,
+                    upload_file=None,
+                    autocommit=False,
+                )
+                async with build_sync_file(
+                    new_km,
+                    new_sync_file,
+                    sync_provider=sync_provider,
+                    credentials=sync_credentials,
+                ) as (
+                    new_km,
+                    qfile,
+                ):
+                    await self._process_inner(new_km, qfile)
+                await self.services.knowledge_service.remove_knowledge(
+                    old_km, autocommit=False
+                )
+                await savepoint.commit()
+                await savepoint.session.refresh(new_km)
+                return new_km
+
+            except Exception as e:
+                logger.exception(
+                    f"Rolling back. Error occured updating sync {old_km.id}: {e}"
+                )
+                await savepoint.rollback()
+                raise

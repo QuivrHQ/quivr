@@ -1,4 +1,5 @@
 import os
+from datetime import datetime, timedelta, timezone
 from io import BytesIO
 from pathlib import Path
 from uuid import uuid4
@@ -217,7 +218,7 @@ async def local_knowledge_folder_with_file(
         parent_id=folder_km.id,
     )
     km_data = BytesIO(os.urandom(24))
-    km = await service.create_knowledge(
+    _ = await service.create_knowledge(
         user_id=user.id,
         knowledge_to_add=km_to_add,
         upload_file=UploadFile(file=km_data, size=24, filename=km_to_add.file_name),
@@ -287,6 +288,7 @@ async def sync_knowledge_file(
         parent=None,
         sync_file_id="id1",
         sync=sync,
+        last_synced_at=datetime.now(timezone.utc) - timedelta(days=2),
     )
 
     session.add(km)
