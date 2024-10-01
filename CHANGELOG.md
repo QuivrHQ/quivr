@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.0.319 (2024-10-01)
+
+## What's Changed
+* feat: Add error handling for rate-limited search in fetch_notion_pages by @StanGirard in https://github.com/QuivrHQ/quivr/pull/3298
+* feat: Remove syncNotion from ConnectionCards by @StanGirard in https://github.com/QuivrHQ/quivr/pull/3300
+
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.318...v0.0.319
+
 ## 0.0.318 (2024-09-30)
 
 ## What's Changed
