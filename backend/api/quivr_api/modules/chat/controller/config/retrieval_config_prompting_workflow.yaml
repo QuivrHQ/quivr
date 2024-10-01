@@ -13,9 +13,21 @@ workflow_config:
       edges: ["rewrite"]
 
     - name: "rewrite"
-      edges: ["retrieve"]
+      edges: ["dynamic_retrieve"]
+      #edges: ["retrieve"]
 
-    - name: "retrieve"
+    #- name: "retrieve"
+    #  edges: ["generate_rag"]
+
+    #- name: "dynamic_retrieve"
+    #  edges: ["generate_rag"]
+
+    - name: "dynamic_retrieve"
+      conditional_edge:
+        routing_function: "websearch_split"
+        conditions: ["tavily_search", "generate_rag"]
+
+    - name: "tavily_search"
       edges: ["generate_rag"]
 
     - name: "generate_rag" # the name of the last node, from which we want to stream the answer to the user, should always start with "generate"
@@ -27,24 +39,29 @@ max_history: 10
 # Number of chunks returned by the retriever
 k: 40
 
-# Whether to dynamically determine the number of chunks (from their relevance score)
-# to be returned to the LLM for the answer generation
-dynamic_chunk_retrieval: true
+max_files: 10
 
-max_files: 20
+web_search_config:
+  supplier: "tavily"
+
+# Reranker configuration
 reranker_config:
   # The reranker supplier to use
   supplier: "cohere"
 
   # The model to use for the reranker for the given supplier
-  model: "rerank-multilingual-v3.0"
-
-  # Only chunks with relevance scores equal or above this threshold will be
-  # returned to the LLM to generate the answer (allowed values are between 0 and 1)
-  relevance_score_threshold: 0.4
+  #model: "rerank-multilingual-v3.0"
 
   # Number of chunks returned by the reranker
-  top_n: 20
+  top_n: 5
+
+  # Among the chunks returned by the reranker, only those with relevance
+  # scores equal or above the relevance_score_threshold will be returned
+  # to the LLM to generate the answer (allowed values are between 0 and 1,
+  # a value of 0.1 works well with the cohere and jina rerankers)
+  relevance_score_threshold: 0.1
+
+# LLM configuration
 llm_config:
 
   # Maximum number of tokens to pass to the LLM
