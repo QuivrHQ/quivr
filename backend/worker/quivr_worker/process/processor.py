@@ -146,7 +146,7 @@ class KnowledgeProcessor:
                 f"received unprocessable knowledge : {parent_knowledge.id} "
             )
         # Get associated sync
-        sync = await self.services.sync_service.get_sync_by_id(parent_knowledge.sync_id)
+        sync = await self._get_sync(parent_knowledge.sync_id)
         if sync.credentials is None:
             logger.error(
                 f"can't process knowledge: {parent_knowledge.id}. sync {sync.id} has no credentials"
@@ -230,6 +230,7 @@ class KnowledgeProcessor:
                 )
 
     async def _process_inner(self, knowledge: KnowledgeDB, qfile: QuivrFile):
+        last_synced_at = datetime.now(timezone.utc)
         if not skip_process(knowledge):
             chunks = await parse_qfile(qfile=qfile)
             await store_chunks(
@@ -237,7 +238,6 @@ class KnowledgeProcessor:
                 chunks=chunks,
                 vector_service=self.services.vector_service,
             )
-        last_synced_at = datetime.now(timezone.utc)
         await self.services.knowledge_service.update_knowledge(
             knowledge,
             KnowledgeUpdate(
@@ -250,11 +250,92 @@ class KnowledgeProcessor:
         )
 
     @lru_cache(maxsize=50)  # noqa: B019
-    async def get_sync_provider(self, sync_id: int) -> Sync:
+    async def _get_sync(self, sync_id: int) -> Sync:
         sync = await self.services.sync_service.get_sync_by_id(sync_id)
         return sync
 
-    async def update_outdated_syncs_files(
+    async def refresh_sync_folders(
+        self, timedelta_hour: int = 8, batch_size: int = 100
+    ):
+        last_time = datetime.now(timezone.utc) - timedelta(hours=timedelta_hour)
+        km_sync_folders = await self.services.knowledge_service.get_outdated_syncs(
+            limit_time=last_time,
+            batch_size=batch_size,
+            km_sync_type=SyncType.FOLDER,
+        )
+        for sync_folder_km in km_sync_folders:
+            await self.refresh_sync_folder(sync_folder_km)
+
+    async def refresh_sync_folder(self, folder_km: KnowledgeDB) -> KnowledgeDB:
+        assert folder_km.sync_id, "can only update sync files with sync_id"
+        assert folder_km.sync_file_id, "can only update sync files with sync_file_id "
+        sync = await self._get_sync(folder_km.sync_id)
+        if sync.credentials is None:
+            logger.error(
+                f"can't process knowledge: {folder_km.id}. sync {sync.id} has no credentials"
+            )
+            raise ValueError(f"no associated credentials with knowledge {folder_km}")
+        provider_name = SyncProvider(sync.provider.lower())
+        sync_provider = self.services.syncprovider_mapping[provider_name]
+        km_children: List[KnowledgeDB] = await folder_km.awaitable_attrs.children
+        sync_children = {c.sync_file_id for c in km_children}
+        try:
+            sync_files = await sync_provider.aget_files(
+                credentials=sync.credentials,
+                folder_id=folder_km.sync_file_id,
+                recursive=False,
+            )
+            breakpoint()
+            for sync_entry in filter(lambda s: s.id not in sync_children, sync_files):
+                await self.add_new_sync_entry(folder=folder_km, sync_entry=sync_entry)
+
+        except FileNotFoundError:
+            logger.info(
+                f"Knowledge {folder_km.id} not found in remote sync. Removing the folder"
+            )
+            await self.services.knowledge_service.remove_knowledge(
+                folder_km, autocommit=True
+            )
+        except Exception:
+            logger.exception(f"Exception occured processing folder: {folder_km.id}")
+        finally:
+            await self.services.knowledge_service.update_knowledge(
+                knowledge=folder_km,
+                payload=KnowledgeUpdate(last_synced_at=datetime.now(timezone.utc)),
+            )
+        return folder_km
+
+    async def add_new_sync_entry(self, folder: KnowledgeDB, sync_entry: SyncFile):
+        sync_km = await self.services.knowledge_service.create_knowledge(
+            user_id=folder.user_id,
+            knowledge_to_add=AddKnowledge(
+                file_name=sync_entry.name,
+                is_folder=sync_entry.is_folder,
+                extension=sync_entry.extension,
+                source=folder.source,
+                source_link=sync_entry.web_view_link,
+                parent_id=folder.id,
+                sync_id=folder.sync_id,
+                sync_file_id=sync_entry.id,
+            ),
+            status=KnowledgeStatus.PROCESSING,
+            upload_file=None,
+            autocommit=True,
+            process_async=False,
+        )
+        async for processable_tuple in self._yield_syncs(sync_km):
+            if processable_tuple is None:
+                continue
+            knowledge, qfile = processable_tuple
+            savepoint = await self.create_savepoint()
+            try:
+                await self._process_inner(knowledge=knowledge, qfile=qfile)
+                await savepoint.commit()
+            except Exception:
+                await savepoint.rollback()
+                logger.exception(f"Error occured processing :{knowledge.id}")
+
+    async def refresh_knowledge_sync_files(
         self, timedelta_hour: int = 8, batch_size: int = 1000
     ):
         last_time = datetime.now(timezone.utc) - timedelta(hours=timedelta_hour)
@@ -269,7 +350,7 @@ class KnowledgeProcessor:
                 assert (
                     old_km.sync_file_id
                 ), "can only update sync files with sync_file_id "
-                sync = await self.get_sync_provider(old_km.sync_id)
+                sync = await self._get_sync(old_km.sync_id)
                 if sync.credentials is None:
                     logger.error(
                         f"can't process knowledge: {old_km.id}. sync {sync.id} has no credentials"
@@ -284,7 +365,7 @@ class KnowledgeProcessor:
                         credentials=sync.credentials, file_ids=[old_km.sync_file_id]
                     )
                 )[0]
-                await self.update_outdated_km(
+                await self.refresh_knowledge_entry(
                     old_km=old_km,
                     new_sync_file=new_sync_file,
                     sync_provider=sync_provider,
@@ -300,7 +381,7 @@ class KnowledgeProcessor:
             except Exception:
                 logger.exception(f"Exception occured processing km: {old_km.id}")
 
-    async def update_outdated_km(
+    async def refresh_knowledge_entry(
         self,
         old_km: KnowledgeDB,
         new_sync_file: SyncFile,
@@ -329,9 +410,10 @@ class KnowledgeProcessor:
                         sync_file_id=new_sync_file.id,
                     ),
                     status=KnowledgeStatus.PROCESSING,
-                    add_brains=await old_km.awaitable_attrs.brains,
+                    link_brains=await old_km.awaitable_attrs.brains,
                     upload_file=None,
                     autocommit=False,
+                    process_async=False,
                 )
                 async with build_sync_file(
                     new_km,

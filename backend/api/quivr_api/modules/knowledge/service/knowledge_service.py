@@ -167,18 +167,19 @@ class KnowledgeService(BaseService[KnowledgeRepository]):
         knowledge_to_add: AddKnowledge,
         upload_file: UploadFile | None = None,
         status: KnowledgeStatus = KnowledgeStatus.RESERVED,
-        add_brains: list[Brain] = [],
+        link_brains: list[Brain] = [],
         autocommit: bool = True,
+        process_async: bool = True,
     ) -> KnowledgeDB:
         brains = []
         if knowledge_to_add.parent_id:
             parent_knowledge = await self.get_knowledge(knowledge_to_add.parent_id)
             brains = await parent_knowledge.awaitable_attrs.brains
-        if len(add_brains) > 0:
+        if len(link_brains) > 0:
             brains.extend(
                 [
                     b
-                    for b in add_brains
+                    for b in link_brains
                     if b.brain_id not in {b.brain_id for b in brains}
                 ]
             )
@@ -217,7 +218,7 @@ class KnowledgeService(BaseService[KnowledgeRepository]):
                     KnowledgeUpdate(status=KnowledgeStatus.UPLOADED),
                     autocommit=autocommit,
                 )
-            if knowledge_db.brains and len(knowledge_db.brains) > 0:
+            if knowledge_db.brains and len(knowledge_db.brains) > 0 and process_async:
                 # Schedule this new knowledge to be processed
                 knowledge_db = await self.repository.update_knowledge(
                     knowledge_db,

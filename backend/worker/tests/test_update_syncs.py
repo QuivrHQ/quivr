@@ -1,11 +1,15 @@
+import os
 from datetime import datetime, timedelta, timezone
-from typing import Any
+from io import BytesIO
+from typing import Any, Dict, List, Union
 
 import pytest
 from langchain_core.documents import Document
 from quivr_api.modules.knowledge.entity.knowledge import KnowledgeDB
+from quivr_api.modules.sync.dto.outputs import SyncProvider
 from quivr_api.modules.sync.entity.sync_models import SyncFile
 from quivr_api.modules.sync.tests.test_sync_controller import FakeSync
+from quivr_api.modules.sync.utils.sync import BaseSync
 from quivr_api.modules.vector.entity.vector import Vector
 from quivr_core.files.file import QuivrFile
 from quivr_core.models import KnowledgeStatus
@@ -24,7 +28,7 @@ async def _parse_file_mock(
 
 @pytest.mark.asyncio(loop_scope="session")
 @pytest.mark.parametrize("proc_services", [0], indirect=True)
-async def test_update_sync_file(
+async def test_refresh_sync_file(
     monkeypatch,
     session: AsyncSession,
     proc_services: ProcessorServices,
@@ -49,7 +53,7 @@ async def test_update_sync_file(
         last_modified_at=datetime.now(timezone.utc) - timedelta(hours=1),
     )
     sync_provider = FakeSync(provider_name=input_km.source, n_get_files=0)
-    new_km = await km_processor.update_outdated_km(
+    new_km = await km_processor.refresh_knowledge_entry(
         old_km=sync_knowledge_file,
         new_sync_file=new_sync_file,
         sync_provider=sync_provider,
@@ -90,7 +94,7 @@ async def test_update_sync_file(
 
 @pytest.mark.asyncio(loop_scope="session")
 @pytest.mark.parametrize("proc_services", [0], indirect=True)
-async def test_update_sync_file_rollback(
+async def test_refresh_sync_file_rollback(
     monkeypatch,
     session: AsyncSession,
     proc_services: ProcessorServices,
@@ -123,7 +127,7 @@ async def test_update_sync_file_rollback(
         last_modified_at=datetime.now(timezone.utc) - timedelta(hours=1),
     )
     sync_provider = FakeSync(provider_name=input_km.source, n_get_files=0)
-    new_km = await km_processor.update_outdated_km(
+    new_km = await km_processor.refresh_knowledge_entry(
         old_km=input_km,
         new_sync_file=new_sync_file,
         sync_provider=sync_provider,
@@ -149,3 +153,68 @@ async def test_update_sync_file_rollback(
     assert len(all_kms) == 1
     assert all_kms[0].id == input_km.id
     assert all_kms[0].last_synced_at == input_km.last_synced_at
+
+
+@pytest.mark.asyncio(loop_scope="session")
+@pytest.mark.parametrize("proc_services", [2], indirect=True)
+async def test_refresh_sync_folder(
+    monkeypatch,
+    session: AsyncSession,
+    proc_services: ProcessorServices,
+    sync_knowledge_folder_processed: KnowledgeDB,
+):
+    input_km_folder = sync_knowledge_folder_processed
+    assert input_km_folder.id
+    assert input_km_folder.brains
+    assert input_km_folder.sync_file_id
+    assert input_km_folder.file_name
+    assert input_km_folder.source_link
+    assert input_km_folder.last_synced_at
+
+    class _MockSync:
+        name = "FakeProvider"
+        lower_name = "google"
+        datetime_format: str = "%Y-%m-%dT%H:%M:%S.%fZ"
+
+        async def aget_files(
+            self, credentials: Dict, file_ids: List[str]
+        ) -> List[SyncFile]:
+            return self.get_files(credentials, file_ids)
+
+        def get_files(self, credentials: Dict, file_ids: List[str]) -> List[SyncFile]:
+            return [
+                SyncFile(
+                    id="file_id_1",
+                    name="new_file",
+                    extension=".txt",
+                    web_view_link="fake://test.com",
+                    is_folder=False,
+                    last_modified_at=datetime.now(),
+                )
+            ]
+
+        async def adownload_file(
+            self, credentials: Dict, file: SyncFile
+        ) -> Dict[str, Union[str, BytesIO]]:
+            return {"content": str(os.urandom(24))}
+
+    sync_provider_mapping: dict[SyncProvider, BaseSync] = {
+        provider: _MockSync()  # type: ignore
+        for provider in list(SyncProvider)
+    }
+
+    input_km_children = await input_km_folder.awaitable_attrs.children
+    proc_services.syncprovider_mapping = sync_provider_mapping
+    km_processor = KnowledgeProcessor(proc_services)
+    monkeypatch.setattr("quivr_worker.process.processor.parse_qfile", _parse_file_mock)
+    await km_processor.refresh_sync_folder(folder_km=input_km_folder)
+
+    # Check knowledge was updated
+    assert input_km_folder
+    assert input_km_folder.id
+    knowledge_service = km_processor.services.knowledge_service
+    km = await knowledge_service.get_knowledge(input_km_folder.id)
+    assert km.status == KnowledgeStatus.PROCESSED
+    assert {k.id for k in await km.awaitable_attrs.children}.issuperset(
+        {k.id for k in input_km_children}
+    )

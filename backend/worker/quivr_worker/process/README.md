@@ -1,8 +1,4 @@
-Here's the grammar correction and a more explicit version of your markdown, keeping the original logic intact:
-
----
-
-# Knowledge Processing
+# Knowledge Processing Task
 
 ## Steps for Processing
 
@@ -74,14 +70,43 @@ Why can’t we set all children to `ERROR`? This introduces a potential race con
 
 However, sync knowledge added to a brain will be reprocessed after some time through the sync update task, ensuring that their status will eventually be set to the correct state.
 
+# Syncing Knowledge task
+
+- Task to update all files
+- Task to get all folders and proceess
+- Rollback doesnt modify the original knowledge
+- If we don't find a folder we will delete it -> deleting all the knowledges associated with it !
+
+1. **Syncing Knowledge Syncs of Type Files:**
+   - Outdated file syncs are fetched in batches.
+   - For each file, if the remote file's `last_modified_at` is newer than the local `last_synced_at`, the file is updated.
+   - If the file is missing remotely, the db knowledge is deleted.
+2. **Syncing Knowledge Folders:**
+   - Outdated folder syncs are retrieved in batches.
+   - For each folder, its children (files and subfolders) are fetched from both the database and the remote provider.
+   - Remote children missing from the local database are added and processed.
+   - **If a Folder is Not Found:**
+     - If a folder no longer exists remotely, it is deleted locally, along with all associated knowledge entries.
+
+🔴 **Key Considerations**
+
+- **Batch Processing:**
+
+  - Both file and folder syncs are handled in batches, ensuring the system can process large data efficiently.
+
+- **Error Handling:**
+
+  - The system logs errors such as missing credentials or files, allowing the sync process to continue or fail gracefully.
+
+- **Savepoints and Rollback:**
+
+  - During file and folder processing, savepoints are created. If an error occurs, the transaction can be rolled back, ensuring the original knowledge remains unmodified.
+
+- **Deleting Folders:**
+  - If a folder is missing remotely, it triggers the deletion of the folder and all associated knowledge entries from the local system.
+
 ---
 
 ## Notification Steps
 
 To discuss: @StanGirard @Zewed
-
-# Sync update
-
-- Task to update all files
-- Task to get all folders and proceess
-- Rollback doesnt modify the original knowledge

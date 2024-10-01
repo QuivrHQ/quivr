@@ -561,3 +561,55 @@ def pdf_qfile(tmp_path) -> QuivrFile:
         file_size=1000,
         path=Path("./tests/sample.pdf"),
     )
+
+
+@pytest_asyncio.fixture(scope="function")
+async def sync_knowledge_folder_processed(
+    session: AsyncSession,
+    user: User,
+    brain_user: Brain,
+    sync: Sync,
+) -> KnowledgeDB:
+    assert user.id
+    assert brain_user.brain_id
+    folder = KnowledgeDB(
+        file_name="folder",
+        extension="",
+        status=KnowledgeStatus.PROCESSED,
+        source=SyncProvider.GOOGLE,
+        source_link="drive://test/file1",
+        file_size=10,
+        file_sha1="test",
+        user_id=user.id,
+        brains=[brain_user],
+        parent=None,
+        is_folder=True,
+        # NOTE: See FakeSync Implementation
+        sync_file_id="folder-1",
+        sync=sync,
+        last_synced_at=datetime.now(timezone.utc) - timedelta(days=2),
+    )
+
+    km = KnowledgeDB(
+        file_name="file",
+        extension=".txt",
+        status=KnowledgeStatus.PROCESSED,
+        source=SyncProvider.GOOGLE,
+        source_link="drive://test/folder1",
+        file_size=0,
+        file_sha1=None,
+        user_id=user.id,
+        brains=[brain_user],
+        parent=folder,
+        is_folder=False,
+        sync_file_id="file-1",
+        sync=sync,
+        last_synced_at=datetime.now(timezone.utc) - timedelta(days=2),
+    )
+
+    session.add(folder)
+    session.add(km)
+    await session.commit()
+    await session.refresh(folder)
+
+    return folder
