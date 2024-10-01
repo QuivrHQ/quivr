@@ -1,14 +1,19 @@
 "use client";
 
 import { Icon } from "@/lib/components/ui/Icon/Icon";
+import { transformConnectionLabel } from "@/lib/helpers/providers";
 
 import styles from "./FolderExplorerHeader.module.scss";
 
-import { useKnowledgeContext } from "../../KnowledgeProvider/hooks/useKnowledgeContext";
+import { useKnowledgeContext } from "../../../KnowledgeProvider/hooks/useKnowledgeContext";
 
 const FolderExplorerHeader = (): JSX.Element => {
-  const { currentFolder, setCurrentFolder, quivrRootSelected } =
-    useKnowledgeContext();
+  const {
+    currentFolder,
+    setCurrentFolder,
+    quivrRootSelected,
+    providerRootSelected,
+  } = useKnowledgeContext();
 
   const loadParentFolder = () => {
     if (currentFolder?.parentKMSElement) {
@@ -23,6 +28,10 @@ const FolderExplorerHeader = (): JSX.Element => {
     <div className={styles.header_wrapper}>
       {quivrRootSelected ? (
         <span className={styles.name}>Quivr</span>
+      ) : providerRootSelected ? (
+        <span className={styles.name}>
+          {transformConnectionLabel(providerRootSelected)}
+        </span>
       ) : (
         currentFolder?.parentKMSElement && (
           <div className={styles.parent_folder}>

@@ -7,7 +7,7 @@ import { useUserSettingsContext } from "@/lib/context/UserSettingsProvider/hooks
 
 import styles from "./QuivrKnowledges.module.scss";
 
-import { useKnowledgeContext } from "../KnowledgeProvider/hooks/useKnowledgeContext";
+import { useKnowledgeContext } from "../../KnowledgeProvider/hooks/useKnowledgeContext";
 
 const QuivrKnowledges = (): JSX.Element => {
   const [folded, setFolded] = useState(true);

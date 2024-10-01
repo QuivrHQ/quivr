@@ -1,6 +1,6 @@
 import { createContext, useState } from "react";
 
-import { KMSElement } from "@/lib/api/sync/types";
+import { KMSElement, Provider } from "@/lib/api/sync/types";
 
 type KnowledgeContextType = {
   currentFolder: KMSElement | undefined;
@@ -9,6 +9,10 @@ type KnowledgeContextType = {
   >;
   quivrRootSelected: boolean;
   setQuivrRootSelected: React.Dispatch<React.SetStateAction<boolean>>;
+  providerRootSelected: Provider | undefined;
+  setProviderRootSelected: React.Dispatch<
+    React.SetStateAction<Provider | undefined>
+  >;
 };
 
 export const KnowledgeContext = createContext<KnowledgeContextType | undefined>(
@@ -24,6 +28,9 @@ export const KnowledgeProvider = ({
     undefined
   );
   const [quivrRootSelected, setQuivrRootSelected] = useState<boolean>(false);
+  const [providerRootSelected, setProviderRootSelected] = useState<
+    Provider | undefined
+  >(undefined);
 
   return (
     <KnowledgeContext.Provider
@@ -32,6 +39,8 @@ export const KnowledgeProvider = ({
         setCurrentFolder,
         quivrRootSelected,
         setQuivrRootSelected,
+        providerRootSelected,
+        setProviderRootSelected,
       }}
     >
       {children}

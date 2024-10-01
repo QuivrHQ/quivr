@@ -7,7 +7,7 @@ import { LoaderIcon } from "@/lib/components/ui/LoaderIcon/LoaderIcon";
 
 import styles from "./QuivrCurrentFolder.module.scss";
 
-import { useKnowledgeContext } from "../../KnowledgeProvider/hooks/useKnowledgeContext";
+import { useKnowledgeContext } from "../../../KnowledgeProvider/hooks/useKnowledgeContext";
 import CurrentFolderExplorerLine from "../../shared/CurrentFolderExplorerLine/CurrentFolderExplorerLine";
 import FolderExplorerHeader from "../../shared/FolderExplorerHeader/FolderExplorerHeader";
 

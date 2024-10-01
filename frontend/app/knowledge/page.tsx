@@ -4,10 +4,10 @@ import { useEffect, useRef, useState } from "react";
 
 import PageHeader from "@/lib/components/PageHeader/PageHeader";
 
-import ConnectionsKnowledges from "./ConnectionsKnowledge/ConnectionsKnowledges";
-import CurrentFolderExplorer from "./CurrentFolderExplorer/CurrentFolderExplorer";
+import CurrentFolderExplorer from "./Explorer/CurrentFolderExplorer/CurrentFolderExplorer";
 import { KnowledgeProvider } from "./KnowledgeProvider/knowledge-provider";
-import QuivrKnowledges from "./QuivrKnowledge/QuivrKnowledges";
+import ConnectionsKnowledges from "./Menu/ConnectionsKnowledge/ConnectionsKnowledges";
+import QuivrKnowledges from "./Menu/QuivrKnowledge/QuivrKnowledges";
 import styles from "./page.module.scss";
 
 const Knowledge = (): JSX.Element => {

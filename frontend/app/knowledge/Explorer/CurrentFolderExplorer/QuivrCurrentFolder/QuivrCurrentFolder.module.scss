@@ -1,0 +1,20 @@
+@use "styles/Spacings.module.scss";
+
+.main_container {
+  height: 100%;
+  width: 100%;
+
+  .current_folder_content {
+    display: flex;
+    flex-direction: column;
+    overflow: scroll;
+
+    .loading_icon {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding-top: Spacings.$spacing06;
+    }
+  }
+}
