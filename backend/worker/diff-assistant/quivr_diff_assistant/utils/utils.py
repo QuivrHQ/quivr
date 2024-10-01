@@ -53,15 +53,15 @@ COMPARISON_PROMPT = PromptTemplate.from_template(
 
     Chaque sections doivent être organisées comme suit :
     ## Section name
-    *<text 1> :
+    **<text 1>** :
         * ...
         * ...
 
-    *<text 2>* : ...
+    **<text 2>** : ...
         * ...
         * ...
 
-    *Differences*: 
+    **Differences**: 
         * ...
         * ...
 
@@ -85,7 +85,7 @@ COMPARISON_PROMPT = PromptTemplate.from_template(
     In the report you should replace evry occurence of <text 1> with {text_1} and every occurence of <text 2> with {text_2}.
         
     ## Dénominations
-    *{text_1}* :
+    **{text_1}** :
         * 
     """
 )

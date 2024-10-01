@@ -1,5 +1,6 @@
 import { MotionConfig } from "framer-motion";
 import { usePathname, useRouter } from "next/navigation";
+import { useFeatureFlagEnabled } from 'posthog-js/react';
 import { useState } from "react";
 
 import { MenuControlButton } from "@/app/chat/[chatId]/components/ActionsBar/components/ChatInput/components/MenuControlButton/MenuControlButton";
@@ -23,6 +24,7 @@ import { StudioButton } from "./components/StudioButton/StudioButton";
 import { ThreadsButton } from "./components/ThreadsButton/ThreadsButton";
 import { UpgradeToPlusButton } from "./components/UpgradeToPlusButton/UpgradeToPlusButton";
 
+
 const showUpgradeButton = process.env.NEXT_PUBLIC_SHOW_TOKENS === "true";
 
 export const Menu = (): JSX.Element => {
@@ -32,6 +34,8 @@ export const Menu = (): JSX.Element => {
   const pathname = usePathname() ?? "";
   const [isLogoHovered, setIsLogoHovered] = useState<boolean>(false);
   const { isDarkMode } = useUserSettingsContext();
+  const flagEnabled = useFeatureFlagEnabled('show-quality-assistant')
+
 
   useChatsList();
 
@@ -61,9 +65,8 @@ export const Menu = (): JSX.Element => {
     <div>
       <MotionConfig transition={{ mass: 1, damping: 10, duration: 0.1 }}>
         <div
-          className={`${styles.menu_container} ${
-            !isOpened ? styles.hidden : ""
-          }`}
+          className={`${styles.menu_container} ${!isOpened ? styles.hidden : ""
+            }`}
         >
           <AnimatedDiv>
             <div className={styles.menu_wrapper}>
@@ -85,7 +88,8 @@ export const Menu = (): JSX.Element => {
                 <div className={styles.block}>
                   <DiscussionButton />
                   <HomeButton />
-                  <QualityAssistantButton />
+
+                  {flagEnabled && <QualityAssistantButton />}
                   <StudioButton />
                   <NotificationsButton />
                   <ThreadsButton />
