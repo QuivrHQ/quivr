@@ -2,18 +2,18 @@ import { useEffect, useState } from "react";
 
 import { KMSElement } from "@/lib/api/sync/types";
 import { useSync } from "@/lib/api/sync/useSync";
-import { Icon } from "@/lib/components/ui/Icon/Icon";
 import { LoaderIcon } from "@/lib/components/ui/LoaderIcon/LoaderIcon";
 
 import styles from "./SyncCurrentFolder.module.scss";
 
 import { useKnowledgeContext } from "../../KnowledgeProvider/hooks/useKnowledgeContext";
 import CurrentFolderExplorerLine from "../../shared/CurrentFolderExplorerLine/CurrentFolderExplorerLine";
+import FolderExplorerHeader from "../../shared/FolderExplorerHeader/FolderExplorerHeader";
 
 const SyncCurrentFolder = (): JSX.Element => {
   const [loading, setLoading] = useState(false);
   const [syncElements, setKMSElements] = useState<KMSElement[]>();
-  const { currentFolder, setCurrentFolder } = useKnowledgeContext();
+  const { currentFolder } = useKnowledgeContext();
   const { getSyncFiles } = useSync();
 
   const fetchSyncFiles = async (folderId: string) => {
@@ -36,47 +36,9 @@ const SyncCurrentFolder = (): JSX.Element => {
     }
   }, [currentFolder]);
 
-  const loadParentFolder = () => {
-    if (currentFolder?.parentKMSElement) {
-      setCurrentFolder({
-        ...currentFolder.parentKMSElement,
-        parentKMSElement: currentFolder.parentKMSElement.parentKMSElement,
-      });
-    }
-  };
-
   return (
     <div className={styles.current_folder_explorer_wrapper}>
-      <div className={styles.header}>
-        {currentFolder?.parentKMSElement && (
-          <div className={styles.parent_folder}>
-            {currentFolder.parentKMSElement.icon && (
-              <div className={styles.icon}>
-                {currentFolder.parentKMSElement.icon}
-              </div>
-            )}
-            <span
-              className={styles.name}
-              onClick={() => void loadParentFolder()}
-            >
-              {currentFolder.parentKMSElement.file_name?.replace(/(\..+)$/, "")}
-            </span>
-            <Icon name="chevronRight" size="normal" color="black" />
-          </div>
-        )}
-        <div className={styles.current_folder}>
-          {currentFolder?.icon && (
-            <div className={styles.icon}>{currentFolder.icon}</div>
-          )}
-          <span
-            className={`${styles.name} ${
-              currentFolder?.parentKMSElement ? styles.selected : ""
-            }`}
-          >
-            {currentFolder?.file_name?.replace(/(\..+)$/, "")}
-          </span>
-        </div>
-      </div>
+      <FolderExplorerHeader />
       <div className={styles.current_folder_content}>
         {loading ? (
           <div className={styles.loading_icon}>
