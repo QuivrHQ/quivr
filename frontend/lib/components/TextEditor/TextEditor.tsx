@@ -42,6 +42,7 @@ export const TextEditor = (): JSX.Element => {
             editor.commands.setHighlight();
           }
 
+          setSearchBarOpen(true);
           searchEditorRef.current
             ?.chain()
             .focus()
