@@ -18,6 +18,7 @@ from copy import deepcopy
 from langchain.retrievers import ContextualCompressionRetriever
 from langchain_cohere import CohereRerank
 from langchain_community.document_compressors import JinaRerank
+from langchain_community.tools import TavilySearchResults
 from langchain_core.callbacks import Callbacks
 from langchain_core.documents import BaseDocumentCompressor, Document
 from langchain_core.messages import BaseMessage
@@ -63,6 +64,17 @@ class SplittedInput(BaseModel):
     questions: Optional[List[str]] = Field(
         default=None,
         description="The user questions, where each question in the list is a self-contained question.",
+    )
+
+
+class AnsweredQuestions(BaseModel):
+    answered: Optional[List[str]] = Field(
+        default=None,
+        description="The user questions that can be answered by the system.",
+    )
+    non_answered: Optional[List[str]] = Field(
+        default=None,
+        description="The user questions that cannot be answered by the system.",
     )
 
 
@@ -425,6 +437,77 @@ class QuivrQARAGLangGraph:
 
         return filtered_chunks
 
+    def websearch_split(self, state: AgentState):
+        input = {
+            "chat_history": state["chat_history"].to_list(),
+            "questions": state["questions"],
+            "documents": state["docs"],
+        }
+
+        msg = custom_prompts.ANSWERED_QUESTIONS_PROMPT.format(**input)
+
+        try:
+            structured_llm = self.llm_endpoint._llm.with_structured_output(
+                AnsweredQuestions, method="json_schema"
+            )
+            response = structured_llm.invoke(msg)
+
+        except openai.BadRequestError:
+            structured_llm = self.llm_endpoint._llm.with_structured_output(
+                AnsweredQuestions
+            )
+            response = structured_llm.invoke(msg)
+
+        send_list: List[Send] = []
+
+        if response.non_answered:
+            payload = {
+                **state,
+                "questions": response.non_answered,
+            }
+            send_list.append(Send("tavily_search", payload))
+        else:
+            send_list.append(Send("generate_rag", state))
+
+        return send_list
+
+    async def tavily_search(self, state: AgentState) -> AgentState:
+        questions = state["questions"]
+
+        tool = TavilySearchResults(
+            max_results=5,
+            search_depth="advanced",
+            include_answer=True,
+        )
+
+        # Prepare the async tasks for all questions
+        tasks = []
+        for question in questions:
+            # Asynchronously invoke the model for each question
+            tasks.append(tool.ainvoke({"query": question}))
+
+        # Gather all the responses asynchronously
+        responses = await asyncio.gather(*tasks) if tasks else []
+
+        docs = []
+        for response in responses:
+            metadata = {"integration": "", "integration_link": ""}
+            _docs = [
+                Document(
+                    page_content=d["content"],
+                    metadata={
+                        **metadata,
+                        "file_name": d["url"],
+                        "original_file_name": d["url"],
+                    },
+                )
+                for d in response
+            ]
+            _docs = self.filter_chunks_by_relevance(_docs)
+            docs += _docs
+
+        return {**state, "docs": state["docs"] + docs}
+
     async def retrieve(self, state: AgentState) -> AgentState:
         """
         Retrieve relevent chunks
@@ -442,10 +525,10 @@ class QuivrQARAGLangGraph:
             "search_kwargs": {
                 "k": self.retrieval_config.k,
             }
-        }
+        }  # type: ignore
         base_retriever = self.get_retriever(**kwargs)
 
-        kwargs = {"top_n": self.retrieval_config.reranker_config.top_n}
+        kwargs = {"top_n": self.retrieval_config.reranker_config.top_n}  # type: ignore
         reranker = self.get_reranker(**kwargs)
 
         compression_retriever = ContextualCompressionRetriever(
@@ -492,7 +575,7 @@ class QuivrQARAGLangGraph:
             reranker = self.get_reranker(**kwargs)
 
             k = top_n * 2
-            kwargs = {"search_kwargs": {"k": k}}
+            kwargs = {"search_kwargs": {"k": k}}  # type: ignore
             base_retriever = self.get_retriever(**kwargs)
 
             if i > 1:

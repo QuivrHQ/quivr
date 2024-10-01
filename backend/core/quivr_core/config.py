@@ -13,6 +13,19 @@ from quivr_core.processor.splitter import SplitterConfig
 from quivr_core.prompts import CustomPromptsModel
 
 
+def normalize_to_env_variable_name(name: str) -> str:
+    # Replace any character that is not a letter, digit, or underscore with an underscore
+    env_variable_name = re.sub(r"[^A-Za-z0-9_]", "_", name).upper()
+
+    # Check if the normalized name starts with a digit
+    if env_variable_name[0].isdigit():
+        raise ValueError(
+            f"Invalid environment variable name '{env_variable_name}': Cannot start with a digit."
+        )
+
+    return env_variable_name
+
+
 class SpecialEdges(str, Enum):
     start = "START"
     end = "END"
@@ -25,6 +38,10 @@ class BrainConfig(QuivrBaseConfig):
     @property
     def id(self) -> UUID | None:
         return self.brain_id
+
+
+class DefaultWebSearchTool(str, Enum):
+    TAVILY = "tavily"
 
 
 class DefaultRerankers(str, Enum):
@@ -173,7 +190,7 @@ class LLMEndpointConfig(QuivrBaseConfig):
     context_length: int | None = None
     tokenizer_hub: str | None = None
     llm_base_url: str | None = None
-    env_variable_name: str = f"{supplier.upper()}_API_KEY"
+    env_variable_name: str = f"{normalize_to_env_variable_name(supplier)}_API_KEY"
     llm_api_key: str | None = None
     max_context_tokens: int = 2000
     max_output_tokens: int = 2000
@@ -254,18 +271,6 @@ class RerankerConfig(QuivrBaseConfig):
         super().__init__(**data)  # Call Pydantic's BaseModel init
         self.validate_model()  # Automatically call external validation
 
-    def normalize_to_env_variable_name(self, supplier: str) -> str:
-        # Replace any character that is not a letter, digit, or underscore with an underscore
-        env_variable_name = re.sub(r"[^A-Za-z0-9_]", "_", supplier).upper()
-
-        # Check if the normalized name starts with a digit
-        if env_variable_name[0].isdigit():
-            raise ValueError(
-                f"Invalid environment variable name '{env_variable_name}': Cannot start with a digit."
-            )
-
-        return env_variable_name
-
     def validate_model(self):
         # If model is not provided, get default model based on supplier
         if self.model is None and self.supplier is not None:
@@ -273,14 +278,33 @@ class RerankerConfig(QuivrBaseConfig):
 
         # Check if the corresponding API key environment variable is set
         if self.supplier:
-            api_key_var = (
-                f"{self.normalize_to_env_variable_name(self.supplier)}_API_KEY"
-            )
+            api_key_var = f"{normalize_to_env_variable_name(self.supplier)}_API_KEY"
             self.api_key = os.getenv(api_key_var)
 
             if self.api_key is None:
                 raise ValueError(
                     f"The API key for supplier '{self.supplier}' is not set. "
+                    f"Please set the environment variable: {api_key_var}"
+                )
+
+
+class WebSearchConfig(QuivrBaseConfig):
+    supplier: DefaultWebSearchTool | None = None
+    api_key: str | None = None
+
+    def __init__(self, **data):
+        super().__init__(**data)  # Call Pydantic's BaseModel init
+        self.validate_model()  # Automatically call external validation
+
+    def validate_model(self):
+        # Check if the corresponding API key environment variable is set
+        if self.supplier:
+            api_key_var = f"{normalize_to_env_variable_name(self.supplier)}_API_KEY"
+            self.api_key = os.getenv(api_key_var)
+
+            if self.api_key is None:
+                raise ValueError(
+                    f"The API key for supplier '{self.supplier.value}' is not set. "
                     f"Please set the environment variable: {api_key_var}"
                 )
 
@@ -355,6 +379,7 @@ class WorkflowConfig(QuivrBaseConfig):
 class RetrievalConfig(QuivrBaseConfig):
     reranker_config: RerankerConfig = RerankerConfig()
     llm_config: LLMEndpointConfig = LLMEndpointConfig()
+    web_search_config: WebSearchConfig = WebSearchConfig()
     max_history: int = 10
     max_files: int = 20
     k: int = 40  # Number of chunks returned by the retriever

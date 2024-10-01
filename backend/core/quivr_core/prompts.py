@@ -108,12 +108,14 @@ def _define_custom_prompts() -> CustomPromptsDict:
     # Prompt to understand the user intent
     # ---------------------------------------------------------------------------
     _template = (
-        "Given the following user input, determine the user intent:\n"
-        "    - if the user is providing direct instructions to the system (for instance, "
+        "Given the following user input, determine the user intent, in particular "
+        "whether the user is providing instructions to the system or is asking the system to "
+        "execute a task:\n"
+        "    - if the user is providing direct instructions to modify the system behaviour (for instance, "
         "'Can you reply in French?' or 'Answer in French' or 'You are an expert legal assistant' "
         "or 'You will behave as...'), the user intent is 'prompt';\n"
-        "    - in all other cases, the intent is 'rag';\n"
-        "    - if you are unsure about the user intent, the itent is 'unsure';\n"
+        "    - in all other cases (asking questions, asking for summarising a text, asking for translating a text, ...), "
+        "the intent is 'task'.\n"
         "User input: {question}"
     )
 
@@ -157,6 +159,24 @@ def _define_custom_prompts() -> CustomPromptsDict:
 
     SPLIT_PROMPT = PromptTemplate.from_template(_template)
     custom_prompts["SPLIT_PROMPT"] = SPLIT_PROMPT
+
+    # ---------------------------------------------------------------------------
+    # Prompt to grade the relevance of an answer and decide whather to perform a web search
+    # ---------------------------------------------------------------------------
+    _template = (
+        "Given the following user questions, retrieved documents, and chat history"
+        "you shall determine whether the retrieved documents allow you "
+        "to provide a satisfactory asnwer to each question. You shall: \n"
+        "1) Consider each question separately, \n"
+        "2) Determine whether the retrieved documents and chat history contain "
+        "enough relevant information to answer the question.\n"
+        "Chat history: {chat_history}\n"
+        "Retrieved documents: {documents}\n"
+        "User questions: {questions}\n"
+    )
+
+    ANSWERED_QUESTIONS_PROMPT = PromptTemplate.from_template(_template)
+    custom_prompts["ANSWERED_QUESTIONS_PROMPT"] = ANSWERED_QUESTIONS_PROMPT
 
     return custom_prompts
 
