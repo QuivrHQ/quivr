@@ -26,15 +26,12 @@ const ConnectionKnowledges = ({
   const selectProvider = () => {
     setCurrentFolder(undefined);
     setQuivrRootSelected(false);
-    setProviderRootSelected(providerGroup.provider);
+    setProviderRootSelected(providerGroup);
   };
 
   return (
     <div className={styles.connection_knowledges_wrapper}>
-      <div
-        className={styles.provider_line_wrapper}
-        onClick={() => selectProvider()}
-      >
+      <div className={styles.provider_line_wrapper}>
         <Icon
           name={folded ? "chevronRight" : "chevronDown"}
           size="normal"
@@ -42,7 +39,7 @@ const ConnectionKnowledges = ({
           handleHover={true}
           onClick={() => setFolded(!folded)}
         />
-        <div className={styles.hoverable}>
+        <div className={styles.hoverable} onClick={() => selectProvider()}>
           <Image
             src={providerIconUrls[providerGroup.provider]}
             alt={providerGroup.provider}

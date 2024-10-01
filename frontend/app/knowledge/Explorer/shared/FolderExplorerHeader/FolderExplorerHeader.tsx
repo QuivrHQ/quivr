@@ -30,7 +30,7 @@ const FolderExplorerHeader = (): JSX.Element => {
         <span className={styles.name}>Quivr</span>
       ) : providerRootSelected ? (
         <span className={styles.name}>
-          {transformConnectionLabel(providerRootSelected)}
+          {transformConnectionLabel(providerRootSelected.provider)}
         </span>
       ) : (
         currentFolder?.parentKMSElement && (

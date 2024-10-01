@@ -19,13 +19,18 @@ const SyncFolder = ({ element }: SyncFolderProps): JSX.Element => {
   const [syncElements, setKMSElements] = useState<KMSElement[]>();
   const [selectedFolder, setSelectedFolder] = useState<boolean>(false);
 
-  const { currentFolder, setCurrentFolder, setQuivrRootSelected } =
-    useKnowledgeContext();
+  const {
+    currentFolder,
+    setCurrentFolder,
+    setQuivrRootSelected,
+    setProviderRootSelected,
+  } = useKnowledgeContext();
 
   useEffect(() => {
     setSelectedFolder(currentFolder?.sync_file_id === element.sync_file_id);
     if (currentFolder) {
       setQuivrRootSelected(false);
+      setProviderRootSelected(undefined);
     }
   }, [currentFolder]);
 
