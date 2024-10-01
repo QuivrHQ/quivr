@@ -30,7 +30,6 @@
 
   .bubble_menu {
     background-color: var(--background-3);
-    // padding: Spacings.$spacing03 Spacings.$spacing05;
     border: solid 1px var(--border-0);
     border-radius: Radius.$normal;
   }
@@ -41,7 +40,7 @@
     position: relative;
 
     .ai_highlight {
-      background-color: var(--primary-0);
+      background-color: blue;
       color: white;
       padding: 2px 0 3px 0;
     }
