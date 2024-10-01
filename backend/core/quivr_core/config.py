@@ -1,4 +1,5 @@
 import os
+import re
 from enum import Enum
 from typing import Dict, Hashable, List, Optional, Union
 from uuid import UUID
@@ -29,6 +30,7 @@ class BrainConfig(QuivrBaseConfig):
 class DefaultRerankers(str, Enum):
     COHERE = "cohere"
     JINA = "jina"
+    # MIXEDBREAD = "mixedbread-ai"
 
     @property
     def default_model(self) -> str:
@@ -36,6 +38,7 @@ class DefaultRerankers(str, Enum):
         return {
             self.COHERE: "rerank-multilingual-v3.0",
             self.JINA: "jina-reranker-v2-base-multilingual",
+            # self.MIXEDBREAD: "rmxbai-rerank-large-v1",
         }[self]
 
 
@@ -251,6 +254,18 @@ class RerankerConfig(QuivrBaseConfig):
         super().__init__(**data)  # Call Pydantic's BaseModel init
         self.validate_model()  # Automatically call external validation
 
+    def normalize_to_env_variable_name(self, supplier: str) -> str:
+        # Replace any character that is not a letter, digit, or underscore with an underscore
+        env_variable_name = re.sub(r"[^A-Za-z0-9_]", "_", supplier).upper()
+
+        # Check if the normalized name starts with a digit
+        if env_variable_name[0].isdigit():
+            raise ValueError(
+                f"Invalid environment variable name '{env_variable_name}': Cannot start with a digit."
+            )
+
+        return env_variable_name
+
     def validate_model(self):
         # If model is not provided, get default model based on supplier
         if self.model is None and self.supplier is not None:
@@ -258,7 +273,9 @@ class RerankerConfig(QuivrBaseConfig):
 
         # Check if the corresponding API key environment variable is set
         if self.supplier:
-            api_key_var = f"{self.supplier.upper()}_API_KEY"
+            api_key_var = (
+                f"{self.normalize_to_env_variable_name(self.supplier)}_API_KEY"
+            )
             self.api_key = os.getenv(api_key_var)
 
             if self.api_key is None:
@@ -343,22 +360,9 @@ class RetrievalConfig(QuivrBaseConfig):
     k: int = 40  # Number of chunks returned by the retriever
     prompt: str | None = None
     workflow_config: WorkflowConfig | None = None
-    dynamic_chunk_retrieval: bool = False
-
-    def validate_dynamic_chunk_retrieval(self):
-        # Ensure that dynamic_chunk_retrieval can only be True if reranker_config is validated
-        if self.dynamic_chunk_retrieval:
-            if not self.reranker_config.supplier:
-                raise ValueError(
-                    "Dynamic chunk retrieval requires a valid supplier in RerankerConfig."
-                )
-
-            # Check that the RerankerConfig has been validated correctly (i.e., has a model and API key)
-            self.reranker_config.validate_model()
 
     def __init__(self, **data):
         super().__init__(**data)
-        self.validate_dynamic_chunk_retrieval()
 
 
 class ParserConfig(QuivrBaseConfig):
