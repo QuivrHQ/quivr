@@ -1,5 +1,7 @@
 "use client";
 
+import { useEffect } from "react";
+
 import { Icon } from "@/lib/components/ui/Icon/Icon";
 import { transformConnectionLabel } from "@/lib/helpers/providers";
 
@@ -24,9 +26,15 @@ const FolderExplorerHeader = (): JSX.Element => {
     }
   };
 
+  useEffect(() => {
+    if (currentFolder) {
+      console.log("Current folder:", currentFolder);
+    }
+  });
+
   return (
     <div className={styles.header_wrapper}>
-      {quivrRootSelected ? (
+      {quivrRootSelected && !currentFolder?.parentKMSElement ? (
         <span className={styles.name}>Quivr</span>
       ) : providerRootSelected ? (
         <span className={styles.name}>
