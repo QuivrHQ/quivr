@@ -1,5 +1,6 @@
 import { useState } from "react";
 
+import { useKnowledgeContext } from "@/app/knowledge/KnowledgeProvider/hooks/useKnowledgeContext";
 import { useKnowledgeApi } from "@/lib/api/knowledge/useKnowledgeApi";
 import { Modal } from "@/lib/components/ui/Modal/Modal";
 import QuivrButton from "@/lib/components/ui/QuivrButton/QuivrButton";
@@ -17,21 +18,34 @@ const AddFolderModal = ({
   setIsOpen,
 }: AddFolderModalProps): JSX.Element => {
   const [folderName, setFolderName] = useState<string>("");
+  const [loading, setLoading] = useState<boolean>(false);
 
+  const { currentFolder } = useKnowledgeContext();
   const { addFolder } = useKnowledgeApi();
 
   const handleKeyDown = async (event: React.KeyboardEvent) => {
     if (event.key === "Enter" && folderName !== "") {
-      await addFolder({
-        parent_id: null,
-        file_name: folderName,
-        is_folder: true,
-      });
+      await createFolder();
     }
   };
 
-  const createFolder = () => {
-    console.log(folderName);
+  const createFolder = async () => {
+    if (folderName !== "") {
+      setLoading(true);
+      await addFolder({
+        parent_id: currentFolder?.id ?? null,
+        file_name: folderName,
+        is_folder: true,
+      });
+      setFolderName("");
+      setIsOpen(false);
+      setLoading(false);
+    }
+  };
+
+  const handleCancel = () => {
+    setFolderName("");
+    setIsOpen(false);
   };
 
   return (
@@ -57,19 +71,15 @@ const AddFolderModal = ({
               label="Cancel"
               iconName="close"
               color="dangerous"
-              onClick={() => {
-                setFolderName("");
-                setIsOpen(false);
-              }}
+              onClick={handleCancel}
             />
             <QuivrButton
               label="Create Folder"
               iconName="add"
               color="primary"
               disabled={folderName === ""}
-              onClick={() => {
-                createFolder();
-              }}
+              onClick={createFolder}
+              isLoading={loading}
             />
           </div>
         </div>

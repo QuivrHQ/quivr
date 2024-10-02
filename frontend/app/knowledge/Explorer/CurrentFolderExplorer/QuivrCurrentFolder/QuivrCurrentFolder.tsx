@@ -36,6 +36,12 @@ const QuivrCurrentFolder = (): JSX.Element => {
     void fetchQuivrFiles(currentFolder?.id ?? null);
   }, [currentFolder]);
 
+  useEffect(() => {
+    if (!addFolderModalOpened) {
+      void fetchQuivrFiles(currentFolder?.id ?? null);
+    }
+  }, [addFolderModalOpened]);
+
   return (
     <>
       <div className={styles.main_container}>
