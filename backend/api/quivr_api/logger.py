@@ -4,13 +4,11 @@ import queue
 import sys
 import threading
 from logging.handlers import RotatingFileHandler
-from time import sleep
 from typing import List
 
 import orjson
 import requests
 import structlog
-from pythonjsonlogger import jsonlogger
 
 from quivr_api.models.settings import parseable_settings
 
@@ -35,6 +33,7 @@ class ParseableLogHandler(logging.Handler):
         self.batch_size = batch_size
         self.flush_interval = flush_interval
         self._worker_thread = threading.Thread(target=self._process_log_queue)
+        self._worker_thread.daemon = True
         self._worker_thread.start()
         self.headers = {
             "Authorization": f"Basic {auth_token}",  # base64 encoding user:mdp
@@ -87,58 +86,6 @@ class ParseableLogHandler(logging.Handler):
             self._send_logs_to_parseable(remaining_logs)
 
 
-def get_logger(
-    logger_name,
-    log_file="application.log",
-):
-    log_level = os.getenv("LOG_LEVEL", "WARNING").upper()
-    logger = logging.getLogger(logger_name)
-    logger.setLevel(log_level)
-    logger.propagate = False
-
-    # Set handlers
-    console_handler = logging.StreamHandler(sys.stdout)
-    file_handler = RotatingFileHandler(
-        log_file, maxBytes=5000000, backupCount=5
-    )  # 5MB file
-
-    handlers = [console_handler]
-
-    if (
-        parseable_settings.parseable_url is not None
-        and parseable_settings.parseable_auth is not None
-    ):
-        parseable_handler = ParseableLogHandler(
-            auth_token=parseable_settings.parseable_auth,
-            base_parseable_url=parseable_settings.parseable_url,
-        )
-        handlers.append(parseable_handler)
-
-    if not logger.handlers:
-        for handler in handlers:
-            handler.setFormatter(jsonlogger.JsonFormatter())
-            logger.addHandler(handler)
-
-    return logger
-
-
-structlog.configure(
-    processors=[
-        structlog.stdlib.add_log_level,
-        structlog.stdlib.PositionalArgumentsFormatter(),
-        structlog.processors.TimeStamper(fmt="iso"),
-        structlog.processors.StackInfoRenderer(),
-        structlog.processors.UnicodeDecoder(),
-        structlog.processors.EventRenamer("msg"),
-        structlog.stdlib.ProcessorFormatter.wrap_for_formatter,
-    ],
-    logger_factory=structlog.stdlib.LoggerFactory(),  # Use standard logging compatible logger
-    wrapper_class=structlog.stdlib.BoundLogger,  # Use BoundLogger for compatibility
-    # Use Python's logging configuration
-    cache_logger_on_first_use=True,
-)
-
-
 def extract_from_record(_, __, event_dict):
     """
     Extract thread and process names and add them to the event dict.
@@ -149,34 +96,55 @@ def extract_from_record(_, __, event_dict):
     return event_dict
 
 
-# Set handlers
-console_handler = logging.StreamHandler(sys.stdout)
-file_handler = RotatingFileHandler(
-    "application.log", maxBytes=5000000, backupCount=5
-)  # 5MB file
-
-plain_fmt = structlog.stdlib.ProcessorFormatter(
-    processors=[
-        extract_from_record,
-        structlog.stdlib.ProcessorFormatter.remove_processors_meta,
-        structlog.dev.ConsoleRenderer(colors=True),
+# Shared handlers
+shared_processors = [
+    structlog.stdlib.add_log_level,
+    structlog.stdlib.PositionalArgumentsFormatter(),
+    structlog.processors.TimeStamper(fmt="iso"),
+    structlog.processors.StackInfoRenderer(),
+    structlog.processors.UnicodeDecoder(),
+    structlog.processors.EventRenamer("msg"),
+]
+structlog.configure(
+    processors=shared_processors
+    + [
+        structlog.stdlib.ProcessorFormatter.wrap_for_formatter,
     ],
+    logger_factory=structlog.stdlib.LoggerFactory(),  # Use standard logging compatible logger
+    wrapper_class=structlog.stdlib.BoundLogger,  # Use BoundLogger for compatibility
+    # Use Python's logging configuration
+    cache_logger_on_first_use=True,
 )
 
-console_handler.setFormatter(plain_fmt)
-handlers: list[logging.Handler] = [console_handler]
 
-if (
-    parseable_settings.parseable_url is not None
-    and parseable_settings.parseable_auth is not None
+def get_logger(
+    logger_name,
+    log_file="application.log",
 ):
+    # Set Formatters
+    plain_fmt = structlog.stdlib.ProcessorFormatter(
+        foreign_pre_chain=shared_processors,
+        processors=[
+            extract_from_record,
+            structlog.stdlib.ProcessorFormatter.remove_processors_meta,
+            structlog.dev.ConsoleRenderer(colors=False),
+        ],
+    )
+    color_fmt = structlog.stdlib.ProcessorFormatter(
+        foreign_pre_chain=shared_processors,
+        processors=[
+            structlog.stdlib.ProcessorFormatter.remove_processors_meta,
+            structlog.dev.ConsoleRenderer(colors=True),
+        ],
+    )
     parseable_fmt = structlog.stdlib.ProcessorFormatter(
         processors=[
             structlog.processors.dict_tracebacks,
             structlog.stdlib.ProcessorFormatter.remove_processors_meta,
             structlog.processors.JSONRenderer(),
         ],
-        foreign_pre_chain=[
+        foreign_pre_chain=shared_processors
+        + [
             structlog.processors.CallsiteParameterAdder(
                 {
                     structlog.processors.CallsiteParameter.FILENAME,
@@ -186,25 +154,31 @@ if (
             ),
         ],
     )
-    parseable_handler = ParseableLogHandler(
-        auth_token=parseable_settings.parseable_auth,
-        base_parseable_url=parseable_settings.parseable_url,
-    )
-    parseable_handler.setFormatter(parseable_fmt)
-    handlers.append(parseable_handler)
 
-log_level = os.getenv("LOG_LEVEL", "INFO").upper()
-quivr_logger = logging.getLogger("quivr-api")
-quivr_logger.setLevel(log_level)
-for handler in handlers:
-    quivr_logger.addHandler(handler)
+    # Set handlers
+    console_handler = logging.StreamHandler(sys.stdout)
+    file_handler = RotatingFileHandler(
+        log_file, maxBytes=5000000, backupCount=5
+    )  # 5MB file
+    console_handler.setFormatter(color_fmt)
+    file_handler.setFormatter(plain_fmt)
+    handlers: list[logging.Handler] = [console_handler, file_handler]
+    if (
+        parseable_settings.parseable_url is not None
+        and parseable_settings.parseable_auth is not None
+    ):
+        parseable_handler = ParseableLogHandler(
+            auth_token=parseable_settings.parseable_auth,
+            base_parseable_url=parseable_settings.parseable_url,
+        )
+        parseable_handler.setFormatter(parseable_fmt)
+        handlers.append(parseable_handler)
 
-log = structlog.get_logger("quivr-api")
+    # Configure logger
+    log_level = os.getenv("LOG_LEVEL", "INFO").upper()
+    logger = logging.getLogger(logger_name)
+    logger.setLevel(log_level)
+    for handler in handlers:
+        logger.addHandler(handler)
 
-for _ in range(10):
-    log.info("this is a test", a=12, b=121)
-    try:
-        a = 1 / 0
-    except Exception as e:
-        log.exception(f"error occured: {e}")
-    sleep(0.4)
+    return logger
