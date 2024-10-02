@@ -118,3 +118,7 @@ class LLMEndpoint:
             max_tokens=self._config.max_output_tokens,
             supports_function_calling=self.supports_func_calling(),
         )
+
+    def clone_llm(self):
+        """Create a new instance of the LLM with the same configuration."""
+        return self._llm.__class__(**self._llm.__dict__)

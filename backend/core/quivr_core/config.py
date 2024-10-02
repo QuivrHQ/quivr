@@ -1,7 +1,7 @@
 import os
 import re
 from enum import Enum
-from typing import Dict, Hashable, List, Optional, Union
+from typing import Dict, Hashable, List, Optional, Union, Any
 from uuid import UUID
 from sqlmodel import SQLModel
 from langgraph.graph import START, END
@@ -11,6 +11,7 @@ from megaparse.config import MegaparseConfig
 from quivr_core.base_config import QuivrBaseConfig
 from quivr_core.processor.splitter import SplitterConfig
 from quivr_core.prompts import CustomPromptsModel
+from quivr_core.llm_tools import LLMToolFactory
 
 
 def normalize_to_env_variable_name(name: str) -> str:
@@ -338,23 +339,22 @@ class ConditionalEdgeConfig(QuivrBaseConfig):
 
 class NodeConfig(QuivrBaseConfig):
     name: str
-    # config: QuivrBaseConfig  # This can be any config like RerankerConfig or LLMEndpointConfig
-    edges: List[str] | None = None  # List of names of other nodes this node links to
+    edges: List[str] | None = None
     conditional_edge: ConditionalEdgeConfig | None = None
+    tools: List[Dict[str, Any]] | None = None  # Add tools attribute
 
     def __init__(self, **data):
         super().__init__(**data)
         self.resolve_special_edges_in_name_and_edges()
+        self.instantiate_tools()
 
     def resolve_special_edges_in_name_and_edges(self):
         """Replace SpecialEdges enum values in name and edges with corresponding langgraph values."""
-        # Replace in name
         if self.name == SpecialEdges.start:
             self.name = START
         elif self.name == SpecialEdges.end:
             self.name = END
 
-        # Replace in edges
         if self.edges:
             for i, edge in enumerate(self.edges):
                 if edge == SpecialEdges.start:
@@ -362,10 +362,18 @@ class NodeConfig(QuivrBaseConfig):
                 elif edge == SpecialEdges.end:
                     self.edges[i] = END
 
+    def instantiate_tools(self):
+        """Instantiate tools based on the configuration."""
+        if self.tools:
+            self.tools = [
+                LLMToolFactory.create_tool(tool_config.pop("name"), tool_config)
+                for tool_config in self.tools
+            ]
+
 
 class WorkflowConfig(QuivrBaseConfig):
-    name: str
-    nodes: List[NodeConfig]
+    name: str | None = None
+    nodes: List[NodeConfig] = []
 
     def __init__(self, **data):
         super().__init__(**data)
@@ -374,6 +382,13 @@ class WorkflowConfig(QuivrBaseConfig):
     def check_start_node_exists(self):
         if START not in [node.name for node in self.nodes]:
             raise ValueError(f"The workflow should contain a {SpecialEdges.start} node")
+
+    def get_node_tools(self, node_name: str) -> List[Any]:
+        """Get tools for a specific node."""
+        for node in self.nodes:
+            if node.name == node_name and node.tools:
+                return node.tools
+        return []
 
 
 class RetrievalConfig(QuivrBaseConfig):
@@ -384,7 +399,7 @@ class RetrievalConfig(QuivrBaseConfig):
     max_files: int = 20
     k: int = 40  # Number of chunks returned by the retriever
     prompt: str | None = None
-    workflow_config: WorkflowConfig | None = None
+    workflow_config: WorkflowConfig = WorkflowConfig()
 
     def __init__(self, **data):
         super().__init__(**data)

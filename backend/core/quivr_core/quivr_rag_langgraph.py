@@ -40,7 +40,6 @@ from quivr_core.models import (
     ParsedRAGChunkResponse,
     QuivrKnowledge,
     RAGResponseMetadata,
-    cited_answer,
 )
 from quivr_core.prompts import custom_prompts
 from quivr_core.utils import (
@@ -68,13 +67,13 @@ class SplittedInput(BaseModel):
 
 
 class AnsweredQuestions(BaseModel):
-    answered: Optional[List[str]] = Field(
+    completable_tasks: Optional[List[str]] = Field(
         default=None,
-        description="The user tasks or questions that can be answered by the system.",
+        description="The user tasks or questions that can be completed using the provided context and chat history.",
     )
-    non_answered: Optional[List[str]] = Field(
+    non_completable_tasks: Optional[List[str]] = Field(
         default=None,
-        description="The user tasks or questions that cannot be answered by the system.",
+        description="The user tasks or questions that need a web search to be completed.",
     )
 
 
@@ -449,18 +448,18 @@ class QuivrQARAGLangGraph:
 
         input = {
             "chat_history": state["chat_history"].to_list(),
-            "questions": state["tasks"],
+            "tasks": state["tasks"],
             "context": docs,
         }
 
         input, _ = self.reduce_rag_context(
             inputs=input,
-            prompt=custom_prompts.ANSWERED_QUESTIONS_PROMPT,
+            prompt=custom_prompts.WEBSEARCH_ROUTING_PROMPT,
             docs=docs,
             max_context_tokens=2000,
         )
 
-        msg = custom_prompts.ANSWERED_QUESTIONS_PROMPT.format(**input)
+        msg = custom_prompts.WEBSEARCH_ROUTING_PROMPT.format(**input)
 
         try:
             structured_llm = self.llm_endpoint._llm.with_structured_output(
@@ -476,10 +475,10 @@ class QuivrQARAGLangGraph:
 
         send_list: List[Send] = []
 
-        if response.non_answered:
+        if response.non_completable_tasks:
             payload = {
                 **state,
-                "tasks": response.non_answered,
+                "tasks": response.non_completable_tasks,
             }
             send_list.append(Send("tavily_search", payload))
         else:
@@ -594,7 +593,7 @@ class QuivrQARAGLangGraph:
             kwargs = {"top_n": top_n}
             reranker = self.get_reranker(**kwargs)
 
-            k = top_n * 2
+            k = max([top_n * 2, self.retrieval_config.k])
             kwargs = {"search_kwargs": {"k": k}}  # type: ignore
             base_retriever = self.get_retriever(**kwargs)
 
@@ -622,6 +621,9 @@ class QuivrQARAGLangGraph:
                 _docs = self.filter_chunks_by_relevance(response)
                 _n.append(len(_docs))
                 docs += _docs
+
+            if not docs:
+                break
 
             context_length = self.get_rag_context_length(state, docs)
             if context_length >= self.retrieval_config.llm_config.max_context_tokens:
@@ -708,24 +710,21 @@ class QuivrQARAGLangGraph:
 
         return reduced_inputs, docs
 
+    def bind_tools_to_llm(self, node_name: str):
+        if self.llm_endpoint.supports_func_calling():
+            tools = self.retrieval_config.workflow_config.get_node_tools(node_name)
+            llm_copy = self.llm_endpoint.clone_llm()  # Clone the LLM
+            llm_copy = llm_copy.bind_tools(tools, tool_choice="any")
+            return llm_copy
+        return self.llm_endpoint._llm
+
     def generate_rag(self, state: AgentState) -> AgentState:
-        """
-        Generate answer
-
-        Args:
-            state (messages): The current state
-
-        Returns:
-            dict: The updated state with re-phrased question
-        """
-
         messages = state["messages"]
         user_question = messages[0].content
         files = state["files"]
 
         docs: List[Document] | None = state["docs"]
 
-        # Prompt
         prompt = self.retrieval_config.prompt
 
         final_inputs = {}
@@ -735,22 +734,13 @@ class QuivrQARAGLangGraph:
         final_inputs["files"] = files if files else "None"
         final_inputs["chat_history"] = state["chat_history"].to_list()
 
-        # LLM
-        llm = self.llm_endpoint._llm
-        if self.llm_endpoint.supports_func_calling():
-            llm = self.llm_endpoint._llm.bind_tools(
-                [cited_answer],
-                tool_choice="any",
-            )
-
         reduced_inputs, docs = self.reduce_rag_context(
             final_inputs, prompt=custom_prompts.RAG_ANSWER_PROMPT, docs=docs
         )
 
-        # Chain
         msg = custom_prompts.RAG_ANSWER_PROMPT.format(**reduced_inputs)
 
-        # Run
+        llm = self.bind_tools_to_llm(self.generate_rag.__name__)
         response = llm.invoke(msg)
         return {**state, "messages": [response], "docs": docs if docs else []}
 
