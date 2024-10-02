@@ -10,7 +10,7 @@ from pyinstrument import Profiler
 from sentry_sdk.integrations.fastapi import FastApiIntegration
 from sentry_sdk.integrations.starlette import StarletteIntegration
 
-from quivr_api.logger import get_logger
+from quivr_api.logger import get_logger, stop_log_queue
 from quivr_api.middlewares.cors import add_cors_middleware
 from quivr_api.modules.analytics.controller.analytics_routes import analytics_router
 from quivr_api.modules.api_key.controller import api_key_router
@@ -37,11 +37,11 @@ logging.basicConfig(level=logging.INFO)
 logging.getLogger("httpx").setLevel(logging.WARNING)
 logging.getLogger("LiteLLM").setLevel(logging.WARNING)
 logging.getLogger("litellm").setLevel(logging.WARNING)
-get_logger("quivr_core")
 litellm.set_verbose = False  # type: ignore
-
-
-logger = get_logger(__name__)
+get_logger("uvicorn")
+get_logger("uvicorn.access")
+get_logger("quivr_core")
+logger = get_logger("quivr-api")
 
 
 def before_send(event, hint):
@@ -112,6 +112,11 @@ async def http_exception_handler(_, exc):
         status_code=exc.status_code,
         content={"detail": exc.detail},
     )
+
+
+@app.on_event("shutdown")
+def shutdown_event():
+    stop_log_queue.set()
 
 
 handle_request_validation_error(app)

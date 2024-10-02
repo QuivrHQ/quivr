@@ -178,6 +178,7 @@ def get_logger(
     log_level = os.getenv("LOG_LEVEL", "INFO").upper()
     logger = logging.getLogger(logger_name)
     logger.setLevel(log_level)
+    logger.handlers = []
     for handler in handlers:
         logger.addHandler(handler)
 
