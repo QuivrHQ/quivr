@@ -29,17 +29,24 @@ def _define_custom_prompts() -> CustomPromptsDict:
     # ---------------------------------------------------------------------------
     # Prompt for question rephrasing
     # ---------------------------------------------------------------------------
-    _template = (
-        "Given the following conversation and a follow up question, "
-        "rephrase the follow up question to be a standalone question, "
-        "in its original language. Keep as much details as possible from the chat history. "
-        "Keep entity names and all.\n"
-        "Chat history: {chat_history}\n"
-        "Follow up question: {question}\n"
-        "Standalone question:"
+    system_message_template = (
+        "Given a chat history and the latest user question "
+        "which might reference context in the chat history, "
+        "formulate a standalone question which can be understood "
+        "without the chat history. Do NOT answer the question, "
+        "just reformulate it if needed and otherwise return it as is."
     )
 
-    CONDENSE_QUESTION_PROMPT = PromptTemplate.from_template(_template)
+    template_answer = "User question: {question}\n Standalone question:"
+
+    CONDENSE_QUESTION_PROMPT = ChatPromptTemplate.from_messages(
+        [
+            SystemMessagePromptTemplate.from_template(system_message_template),
+            MessagesPlaceholder(variable_name="chat_history"),
+            HumanMessagePromptTemplate.from_template(template_answer),
+        ]
+    )
+
     custom_prompts["CONDENSE_QUESTION_PROMPT"] = CONDENSE_QUESTION_PROMPT
 
     # ---------------------------------------------------------------------------
@@ -56,17 +63,22 @@ def _define_custom_prompts() -> CustomPromptsDict:
         "just say that you don't know the answer, don't try to make up an answer. "
         "Do not apologize when providing an answer. "
         "Don't cite the source id in the answer objects, but you can use the source to answer the question.\n"
+    )
+
+    context_template = (
         "You have access to the following files to answer the user question (limited to first 20 files): {files}\n"
+        "Context: {context}\n"
         "Follow these user instruction when crafting the answer: {custom_instructions} "
         "These user instructions shall take priority over any other previous instruction.\n"
     )
 
-    template_answer = "Context: {context}\n" "User question: {question}\n" "Answer:"
+    template_answer = "User question: {question}\n" "Answer:"
 
     RAG_ANSWER_PROMPT = ChatPromptTemplate.from_messages(
         [
             SystemMessagePromptTemplate.from_template(system_message_template),
             MessagesPlaceholder(variable_name="chat_history"),
+            SystemMessagePromptTemplate.from_template(context_template),
             HumanMessagePromptTemplate.from_template(template_answer),
         ]
     )
@@ -106,7 +118,7 @@ def _define_custom_prompts() -> CustomPromptsDict:
     # ---------------------------------------------------------------------------
     # Prompt to understand the user intent
     # ---------------------------------------------------------------------------
-    _template = (
+    system_message_template = (
         "Given the following user input, determine the user intent, in particular "
         "whether the user is providing instructions to the system or is asking the system to "
         "execute a task:\n"
@@ -115,33 +127,45 @@ def _define_custom_prompts() -> CustomPromptsDict:
         "or 'You will behave as...'), the user intent is 'prompt';\n"
         "    - in all other cases (asking questions, asking for summarising a text, asking for translating a text, ...), "
         "the intent is 'task'.\n"
-        "User input: {question}"
     )
 
-    USER_INTENT_PROMPT = PromptTemplate.from_template(_template)
+    template_answer = "User input: {question}"
+
+    USER_INTENT_PROMPT = ChatPromptTemplate.from_messages(
+        [
+            SystemMessagePromptTemplate.from_template(system_message_template),
+            HumanMessagePromptTemplate.from_template(template_answer),
+        ]
+    )
     custom_prompts["USER_INTENT_PROMPT"] = USER_INTENT_PROMPT
 
     # ---------------------------------------------------------------------------
     # Prompt to create a system prompt from user instructions
     # ---------------------------------------------------------------------------
-    _template = (
+    system_message_template = (
         "Given the following user instruction and the current system prompt, "
         "update the prompt to include the instruction. "
         "If the system prompt already contains the instruction, do not add it again. "
         "If the system prompt contradicts ther user instruction, remove the contradictory "
-        "statement or statements in the system prompt.\n"
+        "statement or statements in the system prompt. "
+        "You shall return separately the updated system prompt and the reasoning that led to the update.\n"
         "Current system prompt: {system_prompt}\n"
-        "User instructions: {instruction}\n"
-        "You shall return separately the updated system prompt and the reasoning that led to the update."
     )
 
-    UPDATE_PROMPT = PromptTemplate.from_template(_template)
+    template_answer = "User instructions: {instruction}\n"
+
+    UPDATE_PROMPT = ChatPromptTemplate.from_messages(
+        [
+            SystemMessagePromptTemplate.from_template(system_message_template),
+            HumanMessagePromptTemplate.from_template(template_answer),
+        ]
+    )
     custom_prompts["UPDATE_PROMPT"] = UPDATE_PROMPT
 
     # ---------------------------------------------------------------------------
     # Prompt to split the user input into multiple questions / instructions
     # ---------------------------------------------------------------------------
-    _template = (
+    system_message_template = (
         "Given the following user input, split the input into instructions and questions. "
         "Instructions direct the system to behave in a certain way: examples of instructions are "
         "'Can you reply in French?' or 'Answer in French' or 'You are an expert legal assistant' "
@@ -149,32 +173,48 @@ def _define_custom_prompts() -> CustomPromptsDict:
         "If no instructions are found, return an empty string. \n"
         "Questions, on the other hand, are questions that the system should answer. You shall determine if the user "
         "input contains different questions, in which case you shall split the user input into multiple questions. "
-        "Each splitted question should be self-contained. "
+        "Each splitted question should be self-contained. You shall NOT suggest or generate new questions, "
+        "nor modify questions which are already self-contained. You shall only rephrase questions which are not self-contained. "
         "As an example, the user input 'What is Apple and who is the CEO? shall be split into the two questions "
         "'What is Apple?' and 'Who is the CEO of Apple?'. "
         "If no questions are found, return an empty list. \n"
-        "User input: {user_input}"
     )
 
-    SPLIT_PROMPT = PromptTemplate.from_template(_template)
+    template_answer = "User input: {user_input}"
+
+    SPLIT_PROMPT = ChatPromptTemplate.from_messages(
+        [
+            SystemMessagePromptTemplate.from_template(system_message_template),
+            HumanMessagePromptTemplate.from_template(template_answer),
+        ]
+    )
     custom_prompts["SPLIT_PROMPT"] = SPLIT_PROMPT
 
     # ---------------------------------------------------------------------------
     # Prompt to grade the relevance of an answer and decide whather to perform a web search
     # ---------------------------------------------------------------------------
-    _template = (
-        "Given the following user questions, retrieved documents, and chat history"
+    system_message_template = (
+        "Given the following user questions, retrieved documents, and chat history, "
         "you shall determine whether the retrieved documents allow you "
-        "to provide a satisfactory asnwer to each question. You shall: \n"
+        "to provide a satisfactory answer to each question. You shall: \n"
         "1) Consider each question separately, \n"
         "2) Determine whether the retrieved documents and chat history contain "
         "enough relevant information to answer the question.\n"
-        "Chat history: {chat_history}\n"
-        "Retrieved documents: {documents}\n"
-        "User questions: {questions}\n"
     )
 
-    ANSWERED_QUESTIONS_PROMPT = PromptTemplate.from_template(_template)
+    context_template = "Retrieved documents: {documents}\n"
+
+    template_answer = "User questions: {questions}\n"
+
+    ANSWERED_QUESTIONS_PROMPT = ChatPromptTemplate.from_messages(
+        [
+            SystemMessagePromptTemplate.from_template(system_message_template),
+            MessagesPlaceholder(variable_name="chat_history"),
+            SystemMessagePromptTemplate.from_template(context_template),
+            HumanMessagePromptTemplate.from_template(template_answer),
+        ]
+    )
+
     custom_prompts["ANSWERED_QUESTIONS_PROMPT"] = ANSWERED_QUESTIONS_PROMPT
 
     return custom_prompts
