@@ -70,7 +70,9 @@ const FolderExplorerHeader = (): JSX.Element => {
         )}
         <span
           className={`${styles.name} ${
-            currentFolder?.parentKMSElement ? styles.selected : ""
+            currentFolder?.parentKMSElement || quivrRootSelected
+              ? styles.selected
+              : ""
           }`}
         >
           {currentFolder?.file_name?.replace(/(\..+)$/, "")}
