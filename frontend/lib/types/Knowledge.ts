@@ -23,6 +23,7 @@ export interface CrawledKnowledge {
 export interface AddFolderData {
   parent_id: UUID | null;
   file_name: string;
+  is_folder: boolean;
 }
 
 export const isUploadedKnowledge = (

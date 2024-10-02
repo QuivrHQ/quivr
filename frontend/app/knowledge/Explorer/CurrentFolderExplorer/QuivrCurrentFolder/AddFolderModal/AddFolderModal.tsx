@@ -25,6 +25,7 @@ const AddFolderModal = ({
       await addFolder({
         parent_id: null,
         file_name: folderName,
+        is_folder: true,
       });
     }
   };

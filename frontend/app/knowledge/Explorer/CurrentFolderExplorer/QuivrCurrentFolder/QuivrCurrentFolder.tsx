@@ -25,6 +25,7 @@ const QuivrCurrentFolder = (): JSX.Element => {
     try {
       const res = await getFiles(folderId);
       setQuivrElements(res);
+      console.info(res);
     } catch (error) {
       console.error("Failed to get sync files:", error);
     } finally {
