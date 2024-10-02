@@ -61,9 +61,9 @@ def get_chunk_metadata(
     # Initiate the source
     metadata = {"sources": sources} if sources else {"sources": []}
     if msg.tool_calls:
-        cited_answer = next(x for x in msg.tool_calls if cited_answer_filter(x))
+        cited_answer = next((x for x in msg.tool_calls if cited_answer_filter(x)), None)
 
-        if "args" in cited_answer:
+        if cited_answer and "args" in cited_answer:
             gathered_args = cited_answer["args"]
             if "citations" in gathered_args:
                 citations = gathered_args["citations"]
@@ -102,8 +102,10 @@ def parse_chunk_response(
 
     rolling_msg += answer
     if supports_func_calling and rolling_msg.tool_calls:
-        cited_answer = next(x for x in rolling_msg.tool_calls if cited_answer_filter(x))
-        if "args" in cited_answer and "answer" in cited_answer["args"]:
+        cited_answer = next(
+            (x for x in rolling_msg.tool_calls if cited_answer_filter(x)), None
+        )
+        if cited_answer and "args" in cited_answer and "answer" in cited_answer["args"]:
             gathered_args = cited_answer["args"]
             # Only send the difference between answer and response_tokens which was the previous answer
             answer_str = gathered_args["answer"]
