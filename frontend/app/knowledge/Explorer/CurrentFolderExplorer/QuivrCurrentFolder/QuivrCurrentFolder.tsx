@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useKnowledgeApi } from "@/lib/api/knowledge/useKnowledgeApi";
 import { KMSElement } from "@/lib/api/sync/types";
 import { LoaderIcon } from "@/lib/components/ui/LoaderIcon/LoaderIcon";
+import QuivrButton from "@/lib/components/ui/QuivrButton/QuivrButton";
 
 import styles from "./QuivrCurrentFolder.module.scss";
 
@@ -42,18 +43,29 @@ const QuivrCurrentFolder = (): JSX.Element => {
             <LoaderIcon size="large" color="primary" />
           </div>
         ) : (
-          quivrElements
-            ?.sort((a, b) => Number(b.is_folder) - Number(a.is_folder))
-            .map((element, index) => (
-              <div key={index}>
-                <CurrentFolderExplorerLine
-                  element={{
-                    ...element,
-                    parentKMSElement: currentFolder,
-                  }}
-                />
-              </div>
-            ))
+          <>
+            <div className={styles.content_header}>
+              <QuivrButton
+                iconName="add"
+                label="Add Folder"
+                color="primary"
+                onClick={() => console.info("hey")}
+                small={true}
+              />
+            </div>
+            {quivrElements
+              ?.sort((a, b) => Number(b.is_folder) - Number(a.is_folder))
+              .map((element, index) => (
+                <div key={index}>
+                  <CurrentFolderExplorerLine
+                    element={{
+                      ...element,
+                      parentKMSElement: currentFolder,
+                    }}
+                  />
+                </div>
+              ))}
+          </>
         )}
       </div>
     </div>
