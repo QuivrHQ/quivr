@@ -8,18 +8,18 @@ import SyncCurrentFolder from "./SyncCurrentFolder/SyncCurrentFolder";
 import { useKnowledgeContext } from "../../KnowledgeProvider/hooks/useKnowledgeContext";
 
 const CurrentFolderExplorer = (): JSX.Element => {
-  const { quivrRootSelected, providerRootSelected, setQuivrRootSelected } =
+  const { exploringQuivr, providerRootSelected, setExploringQuivr } =
     useKnowledgeContext();
 
   useEffect(() => {
-    setQuivrRootSelected(true);
+    setExploringQuivr(true);
   }, []);
 
   return (
     <div className={styles.current_folder_explorer_container}>
       {providerRootSelected ? (
         <ProviderCurrentFolder />
-      ) : quivrRootSelected ? (
+      ) : exploringQuivr ? (
         <QuivrCurrentFolder />
       ) : (
         <SyncCurrentFolder />

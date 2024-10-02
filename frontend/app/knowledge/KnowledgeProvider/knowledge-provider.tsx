@@ -7,8 +7,8 @@ type KnowledgeContextType = {
   setCurrentFolder: React.Dispatch<
     React.SetStateAction<KMSElement | undefined>
   >;
-  quivrRootSelected: boolean;
-  setQuivrRootSelected: React.Dispatch<React.SetStateAction<boolean>>;
+  exploringQuivr: boolean;
+  setExploringQuivr: React.Dispatch<React.SetStateAction<boolean>>;
   providerRootSelected: SyncsByProvider | undefined;
   setProviderRootSelected: React.Dispatch<
     React.SetStateAction<SyncsByProvider | undefined>
@@ -27,7 +27,7 @@ export const KnowledgeProvider = ({
   const [currentFolder, setCurrentFolder] = useState<KMSElement | undefined>(
     undefined
   );
-  const [quivrRootSelected, setQuivrRootSelected] = useState<boolean>(false);
+  const [exploringQuivr, setExploringQuivr] = useState<boolean>(false);
   const [providerRootSelected, setProviderRootSelected] = useState<
     SyncsByProvider | undefined
   >(undefined);
@@ -37,8 +37,8 @@ export const KnowledgeProvider = ({
       value={{
         currentFolder,
         setCurrentFolder,
-        quivrRootSelected,
-        setQuivrRootSelected,
+        exploringQuivr,
+        setExploringQuivr,
         providerRootSelected,
         setProviderRootSelected,
       }}

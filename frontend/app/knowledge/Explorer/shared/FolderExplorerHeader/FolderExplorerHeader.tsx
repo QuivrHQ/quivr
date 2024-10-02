@@ -13,7 +13,7 @@ const FolderExplorerHeader = (): JSX.Element => {
   const {
     currentFolder,
     setCurrentFolder,
-    quivrRootSelected,
+    exploringQuivr,
     providerRootSelected,
   } = useKnowledgeContext();
 
@@ -38,7 +38,7 @@ const FolderExplorerHeader = (): JSX.Element => {
 
   return (
     <div className={styles.header_wrapper}>
-      {quivrRootSelected && !currentFolder?.parentKMSElement ? (
+      {exploringQuivr && !currentFolder?.parentKMSElement ? (
         <>
           <span
             className={`${styles.name} ${
@@ -75,8 +75,7 @@ const FolderExplorerHeader = (): JSX.Element => {
         )}
         <span
           className={`${styles.name} ${
-            currentFolder?.parentKMSElement ||
-            (quivrRootSelected && currentFolder)
+            currentFolder?.parentKMSElement || (exploringQuivr && currentFolder)
               ? styles.selected
               : ""
           }`}

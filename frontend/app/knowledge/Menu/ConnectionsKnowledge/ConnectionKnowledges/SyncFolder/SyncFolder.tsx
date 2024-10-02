@@ -22,14 +22,14 @@ const SyncFolder = ({ element }: SyncFolderProps): JSX.Element => {
   const {
     currentFolder,
     setCurrentFolder,
-    setQuivrRootSelected,
+    setExploringQuivr,
     setProviderRootSelected,
   } = useKnowledgeContext();
 
   useEffect(() => {
     setSelectedFolder(currentFolder?.sync_file_id === element.sync_file_id);
     if (currentFolder) {
-      setQuivrRootSelected(false);
+      setExploringQuivr(false);
       setProviderRootSelected(undefined);
     }
   }, [currentFolder]);
