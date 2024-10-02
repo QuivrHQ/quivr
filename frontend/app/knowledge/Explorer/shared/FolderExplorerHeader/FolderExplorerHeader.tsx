@@ -26,6 +26,10 @@ const FolderExplorerHeader = (): JSX.Element => {
     }
   };
 
+  const loadQuivrRoot = () => {
+    setCurrentFolder(undefined);
+  };
+
   useEffect(() => {
     if (currentFolder) {
       console.log("Current folder:", currentFolder);
@@ -40,6 +44,7 @@ const FolderExplorerHeader = (): JSX.Element => {
             className={`${styles.name} ${
               currentFolder ? styles.hoverable : ""
             }`}
+            onClick={() => void loadQuivrRoot()}
           >
             Quivr
           </span>
@@ -70,7 +75,8 @@ const FolderExplorerHeader = (): JSX.Element => {
         )}
         <span
           className={`${styles.name} ${
-            currentFolder?.parentKMSElement || quivrRootSelected
+            currentFolder?.parentKMSElement ||
+            (quivrRootSelected && currentFolder)
               ? styles.selected
               : ""
           }`}
