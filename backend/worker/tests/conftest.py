@@ -1,4 +1,5 @@
 import os
+from datetime import datetime, timedelta, timezone
 from io import BytesIO
 from pathlib import Path
 from uuid import uuid4
@@ -24,11 +25,12 @@ from quivr_api.modules.sync.service.sync_service import SyncsService
 from quivr_api.modules.sync.tests.test_sync_controller import FakeSync
 from quivr_api.modules.sync.utils.sync import BaseSync
 from quivr_api.modules.user.entity.user_identity import User
+from quivr_api.modules.vector.entity.vector import Vector
 from quivr_api.modules.vector.repository.vectors_repository import VectorRepository
 from quivr_api.modules.vector.service.vector_service import VectorService
 from quivr_core.files.file import QuivrFile
 from quivr_core.models import KnowledgeStatus
-from quivr_worker.process.processor import ProcessorServices
+from quivr_worker.utils.services import ProcessorServices
 from sqlalchemy.ext.asyncio import create_async_engine
 from sqlmodel import select
 from sqlmodel.ext.asyncio.session import AsyncSession
@@ -217,7 +219,7 @@ async def local_knowledge_folder_with_file(
         parent_id=folder_km.id,
     )
     km_data = BytesIO(os.urandom(24))
-    km = await service.create_knowledge(
+    _ = await service.create_knowledge(
         user_id=user.id,
         knowledge_to_add=km_to_add,
         upload_file=UploadFile(file=km_data, size=24, filename=km_to_add.file_name),
@@ -287,11 +289,63 @@ async def sync_knowledge_file(
         parent=None,
         sync_file_id="id1",
         sync=sync,
+        last_synced_at=datetime.now(timezone.utc) - timedelta(days=2),
     )
 
     session.add(km)
     await session.commit()
     await session.refresh(km)
+
+    return km
+
+
+@pytest.fixture(scope="module")
+def embedder():
+    return DeterministicFakeEmbedding(size=settings.embedding_dim)
+
+
+@pytest_asyncio.fixture(scope="function")
+async def sync_knowledge_file_processed(
+    session: AsyncSession,
+    proc_services: ProcessorServices,
+    user: User,
+    brain_user: Brain,
+    sync: Sync,
+    embedder: DeterministicFakeEmbedding,
+) -> KnowledgeDB:
+    assert user.id
+    assert brain_user.brain_id
+
+    km = KnowledgeDB(
+        file_name="test_file_1.txt",
+        extension=".txt",
+        status=KnowledgeStatus.PROCESSED,
+        source=SyncProvider.GOOGLE,
+        source_link="drive://test/test",
+        file_size=1233,
+        file_sha1="1234kj",
+        user_id=user.id,
+        brains=[brain_user],
+        parent=None,
+        sync_file_id="id1",
+        sync=sync,
+        last_synced_at=datetime.now(timezone.utc) - timedelta(days=2),
+    )
+
+    session.add(km)
+    await session.commit()
+    await session.refresh(km)
+
+    assert km.id
+
+    vec = Vector(
+        content="test",
+        metadata_={},
+        embedding=embedder.embed_query("test"),  # type: ignore
+        knowledge_id=km.id,
+    )
+    session.add(vec)
+    await session.commit()
 
     return km
 
@@ -507,3 +561,55 @@ def pdf_qfile(tmp_path) -> QuivrFile:
         file_size=1000,
         path=Path("./tests/sample.pdf"),
     )
+
+
+@pytest_asyncio.fixture(scope="function")
+async def sync_knowledge_folder_processed(
+    session: AsyncSession,
+    user: User,
+    brain_user: Brain,
+    sync: Sync,
+) -> KnowledgeDB:
+    assert user.id
+    assert brain_user.brain_id
+    folder = KnowledgeDB(
+        file_name="folder",
+        extension="",
+        status=KnowledgeStatus.PROCESSED,
+        source=SyncProvider.GOOGLE,
+        source_link="drive://test/file1",
+        file_size=10,
+        file_sha1="test",
+        user_id=user.id,
+        brains=[brain_user],
+        parent=None,
+        is_folder=True,
+        # NOTE: See FakeSync Implementation
+        sync_file_id="folder-1",
+        sync=sync,
+        last_synced_at=datetime.now(timezone.utc) - timedelta(days=2),
+    )
+
+    km = KnowledgeDB(
+        file_name="file",
+        extension=".txt",
+        status=KnowledgeStatus.PROCESSED,
+        source=SyncProvider.GOOGLE,
+        source_link="drive://test/folder1",
+        file_size=0,
+        file_sha1=None,
+        user_id=user.id,
+        brains=[brain_user],
+        parent=folder,
+        is_folder=False,
+        sync_file_id="file-1",
+        sync=sync,
+        last_synced_at=datetime.now(timezone.utc) - timedelta(days=2),
+    )
+
+    session.add(folder)
+    session.add(km)
+    await session.commit()
+    await session.refresh(folder)
+
+    return folder

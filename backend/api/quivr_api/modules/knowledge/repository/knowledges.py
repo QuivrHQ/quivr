@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import Any, List, Sequence
 from uuid import UUID
 
@@ -5,6 +6,7 @@ from fastapi import HTTPException
 from quivr_core.models import KnowledgeStatus
 from sqlalchemy.exc import IntegrityError, NoResultFound
 from sqlalchemy.orm import joinedload
+from sqlalchemy.sql.functions import random
 from sqlmodel import and_, col, select, text
 from sqlmodel.ext.asyncio.session import AsyncSession
 
@@ -24,6 +26,7 @@ from quivr_api.modules.knowledge.service.knowledge_exceptions import (
     KnowledgeNotFoundException,
     KnowledgeUpdateError,
 )
+from quivr_api.modules.sync.entity.sync_models import SyncType
 
 logger = get_logger(__name__)
 
@@ -34,11 +37,15 @@ class KnowledgeRepository(BaseRepository):
         supabase_client = get_supabase_client()
         self.db = supabase_client
 
-    async def create_knowledge(self, knowledge: KnowledgeDB) -> KnowledgeDB:
+    async def create_knowledge(
+        self, knowledge: KnowledgeDB, autocommit: bool
+    ) -> KnowledgeDB:
         try:
             self.session.add(knowledge)
-            await self.session.commit()
-            await self.session.refresh(knowledge)
+            if autocommit:
+                await self.session.commit()
+                await self.session.refresh(knowledge)
+            await self.session.flush()
         except IntegrityError:
             await self.session.rollback()
             raise
@@ -51,6 +58,7 @@ class KnowledgeRepository(BaseRepository):
         self,
         knowledge: KnowledgeDB,
         payload: KnowledgeDTO | KnowledgeUpdate | dict[str, Any],
+        autocommit: bool,
     ) -> KnowledgeDB:
         try:
             logger.debug(f"updating {knowledge.id} with payload {payload}")
@@ -62,8 +70,11 @@ class KnowledgeRepository(BaseRepository):
                 setattr(knowledge, field, update_data[field])
 
             self.session.add(knowledge)
-            await self.session.commit()
-            await self.session.refresh(knowledge)
+            if autocommit:
+                await self.session.commit()
+                await self.session.refresh(knowledge)
+            else:
+                await self.session.flush()
             return knowledge
         except IntegrityError as e:
             await self.session.rollback()
@@ -204,10 +215,14 @@ class KnowledgeRepository(BaseRepository):
         await self.session.refresh(knowledge)
         return knowledge
 
-    async def remove_knowledge(self, knowledge: KnowledgeDB) -> DeleteKnowledgeResponse:
+    async def remove_knowledge(
+        self, knowledge: KnowledgeDB, autocommit: bool
+    ) -> DeleteKnowledgeResponse:
         assert knowledge.id
         await self.session.delete(knowledge)
-        await self.session.commit()
+        if autocommit:
+            await self.session.commit()
+
         return DeleteKnowledgeResponse(
             status="deleted", knowledge_id=knowledge.id, file_name=knowledge.file_name
         )
@@ -435,3 +450,28 @@ class KnowledgeRepository(BaseRepository):
         query = select(KnowledgeDB)
         result = await self.session.exec(query)
         return result.all()
+
+    async def get_outdated_syncs(
+        self,
+        limit_time: datetime,
+        batch_size: int,
+        km_sync_type: SyncType,
+    ) -> List[KnowledgeDB]:
+        is_folder_check = km_sync_type == SyncType.FOLDER
+        query = (
+            select(KnowledgeDB)
+            .where(
+                KnowledgeDB.is_folder == is_folder_check,
+                col(KnowledgeDB.sync_id).isnot(None),
+                col(KnowledgeDB.sync_file_id).isnot(None),
+                col(KnowledgeDB.last_synced_at) < limit_time,
+                col(KnowledgeDB.brains).any(),
+            )
+            # Oldest first
+            .order_by(col(KnowledgeDB.last_synced_at).asc(), random())
+            .limit(batch_size)
+        )
+
+        # Execute the query (assuming you have a session)
+        result = await self.session.exec(query)
+        return list(result.unique().all())

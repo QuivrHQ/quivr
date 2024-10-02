@@ -5,12 +5,7 @@ from urllib.parse import urlparse
 from fastapi import Depends
 from langchain.embeddings.base import Embeddings
 from langchain_community.embeddings.ollama import OllamaEmbeddings
-
-# from langchain_community.vectorstores.supabase import SupabaseVectorStore
 from langchain_openai import AzureOpenAIEmbeddings, OpenAIEmbeddings
-
-# from quivr_api.modules.vector.service.vector_service import VectorService
-# from quivr_api.modules.vectorstore.supabase import CustomSupabaseVectorStore
 from sqlalchemy import Engine, create_engine
 from sqlalchemy.ext.asyncio import create_async_engine
 from sqlmodel import Session, text

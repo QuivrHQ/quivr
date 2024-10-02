@@ -33,3 +33,4 @@ class KnowledgeDTO(BaseModel):
     children: List[Self]
     sync_id: int | None
     sync_file_id: str | None
+    last_synced_at: datetime | None = None

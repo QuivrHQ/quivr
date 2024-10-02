@@ -7,8 +7,8 @@ from quivr_api.modules.upload.service.upload_file import (
 )
 from sqlalchemy.ext.asyncio import AsyncEngine
 
-from quivr_worker.process.processor import _start_session
 from quivr_worker.utils.pdf_generator.pdf_generator import PDFGenerator, PDFModel
+from quivr_worker.utils.services import _start_session
 
 
 async def aprocess_assistant_task(

@@ -3,7 +3,7 @@ import json
 import os
 import time
 from abc import ABC, abstractmethod
-from datetime import datetime
+from datetime import datetime, timezone
 from io import BytesIO
 from typing import Any, Dict, List, Optional, Union
 
@@ -195,7 +195,9 @@ class GoogleDriveSync(BaseSync):
                         is_folder=(
                             result["mimeType"] == "application/vnd.google-apps.folder"
                         ),
-                        last_modified_at=result["modifiedTime"],
+                        last_modified_at=datetime.strptime(
+                            result["modifiedTime"], self.datetime_format
+                        ).replace(tzinfo=timezone.utc),
                         extension=result["mimeType"],
                         web_view_link=result["webViewLink"],
                         size=result.get("size", None),
@@ -208,6 +210,8 @@ class GoogleDriveSync(BaseSync):
             return files
 
         except HTTPError as error:
+            if error.response.status_code == 404:
+                raise FileNotFoundError
             logger.error(
                 "An error occurred while retrieving Google Drive files: %s", error
             )
@@ -271,7 +275,9 @@ class GoogleDriveSync(BaseSync):
                             is_folder=(
                                 item["mimeType"] == "application/vnd.google-apps.folder"
                             ),
-                            last_modified_at=item["modifiedTime"],
+                            last_modified_at=datetime.strptime(
+                                item["modifiedTime"], self.datetime_format
+                            ).replace(tzinfo=timezone.utc),
                             extension=item["mimeType"],
                             web_view_link=item["webViewLink"],
                             size=item.get("size", None),
@@ -446,8 +452,8 @@ class AzureDriveSync(BaseSync):
                 ),
                 is_folder="folder" in item or not site_folder_id,
                 last_modified_at=datetime.strptime(
-                    item.get("lastModifiedDateTime"), self.datetime_format
-                ),
+                    item["lastModiedDateTime"], self.datetime_format
+                ).replace(tzinfo=timezone.utc),
                 extension=item.get("file", {}).get("mimeType", "folder"),
                 web_view_link=item.get("webUrl"),
                 size=item.get("size", None),
@@ -528,7 +534,7 @@ class AzureDriveSync(BaseSync):
                     is_folder="folder" in result,
                     last_modified_at=datetime.strptime(
                         result.get("lastModifiedDateTime"), self.datetime_format
-                    ),
+                    ).replace(tzinfo=timezone.utc),
                     extension=result.get("file", {}).get("mimeType", "folder"),
                     web_view_link=result.get("webUrl"),
                     size=result.get("size", None),
@@ -820,7 +826,7 @@ class NotionSync(BaseSync):
                 name=page.name,
                 id=str(page.notion_id),
                 is_folder=await self.notion_service.is_folder_page(page.notion_id),
-                last_modified_at=str(page.last_modified),
+                last_modified_at=page.last_modified,
                 extension=page.mime_type,
                 web_view_link=page.web_view_link,
                 icon=page.icon,
@@ -864,7 +870,7 @@ class NotionSync(BaseSync):
                     name=page.name,
                     id=str(page.notion_id),
                     is_folder=await self.notion_service.is_folder_page(page.notion_id),
-                    last_modified_at=str(page.last_modified),
+                    last_modified_at=page.last_modified,
                     extension=page.mime_type,
                     web_view_link=page.web_view_link,
                     icon=page.icon,
