@@ -59,22 +59,22 @@ class UserIntent(BaseModel):
 
 class SplittedInput(BaseModel):
     instructions: Optional[str] = Field(
-        default=None, description="The user instructions to the system"
+        default=None, description="The instructions to the system"
     )
-    questions: Optional[List[str]] = Field(
+    tasks: Optional[List[str]] = Field(
         default=None,
-        description="The user questions, where each question in the list is a self-contained question.",
+        description="The list of standalone, self-contained tasks or questions.",
     )
 
 
 class AnsweredQuestions(BaseModel):
     answered: Optional[List[str]] = Field(
         default=None,
-        description="The user questions that can be answered by the system.",
+        description="The user tasks or questions that can be answered by the system.",
     )
     non_answered: Optional[List[str]] = Field(
         default=None,
-        description="The user questions that cannot be answered by the system.",
+        description="The user tasks or questions that cannot be answered by the system.",
     )
 
 
@@ -92,7 +92,7 @@ class AgentState(TypedDict):
     chat_history: ChatHistory
     docs: list[Document]
     files: str
-    questions: List[str]
+    tasks: List[str]
     instructions: str
 
 
@@ -245,21 +245,24 @@ class QuivrQARAGLangGraph:
             send_list.append(
                 Send("edit_system_prompt", {"instructions": response.instructions})
             )
-        elif response.questions:
+        elif response.tasks:
             chat_history = state["chat_history"]
             send_list.append(
                 Send(
                     "filter_history",
-                    {"chat_history": chat_history, "questions": response.questions},
+                    {"chat_history": chat_history, "tasks": response.tasks},
                 )
             )
 
         return send_list
 
     def routing_split(self, state: AgentState):
-        msg = custom_prompts.SPLIT_PROMPT.format(
-            user_input=state["messages"][0].content,
-        )
+        input = {
+            "chat_history": state["chat_history"].to_list(),
+            "user_input": state["messages"][0].content,
+        }
+
+        msg = custom_prompts.SPLIT_PROMPT.format(**input)
 
         try:
             structured_llm = self.llm_endpoint._llm.with_structured_output(
@@ -279,15 +282,15 @@ class QuivrQARAGLangGraph:
             payload = {
                 **state,
                 "instructions": response.instructions,
-                "questions": response.questions if response.questions else [],
+                "tasks": response.tasks if response.tasks else [],
             }
             send_list.append(Send("edit_system_prompt", payload))
-        elif response.questions:
+        elif response.tasks:
             chat_history = state["chat_history"]
             payload = {
                 **state,
                 "chat_history": chat_history,
-                "questions": response.questions,
+                "tasks": response.tasks,
             }
             send_list.append(Send("filter_history", payload))
 
@@ -390,29 +393,29 @@ class QuivrQARAGLangGraph:
             dict: The updated state with re-phrased question
         """
 
-        questions = state["questions"]
+        tasks = state["tasks"]
 
-        # Prepare the async tasks for all questions
-        tasks = []
-        for question in questions:
+        # Prepare the async tasks for all user tsks
+        async_tasks = []
+        for task in tasks:
             msg = custom_prompts.CONDENSE_QUESTION_PROMPT.format(
                 chat_history=state["chat_history"].to_list(),
-                question=question,
+                question=task,
             )
 
             model = self.llm_endpoint._llm
             # Asynchronously invoke the model for each question
-            tasks.append(model.ainvoke(msg))
+            async_tasks.append(model.ainvoke(msg))
 
         # Gather all the responses asynchronously
-        responses = await asyncio.gather(*tasks) if tasks else []
+        responses = await asyncio.gather(*async_tasks) if async_tasks else []
 
         # Replace each question with its condensed version
         condensed_questions = []
         for response in responses:
             condensed_questions.append(response.content)
 
-        return {**state, "questions": condensed_questions}
+        return {**state, "tasks": condensed_questions}
 
     def filter_chunks_by_relevance(self, chunks: List[Document], **kwargs):
         config = self.retrieval_config.reranker_config
@@ -438,15 +441,24 @@ class QuivrQARAGLangGraph:
         return filtered_chunks
 
     def websearch_split(self, state: AgentState):
-        questions = state["questions"]
-        if not questions:
+        tasks = state["tasks"]
+        if not tasks:
             return [Send("generate_rag", state)]
+
+        docs = state["docs"]
 
         input = {
             "chat_history": state["chat_history"].to_list(),
-            "questions": state["questions"],
-            "documents": state["docs"],
+            "questions": state["tasks"],
+            "context": docs,
         }
+
+        input, _ = self.reduce_rag_context(
+            inputs=input,
+            prompt=custom_prompts.ANSWERED_QUESTIONS_PROMPT,
+            docs=docs,
+            max_context_tokens=2000,
+        )
 
         msg = custom_prompts.ANSWERED_QUESTIONS_PROMPT.format(**input)
 
@@ -467,7 +479,7 @@ class QuivrQARAGLangGraph:
         if response.non_answered:
             payload = {
                 **state,
-                "questions": response.non_answered,
+                "tasks": response.non_answered,
             }
             send_list.append(Send("tavily_search", payload))
         else:
@@ -476,7 +488,7 @@ class QuivrQARAGLangGraph:
         return send_list
 
     async def tavily_search(self, state: AgentState) -> AgentState:
-        questions = state["questions"]
+        tasks = state["tasks"]
 
         tool = TavilySearchResults(
             max_results=5,
@@ -485,13 +497,13 @@ class QuivrQARAGLangGraph:
         )
 
         # Prepare the async tasks for all questions
-        tasks = []
-        for question in questions:
+        async_tasks = []
+        for task in tasks:
             # Asynchronously invoke the model for each question
-            tasks.append(tool.ainvoke({"query": question}))
+            async_tasks.append(tool.ainvoke({"query": task}))
 
         # Gather all the responses asynchronously
-        responses = await asyncio.gather(*tasks) if tasks else []
+        responses = await asyncio.gather(*async_tasks) if async_tasks else []
 
         docs = []
         for response in responses:
@@ -523,8 +535,8 @@ class QuivrQARAGLangGraph:
             dict: The retrieved chunks
         """
 
-        questions = state["questions"]
-        if not questions:
+        tasks = state["tasks"]
+        if not tasks:
             return {**state, "docs": []}
 
         kwargs = {
@@ -542,13 +554,13 @@ class QuivrQARAGLangGraph:
         )
 
         # Prepare the async tasks for all questions
-        tasks = []
-        for question in questions:
+        async_tasks = []
+        for task in tasks:
             # Asynchronously invoke the model for each question
-            tasks.append(compression_retriever.ainvoke(question))
+            async_tasks.append(compression_retriever.ainvoke(task))
 
         # Gather all the responses asynchronously
-        responses = await asyncio.gather(*tasks) if tasks else []
+        responses = await asyncio.gather(*async_tasks) if async_tasks else []
 
         docs = []
         for response in responses:
@@ -568,8 +580,8 @@ class QuivrQARAGLangGraph:
             dict: The retrieved chunks
         """
 
-        questions = state["questions"]
-        if not questions:
+        tasks = state["tasks"]
+        if not tasks:
             return {**state, "docs": []}
 
         k = self.retrieval_config.k
@@ -596,13 +608,13 @@ class QuivrQARAGLangGraph:
             )
 
             # Prepare the async tasks for all questions
-            tasks = []
-            for question in questions:
+            async_tasks = []
+            for task in tasks:
                 # Asynchronously invoke the model for each question
-                tasks.append(compression_retriever.ainvoke(question))
+                async_tasks.append(compression_retriever.ainvoke(task))
 
             # Gather all the responses asynchronously
-            responses = await asyncio.gather(*tasks) if tasks else []
+            responses = await asyncio.gather(*async_tasks) if async_tasks else []
 
             docs = []
             _n = []
@@ -647,6 +659,7 @@ class QuivrQARAGLangGraph:
         inputs: Dict[str, Any],
         prompt: BasePromptTemplate,
         docs: List[Document] | None = None,
+        max_context_tokens: int | None = None,
     ) -> Tuple[Dict[str, Any], List[Document] | None]:
         MAX_ITERATION = 100
         SECURITY_FACTOR = 0.85
@@ -656,8 +669,18 @@ class QuivrQARAGLangGraph:
         n = self.llm_endpoint.count_tokens(msg)
         reduced_inputs = deepcopy(inputs)
 
-        while n > self.retrieval_config.llm_config.max_context_tokens * SECURITY_FACTOR:
-            chat_history = reduced_inputs["chat_history"]
+        max_context_tokens = (
+            max_context_tokens
+            if max_context_tokens
+            else self.retrieval_config.llm_config.max_context_tokens
+        )
+
+        while n > max_context_tokens * SECURITY_FACTOR:
+            chat_history = (
+                reduced_inputs["chat_history"]
+                if "chat_history" in reduced_inputs
+                else []
+            )
 
             if len(chat_history) > 0:
                 reduced_inputs["chat_history"] = chat_history[2:]
@@ -666,11 +689,11 @@ class QuivrQARAGLangGraph:
             else:
                 logging.warning(
                     f"Not enough context to reduce. The context length is {n} "
-                    f"which is greater than the max context tokens of {self.retrieval_config.llm_config.max_context_tokens}"
+                    f"which is greater than the max context tokens of {max_context_tokens}"
                 )
                 break
 
-            if docs:
+            if docs and "context" in reduced_inputs:
                 reduced_inputs["context"] = combine_documents(docs)
 
             msg = prompt.format(**reduced_inputs)
