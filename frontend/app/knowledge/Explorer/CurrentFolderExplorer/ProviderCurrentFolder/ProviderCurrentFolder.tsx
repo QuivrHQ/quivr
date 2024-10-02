@@ -2,6 +2,7 @@ import { useEffect } from "react";
 
 import { useKnowledgeContext } from "@/app/knowledge/KnowledgeProvider/hooks/useKnowledgeContext";
 
+import ProviderAccount from "./ProviderAccount/ProviderAccount";
 import styles from "./ProviderCurrentFolder.module.scss";
 
 import FolderExplorerHeader from "../../shared/FolderExplorerHeader/FolderExplorerHeader";
@@ -20,7 +21,9 @@ const ProviderCurrentFolder = (): JSX.Element => {
         {providerRootSelected?.syncs &&
         providerRootSelected.syncs.length > 1 ? (
           providerRootSelected.syncs.map((sync, index) => (
-            <div key={index}>{sync.email}</div>
+            <div key={index}>
+              <ProviderAccount sync={sync} index={index} />
+            </div>
           ))
         ) : (
           <div>hey</div>
