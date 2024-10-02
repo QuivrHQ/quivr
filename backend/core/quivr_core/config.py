@@ -377,11 +377,11 @@ class WorkflowConfig(QuivrBaseConfig):
 
     def __init__(self, **data):
         super().__init__(**data)
-        self.check_start_node_exists()
+        self.check_first_node_is_start()
 
-    def check_start_node_exists(self):
-        if START not in [node.name for node in self.nodes]:
-            raise ValueError(f"The workflow should contain a {SpecialEdges.start} node")
+    def check_first_node_is_start(self):
+        if self.nodes and self.nodes[0].name != START:
+            raise ValueError(f"The first node should be a {SpecialEdges.start} node")
 
     def get_node_tools(self, node_name: str) -> List[Any]:
         """Get tools for a specific node."""
