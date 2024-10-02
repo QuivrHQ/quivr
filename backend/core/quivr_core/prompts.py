@@ -34,7 +34,8 @@ def _define_custom_prompts() -> CustomPromptsDict:
         "which might reference context in the chat history, "
         "formulate a standalone question which can be understood "
         "without the chat history. Do NOT answer the question, "
-        "just reformulate it if needed and otherwise return it as is."
+        "just reformulate it if needed and otherwise return it as is. "
+        "Do not output your reasoning, just the question."
     )
 
     template_answer = "User question: {question}\n Standalone question:"
@@ -166,18 +167,22 @@ def _define_custom_prompts() -> CustomPromptsDict:
     # Prompt to split the user input into multiple questions / instructions
     # ---------------------------------------------------------------------------
     system_message_template = (
-        "Given the following user input, split the input into instructions and questions. "
+        "Given a chat history and the latest user input split the input into instructions and tasks.\n"
         "Instructions direct the system to behave in a certain way: examples of instructions are "
         "'Can you reply in French?' or 'Answer in French' or 'You are an expert legal assistant' "
         "or 'You will behave as...'). You shall collect and condense all the instructions into a single string. "
-        "If no instructions are found, return an empty string. \n"
-        "Questions, on the other hand, are questions that the system should answer. You shall determine if the user "
-        "input contains different questions, in which case you shall split the user input into multiple questions. "
-        "Each splitted question should be self-contained. You shall NOT suggest or generate new questions, "
-        "nor modify questions which are already self-contained. You shall only rephrase questions which are not self-contained. "
-        "As an example, the user input 'What is Apple and who is the CEO? shall be split into the two questions "
-        "'What is Apple?' and 'Who is the CEO of Apple?'. "
-        "If no questions are found, return an empty list. \n"
+        "The instructions should be standalone, self-contained instructions which can be understood "
+        "without the chat history. If no instructions are found, return an empty string. \n"
+        "Tasks, on the other hand, are tasks that the system should complete. Tasks are often questions, "
+        "but they can also be summarisation tasks, translation tasks, content generation tasks, etc. If the user "
+        "input contains different tasks, you shall split the input into multiple tasks. "
+        "Each splitted task should be a standalone, self-contained task which can be understood "
+        "without the chat history. Do NOT try to solve the tasks or answer the questions, "
+        "just reformulate them if needed and otherwise return them as is. Do not output your reasoning, just the tasks."
+        "Remember, you shall NOT suggest or generate new tasks, and you shall NOT rephrase tasks which are already standalone and self-contained. "
+        "As an example, the user input 'What is Apple and who is the CEO?' shall be split into the two questions "
+        "'What is Apple?' and 'Who is the CEO of Apple?'.\n"
+        # "If no tasks are found, return an empty list.\n"
     )
 
     template_answer = "User input: {user_input}"
@@ -185,6 +190,7 @@ def _define_custom_prompts() -> CustomPromptsDict:
     SPLIT_PROMPT = ChatPromptTemplate.from_messages(
         [
             SystemMessagePromptTemplate.from_template(system_message_template),
+            MessagesPlaceholder(variable_name="chat_history"),
             HumanMessagePromptTemplate.from_template(template_answer),
         ]
     )
@@ -194,15 +200,15 @@ def _define_custom_prompts() -> CustomPromptsDict:
     # Prompt to grade the relevance of an answer and decide whather to perform a web search
     # ---------------------------------------------------------------------------
     system_message_template = (
-        "Given the following user questions, retrieved documents, and chat history, "
-        "you shall determine whether the retrieved documents allow you "
-        "to provide a satisfactory answer to each question. You shall: \n"
+        "Given the following user questions, context, and chat history, "
+        "you shall determine whether you can provide a satisfactory answer "
+        "to each question. You shall: \n"
         "1) Consider each question separately, \n"
-        "2) Determine whether the retrieved documents and chat history contain "
+        "2) Determine whether the context and chat history contain "
         "enough relevant information to answer the question.\n"
     )
 
-    context_template = "Retrieved documents: {documents}\n"
+    context_template = "Context: {context}\n"
 
     template_answer = "User questions: {questions}\n"
 
