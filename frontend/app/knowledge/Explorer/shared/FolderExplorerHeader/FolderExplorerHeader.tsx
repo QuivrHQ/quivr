@@ -35,7 +35,18 @@ const FolderExplorerHeader = (): JSX.Element => {
   return (
     <div className={styles.header_wrapper}>
       {quivrRootSelected && !currentFolder?.parentKMSElement ? (
-        <span className={styles.name}>Quivr</span>
+        <>
+          <span
+            className={`${styles.name} ${
+              currentFolder ? styles.hoverable : ""
+            }`}
+          >
+            Quivr
+          </span>
+          {currentFolder && (
+            <Icon name="chevronRight" size="normal" color="black" />
+          )}
+        </>
       ) : providerRootSelected ? (
         <span className={styles.name}>
           {transformConnectionLabel(providerRootSelected.provider)}

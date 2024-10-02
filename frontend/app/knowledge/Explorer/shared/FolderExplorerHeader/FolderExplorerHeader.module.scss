@@ -13,6 +13,15 @@
   background-color: var(--background-0);
   height: 64px;
 
+  .name {
+    &.hoverable {
+      &:hover {
+        cursor: pointer;
+        color: var(--primary-0);
+      }
+    }
+  }
+
   .parent_folder {
     display: flex;
     align-items: center;
