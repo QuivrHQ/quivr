@@ -692,6 +692,7 @@ opentelemetry-semantic-conventions==0.48b0
     # via opentelemetry-sdk
 orjson==3.10.7
     # via langsmith
+    # via quivr-monorepo
 packaging==23.2
     # via black
     # via chainlit
@@ -928,6 +929,8 @@ python-iso639==2024.4.27
     # via unstructured
 python-jose==3.3.0
     # via quivr-api
+python-json-logger==2.0.7
+    # via quivr-monorepo
 python-magic==0.4.27
     # via unstructured
 python-multipart==0.0.9
@@ -1071,6 +1074,8 @@ strenum==0.4.15
     # via postgrest
 striprtf==0.0.26
     # via llama-index-readers-file
+structlog==24.4.0
+    # via quivr-monorepo
 supabase==2.7.2
     # via quivr-api
 supafunc==0.5.1
