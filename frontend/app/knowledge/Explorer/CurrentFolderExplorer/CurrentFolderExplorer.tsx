@@ -1,5 +1,3 @@
-import { useEffect } from "react";
-
 import styles from "./CurrentFolderExplorer.module.scss";
 import ProviderCurrentFolder from "./ProviderCurrentFolder/ProviderCurrentFolder";
 import QuivrCurrentFolder from "./QuivrCurrentFolder/QuivrCurrentFolder";
@@ -9,10 +7,6 @@ import { useKnowledgeContext } from "../../KnowledgeProvider/hooks/useKnowledgeC
 
 const CurrentFolderExplorer = (): JSX.Element => {
   const { quivrRootSelected, providerRootSelected } = useKnowledgeContext();
-
-  useEffect(() => {
-    console.info(quivrRootSelected);
-  }, [quivrRootSelected]);
 
   return (
     <div className={styles.current_folder_explorer_container}>

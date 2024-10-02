@@ -30,7 +30,6 @@ const QuivrCurrentFolder = (): JSX.Element => {
   };
 
   useEffect(() => {
-    console.info("hey");
     void fetchQuivrFiles(currentFolder?.id ?? null);
   }, [currentFolder]);
 
