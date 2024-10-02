@@ -182,7 +182,7 @@ def _define_custom_prompts() -> CustomPromptsDict:
         "Remember, you shall NOT suggest or generate new tasks, and you shall NOT rephrase tasks which are already standalone and self-contained. "
         "As an example, the user input 'What is Apple and who is the CEO?' shall be split into the two questions "
         "'What is Apple?' and 'Who is the CEO of Apple?'.\n"
-        # "If no tasks are found, return an empty list.\n"
+        "If no tasks are found, return the user input as is in the task .\n"
     )
 
     template_answer = "User input: {user_input}"
@@ -200,19 +200,20 @@ def _define_custom_prompts() -> CustomPromptsDict:
     # Prompt to grade the relevance of an answer and decide whather to perform a web search
     # ---------------------------------------------------------------------------
     system_message_template = (
-        "Given the following user questions, context, and chat history, "
-        "you shall determine whether you can provide a satisfactory answer "
-        "to each question. You shall: \n"
-        "1) Consider each question separately, \n"
+        "Given the following tasks you shall determine whether all tasks can be "
+        "completed fully and in the best possible way using the provided context and chat history. "
+        "You shall:\n"
+        "1) Consider each task separately,\n"
         "2) Determine whether the context and chat history contain "
-        "enough relevant information to answer the question.\n"
+        "all the information necessary to complete the task, "
+        "or if a web search is necessary to gather more information.\n"
     )
 
     context_template = "Context: {context}\n"
 
-    template_answer = "User questions: {questions}\n"
+    template_answer = "Tasks: {tasks}\n"
 
-    ANSWERED_QUESTIONS_PROMPT = ChatPromptTemplate.from_messages(
+    WEBSEARCH_ROUTING_PROMPT = ChatPromptTemplate.from_messages(
         [
             SystemMessagePromptTemplate.from_template(system_message_template),
             MessagesPlaceholder(variable_name="chat_history"),
@@ -221,7 +222,7 @@ def _define_custom_prompts() -> CustomPromptsDict:
         ]
     )
 
-    custom_prompts["ANSWERED_QUESTIONS_PROMPT"] = ANSWERED_QUESTIONS_PROMPT
+    custom_prompts["WEBSEARCH_ROUTING_PROMPT"] = WEBSEARCH_ROUTING_PROMPT
 
     return custom_prompts
 
