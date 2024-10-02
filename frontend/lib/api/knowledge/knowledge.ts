@@ -2,6 +2,7 @@ import { AxiosInstance } from "axios";
 import { UUID } from "crypto";
 
 import {
+  AddFolderData,
   CrawledKnowledge,
   Knowledge,
   UploadedKnowledge,
@@ -89,6 +90,23 @@ export const getFiles = async (
   return (
     await axiosInstance.get<KMSElement[]>(`/knowledge/files`, {
       params: { parent_id: parentId },
+    })
+  ).data;
+};
+
+export const addFolder = async (
+  knowledgeData: AddFolderData,
+  axiosInstance: AxiosInstance
+): Promise<BEKnowledge> => {
+  const formData = new FormData();
+  formData.append("knowledge_data", JSON.stringify(knowledgeData));
+  formData.append("file", "");
+
+  return (
+    await axiosInstance.post<BEKnowledge>(`/knowledge/`, formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
     })
   ).data;
 };

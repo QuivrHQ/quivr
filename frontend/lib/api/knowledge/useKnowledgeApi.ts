@@ -1,8 +1,10 @@
 import { UUID } from "crypto";
 
 import { useAxios } from "@/lib/hooks";
+import { AddFolderData } from "@/lib/types/Knowledge";
 
 import {
+  addFolder,
   deleteKnowledge,
   DeleteKnowledgeInputProps,
   generateSignedUrlKnowledge,
@@ -24,5 +26,7 @@ export const useKnowledgeApi = () => {
       generateSignedUrlKnowledge(props, axiosInstance),
     getFiles: async (parentId: UUID | null) =>
       getFiles(parentId, axiosInstance),
+    addFolder: async (addFolderData: AddFolderData) =>
+      addFolder(addFolderData, axiosInstance),
   };
 };

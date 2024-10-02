@@ -20,6 +20,11 @@ export interface CrawledKnowledge {
   status: "UPLOADED" | "PROCESSING" | "ERROR";
 }
 
+export interface AddFolderData {
+  parent_id: UUID | null;
+  file_name: string;
+}
+
 export const isUploadedKnowledge = (
   knowledge: Knowledge
 ): knowledge is UploadedKnowledge => {

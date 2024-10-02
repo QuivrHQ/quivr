@@ -6,6 +6,7 @@ import { KMSElement } from "@/lib/api/sync/types";
 import { LoaderIcon } from "@/lib/components/ui/LoaderIcon/LoaderIcon";
 import QuivrButton from "@/lib/components/ui/QuivrButton/QuivrButton";
 
+import AddFolderModal from "./AddFolderModal/AddFolderModal";
 import styles from "./QuivrCurrentFolder.module.scss";
 
 import { useKnowledgeContext } from "../../../KnowledgeProvider/hooks/useKnowledgeContext";
@@ -14,6 +15,7 @@ import FolderExplorerHeader from "../../shared/FolderExplorerHeader/FolderExplor
 
 const QuivrCurrentFolder = (): JSX.Element => {
   const [loading, setLoading] = useState(false);
+  const [addFolderModalOpened, setAddFolderModalOpened] = useState(false);
   const [quivrElements, setQuivrElements] = useState<KMSElement[]>();
   const { currentFolder } = useKnowledgeContext();
   const { getFiles } = useKnowledgeApi();
@@ -35,40 +37,46 @@ const QuivrCurrentFolder = (): JSX.Element => {
   }, [currentFolder]);
 
   return (
-    <div className={styles.main_container}>
-      <FolderExplorerHeader />
-      <div className={styles.current_folder_content}>
-        {loading ? (
-          <div className={styles.loading_icon}>
-            <LoaderIcon size="large" color="primary" />
-          </div>
-        ) : (
-          <>
-            <div className={styles.content_header}>
-              <QuivrButton
-                iconName="add"
-                label="Add Folder"
-                color="primary"
-                onClick={() => console.info("hey")}
-                small={true}
-              />
+    <>
+      <div className={styles.main_container}>
+        <FolderExplorerHeader />
+        <div className={styles.current_folder_content}>
+          {loading ? (
+            <div className={styles.loading_icon}>
+              <LoaderIcon size="large" color="primary" />
             </div>
-            {quivrElements
-              ?.sort((a, b) => Number(b.is_folder) - Number(a.is_folder))
-              .map((element, index) => (
-                <div key={index}>
-                  <CurrentFolderExplorerLine
-                    element={{
-                      ...element,
-                      parentKMSElement: currentFolder,
-                    }}
-                  />
-                </div>
-              ))}
-          </>
-        )}
+          ) : (
+            <>
+              <div className={styles.content_header}>
+                <QuivrButton
+                  iconName="add"
+                  label="Add Folder"
+                  color="primary"
+                  onClick={() => setAddFolderModalOpened(true)}
+                  small={true}
+                />
+              </div>
+              {quivrElements
+                ?.sort((a, b) => Number(b.is_folder) - Number(a.is_folder))
+                .map((element, index) => (
+                  <div key={index}>
+                    <CurrentFolderExplorerLine
+                      element={{
+                        ...element,
+                        parentKMSElement: currentFolder,
+                      }}
+                    />
+                  </div>
+                ))}
+            </>
+          )}
+        </div>
       </div>
-    </div>
+      <AddFolderModal
+        isOpen={addFolderModalOpened}
+        setIsOpen={setAddFolderModalOpened}
+      />
+    </>
   );
 };
 
