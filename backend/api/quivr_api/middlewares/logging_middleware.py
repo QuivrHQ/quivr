@@ -8,7 +8,6 @@ from starlette.middleware.base import BaseHTTPMiddleware
 from structlog.contextvars import (
     bind_contextvars,
     clear_contextvars,
-    get_merged_contextvars,
 )
 
 logger = structlog.stdlib.get_logger("quivr_api.access")
@@ -33,8 +32,6 @@ class LoggingMiddleware(BaseHTTPMiddleware):
         url = request.url.path
         http_version = request.scope["http_version"]
 
-        # Log request details, cleaning None values
-        # TODO: dataclass this struct
         bind_contextvars(
             **clean_dict(
                 {
@@ -69,11 +66,6 @@ class LoggingMiddleware(BaseHTTPMiddleware):
                 )
             )
 
-            vars = get_merged_contextvars(logger)
-            from pprint import pprint
-
-            print("\n")
-            pprint(vars)
             logger.info(
                 f"""{client_addr} - "{request.method} {url} HTTP/{http_version}" {response.status_code}""",
             )
