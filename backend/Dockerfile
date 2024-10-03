@@ -3,22 +3,29 @@ FROM python:3.11.6-slim-bullseye
 WORKDIR /app
 
 # Install runtime dependencies
-RUN apt-get update && apt-get install -y \
+RUN apt-get clean && apt-get update && apt-get install -y \
     libgeos-dev \
     libcurl4-openssl-dev \
     libssl-dev \
     binutils \
-    pandoc \
     curl \
     git \
+    autoconf \
+    automake \
+    build-essential \
+    libtool \
+    python-dev \
+    build-essential \
+    wget \
+    # Additional dependencies for document handling
+    libmagic-dev \
     poppler-utils \
     tesseract-ocr \
-    libmagic-dev \
     libreoffice \
     libpq-dev \
     gcc \
-    wget \
-    && rm -rf /var/lib/apt/lists/*
+    pandoc && \
+    rm -rf /var/lib/apt/lists/* && apt-get clean
 
 # Install Supabase CLI
 RUN ARCHITECTURE=$(uname -m) && \
@@ -32,7 +39,15 @@ RUN ARCHITECTURE=$(uname -m) && \
     rm supabase_1.163.6_linux_arm64.deb; \
     fi
 
-COPY . .
+COPY requirements.lock  pyproject.toml README.md ./
+COPY api/pyproject.toml api/README.md ./api/
+COPY api/quivr_api/__init__.py ./api/quivr_api/__init__.py
+COPY core/pyproject.toml core/README.md ./core/
+COPY core/quivr_core/__init__.py ./core/quivr_core/__init__.py
+COPY worker/pyproject.toml worker/README.md ./worker/
+COPY worker/quivr_worker/__init__.py ./worker/quivr_worker/__init__.py
+COPY core/MegaParse/pyproject.toml core/MegaParse/README.md ./core/MegaParse/
+COPY core/MegaParse/megaparse/__init__.py ./core/MegaParse/megaparse/__init__.py
 
 RUN PYTHONDONTWRITEBYTECODE=1 pip install --no-cache-dir -r requirements.lock
 
@@ -43,4 +58,5 @@ RUN playwright install --with-deps && \
 
 ENV PYTHONPATH=/app
 
+COPY . .
 EXPOSE 5050
