@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import Dict, List, Optional
 from uuid import UUID
 
 from pydantic import BaseModel, root_validator
@@ -7,7 +7,9 @@ from pydantic import BaseModel, root_validator
 class CreateTask(BaseModel):
     pretty_id: str
     assistant_id: int
+    assistant_name: str
     settings: dict
+    task_metadata: Dict | None = None
 
 
 class BrainInput(BaseModel):

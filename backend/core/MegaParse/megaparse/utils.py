@@ -1,9 +1,11 @@
 from docx.document import Document as DocumentObject
+from docx.oxml.table import CT_Tbl
+from docx.oxml.text.paragraph import CT_P
+from docx.section import Section
+from docx.section import _Footer as Footer
+from docx.section import _Header as Header
 from docx.table import Table
 from docx.text.paragraph import Paragraph
-from docx.section import Section, _Header as Header, _Footer as Footer
-from docx.oxml.text.paragraph import CT_P
-from docx.oxml.table import CT_Tbl
 
 
 def print_element(element):

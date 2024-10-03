@@ -1,7 +1,7 @@
 import logging
+from enum import Enum
 from typing import Annotated, AsyncGenerator, Optional, Sequence, TypedDict
 from uuid import uuid4
-from enum import Enum
 
 # TODO(@aminediro): this is the only dependency to langchain package, we should remove it
 from langchain.retrievers import ContextualCompressionRetriever
@@ -12,7 +12,7 @@ from langchain_core.documents import BaseDocumentCompressor, Document
 from langchain_core.messages import BaseMessage
 from langchain_core.messages.ai import AIMessageChunk
 from langchain_core.vectorstores import VectorStore
-from langgraph.graph import START, END, StateGraph
+from langgraph.graph import END, START, StateGraph
 from langgraph.graph.message import add_messages
 
 from quivr_core.chat import ChatHistory

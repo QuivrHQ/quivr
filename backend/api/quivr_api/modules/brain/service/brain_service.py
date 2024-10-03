@@ -1,4 +1,4 @@
-from typing import Optional, Tuple, Dict
+from typing import Dict, Optional, Tuple
 from uuid import UUID
 
 from fastapi import HTTPException

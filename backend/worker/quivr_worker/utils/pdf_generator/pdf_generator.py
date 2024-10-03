@@ -1,6 +1,6 @@
 import os
 
-from fpdf import FPDF, XPos, YPos
+from fpdf import FPDF
 from pydantic import BaseModel
 
 
@@ -59,15 +59,24 @@ class PDFGenerator(FPDF):
 
     def chapter_body(self):
         self.set_font("DejaVu", "", 12)
-        self.multi_cell(
-            0,
-            10,
-            self.pdf_model.content,
-            markdown=True,
-            new_x=XPos.RIGHT,
-            new_y=YPos.TOP,
-        )
-        self.ln()
+        content_lines = self.pdf_model.content.split("\n")
+        for line in content_lines:
+            if line.startswith("# "):
+                self.ln()  # Add line break before header
+                self.set_font("DejaVu", "B", 16)
+                self.multi_cell(0, 10, line[2:], markdown=False)
+            elif line.startswith("## "):
+                self.ln()  # Add line break before header
+                self.set_font("DejaVu", "B", 14)
+                self.multi_cell(0, 10, line[3:], markdown=False)
+            elif line.startswith("### "):
+                self.ln()  # Add line break before header
+                self.set_font("DejaVu", "B", 12)
+                self.multi_cell(0, 10, line[4:], markdown=False)
+            else:
+                self.set_font("DejaVu", "", 12)
+                self.multi_cell(0, 10, line, markdown=True)
+            self.ln()
 
     def print_pdf(self):
         self.add_page()
@@ -78,7 +87,12 @@ if __name__ == "__main__":
     pdf_model = PDFModel(
         title="Summary of Legal Services Rendered by Orrick",
         content="""
+# Main Header
+## Sub Header
+### Sub Sub Header
 **Summary:** 
+This is a **summary** of the legal services rendered. This is a summary of the legal services rendered. This is a summary of the legal services rendered. This is a summary of the legal services rendered. This is a summary of the legal services rendered.
+Hello world
 """,
     )
     pdf = PDFGenerator(pdf_model)

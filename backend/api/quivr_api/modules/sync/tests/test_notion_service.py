@@ -74,7 +74,9 @@ def test_fetch_limit_notion_pages_now(fetch_response):
     assert len(result) == 0
 
 
-@pytest.mark.skip(reason="Bug: httpx.ConnectError: [Errno -2] Name or service not known'")
+@pytest.mark.skip(
+    reason="Bug: httpx.ConnectError: [Errno -2] Name or service not known'"
+)
 @pytest.mark.asyncio(loop_scope="session")
 async def test_store_notion_pages_success(
     session: AsyncSession,

@@ -24,6 +24,7 @@ RUN apt-get clean && apt-get update && apt-get install -y \
     libreoffice \
     libpq-dev \
     gcc \
+    libhdf5-serial-dev \
     pandoc && \
     rm -rf /var/lib/apt/lists/* && apt-get clean
 
@@ -46,6 +47,8 @@ COPY core/pyproject.toml core/README.md ./core/
 COPY core/quivr_core/__init__.py ./core/quivr_core/__init__.py
 COPY worker/pyproject.toml worker/README.md ./worker/
 COPY worker/quivr_worker/__init__.py ./worker/quivr_worker/__init__.py
+COPY worker/diff-assistant/pyproject.toml worker/diff-assistant/README.md ./worker/diff-assistant/
+COPY worker/diff-assistant/quivr_diff_assistant/__init__.py ./worker/diff-assistant/quivr_diff_assistant/__init__.py
 COPY core/MegaParse/pyproject.toml core/MegaParse/README.md ./core/MegaParse/
 COPY core/MegaParse/megaparse/__init__.py ./core/MegaParse/megaparse/__init__.py
 

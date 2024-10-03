@@ -1,13 +1,14 @@
+import asyncio
+import base64
+import re
 from enum import Enum
 from io import BytesIO
 from pathlib import Path
 from typing import List
+
 from langchain_core.messages import HumanMessage
 from langchain_openai import ChatOpenAI
-import base64
 from pdf2image import convert_from_path
-import asyncio
-import re
 
 # BASE_OCR_PROMPT = """
 # Transcribe the content of this file into markdown. Be mindful of the formatting.

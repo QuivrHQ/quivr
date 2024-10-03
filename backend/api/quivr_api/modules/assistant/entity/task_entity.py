@@ -1,8 +1,13 @@
 from datetime import datetime
-from typing import Dict
+from typing import Dict, List, Optional
 from uuid import UUID
 
+from pydantic import BaseModel
 from sqlmodel import JSON, TIMESTAMP, BigInteger, Column, Field, SQLModel, text
+
+
+class TaskMetadata(BaseModel):
+    input_files: Optional[List[str]] = None
 
 
 class Task(SQLModel, table=True):
@@ -17,6 +22,7 @@ class Task(SQLModel, table=True):
         ),
     )
     assistant_id: int
+    assistant_name: str
     pretty_id: str
     user_id: UUID
     status: str = Field(default="pending")
@@ -29,6 +35,4 @@ class Task(SQLModel, table=True):
     )
     settings: Dict = Field(default_factory=dict, sa_column=Column(JSON))
     answer: str | None = Field(default=None)
-
-    class Config:
-        arbitrary_types_allowed = True
+    task_metadata: Dict | None = Field(default_factory=dict, sa_column=Column(JSON))

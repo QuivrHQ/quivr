@@ -93,9 +93,7 @@ class SyncUserRepository:
             sync_user_id,
         )
         query = (
-            self.db.from_("syncs_user")
-            .select("*")
-            .eq("user_id", user_id)
+            self.db.from_("syncs_user").select("*").eq("user_id", user_id)
             # .neq("status", "REMOVED")
         )
         if sync_user_id:
@@ -170,9 +168,9 @@ class SyncUserRepository:
         )
 
         state_str = json.dumps(state)
-        self.db.from_("syncs_user").update(sync_user_input.model_dump(exclude_unset=True)).eq(
-            "user_id", str(sync_user_id)
-        ).eq("state", state_str).execute()
+        self.db.from_("syncs_user").update(
+            sync_user_input.model_dump(exclude_unset=True)
+        ).eq("user_id", str(sync_user_id)).eq("state", state_str).execute()
         logger.info("Sync user updated successfully")
 
     def update_sync_user_status(self, sync_user_id: int, status: str):
