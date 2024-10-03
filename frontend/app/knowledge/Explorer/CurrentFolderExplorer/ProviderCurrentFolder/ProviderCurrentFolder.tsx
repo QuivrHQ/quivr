@@ -57,7 +57,13 @@ const ProviderCurrentFolder = (): JSX.Element => {
         ) : (
           <div className={styles.current_folder_content}>
             {providerRootElements?.map((element, index) => (
-              <CurrentFolderExplorerLine key={index} element={element} />
+              <CurrentFolderExplorerLine
+                key={index}
+                element={{
+                  ...element,
+                  parentKMSElement: currentFolder,
+                }}
+              />
             ))}
           </div>
         )}
