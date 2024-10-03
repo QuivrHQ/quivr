@@ -9,8 +9,8 @@ type KnowledgeContextType = {
   >;
   exploringQuivr: boolean;
   setExploringQuivr: React.Dispatch<React.SetStateAction<boolean>>;
-  providerRootSelected: SyncsByProvider | undefined;
-  setProviderRootSelected: React.Dispatch<
+  exploredProvider: SyncsByProvider | undefined;
+  setExploredProvider: React.Dispatch<
     React.SetStateAction<SyncsByProvider | undefined>
   >;
 };
@@ -28,7 +28,7 @@ export const KnowledgeProvider = ({
     undefined
   );
   const [exploringQuivr, setExploringQuivr] = useState<boolean>(false);
-  const [providerRootSelected, setProviderRootSelected] = useState<
+  const [exploredProvider, setExploredProvider] = useState<
     SyncsByProvider | undefined
   >(undefined);
 
@@ -39,8 +39,8 @@ export const KnowledgeProvider = ({
         setCurrentFolder,
         exploringQuivr,
         setExploringQuivr,
-        providerRootSelected,
-        setProviderRootSelected,
+        exploredProvider,
+        setExploredProvider,
       }}
     >
       {children}

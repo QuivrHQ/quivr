@@ -15,14 +15,14 @@ const ProviderCurrentFolder = (): JSX.Element => {
   const [providerRootElements, setproviderRootElements] =
     useState<KMSElement[]>();
   const [loading, setLoading] = useState(false);
-  const { providerRootSelected, currentFolder } = useKnowledgeContext();
+  const { exploredProvider, currentFolder } = useKnowledgeContext();
   const { getSyncFiles } = useSync();
 
   const fetchProviderRootElements = () => {
     setLoading(true);
     void (async () => {
       try {
-        const res = await getSyncFiles(providerRootSelected?.syncs[0].id ?? 0);
+        const res = await getSyncFiles(exploredProvider?.syncs[0].id ?? 0);
         setproviderRootElements(res);
         setLoading(false);
       } catch (error) {
@@ -32,18 +32,17 @@ const ProviderCurrentFolder = (): JSX.Element => {
   };
 
   useEffect(() => {
-    if (providerRootSelected) {
+    if (exploredProvider && !currentFolder?.parentKMSElement) {
       void fetchProviderRootElements();
     }
-  }, [currentFolder, providerRootSelected]);
+  }, [currentFolder, exploredProvider]);
 
   return (
     <div className={styles.main_container}>
       <FolderExplorerHeader />
       <div className={styles.current_folder_content}>
-        {providerRootSelected?.syncs &&
-        providerRootSelected.syncs.length > 1 ? (
-          providerRootSelected.syncs.map((sync, index) => (
+        {exploredProvider?.syncs && exploredProvider.syncs.length > 1 ? (
+          exploredProvider.syncs.map((sync, index) => (
             <div key={index}>
               <ProviderAccount sync={sync} index={index} />
             </div>

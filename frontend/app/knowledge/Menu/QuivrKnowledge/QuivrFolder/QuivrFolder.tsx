@@ -23,13 +23,13 @@ const QuivrFolder = ({ element }: QuivrFolderProps): JSX.Element => {
     currentFolder,
     setCurrentFolder,
     setExploringQuivr,
-    setProviderRootSelected,
+    setExploredProvider,
   } = useKnowledgeContext();
 
   useEffect(() => {
     setSelectedFolder(currentFolder?.id === element.id);
     setExploringQuivr(true);
-    setProviderRootSelected(undefined);
+    setExploredProvider(undefined);
   }, [currentFolder]);
 
   useEffect(() => {

@@ -17,14 +17,14 @@ const QuivrKnowledges = (): JSX.Element => {
   const [kmsElements, setKMSElements] = useState<KMSElement[]>();
   const [loading, setLoading] = useState(false);
   const { isDarkMode } = useUserSettingsContext();
-  const { setExploringQuivr, setCurrentFolder, setProviderRootSelected } =
+  const { setExploringQuivr, setCurrentFolder, setExploredProvider } =
     useKnowledgeContext();
 
   const { getFiles } = useKnowledgeApi();
 
   const fetchFiles = () => {
     setCurrentFolder(undefined);
-    setProviderRootSelected(undefined);
+    setExploredProvider(undefined);
     setExploringQuivr(true);
   };
 
