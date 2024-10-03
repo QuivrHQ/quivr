@@ -22,7 +22,7 @@ class ParseableLogHandler(logging.Handler):
         self,
         base_parseable_url: str,
         auth_token: str,
-        stream_name: str = "quivr-api",
+        stream_name: str,
         batch_size: int = 10,
         flush_interval: float = 1,
     ):
@@ -116,7 +116,9 @@ def drop_http_context(_, __, event_dict):
     return {k: event_dict.get(k, None) for k in keys}
 
 
-def setup_logger(log_file="application.log", send_log_server: bool = True):
+def setup_logger(
+    log_file="application.log", send_log_server: bool = parseable_settings.use_parseable
+):
     # Shared handlers
     shared_processors = [
         structlog.contextvars.merge_contextvars,
@@ -198,10 +200,12 @@ def setup_logger(log_file="application.log", send_log_server: bool = True):
         send_log_server
         and parseable_settings.parseable_url is not None
         and parseable_settings.parseable_auth is not None
+        and parseable_settings.parseable_stream_name
     ):
         parseable_handler = ParseableLogHandler(
             auth_token=parseable_settings.parseable_auth,
             base_parseable_url=parseable_settings.parseable_url,
+            stream_name=parseable_settings.parseable_stream_name,
         )
         parseable_handler.setFormatter(parseable_fmt)
         handlers.append(parseable_handler)

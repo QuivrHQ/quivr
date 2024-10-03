@@ -128,9 +128,10 @@ class ResendSettings(BaseSettings):
 
 class ParseableSettings(BaseSettings):
     model_config = SettingsConfigDict(validate_default=False)
-    use_parseable: bool = True
+    use_parseable: bool = False
     parseable_url: str | None = None
     parseable_auth: str | None = None
+    parseable_stream_name: str | None = None
 
 
 settings = BrainSettings()  # type: ignore
