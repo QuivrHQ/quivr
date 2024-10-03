@@ -18,7 +18,7 @@ const ProviderCurrentFolder = (): JSX.Element => {
   const { exploredProvider, currentFolder } = useKnowledgeContext();
   const { getSyncFiles } = useSync();
 
-  const fetchProviderRootElements = () => {
+  const fetchCurrentFolderElements = () => {
     setLoading(true);
     void (async () => {
       try {
@@ -35,8 +35,8 @@ const ProviderCurrentFolder = (): JSX.Element => {
   };
 
   useEffect(() => {
-    if (exploredProvider && !currentFolder?.parentKMSElement) {
-      void fetchProviderRootElements();
+    if (exploredProvider) {
+      void fetchCurrentFolderElements();
     }
   }, [currentFolder, exploredProvider]);
 
