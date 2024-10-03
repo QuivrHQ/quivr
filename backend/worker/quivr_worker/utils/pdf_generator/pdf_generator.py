@@ -34,9 +34,9 @@ class PDFGenerator(FPDF):
         )
 
     def header(self):
-        # # Logo
-        # logo_path = os.path.join(os.path.dirname(__file__), "logo.png")
-        # self.image(logo_path, 10, 10, 20)  # Adjust size as needed
+        # Logo
+        logo_path = os.path.join(os.path.dirname(__file__), "logo.png")
+        self.image(logo_path, 10, 10, 20)  # Adjust size as needed
 
         # Move cursor to right of image
         self.set_xy(20, 15)
