@@ -51,8 +51,11 @@ class ParseableLogHandler(logging.Handler):
                 logger_name.startswith("quivr_api.access")
                 or logger_name.startswith("quivr_api.error")
             ):
-                fmt = orjson.loads(self.format(record))
-                log_queue.put(fmt)
+                url = record.msg.get("url", None)
+                # Filter on healthz
+                if url and "healthz" not in url:
+                    fmt = orjson.loads(self.format(record))
+                    log_queue.put(fmt)
         else:
             return
 
