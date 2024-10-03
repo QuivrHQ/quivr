@@ -8,6 +8,11 @@ logger = get_logger()
 misc_router = APIRouter()
 
 
+@misc_router.get("/excp")
+async def excp():
+    raise ValueError
+
+
 @misc_router.get("/")
 async def root():
     """

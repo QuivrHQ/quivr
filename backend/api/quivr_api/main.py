@@ -28,7 +28,6 @@ from quivr_api.modules.upload.controller import upload_router
 from quivr_api.modules.user.controller import user_router
 from quivr_api.routes.crawl_routes import crawl_router
 from quivr_api.routes.subscription_routes import subscription_router
-from quivr_api.utils import handle_request_validation_error
 from quivr_api.utils.telemetry import maybe_send_telemetry
 
 load_dotenv()
@@ -110,20 +109,10 @@ if PROFILING:
             return await call_next(request)
 
 
-# @app.exception_handler(HTTPException)
-# async def http_exception_handler(_, exc):
-#     return JSONResponse(
-#         status_code=exc.status_code,
-#         content={"detail": exc.detail},
-#     )
-
-
 @app.on_event("shutdown")
 def shutdown_event():
     stop_log_queue.set()
 
-
-handle_request_validation_error(app)
 
 if os.getenv("TELEMETRY_ENABLED") == "true":
     logger.info("Telemetry enabled, we use telemetry to collect anonymous usage data.")
