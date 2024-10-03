@@ -1,17 +1,17 @@
 import os
 import re
 from enum import Enum
-from typing import Dict, Hashable, List, Optional, Union, Any
+from typing import Dict, Hashable, List, Optional, Union, Any, Type
 from uuid import UUID
 from sqlmodel import SQLModel
 from langgraph.graph import START, END
-
+from langchain_core.tools import BaseTool
 from megaparse.config import MegaparseConfig
 
 from quivr_core.base_config import QuivrBaseConfig
 from quivr_core.processor.splitter import SplitterConfig
 from quivr_core.prompts import CustomPromptsModel
-from quivr_core.llm_tools import LLMToolFactory
+from quivr_core.llm_tools.llm_tools import LLMToolFactory
 
 
 def normalize_to_env_variable_name(name: str) -> str:
@@ -341,12 +341,13 @@ class NodeConfig(QuivrBaseConfig):
     name: str
     edges: List[str] | None = None
     conditional_edge: ConditionalEdgeConfig | None = None
-    tools: List[Dict[str, Any]] | None = None  # Add tools attribute
+    tools: List[Dict[str, Any]] | None = None
+    instantiated_tools: List[BaseTool | Type] | None = None
 
     def __init__(self, **data):
         super().__init__(**data)
+        self._instantiate_tools()
         self.resolve_special_edges_in_name_and_edges()
-        self.instantiate_tools()
 
     def resolve_special_edges_in_name_and_edges(self):
         """Replace SpecialEdges enum values in name and edges with corresponding langgraph values."""
@@ -362,10 +363,10 @@ class NodeConfig(QuivrBaseConfig):
                 elif edge == SpecialEdges.end:
                     self.edges[i] = END
 
-    def instantiate_tools(self):
+    def _instantiate_tools(self):
         """Instantiate tools based on the configuration."""
         if self.tools:
-            self.tools = [
+            self.instantiated_tools = [
                 LLMToolFactory.create_tool(tool_config.pop("name"), tool_config)
                 for tool_config in self.tools
             ]
@@ -386,8 +387,8 @@ class WorkflowConfig(QuivrBaseConfig):
     def get_node_tools(self, node_name: str) -> List[Any]:
         """Get tools for a specific node."""
         for node in self.nodes:
-            if node.name == node_name and node.tools:
-                return node.tools
+            if node.name == node_name and node.instantiated_tools:
+                return node.instantiated_tools
         return []
 
 
