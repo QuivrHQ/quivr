@@ -29,7 +29,9 @@ const SyncFolder = ({ element }: SyncFolderProps): JSX.Element => {
   useEffect(() => {
     setSelectedFolder(currentFolder?.sync_file_id === element.sync_file_id);
     if (currentFolder) {
-      setExploringQuivr(false);
+      if (currentFolder.sync_file_id) {
+        setExploringQuivr(false);
+      }
       setProviderRootSelected(undefined);
     }
   }, [currentFolder]);
