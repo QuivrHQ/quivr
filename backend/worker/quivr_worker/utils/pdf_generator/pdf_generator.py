@@ -1,6 +1,6 @@
 import os
 
-from fpdf import FPDF, XPos, YPos
+from fpdf import FPDF
 from pydantic import BaseModel
 
 
@@ -75,14 +75,7 @@ class PDFGenerator(FPDF):
                 self.multi_cell(0, 10, line[4:], markdown=False)
             else:
                 self.set_font("DejaVu", "", 12)
-                self.multi_cell(
-                    0,
-                    10,
-                    line,
-                    markdown=True,
-                    new_x=XPos.RIGHT,
-                    new_y=YPos.TOP,
-                )
+                self.multi_cell(0, 10, line, markdown=True)
             self.ln()
 
     def print_pdf(self):
@@ -98,7 +91,8 @@ if __name__ == "__main__":
 ## Sub Header
 ### Sub Sub Header
 **Summary:** 
-This is a summary of the legal services rendered.
+This is a **summary** of the legal services rendered. This is a summary of the legal services rendered. This is a summary of the legal services rendered. This is a summary of the legal services rendered. This is a summary of the legal services rendered.
+Hello world
 """,
     )
     pdf = PDFGenerator(pdf_model)
