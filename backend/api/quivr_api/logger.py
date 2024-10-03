@@ -43,8 +43,18 @@ class ParseableLogHandler(logging.Handler):
     def emit(self, record: logging.LogRecord):
         # FIXME (@AmineDiro): This ping-pong of serialization/deserialization is a limitation of logging formatter
         # The formatter should return a 'str' for the logger to print
-        fmt = orjson.loads(self.format(record))
-        log_queue.put(fmt)
+        if isinstance(record.msg, str):
+            return
+        elif isinstance(record.msg, dict):
+            logger_name = record.msg.get("logger", None)
+            if logger_name and (
+                logger_name.startswith("quivr_api.access")
+                or logger_name.startswith("quivr_api.error")
+            ):
+                fmt = orjson.loads(self.format(record))
+                log_queue.put(fmt)
+        else:
+            return
 
     def _process_log_queue(self):
         """Background thread that processes the log queue and sends logs to Parseable."""
@@ -95,7 +105,7 @@ def extract_from_record(_, __, event_dict):
     return event_dict
 
 
-def drop_bind_context(_, __, event_dict):
+def drop_http_context(_, __, event_dict):
     """
     Extract thread and process names and add them to the event dict.
     """
@@ -103,7 +113,7 @@ def drop_bind_context(_, __, event_dict):
     return {k: event_dict.get(k, None) for k in keys}
 
 
-def setup_logger(log_file="application.log", parseable_logs: bool = False):
+def setup_logger(log_file="application.log", send_log_server: bool = True):
     # Shared handlers
     shared_processors = [
         structlog.contextvars.merge_contextvars,
@@ -140,8 +150,7 @@ def setup_logger(log_file="application.log", parseable_logs: bool = False):
     )
     color_fmt = structlog.stdlib.ProcessorFormatter(
         processors=[
-            # structlog.stdlib.ProcessorFormatter.remove_processors_meta,
-            drop_bind_context,
+            drop_http_context,
             structlog.dev.ConsoleRenderer(
                 colors=True,
                 exception_formatter=structlog.dev.RichTracebackFormatter(
@@ -153,7 +162,12 @@ def setup_logger(log_file="application.log", parseable_logs: bool = False):
     )
     parseable_fmt = structlog.stdlib.ProcessorFormatter(
         processors=[
-            # structlog.processors.dict_tracebacks,
+            # TODO: Which one gets us the better debug experience ?
+            # structlog.processors.ExceptionRenderer(
+            #     exception_formatter=structlog.tracebacks.ExceptionDictTransformer(
+            #         show_locals=False
+            #     )
+            # ),
             structlog.processors.format_exc_info,
             structlog.stdlib.ProcessorFormatter.remove_processors_meta,
             structlog.processors.JSONRenderer(),
@@ -178,7 +192,7 @@ def setup_logger(log_file="application.log", parseable_logs: bool = False):
     file_handler.setFormatter(plain_fmt)
     handlers: list[logging.Handler] = [console_handler, file_handler]
     if (
-        parseable_logs
+        send_log_server
         and parseable_settings.parseable_url is not None
         and parseable_settings.parseable_auth is not None
     ):

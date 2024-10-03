@@ -8,6 +8,14 @@ logger = get_logger()
 misc_router = APIRouter()
 
 
+@misc_router.get("/excp")
+async def excp():
+    """
+    Root endpoint to check the status of the API.
+    """
+    raise ValueError("this is an error")
+
+
 @misc_router.get("/")
 async def root():
     """

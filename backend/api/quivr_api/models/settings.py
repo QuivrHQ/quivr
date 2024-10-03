@@ -128,6 +128,7 @@ class ResendSettings(BaseSettings):
 
 class ParseableSettings(BaseSettings):
     model_config = SettingsConfigDict(validate_default=False)
+    use_parseable: bool = True
     parseable_url: str | None = None
     parseable_auth: str | None = None
 
