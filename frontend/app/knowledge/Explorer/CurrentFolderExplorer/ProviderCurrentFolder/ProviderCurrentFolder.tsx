@@ -22,7 +22,10 @@ const ProviderCurrentFolder = (): JSX.Element => {
     setLoading(true);
     void (async () => {
       try {
-        const res = await getSyncFiles(exploredProvider?.syncs[0].id ?? 0);
+        const res = await getSyncFiles(
+          exploredProvider?.syncs[0].id ?? 0,
+          currentFolder?.sync_file_id ?? undefined
+        );
         setproviderRootElements(res);
         setLoading(false);
       } catch (error) {
