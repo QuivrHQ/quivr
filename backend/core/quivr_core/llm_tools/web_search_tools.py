@@ -12,14 +12,6 @@ class WebSearchToolsList(str, Enum):
     TAVILY = "tavily"
 
 
-WebSearchTools = ToolsCategory(
-    name="Web Search",
-    description="Tools for web searching",
-    tools=[WebSearchToolsList.TAVILY],
-    default_tool=WebSearchToolsList.TAVILY,
-)
-
-
 def create_web_search_tool(tool_name: str, config: Dict[str, Any]) -> BaseTool:
     if tool_name == WebSearchToolsList.TAVILY:
         api_key = config.pop("api_key") or os.getenv("TAVILY_API_KEY")
@@ -41,3 +33,12 @@ def create_web_search_tool(tool_name: str, config: Dict[str, Any]) -> BaseTool:
         )
     else:
         raise ValueError(f"Web search tool {tool_name} is not supported.")
+
+
+WebSearchTools = ToolsCategory(
+    name="Web Search",
+    description="Tools for web searching",
+    tools=[WebSearchToolsList.TAVILY],
+    default_tool=WebSearchToolsList.TAVILY,
+    create_tool=create_web_search_tool,
+)
