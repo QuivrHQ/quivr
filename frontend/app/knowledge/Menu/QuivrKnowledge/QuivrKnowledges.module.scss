@@ -1,23 +1,47 @@
 @use "styles/Radius.module.scss";
 @use "styles/Spacings.module.scss";
+@use "styles/Typography.module.scss";
 
-.header_section_wrapper {
+.main_container {
   display: flex;
-  align-items: center;
-  gap: Spacings.$spacing02;
-  font-weight: 500;
+  flex-direction: column;
+  gap: Spacings.$spacing03;
 
-  .hoverable {
+  .header_section_wrapper {
     display: flex;
     align-items: center;
-    gap: Spacings.$spacing03;
-    width: 100%;
-    padding-inline: Spacings.$spacing02;
+    gap: Spacings.$spacing02;
+    font-weight: 500;
 
-    &:hover {
-      background-color: var(--background-3);
-      cursor: pointer;
-      border-radius: Radius.$small;
+    .hoverable {
+      display: flex;
+      align-items: center;
+      gap: Spacings.$spacing03;
+      width: 100%;
+      padding-inline: Spacings.$spacing02;
+
+      &:hover {
+        background-color: var(--background-3);
+        cursor: pointer;
+        border-radius: Radius.$small;
+      }
+    }
+  }
+
+  .loader_icon {
+    padding-left: Spacings.$spacing06;
+  }
+
+  .sync_elements_wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: Spacings.$spacing02;
+    font-size: Typography.$small;
+    margin-left: Spacings.$spacing03;
+    border-left: 0.5px solid var(--border-0);
+
+    &.empty {
+      height: 0;
     }
   }
 }
