@@ -65,7 +65,7 @@ class SplittedInput(BaseModel):
     )
 
 
-class AnsweredQuestions(BaseModel):
+class TasksCompletion(BaseModel):
     completable_tasks: Optional[List[str]] = Field(
         default=None,
         description="The user tasks or questions that can be completed using the provided context and chat history.",
@@ -462,13 +462,13 @@ class QuivrQARAGLangGraph:
 
         try:
             structured_llm = self.llm_endpoint._llm.with_structured_output(
-                AnsweredQuestions, method="json_schema"
+                TasksCompletion, method="json_schema"
             )
             response = structured_llm.invoke(msg)
 
         except openai.BadRequestError:
             structured_llm = self.llm_endpoint._llm.with_structured_output(
-                AnsweredQuestions
+                TasksCompletion
             )
             response = structured_llm.invoke(msg)
 
