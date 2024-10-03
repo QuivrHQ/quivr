@@ -55,7 +55,6 @@ REPORT_PROMPT = PromptTemplate.from_template(
 
 
 def redact_report(difference_per_section: List[DiffResult], llm: BaseChatModel) -> str:
-    print(f"🔥 difference_per_section: {difference_per_section}")
     report_per_section = []
     combined_diffs = ""
     for section in difference_per_section:
@@ -72,5 +71,4 @@ def redact_report(difference_per_section: List[DiffResult], llm: BaseChatModel) 
 
     for rep in report_per_section:
         report_text += "\n".join(rep.split("\n")[1:-1]) + "\n\n"
-    print(f"🔥 report_text: {report_text}")
     return report_text

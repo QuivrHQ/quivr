@@ -140,7 +140,6 @@ async def process_cdp_use_case_2(
         f"{path}{after_file_value}"
     )
 
-    logger.info("🔥")
     # Generate a random string of 8 characters
     random_string = "".join(random.choices(string.ascii_letters + string.digits, k=8))
 
@@ -148,17 +147,14 @@ async def process_cdp_use_case_2(
     # because the file is already in the quivr bucket
     before_file_path = f"/tmp/{random_string}_{before_file_value}"
     after_file_path = f"/tmp/{random_string}_{after_file_value}"
-    logger.info("🔥🔥")
     with open(before_file_path, "wb") as f:
         f.write(before_file_data)
     with open(after_file_path, "wb") as f:
         f.write(after_file_data)
-    logger.info("🔥🔥🔥")
     assert input_assistant.inputs.select_texts is not None
     value_use_case = input_assistant.inputs.select_texts[0].value
 
     ## Get the document type
-    logger.info("🔥🔥🔥🔥")
     document_type = None
     if value_use_case == "Etiquettes VS Cahier des charges":
         document_type = ComparisonTypes.CDC_ETIQUETTE
@@ -167,9 +163,7 @@ async def process_cdp_use_case_2(
     else:
         logger.error(f"❌ Document type not supported: {value_use_case}")
         raise ValueError(f"Document type not supported: {value_use_case}")
-    logger.info("🔥🔥")
     parser = DeadlyParser()
-    logger.info("🔥🔥🔥🔥🔥")
     logger.info(f"Document type: {document_type} 📄")
     llm = ChatOpenAI(
         model="gpt-4o",

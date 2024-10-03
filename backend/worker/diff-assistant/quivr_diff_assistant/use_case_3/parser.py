@@ -175,7 +175,6 @@ class DeadlyParser:
         """
         Parse with megaparse
         """
-        print("🔥🔥🔥🔥")
         mp = MegaParse(file_path)
         return await mp.aload()
         # except:

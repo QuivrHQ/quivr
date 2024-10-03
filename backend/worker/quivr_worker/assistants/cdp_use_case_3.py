@@ -104,7 +104,6 @@ async def process_cdp_use_case_3(
         max_retries=2,
     )
 
-    logger.debug(f"🔥 document_type: {document_type}")
     llm_comparator = True if document_type == DocumentType.ETIQUETTE else False
     report = await create_modification_report(
         before_file=before_file_path,
@@ -149,7 +148,6 @@ async def create_modification_report(
         llm_comparator_result = llm_comparator(
             before_text.page_content, after_text.page_content, llm=llm
         )
-        logger.debug(f"🔥 llm_comparator_result: {llm_comparator_result}")
         return llm_comparator_result
     logger.debug("using diff match patch")
     dmp = diff_match_patch()
@@ -162,7 +160,6 @@ async def create_modification_report(
 
     logger.debug(section_diffs)
     report = redact_report(section_diffs, llm=llm)
-    logger.debug(f"🔥 report: {report}")
     return report
 
 
