@@ -60,18 +60,30 @@ def get_chunk_metadata(
 ) -> RAGResponseMetadata:
     # Initiate the source
     metadata = {"sources": sources} if sources else {"sources": []}
+    all_citations = []
+    all_followup_questions = []
+
     if msg.tool_calls:
-        cited_answer = next((x for x in msg.tool_calls if cited_answer_filter(x)), None)
+        for cited_answer in filter(cited_answer_filter, msg.tool_calls):
+            if "args" in cited_answer:
+                gathered_args = cited_answer["args"]
+                if "citations" in gathered_args:
+                    all_citations.extend(gathered_args["citations"])
+                if "followup_questions" in gathered_args:
+                    all_followup_questions.append(gathered_args["followup_questions"])
 
-        if cited_answer and "args" in cited_answer:
-            gathered_args = cited_answer["args"]
-            if "citations" in gathered_args:
-                citations = gathered_args["citations"]
-                metadata["citations"] = citations
+    # Interleave follow-up questions
+    interleaved_followup_questions = []
+    max_length = (
+        max(len(q) for q in all_followup_questions) if all_followup_questions else 0
+    )
+    for i in range(max_length):
+        for questions in all_followup_questions:
+            if i < len(questions):
+                interleaved_followup_questions.append(questions[i])
 
-            if "followup_questions" in gathered_args:
-                followup_questions = gathered_args["followup_questions"]
-                metadata["followup_questions"] = followup_questions
+    metadata["citations"] = all_citations
+    metadata["followup_questions"] = interleaved_followup_questions[:3]  # Limit to 3
 
     return RAGResponseMetadata(**metadata, metadata_model=None)
 
@@ -93,7 +105,7 @@ def parse_chunk_response(
     supports_func_calling: bool,
 ) -> Tuple[AIMessageChunk, str]:
     # Init with sources
-    answer_str = ""
+    answers = []
 
     if "answer" in raw_chunk:
         answer = raw_chunk["answer"]
@@ -102,21 +114,18 @@ def parse_chunk_response(
 
     rolling_msg += answer
     if supports_func_calling and rolling_msg.tool_calls:
-        cited_answer = next(
-            (x for x in rolling_msg.tool_calls if cited_answer_filter(x)), None
-        )
-        if cited_answer and "args" in cited_answer and "answer" in cited_answer["args"]:
-            gathered_args = cited_answer["args"]
-            # Only send the difference between answer and response_tokens which was the previous answer
-            answer_str = gathered_args["answer"]
-            return rolling_msg, answer_str
+        for cited_answer in filter(cited_answer_filter, rolling_msg.tool_calls):
+            if "args" in cited_answer and "answer" in cited_answer["args"]:
+                gathered_args = cited_answer["args"]
+                answers.append(gathered_args["answer"])
 
-    return rolling_msg, answer.content
+    answer_str = "\n\n".join(answers) if answers else answer.content
+    return rolling_msg, answer_str
 
 
 @no_type_check
 def parse_response(raw_response: RawRAGResponse, model_name: str) -> ParsedRAGResponse:
-    answer = ""
+    answers = []
     sources = raw_response["docs"] if "docs" in raw_response else []
 
     metadata = RAGResponseMetadata(
@@ -128,21 +137,24 @@ def parse_response(raw_response: RawRAGResponse, model_name: str) -> ParsedRAGRe
         and "tool_calls" in raw_response["answer"]
         and raw_response["answer"].tool_calls
     ):
-        if "citations" in raw_response["answer"].tool_calls[-1]["args"]:
-            citations = raw_response["answer"].tool_calls[-1]["args"]["citations"]
-            metadata.citations = citations
-            followup_questions = raw_response["answer"].tool_calls[-1]["args"][
-                "followup_questions"
-            ]
-            if followup_questions:
-                metadata.followup_questions = followup_questions
-            answer = raw_response["answer"].tool_calls[-1]["args"]["answer"]
-        else:
-            answer = raw_response["answer"].tool_calls[-1]["args"]["answer"]
+        all_citations = []
+        all_followup_questions = []
+        for tool_call in raw_response["answer"].tool_calls:
+            if "args" in tool_call:
+                args = tool_call["args"]
+                if "citations" in args:
+                    all_citations.extend(args["citations"])
+                if "followup_questions" in args:
+                    all_followup_questions.extend(args["followup_questions"])
+                if "answer" in args:
+                    answers.append(args["answer"])
+        metadata.citations = all_citations
+        metadata.followup_questions = all_followup_questions
     else:
-        answer = raw_response["answer"].content
+        answers.append(raw_response["answer"].content)
 
-    parsed_response = ParsedRAGResponse(answer=answer, metadata=metadata)
+    answer_str = "\n".join(answers)
+    parsed_response = ParsedRAGResponse(answer=answer_str, metadata=metadata)
     return parsed_response
 
 

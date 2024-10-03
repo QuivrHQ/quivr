@@ -39,7 +39,6 @@ from quivr_core.llm import LLMEndpoint
 from quivr_core.models import (
     ParsedRAGChunkResponse,
     QuivrKnowledge,
-    RAGResponseMetadata,
 )
 from quivr_core.prompts import custom_prompts
 from quivr_core.utils import (
@@ -933,7 +932,7 @@ class QuivrQARAGLangGraph:
                         if len(diff_answer) > 0:
                             parsed_chunk = ParsedRAGChunkResponse(
                                 answer=diff_answer,
-                                metadata=RAGResponseMetadata(),
+                                metadata=get_chunk_metadata(rolling_message, docs),
                             )
                             prev_answer += diff_answer
 
@@ -944,7 +943,7 @@ class QuivrQARAGLangGraph:
                     else:
                         parsed_chunk = ParsedRAGChunkResponse(
                             answer=answer_str,
-                            metadata=RAGResponseMetadata(),
+                            metadata=get_chunk_metadata(rolling_message, docs),
                         )
                         logger.debug(
                             f"answer_astream func_calling=False question={question} rolling_msg={rolling_message} chunk_id={chunk_id}, chunk={parsed_chunk}"
@@ -955,7 +954,7 @@ class QuivrQARAGLangGraph:
 
         # Last chunk provides metadata
         last_chunk = ParsedRAGChunkResponse(
-            answer="",
+            answer="",  # Ensure no citations are appended to the answer
             metadata=get_chunk_metadata(rolling_message, docs),
             last_chunk=True,
         )
