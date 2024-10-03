@@ -1,4 +1,4 @@
-import subprocess
+import os
 import time
 import uuid
 
@@ -12,7 +12,8 @@ from structlog.contextvars import (
 
 logger = structlog.stdlib.get_logger("quivr_api.access")
 
-git_sha = subprocess.check_output(["git", "rev-parse", "HEAD"]).strip().decode("utf-8")
+
+git_sha = os.getenv("PORTER_IMAGE_TAG", None)
 
 
 def clean_dict(d):
