@@ -22,7 +22,7 @@ WebSearchTools = ToolsCategory(
 
 def create_web_search_tool(tool_name: str, config: Dict[str, Any]) -> BaseTool:
     if tool_name == WebSearchToolsList.TAVILY:
-        api_key = config.get("api_key") or os.getenv("TAVILY_API_KEY")
+        api_key = config.pop("api_key") or os.getenv("TAVILY_API_KEY")
         if not api_key:
             raise ValueError(
                 f"Missing required config key 'api_key' or environment variable "
@@ -34,9 +34,10 @@ def create_web_search_tool(tool_name: str, config: Dict[str, Any]) -> BaseTool:
         )
         return TavilySearchResults(
             api_wrapper=tavily_api_wrapper,
-            max_results=config.get("max_results", 5),
-            search_depth=config.get("search_depth", "advanced"),
-            include_answer=config.get("include_answer", True),
+            max_results=config.pop("max_results", 5),
+            search_depth=config.pop("search_depth", "advanced"),
+            include_answer=config.pop("include_answer", True),
+            **config,  # Pass any additional keyword arguments
         )
     else:
         raise ValueError(f"Web search tool {tool_name} is not supported.")
