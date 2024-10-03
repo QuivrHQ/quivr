@@ -20,7 +20,10 @@
     # via quivr-worker
 -e file:core/MegaParse
     # via quivr-core
+    # via quivr-diff-assistant
 -e file:worker
+-e file:worker/diff-assistant
+    # via quivr-worker
 aiofiles==23.2.1
     # via chainlit
     # via quivr-core
@@ -43,6 +46,8 @@ anthropic==0.34.1
     # via langchain-anthropic
 antlr4-python3-runtime==4.9.3
     # via omegaconf
+anyascii==0.3.2
+    # via python-doctr
 anyio==3.7.1
     # via anthropic
     # via asyncer
@@ -126,6 +131,7 @@ click==8.1.7
     # via mkdocs
     # via mkdocstrings
     # via nltk
+    # via python-oxmsg
     # via uvicorn
 click-didyoumean==0.3.1
     # via celery
@@ -178,6 +184,7 @@ defusedxml==0.7.1
     # via fpdf2
     # via langchain-anthropic
     # via nbconvert
+    # via python-doctr
 deprecated==1.2.14
     # via llama-index-core
     # via llama-index-legacy
@@ -188,6 +195,8 @@ deprecated==1.2.14
     # via pikepdf
 deprecation==2.1.0
     # via postgrest
+diff-match-patch==20230430
+    # via quivr-diff-assistant
 dirtyjson==1.0.8
     # via llama-index-core
     # via llama-index-legacy
@@ -198,6 +207,7 @@ distro==1.9.0
     # via openai
 docx2txt==0.8
     # via quivr-core
+    # via quivr-diff-assistant
 dropbox==12.0.2
     # via quivr-api
 ecdsa==0.19.0
@@ -214,6 +224,7 @@ executing==2.0.1
     # via stack-data
 faiss-cpu==1.8.0.post1
     # via quivr-core
+    # via quivr-diff-assistant
 fastapi==0.110.3
     # via chainlit
     # via quivr-api
@@ -298,6 +309,9 @@ h11==0.14.0
     # via wsproto
 h2==4.1.0
     # via httpx
+h5py==3.10.0
+    # via python-doctr
+    # via quivr-diff-assistant
 hpack==4.0.0
     # via h2
 httpcore==1.0.5
@@ -325,6 +339,7 @@ httpx==0.27.0
 httpx-sse==0.4.0
     # via cohere
 huggingface-hub==0.24.6
+    # via python-doctr
     # via timm
     # via tokenizers
     # via transformers
@@ -371,6 +386,7 @@ jmespath==1.0.1
     # via botocore
 joblib==1.4.2
     # via nltk
+    # via scikit-learn
 jsonpatch==1.33
     # via langchain-core
 jsonpath-python==1.0.6
@@ -399,11 +415,12 @@ kiwisolver==1.4.5
     # via matplotlib
 kombu==5.4.0
     # via celery
-langchain==0.2.14
+langchain==0.2.16
     # via langchain-community
     # via megaparse
     # via quivr-api
     # via quivr-core
+    # via quivr-diff-assistant
 langchain-anthropic==0.1.23
     # via quivr-core
     # via quivr-monorepo
@@ -414,7 +431,7 @@ langchain-community==0.2.12
     # via megaparse
     # via quivr-api
     # via quivr-core
-langchain-core==0.2.38
+langchain-core==0.2.41
     # via langchain
     # via langchain-anthropic
     # via langchain-cohere
@@ -428,18 +445,20 @@ langchain-core==0.2.38
     # via quivr-core
 langchain-experimental==0.0.64
     # via langchain-cohere
-langchain-openai==0.1.22
+langchain-openai==0.1.25
     # via megaparse
     # via quivr-api
+    # via quivr-diff-assistant
 langchain-text-splitters==0.2.2
     # via langchain
 langdetect==1.0.9
+    # via python-doctr
     # via unstructured
 langgraph==0.2.14
     # via quivr-core
 langgraph-checkpoint==1.0.6
     # via langgraph
-langsmith==0.1.100
+langsmith==0.1.126
     # via langchain
     # via langchain-community
     # via langchain-core
@@ -453,14 +472,15 @@ literalai==0.0.607
     # via chainlit
 llama-cloud==0.0.13
     # via llama-index-indices-managed-llama-cloud
-llama-index==0.10.67.post1
+llama-index==0.11.12
     # via megaparse
-llama-index-agent-openai==0.2.9
+    # via quivr-diff-assistant
+llama-index-agent-openai==0.3.4
     # via llama-index
     # via llama-index-program-openai
-llama-index-cli==0.1.13
+llama-index-cli==0.3.1
     # via llama-index
-llama-index-core==0.10.67
+llama-index-core==0.11.12
     # via llama-index
     # via llama-index-agent-openai
     # via llama-index-cli
@@ -473,35 +493,39 @@ llama-index-core==0.10.67
     # via llama-index-readers-file
     # via llama-index-readers-llama-parse
     # via llama-parse
-llama-index-embeddings-openai==0.1.11
+llama-index-embeddings-openai==0.2.5
     # via llama-index
     # via llama-index-cli
-llama-index-indices-managed-llama-cloud==0.2.7
+llama-index-indices-managed-llama-cloud==0.3.1
     # via llama-index
 llama-index-legacy==0.9.48.post3
     # via llama-index
-llama-index-llms-openai==0.1.30
+llama-index-llms-openai==0.2.9
     # via llama-index
     # via llama-index-agent-openai
     # via llama-index-cli
     # via llama-index-multi-modal-llms-openai
     # via llama-index-program-openai
     # via llama-index-question-gen-openai
-llama-index-multi-modal-llms-openai==0.1.9
+    # via quivr-diff-assistant
+llama-index-multi-modal-llms-openai==0.2.1
     # via llama-index
-llama-index-program-openai==0.1.7
+llama-index-program-openai==0.2.0
     # via llama-index
     # via llama-index-question-gen-openai
-llama-index-question-gen-openai==0.1.3
+llama-index-question-gen-openai==0.2.0
     # via llama-index
-llama-index-readers-file==0.1.33
+llama-index-readers-file==0.2.2
     # via llama-index
-llama-index-readers-llama-parse==0.1.6
+    # via quivr-diff-assistant
+llama-index-readers-llama-parse==0.3.0
     # via llama-index
-llama-parse==0.4.9
+llama-parse==0.5.6
     # via llama-index-readers-llama-parse
     # via megaparse
     # via quivr-api
+llvmlite==0.43.0
+    # via numba
 lxml==5.3.0
     # via pikepdf
     # via python-docx
@@ -535,7 +559,9 @@ marshmallow==3.22.0
 marshmallow-enum==1.5.1
     # via unstructured-client
 matplotlib==3.9.2
+    # via mplcursors
     # via pycocotools
+    # via quivr-diff-assistant
     # via unstructured-inference
 matplotlib-inline==0.1.7
     # via ipykernel
@@ -576,6 +602,8 @@ mkdocstrings-python==1.11.1
     # via mkdocstrings
 monotonic==1.6
     # via posthog
+mplcursors==0.5.3
+    # via quivr-diff-assistant
 mpmath==1.3.0
     # via sympy
 msal==1.30.0
@@ -608,6 +636,7 @@ networkx==3.2.1
     # via torch
     # via unstructured
 nltk==3.9.1
+    # via llama-index
     # via llama-index-core
     # via llama-index-legacy
     # via unstructured
@@ -615,16 +644,20 @@ nodeenv==1.9.1
     # via pre-commit
 notion-client==2.2.1
     # via quivr-api
+numba==0.60.0
+    # via quivr-diff-assistant
 numpy==1.26.3
     # via chainlit
     # via contourpy
     # via faiss-cpu
+    # via h5py
     # via langchain
     # via langchain-community
     # via layoutparser
     # via llama-index-core
     # via llama-index-legacy
     # via matplotlib
+    # via numba
     # via onnx
     # via onnxruntime
     # via opencv-python
@@ -633,12 +666,18 @@ numpy==1.26.3
     # via pdf2docx
     # via pgvector
     # via pycocotools
+    # via python-doctr
+    # via quivr-diff-assistant
+    # via scikit-learn
     # via scipy
+    # via shapely
     # via torchvision
     # via transformers
     # via unstructured
 oauthlib==3.2.2
     # via requests-oauthlib
+olefile==0.47
+    # via python-oxmsg
 omegaconf==2.3.0
     # via effdet
 onnx==1.16.2
@@ -646,21 +685,25 @@ onnx==1.16.2
     # via unstructured-inference
 onnxruntime==1.19.0
     # via unstructured-inference
-openai==1.42.0
+openai==1.47.1
     # via langchain-openai
     # via litellm
     # via llama-index-agent-openai
-    # via llama-index-core
+    # via llama-index-embeddings-openai
     # via llama-index-legacy
     # via llama-index-llms-openai
     # via quivr-api
+    # via quivr-diff-assistant
     # via quivr-worker
 opencv-python==4.10.0.84
     # via layoutparser
+    # via python-doctr
+    # via quivr-diff-assistant
     # via unstructured-inference
 opencv-python-headless==4.10.0.84
     # via pdf2docx
 openpyxl==3.1.5
+    # via quivr-diff-assistant
     # via unstructured
 opentelemetry-api==1.27.0
     # via opentelemetry-exporter-otlp-proto-grpc
@@ -720,8 +763,9 @@ paginate==0.5.7
 pandas==2.2.2
     # via langchain-cohere
     # via layoutparser
-    # via llama-index-core
     # via llama-index-legacy
+    # via llama-index-readers-file
+    # via quivr-diff-assistant
     # via unstructured
 pandocfilters==1.5.1
     # via nbconvert
@@ -747,6 +791,8 @@ pexpect==4.9.0 ; sys_platform != 'emscripten' and sys_platform != 'win32'
     # via ipython
 pgvector==0.3.2
     # via quivr-api
+pi-heif==0.18.0
+    # via unstructured
 pikepdf==9.1.1
     # via unstructured
 pillow==10.2.0
@@ -756,13 +802,12 @@ pillow==10.2.0
     # via matplotlib
     # via pdf2image
     # via pdfplumber
+    # via pi-heif
     # via pikepdf
-    # via pillow-heif
+    # via python-doctr
     # via python-pptx
     # via torchvision
     # via unstructured-pytesseract
-pillow-heif==0.18.0
-    # via unstructured
 platformdirs==4.2.2
     # via black
     # via jupyter-core
@@ -819,6 +864,8 @@ pyasn1==0.6.0
     # via rsa
 pyasn1-modules==0.4.0
     # via google-auth
+pyclipper==1.3.0.post5
+    # via python-doctr
 pycocotools==2.0.8
     # via effdet
 pycodestyle==2.12.1
@@ -839,6 +886,7 @@ pydantic==2.8.2
     # via litellm
     # via literalai
     # via llama-cloud
+    # via llama-index-core
     # via openai
     # via postgrest
     # via pydantic-settings
@@ -879,9 +927,12 @@ pyparsing==3.1.2
     # via unstructured-client
 pypdf==4.3.1
     # via llama-index-readers-file
+    # via quivr-diff-assistant
     # via unstructured
 pypdfium2==4.30.0
     # via pdfplumber
+    # via python-doctr
+    # via quivr-diff-assistant
 pyproject-api==1.6.1
     # via tox
 pyreadline3==3.4.1 ; sys_platform == 'win32'
@@ -910,6 +961,8 @@ python-dateutil==2.9.0.post0
     # via realtime
     # via storage3
     # via unstructured-client
+python-doctr==0.9.0
+    # via quivr-diff-assistant
 python-docx==1.1.2
     # via megaparse
     # via pdf2docx
@@ -921,6 +974,7 @@ python-dotenv==1.0.1
     # via pydantic-settings
     # via pytest-dotenv
     # via quivr-api
+    # via quivr-diff-assistant
     # via quivr-worker
 python-engineio==4.9.1
     # via python-socketio
@@ -929,11 +983,14 @@ python-iso639==2024.4.27
 python-jose==3.3.0
     # via quivr-api
 python-magic==0.4.27
+    # via quivr-diff-assistant
     # via unstructured
 python-multipart==0.0.9
     # via chainlit
     # via quivr-api
     # via unstructured-inference
+python-oxmsg==0.0.1
+    # via unstructured
 python-pptx==1.0.2
     # via megaparse
     # via unstructured
@@ -967,6 +1024,7 @@ pyzmq==26.1.1
     # via ipykernel
     # via jupyter-client
 rapidfuzz==3.9.6
+    # via python-doctr
     # via unstructured
     # via unstructured-inference
 realtime==2.0.2
@@ -1021,14 +1079,20 @@ s3transfer==0.10.2
 safetensors==0.4.4
     # via timm
     # via transformers
+scikit-learn==1.5.2
+    # via quivr-diff-assistant
 scipy==1.14.1
     # via layoutparser
+    # via python-doctr
+    # via scikit-learn
 sentencepiece==0.2.0
     # via transformers
 sentry-sdk==2.13.0
     # via quivr-api
 setuptools==70.0.0
     # via opentelemetry-instrumentation
+shapely==2.0.6
+    # via python-doctr
 simple-websocket==1.0.0
     # via python-engineio
 six==1.16.0
@@ -1091,6 +1155,8 @@ tenacity==8.5.0
     # via llama-index-legacy
 termcolor==2.4.0
     # via fire
+threadpoolctl==3.5.0
+    # via scikit-learn
 tiktoken==0.7.0
     # via langchain-openai
     # via litellm
@@ -1141,6 +1207,7 @@ tqdm==4.66.5
     # via llama-index-core
     # via nltk
     # via openai
+    # via python-doctr
     # via transformers
     # via unstructured
 traitlets==5.14.3
@@ -1180,6 +1247,7 @@ typing-extensions==4.12.2
     # via pydantic-core
     # via pyee
     # via python-docx
+    # via python-oxmsg
     # via python-pptx
     # via realtime
     # via resend
@@ -1199,9 +1267,10 @@ tzdata==2024.1
     # via pandas
 unidecode==1.3.8
     # via quivr-api
-unstructured==0.15.7
+unstructured==0.15.13
     # via megaparse
     # via quivr-core
+    # via quivr-diff-assistant
 unstructured-client==0.6.0
     # via unstructured
 unstructured-inference==0.7.36

@@ -2,7 +2,7 @@ import io
 from typing import Annotated, List
 from uuid import uuid4
 
-from fastapi import APIRouter, Depends, HTTPException, Request, UploadFile
+from fastapi import APIRouter, Depends, File, HTTPException, Request, UploadFile
 
 from quivr_api.celery_config import celery
 from quivr_api.logger import get_logger
@@ -16,6 +16,7 @@ from quivr_api.modules.assistant.dto.outputs import AssistantOutput
 from quivr_api.modules.assistant.entity.assistant_entity import (
     AssistantSettings,
 )
+from quivr_api.modules.assistant.entity.task_entity import TaskMetadata
 from quivr_api.modules.assistant.services.tasks_service import TasksService
 from quivr_api.modules.dependencies import get_service
 from quivr_api.modules.upload.service.upload_file import (
@@ -64,12 +65,15 @@ async def create_task(
     current_user: UserIdentityDep,
     tasks_service: TasksServiceDep,
     request: Request,
-    input: InputAssistant,
+    input: str = File(...),
     files: List[UploadFile] = None,
 ):
+    input = InputAssistant.model_validate_json(input)
+
     assistant = next(
         (assistant for assistant in assistants if assistant.id == input.id), None
     )
+
     if assistant is None:
         raise HTTPException(status_code=404, detail="Assistant not found")
 
@@ -80,7 +84,7 @@ async def create_task(
             raise HTTPException(status_code=400, detail=error)
     else:
         print("Assistant input is valid.")
-    notification_uuid = uuid4()
+    notification_uuid = f"{assistant.name}-{str(uuid4())[:8]}"
 
     # Process files dynamically
     for upload_file in files:
@@ -96,8 +100,14 @@ async def create_task(
 
     task = CreateTask(
         assistant_id=input.id,
-        pretty_id=str(notification_uuid),
+        assistant_name=assistant.name,
+        pretty_id=notification_uuid,
         settings=input.model_dump(mode="json"),
+        task_metadata=TaskMetadata(
+            input_files=[file.filename for file in files]
+        ).model_dump(mode="json")
+        if files
+        else None,  # type: ignore
     )
 
     task_created = await tasks_service.create_task(task, current_user.id)

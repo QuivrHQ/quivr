@@ -2,6 +2,7 @@ import asyncio
 import os
 from uuid import UUID
 
+import torch
 from celery.schedules import crontab
 from celery.signals import worker_process_init
 from dotenv import load_dotenv
@@ -32,8 +33,8 @@ from sqlalchemy.ext.asyncio import AsyncEngine, create_async_engine
 from sqlmodel import Session, text
 from sqlmodel.ext.asyncio.session import AsyncSession
 
-from quivr_worker.celery_monitor import is_being_executed
 from quivr_worker.assistants.assistants import process_assistant
+from quivr_worker.celery_monitor import is_being_executed
 from quivr_worker.check_premium import check_is_premium
 from quivr_worker.process.process_s3_file import process_uploaded_file
 from quivr_worker.process.process_url import process_url_func
@@ -45,6 +46,9 @@ from quivr_worker.syncs.process_active_syncs import (
 )
 from quivr_worker.syncs.store_notion import fetch_and_store_notion_files_async
 from quivr_worker.utils.utils import _patch_json
+
+torch.set_num_threads(1)
+
 
 load_dotenv()
 
@@ -130,6 +134,8 @@ async def aprocess_assistant_task(
     task_id: int,
     user_id: str,
 ):
+    global async_engine
+    assert async_engine
     async with AsyncSession(async_engine) as async_session:
         try:
             await async_session.execute(

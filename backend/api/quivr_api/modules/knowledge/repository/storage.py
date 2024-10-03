@@ -86,4 +86,3 @@ class SupabaseS3Storage(StorageInterface):
         except Exception as e:
             logger.error(e)
             raise e
-
