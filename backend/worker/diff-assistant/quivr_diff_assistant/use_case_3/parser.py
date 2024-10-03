@@ -120,6 +120,7 @@ class DeadlyParser:
 
             logger.info("Starting OCR")
             raw_results: doctrDocument = self.predictor(docs)
+            logger.debug(raw_results)
             logger.info("OCR completed")
 
             if llm:
