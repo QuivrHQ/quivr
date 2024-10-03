@@ -41,9 +41,8 @@ class ParseableLogHandler(logging.Handler):
         }
 
     def emit(self, record: logging.LogRecord):
-        # NOTE (@AmineDiro): This ping-pong of serialization/deserialization is a limitation of logging formatter
+        # FIXME (@AmineDiro): This ping-pong of serialization/deserialization is a limitation of logging formatter
         # The formatter should return a 'str' for the logger to print
-        # We
         fmt = orjson.loads(self.format(record))
         log_queue.put(fmt)
 
@@ -96,50 +95,66 @@ def extract_from_record(_, __, event_dict):
     return event_dict
 
 
-# Shared handlers
-shared_processors = [
-    structlog.stdlib.add_log_level,
-    structlog.stdlib.PositionalArgumentsFormatter(),
-    structlog.processors.TimeStamper(fmt="iso"),
-    structlog.processors.StackInfoRenderer(),
-    structlog.processors.UnicodeDecoder(),
-    structlog.processors.EventRenamer("msg"),
-]
-structlog.configure(
-    processors=shared_processors
-    + [
-        structlog.stdlib.ProcessorFormatter.wrap_for_formatter,
-    ],
-    logger_factory=structlog.stdlib.LoggerFactory(),  # Use standard logging compatible logger
-    wrapper_class=structlog.stdlib.BoundLogger,  # Use BoundLogger for compatibility
-    # Use Python's logging configuration
-    cache_logger_on_first_use=True,
-)
+def drop_bind_context(_, __, event_dict):
+    """
+    Extract thread and process names and add them to the event dict.
+    """
+    keys = ["msg", "logger", "level", "timestamp", "exc_info"]
+    return {k: event_dict.get(k, None) for k in keys}
 
 
-def get_logger(
-    logger_name,
-    log_file="application.log",
-):
+def setup_logger(log_file="application.log", parseable_logs: bool = False):
+    # Shared handlers
+    shared_processors = [
+        structlog.contextvars.merge_contextvars,
+        structlog.stdlib.add_log_level,
+        structlog.stdlib.add_logger_name,
+        structlog.stdlib.PositionalArgumentsFormatter(),
+        structlog.processors.TimeStamper(fmt="iso"),
+        structlog.processors.StackInfoRenderer(),
+        structlog.processors.UnicodeDecoder(),
+        structlog.processors.EventRenamer("msg"),
+    ]
+    structlog.configure(
+        processors=shared_processors
+        + [
+            structlog.stdlib.ProcessorFormatter.wrap_for_formatter,
+        ],
+        # Use standard logging compatible logger
+        logger_factory=structlog.stdlib.LoggerFactory(),
+        wrapper_class=structlog.stdlib.BoundLogger,
+        # Use Python's logging configuration
+        cache_logger_on_first_use=True,
+    )
     # Set Formatters
     plain_fmt = structlog.stdlib.ProcessorFormatter(
         foreign_pre_chain=shared_processors,
         processors=[
             extract_from_record,
+            structlog.processors.format_exc_info,
             structlog.stdlib.ProcessorFormatter.remove_processors_meta,
-            structlog.dev.ConsoleRenderer(colors=False),
+            structlog.dev.ConsoleRenderer(
+                colors=False, exception_formatter=structlog.dev.plain_traceback
+            ),
         ],
     )
     color_fmt = structlog.stdlib.ProcessorFormatter(
-        foreign_pre_chain=shared_processors,
         processors=[
-            structlog.stdlib.ProcessorFormatter.remove_processors_meta,
-            structlog.dev.ConsoleRenderer(colors=True),
+            # structlog.stdlib.ProcessorFormatter.remove_processors_meta,
+            drop_bind_context,
+            structlog.dev.ConsoleRenderer(
+                colors=True,
+                exception_formatter=structlog.dev.RichTracebackFormatter(
+                    show_locals=False
+                ),
+            ),
         ],
+        foreign_pre_chain=shared_processors,
     )
     parseable_fmt = structlog.stdlib.ProcessorFormatter(
         processors=[
-            structlog.processors.dict_tracebacks,
+            # structlog.processors.dict_tracebacks,
+            structlog.processors.format_exc_info,
             structlog.stdlib.ProcessorFormatter.remove_processors_meta,
             structlog.processors.JSONRenderer(),
         ],
@@ -147,7 +162,6 @@ def get_logger(
         + [
             structlog.processors.CallsiteParameterAdder(
                 {
-                    structlog.processors.CallsiteParameter.FILENAME,
                     structlog.processors.CallsiteParameter.FUNC_NAME,
                     structlog.processors.CallsiteParameter.LINENO,
                 }
@@ -164,7 +178,8 @@ def get_logger(
     file_handler.setFormatter(plain_fmt)
     handlers: list[logging.Handler] = [console_handler, file_handler]
     if (
-        parseable_settings.parseable_url is not None
+        parseable_logs
+        and parseable_settings.parseable_url is not None
         and parseable_settings.parseable_auth is not None
     ):
         parseable_handler = ParseableLogHandler(
@@ -176,10 +191,29 @@ def get_logger(
 
     # Configure logger
     log_level = os.getenv("LOG_LEVEL", "INFO").upper()
-    logger = logging.getLogger(logger_name)
-    logger.setLevel(log_level)
-    logger.handlers = []
+    root_logger = logging.getLogger()
+    root_logger.setLevel(log_level)
+    root_logger.handlers = []
     for handler in handlers:
-        logger.addHandler(handler)
+        root_logger.addHandler(handler)
 
-    return logger
+    _clear_uvicorn_logger()
+
+
+def _clear_uvicorn_logger():
+    for _log in ["uvicorn", "uvicorn.error"]:
+        # Clear the log handlers for uvicorn loggers, and enable propagation
+        # so the messages are caught by our root logger and formatted correctly
+        # by structlog
+        logging.getLogger(_log).handlers.clear()
+        logging.getLogger(_log).propagate = True
+    logging.getLogger("uvicorn.access").handlers.clear()
+    logging.getLogger("uvicorn.access").propagate = False
+
+
+def get_logger(_name: str | None = None):
+    assert structlog.is_configured()
+    return structlog.get_logger()
+
+
+setup_logger()

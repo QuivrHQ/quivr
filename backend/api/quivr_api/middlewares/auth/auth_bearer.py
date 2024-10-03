@@ -66,5 +66,13 @@ class AuthBearer(HTTPBearer):
 auth_bearer = AuthBearer()
 
 
-def get_current_user(user: UserIdentity = Depends(auth_bearer)) -> UserIdentity:
+async def get_current_user(user: UserIdentity = Depends(auth_bearer)) -> UserIdentity:
+    import structlog
+
+    # structlog.contextvars.bind_contextvars(client_id=user.id)
+    structlog.contextvars.bind_contextvars(client_id=user.id)
+    vars = structlog.contextvars.get_contextvars()
+    from pprint import pprint
+
+    pprint(vars)
     return user

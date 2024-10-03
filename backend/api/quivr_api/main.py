@@ -4,14 +4,15 @@ import os
 import litellm
 import sentry_sdk
 from dotenv import load_dotenv  # type: ignore
-from fastapi import FastAPI, HTTPException, Request
-from fastapi.responses import HTMLResponse, JSONResponse
+from fastapi import FastAPI, Request
+from fastapi.responses import HTMLResponse
 from pyinstrument import Profiler
 from sentry_sdk.integrations.fastapi import FastApiIntegration
 from sentry_sdk.integrations.starlette import StarletteIntegration
 
 from quivr_api.logger import get_logger, stop_log_queue
 from quivr_api.middlewares.cors import add_cors_middleware
+from quivr_api.middlewares.logging_middleware import LoggingMiddleware
 from quivr_api.modules.analytics.controller.analytics_routes import analytics_router
 from quivr_api.modules.api_key.controller import api_key_router
 from quivr_api.modules.assistant.controller import assistant_router
@@ -72,6 +73,9 @@ if sentry_dsn:
 app = FastAPI()
 add_cors_middleware(app)
 
+app.add_middleware(LoggingMiddleware)
+
+
 app.include_router(brain_router)
 app.include_router(chat_router)
 app.include_router(crawl_router)
@@ -106,12 +110,12 @@ if PROFILING:
             return await call_next(request)
 
 
-@app.exception_handler(HTTPException)
-async def http_exception_handler(_, exc):
-    return JSONResponse(
-        status_code=exc.status_code,
-        content={"detail": exc.detail},
-    )
+# @app.exception_handler(HTTPException)
+# async def http_exception_handler(_, exc):
+#     return JSONResponse(
+#         status_code=exc.status_code,
+#         content={"detail": exc.detail},
+#     )
 
 
 @app.on_event("shutdown")
