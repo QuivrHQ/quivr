@@ -1,7 +1,5 @@
 "use client";
 
-import { useEffect } from "react";
-
 import { KMSElement } from "@/lib/api/sync/types";
 import { Icon } from "@/lib/components/ui/Icon/Icon";
 import { transformConnectionLabel } from "@/lib/helpers/providers";
@@ -100,10 +98,6 @@ const FolderExplorerHeader = (): JSX.Element => {
   const loadQuivrRoot = () => {
     setCurrentFolder(undefined);
   };
-
-  useEffect(() => {
-    console.info(currentFolder);
-  }, [currentFolder]);
 
   return (
     <div className={styles.header_wrapper}>
