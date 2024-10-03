@@ -16,13 +16,13 @@ from quivr_api.modules.assistant.dto.outputs import AssistantOutput
 from quivr_api.modules.assistant.entity.assistant_entity import (
     AssistantSettings,
 )
+from quivr_api.modules.assistant.entity.task_entity import TaskMetadata
 from quivr_api.modules.assistant.services.tasks_service import TasksService
 from quivr_api.modules.dependencies import get_service
 from quivr_api.modules.upload.service.upload_file import (
     upload_file_storage,
 )
 from quivr_api.modules.user.entity.user_identity import UserIdentity
-from quivr_api.modules.assistant.entity.task_entity import TaskMetadata
 
 logger = get_logger(__name__)
 
@@ -103,7 +103,11 @@ async def create_task(
         assistant_name=assistant.name,
         pretty_id=notification_uuid,
         settings=input.model_dump(mode="json"),
-        task_metadata=TaskMetadata(input_files=[file.filename for file in files]).model_dump(mode="json") if files else None, # type: ignore
+        task_metadata=TaskMetadata(
+            input_files=[file.filename for file in files]
+        ).model_dump(mode="json")
+        if files
+        else None,  # type: ignore
     )
 
     task_created = await tasks_service.create_task(task, current_user.id)

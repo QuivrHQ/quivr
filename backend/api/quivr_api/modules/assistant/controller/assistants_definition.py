@@ -1,12 +1,12 @@
 from quivr_api.modules.assistant.dto.inputs import InputAssistant
 from quivr_api.modules.assistant.dto.outputs import (
     AssistantOutput,
+    ConditionalInput,
     InputBoolean,
     InputFile,
     Inputs,
     InputSelectText,
     Pricing,
-    ConditionalInput,
 )
 
 

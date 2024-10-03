@@ -60,16 +60,21 @@ class InputSelectNumber(BaseModel):
     options: List[int]
     default: Optional[int] = None
 
+
 class ConditionalInput(BaseModel):
-    '''
+    """
     Conditional input is a list of inputs that are conditional to the value of another input.
     key: The key of the input that is conditional.
     conditional_key: The key that determines if the input is shown.
-    '''
+    """
+
     key: str
     conditional_key: str
-    condition: Optional[str] = None # e.g. "equals", "contains", "starts_with", "ends_with", "regex", "in", "not_in", "is_empty", "is_not_empty"
+    condition: Optional[str] = (
+        None  # e.g. "equals", "contains", "starts_with", "ends_with", "regex", "in", "not_in", "is_empty", "is_not_empty"
+    )
     value: Optional[str] = None
+
 
 class Inputs(BaseModel):
     files: Optional[List[InputFile]] = None

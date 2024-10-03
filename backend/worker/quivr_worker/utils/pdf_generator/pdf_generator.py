@@ -59,17 +59,17 @@ class PDFGenerator(FPDF):
 
     def chapter_body(self):
         self.set_font("DejaVu", "", 12)
-        content_lines = self.pdf_model.content.split('\n')
+        content_lines = self.pdf_model.content.split("\n")
         for line in content_lines:
-            if line.startswith('# '):
+            if line.startswith("# "):
                 self.ln()  # Add line break before header
                 self.set_font("DejaVu", "B", 16)
                 self.multi_cell(0, 10, line[2:], markdown=False)
-            elif line.startswith('## '):
+            elif line.startswith("## "):
                 self.ln()  # Add line break before header
                 self.set_font("DejaVu", "B", 14)
                 self.multi_cell(0, 10, line[3:], markdown=False)
-            elif line.startswith('### '):
+            elif line.startswith("### "):
                 self.ln()  # Add line break before header
                 self.set_font("DejaVu", "B", 12)
                 self.multi_cell(0, 10, line[4:], markdown=False)

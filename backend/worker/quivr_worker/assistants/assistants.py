@@ -5,9 +5,10 @@ from quivr_api.modules.upload.service.upload_file import (
     upload_file_storage,
 )
 
+from quivr_worker.assistants.cdp_use_case_2 import process_cdp_use_case_2
 from quivr_worker.assistants.cdp_use_case_3 import process_cdp_use_case_3
 from quivr_worker.utils.pdf_generator.pdf_generator import PDFGenerator, PDFModel
-from quivr_worker.assistants.cdp_use_case_2 import process_cdp_use_case_2
+
 
 async def process_assistant(
     assistant_id: str,

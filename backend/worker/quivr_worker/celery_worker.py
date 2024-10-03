@@ -2,6 +2,7 @@ import asyncio
 import os
 from uuid import UUID
 
+import torch
 from celery.schedules import crontab
 from celery.signals import worker_process_init
 from dotenv import load_dotenv
@@ -45,7 +46,6 @@ from quivr_worker.syncs.process_active_syncs import (
 )
 from quivr_worker.syncs.store_notion import fetch_and_store_notion_files_async
 from quivr_worker.utils.utils import _patch_json
-import torch
 
 torch.set_num_threads(1)
 

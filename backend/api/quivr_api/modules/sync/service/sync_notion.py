@@ -1,9 +1,9 @@
+import time
 from datetime import datetime, timezone
 from typing import List, Sequence
 from uuid import UUID
 
 from notion_client import Client
-import time
 
 from quivr_api.logger import get_logger
 from quivr_api.modules.dependencies import BaseService
@@ -165,7 +165,6 @@ async def store_notion_pages(
 def fetch_notion_pages(
     notion_client: Client, start_cursor: str | None = None, iteration: int = 0
 ) -> NotionSearchResult:
-    
     if iteration > 10:
         return NotionSearchResult(results=[], has_more=False, next_cursor=None)
     search_result = notion_client.search(
@@ -177,7 +176,9 @@ def fetch_notion_pages(
     if "code" in search_result and search_result["code"] == "rate_limited":
         # Wait 10 seconds
         time.sleep(10)
-        search_result = fetch_notion_pages(notion_client, start_cursor=start_cursor, iteration=iteration+1)
+        search_result = fetch_notion_pages(
+            notion_client, start_cursor=start_cursor, iteration=iteration + 1
+        )
 
     return NotionSearchResult.model_validate(search_result)
 

@@ -14,12 +14,12 @@ from llama_index.core.query_engine import RetrieverQueryEngine
 from llama_index.core.retrievers import RecursiveRetriever
 from llama_index.core.schema import Document
 from llama_index.llms.openai import OpenAI
+from quivr_api.logger import get_logger
 from quivr_api.modules.assistant.dto.inputs import InputAssistant
 from quivr_api.modules.assistant.services.tasks_service import TasksService
 from quivr_api.modules.dependencies import get_supabase_client
 from quivr_diff_assistant.use_case_3.parser import DeadlyParser
 from quivr_diff_assistant.utils.utils import COMPARISON_PROMPT
-from quivr_api.logger import get_logger
 
 logger = get_logger(__name__)
 
@@ -156,7 +156,7 @@ async def process_cdp_use_case_2(
     logger.info("🔥🔥🔥")
     assert input_assistant.inputs.select_texts is not None
     value_use_case = input_assistant.inputs.select_texts[0].value
-    
+
     ## Get the document type
     logger.info("🔥🔥🔥🔥")
     document_type = None
@@ -177,8 +177,8 @@ async def process_cdp_use_case_2(
         max_tokens=None,
         max_retries=2,
     )
-    
-    before_file_parsed =  await parser.aparse(before_file_path)
+
+    before_file_parsed = await parser.aparse(before_file_path)
     logger.info("Before file parsed 📜")
     after_file_parsed = None
     if document_type == ComparisonTypes.CDC_ETIQUETTE:
@@ -187,7 +187,7 @@ async def process_cdp_use_case_2(
     else:
         logger.info("Parsing after file with classical parse 🔍")
         after_file_parsed = await parser.aparse(after_file_path)
-        
+
     logger.info("Comparing documents ⚖️")
     comparison = llm_comparator(
         document=after_file_parsed.page_content,
@@ -195,11 +195,11 @@ async def process_cdp_use_case_2(
         llm=llm,
         comparison_type=document_type,
     )
-    
+
     logger.info(f"Comparison: {comparison} ✅")
-    return ''.join(comparison)
-        
-    
+    return "".join(comparison)
+
+
 async def test_main():
     cdc_doc = "/Users/jchevall/Coding/diff-assistant/data/Use case #2/Cas2-2-1_Mendiant Lait_QD PC F03 - FR Cahier des charges produit -rev 2021-v2.pdf"
     doc = "/Users/jchevall/Coding/diff-assistant/data/Use case #2/Cas2-2-1_Proposition étiquette Mendiant Lait croustillant.pdf"

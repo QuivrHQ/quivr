@@ -25,7 +25,7 @@ class TasksRepository(BaseRepository):
                 pretty_id=task.pretty_id,
                 user_id=user_id,
                 settings=task.settings,
-                task_metadata=task.task_metadata, # type: ignore
+                task_metadata=task.task_metadata,  # type: ignore
             )
             self.session.add(task_to_create)
             await self.session.commit()

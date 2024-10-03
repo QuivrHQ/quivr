@@ -36,4 +36,3 @@ class Task(SQLModel, table=True):
     settings: Dict = Field(default_factory=dict, sa_column=Column(JSON))
     answer: str | None = Field(default=None)
     task_metadata: Dict | None = Field(default_factory=dict, sa_column=Column(JSON))
-
