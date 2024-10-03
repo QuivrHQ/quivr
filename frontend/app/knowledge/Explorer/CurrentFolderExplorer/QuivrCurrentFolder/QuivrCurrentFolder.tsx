@@ -17,7 +17,7 @@ const QuivrCurrentFolder = (): JSX.Element => {
   const [loading, setLoading] = useState(false);
   const [addFolderModalOpened, setAddFolderModalOpened] = useState(false);
   const [quivrElements, setQuivrElements] = useState<KMSElement[]>();
-  const { currentFolder } = useKnowledgeContext();
+  const { currentFolder, exploringQuivr } = useKnowledgeContext();
   const { getFiles } = useKnowledgeApi();
 
   const fetchQuivrFiles = async (folderId: UUID | null) => {
@@ -33,7 +33,9 @@ const QuivrCurrentFolder = (): JSX.Element => {
   };
 
   useEffect(() => {
-    void fetchQuivrFiles(currentFolder?.id ?? null);
+    if (exploringQuivr) {
+      void fetchQuivrFiles(currentFolder?.id ?? null);
+    }
   }, [currentFolder]);
 
   useEffect(() => {
