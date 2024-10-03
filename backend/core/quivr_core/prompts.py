@@ -89,7 +89,7 @@ def _define_custom_prompts() -> CustomPromptsDict:
     # Prompt for formatting documents
     # ---------------------------------------------------------------------------
     DEFAULT_DOCUMENT_PROMPT = PromptTemplate.from_template(
-        template="Source: {index} \n {page_content}"
+        template="Filename: {original_file_name}\nSource: {index} \n {page_content}"
     )
     custom_prompts["DEFAULT_DOCUMENT_PROMPT"] = DEFAULT_DOCUMENT_PROMPT
 
