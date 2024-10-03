@@ -7,11 +7,13 @@ from sqlmodel import SQLModel
 from langgraph.graph import START, END
 from langchain_core.tools import BaseTool
 from megaparse.config import MegaparseConfig
+from rapidfuzz import process, fuzz
+
 
 from quivr_core.base_config import QuivrBaseConfig
 from quivr_core.processor.splitter import SplitterConfig
 from quivr_core.prompts import CustomPromptsModel
-from quivr_core.llm_tools.llm_tools import LLMToolFactory
+from quivr_core.llm_tools.llm_tools import LLMToolFactory, TOOLS_CATEGORIES, TOOLS_LISTS
 
 
 def normalize_to_env_variable_name(name: str) -> str:
@@ -289,27 +291,6 @@ class RerankerConfig(QuivrBaseConfig):
                 )
 
 
-class WebSearchConfig(QuivrBaseConfig):
-    supplier: DefaultWebSearchTool | None = None
-    api_key: str | None = None
-
-    def __init__(self, **data):
-        super().__init__(**data)  # Call Pydantic's BaseModel init
-        self.validate_model()  # Automatically call external validation
-
-    def validate_model(self):
-        # Check if the corresponding API key environment variable is set
-        if self.supplier:
-            api_key_var = f"{normalize_to_env_variable_name(self.supplier)}_API_KEY"
-            self.api_key = os.getenv(api_key_var)
-
-            if self.api_key is None:
-                raise ValueError(
-                    f"The API key for supplier '{self.supplier.value}' is not set. "
-                    f"Please set the environment variable: {api_key_var}"
-                )
-
-
 class ConditionalEdgeConfig(QuivrBaseConfig):
     routing_function: str
     conditions: Union[list, Dict[Hashable, str]]
@@ -375,10 +356,12 @@ class NodeConfig(QuivrBaseConfig):
 class WorkflowConfig(QuivrBaseConfig):
     name: str | None = None
     nodes: List[NodeConfig] = []
+    available_tools: List[str] | None = None
 
     def __init__(self, **data):
         super().__init__(**data)
         self.check_first_node_is_start()
+        self.validate_available_tools()
 
     def check_first_node_is_start(self):
         if self.nodes and self.nodes[0].name != START:
@@ -391,11 +374,27 @@ class WorkflowConfig(QuivrBaseConfig):
                 return node.instantiated_tools
         return []
 
+    def validate_available_tools(self):
+        if self.available_tools:
+            valid_tools = list(TOOLS_CATEGORIES.keys()) + list(TOOLS_LISTS.keys())
+            for tool in self.available_tools:
+                if tool.lower() not in valid_tools:
+                    matches = process.extractOne(
+                        tool.lower(), valid_tools, scorer=fuzz.WRatio
+                    )
+                    if matches:
+                        raise ValueError(
+                            f"Tool {tool} is not a valid ToolsCategory or ToolsList. Did you mean {matches[0]}?"
+                        )
+                    else:
+                        raise ValueError(
+                            f"Tool {tool} is not a valid ToolsCategory or ToolsList"
+                        )
+
 
 class RetrievalConfig(QuivrBaseConfig):
     reranker_config: RerankerConfig = RerankerConfig()
     llm_config: LLMEndpointConfig = LLMEndpointConfig()
-    web_search_config: WebSearchConfig = WebSearchConfig()
     max_history: int = 10
     max_files: int = 20
     k: int = 40  # Number of chunks returned by the retriever

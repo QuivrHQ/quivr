@@ -13,7 +13,7 @@ class WebSearchToolsList(str, Enum):
 
 
 WebSearchTools = ToolsCategory(
-    name="WebSearch",
+    name="Web Search",
     description="Tools for web searching",
     tools=[WebSearchToolsList.TAVILY],
     default_tool=WebSearchToolsList.TAVILY,
