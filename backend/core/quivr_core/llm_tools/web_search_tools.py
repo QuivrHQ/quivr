@@ -1,7 +1,11 @@
 from enum import Enum
+from typing import Dict, Any
+from langchain_core.tools import BaseTool
 from langchain_community.tools import TavilySearchResults
 from langchain_community.utilities.tavily_search import TavilySearchAPIWrapper
 from quivr_core.llm_tools.entity import ToolsCategory
+import os
+from pydantic.v1 import SecretStr as SecretStrV1  # Ensure correct import
 
 
 class WebSearchToolsList(str, Enum):
@@ -16,14 +20,17 @@ WebSearchTools = ToolsCategory(
 )
 
 
-def create_web_search_tool(tool_name: str, config: dict):
+def create_web_search_tool(tool_name: str, config: Dict[str, Any]) -> BaseTool:
     if tool_name == WebSearchToolsList.TAVILY:
-        required_keys = ["api_key"]
-        for key in required_keys:
-            if key not in config:
-                raise ValueError(f"Missing required config key: {key}")
+        api_key = config.get("api_key") or os.getenv("TAVILY_API_KEY")
+        if not api_key:
+            raise ValueError(
+                f"Missing required config key 'api_key' or environment variable "
+                f"'TAVILY_API_KEY' for the tool {tool_name}"
+            )
+
         tavily_api_wrapper = TavilySearchAPIWrapper(
-            tavily_api_key=config["api_key"],
+            tavily_api_key=SecretStrV1(api_key),  # Use the correct SecretStr
         )
         return TavilySearchResults(
             api_wrapper=tavily_api_wrapper,
