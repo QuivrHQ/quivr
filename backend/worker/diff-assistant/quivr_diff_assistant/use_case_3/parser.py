@@ -110,7 +110,7 @@ class DeadlyParser:
             logger.info("Starting document processing")
 
             # Reduce image scale to lower memory usage
-            docs = DocumentFile.from_pdf(file, scale=int(300 / 72))
+            docs = DocumentFile.from_pdf(file, scale=int(500 / 72))
             logger.info("Document loaded")
 
             if partition:
@@ -140,7 +140,7 @@ class DeadlyParser:
                                 content=[
                                     {
                                         "type": "text",
-                                        "text": f"Can you correct this entire text retranscription, respond only with the corrected transcription: {raw_result.render()},\n\n do not transcribe logos or images.",
+                                        "text": f"You are given a good image, with a text that can be read. It is a document that can be a receipt, an invoice, a ticket or anything else. Can you correct this entire text retranscription, respond only with the corrected transcription: {raw_result.render()},\n\n do not transcribe logos or images.",
                                     },
                                     {
                                         "type": "image_url",
