@@ -4,13 +4,9 @@ from quivr_api.modules.dependencies import get_async_session
 from sqlmodel import text
 from sqlmodel.ext.asyncio.session import AsyncSession
 
-logger = get_logger()
+logger = get_logger(__name__)
+
 misc_router = APIRouter()
-
-
-@misc_router.get("/excp")
-async def excp():
-    raise ValueError
 
 
 @misc_router.get("/")
@@ -18,7 +14,6 @@ async def root():
     """
     Root endpoint to check the status of the API.
     """
-    logger.info("this is a test", a=10)
     return {"status": "OK"}
 
 
