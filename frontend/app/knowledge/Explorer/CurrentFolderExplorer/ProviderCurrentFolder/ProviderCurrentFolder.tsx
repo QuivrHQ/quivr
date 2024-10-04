@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 
 import { useKnowledgeContext } from "@/app/knowledge/KnowledgeProvider/hooks/useKnowledgeContext";
-import { KMSElement } from "@/lib/api/sync/types";
+import { KMSElement, Sync } from "@/lib/api/sync/types";
 import { useSync } from "@/lib/api/sync/useSync";
 import { LoaderIcon } from "@/lib/components/ui/LoaderIcon/LoaderIcon";
 
@@ -19,12 +19,13 @@ const ProviderCurrentFolder = (): JSX.Element => {
     useKnowledgeContext();
   const { getSyncFiles } = useSync();
 
-  const fetchCurrentFolderElements = () => {
+  const fetchCurrentFolderElements = (sync: Sync) => {
+    console.info(sync);
     setLoading(true);
     void (async () => {
       try {
         const res = await getSyncFiles(
-          exploredProvider?.syncs[0].id ?? 0,
+          sync.id,
           currentFolder?.sync_file_id ?? undefined
         );
         setproviderRootElements(res);
@@ -36,10 +37,14 @@ const ProviderCurrentFolder = (): JSX.Element => {
   };
 
   useEffect(() => {
-    if (exploredProvider && exploredProvider.syncs.length === 1) {
-      void fetchCurrentFolderElements();
+    if (exploredProvider) {
+      if (exploredProvider.syncs.length === 1) {
+        void fetchCurrentFolderElements(exploredProvider.syncs[0]);
+      } else if (exploredSpecificAccount) {
+        void fetchCurrentFolderElements(exploredSpecificAccount);
+      }
     }
-  }, [currentFolder, exploredProvider]);
+  }, [currentFolder, exploredProvider, exploredSpecificAccount]);
 
   return (
     <div className={styles.main_container}>
