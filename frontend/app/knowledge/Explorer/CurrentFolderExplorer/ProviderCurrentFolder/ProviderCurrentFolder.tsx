@@ -20,7 +20,6 @@ const ProviderCurrentFolder = (): JSX.Element => {
   const { getSyncFiles } = useSync();
 
   const fetchCurrentFolderElements = (sync: Sync) => {
-    console.info(sync);
     setLoading(true);
     void (async () => {
       try {
