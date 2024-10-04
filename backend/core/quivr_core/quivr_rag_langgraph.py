@@ -239,6 +239,8 @@ class QuivrQARAGLangGraph:
             user_input=state["messages"][0].content,
         )
 
+        response: SplittedInput
+
         try:
             structured_llm = self.llm_endpoint._llm.with_structured_output(
                 SplittedInput, method="json_schema"
@@ -279,6 +281,8 @@ class QuivrQARAGLangGraph:
         }
 
         msg = custom_prompts.SPLIT_PROMPT.format(**input)
+
+        response: SplittedInput
 
         try:
             structured_llm = self.llm_endpoint._llm.with_structured_output(
