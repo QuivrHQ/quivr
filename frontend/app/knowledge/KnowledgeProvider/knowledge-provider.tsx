@@ -1,6 +1,6 @@
 import { createContext, useState } from "react";
 
-import { KMSElement, SyncsByProvider } from "@/lib/api/sync/types";
+import { KMSElement, Sync, SyncsByProvider } from "@/lib/api/sync/types";
 
 type KnowledgeContextType = {
   currentFolder: KMSElement | undefined;
@@ -12,6 +12,10 @@ type KnowledgeContextType = {
   exploredProvider: SyncsByProvider | undefined;
   setExploredProvider: React.Dispatch<
     React.SetStateAction<SyncsByProvider | undefined>
+  >;
+  exploredSpecificAccount: Sync | undefined;
+  setExploredSpecificAccount: React.Dispatch<
+    React.SetStateAction<Sync | undefined>
   >;
 };
 
@@ -31,6 +35,9 @@ export const KnowledgeProvider = ({
   const [exploredProvider, setExploredProvider] = useState<
     SyncsByProvider | undefined
   >(undefined);
+  const [exploredSpecificAccount, setExploredSpecificAccount] = useState<
+    Sync | undefined
+  >(undefined);
 
   return (
     <KnowledgeContext.Provider
@@ -41,6 +48,8 @@ export const KnowledgeProvider = ({
         setExploringQuivr,
         exploredProvider,
         setExploredProvider,
+        exploredSpecificAccount,
+        setExploredSpecificAccount,
       }}
     >
       {children}

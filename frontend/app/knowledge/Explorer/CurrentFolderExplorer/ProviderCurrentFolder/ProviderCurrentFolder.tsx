@@ -44,7 +44,9 @@ const ProviderCurrentFolder = (): JSX.Element => {
     <div className={styles.main_container}>
       <FolderExplorerHeader />
       <div className={styles.current_folder_content}>
-        {exploredProvider?.syncs && exploredProvider.syncs.length > 1 ? (
+        {exploredProvider?.syncs &&
+        !currentFolder &&
+        exploredProvider.syncs.length > 1 ? (
           exploredProvider.syncs.map((sync, index) => (
             <div key={index}>
               <ProviderAccount sync={sync} index={index} />
