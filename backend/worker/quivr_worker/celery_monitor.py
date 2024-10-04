@@ -88,30 +88,30 @@ async def handler_loop():
                         f"task {event.task_id} process_file_task . Updating knowledge {event.knowledge_id} status to Error"
                     )
 
-                if event.status == TaskStatus.SUCCESS:
-                    logger.info(
-                        f"task {event.task_id} process_file_task succeeded. Sending notification {event.notification_id}"
-                    )
-                    notification_service.update_notification_by_id(
-                        event.notification_id,
-                        NotificationUpdatableProperties(
-                            status=NotificationsStatusEnum.SUCCESS,
-                            description=(
-                                "Your file has been properly uploaded!"
-                                if event.task_name == TaskIdentifier.PROCESS_FILE_TASK
-                                else "Your URL has been properly crawled!"
-                            ),
+            if event.status == TaskStatus.SUCCESS:
+                logger.info(
+                    f"task {event.task_id} process_file_task succeeded. Sending notification {event.notification_id}"
+                )
+                notification_service.update_notification_by_id(
+                    event.notification_id,
+                    NotificationUpdatableProperties(
+                        status=NotificationsStatusEnum.SUCCESS,
+                        description=(
+                            "Your file has been properly uploaded!"
+                            if event.task_name == TaskIdentifier.PROCESS_FILE_TASK
+                            else "Your URL has been properly crawled!"
                         ),
+                    ),
+                )
+                if event.knowledge_id:
+                    await knowledge_service.update_status_knowledge(
+                        knowledge_id=event.knowledge_id,
+                        status=KnowledgeStatus.UPLOADED,
+                        brain_id=event.brain_id,
                     )
-                    if event.knowledge_id:
-                        await knowledge_service.update_status_knowledge(
-                            knowledge_id=event.knowledge_id,
-                            status=KnowledgeStatus.UPLOADED,
-                            brain_id=event.brain_id,
-                        )
-                    logger.info(
-                        f"task {event.task_id} process_file_task failed. Updating knowledge {event.knowledge_id} to UPLOADED"
-                    )
+                logger.info(
+                    f"task {event.task_id} process_file_task failed. Updating knowledge {event.knowledge_id} to UPLOADED"
+                )
 
         except Exception as e:
             logger.error(f"Excpetion occured handling event {event}: {e}")
