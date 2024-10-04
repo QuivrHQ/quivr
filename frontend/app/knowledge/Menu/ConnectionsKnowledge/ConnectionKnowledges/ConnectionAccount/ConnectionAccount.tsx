@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 
+import { useKnowledgeContext } from "@/app/knowledge/KnowledgeProvider/hooks/useKnowledgeContext";
 import { KMSElement, Sync, SyncsByProvider } from "@/lib/api/sync/types"; // Assurez-vous que KMSElement est bien importé
 import { useSync } from "@/lib/api/sync/useSync";
 import { ConnectionIcon } from "@/lib/components/ui/ConnectionIcon/ConnectionIcon";
@@ -23,10 +24,16 @@ const ConnectionAccount = ({
   singleAccount,
   providerGroup,
 }: ConnectionAccountProps): JSX.Element => {
-  const { getSyncFiles } = useSync();
   const [loading, setLoading] = useState(false);
   const [syncElements, setKMSElements] = useState<KMSElement[]>();
   const [folded, setFolded] = useState(true);
+  const { getSyncFiles } = useSync();
+  const {
+    setExploringQuivr,
+    setCurrentFolder,
+    setExploredProvider,
+    setExploredSpecificAccount,
+  } = useKnowledgeContext();
 
   const getFiles = () => {
     setLoading(true);
@@ -39,6 +46,13 @@ const ConnectionAccount = ({
         console.error("Failed to get sync files:", error);
       }
     })();
+  };
+
+  const chooseAccount = () => {
+    setExploredSpecificAccount(sync);
+    setCurrentFolder(undefined);
+    setExploredProvider(providerGroup);
+    setExploringQuivr(false);
   };
 
   useEffect(() => {
@@ -62,7 +76,7 @@ const ConnectionAccount = ({
             handleHover={true}
             onClick={() => setFolded(!folded)}
           />
-          <div className={styles.hoverable}>
+          <div className={styles.hoverable} onClick={() => chooseAccount()}>
             <ConnectionIcon letter={sync.email[0]} index={index} />
             <span className={styles.name}>{sync.email}</span>
           </div>

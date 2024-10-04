@@ -1,6 +1,6 @@
 "use client";
 
-import { KMSElement } from "@/lib/api/sync/types";
+import { KMSElement, Sync } from "@/lib/api/sync/types";
 import { Icon } from "@/lib/components/ui/Icon/Icon";
 import { transformConnectionLabel } from "@/lib/helpers/providers";
 
@@ -27,6 +27,7 @@ const QuivrHeader = ({ currentFolder, loadRoot }: QuivrHeaderProps) => (
 
 interface ProviderHeaderProps {
   currentFolder: KMSElement | undefined;
+  exploredSpecificAccount: Sync | undefined;
   loadRoot: () => void;
   exploredProvider: { provider: string };
 }
@@ -35,12 +36,31 @@ const ProviderHeader = ({
   currentFolder,
   exploredProvider,
   loadRoot,
+  exploredSpecificAccount,
 }: ProviderHeaderProps) => (
   <div className={`${styles.name} ${currentFolder ? styles.hoverable : ""}`}>
-    <span onClick={() => loadRoot()}>
-      {transformConnectionLabel(exploredProvider.provider)}
-    </span>
-    {currentFolder && <Icon name="chevronRight" size="normal" color="black" />}
+    {!currentFolder ? (
+      <>
+        <span onClick={() => loadRoot()}>
+          {transformConnectionLabel(exploredProvider.provider)}
+        </span>
+        {!!exploredSpecificAccount && (
+          <Icon name="chevronRight" size="normal" color="black" />
+        )}
+        {exploredSpecificAccount && (
+          <span>{exploredSpecificAccount.email}</span>
+        )}
+      </>
+    ) : (
+      <>
+        {exploredSpecificAccount && (
+          <span>{exploredSpecificAccount.email}</span>
+        )}
+        {!currentFolder.parentKMSElement && (
+          <Icon name="chevronRight" size="normal" color="black" />
+        )}
+      </>
+    )}
   </div>
 );
 
@@ -93,6 +113,7 @@ const FolderExplorerHeader = (): JSX.Element => {
     exploringQuivr,
     exploredProvider,
     setExploredSpecificAccount,
+    exploredSpecificAccount,
   } = useKnowledgeContext();
 
   const loadParentFolder = () => {
@@ -118,6 +139,7 @@ const FolderExplorerHeader = (): JSX.Element => {
           currentFolder={currentFolder}
           exploredProvider={exploredProvider}
           loadRoot={loadRoot}
+          exploredSpecificAccount={exploredSpecificAccount}
         />
       ) : (
         currentFolder?.parentKMSElement && (
