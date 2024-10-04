@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-import { KMSElement, Sync } from "@/lib/api/sync/types"; // Assurez-vous que KMSElement est bien importé
+import { KMSElement, Sync, SyncsByProvider } from "@/lib/api/sync/types"; // Assurez-vous que KMSElement est bien importé
 import { useSync } from "@/lib/api/sync/useSync";
 import { ConnectionIcon } from "@/lib/components/ui/ConnectionIcon/ConnectionIcon";
 import { Icon } from "@/lib/components/ui/Icon/Icon";
@@ -14,12 +14,14 @@ interface ConnectionAccountProps {
   sync: Sync;
   index: number;
   singleAccount?: boolean;
+  providerGroup?: SyncsByProvider;
 }
 
 const ConnectionAccount = ({
   sync,
   index,
   singleAccount,
+  providerGroup,
 }: ConnectionAccountProps): JSX.Element => {
   const { getSyncFiles } = useSync();
   const [loading, setLoading] = useState(false);
@@ -81,7 +83,12 @@ const ConnectionAccount = ({
               ?.filter((file) => file.is_folder)
               .map((element, id) => (
                 <div key={id}>
-                  <SyncFolder element={element} />
+                  <SyncFolder
+                    element={{
+                      ...element,
+                      fromProvider: providerGroup,
+                    }}
+                  />
                 </div>
               ))}
           </div>

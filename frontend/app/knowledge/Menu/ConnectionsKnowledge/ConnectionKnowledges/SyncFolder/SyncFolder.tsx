@@ -19,14 +19,19 @@ const SyncFolder = ({ element }: SyncFolderProps): JSX.Element => {
   const [syncElements, setKMSElements] = useState<KMSElement[]>();
   const [selectedFolder, setSelectedFolder] = useState<boolean>(false);
 
-  const { currentFolder, setCurrentFolder, setExploringQuivr } =
-    useKnowledgeContext();
+  const {
+    currentFolder,
+    setCurrentFolder,
+    setExploringQuivr,
+    setExploredProvider,
+  } = useKnowledgeContext();
 
   useEffect(() => {
     setSelectedFolder(currentFolder?.sync_file_id === element.sync_file_id);
     if (currentFolder) {
       if (currentFolder.sync_file_id) {
         setExploringQuivr(false);
+        setExploredProvider(currentFolder.fromProvider);
       }
     }
   }, [currentFolder]);
@@ -95,6 +100,7 @@ const SyncFolder = ({ element }: SyncFolderProps): JSX.Element => {
                     element={{
                       ...folder,
                       parentKMSElement: element,
+                      fromProvider: element.fromProvider,
                     }}
                   />
                 </div>

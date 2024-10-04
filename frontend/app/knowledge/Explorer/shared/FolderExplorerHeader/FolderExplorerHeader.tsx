@@ -10,14 +10,14 @@ import { useKnowledgeContext } from "../../../KnowledgeProvider/hooks/useKnowled
 
 interface QuivrHeaderProps {
   currentFolder: KMSElement | undefined;
-  loadQuivrRoot: () => void;
+  loadRoot: () => void;
 }
 
-const QuivrHeader = ({ currentFolder, loadQuivrRoot }: QuivrHeaderProps) => (
+const QuivrHeader = ({ currentFolder, loadRoot }: QuivrHeaderProps) => (
   <>
     <span
       className={`${styles.name} ${currentFolder ? styles.hoverable : ""}`}
-      onClick={() => void loadQuivrRoot()}
+      onClick={() => void loadRoot()}
     >
       Quivr
     </span>
@@ -27,17 +27,17 @@ const QuivrHeader = ({ currentFolder, loadQuivrRoot }: QuivrHeaderProps) => (
 
 interface ProviderHeaderProps {
   currentFolder: KMSElement | undefined;
-  loadQuivrRoot: () => void;
+  loadRoot: () => void;
   exploredProvider: { provider: string };
 }
 
 const ProviderHeader = ({
   currentFolder,
   exploredProvider,
-  loadQuivrRoot,
+  loadRoot,
 }: ProviderHeaderProps) => (
   <div className={`${styles.name} ${currentFolder ? styles.hoverable : ""}`}>
-    <span onClick={() => loadQuivrRoot()}>
+    <span onClick={() => loadRoot()}>
       {transformConnectionLabel(exploredProvider.provider)}
     </span>
     {currentFolder && <Icon name="chevronRight" size="normal" color="black" />}
@@ -99,22 +99,19 @@ const FolderExplorerHeader = (): JSX.Element => {
     }
   };
 
-  const loadQuivrRoot = () => {
+  const loadRoot = () => {
     setCurrentFolder(undefined);
   };
 
   return (
     <div className={styles.header_wrapper}>
       {exploringQuivr && !currentFolder?.parentKMSElement ? (
-        <QuivrHeader
-          currentFolder={currentFolder}
-          loadQuivrRoot={loadQuivrRoot}
-        />
+        <QuivrHeader currentFolder={currentFolder} loadRoot={loadRoot} />
       ) : exploredProvider && !currentFolder?.parentKMSElement ? (
         <ProviderHeader
           currentFolder={currentFolder}
           exploredProvider={exploredProvider}
-          loadQuivrRoot={loadQuivrRoot}
+          loadRoot={loadRoot}
         />
       ) : (
         currentFolder?.parentKMSElement && (

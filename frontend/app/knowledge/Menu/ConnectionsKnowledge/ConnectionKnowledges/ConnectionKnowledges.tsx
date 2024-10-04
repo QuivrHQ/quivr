@@ -58,6 +58,7 @@ const ConnectionKnowledges = ({
             sync={sync}
             index={index}
             singleAccount={providerGroup.syncs.length === 1}
+            providerGroup={providerGroup}
           />
         ))}
       </div>

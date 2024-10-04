@@ -19,6 +19,7 @@ export interface KMSElement {
   icon?: string;
   sync_id: number | null;
   parentKMSElement?: KMSElement;
+  fromProvider?: SyncsByProvider;
 }
 
 interface Credentials {
