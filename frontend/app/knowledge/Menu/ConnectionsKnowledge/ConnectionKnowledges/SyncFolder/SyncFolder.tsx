@@ -31,7 +31,9 @@ const SyncFolder = ({ element }: SyncFolderProps): JSX.Element => {
     if (currentFolder) {
       if (currentFolder.sync_file_id) {
         setExploringQuivr(false);
-        setExploredProvider(currentFolder.fromProvider);
+        if (currentFolder.fromProvider) {
+          setExploredProvider(currentFolder.fromProvider);
+        }
       }
     }
   }, [currentFolder]);
