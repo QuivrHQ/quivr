@@ -58,9 +58,11 @@ const ProviderHeader = ({
         )}
         {!currentFolder.parentKMSElement && (
           <>
-            <span onClick={() => loadRoot()}>
-              {transformConnectionLabel(exploredProvider?.provider ?? "")}
-            </span>
+            {!exploredSpecificAccount && (
+              <span onClick={() => loadRoot()}>
+                {transformConnectionLabel(exploredProvider?.provider ?? "")}
+              </span>
+            )}
             <Icon name="chevronRight" size="normal" color="black" />
           </>
         )}
@@ -89,11 +91,13 @@ const ParentFolderHeader = ({
 interface CurrentFolderHeaderProps {
   currentFolder: KMSElement | undefined;
   exploringQuivr: boolean;
+  exploredSpecificAccount?: Sync;
 }
 
 const CurrentFolderHeader = ({
   currentFolder,
   exploringQuivr,
+  exploredSpecificAccount,
 }: CurrentFolderHeaderProps) => (
   <div className={styles.current_folder}>
     {currentFolder?.icon && (
@@ -101,7 +105,8 @@ const CurrentFolderHeader = ({
     )}
     <span
       className={`${styles.name} ${
-        currentFolder?.parentKMSElement || (exploringQuivr && currentFolder)
+        currentFolder?.parentKMSElement ||
+        ((exploringQuivr || exploredSpecificAccount) && currentFolder)
           ? styles.selected
           : ""
       }`}
@@ -158,6 +163,7 @@ const FolderExplorerHeader = (): JSX.Element => {
       <CurrentFolderHeader
         currentFolder={currentFolder}
         exploringQuivr={exploringQuivr}
+        exploredSpecificAccount={exploredSpecificAccount}
       />
     </div>
   );
