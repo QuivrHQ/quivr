@@ -18,7 +18,8 @@
   transition: transform 0.2s ease-out, opacity 0.2s ease-out;
 
   &:focus-within,
-  &:hover {
+  &:hover,
+  &.active {
     transform: translateY(0%);
     opacity: 1;
   }
@@ -27,10 +28,21 @@
 .editor_wrapper {
   min-height: 100vh;
 
+  .bubble_menu {
+    background-color: var(--background-3);
+    border: solid 1px var(--border-0);
+    border-radius: Radius.$normal;
+  }
+
   .content_wrapper {
     color: var(--text-3);
     width: 100%;
     position: relative;
+
+    .ai_highlight {
+      background-color: var(--primary-0);
+      color: white;
+    }
 
     .has_focus {
       position: relative;

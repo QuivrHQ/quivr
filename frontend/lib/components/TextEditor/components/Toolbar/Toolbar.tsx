@@ -4,6 +4,7 @@ import { useState } from "react";
 
 import Button from "@/lib/components/ui/Button";
 import { Modal } from "@/lib/components/ui/Modal/Modal";
+import QuivrButton from "@/lib/components/ui/QuivrButton/QuivrButton";
 import { TextInput } from "@/lib/components/ui/TextInput/TextInput";
 
 import styles from "./Toolbar.module.scss";
@@ -22,16 +23,15 @@ export const ToolbarSectionSeparator = (): JSX.Element => {
 
 type ToolbarProps = {
   editor: Editor;
-  searchBarEditor: Editor | null;
+  toggleSearchBar: () => void;
 };
 
 export const Toolbar = ({
   editor,
-  searchBarEditor,
+  toggleSearchBar,
 }: ToolbarProps): JSX.Element => {
   const [linkModalOpen, setLinkModalOpen] = useState(false);
   const [urlInp, setUrlInp] = useState("");
-  const [searchBarEditorOpen, setSearchBarEditorOpen] = useState(false);
 
   const setLink = () => {
     const editorChain = editor.chain().extendMarkRange("link").focus();
@@ -47,16 +47,6 @@ export const Toolbar = ({
     const prevUrl = editor.getAttributes("link").href as string;
     setUrlInp(prevUrl || "");
     setLinkModalOpen(true);
-  };
-
-  const toggleSearchBarEditor = () => {
-    if (searchBarEditorOpen) {
-      setSearchBarEditorOpen(false);
-      editor.commands.focus();
-    } else {
-      setSearchBarEditorOpen(true);
-      searchBarEditor?.commands.focus();
-    }
   };
 
   return (
@@ -187,13 +177,14 @@ export const Toolbar = ({
         }
       />
 
-      <Button
-        className={styles.focusSearchBarBtn}
-        onClick={toggleSearchBarEditor}
-        variant={"primary"}
-      >
-        Ask Brain
-      </Button>
+      <div className={styles.focusSearchBarBtn}>
+        <QuivrButton
+          onClick={toggleSearchBar}
+          label="Ask Brain"
+          color="primary"
+          iconName={"chat"}
+        />
+      </div>
     </div>
   );
 };

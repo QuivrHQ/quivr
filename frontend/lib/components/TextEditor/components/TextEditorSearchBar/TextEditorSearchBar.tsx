@@ -25,7 +25,12 @@ const TextEditorSearchBar = forwardRef<Editor, TextEditorSearchBarProps>(
       if (chatInput.generatingAnswer || messages.length <= 0) {
         return;
       }
-      editor.commands.insertContent(messages[0].assistant);
+      editor
+        .chain()
+        .unsetHighlight()
+        .insertContent(messages[0].assistant)
+        .focus()
+        .run();
     }, [messages.length, router, editor, chatInput.generatingAnswer]);
 
     useEffect(() => {
