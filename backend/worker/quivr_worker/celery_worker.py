@@ -115,7 +115,6 @@ def process_assistant_task(
     logger.info(
         f"process_assistant_task started for assistant_id={assistant_id}, notification_uuid={notification_uuid}, task_id={task_id}"
     )
-    print("process_assistant_task")
 
     loop = asyncio.get_event_loop()
     loop.run_until_complete(

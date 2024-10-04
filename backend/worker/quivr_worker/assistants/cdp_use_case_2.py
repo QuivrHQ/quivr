@@ -131,6 +131,7 @@ async def process_cdp_use_case_2(
     supabase_client = get_supabase_client()
     path = f"{task.assistant_id}/{task.pretty_id}/"
     logger.info(f"Path: {path} 📁")
+    
     await tasks_service.update_task(task_id, {"status": "processing"})
 
     before_file_data = supabase_client.storage.from_("quivr").download(
