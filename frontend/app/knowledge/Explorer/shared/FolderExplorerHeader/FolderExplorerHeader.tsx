@@ -100,7 +100,6 @@ const FolderExplorerHeader = (): JSX.Element => {
   };
 
   const loadQuivrRoot = () => {
-    console.info("hey");
     setCurrentFolder(undefined);
   };
 
