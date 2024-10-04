@@ -18,7 +18,7 @@
     - Asynchronous code
 - Don’t replicate object that are Standalone/Singleton or with heavy dependencies. All python objects are references. Use the references: 🔺🔺🔺
     - **Example**: Recreating a `BrainService`  inside a function is an antipattern. This function should take `service : BrainService` as a parameter ( also easily testable via dependency injection)
-    - **Example**: Recreating a class that connects to a `APIService` is an antipattern. Connection creation is pretty costly process. You should the a **single object** and pass it accross function calls
+    - **Example**: Recreating a class that connects to a `APIService` is an antipattern. Connection creation is pretty costly process. You should the a **single object** and pass it across function calls
 - Error handling:
     - Use specific exception types rather than catching all exceptions. The caller can then `try .. except CustomException`
     - Create custom exception classes for **application-specific errors.**
