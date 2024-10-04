@@ -7,7 +7,7 @@ from uuid import UUID
 from attr import dataclass
 from celery.result import AsyncResult
 from quivr_api.celery_config import celery
-from quivr_api.logger import get_logger
+from quivr_api.logger import get_logger, setup_logger
 from quivr_api.modules.dependencies import async_engine
 from quivr_api.modules.knowledge.repository.knowledges import KnowledgeRepository
 from quivr_api.modules.assistant.repository.tasks import TasksRepository
@@ -21,7 +21,8 @@ from quivr_api.modules.notification.service.notification_service import (
 from quivr_core.models import KnowledgeStatus
 from sqlmodel.ext.asyncio.session import AsyncSession
 
-logger = get_logger("notifier_service", "notifier_service.log")
+setup_logger("notifier.log", send_log_server=False)
+logger = get_logger("notifier_service")
 notification_service = NotificationService()
 queue = Queue()
 

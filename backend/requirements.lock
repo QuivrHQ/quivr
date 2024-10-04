@@ -374,7 +374,6 @@ langchain==0.2.16
     # via quivr-diff-assistant
 langchain-anthropic==0.1.23
     # via quivr-core
-    # via quivr-monorepo
 langchain-cohere==0.2.2
     # via quivr-api
 langchain-community==0.2.12
@@ -645,6 +644,7 @@ openpyxl==3.1.5
     # via unstructured
 orjson==3.10.7
     # via langsmith
+    # via quivr-monorepo
 packaging==24.1
     # via deprecation
     # via faiss-cpu
@@ -849,6 +849,8 @@ python-iso639==2024.4.27
     # via unstructured
 python-jose==3.3.0
     # via quivr-api
+python-json-logger==2.0.7
+    # via quivr-monorepo
 python-magic==0.4.27
     # via quivr-diff-assistant
     # via unstructured
@@ -991,6 +993,8 @@ strenum==0.4.15
     # via postgrest
 striprtf==0.0.26
     # via llama-index-readers-file
+structlog==24.4.0
+    # via quivr-monorepo
 supabase==2.7.2
     # via quivr-api
 supafunc==0.5.1

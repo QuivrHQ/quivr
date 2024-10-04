@@ -80,7 +80,7 @@ paulgraham.py
 .env_test
 supabase/seed-airwallex.sql
 airwallexpayouts.py
-application.log
+**/application.log*
 backend/celerybeat-schedule.db
 
 backend/application.log.*
