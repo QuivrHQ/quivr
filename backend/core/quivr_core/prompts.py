@@ -60,17 +60,23 @@ def _define_custom_prompts() -> CustomPromptsDict:
         "Answer in a concise and clear manner. "
         "Use the following pieces of context from the files provided by the user to answer the question. "
         "If no preferred language is provided, answer in the same language as the language used by the user. "
-        "If you cannot provide an answer using only the context provided by the files, "
-        "just say that you don't know the answer, don't try to make up an answer. "
-        "Do not apologize when providing an answer. "
+        "If you cannot provide an answer using ONLY the context provided, NEVER try to make up an answer, "
+        "just reply that you don't know the answer and THINK if the available tools below can help in "
+        "answering the user question. Do not apologize when providing an answer. "
         "Don't cite the source id in the answer objects, but you can use the source to answer the question.\n"
     )
 
     context_template = (
+        "You have access to the following internal reasoning to provide an answer: {reasoning}\n"
+        "You can activate the following tools: {tools}. If any of these tools can help in providing an answer "
+        "to the user question, you should offer the user the possibility to activate it.\n"
         "You have access to the following files to answer the user question (limited to first 20 files): {files}\n"
         "Context: {context}\n"
         "Follow these user instruction when crafting the answer: {custom_instructions} "
         "These user instructions shall take priority over any other previous instruction.\n"
+        "Remember: if you cannot provide an answer using ONLY the context provided, just reply "
+        "that you don't know the answer and offer the user the possibility to activate a relevant tool among "
+        "the available ones."
     )
 
     template_answer = "User question: {question}\n" "Answer:"
@@ -144,13 +150,16 @@ def _define_custom_prompts() -> CustomPromptsDict:
     # Prompt to create a system prompt from user instructions
     # ---------------------------------------------------------------------------
     system_message_template = (
-        "Given the following user instruction and the current system prompt, "
-        "update the prompt to include the instruction. "
+        "Given the following user instruction, current system prompt, list of available tools "
+        "and list of activated tools, update the prompt to include the instruction and decide which tools to activate or deactivate. "
         "If the system prompt already contains the instruction, do not add it again. "
         "If the system prompt contradicts ther user instruction, remove the contradictory "
         "statement or statements in the system prompt. "
-        "You shall return separately the updated system prompt and the reasoning that led to the update.\n"
+        "You shall return separately the updated system prompt and the reasoning that led to the update. "
+        "You shall also return the list of tools to activate and deactivate and the reasoning that led to this decision. "
         "Current system prompt: {system_prompt}\n"
+        "List of available tools: {available_tools}\n"
+        "List of activated tools: {activated_tools}\n"
     )
 
     template_answer = "User instructions: {instruction}\n"
@@ -168,9 +177,9 @@ def _define_custom_prompts() -> CustomPromptsDict:
     # ---------------------------------------------------------------------------
     system_message_template = (
         "Given a chat history and the latest user input split the input into instructions and tasks.\n"
-        "Instructions direct the system to behave in a certain way: examples of instructions are "
-        "'Can you reply in French?' or 'Answer in French' or 'You are an expert legal assistant' "
-        "or 'You will behave as...'). You shall collect and condense all the instructions into a single string. "
+        "Instructions direct the system to behave in a certain way or to use specific tools: examples of instructions are "
+        "'Can you reply in French?', 'Answer in French', 'You are an expert legal assistant', "
+        "'You will behave as...', 'Use web search'). You shall collect and condense all the instructions into a single string. "
         "The instructions should be standalone, self-contained instructions which can be understood "
         "without the chat history. If no instructions are found, return an empty string. \n"
         "Tasks are often questions, but they can also be summarisation tasks, translation tasks, content generation tasks, etc. "
@@ -204,11 +213,12 @@ def _define_custom_prompts() -> CustomPromptsDict:
         "You shall:\n"
         "1) Consider each task separately,\n"
         "2) Determine whether the context and chat history contain "
-        "all the information necessary to complete the task, "
-        "or if a web search is necessary to gather more information.\n"
+        "all the information necessary to complete the task.\n"
+        "3) If the context and chat history do not contain all the information necessary to complete the task, "
+        "consider the available tools and select the tool most appropriate to complete the task.\n"
     )
 
-    context_template = "Context: {context}\n"
+    context_template = "Context: {context}\n Available tools: {available_tools}\n"
 
     template_answer = "Tasks: {tasks}\n"
 

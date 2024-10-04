@@ -357,6 +357,8 @@ class WorkflowConfig(QuivrBaseConfig):
     name: str | None = None
     nodes: List[NodeConfig] = []
     available_tools: List[str] | None = None
+    validated_tools: List[BaseTool | Type] = []
+    activated_tools: List[BaseTool | Type] = []
 
     def __init__(self, **data):
         super().__init__(**data)
@@ -378,7 +380,11 @@ class WorkflowConfig(QuivrBaseConfig):
         if self.available_tools:
             valid_tools = list(TOOLS_CATEGORIES.keys()) + list(TOOLS_LISTS.keys())
             for tool in self.available_tools:
-                if tool.lower() not in valid_tools:
+                if tool.lower() in valid_tools:
+                    self.validated_tools.append(
+                        LLMToolFactory.create_tool(tool, {}).tool
+                    )
+                else:
                     matches = process.extractOne(
                         tool.lower(), valid_tools, scorer=fuzz.WRatio
                     )

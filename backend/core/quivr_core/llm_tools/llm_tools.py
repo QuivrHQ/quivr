@@ -1,5 +1,6 @@
 from typing import Dict, Any, Type, Union
-from langchain_core.tools import BaseTool
+
+from quivr_core.llm_tools.entity import ToolWrapper
 
 from quivr_core.llm_tools.web_search_tools import (
     WebSearchTools,
@@ -23,7 +24,7 @@ TOOLS_LISTS = {
 
 class LLMToolFactory:
     @staticmethod
-    def create_tool(tool_name: str, config: Dict[str, Any]) -> Union[BaseTool, Type]:
+    def create_tool(tool_name: str, config: Dict[str, Any]) -> Union[ToolWrapper, Type]:
         for category, tools_class in TOOLS_CATEGORIES.items():
             if tool_name in tools_class.tools:
                 return tools_class.create_tool(tool_name, config)

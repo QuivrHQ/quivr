@@ -5,6 +5,7 @@ from langchain_core.messages import AIMessage, BaseMessage, HumanMessage, System
 from langchain_core.messages.ai import AIMessageChunk
 from langchain_core.prompts import format_document
 
+from quivr_core.config import WorkflowConfig
 from quivr_core.models import (
     ChatLLMMetadata,
     ParsedRAGResponse,
@@ -179,3 +180,17 @@ def format_file_list(
 
     files_str = "\n".join(files) if list_files_array else "None"
     return files_str
+
+
+def collect_tools(workflow_config: WorkflowConfig):
+    validated_tools = "Available tools which can be activated:\n"
+    for i, tool in enumerate(workflow_config.validated_tools):
+        validated_tools += f"Tool {i+1} name: {tool.name}\n"
+        validated_tools += f"Tool {i+1} description: {tool.description}\n\n"
+
+    activated_tools = "Activated tools which can be deactivated:\n"
+    for i, tool in enumerate(workflow_config.activated_tools):
+        activated_tools += f"Tool {i+1} name: {tool.name}\n"
+        activated_tools += f"Tool {i+1} description: {tool.description}\n\n"
+
+    return validated_tools, activated_tools

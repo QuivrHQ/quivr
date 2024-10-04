@@ -1,4 +1,5 @@
 import logging
+from operator import add
 from typing import (
     Annotated,
     AsyncGenerator,
@@ -18,7 +19,6 @@ from copy import deepcopy
 from langchain.retrievers import ContextualCompressionRetriever
 from langchain_cohere import CohereRerank
 from langchain_community.document_compressors import JinaRerank
-from langchain_community.tools import TavilySearchResults
 from langchain_core.callbacks import Callbacks
 from langchain_core.documents import BaseDocumentCompressor, Document
 from langchain_core.messages import BaseMessage
@@ -36,12 +36,14 @@ import openai
 from quivr_core.chat import ChatHistory
 from quivr_core.config import DefaultRerankers, RetrievalConfig
 from quivr_core.llm import LLMEndpoint
+from quivr_core.llm_tools.llm_tools import LLMToolFactory
 from quivr_core.models import (
     ParsedRAGChunkResponse,
     QuivrKnowledge,
 )
 from quivr_core.prompts import custom_prompts
 from quivr_core.utils import (
+    collect_tools,
     combine_documents,
     format_file_list,
     get_chunk_metadata,
@@ -76,10 +78,21 @@ class TasksCompletion(BaseModel):
     )
 
 
-class UpdatedPrompt(BaseModel):
-    prompt: str = Field(description="The updated system prompt")
-    reasoning: str = Field(
-        description="The reasoning that led to the updated system prompt"
+class UpdatedPromptAndTools(BaseModel):
+    prompt: Optional[str] = Field(default=None, description="The updated system prompt")
+    prompt_reasoning: Optional[str] = Field(
+        default=None, description="The reasoning that led to the updated system prompt"
+    )
+
+    tools_to_activate: Optional[List[str]] = Field(
+        default=None, description="The list of tools to activate"
+    )
+    tools_to_deactivate: Optional[List[str]] = Field(
+        default=None, description="The list of tools to deactivate"
+    )
+    reasoning_tools: Optional[str] = Field(
+        default=None,
+        description="The reasoning that led to the tools to activate and deactivate",
     )
 
 
@@ -87,6 +100,7 @@ class AgentState(TypedDict):
     # The add_messages function defines how an update should be processed
     # Default is to replace. add_messages says "append"
     messages: Annotated[Sequence[BaseMessage], add_messages]
+    reasoning: Annotated[List[str], add]
     chat_history: ChatHistory
     docs: list[Document]
     files: str
@@ -239,10 +253,14 @@ class QuivrQARAGLangGraph:
 
         send_list: List[Send] = []
 
-        if response.instructions:
-            send_list.append(
-                Send("edit_system_prompt", {"instructions": response.instructions})
-            )
+        instructions = (
+            response.instructions
+            if response.instructions
+            else self.retrieval_config.prompt
+        )
+
+        if instructions:
+            send_list.append(Send("edit_system_prompt", {"instructions": instructions}))
         elif response.tasks:
             chat_history = state["chat_history"]
             send_list.append(
@@ -275,11 +293,16 @@ class QuivrQARAGLangGraph:
             response = structured_llm.invoke(msg)
 
         send_list: List[Send] = []
+        instructions = (
+            response.instructions
+            if response.instructions
+            else self.retrieval_config.prompt
+        )
 
-        if response.instructions:
+        if instructions:
             payload = {
                 **state,
-                "instructions": response.instructions,
+                "instructions": instructions,
                 "tasks": response.tasks if response.tasks else [],
             }
             send_list.append(Send("edit_system_prompt", payload))
@@ -308,29 +331,57 @@ class QuivrQARAGLangGraph:
     #     # as well as the state to send to that node
     #     return [Send("generate_joke", {"subject": s}) for s in state["subjects"]]
 
+    def update_active_tools(self, updated_prompt_and_tools: UpdatedPromptAndTools):
+        if updated_prompt_and_tools.tools_to_activate:
+            for tool in updated_prompt_and_tools.tools_to_activate:
+                for (
+                    validated_tool
+                ) in self.retrieval_config.workflow_config.validated_tools:
+                    if tool == validated_tool.name:
+                        self.retrieval_config.workflow_config.activated_tools.append(
+                            validated_tool
+                        )
+
+        if updated_prompt_and_tools.tools_to_deactivate:
+            for tool in updated_prompt_and_tools.tools_to_deactivate:
+                for (
+                    activated_tool
+                ) in self.retrieval_config.workflow_config.activated_tools:
+                    if tool == activated_tool.name:
+                        self.retrieval_config.workflow_config.activated_tools.remove(
+                            activated_tool
+                        )
+
     def edit_system_prompt(self, state: AgentState) -> AgentState:
         user_instruction = state["instructions"]
         prompt = self.retrieval_config.prompt
-
+        available_tools, activated_tools = collect_tools(
+            self.retrieval_config.workflow_config
+        )
         inputs = {
             "instruction": user_instruction,
             "system_prompt": prompt if prompt else "",
+            "available_tools": available_tools,
+            "activated_tools": activated_tools,
         }
 
         msg = custom_prompts.UPDATE_PROMPT.format(**inputs)
 
+        response: UpdatedPromptAndTools
+
         try:
             structured_llm = self.llm_endpoint._llm.with_structured_output(
-                UpdatedPrompt, method="json_schema"
+                UpdatedPromptAndTools, method="json_schema"
             )
             response = structured_llm.invoke(msg)
 
         except openai.BadRequestError:
             structured_llm = self.llm_endpoint._llm.with_structured_output(
-                UpdatedPrompt
+                UpdatedPromptAndTools
             )
             response = structured_llm.invoke(msg)
 
+        self.update_active_tools(response)
         self.retrieval_config.prompt = response.prompt
 
         # message = f"Updated system prompt: {response.content}"
@@ -339,8 +390,10 @@ class QuivrQARAGLangGraph:
         #     "answer": message,  # Assuming the last message contains the final answer
         # }
         # return {"messages": [message], "final_response": formatted_response}
+        reasoning = [response.prompt_reasoning] if response.prompt_reasoning else []
+        reasoning += [response.reasoning_tools] if response.reasoning_tools else []
 
-        return {**state, "messages": []}
+        return {**state, "messages": [], "reasoning": reasoning}
 
     def filter_history(self, state: AgentState) -> AgentState:
         """
@@ -445,10 +498,15 @@ class QuivrQARAGLangGraph:
 
         docs = state["docs"]
 
+        available_tools, activated_tools = collect_tools(
+            self.retrieval_config.workflow_config
+        )
+
         input = {
             "chat_history": state["chat_history"].to_list(),
             "tasks": state["tasks"],
             "context": docs,
+            "available_tools": available_tools,
         }
 
         input, _ = self.reduce_rag_context(
@@ -459,6 +517,8 @@ class QuivrQARAGLangGraph:
         )
 
         msg = custom_prompts.WEBSEARCH_ROUTING_PROMPT.format(**input)
+
+        response: TasksCompletion
 
         try:
             structured_llm = self.llm_endpoint._llm.with_structured_output(
@@ -486,37 +546,27 @@ class QuivrQARAGLangGraph:
         return send_list
 
     async def tavily_search(self, state: AgentState) -> AgentState:
+        if not self.retrieval_config.workflow_config.activated_tools:
+            return {**state}
+
         tasks = state["tasks"]
 
-        tool = TavilySearchResults(
-            max_results=5,
-            search_depth="advanced",
-            include_answer=True,
-        )
+        tool_name = self.retrieval_config.workflow_config.activated_tools[0].name
+        tool_wrapper = LLMToolFactory.create_tool(tool_name, {})
 
         # Prepare the async tasks for all questions
         async_tasks = []
         for task in tasks:
+            formatted_input = tool_wrapper.format_input(task)
             # Asynchronously invoke the model for each question
-            async_tasks.append(tool.ainvoke({"query": task}))
+            async_tasks.append(tool_wrapper.tool.ainvoke(formatted_input))
 
         # Gather all the responses asynchronously
         responses = await asyncio.gather(*async_tasks) if async_tasks else []
 
         docs = []
         for response in responses:
-            metadata = {"integration": "", "integration_link": ""}
-            _docs = [
-                Document(
-                    page_content=d["content"],
-                    metadata={
-                        **metadata,
-                        "file_name": d["url"],
-                        "original_file_name": d["url"],
-                    },
-                )
-                for d in response
-            ]
+            _docs = tool_wrapper.format_output(response)
             _docs = self.filter_chunks_by_relevance(_docs)
             docs += _docs
 
@@ -732,6 +782,11 @@ class QuivrQARAGLangGraph:
         final_inputs["custom_instructions"] = prompt if prompt else "None"
         final_inputs["files"] = files if files else "None"
         final_inputs["chat_history"] = state["chat_history"].to_list()
+        final_inputs["reasoning"] = state["reasoning"]
+        available_tools, activated_tools = collect_tools(
+            self.retrieval_config.workflow_config
+        )
+        final_inputs["tools"] = available_tools
 
         reduced_inputs, docs = self.reduce_rag_context(
             final_inputs, prompt=custom_prompts.RAG_ANSWER_PROMPT, docs=docs
