@@ -1,3 +1,4 @@
+@use "styles/Radius.module.scss";
 @use "styles/Spacings.module.scss";
 @use "styles/Typography.module.scss";
 
@@ -9,13 +10,27 @@
   .account_line_wrapper {
     display: flex;
     align-items: center;
-    gap: Spacings.$spacing03;
+    gap: Spacings.$spacing02;
     padding-left: Spacings.$spacing03;
     font-size: Typography.$small;
     font-weight: 500;
 
-    .name {
-      @include Typography.EllipsisOverflow;
+    .hoverable {
+      display: flex;
+      align-items: center;
+      gap: Spacings.$spacing03;
+      padding-inline: Spacings.$spacing02;
+      width: 100%;
+
+      .name {
+        @include Typography.EllipsisOverflow;
+      }
+
+      &:hover {
+        background-color: var(--background-3);
+        cursor: pointer;
+        border-radius: Radius.$small;
+      }
     }
   }
 

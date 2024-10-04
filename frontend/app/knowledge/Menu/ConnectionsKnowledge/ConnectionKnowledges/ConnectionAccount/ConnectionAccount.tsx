@@ -62,8 +62,10 @@ const ConnectionAccount = ({
             handleHover={true}
             onClick={() => setFolded(!folded)}
           />
-          <ConnectionIcon letter={sync.email[0]} index={index} />
-          <span className={styles.name}>{sync.email}</span>
+          <div className={styles.hoverable}>
+            <ConnectionIcon letter={sync.email[0]} index={index} />
+            <span className={styles.name}>{sync.email}</span>
+          </div>
         </div>
       )}
       {(!singleAccount && !folded) || singleAccount ? (
