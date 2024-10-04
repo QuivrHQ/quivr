@@ -40,13 +40,8 @@
     position: relative;
 
     .ai_highlight {
-      background-color: blue;
+      background-color: var(--primary-0);
       color: white;
-      padding: 2px 0 3px 0;
-    }
-
-    ::selection {
-      @extend .ai_highlight;
     }
 
     .has_focus {

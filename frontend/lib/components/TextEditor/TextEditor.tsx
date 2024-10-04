@@ -1,7 +1,7 @@
 "use client";
 import { Editor, Extension } from "@tiptap/core";
 import Focus from "@tiptap/extension-focus";
-import Highlight from "@tiptap/extension-highlight";
+import { Highlight } from "@tiptap/extension-highlight";
 import { Link } from "@tiptap/extension-link";
 import { EditorContent, useEditor } from "@tiptap/react";
 import { StarterKit } from "@tiptap/starter-kit";
@@ -82,13 +82,10 @@ export const TextEditor = (): JSX.Element => {
   );
 
   const toggleSearchBar = () => {
-    if (searchBarOpen) {
-      setSearchBarOpen(false);
-      editor?.commands.focus();
-    } else {
-      setSearchBarOpen(true);
-      searchEditorRef.current?.commands.focus();
-    }
+    searchBarOpen
+      ? editor?.commands.focus()
+      : searchEditorRef.current?.commands.focus();
+    setSearchBarOpen(!searchBarOpen);
   };
 
   if (!editor) {
