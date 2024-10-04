@@ -29,7 +29,7 @@ interface ProviderHeaderProps {
   currentFolder: KMSElement | undefined;
   exploredSpecificAccount: Sync | undefined;
   loadRoot: () => void;
-  exploredProvider: { provider: string };
+  exploredProvider: { provider: string } | undefined;
 }
 
 const ProviderHeader = ({
@@ -42,7 +42,7 @@ const ProviderHeader = ({
     {!currentFolder ? (
       <>
         <span onClick={() => loadRoot()}>
-          {transformConnectionLabel(exploredProvider.provider)}
+          {transformConnectionLabel(exploredProvider?.provider ?? "")}
         </span>
         {!!exploredSpecificAccount && (
           <Icon name="chevronRight" size="normal" color="black" />
@@ -134,7 +134,8 @@ const FolderExplorerHeader = (): JSX.Element => {
     <div className={styles.header_wrapper}>
       {exploringQuivr && !currentFolder?.parentKMSElement ? (
         <QuivrHeader currentFolder={currentFolder} loadRoot={loadRoot} />
-      ) : exploredProvider && !currentFolder?.parentKMSElement ? (
+      ) : (exploredProvider || exploredSpecificAccount) &&
+        !currentFolder?.parentKMSElement ? (
         <ProviderHeader
           currentFolder={currentFolder}
           exploredProvider={exploredProvider}
