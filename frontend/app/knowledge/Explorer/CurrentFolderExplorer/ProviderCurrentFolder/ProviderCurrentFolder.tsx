@@ -15,7 +15,8 @@ const ProviderCurrentFolder = (): JSX.Element => {
   const [providerRootElements, setproviderRootElements] =
     useState<KMSElement[]>();
   const [loading, setLoading] = useState(false);
-  const { exploredProvider, currentFolder } = useKnowledgeContext();
+  const { exploredProvider, currentFolder, exploredSpecificAccount } =
+    useKnowledgeContext();
   const { getSyncFiles } = useSync();
 
   const fetchCurrentFolderElements = () => {
@@ -45,7 +46,7 @@ const ProviderCurrentFolder = (): JSX.Element => {
       <FolderExplorerHeader />
       <div className={styles.current_folder_content}>
         {exploredProvider?.syncs &&
-        !currentFolder &&
+        !exploredSpecificAccount &&
         exploredProvider.syncs.length > 1 ? (
           exploredProvider.syncs.map((sync, index) => (
             <div key={index}>
