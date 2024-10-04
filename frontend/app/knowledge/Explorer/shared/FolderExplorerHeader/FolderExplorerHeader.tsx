@@ -57,7 +57,12 @@ const ProviderHeader = ({
           <span>{exploredSpecificAccount.email}</span>
         )}
         {!currentFolder.parentKMSElement && (
-          <Icon name="chevronRight" size="normal" color="black" />
+          <>
+            <span onClick={() => loadRoot()}>
+              {transformConnectionLabel(exploredProvider?.provider ?? "")}
+            </span>
+            <Icon name="chevronRight" size="normal" color="black" />
+          </>
         )}
       </>
     )}
