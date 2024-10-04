@@ -24,6 +24,20 @@
         color: var(--primary-0);
       }
     }
+
+    .hoverable {
+      &:hover {
+        cursor: pointer;
+        color: var(--primary-0);
+      }
+    }
+
+    .selected {
+      background-color: var(--background-6);
+      padding-block: Spacings.$spacing02;
+      padding-inline: Spacings.$spacing03;
+      border-radius: Radius.$normal;
+    }
   }
 
   .parent_folder {

@@ -41,14 +41,19 @@ const ProviderHeader = ({
   <div className={`${styles.name} ${currentFolder ? styles.hoverable : ""}`}>
     {!currentFolder ? (
       <>
-        <span onClick={() => loadRoot()}>
+        <span
+          className={`${!!exploredSpecificAccount && styles.hoverable}`}
+          onClick={() => loadRoot()}
+        >
           {transformConnectionLabel(exploredProvider?.provider ?? "")}
         </span>
         {!!exploredSpecificAccount && (
           <Icon name="chevronRight" size="normal" color="black" />
         )}
         {exploredSpecificAccount && (
-          <span>{exploredSpecificAccount.email}</span>
+          <span className={styles.selected}>
+            {exploredSpecificAccount.email}
+          </span>
         )}
       </>
     ) : (
