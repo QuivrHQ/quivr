@@ -20,6 +20,7 @@ export interface KMSElement {
   sync_id: number | null;
   parentKMSElement?: KMSElement;
   fromProvider?: SyncsByProvider;
+  source: "local" | string;
 }
 
 interface Credentials {

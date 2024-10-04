@@ -28,8 +28,10 @@ const QuivrFolder = ({ element }: QuivrFolderProps): JSX.Element => {
 
   useEffect(() => {
     setSelectedFolder(currentFolder?.id === element.id);
-    setExploringQuivr(true);
-    setExploredProvider(undefined);
+    if (currentFolder?.source === "local") {
+      setExploringQuivr(true);
+      setExploredProvider(undefined);
+    }
   }, [currentFolder]);
 
   useEffect(() => {
