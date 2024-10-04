@@ -25,6 +25,14 @@
   }
 }
 
+.bubble_menu {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: Spacings.$spacing03;
+  padding: Spacings.$spacing03;
+}
+
 .editor_wrapper {
   min-height: 100vh;
 
@@ -40,13 +48,12 @@
     position: relative;
 
     .ai_highlight {
-      background-color: blue;
-      color: white;
+      // color: white;
       padding: 2px 0 3px 0;
     }
 
     ::selection {
-      @extend .ai_highlight;
+      // @extend .ai_highlight;
     }
 
     .has_focus {

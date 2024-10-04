@@ -3,7 +3,7 @@ import { Editor, Extension } from "@tiptap/core";
 import Focus from "@tiptap/extension-focus";
 import Highlight from "@tiptap/extension-highlight";
 import { Link } from "@tiptap/extension-link";
-import { EditorContent, useEditor } from "@tiptap/react";
+import { BubbleMenu, EditorContent, useEditor } from "@tiptap/react";
 import { StarterKit } from "@tiptap/starter-kit";
 import { useRef, useState } from "react";
 
@@ -12,6 +12,9 @@ import { useBrainMention } from "@/app/chat/[chatId]/components/ActionsBar/compo
 import styles from "./TextEditor.module.scss";
 import { TextEditorSearchBar } from "./components/TextEditorSearchBar/TextEditorSearchBar";
 import { Toolbar } from "./components/Toolbar/Toolbar";
+import { unsetMarkInDocument } from "./utils";
+
+import QuivrButton from "../ui/QuivrButton/QuivrButton";
 
 const defaultContent = `
   <h1>My Note</h1>
@@ -39,7 +42,7 @@ export const TextEditor = (): JSX.Element => {
           );
 
           if (selection) {
-            editor.commands.setHighlight();
+            editor.commands.setHighlight({ isSelection: true });
           }
 
           setSearchBarOpen(true);
@@ -69,8 +72,21 @@ export const TextEditor = (): JSX.Element => {
         BrainMention,
         FocusSearchBar,
         Highlight.configure({
+          multicolor: true,
           HTMLAttributes: {
-            class: styles.ai_highlight,
+            // class: styles.ai_highlight,
+          },
+        }).extend({
+          addAttributes: () => {
+            return {
+              isAi: false,
+              isSelection: false,
+            };
+          },
+          onSelectionUpdate() {
+            unsetMarkInDocument(this.editor, "highlight", {
+              isSelection: true,
+            });
           },
         }),
       ],
@@ -99,6 +115,46 @@ export const TextEditor = (): JSX.Element => {
     <div className={styles.main_container}>
       <div className={styles.editor_wrapper}>
         <Toolbar toggleSearchBar={toggleSearchBar} editor={editor} />
+        <div>
+          <BubbleMenu
+            shouldShow={() => {
+              return editor.isActive("highlight", { isAi: true });
+            }}
+            tippyOptions={{
+              moveTransition: "transform 0.1s",
+              placement: "bottom-start",
+            }}
+            className={styles.bubble_menu}
+            editor={editor}
+          >
+            <QuivrButton
+              onClick={() => {
+                editor
+                  .chain()
+                  .extendMarkRange("highlight")
+                  .unsetHighlight()
+                  .run();
+              }}
+              label="Accept"
+              color="primary"
+              iconName="check"
+            />
+            <QuivrButton
+              onClick={() => {
+                // editor
+                //   .chain()
+                //   .extendMarkRange("highlight")
+                //   .deleteSelection()
+                //   .run();
+                editor.commands.undo();
+              }}
+              label="Decline"
+              color="dangerous"
+              iconName="close"
+            />
+          </BubbleMenu>
+        </div>
+
         <EditorContent className={styles.content_wrapper} editor={editor} />
       </div>
       <div

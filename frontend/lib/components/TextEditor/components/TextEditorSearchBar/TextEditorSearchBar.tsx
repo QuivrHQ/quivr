@@ -25,9 +25,16 @@ const TextEditorSearchBar = forwardRef<Editor, TextEditorSearchBarProps>(
       if (chatInput.generatingAnswer || messages.length <= 0) {
         return;
       }
+      // editor
+      //   .chain()
+      //   .unsetHighlight()
+      //   .insertContent(messages[0].assistant)
+      //   .focus()
+      //   .run();
+
       editor
         .chain()
-        .unsetHighlight()
+        .setHighlight({ color: "red", isAi: true, isSelection: false })
         .insertContent(messages[0].assistant)
         .focus()
         .run();
