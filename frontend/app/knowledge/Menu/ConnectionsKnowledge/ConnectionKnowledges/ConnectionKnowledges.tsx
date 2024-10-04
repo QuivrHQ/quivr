@@ -20,11 +20,16 @@ const ConnectionKnowledges = ({
 }: ConnectionKnowledgeProps): JSX.Element => {
   const [folded, setFolded] = useState(true);
   const { providerIconUrls } = useSync();
-  const { setExploringQuivr, setCurrentFolder, setExploredProvider } =
-    useKnowledgeContext();
+  const {
+    setExploringQuivr,
+    setCurrentFolder,
+    setExploredProvider,
+    setExploredSpecificAccount,
+  } = useKnowledgeContext();
 
   const selectProvider = () => {
     setCurrentFolder(undefined);
+    setExploredSpecificAccount(undefined);
     setExploringQuivr(false);
     setExploredProvider(providerGroup);
   };

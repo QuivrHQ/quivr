@@ -36,7 +36,7 @@ const ProviderCurrentFolder = (): JSX.Element => {
   };
 
   useEffect(() => {
-    if (exploredProvider) {
+    if (exploredProvider && exploredProvider.syncs.length === 1) {
       void fetchCurrentFolderElements();
     }
   }, [currentFolder, exploredProvider]);
