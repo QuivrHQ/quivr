@@ -87,8 +87,13 @@ const CurrentFolderHeader = ({
 );
 
 const FolderExplorerHeader = (): JSX.Element => {
-  const { currentFolder, setCurrentFolder, exploringQuivr, exploredProvider } =
-    useKnowledgeContext();
+  const {
+    currentFolder,
+    setCurrentFolder,
+    exploringQuivr,
+    exploredProvider,
+    setExploredSpecificAccount,
+  } = useKnowledgeContext();
 
   const loadParentFolder = () => {
     if (currentFolder?.parentKMSElement) {
@@ -101,6 +106,7 @@ const FolderExplorerHeader = (): JSX.Element => {
 
   const loadRoot = () => {
     setCurrentFolder(undefined);
+    setExploredSpecificAccount(undefined);
   };
 
   return (

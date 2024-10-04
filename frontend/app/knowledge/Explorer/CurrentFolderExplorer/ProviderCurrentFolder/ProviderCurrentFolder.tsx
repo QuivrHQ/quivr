@@ -64,15 +64,17 @@ const ProviderCurrentFolder = (): JSX.Element => {
           </div>
         ) : (
           <div className={styles.current_folder_content}>
-            {providerRootElements?.map((element, index) => (
-              <CurrentFolderExplorerLine
-                key={index}
-                element={{
-                  ...element,
-                  parentKMSElement: currentFolder,
-                }}
-              />
-            ))}
+            {providerRootElements
+              ?.sort((a, b) => Number(b.is_folder) - Number(a.is_folder))
+              .map((element, index) => (
+                <CurrentFolderExplorerLine
+                  key={index}
+                  element={{
+                    ...element,
+                    parentKMSElement: currentFolder,
+                  }}
+                />
+              ))}
           </div>
         )}
       </div>
