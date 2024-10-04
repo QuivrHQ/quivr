@@ -30,6 +30,7 @@ interface ProviderHeaderProps {
   exploredSpecificAccount: Sync | undefined;
   loadRoot: () => void;
   exploredProvider: { provider: string } | undefined;
+  setCurrentFolder: (folder: KMSElement | undefined) => void;
 }
 
 const ProviderHeader = ({
@@ -37,6 +38,7 @@ const ProviderHeader = ({
   exploredProvider,
   loadRoot,
   exploredSpecificAccount,
+  setCurrentFolder,
 }: ProviderHeaderProps) => (
   <div className={`${styles.name} ${currentFolder ? styles.hoverable : ""}`}>
     {!currentFolder ? (
@@ -51,7 +53,10 @@ const ProviderHeader = ({
           <Icon name="chevronRight" size="normal" color="black" />
         )}
         {exploredSpecificAccount && (
-          <span className={styles.selected}>
+          <span
+            className={styles.selected}
+            onClick={() => setCurrentFolder(undefined)}
+          >
             {exploredSpecificAccount.email}
           </span>
         )}
@@ -59,7 +64,9 @@ const ProviderHeader = ({
     ) : (
       <>
         {exploredSpecificAccount && (
-          <span>{exploredSpecificAccount.email}</span>
+          <span onClick={() => setCurrentFolder(undefined)}>
+            {exploredSpecificAccount.email}
+          </span>
         )}
         {!currentFolder.parentKMSElement && (
           <>
@@ -156,6 +163,7 @@ const FolderExplorerHeader = (): JSX.Element => {
           exploredProvider={exploredProvider}
           loadRoot={loadRoot}
           exploredSpecificAccount={exploredSpecificAccount}
+          setCurrentFolder={setCurrentFolder}
         />
       ) : (
         currentFolder?.parentKMSElement && (
