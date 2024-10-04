@@ -2,7 +2,6 @@ import datetime
 import os
 from uuid import UUID, uuid4
 
-from quivr_api.utils.uuid_generator import generate_uuid_from_string
 from quivr_core.brain import Brain as BrainCore
 from quivr_core.chat import ChatHistory as ChatHistoryCore
 from quivr_core.config import LLMEndpointConfig, RetrievalConfig
@@ -29,6 +28,7 @@ from quivr_api.modules.prompt.entity.prompt import Prompt
 from quivr_api.modules.prompt.service.prompt_service import PromptService
 from quivr_api.modules.user.entity.user_identity import UserIdentity
 from quivr_api.modules.vector.service.vector_service import VectorService
+from quivr_api.utils.uuid_generator import generate_uuid_from_string
 from quivr_api.vectorstore.supabase import CustomSupabaseVectorStore
 
 from .utils import generate_source

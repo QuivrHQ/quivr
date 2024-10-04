@@ -1,38 +1,63 @@
 import { AxiosInstance } from "axios";
 
-import { Assistant, ProcessAssistantRequest } from "./types";
+import {
+  Assistant,
+  ProcessAssistantInput,
+} from "@/app/quality-assistant/types/assistant";
+import { Process } from "@/app/quality-assistant/types/process";
 
 export const getAssistants = async (
   axiosInstance: AxiosInstance
-): Promise<Assistant[] | undefined> => {
-  return (await axiosInstance.get<Assistant[] | undefined>("/assistants")).data;
+): Promise<Assistant[]> => {
+  return (await axiosInstance.get<Assistant[]>(`/assistants`)).data;
 };
 
-export const processAssistant = async (
+export const getTasks = async (
+  axiosInstance: AxiosInstance
+): Promise<Process[]> => {
+  return (await axiosInstance.get<Process[]>(`/assistants/tasks`)).data;
+};
+
+export const processTask = async (
   axiosInstance: AxiosInstance,
-  input: ProcessAssistantRequest,
-  files: File[]
-): Promise<string | undefined> => {
+  processAssistantInput: ProcessAssistantInput
+): Promise<string> => {
   const formData = new FormData();
 
-  formData.append(
-    "input",
-    JSON.stringify({
-      name: input.name,
-      inputs: {
-        files: input.inputs.files,
-        urls: input.inputs.urls,
-        texts: input.inputs.texts,
-      },
-      outputs: input.outputs,
-    })
-  );
+  formData.append("input", JSON.stringify(processAssistantInput.input));
 
-  files.forEach((file) => {
-    formData.append("files", file);
+  processAssistantInput.files.forEach((file) => {
+    if (file instanceof File) {
+      formData.append("files", file);
+    } else {
+      console.error("L'élément n'est pas un fichier valide", file);
+    }
   });
 
-  return (
-    await axiosInstance.post<string | undefined>("/assistant/process", formData)
-  ).data;
+  const response = await axiosInstance.post<string>(
+    `/assistants/task`,
+    formData,
+    {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    }
+  );
+
+  return response.data;
+};
+
+export const deleteTask = async (
+  axiosInstance: AxiosInstance,
+  taskId: number
+): Promise<void> => {
+  await axiosInstance.delete(`/assistants/task/${taskId}`);
+};
+
+export const downloadTaskResult = async (
+  axiosInstance: AxiosInstance,
+  taskId: number
+): Promise<string> => {
+  return (await axiosInstance<string>(`/assistants/task/${taskId}/download`))
+    .data;
 };

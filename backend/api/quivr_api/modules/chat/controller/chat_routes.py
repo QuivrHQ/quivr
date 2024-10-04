@@ -1,9 +1,10 @@
+import os
 from typing import Annotated, List, Optional
 from uuid import UUID
-import os
 
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Query, Request
 from fastapi.responses import StreamingResponse
+from quivr_core.config import RetrievalConfig
 
 from quivr_api.logger import get_logger
 from quivr_api.middlewares.auth import AuthBearer, get_current_user
@@ -36,7 +37,6 @@ from quivr_api.modules.user.entity.user_identity import UserIdentity
 from quivr_api.modules.vector.service.vector_service import VectorService
 from quivr_api.utils.telemetry import maybe_send_telemetry
 from quivr_api.utils.uuid_generator import generate_uuid_from_string
-from quivr_core.config import RetrievalConfig
 
 logger = get_logger(__name__)
 

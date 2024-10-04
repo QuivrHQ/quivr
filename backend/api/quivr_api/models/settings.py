@@ -3,10 +3,6 @@ from uuid import UUID
 from posthog import Posthog
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
-from quivr_api.logger import get_logger
-
-logger = get_logger(__name__)
-
 
 class BrainRateLimiting(BaseSettings):
     model_config = SettingsConfigDict(validate_default=False)
@@ -118,9 +114,9 @@ class BrainSettings(BaseSettings):
     langfuse_secret_key: str | None = None
     pg_database_url: str
     pg_database_async_url: str
-    embedding_dim: int
-    sqlalchemy_pool_size: int
-    sqlalchemy_max_pool_overflow: int
+    sqlalchemy_pool_size: int = 5
+    sqlalchemy_max_pool_overflow: int = 5
+    embedding_dim: int = 1536
 
 
 class ResendSettings(BaseSettings):
@@ -132,4 +128,13 @@ class ResendSettings(BaseSettings):
     quivr_smtp_password: str = ""
 
 
+class ParseableSettings(BaseSettings):
+    model_config = SettingsConfigDict(validate_default=False)
+    use_parseable: bool = False
+    parseable_url: str | None = None
+    parseable_auth: str | None = None
+    parseable_stream_name: str | None = None
+
+
 settings = BrainSettings()  # type: ignore
+parseable_settings = ParseableSettings()
