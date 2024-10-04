@@ -27,17 +27,21 @@ const QuivrHeader = ({ currentFolder, loadQuivrRoot }: QuivrHeaderProps) => (
 
 interface ProviderHeaderProps {
   currentFolder: KMSElement | undefined;
+  loadQuivrRoot: () => void;
   exploredProvider: { provider: string };
 }
 
 const ProviderHeader = ({
   currentFolder,
   exploredProvider,
+  loadQuivrRoot,
 }: ProviderHeaderProps) => (
-  <span className={`${styles.name} ${currentFolder ? styles.hoverable : ""}`}>
-    {transformConnectionLabel(exploredProvider.provider)}
+  <div className={`${styles.name} ${currentFolder ? styles.hoverable : ""}`}>
+    <span onClick={() => loadQuivrRoot()}>
+      {transformConnectionLabel(exploredProvider.provider)}
+    </span>
     {currentFolder && <Icon name="chevronRight" size="normal" color="black" />}
-  </span>
+  </div>
 );
 
 interface ParentFolderHeaderProps {
@@ -96,6 +100,7 @@ const FolderExplorerHeader = (): JSX.Element => {
   };
 
   const loadQuivrRoot = () => {
+    console.info("hey");
     setCurrentFolder(undefined);
   };
 
@@ -110,6 +115,7 @@ const FolderExplorerHeader = (): JSX.Element => {
         <ProviderHeader
           currentFolder={currentFolder}
           exploredProvider={exploredProvider}
+          loadQuivrRoot={loadQuivrRoot}
         />
       ) : (
         currentFolder?.parentKMSElement && (
