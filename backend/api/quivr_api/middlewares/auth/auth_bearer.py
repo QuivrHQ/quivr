@@ -73,6 +73,6 @@ async def get_current_user(user: UserIdentity = Depends(auth_bearer)) -> UserIde
     # Due to context switch in FastAPI executor we can't get this id back
     # We log it as an additional log so we can get information if exception was raised
     # https://www.structlog.org/en/stable/contextvars.html
-    structlog.contextvars.bind_contextvars(client_id=user.id)
+    structlog.contextvars.bind_contextvars(client_id=str(user.id))
     logger.info("Authentication success")
     return user

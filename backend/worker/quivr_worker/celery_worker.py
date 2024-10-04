@@ -2,12 +2,15 @@ import asyncio
 import os
 from uuid import UUID
 
+import structlog
 import torch
+from celery import signals
 from celery.schedules import crontab
 from celery.signals import worker_process_init
+from celery.utils.log import get_task_logger
 from dotenv import load_dotenv
 from quivr_api.celery_config import celery
-from quivr_api.logger import get_logger
+from quivr_api.logger import setup_logger
 from quivr_api.models.settings import settings
 from quivr_api.modules.assistant.repository.tasks import TasksRepository
 from quivr_api.modules.assistant.services.tasks_service import TasksService
@@ -49,11 +52,11 @@ from quivr_worker.utils.utils import _patch_json
 
 torch.set_num_threads(1)
 
-
+setup_logger("worker.log", send_log_server=False)
 load_dotenv()
 
-get_logger("quivr_core")
-logger = get_logger("celery_worker")
+logger = structlog.wrap_logger(get_task_logger(__name__))
+
 _patch_json()
 
 
@@ -71,6 +74,13 @@ storage = SupabaseS3Storage()
 notion_service: SyncNotionService | None = None
 async_engine: AsyncEngine | None = None
 engine: Engine | None = None
+
+
+@signals.task_prerun.connect
+def on_task_prerun(sender, task_id, task, args, kwargs, **_):
+    structlog.contextvars.bind_contextvars(task_id=task_id, task_name=task.name)
+    if vars := kwargs.get("contextvars", None):
+        structlog.contextvars.bind_contextvars(**vars)
 
 
 @worker_process_init.connect
@@ -115,7 +125,6 @@ def process_assistant_task(
     logger.info(
         f"process_assistant_task started for assistant_id={assistant_id}, notification_uuid={notification_uuid}, task_id={task_id}"
     )
-    print("process_assistant_task")
 
     loop = asyncio.get_event_loop()
     loop.run_until_complete(

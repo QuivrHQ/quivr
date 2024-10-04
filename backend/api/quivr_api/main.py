@@ -1,7 +1,6 @@
 import logging
 import os
 
-import litellm
 import sentry_sdk
 from dotenv import load_dotenv  # type: ignore
 from fastapi import FastAPI, Request
@@ -32,16 +31,9 @@ from quivr_api.utils.telemetry import maybe_send_telemetry
 
 load_dotenv()
 
-# Set the logging level for all loggers to WARNING
+
 logging.basicConfig(level=logging.INFO)
-logging.getLogger("httpx").setLevel(logging.WARNING)
-logging.getLogger("LiteLLM").setLevel(logging.WARNING)
-logging.getLogger("litellm").setLevel(logging.WARNING)
-litellm.set_verbose = False  # type: ignore
-get_logger("uvicorn")
-get_logger("uvicorn.access")
-get_logger("quivr_core")
-logger = get_logger("quivr-api")
+logger = get_logger("quivr_api")
 
 
 def before_send(event, hint):

@@ -74,8 +74,6 @@ beautifulsoup4==4.12.3
     # via markdownify
     # via nbconvert
     # via unstructured
-better-exceptions==0.3.3
-    # via quivr-monorepo
 billiard==4.2.0
     # via celery
 bleach==6.1.0
@@ -128,7 +126,6 @@ cobble==0.1.4
 cohere==5.8.1
     # via langchain-cohere
 colorama==0.4.6
-    # via better-exceptions
     # via click
     # via colorlog
     # via griffe

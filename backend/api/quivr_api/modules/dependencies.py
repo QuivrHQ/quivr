@@ -30,7 +30,7 @@ _embedding_service = None
 
 settings = BrainSettings()  # type: ignore
 
-logger = get_logger(__name__)
+logger = get_logger("quivr_api")
 
 
 class BaseRepository:

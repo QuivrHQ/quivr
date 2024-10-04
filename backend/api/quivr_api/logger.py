@@ -119,6 +119,7 @@ def drop_http_context(_, __, event_dict):
 def setup_logger(
     log_file="application.log", send_log_server: bool = parseable_settings.use_parseable
 ):
+    structlog.reset_defaults()
     # Shared handlers
     shared_processors = [
         structlog.contextvars.merge_contextvars,
@@ -222,19 +223,25 @@ def setup_logger(
 
 
 def _clear_uvicorn_logger():
-    for _log in ["uvicorn", "uvicorn.error"]:
+    for _log in [
+        "uvicorn",
+        "httpcore",
+        "uvicorn.error",
+        "uvicorn.access",
+        "urllib3",
+        "httpx",
+    ]:
         # Clear the log handlers for uvicorn loggers, and enable propagation
         # so the messages are caught by our root logger and formatted correctly
         # by structlog
+        logging.getLogger(_log).setLevel(logging.WARNING)
         logging.getLogger(_log).handlers.clear()
         logging.getLogger(_log).propagate = True
-    logging.getLogger("uvicorn.access").handlers.clear()
-    logging.getLogger("uvicorn.access").propagate = False
-
-
-def get_logger(_name: str | None = None):
-    assert structlog.is_configured()
-    return structlog.get_logger()
 
 
 setup_logger()
+
+
+def get_logger(name: str | None = None):
+    assert structlog.is_configured()
+    return structlog.get_logger(name)
