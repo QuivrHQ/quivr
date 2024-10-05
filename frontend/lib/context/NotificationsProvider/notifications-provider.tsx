@@ -11,31 +11,54 @@ type NotificationsContextType = {
   isVisible: boolean;
   setIsVisible: React.Dispatch<React.SetStateAction<boolean>>;
   bulkNotifications: BulkNotification[];
-  setBulkNotifications: React.Dispatch<
-    React.SetStateAction<BulkNotification[]>
-  >;
+  setBulkNotifications: React.Dispatch<React.SetStateAction<BulkNotification[]>>;
   updateNotifications: () => Promise<void>;
-  unreadNotifications?: number;
-  setUnreadNotifications?: React.Dispatch<React.SetStateAction<number>>;
+  unreadNotifications: number;
+  setUnreadNotifications: React.Dispatch<React.SetStateAction<number>>;
 };
 
-export const NotificationsContext = createContext<
-  NotificationsContextType | undefined
->(undefined);
+export const NotificationsContext = createContext<NotificationsContextType | undefined>(undefined);
 
 export const NotificationsProvider = ({
   children,
 }: {
   children: React.ReactNode;
 }): JSX.Element => {
-  const [isVisible, setIsVisible] = useState(false);
-  const [unreadNotifications, setUnreadNotifications] = useState(0);
-  const [bulkNotifications, setBulkNotifications] = useState<
-    BulkNotification[]
-  >([]);
+  const [isVisible, setIsVisible] = useState<boolean>(false);
+  const [unreadNotifications, setUnreadNotifications] = useState<number>(0);
+  const [bulkNotifications, setBulkNotifications] = useState<BulkNotification[]>([]);
   const { supabase } = useSupabase();
 
-  const updateNotifications = async () => {
+  const fetchNotifications = async (): Promise<NotificationType[]> => {
+    const { data, error } = await supabase.from("notifications").select();
+    if (error) {
+
+      return [];
+    }
+
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unnecessary-condition
+    return data || [];
+  };
+
+  const processNotifications = (notifications: NotificationType[]): BulkNotification[] => {
+    const bulkMap: { [key: string]: NotificationType[] } = {};
+    notifications.forEach((notif) => {
+      if (!bulkMap[notif.bulk_id]) {
+        bulkMap[notif.bulk_id] = [];
+      }
+      bulkMap[notif.bulk_id].push(notif);
+    });
+
+    return Object.keys(bulkMap).map((bulkId) => ({
+      bulk_id: bulkId,
+      notifications: bulkMap[bulkId],
+      category: bulkMap[bulkId][0].category,
+      brain_id: bulkMap[bulkId][0].brain_id,
+      datetime: bulkMap[bulkId][0].datetime,
+    }));
+  };
+
+  const updateNotifications = async (): Promise<void> => {
     try {
       const lastRetrieved = localStorage.getItem("lastRetrieved");
       const now = Date.now();
@@ -47,67 +70,51 @@ export const NotificationsProvider = ({
 
       localStorage.setItem("lastRetrieved", now.toString());
 
-      let notifs = (await supabase.from("notifications").select()).data;
-      if (notifs) {
-        notifs = notifs.sort(
-          (a: NotificationType, b: NotificationType) =>
-            new Date(b.datetime).getTime() - new Date(a.datetime).getTime()
-        );
-      }
-
-      const bulkMap: { [key: string]: NotificationType[] } = {};
-      notifs?.forEach((notif: NotificationType) => {
-        if (!bulkMap[notif.bulk_id]) {
-          bulkMap[notif.bulk_id] = [];
-        }
-        bulkMap[notif.bulk_id].push(notif);
-      });
-
-      const bulkNotifs: BulkNotification[] = Object.keys(bulkMap).map(
-        (bulkId) => ({
-          bulk_id: bulkId,
-          notifications: bulkMap[bulkId],
-          category: bulkMap[bulkId][0].category,
-          brain_id: bulkMap[bulkId][0].brain_id,
-          datetime: bulkMap[bulkId][0].datetime,
-        })
+      const notifications = await fetchNotifications();
+      const sortedNotifications = notifications.sort(
+        (a, b) => new Date(b.datetime).getTime() - new Date(a.datetime).getTime()
       );
 
+      const bulkNotifs = processNotifications(sortedNotifications);
       setBulkNotifications(bulkNotifs);
 
       const unreadCount = bulkNotifs.filter((bulk) => !bulk.notifications[0].read).length;
       setUnreadNotifications(unreadCount);
     } catch (error) {
+      console.error("Error updating notifications:", error);
     }
   };
 
-  const debounce = (func: Function, delay: number) => {
-    let timeoutId: NodeJS.Timeout;
-    let lastArgs: any[];
+  const debounce = <T extends (...args: unknown[]) => void>(func: T, delay: number): T & { cancel: () => void } => {
+    let timeoutId: NodeJS.Timeout; // Holds the timeout ID for the current debounce delay
+    let lastArgs: Parameters<T>; // Stores the last arguments passed to the debounced function
 
-    const debouncedFunction = (...args: any[]) => {
-      lastArgs = args;
-      if (timeoutId) { clearTimeout(timeoutId); }
+    const debouncedFunction = (...args: Parameters<T>) => {
+      lastArgs = args; // Update the last arguments with the current call's arguments
+      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+      if (timeoutId) {
+        clearTimeout(timeoutId); // Clear the existing timeout if it exists
+      }
+      // Set a new timeout to call the function after the specified delay
       timeoutId = setTimeout(() => {
-        func(...lastArgs);
+        func(...lastArgs); // Call the function with the last arguments
       }, delay);
     };
 
     debouncedFunction.cancel = () => {
+      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
       if (timeoutId) {
-        clearTimeout(timeoutId);
+        clearTimeout(timeoutId); // Clear the timeout if the debounced function is canceled
       }
     };
 
-    return debouncedFunction;
+    return debouncedFunction as T & { cancel: () => void }; // Return the debounced function with a cancel method
   };
 
   const debouncedUpdateNotifications = useCallback(
-    debounce(() => {
-      console.log("⏳ Debouncing updateNotifications call");
-      updateNotifications();
-    }, 1000), // Adjusted the delay to 1 second
-    [updateNotifications] // Ensure updateNotifications is a dependency
+    // eslint-disable-next-line @typescript-eslint/no-misused-promises
+    debounce(updateNotifications, 1000),
+    [updateNotifications]
   );
 
   useEffect(() => {
@@ -115,12 +122,10 @@ export const NotificationsProvider = ({
       const lastRetrieved = localStorage.getItem("lastRetrieved");
       const now = Date.now();
 
-      // Only call debouncedUpdateNotifications if the last retrieval was more than 1 second ago
       if (!lastRetrieved || now - parseInt(lastRetrieved) >= 1000) {
-        debouncedUpdateNotifications();
+        void debouncedUpdateNotifications();
       }
 
-      // Add a cleanup function to clear the timeout when the component unmounts or isVisible changes
       return () => {
         debouncedUpdateNotifications.cancel();
       };
@@ -136,6 +141,7 @@ export const NotificationsProvider = ({
         setBulkNotifications,
         updateNotifications,
         unreadNotifications,
+        setUnreadNotifications,
       }}
     >
       {children}
