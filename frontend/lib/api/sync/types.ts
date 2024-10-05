@@ -1,11 +1,12 @@
-export type Provider = "Google" | "Azure" | "DropBox" | "Notion" | "GitHub";
+export type Provider = "Google" | "Azure" | "DropBox" | "Notion" | "GitHub" | "Zendesk";
 
 export type Integration =
   | "Google Drive"
   | "Share Point"
   | "Dropbox"
   | "Notion"
-  | "GitHub";
+  | "GitHub"
+  | "Zendesk"
 
 export type SyncStatus = "SYNCING" | "SYNCED" | "ERROR" | "REMOVED";
 
