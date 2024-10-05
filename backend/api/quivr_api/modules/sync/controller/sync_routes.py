@@ -18,6 +18,7 @@ from quivr_api.modules.sync.controller.dropbox_sync_routes import dropbox_sync_r
 from quivr_api.modules.sync.controller.github_sync_routes import github_sync_router
 from quivr_api.modules.sync.controller.google_sync_routes import google_sync_router
 from quivr_api.modules.sync.controller.notion_sync_routes import notion_sync_router
+from quivr_api.modules.sync.controller.zendesk_sync_routes import zendesk_sync_router
 from quivr_api.modules.sync.dto import SyncsDescription
 from quivr_api.modules.sync.dto.inputs import SyncsActiveInput, SyncsActiveUpdateInput
 from quivr_api.modules.sync.dto.outputs import AuthMethodEnum
@@ -49,6 +50,7 @@ sync_router.include_router(azure_sync_router)
 sync_router.include_router(github_sync_router)
 sync_router.include_router(dropbox_sync_router)
 sync_router.include_router(notion_sync_router)
+sync_router.include_router(zendesk_sync_router)
 
 
 # Google sync description
@@ -79,6 +81,12 @@ notion_sync = SyncsDescription(
 github_sync = SyncsDescription(
     name="GitHub",
     description="Sync your GitHub Drive with Quivr",
+    auth_method=AuthMethodEnum.URI_WITH_CALLBACK,
+)
+
+zendesk_sync = SyncsDescription(
+    name="Zendesk",
+    description="Sync your Zendesk with Quivr",
     auth_method=AuthMethodEnum.URI_WITH_CALLBACK,
 )
 

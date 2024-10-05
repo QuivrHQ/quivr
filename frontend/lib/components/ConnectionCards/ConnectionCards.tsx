@@ -10,7 +10,7 @@ interface ConnectionCardsProps {
 export const ConnectionCards = ({
   fromAddKnowledge,
 }: ConnectionCardsProps): JSX.Element => {
-  const { syncGoogleDrive, syncSharepoint, syncDropbox } =
+  const { syncGoogleDrive, syncSharepoint, syncDropbox, syncZendesk } =
     useSync();
 
   return (
@@ -37,6 +37,12 @@ export const ConnectionCards = ({
         fromAddKnowledge={fromAddKnowledge}
         oneAccountLimitation={true}
       /> */}
+      <ConnectionSection
+        label="Zendesk"
+        provider="Zendesk"
+        callback={(name: string) => syncZendesk(name)}
+        fromAddKnowledge={fromAddKnowledge}
+      />
       <ConnectionSection
         label="Sharepoint"
         provider="Azure"
