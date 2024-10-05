@@ -14,9 +14,9 @@ export const useAzureLogin = (): {
   const signInWithAzure = async () => {
     setIsPending(true);
     const { error } = await supabase.auth.signInWithOAuth({
-      provider: 'azure',
+      provider: "azure",
       options: {
-        scopes: 'email',
+        scopes: "email",
       },
     });
     setIsPending(false);

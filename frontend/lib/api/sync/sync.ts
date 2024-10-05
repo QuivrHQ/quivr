@@ -57,7 +57,7 @@ export const syncNotion = async (
       `/sync/notion/authorize?name=${name}`
     )
   ).data;
-}
+};
 
 export const getUserSyncs = async (
   axiosInstance: AxiosInstance

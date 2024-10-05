@@ -17,7 +17,7 @@
     "strictNullChecks": true,
     "target": "esnext",
     "types": ["node", "vitest/globals"],
-    "lib": ["dom", "dom.iterable","es2020"],
+    "lib": ["dom", "dom.iterable", "es2020"],
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "sourceMap": true,
@@ -31,7 +31,7 @@
       }
     ],
     "paths": {
-      "@/*": ["./*"],
+      "@/*": ["./*"]
     }
   },
   "ts-node": {

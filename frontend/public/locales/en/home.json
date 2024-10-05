@@ -1,36 +1,36 @@
 {
-    "sign_in": "Sign in",
-    "docs": "Docs",
-    "pricing": "Pricing",
-    "sign_up": "Sign up",
-    "star_us": "Star us on Github",
-    "blog": "Blog",
-    "sponsored_by": "Sponsored by",
-    "useCases": {
-        "title": "Experience it now.",
-        "subtitle": "Check our example on using Quivr"
-    },
-    "intro": {
-        "title": "Get a Second Brain with",
-        "subtitle": "Your productivity assistant connected to your files & favorite applications",
-        "try_demo": "Try free demo",
-        "contact_sales": "Contact sales team"
-    },
-    "demo": {
-        "title": "Demo video",
-        "start_now": "Start now"
-    },
-    "security": {
-        "cta": "Get started today "
-    },
-    "footer": {
-        "title": "Get started today",
-        "description_1": "Your personal assistant that acts as your Second Brain.",
-        "description_2": "Simply upload your files and ask questions to it.",
-        "start_using": "Start using Quivr",
-        "contact_sales": "Contact sales team"
-    },
-    "testimonials": {
-        "title": "What people say about"
-    }
+  "sign_in": "Sign in",
+  "docs": "Docs",
+  "pricing": "Pricing",
+  "sign_up": "Sign up",
+  "star_us": "Star us on Github",
+  "blog": "Blog",
+  "sponsored_by": "Sponsored by",
+  "useCases": {
+    "title": "Experience it now.",
+    "subtitle": "Check our example on using Quivr"
+  },
+  "intro": {
+    "title": "Get a Second Brain with",
+    "subtitle": "Your productivity assistant connected to your files & favorite applications",
+    "try_demo": "Try free demo",
+    "contact_sales": "Contact sales team"
+  },
+  "demo": {
+    "title": "Demo video",
+    "start_now": "Start now"
+  },
+  "security": {
+    "cta": "Get started today "
+  },
+  "footer": {
+    "title": "Get started today",
+    "description_1": "Your personal assistant that acts as your Second Brain.",
+    "description_2": "Simply upload your files and ask questions to it.",
+    "start_using": "Start using Quivr",
+    "contact_sales": "Contact sales team"
+  },
+  "testimonials": {
+    "title": "What people say about"
+  }
 }

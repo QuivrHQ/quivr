@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
-import { useEffect } from 'react';
+import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
 
 export const UpdateMetadata = () => {
@@ -13,7 +13,7 @@ export const UpdateMetadata = () => {
     if (metaDescription instanceof HTMLMetaElement) {
       metaDescription.content = description;
     }
-  }, [t]); 
+  }, [t]);
 
   return null;
 };

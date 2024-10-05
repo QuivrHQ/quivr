@@ -11,7 +11,7 @@ export const FileLine = ({
   name,
   selectable,
   id,
-  icon
+  icon,
 }: FileLineProps): JSX.Element => {
   return (
     <SyncElementLine
@@ -19,7 +19,7 @@ export const FileLine = ({
       selectable={selectable}
       id={id}
       isFolder={false}
-      icon= {icon}
+      icon={icon}
     />
   );
 };
