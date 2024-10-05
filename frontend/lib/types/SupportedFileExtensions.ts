@@ -21,7 +21,7 @@ export const supportedFileExtensions = [
   "ipynb",
   "py",
   "telegram",
-  "bib"
+  "bib",
 ] as const;
 
 export type SupportedFileExtensions = (typeof supportedFileExtensions)[number];

@@ -1,13 +1,12 @@
 /* eslint-disable */
-'use client';
-import type { GetStaticPaths, InferGetStaticPropsType } from 'next';
-import Head from 'next/head';
+"use client";
+import type { GetStaticPaths, InferGetStaticPropsType } from "next";
+import Head from "next/head";
 import Image from "next/image";
-import Link from 'next/link';
-import { useEffect, useState } from 'react';
+import Link from "next/link";
+import { useEffect, useState } from "react";
 
 import "@/globals.css";
-
 
 type SeoAttributes = {
   id: number;
@@ -54,10 +53,12 @@ export const getStaticPaths: GetStaticPaths = async () => {
   try {
     const response = await fetch("https://cms.quivr.app/api/blogs");
     if (!response.ok) {
-      throw new Error('Network response was not ok');
+      throw new Error("Network response was not ok");
     }
     const data: { data: BlogPost[] } = await response.json();
-    const paths = data.data.map(post => ({ params: { slug: post.attributes.slug } }));
+    const paths = data.data.map((post) => ({
+      params: { slug: post.attributes.slug },
+    }));
 
     return {
       paths,
@@ -74,14 +75,18 @@ export const getStaticPaths: GetStaticPaths = async () => {
 
 export const getStaticProps = async (context: { params: { slug: string } }) => {
   try {
-    const response = await fetch(`https://cms.quivr.app/api/blogs?slug=${context.params.slug}&populate=seo,seo.metaImage`);
+    const response = await fetch(
+      `https://cms.quivr.app/api/blogs?slug=${context.params.slug}&populate=seo,seo.metaImage`
+    );
     const data: { data: BlogPost[] } = await response.json();
 
     // Find the blog post with the exact slug match
-    const blogPost = data.data.find(post => post.attributes.slug === context.params.slug);
+    const blogPost = data.data.find(
+      (post) => post.attributes.slug === context.params.slug
+    );
 
     if (!blogPost) {
-      throw new Error('No blog post found for the provided slug');
+      throw new Error("No blog post found for the provided slug");
     }
 
     return {
@@ -97,11 +102,15 @@ export const getStaticProps = async (context: { params: { slug: string } }) => {
   }
 };
 
-const BlogPostDetail = ({ post }: InferGetStaticPropsType<typeof getStaticProps>) => {
-  const { metaTitle, metaDescription, keywords, canonicalURL } = post.attributes.seo;
+const BlogPostDetail = ({
+  post,
+}: InferGetStaticPropsType<typeof getStaticProps>) => {
+  const { metaTitle, metaDescription, keywords, canonicalURL } =
+    post.attributes.seo;
 
   // Extract different image formats
-  const { large, medium } = post.attributes.seo.metaImage.data.attributes.formats;
+  const { large, medium } =
+    post.attributes.seo.metaImage.data.attributes.formats;
 
   const [imageUrl, setImageUrl] = useState(medium.url);
 
@@ -119,7 +128,12 @@ const BlogPostDetail = ({ post }: InferGetStaticPropsType<typeof getStaticProps>
               <div className="text-2xl font-bold cursor-pointer">Quivr</div>
             </Link>
             <div className="space-x-4">
-              <Link className="text-zinc-900 hover:text-zinc-700" href="https://quivr.app">Try Quivr</Link>
+              <Link
+                className="text-zinc-900 hover:text-zinc-700"
+                href="https://quivr.app"
+              >
+                Try Quivr
+              </Link>
             </div>
           </nav>
         </div>
@@ -137,11 +151,11 @@ const BlogPostDetail = ({ post }: InferGetStaticPropsType<typeof getStaticProps>
             <h1 className="text-4xl font-extrabold tracking-tight lg:text-5xl lg:leading-[3.5rem] text-black dark:text-white">
               {metaTitle}
             </h1>
-            <p className="text-zinc-500 dark:text-zinc-400">Posted on {post.attributes.publishedAt}</p>
+            <p className="text-zinc-500 dark:text-zinc-400">
+              Posted on {post.attributes.publishedAt}
+            </p>
           </div>
-          <p className="text-black dark:text-white">
-            {metaDescription}
-          </p>
+          <p className="text-black dark:text-white">{metaDescription}</p>
           <Image
             src={imageUrl}
             alt={metaTitle}
@@ -149,11 +163,14 @@ const BlogPostDetail = ({ post }: InferGetStaticPropsType<typeof getStaticProps>
             width={1250}
             height={340}
           />
-          <div className="text-black dark:text-white" dangerouslySetInnerHTML={{ __html: post.attributes.Article }}></div>
+          <div
+            className="text-black dark:text-white"
+            dangerouslySetInnerHTML={{ __html: post.attributes.Article }}
+          ></div>
         </article>
       </div>
     </section>
   );
-}
+};
 
 export default BlogPostDetail;

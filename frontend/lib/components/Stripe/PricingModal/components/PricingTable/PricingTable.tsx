@@ -5,7 +5,11 @@ import styles from "./PricingTable.module.scss";
 const PRICING_TABLE_ID = process.env.NEXT_PUBLIC_STRIPE_PRICING_TABLE_ID;
 const PUBLISHABLE_KEY = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY;
 
-export const StripePricingTable = ({ user_email }: { user_email: string }): JSX.Element => {
+export const StripePricingTable = ({
+  user_email,
+}: {
+  user_email: string;
+}): JSX.Element => {
   return (
     <>
       <div className={styles.info_content}>

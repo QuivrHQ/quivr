@@ -1,9 +1,7 @@
 @import "tailwindcss/base";
 @import "tailwindcss/components";
 @import "tailwindcss/utilities";
-@import './colors.css';
-
-
+@import "./colors.css";
 
 main {
   @apply max-w-screen-xl mx-auto flex flex-col;
@@ -101,18 +99,18 @@ body.dark_mode {
   --background-success: var(--black-5);
   --background-error: var(--black-5);
   --background-pending: var(--black-5);
- 
+
   /* Borders */
   --border-0: var(--black-5);
   --border-1: var(--black-6);
   --border-2: var(--black-7);
- 
+
   /* Icons */
   --icon-0: var(--black-0);
   --icon-1: var(--grey-0);
   --icon-2: var(--grey-2);
   --icon-3: var(--white-0);
- 
+
   /* Text */
   --text-0: var(--black-0);
   --text-1: var(--grey-0);
@@ -142,7 +140,7 @@ body.dark_mode {
 .token.constant,
 .token.symbol,
 .token.deleted {
-  color: var(--code-red); 
+  color: var(--code-red);
 }
 
 .token.boolean,
@@ -156,7 +154,7 @@ body.dark_mode {
 .token.char,
 .token.builtin,
 .token.inserted {
-  color: var(--code-green); 
+  color: var(--code-green);
 }
 
 .token.operator,
@@ -165,7 +163,7 @@ body.dark_mode {
 .language-css .token.string,
 .style .token.string,
 .token.variable {
-  color: var(--code-grey); 
+  color: var(--code-grey);
 }
 
 .token.atrule,
@@ -176,7 +174,7 @@ body.dark_mode {
 }
 
 .token.keyword {
-  color: var(--code-blue); 
+  color: var(--code-blue);
 }
 
 .token.regex,
@@ -206,7 +204,7 @@ body.dark_mode {
 }
 
 .EmojiPickerReact.epr-dark-theme {
-  --epr-emoji-size: 20px !important; 
+  --epr-emoji-size: 20px !important;
   --epr-hover-bg-color: var(--primary-1) !important;
   --epr-category-navigation-button-size: 24px !important;
   --epr-category-label-bg-color: var(--background-0) !important;

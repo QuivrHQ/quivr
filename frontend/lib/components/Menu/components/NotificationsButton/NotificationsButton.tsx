@@ -12,6 +12,7 @@ export const NotificationsButton = (): JSX.Element => {
   const { supabase } = useSupabase();
 
   useEffect(() => {
+    console.log("NotificationsButton");
     const channel = supabase
       .channel("notifications")
       .on(

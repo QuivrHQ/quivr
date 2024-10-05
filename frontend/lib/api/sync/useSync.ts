@@ -13,7 +13,7 @@ import {
   syncGoogleDrive,
   syncNotion,
   syncSharepoint,
-  updateActiveSync
+  updateActiveSync,
 } from "./sync";
 import { Integration, OpenedConnection, Provider } from "./types";
 
