@@ -1,4 +1,4 @@
-import { createContext, useEffect, useState } from "react";
+import { createContext, useCallback, useEffect, useState } from "react";
 
 import {
   BulkNotification,
@@ -37,6 +37,16 @@ export const NotificationsProvider = ({
 
   const updateNotifications = async () => {
     try {
+      const lastRetrieved = localStorage.getItem("lastRetrieved");
+      const now = Date.now();
+
+      if (lastRetrieved && now - parseInt(lastRetrieved) < 1000) {
+
+        return;
+      }
+
+      localStorage.setItem("lastRetrieved", now.toString());
+
       let notifs = (await supabase.from("notifications").select()).data;
       if (notifs) {
         notifs = notifs.sort(
@@ -64,31 +74,58 @@ export const NotificationsProvider = ({
       );
 
       setBulkNotifications(bulkNotifs);
-      setUnreadNotifications(
-        bulkNotifs.filter((bulk) => !bulk.notifications[0].read).length
-      );
+
+      const unreadCount = bulkNotifs.filter((bulk) => !bulk.notifications[0].read).length;
+      setUnreadNotifications(unreadCount);
     } catch (error) {
-      console.error(error);
     }
   };
 
-  useEffect(() => {
-    void (async () => {
-      for (const notifications of bulkNotifications) {
-        if (
-          notifications.notifications.every((notif) => notif.status !== "info")
-        ) {
-          for (const notification of notifications.notifications) {
-            await supabase
-              .from("notifications")
-              .update({ read: true })
-              .eq("id", notification.id);
-          }
-        }
+  const debounce = (func: Function, delay: number) => {
+    let timeoutId: NodeJS.Timeout;
+    let lastArgs: any[];
+
+    const debouncedFunction = (...args: any[]) => {
+      lastArgs = args;
+      if (timeoutId) { clearTimeout(timeoutId); }
+      timeoutId = setTimeout(() => {
+        func(...lastArgs);
+      }, delay);
+    };
+
+    debouncedFunction.cancel = () => {
+      if (timeoutId) {
+        clearTimeout(timeoutId);
       }
-      await updateNotifications();
-    })();
-  }, [isVisible]);
+    };
+
+    return debouncedFunction;
+  };
+
+  const debouncedUpdateNotifications = useCallback(
+    debounce(() => {
+      console.log("⏳ Debouncing updateNotifications call");
+      updateNotifications();
+    }, 1000), // Adjusted the delay to 1 second
+    [updateNotifications] // Ensure updateNotifications is a dependency
+  );
+
+  useEffect(() => {
+    if (isVisible) {
+      const lastRetrieved = localStorage.getItem("lastRetrieved");
+      const now = Date.now();
+
+      // Only call debouncedUpdateNotifications if the last retrieval was more than 1 second ago
+      if (!lastRetrieved || now - parseInt(lastRetrieved) >= 1000) {
+        debouncedUpdateNotifications();
+      }
+
+      // Add a cleanup function to clear the timeout when the component unmounts or isVisible changes
+      return () => {
+        debouncedUpdateNotifications.cancel();
+      };
+    }
+  }, [isVisible, debouncedUpdateNotifications]);
 
   return (
     <NotificationsContext.Provider
