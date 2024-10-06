@@ -31,13 +31,8 @@ export const NotificationsProvider = ({
 
   const fetchNotifications = async (): Promise<NotificationType[]> => {
     const { data, error } = await supabase.from("notifications").select();
-    if (error) {
 
-      return [];
-    }
-
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unnecessary-condition
-    return data || [];
+    return (error) ? [] : data; // eslint-disable-line @typescript-eslint/no-unsafe-return
   };
 
   const processNotifications = (notifications: NotificationType[]): BulkNotification[] => {
@@ -86,29 +81,28 @@ export const NotificationsProvider = ({
   };
 
   const debounce = <T extends (...args: unknown[]) => void>(func: T, delay: number): T & { cancel: () => void } => {
-    let timeoutId: NodeJS.Timeout; // Holds the timeout ID for the current debounce delay
-    let lastArgs: Parameters<T>; // Stores the last arguments passed to the debounced function
+    let timeoutId: NodeJS.Timeout;
+    let lastArgs: Parameters<T>;
 
     const debouncedFunction = (...args: Parameters<T>) => {
-      lastArgs = args; // Update the last arguments with the current call's arguments
+      lastArgs = args;
       // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
       if (timeoutId) {
-        clearTimeout(timeoutId); // Clear the existing timeout if it exists
+        clearTimeout(timeoutId);
       }
-      // Set a new timeout to call the function after the specified delay
       timeoutId = setTimeout(() => {
-        func(...lastArgs); // Call the function with the last arguments
+        func(...lastArgs);
       }, delay);
     };
 
     debouncedFunction.cancel = () => {
       // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
       if (timeoutId) {
-        clearTimeout(timeoutId); // Clear the timeout if the debounced function is canceled
+        clearTimeout(timeoutId);
       }
     };
 
-    return debouncedFunction as T & { cancel: () => void }; // Return the debounced function with a cancel method
+    return debouncedFunction as T & { cancel: () => void };
   };
 
   const debouncedUpdateNotifications = useCallback(
