@@ -1,5 +1,4 @@
 import pytest
-
 from megaparse.Converter import MegaParse
 
 

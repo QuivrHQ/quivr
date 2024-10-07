@@ -1,5 +1,6 @@
 import { MotionConfig } from "framer-motion";
 import { usePathname, useRouter } from "next/navigation";
+import { useFeatureFlagEnabled } from "posthog-js/react";
 import { useState } from "react";
 
 import { MenuControlButton } from "@/app/chat/[chatId]/components/ActionsBar/components/ChatInput/components/MenuControlButton/MenuControlButton";
@@ -18,6 +19,7 @@ import { KnowledgeButton } from "./components/KnowledgeButton/KnowledgeButton";
 import { Notifications } from "./components/Notifications/Notifications";
 import { NotificationsButton } from "./components/NotificationsButton/NotificationsButton";
 import { ProfileButton } from "./components/ProfileButton/ProfileButton";
+import { QualityAssistantButton } from "./components/QualityAssistantButton/QualityAssistantButton";
 import { SocialsButtons } from "./components/SocialsButtons/SocialsButtons";
 import { StudioButton } from "./components/StudioButton/StudioButton";
 import { ThreadsButton } from "./components/ThreadsButton/ThreadsButton";
@@ -32,6 +34,7 @@ export const Menu = (): JSX.Element => {
   const pathname = usePathname() ?? "";
   const [isLogoHovered, setIsLogoHovered] = useState<boolean>(false);
   const { isDarkMode } = useUserSettingsContext();
+  const flagEnabled = useFeatureFlagEnabled("show-quality-assistant");
 
   useChatsList();
 
@@ -45,7 +48,8 @@ export const Menu = (): JSX.Element => {
     "/knowledge",
     "/library",
     "/search",
-    "/studio",
+    "studio",
+    "/quality-assistant",
     "/user",
   ];
 
@@ -85,6 +89,8 @@ export const Menu = (): JSX.Element => {
                 <div className={styles.block}>
                   <DiscussionButton />
                   <HomeButton />
+
+                  {flagEnabled && <QualityAssistantButton />}
                   <StudioButton />
                   <KnowledgeButton />
                   <NotificationsButton />

@@ -2,6 +2,7 @@ import hashlib
 import io
 from dataclasses import dataclass
 from datetime import datetime
+from enum import Enum, auto
 from typing import Dict, List, Optional
 from uuid import UUID
 
@@ -50,6 +51,11 @@ class SyncFile(BaseModel):
     type: Optional[str] = None
 
 
+class SyncType(Enum):
+    FOLDER = auto()
+    FILE = auto()
+
+
 class Sync(SQLModel, table=True):
     __tablename__ = "syncs"  # type: ignore
 
@@ -79,7 +85,6 @@ class Sync(SQLModel, table=True):
             onupdate=datetime.utcnow,
         ),
     )
-    last_synced_at: datetime | None = Field(default=None)
     additional_data: dict | None = Field(
         default=None, sa_column=Column("additional_data", JSON)
     )

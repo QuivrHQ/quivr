@@ -50,16 +50,23 @@ class KnowledgeDB(AsyncAttrs, SQLModel, table=True):
     created_at: datetime | None = Field(
         default=None,
         sa_column=Column(
-            TIMESTAMP(timezone=False),
+            TIMESTAMP(timezone=True),
             server_default=text("CURRENT_TIMESTAMP"),
         ),
     )
     updated_at: datetime | None = Field(
         default=None,
         sa_column=Column(
-            TIMESTAMP(timezone=False),
+            TIMESTAMP(timezone=True),
             server_default=text("CURRENT_TIMESTAMP"),
             onupdate=datetime.utcnow,
+        ),
+    )
+
+    last_synced_at: datetime | None = Field(
+        default=None,
+        sa_column=Column(
+            TIMESTAMP(timezone=True),
         ),
     )
     metadata_: Optional[Dict[str, str]] = Field(
@@ -134,4 +141,5 @@ class KnowledgeDB(AsyncAttrs, SQLModel, table=True):
             user_id=self.user_id,
             sync_id=self.sync_id,
             sync_file_id=self.sync_file_id,
+            last_synced_at=self.last_synced_at,
         )

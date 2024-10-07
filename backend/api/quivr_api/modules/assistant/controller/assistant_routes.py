@@ -1,10 +1,11 @@
 import io
 from typing import Annotated, List
 from uuid import uuid4
-
-from fastapi import APIRouter, Depends, HTTPException, Request, UploadFile
+from fastapi import APIRouter, Depends, File, HTTPException, Request, UploadFile
+import re
 
 from quivr_api.celery_config import celery
+from quivr_api.modules.assistant.dto.inputs import FileInput
 from quivr_api.logger import get_logger
 from quivr_api.middlewares.auth.auth_bearer import AuthBearer, get_current_user
 from quivr_api.modules.assistant.controller.assistants_definition import (
@@ -16,6 +17,7 @@ from quivr_api.modules.assistant.dto.outputs import AssistantOutput
 from quivr_api.modules.assistant.entity.assistant_entity import (
     AssistantSettings,
 )
+from quivr_api.modules.assistant.entity.task_entity import TaskMetadata
 from quivr_api.modules.assistant.services.tasks_service import TasksService
 from quivr_api.modules.dependencies import get_service
 from quivr_api.modules.upload.service.upload_file import (
@@ -64,27 +66,34 @@ async def create_task(
     current_user: UserIdentityDep,
     tasks_service: TasksServiceDep,
     request: Request,
-    input: InputAssistant,
+    input: str = File(...),
     files: List[UploadFile] = None,
 ):
+    inputs = InputAssistant.model_validate_json(input)
+
     assistant = next(
-        (assistant for assistant in assistants if assistant.id == input.id), None
+        (assistant for assistant in assistants if assistant.id == inputs.id), None
     )
+
     if assistant is None:
         raise HTTPException(status_code=404, detail="Assistant not found")
 
-    is_valid, validation_errors = validate_assistant_input(input, assistant)
+    is_valid, validation_errors = validate_assistant_input(inputs, assistant)
     if not is_valid:
         for error in validation_errors:
             print(error)
             raise HTTPException(status_code=400, detail=error)
     else:
         print("Assistant input is valid.")
-    notification_uuid = uuid4()
+    notification_uuid = f"{assistant.name}-{str(uuid4())[:8]}"
 
     # Process files dynamically
     for upload_file in files:
-        file_name_path = f"{input.id}/{notification_uuid}/{upload_file.filename}"
+        # Sanitize the filename to remove spaces and special characters
+        sanitized_filename = re.sub(r'[^\w\-_\.]', '_', upload_file.filename)
+        upload_file.filename = sanitized_filename
+        
+        file_name_path = f"{inputs.id}/{notification_uuid}/{sanitized_filename}"
         buff_reader = io.BufferedReader(upload_file.file)  # type: ignore
         try:
             await upload_file_storage(buff_reader, file_name_path)
@@ -93,11 +102,28 @@ async def create_task(
             raise HTTPException(
                 status_code=500, detail=f"Failed to upload file to storage. {e}"
             )
-
+    logger.info(f"Files are: {files}")
+    
+    # Sanitize the filename in input
+    if inputs.inputs.files:
+        inputs.inputs.files = [
+            FileInput(
+                value=re.sub(r'[^\w\-_\.]', '_', file.value),
+                key=file.key
+            )
+            for file in inputs.inputs.files
+        ]
+    
     task = CreateTask(
-        assistant_id=input.id,
-        pretty_id=str(notification_uuid),
-        settings=input.model_dump(mode="json"),
+        assistant_id=inputs.id,
+        assistant_name=assistant.name,
+        pretty_id=notification_uuid,
+        settings=inputs.model_dump(mode="json"),
+        task_metadata=TaskMetadata(
+            input_files=[file.filename for file in files]
+        ).model_dump(mode="json")
+        if files
+        else None,  # type: ignore
     )
 
     task_created = await tasks_service.create_task(task, current_user.id)
@@ -105,7 +131,7 @@ async def create_task(
     celery.send_task(
         "process_assistant_task",
         kwargs={
-            "assistant_id": input.id,
+            "assistant_id": inputs.id,
             "notification_uuid": notification_uuid,
             "task_id": task_created.id,
             "user_id": str(current_user.id),

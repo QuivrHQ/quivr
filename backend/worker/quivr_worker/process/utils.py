@@ -12,7 +12,7 @@ from quivr_api.logger import get_logger
 from quivr_api.modules.knowledge.dto.outputs import KnowledgeDTO
 from quivr_api.modules.knowledge.entity.knowledge import KnowledgeDB, KnowledgeSource
 from quivr_api.modules.sync.dto.outputs import SyncProvider
-from quivr_api.modules.sync.entity.sync_models import Sync, SyncFile
+from quivr_api.modules.sync.entity.sync_models import SyncFile
 from quivr_api.modules.sync.utils.sync import (
     AzureDriveSync,
     BaseSync,
@@ -98,13 +98,12 @@ async def build_sync_file(
     file_knowledge: KnowledgeDB,
     sync_file: SyncFile,
     sync_provider: BaseSync,
-    sync: Sync,
+    credentials: dict[str, Any],
 ) -> AsyncGenerator[Tuple[KnowledgeDB, QuivrFile], None]:
-    assert sync.credentials
     file_data = await download_sync_file(
         sync_provider=sync_provider,
         file=sync_file,
-        credentials=sync.credentials,
+        credentials=credentials,
     )
     file_knowledge.file_sha1 = compute_sha1(file_data)
     file_knowledge.file_size = len(file_data)
