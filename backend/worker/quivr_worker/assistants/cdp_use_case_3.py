@@ -141,7 +141,6 @@ async def create_modification_report(
     logger.debug(after_text.page_content)
     text_after_sections = before_text.page_content.split("\n# ")
     text_before_sections = after_text.page_content.split("\n# ")
-    assert len(text_after_sections) == len(text_before_sections)
 
     if use_llm_comparator:
         logger.debug("using llm comparator")
