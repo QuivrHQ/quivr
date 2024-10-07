@@ -20,7 +20,7 @@ const AddFolderModal = ({
   const [folderName, setFolderName] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
 
-  const { currentFolder } = useKnowledgeContext();
+  const { currentFolder, setRefetchFolderMenu } = useKnowledgeContext();
   const { addFolder } = useKnowledgeApi();
 
   const handleKeyDown = async (event: React.KeyboardEvent) => {
@@ -37,6 +37,7 @@ const AddFolderModal = ({
         file_name: folderName,
         is_folder: true,
       });
+      setRefetchFolderMenu(true);
       setFolderName("");
       setIsOpen(false);
       setLoading(false);
