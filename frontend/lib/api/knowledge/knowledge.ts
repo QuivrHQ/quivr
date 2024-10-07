@@ -113,28 +113,17 @@ export const addFolder = async (
 
 export const patchKnowledge = async (
   knowledge_id: UUID,
-  knowledgeData: KMSElement,
-  axiosInstance: AxiosInstance
+  axiosInstance: AxiosInstance,
+  parent_id: UUID
 ): Promise<KMSElement> => {
-  console.info("knowledgeData", knowledgeData);
-  console.info("knowledge_id", knowledge_id);
-  const object = {
-    file_name: knowledgeData.file_name,
-    parent_id: knowledgeData.parent_id,
-    status: knowledgeData.status,
-    url: knowledgeData.url,
-    file_sha1: knowledgeData.file_sha1,
-    extension: knowledgeData.extension,
-    source: knowledgeData.source,
-    source_link: knowledgeData.source_link,
-    metadata: knowledgeData.metadata,
-    last_synced_at: knowledgeData.last_synced_at,
+  const data = {
+    parent_id,
   };
 
-  console.info(object);
-  return (
-    await axiosInstance.patch<KMSElement>(`/knowledge/${knowledge_id}`, {
-      object,
-    })
-  ).data;
+  const response: { data: KMSElement } = await axiosInstance.patch<KMSElement>(
+    `/knowledge/${knowledge_id}`,
+    data
+  );
+
+  return response.data;
 };

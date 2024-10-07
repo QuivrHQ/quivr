@@ -83,10 +83,7 @@ const QuivrCurrentFolder = (): JSX.Element => {
       event.dataTransfer.getData("application/json")
     ) as KMSElement;
     try {
-      await patchKnowledge(draggedElement.id, {
-        ...draggedElement,
-        parent_id: targetElement.id,
-      });
+      await patchKnowledge(draggedElement.id, targetElement.id);
       await fetchQuivrFiles(currentFolder?.id ?? null);
     } catch (error) {
       console.error("Failed to patch knowledge:", error);
@@ -136,7 +133,7 @@ const QuivrCurrentFolder = (): JSX.Element => {
                         parentKMSElement: currentFolder,
                       }}
                       onDragStart={handleDragStart}
-                      onDrop={handleDrop}
+                      onDrop={(event) => void handleDrop(event, element)}
                       onDragOver={handleDragOver}
                     />
                   </div>

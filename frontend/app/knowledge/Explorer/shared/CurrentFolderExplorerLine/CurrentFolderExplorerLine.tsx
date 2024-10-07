@@ -88,8 +88,8 @@ const CurrentFolderExplorerLine = ({
         }
       }}
       draggable
-      onDragStart={(event) => onDragStart && onDragStart(event, element)}
-      onDrop={(event) => onDrop && onDrop(event, element)}
+      onDragStart={(event) => onDragStart?.(event, element)}
+      onDrop={(event) => onDrop?.(event, element)}
       onDragOver={onDragOver}
     >
       <div className={styles.left}>

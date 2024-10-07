@@ -3,7 +3,6 @@ import { UUID } from "crypto";
 import { useAxios } from "@/lib/hooks";
 import { AddFolderData } from "@/lib/types/Knowledge";
 
-import { KMSElement } from "../sync/types";
 import {
   addFolder,
   deleteKnowledge,
@@ -30,7 +29,7 @@ export const useKnowledgeApi = () => {
       getFiles(parentId, axiosInstance),
     addFolder: async (addFolderData: AddFolderData) =>
       addFolder(addFolderData, axiosInstance),
-    patchKnowledge: async (knowledgeId: UUID, data: KMSElement) =>
-      patchKnowledge(knowledgeId, data, axiosInstance),
+    patchKnowledge: async (knowledgeId: UUID, parent_id: UUID) =>
+      patchKnowledge(knowledgeId, axiosInstance, parent_id),
   };
 };
