@@ -18,8 +18,12 @@ const QuivrCurrentFolder = (): JSX.Element => {
   const [deleteLoading, setDeleteLoading] = useState(false);
   const [addFolderModalOpened, setAddFolderModalOpened] = useState(false);
   const [quivrElements, setQuivrElements] = useState<KMSElement[]>();
-  const { currentFolder, exploringQuivr, selectedKnowledges } =
-    useKnowledgeContext();
+  const {
+    currentFolder,
+    exploringQuivr,
+    selectedKnowledges,
+    setSelectedKnowledges,
+  } = useKnowledgeContext();
   const { getFiles, deleteKnowledge } = useKnowledgeApi();
 
   const fetchQuivrFiles = async (folderId: UUID | null) => {
@@ -43,6 +47,7 @@ const QuivrCurrentFolder = (): JSX.Element => {
         )
       );
       await fetchQuivrFiles(currentFolder?.id ?? null);
+      setSelectedKnowledges([]);
     } catch (error) {
       console.error("Failed to delete knowledges:", error);
     } finally {
