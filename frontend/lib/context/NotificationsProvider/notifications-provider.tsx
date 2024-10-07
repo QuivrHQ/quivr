@@ -7,17 +7,23 @@ import {
 
 import { useSupabase } from "../SupabaseProvider";
 
+const LAST_RETRIEVED_KEY = "lastRetrieved";
+
 type NotificationsContextType = {
   isVisible: boolean;
   setIsVisible: React.Dispatch<React.SetStateAction<boolean>>;
   bulkNotifications: BulkNotification[];
-  setBulkNotifications: React.Dispatch<React.SetStateAction<BulkNotification[]>>;
+  setBulkNotifications: React.Dispatch<
+    React.SetStateAction<BulkNotification[]>
+  >;
   updateNotifications: () => Promise<void>;
   unreadNotifications: number;
   setUnreadNotifications: React.Dispatch<React.SetStateAction<number>>;
 };
 
-export const NotificationsContext = createContext<NotificationsContextType | undefined>(undefined);
+export const NotificationsContext = createContext<
+  NotificationsContextType | undefined
+>(undefined);
 
 export const NotificationsProvider = ({
   children,
@@ -26,16 +32,20 @@ export const NotificationsProvider = ({
 }): JSX.Element => {
   const [isVisible, setIsVisible] = useState<boolean>(false);
   const [unreadNotifications, setUnreadNotifications] = useState<number>(0);
-  const [bulkNotifications, setBulkNotifications] = useState<BulkNotification[]>([]);
+  const [bulkNotifications, setBulkNotifications] = useState<
+    BulkNotification[]
+  >([]);
   const { supabase } = useSupabase();
 
   const fetchNotifications = async (): Promise<NotificationType[]> => {
     const { data, error } = await supabase.from("notifications").select();
 
-    return (error) ? [] : data; // eslint-disable-line @typescript-eslint/no-unsafe-return
+    return error ? [] : data; // eslint-disable-line @typescript-eslint/no-unsafe-return
   };
 
-  const processNotifications = (notifications: NotificationType[]): BulkNotification[] => {
+  const processNotifications = (
+    notifications: NotificationType[]
+  ): BulkNotification[] => {
     const bulkMap: { [key: string]: NotificationType[] } = {};
     notifications.forEach((notif) => {
       if (!bulkMap[notif.bulk_id]) {
@@ -55,11 +65,10 @@ export const NotificationsProvider = ({
 
   const updateNotifications = async (): Promise<void> => {
     try {
-      const lastRetrieved = localStorage.getItem("lastRetrieved");
+      const lastRetrieved = localStorage.getItem(LAST_RETRIEVED_KEY);
       const now = Date.now();
 
       if (lastRetrieved && now - parseInt(lastRetrieved) < 1000) {
-
         return;
       }
 
@@ -67,38 +76,42 @@ export const NotificationsProvider = ({
 
       const notifications = await fetchNotifications();
       const sortedNotifications = notifications.sort(
-        (a, b) => new Date(b.datetime).getTime() - new Date(a.datetime).getTime()
+        (a, b) =>
+          new Date(b.datetime).getTime() - new Date(a.datetime).getTime()
       );
 
       const bulkNotifs = processNotifications(sortedNotifications);
       setBulkNotifications(bulkNotifs);
 
-      const unreadCount = bulkNotifs.filter((bulk) => !bulk.notifications[0].read).length;
+      const unreadCount = bulkNotifs.filter(
+        (bulk) => !bulk.notifications[0].read
+      ).length;
       setUnreadNotifications(unreadCount);
     } catch (error) {
       console.error("Error updating notifications:", error);
     }
   };
 
-  const debounce = <T extends (...args: unknown[]) => void>(func: T, delay: number): T & { cancel: () => void } => {
-    let timeoutId: NodeJS.Timeout;
+  const debounce = <T extends (...args: unknown[]) => void>(
+    func: T,
+    delay: number
+  ): T & { cancel: () => void } => {
+    let timer: NodeJS.Timeout | undefined = undefined;
     let lastArgs: Parameters<T>;
 
     const debouncedFunction = (...args: Parameters<T>) => {
       lastArgs = args;
-      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-      if (timeoutId) {
-        clearTimeout(timeoutId);
+      if (timer) {
+        clearTimeout(timer);
       }
-      timeoutId = setTimeout(() => {
+      timer = setTimeout(() => {
         func(...lastArgs);
       }, delay);
     };
 
     debouncedFunction.cancel = () => {
-      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-      if (timeoutId) {
-        clearTimeout(timeoutId);
+      if (timer) {
+        clearTimeout(timer);
       }
     };
 
@@ -106,14 +119,15 @@ export const NotificationsProvider = ({
   };
 
   const debouncedUpdateNotifications = useCallback(
-    // eslint-disable-next-line @typescript-eslint/no-misused-promises
-    debounce(updateNotifications, 1000),
+    debounce(() => {
+      void updateNotifications();
+    }, 1000),
     [updateNotifications]
   );
 
   useEffect(() => {
     if (isVisible) {
-      const lastRetrieved = localStorage.getItem("lastRetrieved");
+      const lastRetrieved = localStorage.getItem(LAST_RETRIEVED_KEY);
       const now = Date.now();
 
       if (!lastRetrieved || now - parseInt(lastRetrieved) >= 1000) {
