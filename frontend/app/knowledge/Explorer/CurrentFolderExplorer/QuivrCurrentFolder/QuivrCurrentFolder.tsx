@@ -5,6 +5,7 @@ import { useKnowledgeApi } from "@/lib/api/knowledge/useKnowledgeApi";
 import { KMSElement } from "@/lib/api/sync/types";
 import { LoaderIcon } from "@/lib/components/ui/LoaderIcon/LoaderIcon";
 import QuivrButton from "@/lib/components/ui/QuivrButton/QuivrButton";
+import { handleDrop } from "@/lib/helpers/kms";
 
 import AddFolderModal from "./AddFolderModal/AddFolderModal";
 import styles from "./QuivrCurrentFolder.module.scss";
@@ -78,25 +79,6 @@ const QuivrCurrentFolder = (): JSX.Element => {
     event.dataTransfer.setData("application/json", JSON.stringify(element));
   };
 
-  const handleDrop = async (
-    event: React.DragEvent<HTMLDivElement>,
-    targetElement: KMSElement
-  ) => {
-    event.preventDefault();
-    const draggedElement = JSON.parse(
-      event.dataTransfer.getData("application/json")
-    ) as KMSElement;
-    if (draggedElement.id !== targetElement.id) {
-      try {
-        await patchKnowledge(draggedElement.id, targetElement.id);
-        setRefetchFolderMenu(true);
-        await fetchQuivrFiles(currentFolder?.id ?? null);
-      } catch (error) {
-        console.error("Failed to patch knowledge:", error);
-      }
-    }
-  };
-
   const handleDragOver = (event: React.DragEvent<HTMLDivElement>) => {
     event.preventDefault();
   };
@@ -142,7 +124,15 @@ const QuivrCurrentFolder = (): JSX.Element => {
                       onDragStart={handleDragStart}
                       onDrop={
                         element.is_folder
-                          ? (event) => void handleDrop(event, element)
+                          ? (event) =>
+                              void handleDrop({
+                                event,
+                                targetElement: element,
+                                patchKnowledge,
+                                setRefetchFolderMenu,
+                                fetchQuivrFiles,
+                                currentFolder,
+                              })
                           : undefined
                       }
                       onDragOver={
