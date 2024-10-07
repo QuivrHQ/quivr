@@ -230,7 +230,7 @@ async def update_knowledge(
                 detail="You do not have permission to access this knowledge.",
             )
         km = await knowledge_service.update_knowledge(km, payload)
-        return km
+        return await km.to_dto()
     except KnowledgeNotFoundException as e:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail=f"{e.message}"
