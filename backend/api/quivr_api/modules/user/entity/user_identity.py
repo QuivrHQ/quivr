@@ -2,8 +2,9 @@ from typing import List, Optional
 from uuid import UUID, uuid4
 
 from pydantic import BaseModel
-from quivr_api.modules.brain.entity.brain_user import BrainUserDB
 from sqlmodel import Field, Relationship, SQLModel
+
+from quivr_api.modules.brain.entity.brain_user import BrainUserDB
 
 
 class User(SQLModel, table=True):
@@ -21,6 +22,10 @@ class User(SQLModel, table=True):
     brains: List["Brain"] = Relationship(
         back_populates="users",
         link_model=BrainUserDB,
+    )
+    product_id: int | None = Field(default=None, foreign_key="product_to_features.id")
+    product: Optional["ProductSettings"] = Relationship(  # type: ignore  # noqa: F821
+        back_populates="users", sa_relationship_kwargs={"lazy": "joined"}
     )
 
 
