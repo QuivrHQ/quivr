@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Any, List, Sequence
 from uuid import UUID
 
@@ -68,7 +68,7 @@ class KnowledgeRepository(BaseRepository):
                 update_data = payload.model_dump(exclude_unset=True)
             for field in update_data:
                 setattr(knowledge, field, update_data[field])
-
+            knowledge.updated_at = datetime.now(timezone.utc)
             self.session.add(knowledge)
             if autocommit:
                 await self.session.commit()
