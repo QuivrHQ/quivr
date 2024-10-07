@@ -57,6 +57,13 @@ const QuivrCurrentFolder = (): JSX.Element => {
             <>
               <div className={styles.content_header}>
                 <QuivrButton
+                  iconName="delete"
+                  label="Delete"
+                  color="dangerous"
+                  onClick={() => console.log("Delete folder")}
+                  small={true}
+                />
+                <QuivrButton
                   iconName="add"
                   label="Add Folder"
                   color="primary"

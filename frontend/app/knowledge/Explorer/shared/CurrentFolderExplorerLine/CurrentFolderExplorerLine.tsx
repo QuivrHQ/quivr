@@ -1,4 +1,5 @@
 import { KMSElement } from "@/lib/api/sync/types";
+import { Checkbox } from "@/lib/components/ui/Checkbox/Checkbox";
 import { Icon } from "@/lib/components/ui/Icon/Icon";
 import { iconList } from "@/lib/helpers/iconList";
 
@@ -14,6 +15,7 @@ const CurrentFolderExplorerLine = ({
   element,
 }: CurrentFolderExplorerLineProps): JSX.Element => {
   const { setCurrentFolder } = useKnowledgeContext();
+  const { selectedKnowledges, setSelectedKnowledges } = useKnowledgeContext();
 
   const fileType = element.file_name?.includes(".")
     ? element.file_name.split(".").pop()?.toLowerCase() ?? "default"
@@ -50,6 +52,16 @@ const CurrentFolderExplorerLine = ({
     return iconColors[fileTypeLowerCase] ?? "#B1B9BE";
   };
 
+  const handleCheckboxChange = (checked: boolean) => {
+    if (checked) {
+      setSelectedKnowledges([...selectedKnowledges, element]);
+    } else {
+      setSelectedKnowledges(
+        selectedKnowledges.filter((knowledge) => knowledge.id !== element.id)
+      );
+    }
+  };
+
   return (
     <div
       className={`${styles.folder_explorer_line_wrapper} ${
@@ -65,6 +77,12 @@ const CurrentFolderExplorerLine = ({
       }}
     >
       <div className={styles.left}>
+        <Checkbox
+          checked={selectedKnowledges.includes(element)}
+          setChecked={() =>
+            handleCheckboxChange(!selectedKnowledges.includes(element))
+          }
+        />
         {
           <Icon
             name={

@@ -17,6 +17,8 @@ type KnowledgeContextType = {
   setExploredSpecificAccount: React.Dispatch<
     React.SetStateAction<Sync | undefined>
   >;
+  selectedKnowledges: KMSElement[];
+  setSelectedKnowledges: React.Dispatch<React.SetStateAction<KMSElement[]>>;
 };
 
 export const KnowledgeContext = createContext<KnowledgeContextType | undefined>(
@@ -38,6 +40,9 @@ export const KnowledgeProvider = ({
   const [exploredSpecificAccount, setExploredSpecificAccount] = useState<
     Sync | undefined
   >(undefined);
+  const [selectedKnowledges, setSelectedKnowledges] = useState<KMSElement[]>(
+    []
+  );
 
   return (
     <KnowledgeContext.Provider
@@ -50,6 +55,8 @@ export const KnowledgeProvider = ({
         setExploredProvider,
         exploredSpecificAccount,
         setExploredSpecificAccount,
+        selectedKnowledges,
+        setSelectedKnowledges,
       }}
     >
       {children}
