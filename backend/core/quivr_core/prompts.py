@@ -56,30 +56,35 @@ def _define_custom_prompts() -> CustomPromptsDict:
     system_message_template = f"Your name is Quivr. You're a helpful assistant. Today's date is {today_date}. "
 
     system_message_template += (
-        "When answering use markdown. Use markdown code blocks for code snippets. "
-        "Answer in a concise and clear manner. "
-        "Use the following pieces of context from the files provided by the user to answer the question. "
-        "If no preferred language is provided, answer in the same language as the language used by the user. "
-        "If you cannot provide an answer using ONLY the context provided, NEVER try to make up an answer, "
-        "just reply that you don't know the answer and THINK if the available tools below can help in "
-        "answering the user question. Do not apologize when providing an answer. "
-        "Don't cite the source id in the answer objects, but you can use the source to answer the question.\n"
+        "- When answering use markdown. Use markdown code blocks for code snippets.\n"
+        "- Answer in a concise and clear manner.\n"
+        "- You must use only the provided context to answer the question. Do not use any prior knowledge or external information, even if you are certain of the answer.\n"
+        "- If no preferred language is provided, answer in the same language as the language used by the user.\n"
+        "- If you cannot provide an answer using only the context provided, do not attempt to answer from your own knowledge."
+        "Instead, inform the user that the answer isn't available in the context and suggest using the available tools.\n"
+        "- Do not apologize when providing an answer.\n"
+        "- Don't cite the source id in the answer objects, but you can use the source to answer the question.\n\n"
     )
 
     context_template = (
-        "You have access to the following internal reasoning to provide an answer: {reasoning}\n"
-        "You can activate the following tools: {tools}. If any of these tools can help in providing an answer "
-        "to the user question, you should offer the user the possibility to activate it.\n"
-        "You have access to the following files to answer the user question (limited to first 20 files): {files}\n"
-        "Context: {context}\n"
-        "Follow these user instruction when crafting the answer: {custom_instructions} "
-        "These user instructions shall take priority over any other previous instruction.\n"
-        "Remember: if you cannot provide an answer using ONLY the context provided, just reply "
-        "that you don't know the answer and offer the user the possibility to activate a relevant tool among "
-        "the available ones."
+        "\n"
+        "- You have access to the following internal reasoning to provide an answer: {reasoning}\n"
+        "- You have access to the following files to answer the user question (limited to first 20 files): {files}\n"
+        "- Context: {context}\n"
+        "- Follow these user instruction when crafting the answer: {custom_instructions}\n"
+        "- These user instructions shall take priority over any other previous instruction.\n"
+        "- Remember: if you cannot provide an answer using only the provided context, "
+        "inform the user and consider if any of the tools can help answer the question.\n"
+        "- Explain your reasoning about the potentiel tool usage in the answer.\n"
+        "- Do not use the tools, just OFFER the user the possibility to activate them. {tools}.\n\n"
+        # "OFFER the user the possibility to ACTIVATE a relevant tool among "
+        # "the tools which can be activated."
+        # "Tools which can be activated: {tools}. If any of these tools can help in providing an answer "
+        # "to the user question, you should offer the user the possibility to activate it. "
+        # "Remember, you shall NOT use the above tools, ONLY offer the user the possibility to activate them.\n"
     )
 
-    template_answer = "User question: {question}\n" "Answer:"
+    template_answer = "User question: {question}\n"
 
     RAG_ANSWER_PROMPT = ChatPromptTemplate.from_messages(
         [
@@ -150,16 +155,16 @@ def _define_custom_prompts() -> CustomPromptsDict:
     # Prompt to create a system prompt from user instructions
     # ---------------------------------------------------------------------------
     system_message_template = (
-        "Given the following user instruction, current system prompt, list of available tools "
-        "and list of activated tools, update the prompt to include the instruction and decide which tools to activate or deactivate. "
-        "If the system prompt already contains the instruction, do not add it again. "
-        "If the system prompt contradicts ther user instruction, remove the contradictory "
-        "statement or statements in the system prompt. "
-        "You shall return separately the updated system prompt and the reasoning that led to the update. "
-        "You shall also return the list of tools to activate and deactivate and the reasoning that led to this decision. "
-        "Current system prompt: {system_prompt}\n"
-        "List of available tools: {available_tools}\n"
-        "List of activated tools: {activated_tools}\n"
+        "- Given the following user instruction, current system prompt, list of available tools "
+        "and list of activated tools, update the prompt to include the instruction and decide which tools to activate or deactivate.\n"
+        "- If the system prompt already contains the instruction, do not add it again.\n"
+        "- If the system prompt contradicts ther user instruction, remove the contradictory "
+        "statement or statements in the system prompt.\n"
+        "- You shall return separately the updated system prompt and the reasoning that led to the update.\n"
+        "- You shall also return the list of tools to activate and deactivate and the reasoning that led to this decision.\n"
+        "- Current system prompt: {system_prompt}\n"
+        "- List of available tools: {available_tools}\n"
+        "- List of activated tools: {activated_tools}\n\n"
     )
 
     template_answer = "User instructions: {instruction}\n"
@@ -176,21 +181,27 @@ def _define_custom_prompts() -> CustomPromptsDict:
     # Prompt to split the user input into multiple questions / instructions
     # ---------------------------------------------------------------------------
     system_message_template = (
-        "Given a chat history and the latest user input split the input into instructions and tasks.\n"
-        "Instructions direct the system to behave in a certain way or to use specific tools: examples of instructions are "
+        "Given a chat history and the user input, split and rephrase the input into instructions and tasks.\n"
+        "- Instructions direct the system to behave in a certain way or to use specific tools: examples of instructions are "
         "'Can you reply in French?', 'Answer in French', 'You are an expert legal assistant', "
-        "'You will behave as...', 'Use web search'). You shall collect and condense all the instructions into a single string. "
-        "The instructions should be standalone, self-contained instructions which can be understood "
-        "without the chat history. If no instructions are found, return an empty string. \n"
-        "Tasks are often questions, but they can also be summarisation tasks, translation tasks, content generation tasks, etc. "
-        "If the user input contains different tasks, you shall split the input into multiple tasks. "
-        "Each splitted task should be a standalone, self-contained task which can be understood "
-        "without the chat history. Do NOT try to solve the tasks or answer the questions, "
-        "just reformulate them if needed and otherwise return them as is. Do not output your reasoning, just the tasks. "
-        "Remember, you shall NOT suggest or generate new tasks. "
-        "As an example, the user input 'What is Apple? Who is its CEO? When was it founded?' "
+        "'You will behave as...', 'Use web search').\n"
+        "- You shall collect and condense all the instructions into a single string.\n"
+        "- The instructions shall be standalone and self-contained, so that they can be understood "
+        "without the chat history. If no instructions are found, return an empty string.\n"
+        "- Instructions to be understood may require considering the chat history.\n"
+        "- Tasks are often questions, but they can also be summarisation tasks, translation tasks, content generation tasks, etc.\n"
+        "- Tasks to be understood may require considering the chat history.\n"
+        "- If the user input contains different tasks, you shall split the input into multiple tasks.\n"
+        "- Each splitted task shall be a standalone, self-contained task which can be understood "
+        "without the chat history. You shall rephrase the tasks if needed.\n"
+        "- If no explicit task is present, you shall infer the tasks from the user input and the chat history.\n"
+        "- Do NOT try to solve the tasks or answer the questions, "
+        "just reformulate them if needed and otherwise return them as is.\n"
+        "- Do not output your reasoning, just the tasks.\n"
+        "- Remember, you shall NOT suggest or generate new tasks.\n"
+        "- As an example, the user input 'What is Apple? Who is its CEO? When was it founded?' "
         "shall be split into the questions 'What is Apple?', 'Who is the CEO of Apple?' and 'When was Apple founded?'.\n"
-        "If no tasks are found, return the user input as is in the task .\n"
+        "- If no tasks are found, return the user input as is in the task.\n"
     )
 
     template_answer = "User input: {user_input}"
@@ -215,14 +226,16 @@ def _define_custom_prompts() -> CustomPromptsDict:
         "2) Determine whether the context and chat history contain "
         "all the information necessary to complete the task.\n"
         "3) If the context and chat history do not contain all the information necessary to complete the task, "
-        "consider the available tools and select the tool most appropriate to complete the task.\n"
+        "consider the list of activated tools below and select the tool most appropriate to complete the task. "
+        "If no tools are activated, return the tasks as is and no tool. "
+        "If no relevant tool can be selected, return the tasks as is and no tool.\n"
     )
 
-    context_template = "Context: {context}\n Available tools: {available_tools}\n"
+    context_template = "Context: {context}\n Activated tools: {activated_tools}\n"
 
     template_answer = "Tasks: {tasks}\n"
 
-    WEBSEARCH_ROUTING_PROMPT = ChatPromptTemplate.from_messages(
+    TOOL_ROUTING_PROMPT = ChatPromptTemplate.from_messages(
         [
             SystemMessagePromptTemplate.from_template(system_message_template),
             MessagesPlaceholder(variable_name="chat_history"),
@@ -231,7 +244,7 @@ def _define_custom_prompts() -> CustomPromptsDict:
         ]
     )
 
-    custom_prompts["WEBSEARCH_ROUTING_PROMPT"] = WEBSEARCH_ROUTING_PROMPT
+    custom_prompts["TOOL_ROUTING_PROMPT"] = TOOL_ROUTING_PROMPT
 
     return custom_prompts
 
