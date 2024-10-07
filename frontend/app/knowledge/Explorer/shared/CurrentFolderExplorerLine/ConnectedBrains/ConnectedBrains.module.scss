@@ -1,0 +1,15 @@
+@use "styles/Radius.module.scss";
+@use "styles/Typography.module.scss";
+
+.sample_wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: Radius.$normal;
+  min-width: 18px;
+  min-height: 18px;
+  max-width: 18px;
+  max-height: 18px;
+  border-radius: Radius.$normal;
+  font-size: Typography.$very_tiny;
+}

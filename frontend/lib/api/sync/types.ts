@@ -1,5 +1,7 @@
 import { UUID } from "crypto";
 
+import { Brain } from "@/lib/context/BrainProvider/types";
+
 export type Provider = "Google" | "Azure" | "DropBox" | "Notion" | "GitHub";
 
 export type Integration =
@@ -19,6 +21,7 @@ export type KnowledgeStatus =
   | "UPLOADED";
 
 export interface KMSElement {
+  brains: Brain[];
   id: UUID;
   file_name?: string;
   sync_file_id: string | null;

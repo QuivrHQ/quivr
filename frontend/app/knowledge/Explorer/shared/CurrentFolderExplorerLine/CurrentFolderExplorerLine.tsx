@@ -5,6 +5,7 @@ import { Checkbox } from "@/lib/components/ui/Checkbox/Checkbox";
 import { Icon } from "@/lib/components/ui/Icon/Icon";
 import { iconList } from "@/lib/helpers/iconList";
 
+import ConnectedBrains from "./ConnectedBrains/ConnectedBrains";
 import styles from "./CurrentFolderExplorerLine.module.scss";
 
 import { useKnowledgeContext } from "../../../KnowledgeProvider/hooks/useKnowledgeContext";
@@ -127,14 +128,17 @@ const CurrentFolderExplorerLine = ({
         />
         <span className={styles.name}>{element.file_name}</span>
       </div>
-      {element.is_folder && (
-        <Icon
-          name="chevronRight"
-          size="normal"
-          color="black"
-          handleHover={true}
-        />
-      )}
+      <div className={styles.right}>
+        <ConnectedBrains connectedBrains={element.brains} />
+        <div className={element.is_folder ? styles.visible : styles.hidden}>
+          <Icon
+            name="chevronRight"
+            size="normal"
+            color="black"
+            handleHover={true}
+          />
+        </div>
+      </div>
     </div>
   );
 };

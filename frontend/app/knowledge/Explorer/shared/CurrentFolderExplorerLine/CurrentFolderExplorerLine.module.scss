@@ -32,6 +32,20 @@
     }
   }
 
+  .right {
+    display: flex;
+    align-items: center;
+    gap: Spacings.$spacing03;
+
+    .visible {
+      visibility: visible;
+    }
+
+    .hidden {
+      visibility: hidden;
+    }
+  }
+
   &.folder {
     font-weight: 550;
 
