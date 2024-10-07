@@ -203,7 +203,7 @@ assistant2 = AssistantOutput(
                 key="DocumentsType",
                 description="Select Documents Type",
                 options=[
-                    "Etiquettes VS Cahier des charges",
+                    "Cahier des charges VS Etiquettes",
                     "Fiche Dev VS Cahier des charges",
                 ],
             ),
