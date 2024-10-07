@@ -249,9 +249,12 @@ INSERT INTO "public"."users" ("id", "email", "onboarded") VALUES
 --
 
 INSERT INTO "public"."models" ("name", "price", "max_context_tokens", "max_output_tokens", "description", "display_name", "image_url", "default", "endpoint_url", "env_variable_name") VALUES
-	('gpt-4-0125-preview', 1, 4000, 4000, 'Default Description', 'GPT4', 'https://quivr-cms.s3.eu-west-3.amazonaws.com/logo_quivr_white_7e3c72620f.png', false, 'https://api.openai.com/v1', 'OPENAI_API_KEY'),
-	('gpt-3.5-turbo-0125', 1, 10000, 1000, 'Default Description', 'GPT-3.5', 'https://quivr-cms.s3.eu-west-3.amazonaws.com/logo_quivr_white_7e3c72620f.png', true, 'https://api.openai.com/v1', 'OPENAI_API_KEY');
-
+    ('claude-3-5-sonnet-20240620', 1, 10000, 2000, 'A powerful model by Anthropic that made some waves in the community for being the best in some tasks', 'Claude Sonnet', 'https://quivr-cms.s3.eu-west-3.amazonaws.com/claude_claire_2b6e282f78.png', false, 'https://api.anthropic.com', 'ANTHROPIC_API_KEY'),
+    ('gpt-4o', 2, 5000, 4096, 'An optimized variant of GPT-4, delivering high performance for a wide range of applications.', 'GPT4o', 'https://quivr-cms.s3.eu-west-3.amazonaws.com/openai_violet_ea82d8654c.png', false, 'https://api.openai.com/v1', 'OPENAI_API_KEY'),
+    ('gpt-4o-mini', 1, 5000, 16384, 'A compact version of GPT-4o, designed for efficiency and optimized for lightweight AI tasks.', 'GPT4o Mini', 'https://quivr-cms.s3.eu-west-3.amazonaws.com/openai_vert_678a2921c6.png', true, 'https://api.openai.com/v1', 'OPENAI_API_KEY'),
+    ('llama-3.1-70b-versatile', 1, 2000, 8000, 'A cutting-edge AI model tailored for complex conversational tasks and deep contextual understanding.', 'Groq Llama 3.1 70b', 'https://quivr-cms.s3.eu-west-3.amazonaws.com/groq_2ee79e6245.png', false, 'https://api.groq.com/openai/v1', 'GROQ_API_KEY'),
+    ('mistral-large-latest', 2, 2000, 4096, 'A powerful model by Mistral, capable of handling large-scale, complex computations.', 'Mistral Large', 'https://quivr-cms.s3.eu-west-3.amazonaws.com/mistral_sombre_e39aa596c5.png', false, 'https://api.mistral.ai/v1', 'MISTRAL_API_KEY'),
+    ('mistral-small-latest', 1, 2000, 4096, 'A streamlined model by Mistral, balancing performance and resource efficiency for everyday use.', 'Mistral Small', 'https://quivr-cms.s3.eu-west-3.amazonaws.com/mistral_claire_d7c1119b1a.png', false, 'https://api.mistral.ai/v1', 'MISTRAL_API_KEY');
 
 --
 -- Data for Name: notifications; Type: TABLE DATA; Schema: public; Owner: postgres
