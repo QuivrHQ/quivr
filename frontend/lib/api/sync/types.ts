@@ -11,6 +11,13 @@ export type Integration =
 
 export type SyncStatus = "SYNCING" | "SYNCED" | "ERROR" | "REMOVED";
 
+export type KnowledgeStatus =
+  | "ERROR"
+  | "RESERVED"
+  | "PROCESSING"
+  | "PROCESSED"
+  | "UPLOADED";
+
 export interface KMSElement {
   id: UUID;
   file_name?: string;
@@ -22,6 +29,13 @@ export interface KMSElement {
   parentKMSElement?: KMSElement;
   fromProvider?: SyncsByProvider;
   source: "local" | string;
+  last_synced_at: string;
+  url?: string;
+  extension?: string;
+  status?: KnowledgeStatus;
+  file_sha1?: string;
+  source_link?: string;
+  metadata?: string;
 }
 
 interface Credentials {

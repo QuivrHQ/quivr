@@ -116,9 +116,25 @@ export const patchKnowledge = async (
   knowledgeData: KMSElement,
   axiosInstance: AxiosInstance
 ): Promise<KMSElement> => {
+  console.info("knowledgeData", knowledgeData);
+  console.info("knowledge_id", knowledge_id);
+  const object = {
+    file_name: knowledgeData.file_name,
+    parent_id: knowledgeData.parent_id,
+    status: knowledgeData.status,
+    url: knowledgeData.url,
+    file_sha1: knowledgeData.file_sha1,
+    extension: knowledgeData.extension,
+    source: knowledgeData.source,
+    source_link: knowledgeData.source_link,
+    metadata: knowledgeData.metadata,
+    last_synced_at: knowledgeData.last_synced_at,
+  };
+
+  console.info(object);
   return (
     await axiosInstance.patch<KMSElement>(`/knowledge/${knowledge_id}`, {
-      knowledgeData,
+      object,
     })
   ).data;
 };
