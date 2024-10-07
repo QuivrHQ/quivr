@@ -36,6 +36,7 @@ const QuivrCurrentFolder = (): JSX.Element => {
       console.error("Failed to get sync files:", error);
     } finally {
       setLoading(false);
+      console.info("hey");
     }
   };
 
