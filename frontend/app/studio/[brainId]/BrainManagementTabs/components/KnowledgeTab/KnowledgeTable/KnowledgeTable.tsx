@@ -4,6 +4,7 @@ import { Checkbox } from "@/lib/components/ui/Checkbox/Checkbox";
 import { Icon } from "@/lib/components/ui/Icon/Icon";
 import { QuivrButton } from "@/lib/components/ui/QuivrButton/QuivrButton";
 import { TextInput } from "@/lib/components/ui/TextInput/TextInput";
+import { updateSelectedItems } from "@/lib/helpers/table";
 import { useDevice } from "@/lib/hooks/useDevice";
 import { isUploadedKnowledge, Knowledge } from "@/lib/types/Knowledge";
 
@@ -58,51 +59,6 @@ const filterAndSortKnowledge = (
   return filteredList;
 };
 
-const updateSelectedKnowledge = ({
-  knowledge,
-  index,
-  event,
-  lastSelectedIndex,
-  filteredKnowledgeList,
-  selectedKnowledge,
-}: {
-  knowledge: Knowledge;
-  index: number;
-  event: React.MouseEvent;
-  lastSelectedIndex: number | null;
-  filteredKnowledgeList: Knowledge[];
-  selectedKnowledge: Knowledge[];
-}): { selectedKnowledge: Knowledge[]; lastSelectedIndex: number | null } => {
-  if (event.shiftKey && lastSelectedIndex !== null) {
-    const start = Math.min(lastSelectedIndex, index);
-    const end = Math.max(lastSelectedIndex, index);
-    const range = filteredKnowledgeList.slice(start, end + 1);
-
-    const newSelected = [...selectedKnowledge];
-    range.forEach((item) => {
-      if (!newSelected.some((selectedItem) => selectedItem.id === item.id)) {
-        newSelected.push(item);
-      }
-    });
-
-    return { selectedKnowledge: newSelected, lastSelectedIndex: index };
-  } else {
-    const isSelected = selectedKnowledge.some(
-      (item) => item.id === knowledge.id
-    );
-    const newSelectedKnowledge = isSelected
-      ? selectedKnowledge.filter(
-          (selectedItem) => selectedItem.id !== knowledge.id
-        )
-      : [...selectedKnowledge, knowledge];
-
-    return {
-      selectedKnowledge: newSelectedKnowledge,
-      lastSelectedIndex: isSelected ? null : index,
-    };
-  }
-};
-
 const KnowledgeTable = React.forwardRef<HTMLDivElement, KnowledgeTableProps>(
   ({ knowledgeList }, ref) => {
     const [selectedKnowledge, setSelectedKnowledge] = useState<Knowledge[]>([]);
@@ -131,15 +87,15 @@ const KnowledgeTable = React.forwardRef<HTMLDivElement, KnowledgeTableProps>(
       index: number,
       event: React.MouseEvent
     ) => {
-      const newSelectedKnowledge = updateSelectedKnowledge({
-        knowledge,
+      const newSelectedKnowledge = updateSelectedItems<Knowledge>({
+        item: knowledge,
         index,
         event,
         lastSelectedIndex,
-        filteredKnowledgeList,
-        selectedKnowledge,
+        filteredList: filteredKnowledgeList,
+        selectedItems: selectedKnowledge,
       });
-      setSelectedKnowledge(newSelectedKnowledge.selectedKnowledge);
+      setSelectedKnowledge(newSelectedKnowledge.selectedItems);
       setLastSelectedIndex(newSelectedKnowledge.lastSelectedIndex);
     };
 

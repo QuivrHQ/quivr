@@ -8,7 +8,7 @@ from uuid import UUID
 from attr import dataclass
 from celery.result import AsyncResult
 from quivr_api.celery_config import celery
-from quivr_api.logger import get_logger
+from quivr_api.logger import get_logger, setup_logger
 from quivr_api.models.settings import settings
 from quivr_api.modules.knowledge.repository.knowledges import KnowledgeRepository
 from quivr_api.modules.knowledge.service.knowledge_service import KnowledgeService
@@ -22,19 +22,21 @@ from sqlalchemy.ext.asyncio import create_async_engine
 from sqlmodel import text
 from sqlmodel.ext.asyncio.session import AsyncSession
 
-logger = get_logger("notifier_service", "notifier_service.log")
-
 async_engine = create_async_engine(
     settings.pg_database_async_url,
     connect_args={"server_settings": {"application_name": "quivr-monitor"}},
     echo=True if os.getenv("ORM_DEBUG") else False,
     future=True,
     pool_pre_ping=True,
+    max_overflow=0,
     pool_size=5,  # NOTE: no bouncer for now, if 6 process workers => 6
     pool_recycle=1800,
     isolation_level="AUTOCOMMIT",
 )
 
+setup_logger("notifier.log", send_log_server=False)
+logger = get_logger("notifier_service")
+notification_service = NotificationService()
 queue = Queue()
 
 
@@ -45,6 +47,8 @@ class TaskStatus(str, Enum):
 
 class TaskIdentifier(str, Enum):
     PROCESS_FILE_TASK = "process_file_task"
+    PROCESS_CRAWL_TASK = "process_crawl_task"
+    PROCESS_ASSISTANT_TASK = "process_assistant_task"
 
 
 @dataclass
@@ -52,7 +56,7 @@ class TaskEvent:
     task_id: str
     task_name: TaskIdentifier
     notification_id: str
-    knowledge_id: UUID
+    knowledge_id: UUID | None
     status: TaskStatus
 
 
@@ -162,6 +166,17 @@ def notifier(app):
                     task_name=TaskIdentifier(task_name),
                     knowledge_id=knowledge_id,
                     notification_id=notification_id,
+                    status=TaskStatus(event["type"]),
+                )
+                queue.put(event)
+            elif task_name == "process_assistant_task":
+                logger.debug(f"Received Event : {task} - {task_name} {task_kwargs} ")
+                task_id = task_kwargs["task_id"]
+                event = TaskEvent(
+                    task_id=task,
+                    task_name=TaskIdentifier(task_name),
+                    knowledge_id=None,
+                    notification_id=task_id,
                     status=TaskStatus(event["type"]),
                 )
                 queue.put(event)
