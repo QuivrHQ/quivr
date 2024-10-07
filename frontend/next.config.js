@@ -105,9 +105,9 @@ const ContentSecurityPolicy = {
     "https://*.vercel.app",
     "https://www.google-analytics.com/",
     "https://js.stripe.com",
-    "https://us.posthog.com",
+    "https://*.posthog.com",
   ],
-  "frame-src": ["https://js.stripe.com", "https://us.posthog.com"],
+  "frame-src": ["https://js.stripe.com", "https://*.posthog.com"],
   "frame-ancestors": ["'none'"],
   "style-src": [
     "'unsafe-inline'",
