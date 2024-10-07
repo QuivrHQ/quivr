@@ -157,7 +157,7 @@ async def process_cdp_use_case_2(
 
     ## Get the document type
     document_type = None
-    if value_use_case == "Etiquettes VS Cahier des charges":
+    if value_use_case == "Cahier des charges VS Etiquettes":
         document_type = ComparisonTypes.CDC_ETIQUETTE
     elif value_use_case == "Fiche Dev VS Cahier des charges":
         document_type = ComparisonTypes.CDC_FICHE_DEV
