@@ -136,8 +136,14 @@ const QuivrCurrentFolder = (): JSX.Element => {
                         parentKMSElement: currentFolder,
                       }}
                       onDragStart={handleDragStart}
-                      onDrop={(event) => void handleDrop(event, element)}
-                      onDragOver={handleDragOver}
+                      onDrop={
+                        element.is_folder
+                          ? (event) => void handleDrop(event, element)
+                          : undefined
+                      }
+                      onDragOver={
+                        element.is_folder ? handleDragOver : undefined
+                      }
                     />
                   </div>
                 ))}

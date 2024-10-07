@@ -81,7 +81,7 @@ const CurrentFolderExplorerLine = ({
     <div
       className={`${styles.folder_explorer_line_wrapper} ${
         element.is_folder ? styles.folder : ""
-      } ${isDraggedOver ? styles.dragged : ""}`}
+      } ${isDraggedOver && element.is_folder ? styles.dragged : ""}`}
       onClick={() => {
         if (element.is_folder) {
           setCurrentFolder({
@@ -104,7 +104,7 @@ const CurrentFolderExplorerLine = ({
     >
       <div className={styles.left}>
         <div className={styles.checkbox}>
-          {onDragStart && (
+          {element.source === "local" && (
             <Checkbox
               checked={selectedKnowledges.includes(element)}
               setChecked={(checked) => handleCheckboxChange(checked)}
