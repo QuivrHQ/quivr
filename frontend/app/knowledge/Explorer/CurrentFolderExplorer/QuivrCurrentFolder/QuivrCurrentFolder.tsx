@@ -15,11 +15,12 @@ import FolderExplorerHeader from "../../shared/FolderExplorerHeader/FolderExplor
 
 const QuivrCurrentFolder = (): JSX.Element => {
   const [loading, setLoading] = useState(false);
+  const [deleteLoading, setDeleteLoading] = useState(false);
   const [addFolderModalOpened, setAddFolderModalOpened] = useState(false);
   const [quivrElements, setQuivrElements] = useState<KMSElement[]>();
   const { currentFolder, exploringQuivr, selectedKnowledges } =
     useKnowledgeContext();
-  const { getFiles } = useKnowledgeApi();
+  const { getFiles, deleteKnowledge } = useKnowledgeApi();
 
   const fetchQuivrFiles = async (folderId: UUID | null) => {
     setLoading(true);
@@ -30,6 +31,22 @@ const QuivrCurrentFolder = (): JSX.Element => {
       console.error("Failed to get sync files:", error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const deleteKnowledges = async () => {
+    setDeleteLoading(true);
+    try {
+      await Promise.all(
+        selectedKnowledges.map((knowledge) =>
+          deleteKnowledge({ knowledgeId: knowledge.id })
+        )
+      );
+      await fetchQuivrFiles(currentFolder?.id ?? null);
+    } catch (error) {
+      console.error("Failed to delete knowledges:", error);
+    } finally {
+      setDeleteLoading(false);
     }
   };
 
@@ -61,8 +78,9 @@ const QuivrCurrentFolder = (): JSX.Element => {
                   iconName="delete"
                   label="Delete"
                   color="dangerous"
-                  onClick={() => console.log("Delete folder")}
+                  onClick={() => void deleteKnowledges()}
                   small={true}
+                  isLoading={deleteLoading}
                   disabled={!selectedKnowledges.length}
                 />
                 <QuivrButton

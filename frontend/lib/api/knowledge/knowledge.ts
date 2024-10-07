@@ -61,7 +61,7 @@ export const getAllBrainKnowledge = async (
 };
 
 export type DeleteKnowledgeInputProps = {
-  brainId: UUID;
+  brainId?: UUID;
   knowledgeId: UUID;
 };
 
