@@ -5,6 +5,7 @@ from uuid import uuid4
 import pytest
 import pytest_asyncio
 from httpx import ASGITransport, AsyncClient
+from quivr_api.models.settings import BrainSettings
 from quivr_core.models import KnowledgeStatus
 from sqlmodel import select
 from sqlmodel.ext.asyncio.session import AsyncSession
@@ -142,6 +143,33 @@ async def test_post_knowledge_folder(test_client: AsyncClient):
     assert km.is_folder
     assert km.parent is None
     assert km.children == []
+
+
+@pytest.mark.asyncio(loop_scope="session")
+async def test_add_knowledge_large_file(monkeypatch, test_client):
+    _settings = BrainSettings()
+    _settings.max_file_size = 2
+    monkeypatch.setattr(
+        "quivr_api.modules.knowledge.controller.knowledge_routes.settings", _settings
+    )
+    km_data = {
+        "file_name": "test_file.txt",
+        "source": "local",
+        "is_folder": False,
+        "parent_id": None,
+    }
+
+    multipart_data = {
+        "knowledge_data": (None, json.dumps(km_data), "application/json"),
+        "file": ("test_file.txt", b"Test file content", "application/octet-stream"),
+    }
+
+    response = await test_client.post(
+        "/knowledge/",
+        files=multipart_data,
+    )
+
+    assert response.status_code == 413
 
 
 @pytest.mark.asyncio(loop_scope="session")
