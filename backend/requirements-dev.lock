@@ -553,6 +553,7 @@ llama-parse==0.5.6
     # via quivr-api
 llvmlite==0.43.0
     # via numba
+locust==2.31.8
 lxml==5.3.0
     # via pikepdf
     # via python-docx
@@ -1130,6 +1131,8 @@ sentry-sdk==2.13.0
     # via quivr-api
 setuptools==70.0.0
     # via opentelemetry-instrumentation
+    # via zope-event
+    # via zope-interface
 shapely==2.0.6
     # via python-doctr
 simple-websocket==1.0.0

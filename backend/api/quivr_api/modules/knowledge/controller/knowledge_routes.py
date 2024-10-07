@@ -18,6 +18,7 @@ from quivr_core.models import KnowledgeStatus
 from quivr_api.celery_config import celery
 from quivr_api.logger import get_logger
 from quivr_api.middlewares.auth import AuthBearer, get_current_user
+from quivr_api.models.settings import settings
 from quivr_api.modules.brain.service.brain_authorization_service import (
     validate_brain_authorization,
 )
@@ -123,6 +124,11 @@ async def create_knowledge(
     current_user: UserIdentity = Depends(get_current_user),
 ):
     knowledge = AddKnowledge.model_validate_json(knowledge_data)
+    if file and file.size and file.size > settings.max_file_size:
+        raise HTTPException(
+            status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
+            detail="Uploaded file is too large",
+        )
     if not knowledge.file_name and not knowledge.url:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,

@@ -103,6 +103,8 @@ class PostHogSettings(BaseSettings):
 
 class BrainSettings(BaseSettings):
     model_config = SettingsConfigDict(validate_default=False)
+    pg_database_url: str
+    pg_database_async_url: str
     openai_api_key: str = ""
     azure_openai_embeddings_url: str = ""
     supabase_url: str = ""
@@ -112,11 +114,10 @@ class BrainSettings(BaseSettings):
     ollama_api_base_url: str | None = None
     langfuse_public_key: str | None = None
     langfuse_secret_key: str | None = None
-    pg_database_url: str
-    pg_database_async_url: str
     sqlalchemy_pool_size: int = 5
     sqlalchemy_max_pool_overflow: int = 5
     embedding_dim: int = 1536
+    max_file_size: int = int(5e7)
 
 
 class ResendSettings(BaseSettings):
