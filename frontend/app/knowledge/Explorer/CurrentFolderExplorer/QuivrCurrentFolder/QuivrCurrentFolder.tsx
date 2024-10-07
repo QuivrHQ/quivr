@@ -85,12 +85,14 @@ const QuivrCurrentFolder = (): JSX.Element => {
     const draggedElement = JSON.parse(
       event.dataTransfer.getData("application/json")
     ) as KMSElement;
-    try {
-      await patchKnowledge(draggedElement.id, targetElement.id);
-      setRefetchFolderMenu(true);
-      await fetchQuivrFiles(currentFolder?.id ?? null);
-    } catch (error) {
-      console.error("Failed to patch knowledge:", error);
+    if (draggedElement.id !== targetElement.id) {
+      try {
+        await patchKnowledge(draggedElement.id, targetElement.id);
+        setRefetchFolderMenu(true);
+        await fetchQuivrFiles(currentFolder?.id ?? null);
+      } catch (error) {
+        console.error("Failed to patch knowledge:", error);
+      }
     }
   };
 
