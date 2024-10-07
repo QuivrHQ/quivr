@@ -77,28 +77,26 @@ const CurrentFolderExplorerLine = ({
       }}
     >
       <div className={styles.left}>
-        <Checkbox
-          checked={selectedKnowledges.includes(element)}
-          setChecked={() =>
-            handleCheckboxChange(!selectedKnowledges.includes(element))
-          }
-        />
-        {
-          <Icon
-            name={
-              element.is_folder
-                ? "folder"
-                : fileType !== "default"
-                ? iconList[fileType.toLocaleLowerCase()]
-                  ? fileType.toLowerCase()
-                  : "file"
-                : "file"
-            }
-            size="small"
-            customColor={getIconColor()}
-            color={element.is_folder ? "black" : undefined}
+        <div className={styles.checkbox}>
+          <Checkbox
+            checked={selectedKnowledges.includes(element)}
+            setChecked={(checked) => handleCheckboxChange(checked)}
           />
-        }
+        </div>
+        <Icon
+          name={
+            element.is_folder
+              ? "folder"
+              : fileType !== "default"
+              ? iconList[fileType.toLocaleLowerCase()]
+                ? fileType.toLowerCase()
+                : "file"
+              : "file"
+          }
+          size="small"
+          customColor={getIconColor()}
+          color={element.is_folder ? "black" : undefined}
+        />
         <span className={styles.name}>{element.file_name}</span>
       </div>
       {element.is_folder && (

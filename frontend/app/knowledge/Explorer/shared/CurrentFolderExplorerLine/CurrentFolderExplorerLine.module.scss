@@ -17,6 +17,10 @@
     align-items: center;
     gap: Spacings.$spacing03;
 
+    .checkbox {
+      padding-right: Spacings.$spacing03;
+    }
+
     .file_icon {
       height: 12px;
       width: 12px;

@@ -17,7 +17,8 @@ const QuivrCurrentFolder = (): JSX.Element => {
   const [loading, setLoading] = useState(false);
   const [addFolderModalOpened, setAddFolderModalOpened] = useState(false);
   const [quivrElements, setQuivrElements] = useState<KMSElement[]>();
-  const { currentFolder, exploringQuivr } = useKnowledgeContext();
+  const { currentFolder, exploringQuivr, selectedKnowledges } =
+    useKnowledgeContext();
   const { getFiles } = useKnowledgeApi();
 
   const fetchQuivrFiles = async (folderId: UUID | null) => {
@@ -62,6 +63,7 @@ const QuivrCurrentFolder = (): JSX.Element => {
                   color="dangerous"
                   onClick={() => console.log("Delete folder")}
                   small={true}
+                  disabled={!selectedKnowledges.length}
                 />
                 <QuivrButton
                   iconName="add"
