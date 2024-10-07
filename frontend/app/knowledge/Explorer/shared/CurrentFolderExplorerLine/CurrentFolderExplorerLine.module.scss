@@ -14,6 +14,7 @@
   border-bottom: 1px solid var(--border-1);
   width: 100%;
   overflow: hidden;
+  gap: Spacings.$spacing05;
 
   &.dragged {
     border-color: var(--accent);
