@@ -72,7 +72,7 @@ export const NotificationsProvider = ({
         return;
       }
 
-      localStorage.setItem("lastRetrieved", now.toString());
+      localStorage.setItem(LAST_RETRIEVED_KEY, now.toString());
 
       const notifications = await fetchNotifications();
       const sortedNotifications = notifications.sort(
