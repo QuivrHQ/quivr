@@ -24,7 +24,7 @@ const QuivrCurrentFolder = (): JSX.Element => {
     selectedKnowledges,
     setSelectedKnowledges,
   } = useKnowledgeContext();
-  const { getFiles, deleteKnowledge } = useKnowledgeApi();
+  const { getFiles, deleteKnowledge, patchKnowledge } = useKnowledgeApi();
 
   const fetchQuivrFiles = async (folderId: UUID | null) => {
     setLoading(true);
@@ -67,6 +67,36 @@ const QuivrCurrentFolder = (): JSX.Element => {
     }
   }, [addFolderModalOpened]);
 
+  const handleDragStart = (
+    event: React.DragEvent<HTMLDivElement>,
+    element: KMSElement
+  ) => {
+    event.dataTransfer.setData("application/json", JSON.stringify(element));
+  };
+
+  const handleDrop = async (
+    event: React.DragEvent<HTMLDivElement>,
+    targetElement: KMSElement
+  ) => {
+    event.preventDefault();
+    const draggedElement = JSON.parse(
+      event.dataTransfer.getData("application/json")
+    ) as KMSElement;
+    try {
+      await patchKnowledge(draggedElement.id, {
+        ...draggedElement,
+        parent_id: targetElement.id,
+      });
+      await fetchQuivrFiles(currentFolder?.id ?? null);
+    } catch (error) {
+      console.error("Failed to patch knowledge:", error);
+    }
+  };
+
+  const handleDragOver = (event: React.DragEvent<HTMLDivElement>) => {
+    event.preventDefault();
+  };
+
   return (
     <>
       <div className={styles.main_container}>
@@ -105,6 +135,9 @@ const QuivrCurrentFolder = (): JSX.Element => {
                         ...element,
                         parentKMSElement: currentFolder,
                       }}
+                      onDragStart={handleDragStart}
+                      onDrop={handleDrop}
+                      onDragOver={handleDragOver}
                     />
                   </div>
                 ))}

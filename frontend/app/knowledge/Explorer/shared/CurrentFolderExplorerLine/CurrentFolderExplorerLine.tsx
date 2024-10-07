@@ -9,10 +9,22 @@ import { useKnowledgeContext } from "../../../KnowledgeProvider/hooks/useKnowled
 
 interface CurrentFolderExplorerLineProps {
   element: KMSElement;
+  onDragStart?: (
+    event: React.DragEvent<HTMLDivElement>,
+    element: KMSElement
+  ) => void;
+  onDrop?: (
+    event: React.DragEvent<HTMLDivElement>,
+    element: KMSElement
+  ) => void;
+  onDragOver?: (event: React.DragEvent<HTMLDivElement>) => void;
 }
 
 const CurrentFolderExplorerLine = ({
   element,
+  onDragStart,
+  onDrop,
+  onDragOver,
 }: CurrentFolderExplorerLineProps): JSX.Element => {
   const { setCurrentFolder } = useKnowledgeContext();
   const { selectedKnowledges, setSelectedKnowledges } = useKnowledgeContext();
@@ -75,13 +87,19 @@ const CurrentFolderExplorerLine = ({
           });
         }
       }}
+      draggable
+      onDragStart={(event) => onDragStart && onDragStart(event, element)}
+      onDrop={(event) => onDrop && onDrop(event, element)}
+      onDragOver={onDragOver}
     >
       <div className={styles.left}>
         <div className={styles.checkbox}>
-          <Checkbox
-            checked={selectedKnowledges.includes(element)}
-            setChecked={(checked) => handleCheckboxChange(checked)}
-          />
+          {onDragStart && (
+            <Checkbox
+              checked={selectedKnowledges.includes(element)}
+              setChecked={(checked) => handleCheckboxChange(checked)}
+            />
+          )}
         </div>
         <Icon
           name={

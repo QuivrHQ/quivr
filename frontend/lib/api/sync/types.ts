@@ -18,6 +18,7 @@ export interface KMSElement {
   is_folder: boolean;
   icon?: string;
   sync_id: number | null;
+  parent_id: string | null;
   parentKMSElement?: KMSElement;
   fromProvider?: SyncsByProvider;
   source: "local" | string;

@@ -110,3 +110,15 @@ export const addFolder = async (
     })
   ).data;
 };
+
+export const patchKnowledge = async (
+  knowledge_id: UUID,
+  knowledgeData: KMSElement,
+  axiosInstance: AxiosInstance
+): Promise<KMSElement> => {
+  return (
+    await axiosInstance.patch<KMSElement>(`/knowledge/${knowledge_id}`, {
+      knowledgeData,
+    })
+  ).data;
+};
