@@ -61,6 +61,7 @@ const QuivrCurrentFolder = (): JSX.Element => {
   useEffect(() => {
     if (exploringQuivr) {
       void fetchQuivrFiles(currentFolder?.id ?? null);
+      setSelectedKnowledges([]);
     }
   }, [currentFolder]);
 

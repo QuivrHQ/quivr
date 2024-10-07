@@ -82,7 +82,6 @@ import {
 import {
   MdDarkMode,
   MdDashboardCustomize,
-  MdDeleteOutline,
   MdDynamicFeed,
   MdHistory,
   MdLink,
@@ -101,6 +100,7 @@ import {
 import { PiOfficeChairFill } from "react-icons/pi";
 import {
   RiDeleteBackLine,
+  RiDeleteBin6Line,
   RiHashtag,
   RiNotification2Line,
 } from "react-icons/ri";
@@ -130,7 +130,7 @@ export const iconList: { [name: string]: IconType } = {
   copy: LuCopy,
   csv: FaFileCsv,
   custom: MdDashboardCustomize,
-  delete: MdDeleteOutline,
+  delete: RiDeleteBin6Line,
   discord: FaDiscord,
   doc: FaRegFileAlt,
   docx: FaRegFileWord,
