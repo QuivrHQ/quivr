@@ -189,7 +189,7 @@ class LLMModelConfig:
 
 class LLMEndpointConfig(QuivrBaseConfig):
     supplier: DefaultModelSuppliers = DefaultModelSuppliers.OPENAI
-    model: str = "gpt-3.5-turbo-0125"
+    model: str = "gpt-4o"
     context_length: int | None = None
     tokenizer_hub: str | None = None
     llm_base_url: str | None = None
