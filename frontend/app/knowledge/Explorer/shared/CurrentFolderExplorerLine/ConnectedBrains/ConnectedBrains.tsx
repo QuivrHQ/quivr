@@ -1,3 +1,6 @@
+import { UUID } from "crypto";
+import { useRouter } from "next/navigation";
+
 import Tooltip from "@/lib/components/ui/Tooltip/Tooltip";
 import { Brain } from "@/lib/context/BrainProvider/types";
 
@@ -10,11 +13,22 @@ interface ConnectedbrainsProps {
 const ConnectedBrains = ({
   connectedBrains,
 }: ConnectedbrainsProps): JSX.Element => {
+  const router = useRouter();
+
+  const navigateToBrain = (brainId: UUID) => {
+    router.push(`/studio/${brainId}`);
+  };
+
   return (
     <div className={styles.main_container}>
       {connectedBrains.map((brain) => (
         <Tooltip key={brain.id} tooltip={brain.name}>
-          <div className={styles.brain_container}>
+          <div
+            className={styles.brain_container}
+            onClick={() => {
+              navigateToBrain(brain.brain_id ?? brain.id);
+            }}
+          >
             <div
               className={styles.sample_wrapper}
               style={{ backgroundColor: brain.snippet_color }}

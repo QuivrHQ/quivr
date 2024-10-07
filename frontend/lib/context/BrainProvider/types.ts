@@ -40,6 +40,7 @@ export type Brain = {
   display_name?: string;
   snippet_emoji?: string;
   snippet_color?: string;
+  brain_id?: UUID;
 };
 
 export type MinimalBrainForUser = {

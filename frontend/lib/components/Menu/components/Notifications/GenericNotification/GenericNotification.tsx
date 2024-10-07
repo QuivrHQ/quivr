@@ -23,7 +23,7 @@ export const GenericNotification = ({
   const { updateNotifications } = useNotificationsContext();
 
   const navigateToBrain = () => {
-    router.push(`/studio/${bulkNotification.brain_id}`); // Naviguer vers l'URL
+    router.push(`/studio/${bulkNotification.brain_id}`);
   };
 
   const deleteNotification = async () => {
