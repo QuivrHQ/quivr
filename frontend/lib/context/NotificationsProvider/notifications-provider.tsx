@@ -40,7 +40,7 @@ export const NotificationsProvider = ({
   const fetchNotifications = async (): Promise<NotificationType[]> => {
     const { data, error } = await supabase.from("notifications").select();
 
-    return error ? [] : data; // eslint-disable-line @typescript-eslint/no-unsafe-return
+    return error ? [] : (data as NotificationType[]);
   };
 
   const processNotifications = (
