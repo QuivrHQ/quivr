@@ -76,12 +76,29 @@ class TasksCompletion(BaseModel):
         default=None,
         description="The user tasks or questions that need a web search to be completed.",
     )
+    tool: Optional[str] = Field(
+        default=None,
+        description="The tool that shall be used to complete the tasks.",
+    )
+
+
+class FinalAnswer(BaseModel):
+    answer: str = Field(description="The final answer to the user tasks/questions")
+    reasoning: str = Field(
+        description="The step-by-step reasoning that led to the final answer"
+    )
+    all_tasks_completed: bool = Field(
+        description="Whether all tasks/questions have been successfully answered/completed or not. "
+        " If the final answer to the user is 'I don't know' or 'I don't have enough information' or 'I'm not sure', "
+        " this variable should be 'false'"
+    )
 
 
 class UpdatedPromptAndTools(BaseModel):
     prompt: Optional[str] = Field(default=None, description="The updated system prompt")
     prompt_reasoning: Optional[str] = Field(
-        default=None, description="The reasoning that led to the updated system prompt"
+        default=None,
+        description="The step-by-step reasoning that led to the updated system prompt",
     )
 
     tools_to_activate: Optional[List[str]] = Field(
@@ -106,6 +123,7 @@ class AgentState(TypedDict):
     files: str
     tasks: List[str]
     instructions: str
+    tool: str
 
 
 class InstructionsState(TypedDict):
@@ -495,32 +513,30 @@ class QuivrQARAGLangGraph:
 
         return filtered_chunks
 
-    def websearch_split(self, state: AgentState):
+    def tool_routing(self, state: AgentState):
         tasks = state["tasks"]
         if not tasks:
             return [Send("generate_rag", state)]
 
         docs = state["docs"]
 
-        available_tools, activated_tools = collect_tools(
-            self.retrieval_config.workflow_config
-        )
+        _, activated_tools = collect_tools(self.retrieval_config.workflow_config)
 
         input = {
             "chat_history": state["chat_history"].to_list(),
             "tasks": state["tasks"],
             "context": docs,
-            "available_tools": available_tools,
+            "activated_tools": activated_tools,
         }
 
         input, _ = self.reduce_rag_context(
             inputs=input,
-            prompt=custom_prompts.WEBSEARCH_ROUTING_PROMPT,
+            prompt=custom_prompts.TOOL_ROUTING_PROMPT,
             docs=docs,
-            max_context_tokens=2000,
+            # max_context_tokens=2000,
         )
 
-        msg = custom_prompts.WEBSEARCH_ROUTING_PROMPT.format(**input)
+        msg = custom_prompts.TOOL_ROUTING_PROMPT.format(**input)
 
         response: TasksCompletion
 
@@ -538,25 +554,28 @@ class QuivrQARAGLangGraph:
 
         send_list: List[Send] = []
 
-        if response.non_completable_tasks:
+        if response.non_completable_tasks and response.tool:
             payload = {
                 **state,
                 "tasks": response.non_completable_tasks,
+                "tool": response.tool,
             }
-            send_list.append(Send("tavily_search", payload))
+            send_list.append(Send("run_tool", payload))
         else:
             send_list.append(Send("generate_rag", state))
 
         return send_list
 
-    async def tavily_search(self, state: AgentState) -> AgentState:
-        if not self.retrieval_config.workflow_config.activated_tools:
-            return {**state}
+    async def run_tool(self, state: AgentState) -> AgentState:
+        tool = state["tool"]
+        if tool not in [
+            t.name for t in self.retrieval_config.workflow_config.activated_tools
+        ]:
+            raise ValueError(f"Tool {tool} not activated")
 
         tasks = state["tasks"]
 
-        tool_name = self.retrieval_config.workflow_config.activated_tools[0].name
-        tool_wrapper = LLMToolFactory.create_tool(tool_name, {})
+        tool_wrapper = LLMToolFactory.create_tool(tool, {})
 
         # Prepare the async tasks for all questions
         async_tasks = []
@@ -799,6 +818,22 @@ class QuivrQARAGLangGraph:
         msg = custom_prompts.RAG_ANSWER_PROMPT.format(**reduced_inputs)
 
         llm = self.bind_tools_to_llm(self.generate_rag.__name__)
+
+        # response: FinalAnswer
+        # try:
+        #     structured_llm = llm.with_structured_output(
+        #         FinalAnswer, method="json_schema"
+        #     )
+        #     response = structured_llm.invoke(msg)
+
+        # except openai.BadRequestError:
+        #     structured_llm = llm.with_structured_output(
+        #         FinalAnswer
+        #     )
+        #     response = structured_llm.invoke(msg)
+
+        # return {**state, "messages": [response.answer], "docs": docs if docs else []}
+
         response = llm.invoke(msg)
         return {**state, "messages": [response], "docs": docs if docs else []}
 
