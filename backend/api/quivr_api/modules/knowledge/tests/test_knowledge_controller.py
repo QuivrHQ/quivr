@@ -11,12 +11,13 @@ from sqlmodel.ext.asyncio.session import AsyncSession
 
 from quivr_api.main import app
 from quivr_api.middlewares.auth.auth_bearer import get_current_user
+from quivr_api.models.settings import BrainSettings
 from quivr_api.modules.brain.entity.brain_entity import Brain, BrainType
 from quivr_api.modules.brain.entity.brain_user import BrainUserDB
 from quivr_api.modules.knowledge.controller.knowledge_routes import (
     get_knowledge_service,
 )
-from quivr_api.modules.knowledge.dto.inputs import LinkKnowledgeBrain
+from quivr_api.modules.knowledge.dto.inputs import KnowledgeUpdate, LinkKnowledgeBrain
 from quivr_api.modules.knowledge.dto.outputs import KnowledgeDTO
 from quivr_api.modules.knowledge.repository.knowledges import KnowledgeRepository
 from quivr_api.modules.knowledge.service.knowledge_service import KnowledgeService
@@ -142,6 +143,33 @@ async def test_post_knowledge_folder(test_client: AsyncClient):
     assert km.is_folder
     assert km.parent is None
     assert km.children == []
+
+
+@pytest.mark.asyncio(loop_scope="session")
+async def test_add_knowledge_large_file(monkeypatch, test_client):
+    _settings = BrainSettings()
+    _settings.max_file_size = 2
+    monkeypatch.setattr(
+        "quivr_api.modules.knowledge.controller.knowledge_routes.settings", _settings
+    )
+    km_data = {
+        "file_name": "test_file.txt",
+        "source": "local",
+        "is_folder": False,
+        "parent_id": None,
+    }
+
+    multipart_data = {
+        "knowledge_data": (None, json.dumps(km_data), "application/json"),
+        "file": ("test_file.txt", b"Test file content", "application/octet-stream"),
+    }
+
+    response = await test_client.post(
+        "/knowledge/",
+        files=multipart_data,
+    )
+
+    assert response.status_code == 413
 
 
 @pytest.mark.asyncio(loop_scope="session")
@@ -287,3 +315,130 @@ async def test_link_knowledge_folder(
 
     # 4. Assert both files are being scheduled for processing
     assert len(tasks) == 2
+
+
+@pytest.mark.asyncio(loop_scope="session")
+async def test_move_knowledge_to_folder(
+    monkeypatch,
+    session: AsyncSession,
+    test_client: AsyncClient,
+    brain: Brain,
+    user: User,
+    sync: Sync,
+):
+    assert brain.brain_id
+    tasks = {}
+
+    def _send_task(*args, **kwargs):
+        tasks["args"] = args
+        tasks["kwargs"] = {**kwargs["kwargs"]}
+
+    monkeypatch.setattr("quivr_api.celery_config.celery.send_task", _send_task)
+
+    folder_data = {
+        "file_name": "folder",
+        "source": "local",
+        "is_folder": True,
+        "parent_id": None,
+    }
+    response = await test_client.post(
+        "/knowledge/",
+        files={
+            "knowledge_data": (None, json.dumps(folder_data), "application/json"),
+        },
+    )
+    # 1. Insert folder
+    folder_km = KnowledgeDTO.model_validate(response.json())
+    file_data = {
+        "file_name": "test_file.txt",
+        "source": "local",
+        "is_folder": True,
+        "parent_id": None,
+    }
+
+    multipart_data = {
+        "knowledge_data": (None, json.dumps(file_data), "application/json"),
+    }
+    # 2. Insert file in Root
+    response = await test_client.post(
+        "/knowledge/",
+        files=multipart_data,
+    )
+    file_km = KnowledgeDTO.model_validate(response.json())
+
+    # Move file to folder
+    update = KnowledgeUpdate(parent_id=folder_km.id)
+    response = await test_client.patch(
+        f"/knowledge/{file_km.id}",
+        content=update.model_dump_json(exclude_unset=True),
+        headers={"Content-Type": "application/json"},
+    )
+    assert response.status_code == 202
+    updated_km = KnowledgeDTO.model_validate(response.json())
+
+    # 3. Validate that created knowledges are correct
+    assert updated_km.parent and updated_km.parent.id
+    assert updated_km.parent.id == folder_km.id
+
+
+@pytest.mark.asyncio(loop_scope="session")
+async def test_move_knowledge_to_root(
+    monkeypatch,
+    session: AsyncSession,
+    test_client: AsyncClient,
+    brain: Brain,
+    user: User,
+    sync: Sync,
+):
+    assert brain.brain_id
+    tasks = {}
+
+    def _send_task(*args, **kwargs):
+        tasks["args"] = args
+        tasks["kwargs"] = {**kwargs["kwargs"]}
+
+    monkeypatch.setattr("quivr_api.celery_config.celery.send_task", _send_task)
+
+    folder_data = {
+        "file_name": "folder",
+        "source": "local",
+        "is_folder": True,
+        "parent_id": None,
+    }
+    response = await test_client.post(
+        "/knowledge/",
+        files={
+            "knowledge_data": (None, json.dumps(folder_data), "application/json"),
+        },
+    )
+    # 1. Insert folder
+    folder_km = KnowledgeDTO.model_validate(response.json())
+    file_data = {
+        "file_name": "test_file.txt",
+        "source": "local",
+        "is_folder": True,
+        "parent_id": str(folder_km.id),
+    }
+
+    multipart_data = {
+        "knowledge_data": (None, json.dumps(file_data), "application/json"),
+    }
+    # 2. Insert file in Root
+    response = await test_client.post(
+        "/knowledge/",
+        files=multipart_data,
+    )
+    file_km = KnowledgeDTO.model_validate(response.json())
+
+    # Move file to Root
+    update = KnowledgeUpdate(parent_id=None)
+    response = await test_client.patch(
+        f"/knowledge/{file_km.id}",
+        content=update.model_dump_json(exclude_unset=True),
+        headers={"Content-Type": "application/json"},
+    )
+    assert response.status_code == 202
+    updated_km = KnowledgeDTO.model_validate(response.json())
+
+    # 3. Validate that updated
+    assert updated_km.parent is None

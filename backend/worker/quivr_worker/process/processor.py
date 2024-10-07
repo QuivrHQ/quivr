@@ -285,7 +285,6 @@ class KnowledgeProcessor:
                 folder_id=folder_km.sync_file_id,
                 recursive=False,
             )
-            breakpoint()
             for sync_entry in filter(lambda s: s.id not in sync_children, sync_files):
                 await self.add_new_sync_entry(folder=folder_km, sync_entry=sync_entry)
 
