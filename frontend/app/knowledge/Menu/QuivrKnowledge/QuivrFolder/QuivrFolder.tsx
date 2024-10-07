@@ -16,6 +16,7 @@ interface QuivrFolderProps {
 const QuivrFolder = ({ element }: QuivrFolderProps): JSX.Element => {
   const [folded, setFolded] = useState(true);
   const [loading, setLoading] = useState(false);
+  const [isDraggedOver, setIsDraggedOver] = useState(false);
   const { getFiles } = useKnowledgeApi();
   const [kmsElements, setKMSElements] = useState<KMSElement[]>();
   const [selectedFolder, setSelectedFolder] = useState<boolean>(false);
@@ -59,7 +60,7 @@ const QuivrFolder = ({ element }: QuivrFolderProps): JSX.Element => {
         !kmsElements?.filter((file) => file.is_folder).length && !loading
           ? styles.empty
           : ""
-      }`}
+      } ${isDraggedOver ? styles.dragged : ""}`}
       onDrop={
         element.is_folder
           ? (event) =>
@@ -72,7 +73,13 @@ const QuivrFolder = ({ element }: QuivrFolderProps): JSX.Element => {
               })
           : undefined
       }
-      onDragOver={element.is_folder ? handleDragOver : undefined}
+      onDragOver={(event) => {
+        if (element.is_folder) {
+          handleDragOver(event);
+          setIsDraggedOver(true);
+        }
+      }}
+      onDragLeave={() => setIsDraggedOver(false)}
     >
       <div className={styles.folder_line_wrapper}>
         <Icon

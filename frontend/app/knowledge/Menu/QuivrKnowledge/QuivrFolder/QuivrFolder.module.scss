@@ -7,6 +7,11 @@
   flex-direction: column;
   gap: Spacings.$spacing02;
   margin-left: Spacings.$spacing03;
+  border: 1px solid transparent;
+
+  &.dragged {
+    border: 1px solid var(--accent);
+  }
 
   &.empty {
     gap: 0;
