@@ -61,7 +61,9 @@
     }
 
     .folder_content {
-      width: 100%;
+      flex: 1;
+      overflow-y: hidden;
+      background-color: red;
     }
   }
 }

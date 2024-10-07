@@ -12,6 +12,8 @@
   align-items: center;
   border: 1px solid transparent;
   border-bottom: 1px solid var(--border-1);
+  width: 100%;
+  overflow: hidden;
 
   &.dragged {
     border-color: var(--accent);
@@ -19,8 +21,10 @@
 
   .left {
     display: flex;
+    flex: 1;
     align-items: center;
     gap: Spacings.$spacing03;
+    overflow: hidden;
 
     .checkbox {
       padding-right: Spacings.$spacing03;
@@ -29,6 +33,11 @@
     .file_icon {
       height: 12px;
       width: 12px;
+    }
+
+    .name {
+      @include Typography.EllipsisOverflow;
+      flex: 1;
     }
   }
 
