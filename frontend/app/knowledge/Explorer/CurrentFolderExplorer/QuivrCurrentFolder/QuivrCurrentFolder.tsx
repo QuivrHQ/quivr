@@ -23,6 +23,7 @@ const QuivrCurrentFolder = (): JSX.Element => {
     exploringQuivr,
     selectedKnowledges,
     setSelectedKnowledges,
+    setRefetchFolderMenu,
   } = useKnowledgeContext();
   const { getFiles, deleteKnowledge, patchKnowledge } = useKnowledgeApi();
 
@@ -52,6 +53,7 @@ const QuivrCurrentFolder = (): JSX.Element => {
       console.error("Failed to delete knowledges:", error);
     } finally {
       setDeleteLoading(false);
+      setRefetchFolderMenu(true);
     }
   };
 
@@ -84,6 +86,7 @@ const QuivrCurrentFolder = (): JSX.Element => {
     ) as KMSElement;
     try {
       await patchKnowledge(draggedElement.id, targetElement.id);
+      setRefetchFolderMenu(true);
       await fetchQuivrFiles(currentFolder?.id ?? null);
     } catch (error) {
       console.error("Failed to patch knowledge:", error);

@@ -17,29 +17,44 @@ const QuivrKnowledges = (): JSX.Element => {
   const [kmsElements, setKMSElements] = useState<KMSElement[]>();
   const [loading, setLoading] = useState(false);
   const { isDarkMode } = useUserSettingsContext();
-  const { setExploringQuivr, setCurrentFolder, setExploredProvider } =
-    useKnowledgeContext();
+  const {
+    setExploringQuivr,
+    setCurrentFolder,
+    setExploredProvider,
+    setRefetchFolderMenu,
+    refetchFolderMenu,
+  } = useKnowledgeContext();
 
   const { getFiles } = useKnowledgeApi();
 
-  const fetchFiles = () => {
+  const chooseQuivrRoot = () => {
     setCurrentFolder(undefined);
     setExploredProvider(undefined);
     setExploringQuivr(true);
   };
 
-  useEffect(() => {
+  const fetchFiles = async () => {
     setLoading(true);
-    void (async () => {
-      try {
-        const res = await getFiles(null);
-        setKMSElements(res);
-        setLoading(false);
-      } catch (error) {
-        console.error("Failed to get sync files:", error);
-      }
-    })();
+    try {
+      const res = await getFiles(null);
+      setKMSElements(res);
+    } catch (error) {
+      console.error("Failed to get sync files:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    void fetchFiles();
   }, []);
+
+  useEffect(() => {
+    if (refetchFolderMenu) {
+      void fetchFiles();
+      setRefetchFolderMenu(false);
+    }
+  }, [refetchFolderMenu]);
 
   return (
     <div className={styles.main_container}>
@@ -51,7 +66,10 @@ const QuivrKnowledges = (): JSX.Element => {
           handleHover={true}
           onClick={() => setFolded(!folded)}
         />
-        <div className={styles.hoverable} onClick={() => void fetchFiles()}>
+        <div
+          className={styles.hoverable}
+          onClick={() => void chooseQuivrRoot()}
+        >
           <QuivrLogo size={18} color={isDarkMode ? "white" : "black"} />
           <span className={styles.provider_title}>Quivr</span>
         </div>

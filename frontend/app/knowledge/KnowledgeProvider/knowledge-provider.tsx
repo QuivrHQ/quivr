@@ -19,6 +19,8 @@ type KnowledgeContextType = {
   >;
   selectedKnowledges: KMSElement[];
   setSelectedKnowledges: React.Dispatch<React.SetStateAction<KMSElement[]>>;
+  refetchFolderMenu: boolean;
+  setRefetchFolderMenu: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
 export const KnowledgeContext = createContext<KnowledgeContextType | undefined>(
@@ -43,6 +45,7 @@ export const KnowledgeProvider = ({
   const [selectedKnowledges, setSelectedKnowledges] = useState<KMSElement[]>(
     []
   );
+  const [refetchFolderMenu, setRefetchFolderMenu] = useState<boolean>(false);
 
   return (
     <KnowledgeContext.Provider
@@ -57,6 +60,8 @@ export const KnowledgeProvider = ({
         setExploredSpecificAccount,
         selectedKnowledges,
         setSelectedKnowledges,
+        refetchFolderMenu,
+        setRefetchFolderMenu,
       }}
     >
       {children}
