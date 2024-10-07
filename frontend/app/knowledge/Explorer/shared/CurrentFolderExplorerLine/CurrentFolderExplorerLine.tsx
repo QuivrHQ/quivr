@@ -1,3 +1,5 @@
+import { useState } from "react";
+
 import { KMSElement } from "@/lib/api/sync/types";
 import { Checkbox } from "@/lib/components/ui/Checkbox/Checkbox";
 import { Icon } from "@/lib/components/ui/Icon/Icon";
@@ -28,6 +30,7 @@ const CurrentFolderExplorerLine = ({
 }: CurrentFolderExplorerLineProps): JSX.Element => {
   const { setCurrentFolder } = useKnowledgeContext();
   const { selectedKnowledges, setSelectedKnowledges } = useKnowledgeContext();
+  const [isDraggedOver, setIsDraggedOver] = useState(false);
 
   const fileType = element.file_name?.includes(".")
     ? element.file_name.split(".").pop()?.toLowerCase() ?? "default"
@@ -78,7 +81,7 @@ const CurrentFolderExplorerLine = ({
     <div
       className={`${styles.folder_explorer_line_wrapper} ${
         element.is_folder ? styles.folder : ""
-      }`}
+      } ${isDraggedOver ? styles.dragged : ""}`}
       onClick={() => {
         if (element.is_folder) {
           setCurrentFolder({
@@ -89,8 +92,15 @@ const CurrentFolderExplorerLine = ({
       }}
       draggable
       onDragStart={(event) => onDragStart?.(event, element)}
-      onDrop={(event) => onDrop?.(event, element)}
-      onDragOver={onDragOver}
+      onDrop={(event) => {
+        onDrop?.(event, element);
+        setIsDraggedOver(false);
+      }}
+      onDragOver={(event) => {
+        onDragOver?.(event);
+        setIsDraggedOver(true);
+      }}
+      onDragLeave={() => setIsDraggedOver(false)}
     >
       <div className={styles.left}>
         <div className={styles.checkbox}>
