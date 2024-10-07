@@ -15,12 +15,14 @@ const ConnectionsKnowledges = (): JSX.Element => {
       const res: Sync[] = await getUserSyncs();
       const groupedByProvider: { [key: string]: Sync[] } = {};
 
-      res.forEach((sync) => {
-        if (!groupedByProvider[sync.provider]) {
-          groupedByProvider[sync.provider] = [];
-        }
-        groupedByProvider[sync.provider].push(sync);
-      });
+      res
+        .filter((sync) => sync.credentials.token)
+        .forEach((sync) => {
+          if (!groupedByProvider[sync.provider]) {
+            groupedByProvider[sync.provider] = [];
+          }
+          groupedByProvider[sync.provider].push(sync);
+        });
 
       const syncsByProviderArray: SyncsByProvider[] = Object.keys(
         groupedByProvider
