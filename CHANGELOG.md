@@ -1,5 +1,32 @@
 # Changelog
 
+## 0.0.320 (2024-10-07)
+
+## What's Changed
+* Enable Porter Application cdp by @porter-deployment-app in https://github.com/QuivrHQ/quivr/pull/3306
+* Enable Porter Application cdp-front by @porter-deployment-app in https://github.com/QuivrHQ/quivr/pull/3307
+* feat(assistant): cdp by @StanGirard in https://github.com/QuivrHQ/quivr/pull/3305
+* feat: Add debug logging for OCR results by @StanGirard in https://github.com/QuivrHQ/quivr/pull/3309
+* feat: Update OCR image scale for better accuracy by @StanGirard in https://github.com/QuivrHQ/quivr/pull/3310
+* feat: Update PDFGenerator to include logo in header by @StanGirard in https://github.com/QuivrHQ/quivr/pull/3311
+* feat: structlog parseable by @AmineDiro in https://github.com/QuivrHQ/quivr/pull/3312
+* Revert "feat: structlog parseable" by @StanGirard in https://github.com/QuivrHQ/quivr/pull/3313
+* feat: structlog parseable by @AmineDiro in https://github.com/QuivrHQ/quivr/pull/3314
+* Revert "feat: structlog parseable" by @StanGirard in https://github.com/QuivrHQ/quivr/pull/3315
+* feat: Update PDFGenerator to include logo in header by @StanGirard in https://github.com/QuivrHQ/quivr/pull/3318
+* feat: structlog parseable by @AmineDiro in https://github.com/QuivrHQ/quivr/pull/3319
+* feat: Update knowledge status and send notification on task success by @StanGirard in https://github.com/QuivrHQ/quivr/pull/3320
+* feat: Update text retranscription instructions by @StanGirard in https://github.com/QuivrHQ/quivr/pull/3321
+* feat: update sentry by @StanGirard in https://github.com/QuivrHQ/quivr/pull/3326
+* chore: Remove unnecessary assertion in create_modification_report function by @StanGirard in https://github.com/QuivrHQ/quivr/pull/3329
+* chore: Add NEXT_PUBLIC_INTERCOM_APP_ID to Dockerfile by @StanGirard in https://github.com/QuivrHQ/quivr/pull/3330
+* feat: Update Content Security Policy for PostHog by @StanGirard in https://github.com/QuivrHQ/quivr/pull/3331
+* fix(cdp): order naming cdc_etiquette by @StanGirard in https://github.com/QuivrHQ/quivr/pull/3333
+* fix(notifications): added a debouncing mechanism by @StanGirard in https://github.com/QuivrHQ/quivr/pull/3327
+
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.319...v0.0.320
+
 ## 0.0.319 (2024-10-01)
 
 ## What's Changed
