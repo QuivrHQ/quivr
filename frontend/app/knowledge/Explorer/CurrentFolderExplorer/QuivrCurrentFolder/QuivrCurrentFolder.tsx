@@ -5,7 +5,7 @@ import { useKnowledgeApi } from "@/lib/api/knowledge/useKnowledgeApi";
 import { KMSElement } from "@/lib/api/sync/types";
 import { LoaderIcon } from "@/lib/components/ui/LoaderIcon/LoaderIcon";
 import QuivrButton from "@/lib/components/ui/QuivrButton/QuivrButton";
-import { handleDrop } from "@/lib/helpers/kms";
+import { handleDragOver, handleDrop } from "@/lib/helpers/kms";
 
 import AddFolderModal from "./AddFolderModal/AddFolderModal";
 import styles from "./QuivrCurrentFolder.module.scss";
@@ -37,7 +37,6 @@ const QuivrCurrentFolder = (): JSX.Element => {
       console.error("Failed to get sync files:", error);
     } finally {
       setLoading(false);
-      console.info("hey");
     }
   };
 
@@ -72,15 +71,32 @@ const QuivrCurrentFolder = (): JSX.Element => {
     }
   }, [addFolderModalOpened]);
 
+  useEffect(() => {
+    const handleFetchQuivrFilesMissing = (event: CustomEvent) => {
+      void fetchQuivrFiles(
+        (event.detail as { draggedElement: KMSElement }).draggedElement
+          .parentKMSElement?.id ?? null
+      );
+    };
+
+    window.addEventListener(
+      "needToFetch",
+      handleFetchQuivrFilesMissing as EventListener
+    );
+
+    return () => {
+      window.removeEventListener(
+        "needToFetch",
+        handleFetchQuivrFilesMissing as EventListener
+      );
+    };
+  }, []);
+
   const handleDragStart = (
     event: React.DragEvent<HTMLDivElement>,
     element: KMSElement
   ) => {
     event.dataTransfer.setData("application/json", JSON.stringify(element));
-  };
-
-  const handleDragOver = (event: React.DragEvent<HTMLDivElement>) => {
-    event.preventDefault();
   };
 
   return (

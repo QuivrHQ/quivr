@@ -7,7 +7,7 @@ interface HandleDropParams {
   targetElement: KMSElement;
   patchKnowledge: (knowledgeId: UUID, parent_id: UUID) => Promise<KMSElement>;
   setRefetchFolderMenu: (value: boolean) => void;
-  fetchQuivrFiles: (parentId: UUID | null) => Promise<void>;
+  fetchQuivrFiles?: (parentId: UUID | null) => Promise<void>;
   currentFolder: KMSElement | undefined;
 }
 
@@ -23,13 +23,27 @@ export const handleDrop = async ({
   const draggedElement = JSON.parse(
     event.dataTransfer.getData("application/json")
   ) as KMSElement;
+  console.info(currentFolder);
   if (draggedElement.id !== targetElement.id) {
     try {
       await patchKnowledge(draggedElement.id, targetElement.id);
       setRefetchFolderMenu(true);
-      await fetchQuivrFiles(currentFolder?.id ?? null);
+      if (fetchQuivrFiles) {
+        await fetchQuivrFiles(currentFolder?.id ?? null);
+      } else {
+        const customEvent = new CustomEvent("needToFetch", {
+          detail: { draggedElement, targetElement },
+        });
+        window.dispatchEvent(customEvent);
+      }
     } catch (error) {
       console.error("Failed to patch knowledge:", error);
     }
   }
+};
+
+export const handleDragOver = (
+  event: React.DragEvent<HTMLDivElement>
+): void => {
+  event.preventDefault();
 };

@@ -5,6 +5,7 @@ import { useKnowledgeApi } from "@/lib/api/knowledge/useKnowledgeApi";
 import { KMSElement } from "@/lib/api/sync/types";
 import { Icon } from "@/lib/components/ui/Icon/Icon";
 import { LoaderIcon } from "@/lib/components/ui/LoaderIcon/LoaderIcon";
+import { handleDragOver, handleDrop } from "@/lib/helpers/kms";
 
 import styles from "./QuivrFolder.module.scss";
 
@@ -24,7 +25,9 @@ const QuivrFolder = ({ element }: QuivrFolderProps): JSX.Element => {
     setCurrentFolder,
     setExploringQuivr,
     setExploredProvider,
+    setRefetchFolderMenu,
   } = useKnowledgeContext();
+  const { patchKnowledge } = useKnowledgeApi();
 
   useEffect(() => {
     setSelectedFolder(currentFolder?.id === element.id);
@@ -57,6 +60,19 @@ const QuivrFolder = ({ element }: QuivrFolderProps): JSX.Element => {
           ? styles.empty
           : ""
       }`}
+      onDrop={
+        element.is_folder
+          ? (event) =>
+              void handleDrop({
+                event,
+                targetElement: element,
+                patchKnowledge,
+                setRefetchFolderMenu,
+                currentFolder,
+              })
+          : undefined
+      }
+      onDragOver={element.is_folder ? handleDragOver : undefined}
     >
       <div className={styles.folder_line_wrapper}>
         <Icon
