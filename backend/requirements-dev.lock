@@ -281,6 +281,8 @@ googleapis-common-protos==1.63.2
     # via opentelemetry-exporter-otlp-proto-http
 gotrue==2.7.0
     # via supabase
+grandalf==0.8
+    # via quivr-core
 greenlet==3.0.3
     # via playwright
     # via sqlalchemy
@@ -875,6 +877,7 @@ pymupdfb==1.24.9
 pypandoc==1.13
     # via unstructured
 pyparsing==3.1.2
+    # via grandalf
     # via httplib2
     # via matplotlib
     # via unstructured-client

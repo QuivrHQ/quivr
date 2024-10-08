@@ -18,6 +18,7 @@ dependencies = [
     "langchain-anthropic>=0.1.23",
     "types-pyyaml>=6.0.12.20240808",
     "transformers[sentencepiece]>=4.44.2",
+    "grandalf>=0.8",
 ]
 readme = "README.md"
 requires-python = ">= 3.11"
