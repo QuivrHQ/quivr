@@ -23,20 +23,9 @@ logger = logging.getLogger("quivr_core")
 
 
 def model_supports_function_calling(model_name: str):
-    models_supporting_function_calls = [
-        "gpt-4",
-        "gpt-4-1106-preview",
-        "gpt-4-0613",
-        "gpt-3.5-turbo-0125",
-        "gpt-3.5-turbo-1106",
-        "gpt-3.5-turbo-0613",
-        "gpt-4-0125-preview",
-        "gpt-3.5-turbo",
-        "gpt-4-turbo",
-        "gpt-4o",
-        "gpt-4o-mini",
-    ]
-    return model_name in models_supporting_function_calls
+    models_not_supporting_function_calls: list[str] = []
+
+    return model_name not in models_not_supporting_function_calls
 
 
 def format_history_to_openai_mesages(
@@ -59,32 +48,22 @@ def cited_answer_filter(tool):
 def get_chunk_metadata(
     msg: AIMessageChunk, sources: list[Any] | None = None
 ) -> RAGResponseMetadata:
-    # Initiate the source
-    metadata = {"sources": sources} if sources else {"sources": []}
+    metadata = {"sources": sources or []}
+
+    if not msg.tool_calls:
+        return RAGResponseMetadata(**metadata, metadata_model=None)
+
     all_citations = []
     all_followup_questions = []
 
-    if msg.tool_calls:
-        for cited_answer in filter(cited_answer_filter, msg.tool_calls):
-            if "args" in cited_answer:
-                gathered_args = cited_answer["args"]
-                if "citations" in gathered_args:
-                    all_citations.extend(gathered_args["citations"])
-                if "followup_questions" in gathered_args:
-                    all_followup_questions.append(gathered_args["followup_questions"])
-
-    # Interleave follow-up questions
-    interleaved_followup_questions = []
-    max_length = (
-        max(len(q) for q in all_followup_questions) if all_followup_questions else 0
-    )
-    for i in range(max_length):
-        for questions in all_followup_questions:
-            if i < len(questions):
-                interleaved_followup_questions.append(questions[i])
+    for tool_call in msg.tool_calls:
+        if tool_call.get("name") == "cited_answer" and "args" in tool_call:
+            args = tool_call["args"]
+            all_citations.extend(args.get("citations", []))
+            all_followup_questions.extend(args.get("followup_questions", []))
 
     metadata["citations"] = all_citations
-    metadata["followup_questions"] = interleaved_followup_questions[:3]  # Limit to 3
+    metadata["followup_questions"] = all_followup_questions[:3]  # Limit to 3
 
     return RAGResponseMetadata(**metadata, metadata_model=None)
 
@@ -102,26 +81,29 @@ def get_prev_message_str(msg: AIMessageChunk) -> str:
 @no_type_check
 def parse_chunk_response(
     rolling_msg: AIMessageChunk,
-    raw_chunk: dict[str, Any],
+    raw_chunk: AIMessageChunk,
     supports_func_calling: bool,
-) -> Tuple[AIMessageChunk, str]:
-    # Init with sources
+    previous_content: str = "",
+) -> Tuple[AIMessageChunk, str, str]:
+    rolling_msg += raw_chunk
+
+    if not supports_func_calling or not rolling_msg.tool_calls:
+        new_content = rolling_msg.content[len(previous_content) :]
+        return rolling_msg, new_content, rolling_msg.content
+
+    current_answers = get_answers_from_tool_calls(rolling_msg.tool_calls)
+    full_answer = "\n\n".join(current_answers)
+    new_content = full_answer[len(previous_content) :]
+
+    return rolling_msg, new_content, full_answer
+
+
+def get_answers_from_tool_calls(tool_calls):
     answers = []
-
-    if "answer" in raw_chunk:
-        answer = raw_chunk["answer"]
-    else:
-        answer = raw_chunk
-
-    rolling_msg += answer
-    if supports_func_calling and rolling_msg.tool_calls:
-        for cited_answer in filter(cited_answer_filter, rolling_msg.tool_calls):
-            if "args" in cited_answer and "answer" in cited_answer["args"]:
-                gathered_args = cited_answer["args"]
-                answers.append(gathered_args["answer"])
-
-    answer_str = "\n\n".join(answers) if answers else answer.content
-    return rolling_msg, answer_str
+    for tool_call in tool_calls:
+        if tool_call.get("name") == "cited_answer" and "args" in tool_call:
+            answers.append(tool_call["args"].get("answer", ""))
+    return answers
 
 
 @no_type_check

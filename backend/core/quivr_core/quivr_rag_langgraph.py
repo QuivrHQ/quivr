@@ -1,5 +1,4 @@
 import logging
-from operator import add
 from typing import (
     Annotated,
     AsyncGenerator,
@@ -53,28 +52,47 @@ from quivr_core.utils import (
 logger = logging.getLogger("quivr_core")
 
 
-class UserIntent(BaseModel):
-    intent: str = Field(description="The user intent")
-
-
 class SplittedInput(BaseModel):
+    instructions_reasoning: Optional[str] = Field(
+        default=None,
+        description="The reasoning that leads to identifying the user instructions to the system",
+    )
     instructions: Optional[str] = Field(
         default=None, description="The instructions to the system"
     )
-    tasks: Optional[List[str]] = Field(
+
+    tasks_reasoning: Optional[str] = Field(
         default=None,
+        description="The reasoning that leads to identifying the explicit or implicit user tasks and questions",
+    )
+    tasks: Optional[List[str]] = Field(
+        default="No explicit or implicit task found",
         description="The list of standalone, self-contained tasks or questions.",
     )
 
 
 class TasksCompletion(BaseModel):
+    completable_tasks_reasoning: Optional[str] = Field(
+        default=None,
+        description="The reasoning that leads to identifying the user tasks or questions that can be completed using the provided context and chat history.",
+    )
     completable_tasks: Optional[List[str]] = Field(
         default=None,
         description="The user tasks or questions that can be completed using the provided context and chat history.",
     )
+
+    non_completable_tasks_reasoning: Optional[str] = Field(
+        default=None,
+        description="The reasoning that leads to identifying the user tasks or questions that cannot be completed using the provided context and chat history.",
+    )
     non_completable_tasks: Optional[List[str]] = Field(
         default=None,
-        description="The user tasks or questions that need a web search to be completed.",
+        description="The user tasks or questions that need a tool to be completed.",
+    )
+
+    tool_reasoning: Optional[str] = Field(
+        default=None,
+        description="The reasoning that leads to identifying the tool that shall be used to complete the tasks.",
     )
     tool: Optional[str] = Field(
         default=None,
@@ -83,10 +101,11 @@ class TasksCompletion(BaseModel):
 
 
 class FinalAnswer(BaseModel):
-    answer: str = Field(description="The final answer to the user tasks/questions")
-    reasoning: str = Field(
+    reasoning_answer: str = Field(
         description="The step-by-step reasoning that led to the final answer"
     )
+    answer: str = Field(description="The final answer to the user tasks/questions")
+
     all_tasks_completed: bool = Field(
         description="Whether all tasks/questions have been successfully answered/completed or not. "
         " If the final answer to the user is 'I don't know' or 'I don't have enough information' or 'I'm not sure', "
@@ -95,21 +114,21 @@ class FinalAnswer(BaseModel):
 
 
 class UpdatedPromptAndTools(BaseModel):
-    prompt: Optional[str] = Field(default=None, description="The updated system prompt")
     prompt_reasoning: Optional[str] = Field(
         default=None,
-        description="The step-by-step reasoning that led to the updated system prompt",
+        description="The step-by-step reasoning that leads to the updated system prompt",
     )
+    prompt: Optional[str] = Field(default=None, description="The updated system prompt")
 
+    tools_reasoning: Optional[str] = Field(
+        default=None,
+        description="The reasoning that leads to activating and deactivating the tools",
+    )
     tools_to_activate: Optional[List[str]] = Field(
         default=None, description="The list of tools to activate"
     )
     tools_to_deactivate: Optional[List[str]] = Field(
         default=None, description="The list of tools to deactivate"
-    )
-    reasoning_tools: Optional[str] = Field(
-        default=None,
-        description="The reasoning that led to the tools to activate and deactivate",
     )
 
 
@@ -117,7 +136,7 @@ class AgentState(TypedDict):
     # The add_messages function defines how an update should be processed
     # Default is to replace. add_messages says "append"
     messages: Annotated[Sequence[BaseMessage], add_messages]
-    reasoning: Annotated[List[str], add]
+    reasoning: List[str]
     chat_history: ChatHistory
     docs: list[Document]
     files: str
@@ -214,33 +233,6 @@ class QuivrQARAGLangGraph:
             raise ValueError("No vector store provided")
 
         return retriever
-
-    # def routing(self, state: AgentState) -> str:
-    #     """
-    #     The routing function for the RAG model.
-
-    #     Args:
-    #         state (AgentState): The current state of the agent.
-
-    #     Returns:
-    #         dict: The next state of the agent.
-    #     """
-
-    #     msg = custom_prompts.USER_INTENT_PROMPT.format(
-    #         question=state["messages"][0].content,
-    #     )
-
-    #     try:
-    #         structured_llm = self.llm_endpoint._llm.with_structured_output(
-    #             UserIntent, method="json_schema"
-    #         )
-    #         response = structured_llm.invoke(msg)
-
-    #     except openai.BadRequestError:
-    #         structured_llm = self.llm_endpoint._llm.with_structured_output(UserIntent)
-    #         response = structured_llm.invoke(msg)
-
-    #     return response.intent
 
     def routing(self, state: AgentState) -> List[Send]:
         """
@@ -413,7 +405,7 @@ class QuivrQARAGLangGraph:
         # }
         # return {"messages": [message], "final_response": formatted_response}
         reasoning = [response.prompt_reasoning] if response.prompt_reasoning else []
-        reasoning += [response.reasoning_tools] if response.reasoning_tools else []
+        reasoning += [response.tools_reasoning] if response.tools_reasoning else []
 
         return {**state, "messages": [], "reasoning": reasoning}
 
@@ -785,9 +777,9 @@ class QuivrQARAGLangGraph:
     def bind_tools_to_llm(self, node_name: str):
         if self.llm_endpoint.supports_func_calling():
             tools = self.retrieval_config.workflow_config.get_node_tools(node_name)
-            llm_copy = self.llm_endpoint.clone_llm()  # Clone the LLM
-            llm_copy = llm_copy.bind_tools(tools, tool_choice="any")
-            return llm_copy
+            # llm_copy = self.llm_endpoint.clone_llm()  # Clone the LLM
+            # llm_copy = llm_copy.bind_tools(tools, tool_choice="any")
+            return self.llm_endpoint._llm.bind_tools(tools, tool_choice="any")
         return self.llm_endpoint._llm
 
     def generate_rag(self, state: AgentState) -> AgentState:
@@ -802,10 +794,13 @@ class QuivrQARAGLangGraph:
         final_inputs = {}
         final_inputs["context"] = combine_documents(docs) if docs else "None"
         final_inputs["question"] = user_question
+        final_inputs["rephrased_task"] = state["tasks"]
         final_inputs["custom_instructions"] = prompt if prompt else "None"
         final_inputs["files"] = files if files else "None"
         final_inputs["chat_history"] = state["chat_history"].to_list()
-        final_inputs["reasoning"] = state["reasoning"]
+        final_inputs["reasoning"] = (
+            state["reasoning"] if "reasoning" in state else "None"
+        )
         available_tools, activated_tools = collect_tools(
             self.retrieval_config.workflow_config
         )
@@ -966,15 +961,6 @@ class QuivrQARAGLangGraph:
     ) -> AsyncGenerator[ParsedRAGChunkResponse, ParsedRAGChunkResponse]:
         """
         Answer a question using the langgraph chain and yield each chunk of the answer separately.
-
-        Args:
-            question (str): The question to answer.
-            history (ChatHistory): The chat history to use for context.
-            list_files (list[QuivrKnowledge]): The list of files to use for retrieval.
-            metadata (dict[str, str], optional): The metadata to pass to the langchain invocation. Defaults to {}.
-
-        Yields:
-            ParsedRAGChunkResponse: Each chunk of the answer.
         """
         concat_list_files = format_file_list(
             list_files, self.retrieval_config.max_files
@@ -983,76 +969,53 @@ class QuivrQARAGLangGraph:
 
         rolling_message = AIMessageChunk(content="")
         docs: list[Document] | None = None
-        prev_answer = ""
-        chunk_id = 0
+        previous_content = ""
 
         async for event in conversational_qa_chain.astream_events(
             {
-                "messages": [
-                    ("user", question),
-                ],
+                "messages": [("user", question)],
                 "chat_history": history,
                 "files": concat_list_files,
             },
             version="v1",
             config={"metadata": metadata},
         ):
-            if (
-                not docs
-                and "output" in event["data"]
-                and event["data"]["output"] is not None
-                and "docs" in event["data"]["output"]
-                and event["metadata"]["langgraph_node"] in self.final_nodes
-            ):
+            if self._is_final_node_with_docs(event):
                 docs = event["data"]["output"]["docs"]
 
-            if (
-                event["event"] == "on_chat_model_stream"
-                and "langgraph_node" in event["metadata"]
-                and event["metadata"]["langgraph_node"] in self.final_nodes
-            ):
+            if self._is_chat_model_stream_event(event):
                 chunk = event["data"]["chunk"]
-                rolling_message, answer_str = parse_chunk_response(
+                rolling_message, new_content, previous_content = parse_chunk_response(
                     rolling_message,
                     chunk,
                     self.llm_endpoint.supports_func_calling(),
+                    previous_content,
                 )
-                if len(answer_str) > 0:
-                    if (
-                        self.llm_endpoint.supports_func_calling()
-                        and rolling_message.tool_calls
-                    ):
-                        diff_answer = answer_str[len(prev_answer) :]
-                        if len(diff_answer) > 0:
-                            parsed_chunk = ParsedRAGChunkResponse(
-                                answer=diff_answer,
-                                metadata=get_chunk_metadata(rolling_message, docs),
-                            )
-                            prev_answer += diff_answer
 
-                            logger.debug(
-                                f"answer_astream func_calling=True question={question} rolling_msg={rolling_message} chunk_id={chunk_id}, chunk={parsed_chunk}"
-                            )
-                            yield parsed_chunk
-                    else:
-                        parsed_chunk = ParsedRAGChunkResponse(
-                            answer=answer_str,
-                            metadata=get_chunk_metadata(rolling_message, docs),
-                        )
-                        logger.debug(
-                            f"answer_astream func_calling=False question={question} rolling_msg={rolling_message} chunk_id={chunk_id}, chunk={parsed_chunk}"
-                        )
-                        yield parsed_chunk
+                if new_content:
+                    chunk_metadata = get_chunk_metadata(rolling_message, docs)
+                    yield ParsedRAGChunkResponse(
+                        answer=new_content, metadata=chunk_metadata
+                    )
 
-                    chunk_id += 1
-
-        # Last chunk provides metadata
-        last_chunk = ParsedRAGChunkResponse(
-            answer="",  # Ensure no citations are appended to the answer
+        # Yield final metadata chunk
+        yield ParsedRAGChunkResponse(
+            answer="",
             metadata=get_chunk_metadata(rolling_message, docs),
             last_chunk=True,
         )
-        logger.debug(
-            f"answer_astream last_chunk={last_chunk} question={question} rolling_msg={rolling_message} chunk_id={chunk_id}"
+
+    def _is_final_node_with_docs(self, event: dict) -> bool:
+        return (
+            "output" in event["data"]
+            and event["data"]["output"] is not None
+            and "docs" in event["data"]["output"]
+            and event["metadata"]["langgraph_node"] in self.final_nodes
         )
-        yield last_chunk
+
+    def _is_chat_model_stream_event(self, event: dict) -> bool:
+        return (
+            event["event"] == "on_chat_model_stream"
+            and "langgraph_node" in event["metadata"]
+            and event["metadata"]["langgraph_node"] in self.final_nodes
+        )
