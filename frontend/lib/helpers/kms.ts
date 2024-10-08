@@ -4,8 +4,11 @@ import { KMSElement } from "../api/sync/types";
 
 interface HandleDropParams {
   event: React.DragEvent<HTMLDivElement>;
-  targetElement: KMSElement;
-  patchKnowledge: (knowledgeId: UUID, parent_id: UUID) => Promise<KMSElement>;
+  targetElement: KMSElement | null;
+  patchKnowledge: (
+    knowledgeId: UUID,
+    parent_id: UUID | null
+  ) => Promise<KMSElement>;
   setRefetchFolderMenu: (value: boolean) => void;
   fetchQuivrFiles?: (parentId: UUID | null) => Promise<void>;
   currentFolder: KMSElement | undefined;
@@ -23,10 +26,9 @@ export const handleDrop = async ({
   const draggedElement = JSON.parse(
     event.dataTransfer.getData("application/json")
   ) as KMSElement;
-  console.info(currentFolder);
-  if (draggedElement.id !== targetElement.id) {
+  if (draggedElement.id !== targetElement?.id) {
     try {
-      await patchKnowledge(draggedElement.id, targetElement.id);
+      await patchKnowledge(draggedElement.id, targetElement?.id ?? null);
       setRefetchFolderMenu(true);
       if (fetchQuivrFiles) {
         await fetchQuivrFiles(currentFolder?.id ?? null);

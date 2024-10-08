@@ -6,6 +6,7 @@ import { QuivrLogo } from "@/lib/assets/QuivrLogo";
 import { Icon } from "@/lib/components/ui/Icon/Icon";
 import { LoaderIcon } from "@/lib/components/ui/LoaderIcon/LoaderIcon";
 import { useUserSettingsContext } from "@/lib/context/UserSettingsProvider/hooks/useUserSettingsContext";
+import { handleDrop } from "@/lib/helpers/kms";
 
 import QuivrFolder from "./QuivrFolder/QuivrFolder";
 import styles from "./QuivrKnowledges.module.scss";
@@ -23,9 +24,10 @@ const QuivrKnowledges = (): JSX.Element => {
     setExploredProvider,
     setRefetchFolderMenu,
     refetchFolderMenu,
+    currentFolder,
   } = useKnowledgeContext();
 
-  const { getFiles } = useKnowledgeApi();
+  const { getFiles, patchKnowledge } = useKnowledgeApi();
 
   const chooseQuivrRoot = () => {
     setCurrentFolder(undefined);
@@ -58,7 +60,18 @@ const QuivrKnowledges = (): JSX.Element => {
 
   return (
     <div className={styles.main_container}>
-      <div className={styles.header_section_wrapper}>
+      <div
+        className={styles.header_section_wrapper}
+        onDrop={(event) =>
+          void handleDrop({
+            event,
+            targetElement: null,
+            patchKnowledge,
+            setRefetchFolderMenu,
+            currentFolder,
+          })
+        }
+      >
         <Icon
           name={folded ? "chevronRight" : "chevronDown"}
           size="normal"

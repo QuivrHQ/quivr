@@ -114,7 +114,7 @@ export const addFolder = async (
 export const patchKnowledge = async (
   knowledge_id: UUID,
   axiosInstance: AxiosInstance,
-  parent_id: UUID
+  parent_id: UUID | null
 ): Promise<KMSElement> => {
   const data = {
     parent_id,

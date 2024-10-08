@@ -29,7 +29,7 @@ export const useKnowledgeApi = () => {
       getFiles(parentId, axiosInstance),
     addFolder: async (addFolderData: AddFolderData) =>
       addFolder(addFolderData, axiosInstance),
-    patchKnowledge: async (knowledgeId: UUID, parent_id: UUID) =>
+    patchKnowledge: async (knowledgeId: UUID, parent_id: UUID | null) =>
       patchKnowledge(knowledgeId, axiosInstance, parent_id),
   };
 };
