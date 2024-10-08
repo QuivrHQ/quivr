@@ -16,6 +16,12 @@
       display: flex;
       justify-content: space-between;
       width: 100%;
+
+      .right {
+        display: flex;
+        align-items: center;
+        gap: Spacings.$spacing03;
+      }
     }
 
     .loading_icon {
