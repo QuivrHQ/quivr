@@ -23,7 +23,7 @@ interface AssistantTabProps {
   setSelectedTab: (tab: string) => void;
 }
 
-const FILE_TYPES = ["pdf", "docx", "doc", "txt"];
+const FILE_TYPES = ["pdf", "docx", "doc", "txt", "xlsx", "xls"];
 
 const useAssistantData = () => {
   const [assistants, setAssistants] = useState<Assistant[]>([]);
