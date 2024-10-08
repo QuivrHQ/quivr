@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.0.321 (2024-10-08)
+
+## What's Changed
+* feat: Add file name to knowledge properties in crawl_endpoint by @StanGirard in https://github.com/QuivrHQ/quivr/pull/3346
+* feat(frontend): add xlsx by @Zewed in https://github.com/QuivrHQ/quivr/pull/3340
+
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.320...v0.0.321
+
 ## 0.0.320 (2024-10-07)
 
 ## What's Changed
