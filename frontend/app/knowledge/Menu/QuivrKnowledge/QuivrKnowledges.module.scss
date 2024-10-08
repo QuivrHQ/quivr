@@ -12,6 +12,11 @@
     align-items: center;
     gap: Spacings.$spacing02;
     font-weight: 500;
+    border: 1px solid transparent;
+
+    &.dragged {
+      border-color: var(--accent);
+    }
 
     .hoverable {
       display: flex;

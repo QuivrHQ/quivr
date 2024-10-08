@@ -17,6 +17,7 @@ const QuivrKnowledges = (): JSX.Element => {
   const [folded, setFolded] = useState(true);
   const [kmsElements, setKMSElements] = useState<KMSElement[]>();
   const [loading, setLoading] = useState(false);
+  const [isDraggedOver, setIsDraggedOver] = useState(false);
   const { isDarkMode } = useUserSettingsContext();
   const {
     setExploringQuivr,
@@ -61,16 +62,24 @@ const QuivrKnowledges = (): JSX.Element => {
   return (
     <div className={styles.main_container}>
       <div
-        className={styles.header_section_wrapper}
-        onDrop={(event) =>
+        className={`${styles.header_section_wrapper} ${
+          isDraggedOver ? styles.dragged : ""
+        }`}
+        onDrop={(event) => {
           void handleDrop({
             event,
             targetElement: null,
             patchKnowledge,
             setRefetchFolderMenu,
             currentFolder,
-          })
-        }
+          });
+          setIsDraggedOver(false);
+        }}
+        onDragOver={(event) => {
+          event.preventDefault();
+          setIsDraggedOver(true);
+        }}
+        onDragLeave={() => setIsDraggedOver(false)}
       >
         <Icon
           name={folded ? "chevronRight" : "chevronDown"}
