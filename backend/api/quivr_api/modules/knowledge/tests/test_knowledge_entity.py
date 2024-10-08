@@ -219,9 +219,9 @@ def test_sort_knowledge_dtos():
     }
     dtos = [
         KnowledgeDTO(id=uuid4(), is_folder=False, file_name=None, **data_dict),
+        KnowledgeDTO(id=uuid4(), is_folder=False, file_name="B", **data_dict),
         KnowledgeDTO(id=uuid4(), is_folder=True, file_name="A", **data_dict),
         KnowledgeDTO(id=uuid4(), is_folder=True, file_name=None, **data_dict),
-        KnowledgeDTO(id=uuid4(), is_folder=False, file_name="B", **data_dict),
     ]
 
     sorted_dtos = sort_knowledge_dtos(dtos)
