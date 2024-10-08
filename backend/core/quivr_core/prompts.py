@@ -58,10 +58,11 @@ def _define_custom_prompts() -> CustomPromptsDict:
     system_message_template += (
         "- When answering use markdown. Use markdown code blocks for code snippets.\n"
         "- Answer in a concise and clear manner.\n"
-        "- You must use only the provided context to answer the question. Do not use any prior knowledge or external information, even if you are certain of the answer.\n"
         "- If no preferred language is provided, answer in the same language as the language used by the user.\n"
-        "- If you cannot provide an answer using only the context provided, do not attempt to answer from your own knowledge."
-        "Instead, inform the user that the answer isn't available in the context and suggest using the available tools.\n"
+        "- You must use ONLY the provided context to answer the question. "
+        "Do not use any prior knowledge or external information, even if you are certain of the answer.\n"
+        "- If you cannot provide an answer using ONLY the context provided, do not attempt to answer from your own knowledge."
+        "Instead, inform the user that the answer isn't available in the context and suggest using the available tools {tools}.\n"
         "- Do not apologize when providing an answer.\n"
         "- Don't cite the source id in the answer objects, but you can use the source to answer the question.\n\n"
     )
@@ -70,13 +71,13 @@ def _define_custom_prompts() -> CustomPromptsDict:
         "\n"
         "- You have access to the following internal reasoning to provide an answer: {reasoning}\n"
         "- You have access to the following files to answer the user question (limited to first 20 files): {files}\n"
-        "- Context: {context}\n"
+        "- You have access to the following context to answer the user question: {context}\n"
         "- Follow these user instruction when crafting the answer: {custom_instructions}\n"
         "- These user instructions shall take priority over any other previous instruction.\n"
-        "- Remember: if you cannot provide an answer using only the provided context, "
-        "inform the user and consider if any of the tools can help answer the question.\n"
+        "- Remember: if you cannot provide an answer using ONLY the provided context and CITING the sources, "
+        "inform the user that you don't have the answer and consider if any of the tools can help answer the question.\n"
         "- Explain your reasoning about the potentiel tool usage in the answer.\n"
-        "- Do not use the tools, just OFFER the user the possibility to activate them. {tools}.\n\n"
+        "- Only use binded tools to answer the question.\n"
         # "OFFER the user the possibility to ACTIVATE a relevant tool among "
         # "the tools which can be activated."
         # "Tools which can be activated: {tools}. If any of these tools can help in providing an answer "
@@ -84,7 +85,10 @@ def _define_custom_prompts() -> CustomPromptsDict:
         # "Remember, you shall NOT use the above tools, ONLY offer the user the possibility to activate them.\n"
     )
 
-    template_answer = "User question: {question}\n"
+    template_answer = (
+        "Original task: {question}\n"
+        "Rephrased and contextualized task: {rephrased_task}\n"
+    )
 
     RAG_ANSWER_PROMPT = ChatPromptTemplate.from_messages(
         [
@@ -156,12 +160,16 @@ def _define_custom_prompts() -> CustomPromptsDict:
     # ---------------------------------------------------------------------------
     system_message_template = (
         "- Given the following user instruction, current system prompt, list of available tools "
-        "and list of activated tools, update the prompt to include the instruction and decide which tools to activate or deactivate.\n"
+        "and list of activated tools, update the prompt to include the instruction and decide which tools to activate.\n"
+        "- The prompt shall only contain generic instructions which can be applied to any user task or question.\n"
+        "- The prompt shall be concise and clear.\n"
         "- If the system prompt already contains the instruction, do not add it again.\n"
         "- If the system prompt contradicts ther user instruction, remove the contradictory "
         "statement or statements in the system prompt.\n"
         "- You shall return separately the updated system prompt and the reasoning that led to the update.\n"
-        "- You shall also return the list of tools to activate and deactivate and the reasoning that led to this decision.\n"
+        "- If the system prompt refers to a tool, you shall add the tool to the list of activated tools.\n"
+        "- If no tool activation is needed, return empty lists.\n"
+        "- You shall also return the reasoning that led to the tool activation.\n"
         "- Current system prompt: {system_prompt}\n"
         "- List of available tools: {available_tools}\n"
         "- List of activated tools: {activated_tools}\n\n"
@@ -197,7 +205,6 @@ def _define_custom_prompts() -> CustomPromptsDict:
         "- If no explicit task is present, you shall infer the tasks from the user input and the chat history.\n"
         "- Do NOT try to solve the tasks or answer the questions, "
         "just reformulate them if needed and otherwise return them as is.\n"
-        "- Do not output your reasoning, just the tasks.\n"
         "- Remember, you shall NOT suggest or generate new tasks.\n"
         "- As an example, the user input 'What is Apple? Who is its CEO? When was it founded?' "
         "shall be split into the questions 'What is Apple?', 'Who is the CEO of Apple?' and 'When was Apple founded?'.\n"
