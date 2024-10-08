@@ -2,7 +2,7 @@ import json
 import os
 import random
 from typing import List
-from uuid import UUID, uuid4
+from uuid import UUID
 
 from locust import between, task
 from locust.contrib.fasthttp import FastHttpUser
@@ -136,7 +136,7 @@ class QuivrUser(FastHttpUser):
         random_brains = [random.choice(brains_ids) for _ in range(nb_brains)]
         random_km = random.choice(all_kms)
         json_data = LinkKnowledgeBrain(
-            bulk_id=uuid4(), brain_ids=random_brains, knowledge=random_km
+            brain_ids=random_brains, knowledge=random_km
         ).model_dump_json()
         self.client.post(
             "/knowledge/link_to_brains/",

@@ -34,3 +34,10 @@ class KnowledgeDTO(BaseModel):
     sync_id: int | None
     sync_file_id: str | None
     last_synced_at: datetime | None = None
+
+
+def sort_knowledge_dtos(dtos: List[KnowledgeDTO]) -> List[KnowledgeDTO]:
+    return sorted(
+        dtos,
+        key=lambda dto: (not dto.is_folder, dto.file_name is None, dto.file_name or ""),
+    )

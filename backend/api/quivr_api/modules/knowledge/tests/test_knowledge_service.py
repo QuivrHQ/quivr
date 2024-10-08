@@ -948,6 +948,10 @@ async def test_list_knowledge_root(session: AsyncSession, user: User):
     assert len(root_kms) == 2
     assert {k.id for k in root_kms} == {root_folder.id, root_file.id}
 
+    # check order
+    assert root_kms[0].file_name == "folder"
+    assert root_kms[1].file_name == "file_1"
+
 
 @pytest.mark.asyncio(loop_scope="session")
 async def test_list_knowledge(session: AsyncSession, user: User):

@@ -10,7 +10,7 @@ from sqlalchemy.ext.asyncio import AsyncAttrs
 from sqlmodel import UUID as PGUUID
 from sqlmodel import Field, Relationship, SQLModel
 
-from quivr_api.modules.knowledge.dto.outputs import KnowledgeDTO
+from quivr_api.modules.knowledge.dto.outputs import KnowledgeDTO, sort_knowledge_dtos
 from quivr_api.modules.knowledge.entity.knowledge_brain import KnowledgeBrain
 from quivr_api.modules.sync.entity.sync_models import Sync
 
@@ -118,6 +118,7 @@ class KnowledgeDB(AsyncAttrs, SQLModel, table=True):
         children_dto = await asyncio.gather(
             *[c.to_dto(get_children=False) for c in children]
         )
+        children_dto = sort_knowledge_dtos(children_dto)
         parent = await self.awaitable_attrs.parent if get_parent else None
         parent_dto = await parent.to_dto(get_children=False) if parent else None
 

@@ -1,6 +1,5 @@
 import json
 from datetime import datetime
-from uuid import uuid4
 
 import pytest
 import pytest_asyncio
@@ -214,7 +213,7 @@ async def test_link_knowledge_sync_file(
         children=[],
     )
     json_data = LinkKnowledgeBrain(
-        bulk_id=uuid4(), brain_ids=[brain.brain_id], knowledge=km
+        brain_ids=[brain.brain_id], knowledge=km
     ).model_dump_json()
     response = await test_client.post(
         "/knowledge/link_to_brains/",
@@ -291,7 +290,7 @@ async def test_link_knowledge_folder(
     file_km = KnowledgeDTO.model_validate(response.json())
 
     json_data = LinkKnowledgeBrain(
-        bulk_id=uuid4(), brain_ids=[brain.brain_id], knowledge=folder_km
+        brain_ids=[brain.brain_id], knowledge=folder_km
     ).model_dump_json()
 
     response = await test_client.post(
