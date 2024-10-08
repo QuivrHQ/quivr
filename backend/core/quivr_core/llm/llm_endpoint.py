@@ -70,6 +70,7 @@ class LLMEndpoint:
                     else None,
                     azure_endpoint=azure_endpoint,
                     max_tokens=config.max_output_tokens,
+                    temperature=config.temperature,
                 )
             elif config.supplier == DefaultModelSuppliers.ANTHROPIC:
                 _llm = ChatAnthropic(
@@ -79,6 +80,7 @@ class LLMEndpoint:
                     else None,
                     base_url=config.llm_base_url,
                     max_tokens=config.max_output_tokens,
+                    temperature=config.temperature,
                 )
             elif config.supplier == DefaultModelSuppliers.OPENAI:
                 _llm = ChatOpenAI(
@@ -88,6 +90,7 @@ class LLMEndpoint:
                     else None,
                     base_url=config.llm_base_url,
                     max_tokens=config.max_output_tokens,
+                    temperature=config.temperature,
                 )
             else:
                 _llm = ChatOpenAI(
@@ -97,6 +100,7 @@ class LLMEndpoint:
                     else None,
                     base_url=config.llm_base_url,
                     max_tokens=config.max_output_tokens,
+                    temperature=config.temperature,
                 )
             return cls(llm=_llm, llm_config=config)
 
