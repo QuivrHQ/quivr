@@ -23,10 +23,10 @@ class User(SQLModel, table=True):
         back_populates="users",
         link_model=BrainUserDB,
     )
-    product_id: int | None = Field(default=None, foreign_key="product_to_features.id")
-    product: Optional["ProductSettings"] = Relationship(  # type: ignore  # noqa: F821
-        back_populates="users", sa_relationship_kwargs={"lazy": "joined"}
-    )
+    # product_id: int | None = Field(default=None, foreign_key="product_to_features.id")
+    # product: Optional["ProductSettings"] = Relationship(  # type: ignore  # noqa: F821
+    #     back_populates="users", sa_relationship_kwargs={"lazy": "joined"}
+    # )
 
 
 class UserIdentity(BaseModel):

@@ -55,6 +55,7 @@ members = [
     "core/examples/chatbot",
     "core/MegaParse",
     "worker/diff-assistant",
+    "libs/notion-fetcher",
 ]
 
 [tool.hatch.metadata]

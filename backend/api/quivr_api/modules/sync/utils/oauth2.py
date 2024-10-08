@@ -22,7 +22,6 @@ def parse_oauth2_state(state_str: str | None) -> Oauth2State:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid state parameter"
         )
-
     state = Oauth2State.model_validate_json(state_str)
     if state.sync_id is None:
         raise HTTPException(

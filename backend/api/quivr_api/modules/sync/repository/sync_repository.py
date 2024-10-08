@@ -152,9 +152,7 @@ class SyncsRepository(BaseRepository):
         self, sync: Sync, sync_input: SyncUpdateInput | dict[str, Any]
     ):
         logger.debug(
-            "Updating sync user with user_id: %s, state: %s, input: %s",
-            sync.id,
-            sync_input,
+            f"Updating sync {sync.id} with input: {sync_input}",
         )
         try:
             if isinstance(sync_input, dict):

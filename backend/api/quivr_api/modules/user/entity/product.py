@@ -19,4 +19,4 @@ class ProductSettings(SQLModel, table=True):
     api_access: bool
     monthly_chat_credit: int
     max_storage: int
-    users: List["User"] | None = Relationship(back_populates="product")  # type: ignore # noqa: F821
+    # users: List["User"] | None = Relationship(back_populates="product")  # type: ignore # noqa: F821

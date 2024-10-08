@@ -21,6 +21,7 @@
 -e file:core/MegaParse
     # via quivr-core
     # via quivr-diff-assistant
+-e file:libs/notion-fetcher
 -e file:worker
 -e file:worker/diff-assistant
     # via quivr-worker
@@ -512,6 +513,8 @@ matplotlib==3.9.2
 matplotlib-inline==0.1.7
     # via ipykernel
     # via ipython
+maturin==1.7.4
+    # via notion-fetcher
 mdit-py-plugins==0.4.1
     # via jupytext
 mdurl==0.1.2
