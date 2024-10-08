@@ -8,6 +8,7 @@ import QuivrButton from "@/lib/components/ui/QuivrButton/QuivrButton";
 import { handleDragOver, handleDrop } from "@/lib/helpers/kms";
 
 import AddFolderModal from "./AddFolderModal/AddFolderModal";
+import AddKnowledgeModal from "./AddKnowledgeModal/AddKnowledgeModal";
 import styles from "./QuivrCurrentFolder.module.scss";
 
 import { useKnowledgeContext } from "../../../KnowledgeProvider/hooks/useKnowledgeContext";
@@ -18,6 +19,7 @@ const QuivrCurrentFolder = (): JSX.Element => {
   const [loading, setLoading] = useState(false);
   const [deleteLoading, setDeleteLoading] = useState(false);
   const [addFolderModalOpened, setAddFolderModalOpened] = useState(false);
+  const [addKnowledgeModalOpened, setAddKnowledgeModalOpened] = useState(false);
   const [quivrElements, setQuivrElements] = useState<KMSElement[]>();
   const {
     currentFolder,
@@ -120,13 +122,22 @@ const QuivrCurrentFolder = (): JSX.Element => {
                   isLoading={deleteLoading}
                   disabled={!selectedKnowledges.length}
                 />
-                <QuivrButton
-                  iconName="add"
-                  label="Add Folder"
-                  color="primary"
-                  onClick={() => setAddFolderModalOpened(true)}
-                  small={true}
-                />
+                <div className={styles.right}>
+                  <QuivrButton
+                    iconName="add"
+                    label="Add Folder"
+                    color="primary"
+                    onClick={() => setAddFolderModalOpened(true)}
+                    small={true}
+                  />
+                  <QuivrButton
+                    iconName="add"
+                    label="Add Knowledges"
+                    color="primary"
+                    onClick={() => setAddKnowledgeModalOpened(true)}
+                    small={true}
+                  />
+                </div>
               </div>
               {quivrElements
                 ?.sort((a, b) => Number(b.is_folder) - Number(a.is_folder))
@@ -164,6 +175,10 @@ const QuivrCurrentFolder = (): JSX.Element => {
       <AddFolderModal
         isOpen={addFolderModalOpened}
         setIsOpen={setAddFolderModalOpened}
+      />
+      <AddKnowledgeModal
+        isOpen={addKnowledgeModalOpened}
+        setIsOpen={setAddKnowledgeModalOpened}
       />
     </>
   );
