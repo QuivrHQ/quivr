@@ -18,8 +18,10 @@ pyo3-asyncio = { version = "0.20.0", features = [
     "attributes",
 ] }
 reqwest = { version = "0.12.8", features = ["blocking", "json"] }
+rusqlite = "0.32.1"
 serde = { version = "1.0.210", features = ["derive"] }
 serde_json = "1.0.128"
+sqlx = { version = "0.8.2", features = ["sqlite"] }
 tokio = { version = "1.40.0", features = ["full"] }
 tracing = "0.1.40"
 tracing-subscriber = "0.3.18"
