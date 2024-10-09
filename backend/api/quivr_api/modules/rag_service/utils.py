@@ -33,6 +33,7 @@ async def generate_source(
 
     # Get source documents from the result, default to an empty list if not found
     # If source documents exist
+    logger.info(f"Source documents: {source_documents}")
     if source_documents:
         logger.debug(f"Citations {citations}")
         for index, doc in enumerate(source_documents):
@@ -48,6 +49,7 @@ async def generate_source(
                 "original_file_name" in doc.metadata
                 and doc.metadata["original_file_name"] is not None
                 and doc.metadata["original_file_name"].startswith("http")
+                and doc.metadata["integration"] == ""
             )
 
             # Determine the name based on whether it's a URL or a file
@@ -63,6 +65,8 @@ async def generate_source(
             # Determine the source URL based on whether it's a URL or a file
             if is_url:
                 source_url = doc.metadata["original_file_name"]
+            elif doc.metadata["integration"] != "":
+                logger.info(f"Integration: {doc.metadata['integration']}")
             else:
                 # Check if the URL has already been generated
                 try:
@@ -87,8 +91,12 @@ async def generate_source(
                 except Exception as e:
                     logger.error(f"Error generating file signed URL: {e}")
                     continue
-
+                
+            logger.info(f"Metadata: {doc.metadata}")
             # Append a new Sources object to the list
+            if doc.metadata["integration"] == "Zendesk":
+                logger.error(f"Zendesk integration: {doc.metadata['integration']}")
+                source_url = doc.metadata["integration_link"]
             sources_list.append(
                 Sources(
                     name=name,
