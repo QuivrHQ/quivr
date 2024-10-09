@@ -18,9 +18,8 @@
 
     .file_list {
       margin-top: Spacings.$spacing06;
-      flex: 1;
       border-radius: Radius.$normal;
-      border: 1px solid var(--border-0);
+      border-top: 1px solid var(--border-0);
 
       .file_item {
         font-size: Typography.$tiny;
