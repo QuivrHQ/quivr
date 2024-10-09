@@ -8,7 +8,7 @@ from quivr_api.modules.models.entity.model import Model
 from quivr_api.modules.models.service.model_service import ModelService
 from quivr_api.modules.user.entity.user_identity import UserIdentity
 from quivr_api.modules.user.service.user_usage import UserUsage
-from quivr_core.config import RetrievalConfig
+from quivr_core.rag.entities.config import RetrievalConfig
 
 logger = get_logger(__name__)
 

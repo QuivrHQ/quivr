@@ -16,12 +16,12 @@ from quivr_api.modules.notification.entity.notification import NotificationsStat
 from quivr_api.modules.notification.service.notification_service import (
     NotificationService,
 )
-from quivr_core.models import KnowledgeStatus
+from quivr_core.rag.entities.models import KnowledgeStatus
 from sqlmodel.ext.asyncio.session import AsyncSession
 
 logger = get_logger("notifier_service", "notifier_service.log")
 notification_service = NotificationService()
-queue = Queue()
+queue = Queue()  # type: ignore
 
 
 class TaskStatus(str, Enum):

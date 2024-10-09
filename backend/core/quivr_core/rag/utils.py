@@ -5,15 +5,15 @@ from langchain_core.messages import AIMessage, BaseMessage, HumanMessage, System
 from langchain_core.messages.ai import AIMessageChunk
 from langchain_core.prompts import format_document
 
-from quivr_core.config import WorkflowConfig
-from quivr_core.models import (
+from quivr_core.rag.entities.config import WorkflowConfig
+from quivr_core.rag.entities.models import (
     ChatLLMMetadata,
     ParsedRAGResponse,
     QuivrKnowledge,
     RAGResponseMetadata,
     RawRAGResponse,
 )
-from quivr_core.prompts import custom_prompts
+from quivr_core.rag.prompts import custom_prompts
 
 # TODO(@aminediro): define a types packages where we clearly define IO types
 # This should be used for serialization/deseriallization later

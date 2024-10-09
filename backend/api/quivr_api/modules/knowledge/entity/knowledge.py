@@ -4,7 +4,7 @@ from typing import Any, Dict, List, Optional
 from uuid import UUID
 from pydantic import BaseModel
 
-from quivr_core.models import KnowledgeStatus
+from quivr_core.rag.entities.models import KnowledgeStatus
 from sqlalchemy import JSON, TIMESTAMP, Column, text
 from sqlalchemy.ext.asyncio import AsyncAttrs
 from sqlmodel import UUID as PGUUID

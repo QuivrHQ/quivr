@@ -12,18 +12,18 @@ from langchain_core.output_parsers import StrOutputParser
 from langchain_core.runnables import RunnableLambda, RunnablePassthrough
 from langchain_core.vectorstores import VectorStore
 
-from quivr_core.chat import ChatHistory
-from quivr_core.config import RetrievalConfig
+from quivr_core.rag.entities.chat import ChatHistory
+from quivr_core.rag.entities.config import RetrievalConfig
 from quivr_core.llm import LLMEndpoint
-from quivr_core.models import (
+from quivr_core.rag.entities.models import (
     ParsedRAGChunkResponse,
     ParsedRAGResponse,
     QuivrKnowledge,
     RAGResponseMetadata,
     cited_answer,
 )
-from quivr_core.prompts import custom_prompts
-from quivr_core.utils import (
+from quivr_core.rag.prompts import custom_prompts
+from quivr_core.rag.utils import (
     combine_documents,
     format_file_list,
     get_chunk_metadata,

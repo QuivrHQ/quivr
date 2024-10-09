@@ -9,6 +9,7 @@ from typing import (
     TypedDict,
     Dict,
     Any,
+    Type,
 )
 from uuid import uuid4
 import asyncio
@@ -32,16 +33,16 @@ from langgraph.types import Send
 from pydantic import BaseModel, Field
 import openai
 
-from quivr_core.chat import ChatHistory
-from quivr_core.config import DefaultRerankers, RetrievalConfig
+from quivr_core.rag.entities.chat import ChatHistory
+from quivr_core.rag.entities.config import DefaultRerankers, NodeConfig, RetrievalConfig
 from quivr_core.llm import LLMEndpoint
 from quivr_core.llm_tools.llm_tools import LLMToolFactory
-from quivr_core.models import (
+from quivr_core.rag.entities.models import (
     ParsedRAGChunkResponse,
     QuivrKnowledge,
 )
-from quivr_core.prompts import custom_prompts
-from quivr_core.utils import (
+from quivr_core.rag.prompts import custom_prompts
+from quivr_core.rag.utils import (
     collect_tools,
     combine_documents,
     format_file_list,
@@ -285,51 +286,28 @@ class QuivrQARAGLangGraph:
         return send_list
 
     def routing_split(self, state: AgentState):
-        input = {
-            "chat_history": state["chat_history"].to_list(),
-            "user_input": state["messages"][0].content,
-        }
-
-        msg = custom_prompts.SPLIT_PROMPT.format(**input)
-
-        response: SplittedInput
-
-        try:
-            structured_llm = self.llm_endpoint._llm.with_structured_output(
-                SplittedInput, method="json_schema"
-            )
-            response = structured_llm.invoke(msg)
-
-        except openai.BadRequestError:
-            structured_llm = self.llm_endpoint._llm.with_structured_output(
-                SplittedInput
-            )
-            response = structured_llm.invoke(msg)
-
-        send_list: List[Send] = []
-        instructions = (
-            response.instructions
-            if response.instructions
-            else self.retrieval_config.prompt
+        response = self.invoke_structured_output(
+            custom_prompts.SPLIT_PROMPT.format(
+                chat_history=state["chat_history"].to_list(),
+                user_input=state["messages"][0].content,
+            ),
+            SplittedInput,
         )
 
-        if instructions:
-            payload = {
-                **state,
-                "instructions": instructions,
-                "tasks": response.tasks if response.tasks else [],
-            }
-            send_list.append(Send("edit_system_prompt", payload))
-        elif response.tasks:
-            chat_history = state["chat_history"]
-            payload = {
-                **state,
-                "chat_history": chat_history,
-                "tasks": response.tasks,
-            }
-            send_list.append(Send("filter_history", payload))
+        instructions = response.instructions or self.retrieval_config.prompt
+        tasks = response.tasks or []
 
-        return send_list
+        if instructions:
+            return [
+                Send(
+                    "edit_system_prompt",
+                    {**state, "instructions": instructions, "tasks": tasks},
+                )
+            ]
+        elif tasks:
+            return [Send("filter_history", {**state, "tasks": tasks})]
+
+        return []
 
     # Here we generate a joke, given a subject
     # def generate_joke(state: JokeState):
@@ -381,19 +359,9 @@ class QuivrQARAGLangGraph:
 
         msg = custom_prompts.UPDATE_PROMPT.format(**inputs)
 
-        response: UpdatedPromptAndTools
-
-        try:
-            structured_llm = self.llm_endpoint._llm.with_structured_output(
-                UpdatedPromptAndTools, method="json_schema"
-            )
-            response = structured_llm.invoke(msg)
-
-        except openai.BadRequestError:
-            structured_llm = self.llm_endpoint._llm.with_structured_output(
-                UpdatedPromptAndTools
-            )
-            response = structured_llm.invoke(msg)
+        response: UpdatedPromptAndTools = self.invoke_structured_output(
+            msg, UpdatedPromptAndTools
+        )
 
         self.update_active_tools(response)
         self.retrieval_config.prompt = response.prompt
@@ -530,19 +498,7 @@ class QuivrQARAGLangGraph:
 
         msg = custom_prompts.TOOL_ROUTING_PROMPT.format(**input)
 
-        response: TasksCompletion
-
-        try:
-            structured_llm = self.llm_endpoint._llm.with_structured_output(
-                TasksCompletion, method="json_schema"
-            )
-            response = structured_llm.invoke(msg)
-
-        except openai.BadRequestError:
-            structured_llm = self.llm_endpoint._llm.with_structured_output(
-                TasksCompletion
-            )
-            response = structured_llm.invoke(msg)
+        response: TasksCompletion = self.invoke_structured_output(msg, TasksCompletion)
 
         send_list: List[Send] = []
 
@@ -807,26 +763,15 @@ class QuivrQARAGLangGraph:
         final_inputs["tools"] = available_tools
 
         reduced_inputs, docs = self.reduce_rag_context(
-            final_inputs, prompt=custom_prompts.RAG_ANSWER_PROMPT, docs=docs
+            final_inputs, custom_prompts.RAG_ANSWER_PROMPT, docs
         )
 
         msg = custom_prompts.RAG_ANSWER_PROMPT.format(**reduced_inputs)
 
         llm = self.bind_tools_to_llm(self.generate_rag.__name__)
 
-        # response: FinalAnswer
-        # try:
-        #     structured_llm = llm.with_structured_output(
-        #         FinalAnswer, method="json_schema"
-        #     )
-        #     response = structured_llm.invoke(msg)
-
-        # except openai.BadRequestError:
-        #     structured_llm = llm.with_structured_output(
-        #         FinalAnswer
-        #     )
-        #     response = structured_llm.invoke(msg)
-
+        # Uncomment and update this section if you want to use structured output
+        # response: FinalAnswer = self.invoke_structured_output(msg, FinalAnswer)
         # return {**state, "messages": [response.answer], "docs": docs if docs else []}
 
         response = llm.invoke(msg)
@@ -857,7 +802,7 @@ class QuivrQARAGLangGraph:
         llm = self.llm_endpoint._llm
 
         reduced_inputs, _ = self.reduce_rag_context(
-            final_inputs, prompt=custom_prompts.CHAT_LLM_PROMPT
+            final_inputs, custom_prompts.CHAT_LLM_PROMPT, None
         )
 
         msg = custom_prompts.CHAT_LLM_PROMPT.format(**reduced_inputs)
@@ -879,78 +824,50 @@ class QuivrQARAGLangGraph:
         return self.graph
 
     def create_graph(self):
-        """
-        Builds the langchain chain for the given configuration.
-
-        This function creates a state machine which takes a chat history and a question
-        and produces an answer. The state machine consists of the following states:
-
-        - filter_history: Filter the chat history (i.e., remove the last message)
-        - rewrite: Re-write the question using the filtered history
-        - retrieve: Retrieve documents related to the re-written question
-        - generate: Generate an answer using the retrieved documents
-
-        The state machine starts in the filter_history state and transitions as follows:
-        filter_history -> rewrite -> retrieve -> generate -> END
-
-        The final answer is returned as a dictionary with the answer and the list of documents
-        used to generate the answer.
-
-        Returns:
-            Callable[[Dict], Dict]: The langchain chain.
-        """
         workflow = StateGraph(AgentState)
-
-        self.final_nodes: List[str] = []
+        self.final_nodes = []
 
         if self.retrieval_config.workflow_config:
-            for node in self.retrieval_config.workflow_config.nodes:
-                if node.name not in [START, END]:
-                    workflow.add_node(node.name, getattr(self, node.name))
-
-            for node in self.retrieval_config.workflow_config.nodes:
-                if node.edges:
-                    for edge in node.edges:
-                        workflow.add_edge(node.name, edge)
-                        if edge == END:
-                            self.final_nodes.append(node.name)
-                elif node.conditional_edge:
-                    routing_function = getattr(
-                        self, node.conditional_edge.routing_function
-                    )
-                    workflow.add_conditional_edges(
-                        node.name, routing_function, node.conditional_edge.conditions
-                    )
-                    if isinstance(node.conditional_edge.conditions, dict):
-                        values = node.conditional_edge.conditions.values()
-                    else:
-                        values = node.conditional_edge.conditions
-                    if END in values:
-                        self.final_nodes.append(node.name)
-                else:
-                    raise ValueError(
-                        "Node should have at least one edge or conditional_edge"
-                    )
+            self._build_custom_workflow(workflow)
         else:
-            # Define the nodes we will cycle between
-            workflow.add_node("filter_history", self.filter_history)
-            workflow.add_node("rewrite", self.rewrite)  # Re-writing the question
-            workflow.add_node("retrieve", self.retrieve)  # retrieval
-            workflow.add_node("generate", self.generate_rag)
+            self._build_default_workflow(workflow)
 
-            # Add node for filtering history
+        return workflow.compile()
 
-            workflow.set_entry_point("filter_history")
-            workflow.add_edge("filter_history", "rewrite")
-            workflow.add_edge("rewrite", "retrieve")
-            workflow.add_edge("retrieve", "generate")
-            workflow.add_edge(
-                "generate", END
-            )  # Add edge from generate to format_response
+    def _build_custom_workflow(self, workflow: StateGraph):
+        for node in self.retrieval_config.workflow_config.nodes:
+            if node.name not in [START, END]:
+                workflow.add_node(node.name, getattr(self, node.name))
 
-        # Compile
-        graph = workflow.compile()
-        return graph
+        for node in self.retrieval_config.workflow_config.nodes:
+            self._add_node_edges(workflow, node)
+
+    def _add_node_edges(self, workflow: StateGraph, node: NodeConfig):
+        if node.edges:
+            for edge in node.edges:
+                workflow.add_edge(node.name, edge)
+                if edge == END:
+                    self.final_nodes.append(node.name)
+        elif node.conditional_edge:
+            routing_function = getattr(self, node.conditional_edge.routing_function)
+            workflow.add_conditional_edges(
+                node.name, routing_function, node.conditional_edge.conditions
+            )
+            if END in node.conditional_edge.conditions:
+                self.final_nodes.append(node.name)
+        else:
+            raise ValueError("Node should have at least one edge or conditional_edge")
+
+    def _build_default_workflow(self, workflow: StateGraph):
+        nodes = ["filter_history", "rewrite", "retrieve", "generate"]
+        for node in nodes:
+            workflow.add_node(node, getattr(self, node))
+
+        workflow.set_entry_point("filter_history")
+        for i in range(len(nodes) - 1):
+            workflow.add_edge(nodes[i], nodes[i + 1])
+        workflow.add_edge("generate", END)
+        self.final_nodes = ["generate"]
 
     async def answer_astream(
         self,
@@ -983,7 +900,7 @@ class QuivrQARAGLangGraph:
             if self._is_final_node_with_docs(event):
                 docs = event["data"]["output"]["docs"]
 
-            if self._is_chat_model_stream_event(event):
+            if self._is_final_node_and_chat_model_stream(event):
                 chunk = event["data"]["chunk"]
                 rolling_message, new_content, previous_content = parse_chunk_response(
                     rolling_message,
@@ -1013,9 +930,21 @@ class QuivrQARAGLangGraph:
             and event["metadata"]["langgraph_node"] in self.final_nodes
         )
 
-    def _is_chat_model_stream_event(self, event: dict) -> bool:
+    def _is_final_node_and_chat_model_stream(self, event: dict) -> bool:
         return (
             event["event"] == "on_chat_model_stream"
             and "langgraph_node" in event["metadata"]
             and event["metadata"]["langgraph_node"] in self.final_nodes
         )
+
+    def invoke_structured_output(
+        self, prompt: str, output_class: Type[BaseModel]
+    ) -> Any:
+        try:
+            structured_llm = self.llm_endpoint._llm.with_structured_output(
+                output_class, method="json_schema"
+            )
+            return structured_llm.invoke(prompt)
+        except openai.BadRequestError:
+            structured_llm = self.llm_endpoint._llm.with_structured_output(output_class)
+            return structured_llm.invoke(prompt)

@@ -3,7 +3,7 @@ from uuid import uuid4
 
 import pytest
 import pytest_asyncio
-from quivr_core.models import KnowledgeStatus
+from quivr_core.rag.entities.models import KnowledgeStatus
 from sqlmodel import select, text
 from sqlmodel.ext.asyncio.session import AsyncSession
 
@@ -220,7 +220,7 @@ async def test_knowledge_dto(session, user, brain):
     assert km_dto.file_sha1 == km.file_sha1
     assert km_dto.updated_at == km.updated_at
     assert km_dto.created_at == km.created_at
-    assert km_dto.metadata == km.metadata_  # type: ignor
+    assert km_dto.metadata == km.metadata_  # type: ignore
     assert km_dto.parent
     assert km_dto.parent.id == folder.id
 

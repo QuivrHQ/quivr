@@ -11,6 +11,7 @@ from langchain_core.embeddings import Embeddings
 from langchain_core.messages import AIMessage, HumanMessage
 from langchain_core.vectorstores import VectorStore
 from langchain_openai import OpenAIEmbeddings
+from quivr_core.rag.quivr_rag import QuivrQARAG
 from rich.console import Console
 from rich.panel import Panel
 
@@ -22,19 +23,17 @@ from quivr_core.brain.serialization import (
     LocalStorageConfig,
     TransparentStorageConfig,
 )
-from quivr_core.chat import ChatHistory
-from quivr_core.config import RetrievalConfig
+from quivr_core.rag.entities.chat import ChatHistory
+from quivr_core.rag.entities.config import RetrievalConfig
 from quivr_core.files.file import load_qfile
 from quivr_core.llm import LLMEndpoint
-from quivr_core.models import (
+from quivr_core.rag.entities.models import (
     ParsedRAGChunkResponse,
-    ParsedRAGResponse,
     QuivrKnowledge,
     SearchResult,
 )
 from quivr_core.processor.registry import get_processor_class
-from quivr_core.quivr_rag import QuivrQARAG
-from quivr_core.quivr_rag_langgraph import QuivrQARAGLangGraph
+from quivr_core.rag.quivr_rag_langgraph import QuivrQARAGLangGraph
 from quivr_core.storage.local_storage import LocalStorage, TransparentStorage
 from quivr_core.storage.storage_base import StorageBase
 
@@ -374,43 +373,6 @@ class Brain:
         # add it to storage
         # add it to vectorstore
         raise NotImplementedError
-
-    def ask(
-        self,
-        question: str,
-        retrieval_config: RetrievalConfig | None = None,
-        rag_pipeline: Type[Union[QuivrQARAG, QuivrQARAGLangGraph]] | None = None,
-        list_files: list[QuivrKnowledge] | None = None,
-        chat_history: ChatHistory | None = None,
-    ) -> ParsedRAGResponse:
-        llm = self.llm
-
-        # If you passed a different llm model we'll override the brain  one
-        if retrieval_config:
-            if retrieval_config.llm_config != self.llm.get_config():
-                llm = LLMEndpoint.from_config(config=retrieval_config.llm_config)
-        else:
-            retrieval_config = RetrievalConfig(llm_config=self.llm.get_config())
-
-        if rag_pipeline is None:
-            rag_pipeline = QuivrQARAGLangGraph
-
-        rag_instance = rag_pipeline(
-            retrieval_config=retrieval_config, llm=llm, vector_store=self.vector_db
-        )
-
-        chat_history = self.default_chat if chat_history is None else chat_history
-        list_files = [] if list_files is None else list_files
-
-        parsed_response = rag_instance.answer(
-            question=question, history=chat_history, list_files=list_files
-        )
-
-        chat_history.append(HumanMessage(content=question))
-        chat_history.append(AIMessage(content=parsed_response.answer))
-
-        # Save answer to the chat history
-        return parsed_response
 
     async def ask_streaming(
         self,

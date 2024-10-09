@@ -2,7 +2,7 @@ from enum import Enum
 from typing import Dict, Any, Type, Union
 from langchain_core.tools import BaseTool
 from quivr_core.llm_tools.entity import ToolsCategory
-from quivr_core.models import cited_answer
+from quivr_core.rag.entities.models import cited_answer
 
 
 class OtherToolsList(str, Enum):

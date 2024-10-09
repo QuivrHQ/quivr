@@ -4,7 +4,7 @@ from typing import List, Optional
 from uuid import UUID
 
 from pydantic import BaseModel
-from quivr_core.config import BrainConfig
+from quivr_core.rag.entities.config import BrainConfig
 from sqlalchemy.dialects.postgresql import ENUM as PGEnum
 from sqlalchemy.ext.asyncio import AsyncAttrs
 from sqlmodel import TIMESTAMP, Column, Field, Relationship, SQLModel, text

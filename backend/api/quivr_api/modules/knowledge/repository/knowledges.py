@@ -2,7 +2,7 @@ from typing import Any, Sequence
 from uuid import UUID
 
 from fastapi import HTTPException
-from quivr_core.models import KnowledgeStatus
+from quivr_core.rag.entities.models import KnowledgeStatus
 from sqlalchemy.exc import IntegrityError, NoResultFound
 from sqlalchemy.orm import joinedload
 from sqlmodel import select, text

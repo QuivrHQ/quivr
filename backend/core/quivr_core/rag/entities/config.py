@@ -12,7 +12,7 @@ from rapidfuzz import process, fuzz
 
 from quivr_core.base_config import QuivrBaseConfig
 from quivr_core.processor.splitter import SplitterConfig
-from quivr_core.prompts import CustomPromptsModel
+from quivr_core.rag.prompts import CustomPromptsModel
 from quivr_core.llm_tools.llm_tools import LLMToolFactory, TOOLS_CATEGORIES, TOOLS_LISTS
 
 

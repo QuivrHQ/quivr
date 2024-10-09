@@ -4,7 +4,7 @@ from typing import Any, List
 from uuid import UUID
 
 from fastapi import UploadFile
-from quivr_core.models import KnowledgeStatus
+from quivr_core.rag.entities.models import KnowledgeStatus
 from sqlalchemy.exc import NoResultFound
 
 from quivr_api.logger import get_logger

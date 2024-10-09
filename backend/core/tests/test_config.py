@@ -1,4 +1,4 @@
-from quivr_core.config import LLMEndpointConfig, RetrievalConfig
+from quivr_core.rag.entities.config import LLMEndpointConfig, RetrievalConfig
 
 
 def test_default_llm_config():

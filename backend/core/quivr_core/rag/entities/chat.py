@@ -5,7 +5,7 @@ from copy import deepcopy
 
 from langchain_core.messages import AIMessage, HumanMessage
 
-from quivr_core.models import ChatMessage
+from quivr_core.rag.entities.models import ChatMessage
 
 
 class ChatHistory:

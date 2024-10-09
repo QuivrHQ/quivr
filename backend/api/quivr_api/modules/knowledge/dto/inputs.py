@@ -2,7 +2,7 @@ from typing import Dict, Optional
 from uuid import UUID
 
 from pydantic import BaseModel
-from quivr_core.models import KnowledgeStatus
+from quivr_core.rag.entities.models import KnowledgeStatus
 
 
 class CreateKnowledgeProperties(BaseModel):

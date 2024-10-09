@@ -10,8 +10,8 @@ from langchain_openai import AzureChatOpenAI, ChatOpenAI
 from pydantic.v1 import SecretStr
 
 from quivr_core.brain.info import LLMInfo
-from quivr_core.config import DefaultModelSuppliers, LLMEndpointConfig
-from quivr_core.utils import model_supports_function_calling
+from quivr_core.rag.entities.config import DefaultModelSuppliers, LLMEndpointConfig
+from quivr_core.rag.utils import model_supports_function_calling
 
 logger = logging.getLogger("quivr_core")
 

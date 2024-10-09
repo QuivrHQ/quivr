@@ -5,11 +5,15 @@ from uuid import UUID, uuid4
 from quivr_api.modules.brain.dto.inputs import BrainUpdatableProperties
 from quivr_api.utils.uuid_generator import generate_uuid_from_string
 from quivr_core.brain import Brain as BrainCore
-from quivr_core.chat import ChatHistory as ChatHistoryCore
-from quivr_core.config import LLMEndpointConfig, RetrievalConfig
+from quivr_core.rag.entities.chat import ChatHistory as ChatHistoryCore
+from quivr_core.rag.entities.config import LLMEndpointConfig, RetrievalConfig
 from quivr_core.llm.llm_endpoint import LLMEndpoint
-from quivr_core.models import ChatLLMMetadata, ParsedRAGResponse, RAGResponseMetadata
-from quivr_core.quivr_rag_langgraph import QuivrQARAGLangGraph
+from quivr_core.rag.entities.models import (
+    ChatLLMMetadata,
+    ParsedRAGResponse,
+    RAGResponseMetadata,
+)
+from quivr_core.rag.quivr_rag_langgraph import QuivrQARAGLangGraph
 
 from quivr_api.modules.prompt.entity.prompt import CreatePromptProperties, Prompt
 from quivr_api.logger import get_logger
@@ -194,7 +198,7 @@ class RAGService:
         # Get list of files urls
         list_files = (
             await self.knowledge_service.get_all_knowledge_in_brain(self.brain.brain_id)
-            if self.knowledge_service
+            if self.knowledge_service and self.brain.brain_id
             else []
         )
 
@@ -241,7 +245,7 @@ class RAGService:
             "brain_id": self.brain.brain_id if self.brain_service else None,
         }
 
-        metadata_model = {}
+        metadata_model: ChatLLMMetadata | None = None
         if model_metadata:
             metadata_model = ChatLLMMetadata(
                 name=self.brain.name,
