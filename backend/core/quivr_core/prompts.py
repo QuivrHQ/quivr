@@ -229,16 +229,17 @@ def _define_custom_prompts() -> CustomPromptsDict:
         "Given the following tasks you shall determine whether all tasks can be "
         "completed fully and in the best possible way using the provided context and chat history. "
         "You shall:\n"
-        "1) Consider each task separately,\n"
-        "2) Determine whether the context and chat history contain "
+        "- Consider each task separately,\n"
+        "- Determine whether the context and chat history contain "
         "all the information necessary to complete the task.\n"
-        "3) If the context and chat history do not contain all the information necessary to complete the task, "
-        "consider the list of activated tools below and select the tool most appropriate to complete the task. "
-        "If no tools are activated, return the tasks as is and no tool. "
-        "If no relevant tool can be selected, return the tasks as is and no tool.\n"
+        "- If the context and chat history do not contain all the information necessary to complete the task, "
+        "consider ONLY the list of tools below and select the tool most appropriate to complete the task.\n"
+        "- If no tools are listed, return the tasks as is and no tool.\n"
+        "- If no relevant tool can be selected, return the tasks as is and no tool.\n"
+        "- Do not propose to use a tool if that tool is not listed among the available tools.\n"
     )
 
-    context_template = "Context: {context}\n Activated tools: {activated_tools}\n"
+    context_template = "Context: {context}\n {activated_tools}\n"
 
     template_answer = "Tasks: {tasks}\n"
 
