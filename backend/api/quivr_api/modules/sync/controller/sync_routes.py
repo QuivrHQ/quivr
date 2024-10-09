@@ -1,15 +1,16 @@
+import asyncio
 import os
-import uuid
-from typing import Annotated, List
+from datetime import datetime
+from typing import List, Tuple
+from uuid import UUID
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, status
 
-from quivr_api.celery_config import celery
 from quivr_api.logger import get_logger
 from quivr_api.middlewares.auth import AuthBearer, get_current_user
 from quivr_api.modules.dependencies import get_service
-from quivr_api.modules.notification.dto.inputs import CreateNotification
-from quivr_api.modules.notification.entity.notification import NotificationsStatusEnum
+from quivr_api.modules.knowledge.entity.knowledge import KnowledgeDB, KnowledgeDTO
+from quivr_api.modules.knowledge.service.knowledge_service import KnowledgeService
 from quivr_api.modules.notification.service.notification_service import (
     NotificationService,
 )
@@ -19,11 +20,9 @@ from quivr_api.modules.sync.controller.github_sync_routes import github_sync_rou
 from quivr_api.modules.sync.controller.google_sync_routes import google_sync_router
 from quivr_api.modules.sync.controller.notion_sync_routes import notion_sync_router
 from quivr_api.modules.sync.dto import SyncsDescription
-from quivr_api.modules.sync.dto.inputs import SyncsActiveInput, SyncsActiveUpdateInput
 from quivr_api.modules.sync.dto.outputs import AuthMethodEnum
-from quivr_api.modules.sync.entity.sync_models import SyncsActive
-from quivr_api.modules.sync.service.sync_notion import SyncNotionService
-from quivr_api.modules.sync.service.sync_service import SyncService, SyncUserService
+from quivr_api.modules.sync.entity.sync_models import SyncFile
+from quivr_api.modules.sync.service.sync_service import SyncsService
 from quivr_api.modules.user.entity.user_identity import UserIdentity
 
 notification_service = NotificationService()
@@ -35,9 +34,8 @@ os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
 logger = get_logger(__name__)
 
 # Initialize sync service
-sync_service = SyncService()
-sync_user_service = SyncUserService()
-NotionServiceDep = Annotated[SyncNotionService, Depends(get_service(SyncNotionService))]
+get_sync_service = get_service(SyncsService)
+get_knowledge_service = get_service(KnowledgeService)
 
 
 # Initialize API router
@@ -89,7 +87,7 @@ github_sync = SyncsDescription(
     dependencies=[Depends(AuthBearer())],
     tags=["Sync"],
 )
-async def get_syncs(current_user: UserIdentity = Depends(get_current_user)):
+async def get_all_sync_typs(current_user: UserIdentity = Depends(get_current_user)):
     """
     Get all available sync descriptions.
 
@@ -108,7 +106,10 @@ async def get_syncs(current_user: UserIdentity = Depends(get_current_user)):
     dependencies=[Depends(AuthBearer())],
     tags=["Sync"],
 )
-async def get_user_syncs(current_user: UserIdentity = Depends(get_current_user)):
+async def get_user_syncs(
+    current_user: UserIdentity = Depends(get_current_user),
+    syncs_service: SyncsService = Depends(get_sync_service),
+):
     """
     Get syncs for the current user.
 
@@ -119,7 +120,7 @@ async def get_user_syncs(current_user: UserIdentity = Depends(get_current_user))
         List: A list of syncs for the user.
     """
     logger.debug(f"Fetching user syncs for user: {current_user.id}")
-    return sync_user_service.get_syncs_user(current_user.id)
+    return await syncs_service.get_user_syncs(current_user.id)
 
 
 @sync_router.delete(
@@ -129,7 +130,9 @@ async def get_user_syncs(current_user: UserIdentity = Depends(get_current_user))
     tags=["Sync"],
 )
 async def delete_user_sync(
-    sync_id: int, current_user: UserIdentity = Depends(get_current_user)
+    sync_id: int,
+    current_user: UserIdentity = Depends(get_current_user),
+    syncs_service: SyncsService = Depends(get_sync_service),
 ):
     """
     Delete a sync for the current user.
@@ -144,237 +147,21 @@ async def delete_user_sync(
     logger.debug(
         f"Deleting user sync for user: {current_user.id} with sync ID: {sync_id}"
     )
-    sync_user_service.delete_sync_user(sync_id, str(current_user.id))  # type: ignore
+    await syncs_service.delete_sync(sync_id, current_user.id)
     return None
-
-
-@sync_router.post(
-    "/sync/active",
-    response_model=SyncsActive,
-    dependencies=[Depends(AuthBearer())],
-    tags=["Sync"],
-)
-async def create_sync_active(
-    sync_active_input: SyncsActiveInput,
-    current_user: UserIdentity = Depends(get_current_user),
-):
-    """
-    Create a new active sync for the current user.
-
-    Args:
-        sync_active_input (SyncsActiveInput): The sync active input data.
-        current_user (UserIdentity): The current authenticated user.
-
-    Returns:
-        SyncsActive: The created sync active data.
-    """
-    logger.debug(
-        f"Creating active sync for user: {current_user.id} with data: {sync_active_input}"
-    )
-    bulk_id = uuid.uuid4()
-    notification = notification_service.add_notification(
-        CreateNotification(
-            user_id=current_user.id,
-            status=NotificationsStatusEnum.INFO,
-            title="Synchronization created! ",
-            description="Your brain is preparing to sync files. This may take a few minutes before proceeding.",
-            category="generic",
-            bulk_id=bulk_id,
-            brain_id=sync_active_input.brain_id,
-        )
-    )
-    sync_active_input.notification_id = str(notification.id)
-    sync_active = sync_service.create_sync_active(
-        sync_active_input, str(current_user.id)
-    )
-    if not sync_active:
-        raise HTTPException(
-            status_code=500, detail=f"Error creating sync active for {current_user}"
-        )
-
-    celery.send_task(
-        "process_sync_task",
-        kwargs={
-            "sync_id": sync_active.id,
-            "user_id": sync_active.user_id,
-            "files_ids": sync_active_input.settings.files,
-            "folder_ids": sync_active_input.settings.folders,
-        },
-    )
-
-    return sync_active
-
-
-@sync_router.put(
-    "/sync/active/{sync_id}",
-    response_model=SyncsActive | None,
-    dependencies=[Depends(AuthBearer())],
-    tags=["Sync"],
-)
-async def update_sync_active(
-    sync_id: int,
-    sync_active_input: SyncsActiveUpdateInput,
-    current_user: UserIdentity = Depends(get_current_user),
-):
-    """
-    Update an existing active sync for the current user.
-
-    Args:
-        sync_id (str): The ID of the active sync to update.
-        sync_active_input (SyncsActiveUpdateInput): The updated sync active input data.
-        current_user (UserIdentity): The current authenticated user.
-
-    Returns:
-        SyncsActive: The updated sync active data.
-    """
-    logger.info(
-        f"Updating active sync for user: {current_user.id} with data: {sync_active_input}"
-    )
-
-    details_sync_active = sync_service.get_details_sync_active(sync_id)
-
-    if details_sync_active is None:
-        raise HTTPException(
-            status_code=500,
-            detail="Error updating sync",
-        )
-
-    if sync_active_input.settings is None:
-        return {"message": "No modification to sync active"}
-
-    input_file_ids = (
-        sync_active_input.settings.files if sync_active_input.settings.files else []
-    )
-    input_folder_ids = (
-        sync_active_input.settings.folders if sync_active_input.settings.folders else []
-    )
-
-    if (input_file_ids == details_sync_active["settings"]["files"]) and (
-        input_folder_ids == details_sync_active["settings"]["folders"]
-    ):
-        logger.info({"message": "No modification to sync active"})
-        return None
-
-    logger.debug(
-        f"Updating sync_id {details_sync_active['id']}. Sync prev_settings={details_sync_active['settings'] }, Sync active input={sync_active_input.settings}"
-    )
-
-    bulk_id = uuid.uuid4()
-    sync_active_input.force_sync = True
-    notification = notification_service.add_notification(
-        CreateNotification(
-            user_id=current_user.id,
-            status=NotificationsStatusEnum.INFO,
-            title="Sync updated! Synchronization takes a few minutes to complete",
-            description="Your brain is syncing files. This may take a few minutes before proceeding.",
-            category="generic",
-            bulk_id=bulk_id,
-            brain_id=details_sync_active["brain_id"],  # type: ignore
-        )
-    )
-    sync_active_input.notification_id = str(notification.id)
-    sync_active = sync_service.update_sync_active(sync_id, sync_active_input)
-    if not sync_active:
-        raise HTTPException(
-            status_code=500,
-            detail=f"Error updating sync active for {current_user.id}",
-        )
-    logger.debug(
-        f"Sending task process_sync_task for sync_id={sync_id}, user_id={current_user.id}"
-    )
-
-    added_files_ids = set(input_file_ids).difference(
-        set(details_sync_active["settings"]["files"])
-    )
-    added_folder_ids = set(input_folder_ids).difference(
-        set(details_sync_active["settings"]["folders"])
-    )
-    if len(added_files_ids) + len(added_folder_ids) > 0:
-        celery.send_task(
-            "process_sync_task",
-            kwargs={
-                "sync_id": sync_active.id,
-                "user_id": sync_active.user_id,
-                "files_ids": list(added_files_ids),
-                "folder_ids": list(added_folder_ids),
-            },
-        )
-
-    else:
-        return None
-
-
-@sync_router.delete(
-    "/sync/active/{sync_id}",
-    status_code=status.HTTP_204_NO_CONTENT,
-    dependencies=[Depends(AuthBearer())],
-    tags=["Sync"],
-)
-async def delete_sync_active(
-    sync_id: int, current_user: UserIdentity = Depends(get_current_user)
-):
-    """
-    Delete an existing active sync for the current user.
-
-    Args:
-        sync_id (str): The ID of the active sync to delete.
-        current_user (UserIdentity): The current authenticated user.
-
-    Returns:
-        None
-    """
-    logger.debug(
-        f"Deleting active sync for user: {current_user.id} with sync ID: {sync_id}"
-    )
-
-    details_sync_active = sync_service.get_details_sync_active(sync_id)
-    notification_service.add_notification(
-        CreateNotification(
-            user_id=current_user.id,
-            status=NotificationsStatusEnum.SUCCESS,
-            title="Sync deleted!",
-            description="Sync deleted!",
-            category="generic",
-            bulk_id=uuid.uuid4(),
-            brain_id=details_sync_active["brain_id"],  # type: ignore
-        )
-    )
-    sync_service.delete_sync_active(sync_id, str(current_user.id))  # type: ignore
-    return None
-
-
-@sync_router.get(
-    "/sync/active",
-    response_model=List[SyncsActive],
-    dependencies=[Depends(AuthBearer())],
-    tags=["Sync"],
-)
-async def get_active_syncs_for_user(
-    current_user: UserIdentity = Depends(get_current_user),
-):
-    """
-    Get all active syncs for the current user.
-
-    Args:
-        current_user (UserIdentity): The current authenticated user.
-
-    Returns:
-        List[SyncsActive]: A list of active syncs for the current user.
-    """
-    logger.debug(f"Fetching active syncs for user: {current_user.id}")
-    return sync_service.get_syncs_active(str(current_user.id))
 
 
 @sync_router.get(
     "/sync/{sync_id}/files",
-    dependencies=[Depends(AuthBearer())],
+    response_model=List[KnowledgeDTO] | None,
     tags=["Sync"],
 )
-async def get_files_folder_user_sync(
-    user_sync_id: int,
-    notion_service: NotionServiceDep,
+async def list_sync_files(
+    sync_id: int,
     folder_id: str | None = None,
     current_user: UserIdentity = Depends(get_current_user),
+    syncs_service: SyncsService = Depends(get_sync_service),
+    knowledge_service: KnowledgeService = Depends(get_knowledge_service),
 ):
     """
     Get files for an active sync.
@@ -387,25 +174,65 @@ async def get_files_folder_user_sync(
     Returns:
         SyncsActive: The active sync data.
     """
-    logger.debug(
-        f"Fetching files for user sync: {user_sync_id} for user: {current_user.id}"
+    logger.debug(f"Fetching files for user sync: {sync_id} for user: {current_user.id}")
+
+    # TODO: check to see if this is inefficient
+    # Gets knowledge for each call to list the files,
+    # The logic is that getting from DB will be faster than provider repsonse ?
+    # NOTE: asyncio.gather didn't correcly typecheck
+
+    async def fetch_sync_knowledge(
+        sync_id: int,
+        user_id: UUID,
+        folder_id: str | None,
+    ) -> Tuple[dict[str, KnowledgeDB], List[SyncFile] | None]:
+        map_knowledges_task = knowledge_service.map_syncs_knowledge_user(
+            sync_id=sync_id, user_id=user_id
+        )
+        sync_files_task = syncs_service.get_files_folder_user_sync(
+            sync_id,
+            user_id,
+            folder_id,
+        )
+        return await asyncio.gather(*[map_knowledges_task, sync_files_task])  # type: ignore  # noqa: F821
+
+    sync = await syncs_service.get_sync_by_id(sync_id=sync_id)
+    syncfile_to_knowledge, sync_files = await fetch_sync_knowledge(
+        sync_id=sync_id,
+        user_id=current_user.id,
+        folder_id=folder_id,
     )
-    return await sync_user_service.get_files_folder_user_sync(
-        user_sync_id, current_user.id, folder_id, notion_service=notion_service
-    )
+    if not sync_files:
+        return None
 
-
-@sync_router.get(
-    "/sync/active/interval",
-    dependencies=[Depends(AuthBearer())],
-    tags=["Sync"],
-)
-async def get_syncs_active_in_interval() -> List[SyncsActive]:
-    """
-    Get all active syncs that need to be synced.
-
-    Returns:
-        List: A list of active syncs that need to be synced.
-    """
-    logger.debug("Fetching active syncs in interval")
-    return await sync_service.get_syncs_active_in_interval()
+    kms = []
+    for file in sync_files:
+        existing_km = syncfile_to_knowledge.get(file.id)
+        if existing_km:
+            kms.append(await existing_km.to_dto(get_children=False, get_parent=False))
+        else:
+            last_modified_at = (
+                file.last_modified_at if file.last_modified_at else datetime.now()
+            )
+            kms.append(
+                KnowledgeDTO(
+                    id=None,
+                    file_name=file.name,
+                    is_folder=file.is_folder,
+                    extension=file.extension,
+                    source=sync.provider,
+                    source_link=file.web_view_link,
+                    user_id=current_user.id,
+                    brains=[],
+                    parent=None,
+                    children=[],
+                    # TODO: Handle a sync not added status
+                    status=None,
+                    # TODO: retrieve created at from sync provider
+                    created_at=last_modified_at,
+                    updated_at=last_modified_at,
+                    sync_id=sync_id,
+                    sync_file_id=file.id,
+                )
+            )
+    return kms

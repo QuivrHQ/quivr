@@ -13,6 +13,10 @@ class StorageInterface(ABC):
         pass
 
     @abstractmethod
+    async def download_file(self, knowledge: KnowledgeDB, **kwargs) -> bytes:
+        pass
+
+    @abstractmethod
     async def upload_file_storage(
         self,
         knowledge: KnowledgeDB,

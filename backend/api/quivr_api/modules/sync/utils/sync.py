@@ -3,7 +3,7 @@ import json
 import os
 import time
 from abc import ABC, abstractmethod
-from datetime import datetime
+from datetime import datetime, timezone
 from io import BytesIO
 from typing import Any, Dict, List, Optional, Union
 
@@ -93,7 +93,7 @@ class GoogleDriveSync(BaseSync):
     ) -> Dict[str, Union[str, BytesIO]]:
         file_id = file.id
         file_name = file.name
-        mime_type = file.mime_type
+        mime_type = file.extension
         if not self.creds:
             self.check_and_refresh_access_token(credentials)
         if not self.service:
@@ -193,8 +193,10 @@ class GoogleDriveSync(BaseSync):
                         is_folder=(
                             result["mimeType"] == "application/vnd.google-apps.folder"
                         ),
-                        last_modified=result["modifiedTime"],
-                        mime_type=result["mimeType"],
+                        last_modified_at=datetime.strptime(
+                            result["modifiedTime"], self.datetime_format
+                        ).replace(tzinfo=timezone.utc),
+                        extension=result["mimeType"],
                         web_view_link=result["webViewLink"],
                         size=result.get("size", None),
                     )
@@ -206,6 +208,8 @@ class GoogleDriveSync(BaseSync):
             return files
 
         except HTTPError as error:
+            if error.response.status_code == 404:
+                raise FileNotFoundError
             logger.error(
                 "An error occurred while retrieving Google Drive files: %s", error
             )
@@ -269,8 +273,10 @@ class GoogleDriveSync(BaseSync):
                             is_folder=(
                                 item["mimeType"] == "application/vnd.google-apps.folder"
                             ),
-                            last_modified=item["modifiedTime"],
-                            mime_type=item["mimeType"],
+                            last_modified_at=datetime.strptime(
+                                item["modifiedTime"], self.datetime_format
+                            ).replace(tzinfo=timezone.utc),
+                            extension=item["mimeType"],
                             web_view_link=item["webViewLink"],
                             size=item.get("size", None),
                         )
@@ -447,8 +453,10 @@ class AzureDriveSync(BaseSync):
                     else f'{site_id}:{item.get("id")}'
                 ),
                 is_folder="folder" in item or not site_folder_id,
-                last_modified=item.get("lastModifiedDateTime"),
-                mime_type=item.get("file", {}).get("mimeType", "folder"),
+                last_modified_at=datetime.strptime(
+                    item["lastModiedDateTime"], self.datetime_format
+                ).replace(tzinfo=timezone.utc),
+                extension=item.get("file", {}).get("mimeType", "folder"),
                 web_view_link=item.get("webUrl"),
                 size=item.get("size", None),
             )
@@ -467,8 +475,8 @@ class AzureDriveSync(BaseSync):
                     name="My Drive",
                     id="root:",
                     is_folder=True,
-                    last_modified="",
-                    mime_type="folder",
+                    last_modified_at=None,
+                    extension="folder",
                     web_view_link="https://onedrive.live.com",
                 )
             )
@@ -530,8 +538,10 @@ class AzureDriveSync(BaseSync):
                     name=result.get("name"),
                     id=f'{site_id}:{result.get("id")}',
                     is_folder="folder" in result,
-                    last_modified=result.get("lastModifiedDateTime"),
-                    mime_type=result.get("file", {}).get("mimeType", "folder"),
+                    last_modified_at=datetime.strptime(
+                        result.get("lastModifiedDateTime"), self.datetime_format
+                    ).replace(tzinfo=timezone.utc),
+                    extension=result.get("file", {}).get("mimeType", "folder"),
                     web_view_link=result.get("webUrl"),
                     size=result.get("size", None),
                 )
@@ -641,10 +651,14 @@ class DropboxSync(BaseSync):
                             name=file.name,
                             id=file.id,
                             is_folder=is_folder,
-                            last_modified=(
-                                str(file.client_modified) if not is_folder else ""
+                            last_modified_at=(
+                                datetime.strptime(
+                                    file.client_modified, self.datetime_format
+                                )
+                                if not is_folder
+                                else None
                             ),
-                            mime_type=(
+                            extension=(
                                 file.path_lower.split(".")[-1] if not is_folder else ""
                             ),
                             web_view_link=shared_link,
@@ -720,10 +734,14 @@ class DropboxSync(BaseSync):
                         name=metadata.name,
                         id=metadata.id,
                         is_folder=is_folder,
-                        last_modified=(
-                            str(metadata.client_modified) if not is_folder else ""
+                        last_modified_at=(
+                            datetime.strptime(
+                                metadata.client_modified, self.datetime_format
+                            )
+                            if not is_folder
+                            else None
                         ),
-                        mime_type=(
+                        extension=(
                             metadata.path_lower.split(".")[-1] if not is_folder else ""
                         ),
                         web_view_link=shared_link,
@@ -819,8 +837,8 @@ class NotionSync(BaseSync):
                 name=page.name,
                 id=str(page.notion_id),
                 is_folder=await self.notion_service.is_folder_page(page.notion_id),
-                last_modified=str(page.last_modified),
-                mime_type=page.mime_type,
+                last_modified_at=page.last_modified,
+                extension=page.mime_type,
                 web_view_link=page.web_view_link,
                 icon=page.icon,
             )
@@ -862,8 +880,8 @@ class NotionSync(BaseSync):
                     name=page.name,
                     id=str(page.notion_id),
                     is_folder=await self.notion_service.is_folder_page(page.notion_id),
-                    last_modified=str(page.last_modified),
-                    mime_type=page.mime_type,
+                    last_modified_at=page.last_modified,
+                    extension=page.mime_type,
                     web_view_link=page.web_view_link,
                     icon=page.icon,
                 )
@@ -1082,8 +1100,8 @@ class GitHubSync(BaseSync):
                     name=remove_special_characters(result.get("name")),
                     id=f"{repo_name}:{result.get('path')}",
                     is_folder=False,
-                    last_modified=datetime.now().strftime(self.datetime_format),
-                    mime_type=result.get("type"),
+                    last_modified_at=datetime.now(),
+                    extension=result.get("type"),
                     web_view_link=result.get("html_url"),
                     size=result.get("size", None),
                 )
@@ -1156,8 +1174,8 @@ class GitHubSync(BaseSync):
                 name=remove_special_characters(item.get("name")),
                 id=f"{item.get('full_name')}:",
                 is_folder=True,
-                last_modified=str(item.get("updated_at")),
-                mime_type="repository",
+                last_modified_at=item.get("updated_at"),
+                extension="repository",
                 web_view_link=item.get("html_url"),
                 size=item.get("size", None),
             )
@@ -1203,8 +1221,8 @@ class GitHubSync(BaseSync):
                 name=remove_special_characters(item.get("name")),
                 id=f"{repo_name}:{item.get('path')}",
                 is_folder=item.get("type") == "dir",
-                last_modified=str(item.get("updated_at")),
-                mime_type=item.get("type"),
+                last_modified_at=str(item.get("updated_at")),
+                extension=item.get("type"),
                 web_view_link=item.get("html_url"),
                 size=item.get("size", None),
             )

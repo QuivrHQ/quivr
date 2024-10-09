@@ -10,6 +10,7 @@ from sqlalchemy.ext.asyncio import AsyncAttrs
 from sqlmodel import TIMESTAMP, Column, Field, Relationship, SQLModel, text
 from sqlmodel import UUID as PGUUID
 
+from quivr_api.modules.brain.entity.brain_user import BrainUserDB
 from quivr_api.modules.brain.entity.integration_brain import (
     IntegrationDescriptionEntity,
     IntegrationEntity,
@@ -69,7 +70,12 @@ class Brain(AsyncAttrs, SQLModel, table=True):
     knowledges: List[KnowledgeDB] = Relationship(
         back_populates="brains", link_model=KnowledgeBrain
     )
-
+    users: List["User"] = Relationship(  # type: ignore # noqa: F821
+        back_populates="brains",
+        link_model=BrainUserDB,
+    )
+    snippet_color: str | None = Field(default="#d0c6f2")
+    snippet_emoji: str | None = Field(default="🧠")
     # TODO : add
     # "meaning" "public"."vector",
     # "tags" "public"."tags"[]

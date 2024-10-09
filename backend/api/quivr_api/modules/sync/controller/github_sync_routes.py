@@ -6,12 +6,10 @@ from fastapi.responses import HTMLResponse
 
 from quivr_api.logger import get_logger
 from quivr_api.middlewares.auth import AuthBearer, get_current_user
-from quivr_api.modules.sync.dto.inputs import (
-    SyncsUserInput,
-    SyncsUserStatus,
-    SyncUserUpdateInput,
-)
-from quivr_api.modules.sync.service.sync_service import SyncService, SyncUserService
+from quivr_api.modules.dependencies import get_service
+from quivr_api.modules.sync.dto.inputs import SyncStatus, SyncUpdateInput
+from quivr_api.modules.sync.service.sync_service import SyncsService
+from quivr_api.modules.sync.utils.oauth2 import parse_oauth2_state
 from quivr_api.modules.user.entity.user_identity import UserIdentity
 
 from .successfull_connection import successfullConnectionPage
@@ -20,8 +18,7 @@ from .successfull_connection import successfullConnectionPage
 logger = get_logger(__name__)
 
 # Initialize sync service
-sync_service = SyncService()
-sync_user_service = SyncUserService()
+syncs_service_dep = get_service(SyncsService)
 
 # Initialize API router
 github_sync_router = APIRouter()
@@ -39,8 +36,11 @@ SCOPE = "repo user"
     dependencies=[Depends(AuthBearer())],
     tags=["Sync"],
 )
-def authorize_github(
-    request: Request, name: str, current_user: UserIdentity = Depends(get_current_user)
+async def authorize_github(
+    request: Request,
+    name: str,
+    syncs_service: SyncsService = Depends(syncs_service_dep),
+    current_user: UserIdentity = Depends(get_current_user),
 ):
     """
     Authorize GitHub sync for the current user.
@@ -53,26 +53,20 @@ def authorize_github(
         dict: A dictionary containing the authorization URL.
     """
     logger.debug(f"Authorizing GitHub sync for user: {current_user.id}")
-    state = f"user_id={current_user.id},name={name}"
+    state = await syncs_service.create_oauth2_state(
+        provider="Github", name=name, user_id=current_user.id
+    )
     authorization_url = (
         f"https://github.com/login/oauth/authorize?client_id={CLIENT_ID}"
-        f"&redirect_uri={REDIRECT_URI}&scope={SCOPE}&state={state}"
+        f"&redirect_uri={REDIRECT_URI}&scope={SCOPE}&state={state.model_dump_json()}"
     )
-
-    sync_user_input = SyncsUserInput(
-        user_id=str(current_user.id),
-        name=name,
-        provider="GitHub",
-        credentials={},
-        state={"state": state},
-        status=str(SyncsUserStatus.SYNCING),
-    )
-    sync_user_service.create_sync_user(sync_user_input)
     return {"authorization_url": authorization_url}
 
 
 @github_sync_router.get("/sync/github/oauth2callback", tags=["Sync"])
-def oauth2callback_github(request: Request):
+async def oauth2callback_github(
+    request: Request, syncs_service: SyncsService = Depends(syncs_service_dep)
+):
     """
     Handle OAuth2 callback from GitHub.
 
@@ -82,24 +76,12 @@ def oauth2callback_github(request: Request):
     Returns:
         dict: A dictionary containing a success message.
     """
-    state = request.query_params.get("state")
-    state_split = state.split(",")
-    current_user = state_split[0].split("=")[1]  # Extract user_id from state
-    name = state_split[1].split("=")[1] if state else None
-    state_dict = {"state": state}
+    state_str = request.query_params.get("state")
+    state = parse_oauth2_state(state_str)
     logger.debug(
-        f"Handling OAuth2 callback for user: {current_user} with state: {state}"
+        f"Handling OAuth2 callback for user: {state.user_id} with state: {state}"
     )
-    sync_user_state = sync_user_service.get_sync_user_by_state(state_dict)
-    logger.info(f"Retrieved sync user state: {sync_user_state}")
-
-    if state_dict != sync_user_state["state"]:
-        logger.error("Invalid state parameter")
-        raise HTTPException(status_code=400, detail="Invalid state parameter")
-    if sync_user_state.get("user_id") != current_user:
-        logger.error("Invalid user")
-        raise HTTPException(status_code=400, detail="Invalid user")
-
+    sync = await syncs_service.get_from_oauth2_state(state)
     token_url = "https://github.com/login/oauth/access_token"
     data = {
         "client_id": CLIENT_ID,
@@ -126,8 +108,7 @@ def oauth2callback_github(request: Request):
             detail=f"Failed to acquire token: {result}",
         )
 
-    creds = result
-    logger.info(f"Fetched OAuth2 token for user: {current_user}")
+    logger.info(f"Fetched OAuth2 token for user: {state.user_id}")
 
     # Fetch user email from GitHub API
     github_api_url = "https://api.github.com/user"
@@ -150,15 +131,16 @@ def oauth2callback_github(request: Request):
             logger.error("Failed to fetch user email from GitHub API")
             raise HTTPException(status_code=400, detail="Failed to fetch user email")
 
-    logger.info(f"Retrieved email for user: {current_user} - {user_email}")
+    logger.info(f"Retrieved email for user: {state.user_id} - {user_email}")
 
-    sync_user_input = SyncUserUpdateInput(
+    sync_user_input = SyncUpdateInput(
         credentials=result,
-        # state={},
+        state={},
         email=user_email,
-        status=str(SyncsUserStatus.SYNCED),
+        status=SyncStatus.SYNCED,
     )
 
-    sync_user_service.update_sync_user(current_user, state_dict, sync_user_input)
-    logger.info(f"GitHub sync created successfully for user: {current_user}")
+    # TODO: This an additional select query :(
+    await syncs_service.update_sync(sync.id, sync_user_input)
+    logger.info(f"GitHub sync created successfully for user: {state.user_id}")
     return HTMLResponse(successfullConnectionPage)

@@ -20,7 +20,6 @@ class URL(BaseModel):
 async def extract_from_url(url: URL) -> str:
     # Extract and combine content recursively
     loader = PlaywrightURLLoader(urls=[url.url], remove_selectors=["header", "footer"])
-
     data = await loader.aload()
     # Now turn the data into a string
     logger.info(f"Extracted content from {len(data)} pages")

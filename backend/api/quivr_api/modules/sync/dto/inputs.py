@@ -1,24 +1,17 @@
 import enum
-from typing import List, Optional
+from uuid import UUID
 
 from pydantic import BaseModel
 
 
-class SyncsUserStatus(enum.Enum):
-    """
-    Enum for the status of a sync user.
-    """
-
+class SyncStatus(str, enum.Enum):
     SYNCED = "SYNCED"
     SYNCING = "SYNCING"
     ERROR = "ERROR"
     REMOVED = "REMOVED"
 
-    def __str__(self):
-        return self.value
 
-
-class SyncsUserInput(BaseModel):
+class SyncCreateInput(BaseModel):
     """
     Input model for creating a new sync user.
 
@@ -30,7 +23,7 @@ class SyncsUserInput(BaseModel):
         state (dict): The state information for the sync user.
     """
 
-    user_id: str
+    user_id: UUID
     name: str
     email: str | None = None
     provider: str
@@ -40,7 +33,7 @@ class SyncsUserInput(BaseModel):
     status: str
 
 
-class SyncUserUpdateInput(BaseModel):
+class SyncUpdateInput(BaseModel):
     """
     Input model for updating an existing sync user.
 
@@ -49,82 +42,8 @@ class SyncUserUpdateInput(BaseModel):
         state (dict): The updated state information for the sync user.
     """
 
-    credentials: dict
+    additional_data: dict | None = None
+    credentials: dict | None = None
     state: dict | None = None
-    email: str
-    status: str
-
-
-class SyncActiveSettings(BaseModel):
-    """
-    Sync active settings.
-
-    Attributes:
-        folders (List[str] | None): A list of folder paths to be synced, or None if not applicable.
-        files (List[str] | None): A list of file paths to be synced, or None if not applicable.
-    """
-
-    folders: Optional[List[str]] = None
-    files: Optional[List[str]] = None
-
-
-class SyncsActiveInput(BaseModel):
-    """
-    Input model for creating a new active sync.
-
-    Attributes:
-        name (str): The name of the sync.
-        syncs_user_id (int): The ID of the sync user associated with this sync.
-        settings (SyncActiveSettings): The settings for the active sync.
-    """
-
-    name: str
-    syncs_user_id: int
-    settings: SyncActiveSettings
-    brain_id: str
-    notification_id: Optional[str] = None
-
-
-class SyncsActiveUpdateInput(BaseModel):
-    """
-    Input model for updating an existing active sync.
-
-    Attributes:
-        name (str): The updated name of the sync.
-        sync_interval_minutes (int): The updated sync interval in minutes.
-        settings (dict): The updated settings for the active sync.
-    """
-
-    name: Optional[str] = None
-    settings: Optional[SyncActiveSettings] = None
-    last_synced: Optional[str] = None
-    force_sync: Optional[bool] = False
-    notification_id: Optional[str] = None
-
-
-class SyncFileInput(BaseModel):
-    """
-    Input model for creating a new sync file.
-
-    Attributes:
-        path (str): The path of the file.
-        syncs_active_id (int): The ID of the active sync associated with this file.
-    """
-
-    path: str
-    syncs_active_id: int
-    last_modified: str
-    brain_id: str
-    supported: Optional[bool] = True
-
-
-class SyncFileUpdateInput(BaseModel):
-    """
-    Input model for updating an existing sync file.
-
-    Attributes:
-        last_modified (datetime.datetime): The updated last modified date and time.
-    """
-
-    last_modified: Optional[str] = None
-    supported: Optional[bool] = None
+    email: str | None = None
+    status: SyncStatus

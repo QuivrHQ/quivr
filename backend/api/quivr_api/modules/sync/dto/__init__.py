@@ -1,1 +1,1 @@
-from .outputs import SyncsDescription, SyncsUserOutput
+from .outputs import SyncsDescription, SyncsOutput

@@ -41,10 +41,21 @@ dev-dependencies = [
     "pytest-cov>=5.0.0",
     "tox>=4.0.0",
     "chainlit>=1.1.306",
+    "pytest-profiling>=1.7.0",
+    "locust>=2.31.7",
 ]
 
 [tool.rye.workspace]
-members = [".", "core", "worker", "api", "docs", "core/examples/chatbot", "core/MegaParse", "worker/diff-assistant"]
+members = [
+    ".",
+    "core",
+    "worker",
+    "api",
+    "docs",
+    "core/examples/chatbot",
+    "core/MegaParse",
+    "worker/diff-assistant",
+]
 
 [tool.hatch.metadata]
 allow-direct-references = true

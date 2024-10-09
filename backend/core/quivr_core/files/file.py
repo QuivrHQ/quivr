@@ -112,9 +112,9 @@ class QuivrFile:
         id: UUID,
         original_filename: str,
         path: Path,
-        brain_id: UUID,
         file_sha1: str,
         file_extension: FileExtension | str,
+        brain_id: UUID | None = None,
         file_size: int | None = None,
         metadata: dict[str, Any] | None = None,
     ) -> None:
@@ -153,7 +153,6 @@ class QuivrFile:
     def serialize(self) -> QuivrFileSerialized:
         return QuivrFileSerialized(
             id=self.id,
-            brain_id=self.brain_id,
             path=self.path.absolute(),
             original_filename=self.original_filename,
             file_size=self.file_size,

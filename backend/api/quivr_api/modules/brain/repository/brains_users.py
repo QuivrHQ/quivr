@@ -2,7 +2,7 @@ from uuid import UUID
 
 from quivr_api.logger import get_logger
 from quivr_api.modules.brain.entity.brain_entity import (
-    BrainUser,
+    BrainUserDB,
     MinimalUserBrainEntity,
 )
 from quivr_api.modules.brain.repository.interfaces.brains_users_interface import (
@@ -161,7 +161,7 @@ class BrainsUsers(BrainsUsersInterface):
             return None
         return UUID(response[0].get("brain_id"))
 
-    def get_brain_users(self, brain_id: UUID) -> list[BrainUser]:
+    def get_brain_users(self, brain_id: UUID) -> list[BrainUserDB]:
         response = (
             self.db.table("brains_users")
             .select("id:brain_id, *")
@@ -169,7 +169,7 @@ class BrainsUsers(BrainsUsersInterface):
             .execute()
         )
 
-        return [BrainUser(**item) for item in response.data]
+        return [BrainUserDB(**item) for item in response.data]
 
     def delete_brain_subscribers(self, brain_id: UUID):
         results = (
