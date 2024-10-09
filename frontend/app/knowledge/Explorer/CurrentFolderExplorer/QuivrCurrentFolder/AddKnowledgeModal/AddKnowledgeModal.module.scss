@@ -1,4 +1,6 @@
+@use "styles/Radius.module.scss";
 @use "styles/Spacings.module.scss";
+@use "styles/Typography.module.scss";
 
 .modal_content {
   height: 100%;
@@ -15,8 +17,17 @@
     flex: 1;
 
     .file_list {
-      padding-top: Spacings.$spacing06;
+      margin-top: Spacings.$spacing06;
       flex: 1;
+      border-radius: Radius.$normal;
+      border: 1px solid var(--border-0);
+
+      .file_item {
+        font-size: Typography.$tiny;
+        border-bottom: 1px solid var(--border-0);
+        padding-block: Spacings.$spacing03;
+        padding-inline: Spacings.$spacing05;
+      }
     }
   }
 
