@@ -39,8 +39,9 @@ const AddKnowledgeModal = ({
       }
     });
 
-    // setIsOpen(false);
-    // setLoading(false);
+    setIsOpen(false);
+    setLoading(false);
+    setFiles([]);
   };
 
   const handleCancel = () => {
