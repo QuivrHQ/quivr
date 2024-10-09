@@ -108,7 +108,7 @@ async def get_syncs(current_user: UserIdentity = Depends(get_current_user)):
         List[SyncsDescription]: A list of available sync descriptions.
     """
     logger.debug(f"Fetching all sync descriptions for user: {current_user.id}")
-    return [google_sync, azure_sync, dropbox_sync, notion_sync]
+    return [google_sync, azure_sync, dropbox_sync, notion_sync, zendesk_sync]
 
 
 @sync_router.get(

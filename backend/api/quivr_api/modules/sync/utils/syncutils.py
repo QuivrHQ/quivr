@@ -132,7 +132,7 @@ class SyncUtils:
         )
         extension = os.path.splitext(file_name)[-1].lower()
         dfile = DownloadedSyncFile(
-            file_name=file_name,
+            file_name=file_name.encode("ascii", errors="ignore").decode("ascii"),
             file_data=file_data,
             extension=extension,
         )
@@ -165,6 +165,7 @@ class SyncUtils:
             ".xlsx",
             ".pptx",
             ".doc",
+            ".json",
         ]:
             raise ValueError(f"Incompatible file extension for {downloaded_file}")
 

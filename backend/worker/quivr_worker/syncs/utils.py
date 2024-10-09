@@ -23,6 +23,7 @@ from quivr_api.modules.sync.utils.sync import (
     GitHubSync,
     GoogleDriveSync,
     NotionSync,
+    ZendeskSync,
 )
 from quivr_api.modules.sync.utils.syncutils import SyncUtils
 from sqlalchemy.ext.asyncio import AsyncEngine
@@ -70,6 +71,7 @@ async def build_syncs_utils(
                     "notion",
                     NotionSync(notion_service=notion_service),
                 ),  # Fixed duplicate "github" key
+                ("zendesk", ZendeskSync()),
             ]:
                 provider_sync_util = SyncUtils(
                     sync_user_service=deps.sync_user_service,

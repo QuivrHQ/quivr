@@ -17,6 +17,7 @@ from quivr_api.modules.sync.utils.sync import (
     GitHubSync,
     GoogleDriveSync,
     NotionSync,
+    ZendeskSync,
 )
 
 logger = get_logger(__name__)
@@ -282,6 +283,14 @@ class SyncUserRepository:
         elif provider == "github":
             logger.info("Getting files for GitHub sync")
             sync = GitHubSync()
+            return {
+                "files": sync.get_files(
+                    sync_user["credentials"], folder_id if folder_id else "", recursive
+                )
+            }
+        elif provider == "zendesk":
+            logger.info("Getting files for Zendesk sync")
+            sync = ZendeskSync()
             return {
                 "files": sync.get_files(
                     sync_user["credentials"], folder_id if folder_id else "", recursive

@@ -1218,3 +1218,167 @@ class GitHubSync(BaseSync):
 
         logger.info(f"GitHub repository files retrieved successfully: {len(files)}")
         return files
+
+
+class ZendeskSync(BaseSync):
+    name = "Zendesk"
+    lower_name = "zendesk"
+    datetime_format = "%Y-%m-%dT%H:%M:%SZ"
+
+    def get_zendesk_api_url(self, credentials: Dict):
+        return f"https://{credentials['sub_domain_name']}.zendesk.com/api/v2"
+
+    def get_files(
+        self, credentials: Dict, folder_id: str | None = "", recursive: bool = False
+    ) -> List[SyncFile]:
+        """
+        Retrieve files from Zendesk.
+
+        Args:
+            credentials (Dict): Zendesk API credentials.
+            folder_path (str): Not used for Zendesk, but kept for consistency with other sync methods.
+            recursive (bool): Not used for Zendesk, but kept for consistency with other sync methods.
+
+        Returns:
+            List[SyncFile]: List of SyncFile objects representing Zendesk tickets.
+        """
+
+        logger.info(f"Retrieving Zendesk tickets with credentials: {credentials}")
+        url = f"{self.get_zendesk_api_url(credentials)}/tickets.json"
+        headers = {
+            "Content-Type": "application/json",
+        }
+        email_address = f"{credentials['email']}/token"
+        api_token = credentials["api_token"]
+        auth = (email_address, api_token)
+
+        response = requests.get(url, auth=auth, headers=headers)
+        response.raise_for_status()
+
+        tickets = response.json().get("tickets", [])
+        logger.debug(
+            f"Retrieved {len(tickets)} tickets from Zendesk, example ticket: {tickets[0] if tickets else 'No tickets'}"
+        )
+        files = []
+
+        for ticket in tickets:
+            file_data = SyncFile(
+                name=f"{ticket['subject']}.json",
+                id=str(ticket["id"]),
+                is_folder=False,
+                last_modified=ticket["updated_at"],
+                mime_type=".json",
+                web_view_link=f"{self.get_zendesk_api_url(credentials)}/tickets/{ticket['id']}",
+                size=len(json.dumps(ticket)),
+            )
+            files.append(file_data)
+
+        logger.info(f"Zendesk tickets retrieved successfully: {len(files)}")
+        return files
+
+    async def aget_files(
+        self,
+        credentials: Dict,
+        folder_id: str | None = "",
+        recursive: bool = False,
+        sync_user_id: int | None = None,
+    ) -> List[SyncFile]:
+        return self.get_files(credentials, folder_id, recursive)
+
+    def get_files_by_id(
+        self,
+        credentials: Dict,
+        file_ids: List[str],
+    ) -> List[SyncFile]:
+        """
+        Retrieve specific Zendesk tickets by their IDs.
+
+        Args:
+            credentials (Dict): Zendesk API credentials.
+            file_ids (List[str]): List of ticket IDs to retrieve.
+
+        Returns:
+            List[SyncFile]: List of SyncFile objects representing the specified Zendesk tickets.
+        """
+        logger.info(f"Retrieving specific Zendesk tickets with IDs: {file_ids}")
+        url = f"{self.get_zendesk_api_url(credentials)}/tickets/show_many.json?ids={','.join(file_ids)}"
+        headers = {
+            "Content-Type": "application/json",
+        }
+        email_address = f"{credentials['email']}/token"
+        api_token = credentials["api_token"]
+        auth = (email_address, api_token)
+
+        response = requests.get(url, auth=auth, headers=headers)
+        response.raise_for_status()
+
+        tickets = response.json().get("tickets", [])
+        logger.debug(f"Retrieved {len(tickets)} tickets from Zendesk")
+
+        files = []
+        for ticket in tickets:
+            file_data = SyncFile(
+                name=f"{ticket['subject']}.json",
+                id=str(ticket["id"]),
+                is_folder=False,
+                last_modified=ticket["updated_at"],
+                mime_type=".json",
+                web_view_link=f"{self.get_zendesk_api_url(credentials)}/tickets/{ticket['id']}",
+                size=len(json.dumps(ticket)),
+            )
+            files.append(file_data)
+
+        logger.info(f"Zendesk tickets retrieved successfully: {len(files)}")
+        return files
+
+    async def aget_files_by_id(
+        self, credentials: Dict, file_ids: List[str]
+    ) -> List[SyncFile]:
+        return self.get_files_by_id(credentials, file_ids)
+
+    def download_file(
+        self, credentials: Dict, file: SyncFile
+    ) -> Dict[str, Union[str, BytesIO]]:
+        """
+        Download a specific Zendesk ticket as a JSON file.
+
+        Args:
+            credentials (Dict): Zendesk API credentials.
+            file_id (str): ID of the ticket to download.
+            file_name (str): Name of the file to be downloaded.
+
+        Returns:
+            BytesIO: A BytesIO object containing the JSON data of the ticket.
+        """
+        logger.info(f"Downloading Zendesk ticket with ID: {file.id}")
+        url = f"{self.get_zendesk_api_url(credentials)}/tickets/{file.id}/comments.json"
+        headers = {
+            "Content-Type": "application/json",
+        }
+        email_address = f"{credentials['email']}/token"
+        api_token = credentials["api_token"]
+        auth = (email_address, api_token)
+
+        response = requests.get(url, auth=auth, headers=headers)
+
+        ticket_data = response.json().get("comments", {})
+
+        # Convert the ticket data to a JSON string
+        json_data = json.dumps(ticket_data, indent=2)
+
+        # Create a BytesIO object from the JSON string
+        file_content = BytesIO(json_data.encode("utf-8"))
+
+        return {
+            "file_name": f"{file.name.rsplit('.', 1)[0]}.txt",
+            "content": file_content,
+        }
+
+    async def adownload_file(
+        self, credentials: Dict, file: SyncFile
+    ) -> Dict[str, Union[str, BytesIO]]:
+        return self.download_file(credentials, file)
+
+    def check_and_refresh_access_token(self, credentials: Dict) -> Dict:
+        # not needed for Zendesk
+        return credentials
