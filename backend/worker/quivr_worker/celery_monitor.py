@@ -178,6 +178,9 @@ def is_being_executed(task_name: str) -> bool:
         running currently.
     """
     active_tasks = celery.control.inspect().active()
+    if not active_tasks:
+        return False
+    
     for worker, running_tasks in active_tasks.items():
         for task in running_tasks:
             if task["name"] == task_name:  # type: ignore
