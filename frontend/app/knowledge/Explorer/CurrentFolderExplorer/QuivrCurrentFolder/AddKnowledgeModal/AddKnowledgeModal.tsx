@@ -22,26 +22,32 @@ const AddKnowledgeModal = ({
 
   const FILE_TYPES = ["pdf", "docx", "doc", "txt"];
 
-  const handleAddKnowledge = () => {
+  const handleAddKnowledge = async () => {
     setLoading(true);
-    files.map(async (file) => {
-      try {
-        await addKnowledge(
-          {
-            file_name: file.name,
-            parent_id: null,
-            is_folder: false,
-          },
-          file
-        );
-      } catch (error) {
-        console.error("Failed to add knowledge:", error);
-      }
-    });
-
-    setIsOpen(false);
-    setLoading(false);
-    setFiles([]);
+    try {
+      await Promise.all(
+        files.map(async (file) => {
+          try {
+            await addKnowledge(
+              {
+                file_name: file.name,
+                parent_id: null,
+                is_folder: false,
+              },
+              file
+            );
+          } catch (error) {
+            console.error("Failed to add knowledge:", error);
+          }
+        })
+      );
+    } catch (error) {
+      console.error("Failed to add all knowledges:", error);
+    } finally {
+      setLoading(false);
+      setIsOpen(false);
+      setFiles([]);
+    }
   };
 
   const handleCancel = () => {

@@ -74,6 +74,12 @@ const QuivrCurrentFolder = (): JSX.Element => {
   }, [addFolderModalOpened]);
 
   useEffect(() => {
+    if (!addKnowledgeModalOpened) {
+      void fetchQuivrFiles(currentFolder?.id ?? null);
+    }
+  }, [addKnowledgeModalOpened]);
+
+  useEffect(() => {
     const handleFetchQuivrFilesMissing = (event: CustomEvent) => {
       void fetchQuivrFiles(
         (event.detail as { draggedElement: KMSElement }).draggedElement
