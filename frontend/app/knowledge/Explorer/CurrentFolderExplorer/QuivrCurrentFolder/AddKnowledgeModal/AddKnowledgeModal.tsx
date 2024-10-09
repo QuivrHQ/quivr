@@ -1,6 +1,7 @@
 import { useState } from "react";
 
 import { useKnowledgeApi } from "@/lib/api/knowledge/useKnowledgeApi";
+import { Checkbox } from "@/lib/components/ui/Checkbox/Checkbox";
 import { FileInput } from "@/lib/components/ui/FileInput/FileInput";
 import { Modal } from "@/lib/components/ui/Modal/Modal";
 import QuivrButton from "@/lib/components/ui/QuivrButton/QuivrButton";
@@ -18,6 +19,7 @@ const AddKnowledgeModal = ({
 }: AddKnowledgeModalProps): JSX.Element => {
   const [loading, setLoading] = useState<boolean>(false);
   const [files, setFiles] = useState<File[]>([]);
+  const [selectedKnowledges, setSelectedKnowledges] = useState<File[]>([]);
   const { addKnowledge } = useKnowledgeApi();
 
   const FILE_TYPES = ["pdf", "docx", "doc", "txt"];
@@ -26,7 +28,7 @@ const AddKnowledgeModal = ({
     setLoading(true);
     try {
       await Promise.all(
-        files.map(async (file) => {
+        selectedKnowledges.map(async (file) => {
           try {
             await addKnowledge(
               {
@@ -47,6 +49,7 @@ const AddKnowledgeModal = ({
       setLoading(false);
       setIsOpen(false);
       setFiles([]);
+      setSelectedKnowledges([]);
     }
   };
 
@@ -56,6 +59,14 @@ const AddKnowledgeModal = ({
 
   const handleFileChange = (file: File) => {
     setFiles([...files, file]);
+  };
+
+  const handleCheckboxChange = (file: File, checked: boolean) => {
+    if (checked) {
+      setSelectedKnowledges([...selectedKnowledges, file]);
+    } else {
+      setSelectedKnowledges(selectedKnowledges.filter((f) => f !== file));
+    }
   };
 
   return (
@@ -79,6 +90,12 @@ const AddKnowledgeModal = ({
             <div className={styles.file_list}>
               {files.map((file, index) => (
                 <div key={index} className={styles.file_item}>
+                  <Checkbox
+                    checked={selectedKnowledges.includes(file)}
+                    setChecked={(checked) =>
+                      handleCheckboxChange(file, checked)
+                    }
+                  />
                   <span>{file.name}</span>
                 </div>
               ))}

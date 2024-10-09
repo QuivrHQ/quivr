@@ -21,11 +21,18 @@
       border-radius: Radius.$normal;
       border-top: 1px solid var(--border-0);
 
+      &.empty {
+        border: none;
+      }
+
       .file_item {
         font-size: Typography.$tiny;
         border-bottom: 1px solid var(--border-0);
         padding-block: Spacings.$spacing03;
         padding-inline: Spacings.$spacing05;
+        display: flex;
+        align-items: center;
+        gap: Spacings.$spacing03;
       }
     }
   }
