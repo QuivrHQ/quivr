@@ -29,7 +29,7 @@ from quivr_api.modules.knowledge.dto.inputs import (
     LinkKnowledgeBrain,
     UnlinkKnowledgeBrain,
 )
-from quivr_api.modules.knowledge.dto.outputs import KnowledgeDTO
+from quivr_api.modules.knowledge.dto.outputs import KnowledgeDTO, sort_knowledge_dtos
 from quivr_api.modules.knowledge.service.knowledge_exceptions import (
     KnowledgeDeleteError,
     KnowledgeForbiddenAccess,
@@ -37,8 +37,6 @@ from quivr_api.modules.knowledge.service.knowledge_exceptions import (
     UploadError,
 )
 from quivr_api.modules.knowledge.service.knowledge_service import KnowledgeService
-from quivr_api.modules.notification.dto.inputs import CreateNotification
-from quivr_api.modules.notification.entity.notification import NotificationsStatusEnum
 from quivr_api.modules.notification.service.notification_service import (
     NotificationService,
 )
@@ -171,7 +169,8 @@ async def list_knowledge(
     try:
         # TODO: Returns one level of children
         children = await knowledge_service.list_knowledge(parent_id, current_user.id)
-        return [await c.to_dto(get_children=False) for c in children]
+        children_dto = [await c.to_dto(get_children=False) for c in children]
+        return sort_knowledge_dtos(children_dto)
     except KnowledgeNotFoundException as e:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN, detail=f"{e.message}"
@@ -277,10 +276,9 @@ async def link_knowledge_to_brain(
     knowledge_service: KnowledgeService = Depends(get_knowledge_service),
     current_user: UserIdentity = Depends(get_current_user),
 ):
-    brains_ids, knowledge_dto, bulk_id = (
+    brains_ids, knowledge_dto = (
         link_request.brain_ids,
         link_request.knowledge,
-        link_request.bulk_id,
     )
     if len(brains_ids) == 0:
         return Response(status_code=status.HTTP_204_NO_CONTENT)
@@ -312,20 +310,10 @@ async def link_knowledge_to_brain(
         if await k.awaitable_attrs.status
         not in [KnowledgeStatus.PROCESSED, KnowledgeStatus.PROCESSING]
     ]:
-        upload_notification = notification_service.add_notification(
-            CreateNotification(
-                user_id=current_user.id,
-                bulk_id=bulk_id,
-                status=NotificationsStatusEnum.INFO,
-                title=f"{await knowledge.awaitable_attrs.file_name}",
-                category="process",
-            )
-        )
         celery.send_task(
             "process_file_task",
             kwargs={
                 "knowledge_id": await knowledge.awaitable_attrs.id,
-                "notification_id": upload_notification.id,
             },
         )
         knowledge = await knowledge_service.update_knowledge(
@@ -333,7 +321,8 @@ async def link_knowledge_to_brain(
             payload=KnowledgeUpdate(status=KnowledgeStatus.PROCESSING),
         )
 
-    return await asyncio.gather(*[k.to_dto() for k in linked_kms])
+    linked_kms = await asyncio.gather(*[k.to_dto() for k in linked_kms])
+    return sort_knowledge_dtos(linked_kms)
 
 
 @knowledge_router.delete(
@@ -365,4 +354,5 @@ async def unlink_knowledge_from_brain(
     )
 
     if unlinked_kms:
-        return await asyncio.gather(*[k.to_dto() for k in unlinked_kms])
+        unlinked_knowledges = await asyncio.gather(*[k.to_dto() for k in unlinked_kms])
+        return sort_knowledge_dtos(unlinked_knowledges)

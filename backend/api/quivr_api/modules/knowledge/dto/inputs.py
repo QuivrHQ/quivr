@@ -50,7 +50,6 @@ class KnowledgeUpdate(BaseModel):
 
 
 class LinkKnowledgeBrain(BaseModel):
-    bulk_id: UUID
     knowledge: KnowledgeDTO
     brain_ids: List[UUID]
 
