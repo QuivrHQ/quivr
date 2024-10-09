@@ -1,5 +1,6 @@
 import { useState } from "react";
 
+import { FileInput } from "@/lib/components/ui/FileInput/FileInput";
 import { Modal } from "@/lib/components/ui/Modal/Modal";
 import QuivrButton from "@/lib/components/ui/QuivrButton/QuivrButton";
 
@@ -15,6 +16,7 @@ const AddKnowledgeModal = ({
   setIsOpen,
 }: AddKnowledgeModalProps): JSX.Element => {
   const [loading, setLoading] = useState<boolean>(false);
+  const [files, setFiles] = useState<File[]>([]);
 
   const addKnowledge = () => {
     setLoading(true);
@@ -24,6 +26,10 @@ const AddKnowledgeModal = ({
 
   const handleCancel = () => {
     setIsOpen(false);
+  };
+
+  const handleFileChange = (file: File) => {
+    setFiles([...files, file]);
   };
 
   return (
@@ -37,6 +43,16 @@ const AddKnowledgeModal = ({
         CloseTrigger={<div />}
       >
         <div className={styles.modal_content}>
+          <div>
+            <FileInput label="Upload Files" onFileChange={handleFileChange} />
+          </div>
+          <div className={styles.file_list}>
+            {files.map((file, index) => (
+              <div key={index} className={styles.file_item}>
+                <span>{file.name}</span>
+              </div>
+            ))}
+          </div>
           <div className={styles.buttons_wrapper}>
             <QuivrButton
               label="Cancel"

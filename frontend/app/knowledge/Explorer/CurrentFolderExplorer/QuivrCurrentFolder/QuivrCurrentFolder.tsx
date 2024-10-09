@@ -125,7 +125,7 @@ const QuivrCurrentFolder = (): JSX.Element => {
                 <div className={styles.right}>
                   <QuivrButton
                     iconName="add"
-                    label="Add Folder"
+                    label="Create Folder"
                     color="primary"
                     onClick={() => setAddFolderModalOpened(true)}
                     small={true}
