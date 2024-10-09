@@ -34,7 +34,7 @@ export const useSync = () => {
     GitHub:
       "https://quivr-cms.s3.eu-west-3.amazonaws.com/dropbox_dce4f3d753.png",
     Zendesk:
-      "https://quivr-cms.s3.eu-west-3.amazonaws.com/dropbox_dce4f3d753.png",
+      "https://quivr-cms.s3.eu-west-3.amazonaws.com/zendesk_c39745607c.png",
   };
 
   const integrationIconUrls: Record<Integration, string> = {
@@ -49,7 +49,7 @@ export const useSync = () => {
     GitHub:
       "https://quivr-cms.s3.eu-west-3.amazonaws.com/dropbox_dce4f3d753.png",
     Zendesk:
-      "https://quivr-cms.s3.eu-west-3.amazonaws.com/dropbox_dce4f3d753.png",
+      "https://quivr-cms.s3.eu-west-3.amazonaws.com/zendesk_c39745607c.png",
   };
 
   const getActiveSyncsForBrain = async (brainId: string) => {
