@@ -53,10 +53,20 @@ nav:
   - Home: 
     - index.md
     - installation.md
-    - Features:
-      - Parsers:
-        - parsers/index.md
-        - parsers/megaparse.md
-        - parsers/simple.md
+    - Parsers:
+      - parsers/index.md
+      - parsers/megaparse.md
+      - parsers/simple.md
+    - Vector Stores:
+      - vectorstores/index.md
+      - vectorstores/faiss.md
+      - vectorstores/pgvector.md
+    - Workflows:
+      - workflows/index.md
+      - Examples:
+        - workflows/examples/chat.md
+        - workflows/examples/rag_with_internet.md
+    - Examples:
+      - examples/index.md
   - Enterprise: https://docs.quivr.app/
 
