@@ -9,6 +9,7 @@ interface FileInputProps {
   label: string;
   onFileChange: (file: File) => void;
   acceptedFileTypes?: string[];
+  hideFileName?: boolean;
 }
 
 export const FileInput = (props: FileInputProps): JSX.Element => {
@@ -89,7 +90,7 @@ export const FileInput = (props: FileInputProps): JSX.Element => {
             </div>
             <span>or drag it here</span>
           </div>
-          {currentFile && (
+          {currentFile && !props.hideFileName && (
             <span className={styles.filename}>{currentFile.name}</span>
           )}
         </div>

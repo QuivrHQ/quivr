@@ -1,0 +1,27 @@
+@use "styles/Spacings.module.scss";
+
+.modal_content {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: Spacings.$spacing05;
+
+  .top {
+    display: flex;
+    flex-direction: column;
+    gap: Spacings.$spacing03;
+    padding-top: Spacings.$spacing05;
+    flex: 1;
+
+    .file_list {
+      padding-top: Spacings.$spacing06;
+      flex: 1;
+    }
+  }
+
+  .buttons_wrapper {
+    display: flex;
+    justify-content: space-between;
+  }
+}

@@ -18,6 +18,8 @@ const AddKnowledgeModal = ({
   const [loading, setLoading] = useState<boolean>(false);
   const [files, setFiles] = useState<File[]>([]);
 
+  const FILE_TYPES = ["pdf", "docx", "doc", "txt"];
+
   const addKnowledge = () => {
     setLoading(true);
     setIsOpen(false);
@@ -43,15 +45,20 @@ const AddKnowledgeModal = ({
         CloseTrigger={<div />}
       >
         <div className={styles.modal_content}>
-          <div>
-            <FileInput label="Upload Files" onFileChange={handleFileChange} />
-          </div>
-          <div className={styles.file_list}>
-            {files.map((file, index) => (
-              <div key={index} className={styles.file_item}>
-                <span>{file.name}</span>
-              </div>
-            ))}
+          <div className={styles.top}>
+            <FileInput
+              label="Upload Files"
+              onFileChange={handleFileChange}
+              acceptedFileTypes={FILE_TYPES}
+              hideFileName={true}
+            />
+            <div className={styles.file_list}>
+              {files.map((file, index) => (
+                <div key={index} className={styles.file_item}>
+                  <span>{file.name}</span>
+                </div>
+              ))}
+            </div>
           </div>
           <div className={styles.buttons_wrapper}>
             <QuivrButton
@@ -61,7 +68,7 @@ const AddKnowledgeModal = ({
               onClick={handleCancel}
             />
             <QuivrButton
-              label="Create Folder"
+              label="Add Knowledge"
               iconName="add"
               color="primary"
               onClick={addKnowledge}
