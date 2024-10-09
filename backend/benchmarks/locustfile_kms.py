@@ -9,7 +9,11 @@ from locust.contrib.fasthttp import FastHttpUser
 from quivr_api.modules.brain.entity.brain_entity import Brain, BrainType
 from quivr_api.modules.brain.entity.brain_user import BrainUserDB
 from quivr_api.modules.dependencies import get_supabase_client
-from quivr_api.modules.knowledge.dto.inputs import LinkKnowledgeBrain
+from quivr_api.modules.knowledge.dto.inputs import (
+    KnowledgeUpdate,
+    LinkKnowledgeBrain,
+    UnlinkKnowledgeBrain,
+)
 from quivr_api.modules.knowledge.dto.outputs import KnowledgeDTO
 from quivr_api.modules.user.entity.user_identity import User
 from sqlmodel import Session, create_engine, select, text
@@ -23,11 +27,14 @@ load_params = {
     "parent_prob": 0.3,
     "folder_prob": 0.2,
     "km_root_prob": 0.2,
+    # Task rates
     "create_km_rate": 10,
     "list_km_rate": 10,
     "link_brain_rate": 5,
     "max_link_brains": 3,
     "delete_km_rate": 2,
+    "unlink_brain_rate": 5,
+    "update_km_rate": 2,
 }
 
 
@@ -91,7 +98,7 @@ class QuivrUser(FastHttpUser):
     data = os.urandom(load_params["file_size"])
     sync_engine = create_engine(
         pg_database_base_url,
-        echo=True,
+        echo=False,
     )
 
     def on_start(self) -> None:
@@ -126,19 +133,19 @@ class QuivrUser(FastHttpUser):
         returned_km = KnowledgeDTO.model_validate_json(response.text)
         all_kms.append(returned_km)
 
-    create_knowledge.__name__ = "create_knowledge_1MB"
-
     @task(load_params["link_brain_rate"])
     def link_to_brains(self):
+        global all_kms
         if len(all_kms) == 0:
             return
         nb_brains = random.randint(1, load_params["max_link_brains"])
         random_brains = [random.choice(brains_ids) for _ in range(nb_brains)]
-        random_km = random.choice(all_kms)
+        random_idx = random.choice(range(len(all_kms)))
+        random_km = all_kms.pop(random_idx)
         json_data = LinkKnowledgeBrain(
             brain_ids=random_brains, knowledge=random_km
         ).model_dump_json()
-        self.client.post(
+        response = self.client.post(
             "/knowledge/link_to_brains/",
             data=json_data,
             headers={
@@ -146,8 +153,9 @@ class QuivrUser(FastHttpUser):
                 **self.auth_headers,
             },
         )
-
-    link_to_brains.__name__ = "link_to_brain"
+        response.raise_for_status()
+        kms = [KnowledgeDTO.model_validate(r) for r in response.json()]
+        all_kms.extend(kms)
 
     @task(load_params["list_km_rate"])
     def list_knowledge_files(self):
@@ -165,22 +173,78 @@ class QuivrUser(FastHttpUser):
                 name="/knowledge/files",
             )
 
-    list_knowledge_files.__name__ = "list_knowledge_files"
+    @task(load_params["unlink_brain_rate"])
+    def unlink_knowledge_brain(self):
+        global all_kms
+        if len(all_kms) == 0:
+            return
+        random_idx = random.choice(range(len(all_kms)))
+        random_km = all_kms.pop(random_idx)
+        if len(random_km.brains) == 0:
+            return
+        random_brain = random.choice(random_km.brains)
+        assert random_km.id
+        json_data = UnlinkKnowledgeBrain(
+            brain_ids=[UUID(random_brain["brain_id"])],
+            knowledge_id=random_km.id,
+        ).model_dump_json()
+        self.client.delete(
+            "/knowledge/unlink_from_brains/",
+            data=json_data,
+            headers={
+                "Content-Type": "application/json",
+                **self.auth_headers,
+            },
+        )
 
     @task(load_params["delete_km_rate"])
     def delete_knowledge_files(self):
+        global all_kms
         only_files = [idx for idx, km in enumerate(all_kms) if not km.is_folder]
         if len(only_files) == 0:
             return
         random_index = random.choice(only_files)
         random_km = all_kms.pop(random_index)
+        children_ids = [c.id for c in random_km.children]
+        all_kms[:] = [k for k in all_kms if k.id not in children_ids]
         self.client.delete(
             f"/knowledge/{str(random_km.id)}",
             headers=self.auth_headers,
             name="/knowledge/delete",
         )
 
+    @task(load_params["update_km_rate"])
+    def update_knowledge(self):
+        global all_kms
+        if len(all_kms) == 0:
+            return
+        random_idx = random.choice(range(len(all_kms)))
+        random_km = all_kms.pop(random_idx)
+        assert random_km.id
+        json_data = KnowledgeUpdate(file_name=f"file-{uuid4()}").model_dump_json(
+            exclude_unset=True
+        )
+        response = self.client.patch(
+            f"/knowledge/{random_km.id}/",
+            data=json_data,
+            name="/knowledge/update",
+            headers={
+                "Content-Type": "application/json",
+                **self.auth_headers,
+            },
+        )
+        assert response and response.text
+        km = KnowledgeDTO.model_validate_json(response.text)
+        all_kms.append(km)
+
+    #  CRUD operations
+    create_knowledge.__name__ = "create_knowledge_1MB"
+    update_knowledge.__name__ = "update_knowledge"
     delete_knowledge_files.__name__ = "delete_knowledge_file"
+    list_knowledge_files.__name__ = "list_knowledge_files"
+    # Special linking/unlinking brains
+    link_to_brains.__name__ = "link_to_brain"
+    unlink_knowledge_brain.__name__ = "unlink_knowledge_brain"
 
     def on_stop(self):
         global brains_ids
