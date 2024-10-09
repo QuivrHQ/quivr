@@ -87,7 +87,12 @@ const AddKnowledgeModal = ({
               acceptedFileTypes={FILE_TYPES}
               hideFileName={true}
             />
-            <div className={styles.file_list}>
+            {!!files.length && <div className={styles.list_header}>Header</div>}
+            <div
+              className={`${styles.file_list} ${
+                !files.length ? styles.empty : ""
+              }`}
+            >
               {files.map((file, index) => (
                 <div key={index} className={styles.file_item}>
                   <Checkbox

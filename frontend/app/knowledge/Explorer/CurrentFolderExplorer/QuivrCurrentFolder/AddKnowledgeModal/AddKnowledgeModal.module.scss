@@ -16,9 +16,11 @@
     padding-top: Spacings.$spacing05;
     flex: 1;
 
-    .file_list {
+    .list_header {
       margin-top: Spacings.$spacing06;
-      border-radius: Radius.$normal;
+    }
+
+    .file_list {
       border-top: 1px solid var(--border-0);
 
       &.empty {
