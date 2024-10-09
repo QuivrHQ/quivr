@@ -97,6 +97,8 @@ const AddKnowledgeModal = ({
               color="primary"
               onClick={handleAddKnowledge}
               isLoading={loading}
+              disabled={files.length === 0}
+              important={true}
             />
           </div>
         </div>
