@@ -29,7 +29,7 @@ export interface AddFolderData {
 export interface AddKnowledgeData {
   parent_id: UUID | null;
   file_name: string;
-  is_folder: File;
+  is_folder: boolean;
 }
 
 export const isUploadedKnowledge = (

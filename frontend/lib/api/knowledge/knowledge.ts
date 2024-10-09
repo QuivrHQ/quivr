@@ -117,6 +117,7 @@ export const addKnowledge = async (
   file: File,
   axiosInstance: AxiosInstance
 ): Promise<BEKnowledge> => {
+  console.info("Adding knowledge", knowledgeData, file);
   const formData = new FormData();
   formData.append("knowledge_data", JSON.stringify(knowledgeData));
   formData.append("file", file);

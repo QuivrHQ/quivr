@@ -1,5 +1,6 @@
 import { useState } from "react";
 
+import { useKnowledgeApi } from "@/lib/api/knowledge/useKnowledgeApi";
 import { FileInput } from "@/lib/components/ui/FileInput/FileInput";
 import { Modal } from "@/lib/components/ui/Modal/Modal";
 import QuivrButton from "@/lib/components/ui/QuivrButton/QuivrButton";
@@ -17,13 +18,29 @@ const AddKnowledgeModal = ({
 }: AddKnowledgeModalProps): JSX.Element => {
   const [loading, setLoading] = useState<boolean>(false);
   const [files, setFiles] = useState<File[]>([]);
+  const { addKnowledge } = useKnowledgeApi();
 
   const FILE_TYPES = ["pdf", "docx", "doc", "txt"];
 
-  const addKnowledge = () => {
+  const handleAddKnowledge = () => {
     setLoading(true);
-    setIsOpen(false);
-    setLoading(false);
+    files.map(async (file) => {
+      try {
+        await addKnowledge(
+          {
+            file_name: file.name,
+            parent_id: null,
+            is_folder: false,
+          },
+          file
+        );
+      } catch (error) {
+        console.error("Failed to add knowledge:", error);
+      }
+    });
+
+    // setIsOpen(false);
+    // setLoading(false);
   };
 
   const handleCancel = () => {
@@ -71,7 +88,7 @@ const AddKnowledgeModal = ({
               label="Add Knowledge"
               iconName="add"
               color="primary"
-              onClick={addKnowledge}
+              onClick={handleAddKnowledge}
               isLoading={loading}
             />
           </div>
