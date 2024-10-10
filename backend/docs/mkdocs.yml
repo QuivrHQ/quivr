@@ -66,6 +66,10 @@ nav:
       - Examples:
         - workflows/examples/chat.md
         - workflows/examples/rag_with_internet.md
+    - Configuration:
+      - config/index.md
+      - config/base_config.md
+      - config/config.md
     - Examples:
       - examples/index.md
   - Enterprise: https://docs.quivr.app/
