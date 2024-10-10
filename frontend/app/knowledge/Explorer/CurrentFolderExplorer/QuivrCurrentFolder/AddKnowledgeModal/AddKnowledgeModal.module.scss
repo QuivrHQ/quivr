@@ -3,7 +3,8 @@
 @use "styles/Typography.module.scss";
 
 .modal_content {
-  max-height: 100%;
+  max-height: calc(100% - Spacings.$spacing07);
+  min-height: calc(100% - Spacings.$spacing07);
   display: flex;
   flex-direction: column;
   justify-content: space-between;

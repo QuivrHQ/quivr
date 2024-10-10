@@ -7,21 +7,27 @@ import { Icon } from "../Icon/Icon";
 
 interface FileInputProps {
   label: string;
-  onFileChange: (file: File) => void;
+  onFileChange: (files: File[]) => void;
   acceptedFileTypes?: string[];
   hideFileName?: boolean;
+  handleMultipleFiles?: boolean;
 }
 
 export const FileInput = (props: FileInputProps): JSX.Element => {
-  const [currentFile, setCurrentFile] = useState<File | null>(null);
+  const [currentFiles, setCurrentFiles] = useState<File[]>([]);
   const [errorMessage, setErrorMessage] = useState<string>("");
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const handleFileChange = (file: File) => {
-    const fileExtension = file.name.split(".").pop();
-    if (props.acceptedFileTypes?.includes(fileExtension || "")) {
-      props.onFileChange(file);
-      setCurrentFile(file);
+  const handleFileChange = (files: File[]) => {
+    const validFiles = files.filter((file) => {
+      const fileExtension = file.name.split(".").pop();
+
+      return props.acceptedFileTypes?.includes(fileExtension ?? "");
+    });
+
+    if (validFiles.length > 0) {
+      props.onFileChange(validFiles);
+      setCurrentFiles(validFiles);
       setErrorMessage("");
     } else {
       setErrorMessage("Wrong extension");
@@ -29,9 +35,9 @@ export const FileInput = (props: FileInputProps): JSX.Element => {
   };
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      handleFileChange(file);
+    const files = Array.from(event.target.files ?? []);
+    if (files.length > 0) {
+      handleFileChange(files);
     }
   };
 
@@ -66,12 +72,10 @@ export const FileInput = (props: FileInputProps): JSX.Element => {
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop: (acceptedFiles) => {
-      const file = acceptedFiles[0];
-      if (file) {
-        handleFileChange(file);
-      }
+      handleFileChange(acceptedFiles);
     },
     accept,
+    multiple: props.handleMultipleFiles,
   });
 
   return (
@@ -90,8 +94,12 @@ export const FileInput = (props: FileInputProps): JSX.Element => {
             </div>
             <span>or drag it here</span>
           </div>
-          {currentFile && !props.hideFileName && (
-            <span className={styles.filename}>{currentFile.name}</span>
+          {currentFiles.length > 0 && !props.hideFileName && (
+            <div className={styles.filename}>
+              {currentFiles.map((file, index) => (
+                <span key={index}>{file.name}</span>
+              ))}
+            </div>
           )}
         </div>
       </div>
@@ -102,6 +110,7 @@ export const FileInput = (props: FileInputProps): JSX.Element => {
         className={styles.file_input}
         onChange={handleInputChange}
         style={{ display: "none" }}
+        multiple={props.handleMultipleFiles}
       />
       {errorMessage !== "" && (
         <span className={styles.error_message}>{errorMessage}</span>

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { useKnowledgeApi } from "@/lib/api/knowledge/useKnowledgeApi";
 import { Checkbox } from "@/lib/components/ui/Checkbox/Checkbox";
@@ -47,7 +47,7 @@ const AddKnowledgeModal = ({
     setLoading(true);
     try {
       await Promise.all(
-        selectedKnowledges.map(async (file) => {
+        files.map(async (file) => {
           try {
             await addKnowledge(
               {
@@ -76,8 +76,8 @@ const AddKnowledgeModal = ({
     setIsOpen(false);
   };
 
-  const handleFileChange = (file: File) => {
-    setFiles([...files, file]);
+  const handleFileChange = (newFiles: File[]) => {
+    setFiles((prevFiles) => [...prevFiles, ...newFiles]);
   };
 
   const handleCheckboxChange = (file: File, checked: boolean) => {
@@ -92,6 +92,13 @@ const AddKnowledgeModal = ({
     setFiles(files.filter((file) => !selectedKnowledges.includes(file)));
     setSelectedKnowledges([]);
   };
+
+  useEffect(() => {
+    if (!isOpen) {
+      setFiles([]);
+      setSelectedKnowledges([]);
+    }
+  }, [isOpen]);
 
   return (
     <div className={styles.main_container}>
@@ -111,6 +118,7 @@ const AddKnowledgeModal = ({
               onFileChange={handleFileChange}
               acceptedFileTypes={FILE_TYPES}
               hideFileName={true}
+              handleMultipleFiles={true}
             />
             {!!files.length && (
               <div className={styles.list_header}>
@@ -119,6 +127,7 @@ const AddKnowledgeModal = ({
                   iconName="delete"
                   color="dangerous"
                   onClick={handleRemoveSelectedFiles}
+                  disabled={selectedKnowledges.length === 0}
                 />
               </div>
             )}
