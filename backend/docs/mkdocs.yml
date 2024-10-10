@@ -59,13 +59,13 @@ nav:
   - Home:
       - index.md
       - installation.md
-      - chat.md
       - Storage:
           - storage/index.md
           - storage/base.md
       - Brain:
           - brain/index.md
           - brain/brain.md
+          - chat.md
       - Parsers:
           - parsers/index.md
           - parsers/megaparse.md
