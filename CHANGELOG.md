@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.0.322 (2024-10-10)
+
+## What's Changed
+* feat: Add new documentation files by @StanGirard in https://github.com/QuivrHQ/quivr/pull/3351
+* fix: separate english and french ingredients by @chloedia in https://github.com/QuivrHQ/quivr/pull/3358
+
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.321...v0.0.322
+
 ## 0.0.321 (2024-10-08)
 
 ## What's Changed
