@@ -57,25 +57,29 @@ plugins:
 
 nav:
   - Home:
-      - index.md
-      - installation.md
-      - chat.md
-      - Brain:
-          - brain/index.md
-          - brain/brain.md
-      - Parsers:
-          - parsers/index.md
-          - parsers/megaparse.md
-          - parsers/simple.md
-      - Vector Stores:
-          - vectorstores/index.md
-          - vectorstores/faiss.md
-          - vectorstores/pgvector.md
-      - Workflows:
-          - workflows/index.md
-          - Examples:
-              - workflows/examples/chat.md
-              - workflows/examples/rag_with_internet.md
+    - index.md
+    - installation.md
+    - chat.md
+    - Brain:
+      - brain/index.md
+      - brain/brain.md
+    - Parsers:
+      - parsers/index.md
+      - parsers/megaparse.md
+      - parsers/simple.md
+    - Vector Stores:
+      - vectorstores/index.md
+      - vectorstores/faiss.md
+      - vectorstores/pgvector.md
+    - Workflows:
+      - workflows/index.md
       - Examples:
-          - examples/index.md
+        - workflows/examples/chat.md
+        - workflows/examples/rag_with_internet.md
+    - Configuration:
+      - config/index.md
+      - config/base_config.md
+      - config/config.md
+    - Examples:
+      - examples/index.md
   - Enterprise: https://docs.quivr.app/
