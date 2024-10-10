@@ -50,7 +50,7 @@ plugins:
 
 
 nav:
-  - Home: 
+  - Home:
     - index.md
     - installation.md
     - Parsers:
@@ -61,6 +61,7 @@ nav:
       - vectorstores/index.md
       - vectorstores/faiss.md
       - vectorstores/pgvector.md
+    - brain.md
     - Workflows:
       - workflows/index.md
       - Examples:
@@ -69,4 +70,3 @@ nav:
     - Examples:
       - examples/index.md
   - Enterprise: https://docs.quivr.app/
-
