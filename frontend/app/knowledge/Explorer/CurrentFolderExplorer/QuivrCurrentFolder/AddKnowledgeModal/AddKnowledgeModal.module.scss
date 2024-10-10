@@ -18,6 +18,8 @@
 
     .list_header {
       margin-top: Spacings.$spacing06;
+      display: flex;
+      justify-content: flex-end;
     }
 
     .file_list {

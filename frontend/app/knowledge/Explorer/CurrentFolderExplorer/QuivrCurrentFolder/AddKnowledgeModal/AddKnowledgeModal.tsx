@@ -69,6 +69,11 @@ const AddKnowledgeModal = ({
     }
   };
 
+  const handleRemoveSelectedFiles = () => {
+    setFiles(files.filter((file) => !selectedKnowledges.includes(file)));
+    setSelectedKnowledges([]);
+  };
+
   return (
     <div className={styles.main_container}>
       <Modal
@@ -87,7 +92,16 @@ const AddKnowledgeModal = ({
               acceptedFileTypes={FILE_TYPES}
               hideFileName={true}
             />
-            {!!files.length && <div className={styles.list_header}>Header</div>}
+            {!!files.length && (
+              <div className={styles.list_header}>
+                <QuivrButton
+                  label="Remove"
+                  iconName="delete"
+                  color="dangerous"
+                  onClick={handleRemoveSelectedFiles}
+                />
+              </div>
+            )}
             <div
               className={`${styles.file_list} ${
                 !files.length ? styles.empty : ""
