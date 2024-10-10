@@ -5,6 +5,7 @@ import { Checkbox } from "@/lib/components/ui/Checkbox/Checkbox";
 import { FileInput } from "@/lib/components/ui/FileInput/FileInput";
 import { Modal } from "@/lib/components/ui/Modal/Modal";
 import QuivrButton from "@/lib/components/ui/QuivrButton/QuivrButton";
+import { AddKnowledgeData } from "@/lib/types/Knowledge";
 
 import styles from "./AddKnowledgeModal.module.scss";
 
@@ -35,7 +36,7 @@ const AddKnowledgeModal = ({
                 file_name: file.name,
                 parent_id: null,
                 is_folder: false,
-              },
+              } as AddKnowledgeData,
               file
             );
           } catch (error) {
