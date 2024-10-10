@@ -46,6 +46,24 @@ logger = logging.getLogger("quivr_core")
 async def process_files(
     storage: StorageBase, skip_file_error: bool, **processor_kwargs: dict[str, Any]
 ) -> list[Document]:
+    """
+    Process files in storage.
+    This function takes a StorageBase and return a list of langchain documents.
+
+    Args:
+        storage (StorageBase): The storage containing the files to process.
+        skip_file_error (bool): Whether to skip files that cannot be processed.
+        processor_kwargs (dict[str, Any]): Additional arguments for the processor.
+
+    Returns:
+        list[Document]: List of processed documents in the Langchain Document format.
+
+    Raises:
+        ValueError: If a file cannot be processed and skip_file_error is False.
+        Exception: If no processor is found for a file of a specific type and skip_file_error is False.
+
+    """
+
     knowledge = []
     for file in await storage.get_files():
         try:
@@ -71,6 +89,36 @@ async def process_files(
 
 
 class Brain:
+    """
+    A class representing a Brain.
+
+    This class allows for the creation of a Brain, which is a collection of knowledge one wants to retrieve information from.
+
+    A Brain is set to:
+
+    * Store files in the storage of your choice (local, S3, etc.)
+    * Process the files in the storage to extract text and metadata in a wide range of format.
+    * Store the processed files in the vector store of your choice (FAISS, PGVector, etc.) - default to FAISS.
+    * Create an index of the processed files.
+    * Use the *Quivr* workflow for the retrieval augmented generation.
+
+    A Brain is able to:
+
+    * Search for information in the vector store.
+    * Answer questions about the knowledges in the Brain.
+    * Stream the answer to the question.
+
+    Attributes:
+        name (str): The name of the brain.
+        id (UUID): The unique identifier of the brain.
+        storage (StorageBase): The storage used to store the files.
+        llm (LLMEndpoint): The language model used to generate the answer.
+        vector_db (VectorStore): The vector store used to store the processed files.
+        embedder (Embeddings): The embeddings used to create the index of the processed files.
+
+
+    """
+
     def __init__(
         self,
         *,
@@ -106,6 +154,22 @@ class Brain:
 
     @classmethod
     def load(cls, folder_path: str | Path) -> Self:
+        """
+        Load a brain from a folder path.
+
+        Args:
+            folder_path (str | Path): The path to the folder containing the brain.
+
+        Returns:
+            Brain: The brain loaded from the folder path.
+
+        Example:
+        ```python
+        brain_loaded = Brain.load("path/to/brain")
+        brain_loaded.print_info()
+        ```
+
+        """
         if isinstance(folder_path, str):
             folder_path = Path(folder_path)
         if not folder_path.exists():
@@ -154,6 +218,20 @@ class Brain:
         )
 
     async def save(self, folder_path: str | Path):
+        """
+        Save the brain to a folder path.
+
+        Args:
+            folder_path (str | Path): The path to the folder where the brain will be saved.
+
+        Returns:
+            str: The path to the folder where the brain was saved.
+
+        Example:
+        ```python
+        await brain.save("path/to/brain")
+        ```
+        """
         if isinstance(folder_path, str):
             folder_path = Path(folder_path)
 
@@ -247,6 +325,28 @@ class Brain:
         skip_file_error: bool = False,
         processor_kwargs: dict[str, Any] | None = None,
     ):
+        """
+        Create a brain from a list of file paths.
+
+        Args:
+            name (str): The name of the brain.
+            file_paths (list[str | Path]): The list of file paths to add to the brain.
+            vector_db (VectorStore | None): The vector store used to store the processed files.
+            storage (StorageBase): The storage used to store the files.
+            llm (LLMEndpoint | None): The language model used to generate the answer.
+            embedder (Embeddings | None): The embeddings used to create the index of the processed files.
+            skip_file_error (bool): Whether to skip files that cannot be processed.
+            processor_kwargs (dict[str, Any] | None): Additional arguments for the processor.
+
+        Returns:
+            Brain: The brain created from the file paths.
+
+        Example:
+        ```python
+        brain = await Brain.afrom_files(name="My Brain", file_paths=["file1.pdf", "file2.pdf"])
+        brain.print_info()
+        ```
+        """
         if llm is None:
             llm = default_llm()
 
@@ -327,6 +427,28 @@ class Brain:
         llm: LLMEndpoint | None = None,
         embedder: Embeddings | None = None,
     ) -> Self:
+        """
+        Create a brain from a list of langchain documents.
+
+        Args:
+            name (str): The name of the brain.
+            langchain_documents (list[Document]): The list of langchain documents to add to the brain.
+            vector_db (VectorStore | None): The vector store used to store the processed files.
+            storage (StorageBase): The storage used to store the files.
+            llm (LLMEndpoint | None): The language model used to generate the answer.
+            embedder (Embeddings | None): The embeddings used to create the index of the processed files.
+
+        Returns:
+            Brain: The brain created from the langchain documents.
+
+        Example:
+        ```python
+        from langchain_core.documents import Document
+        documents = [Document(page_content="Hello, world!")]
+        brain = await Brain.afrom_langchain_documents(name="My Brain", langchain_documents=documents)
+        brain.print_info()
+        ```
+        """
         if llm is None:
             llm = default_llm()
 
@@ -357,6 +479,26 @@ class Brain:
         filter: Callable | Dict[str, Any] | None = None,
         fetch_n_neighbors: int = 20,
     ) -> list[SearchResult]:
+        """
+        Search for relevant documents in the brain based on a query.
+
+        Args:
+            query (str | Document): The query to search for.
+            n_results (int): The number of results to return.
+            filter (Callable | Dict[str, Any] | None): The filter to apply to the search.
+            fetch_n_neighbors (int): The number of neighbors to fetch.
+
+        Returns:
+            list[SearchResult]: The list of retrieved chunks.
+
+        Example:
+        ```python
+        brain = Brain.from_files(name="My Brain", file_paths=["file1.pdf", "file2.pdf"])
+        results = await brain.asearch("Why everybody loves Quivr?")
+        for result in results:
+            print(result.chunk.page_content)
+        ```
+        """
         if not self.vector_db:
             raise ValueError("No vector db configured for this brain")
 
@@ -383,6 +525,26 @@ class Brain:
         list_files: list[QuivrKnowledge] | None = None,
         chat_history: ChatHistory | None = None,
     ) -> ParsedRAGResponse:
+        """
+        Ask a question to the brain and get a generated answer.
+
+        Args:
+            question (str): The question to ask.
+            retrieval_config (RetrievalConfig | None): The retrieval configuration (see RetrievalConfig docs).
+            rag_pipeline (Type[Union[QuivrQARAG, QuivrQARAGLangGraph]] | None): The RAG pipeline to use.
+            list_files (list[QuivrKnowledge] | None): The list of files to include in the RAG pipeline.
+            chat_history (ChatHistory | None): The chat history to use.
+
+        Returns:
+            ParsedRAGResponse: The generated answer.
+
+        Example:
+        ```python
+        brain = Brain.from_files(name="My Brain", file_paths=["file1.pdf", "file2.pdf"])
+        answer = brain.ask("What is the meaning of life?")
+        print(answer.answer)
+        ```
+        """
         llm = self.llm
 
         # If you passed a different llm model we'll override the brain  one
@@ -420,6 +582,27 @@ class Brain:
         list_files: list[QuivrKnowledge] | None = None,
         chat_history: ChatHistory | None = None,
     ) -> AsyncGenerator[ParsedRAGChunkResponse, ParsedRAGChunkResponse]:
+        """
+        Ask a question to the brain and get a streamed generated answer.
+
+        Args:
+            question (str): The question to ask.
+            retrieval_config (RetrievalConfig | None): The retrieval configuration (see RetrievalConfig docs).
+            rag_pipeline (Type[Union[QuivrQARAG, QuivrQARAGLangGraph]] | None): The RAG pipeline to use.
+            list_files (list[QuivrKnowledge] | None): The list of files to include in the RAG pipeline.
+            chat_history (ChatHistory | None): The chat history to use.
+
+        Returns:
+            AsyncGenerator[ParsedRAGChunkResponse, ParsedRAGChunkResponse]: The streamed generated answer.
+
+        Example:
+        ```python
+        brain = Brain.from_files(name="My Brain", file_paths=["file1.pdf", "file2.pdf"])
+        async for chunk in brain.ask_streaming("What is the meaning of life?"):
+            print(chunk.answer)
+        ```
+
+        """
         llm = self.llm
 
         # If you passed a different llm model we'll override the brain  one

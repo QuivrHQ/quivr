@@ -45,14 +45,24 @@ theme:
         name: Switch to system preference
 
 plugins:
-- mkdocstrings:
-    default_handler: python
-
+  - mkdocstrings:
+      default_handler: python
+      handlers:
+        python:
+          docstring_style: google
+          options:
+            show_source: false
+            heading_level: 2
+            separate_signature: true
 
 nav:
-  - Home: 
+  - Home:
     - index.md
     - installation.md
+    - chat.md
+    - Brain:
+      - brain/index.md
+      - brain/brain.md
     - Parsers:
       - parsers/index.md
       - parsers/megaparse.md
@@ -73,4 +83,3 @@ nav:
     - Examples:
       - examples/index.md
   - Enterprise: https://docs.quivr.app/
-

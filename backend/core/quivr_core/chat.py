@@ -10,21 +10,35 @@ from quivr_core.models import ChatMessage
 
 class ChatHistory:
     """
-    Chat history is a list of ChatMessage.
-    It is used to store the chat history of a chat.
+    ChatHistory is a class that maintains a record of chat conversations. Each message
+    in the history is represented by an instance of the `ChatMessage` class, and the
+    chat history is stored internally as a list of these `ChatMessage` objects.
+    The class provides methods to retrieve, append, iterate, and manipulate the chat
+    history, as well as utilities to convert the messages into specific formats
+    and support deep copying.
     """
 
     def __init__(self, chat_id: UUID, brain_id: UUID | None) -> None:
+        """Init a new ChatHistory object.
+
+        Args:
+            chat_id (UUID): A unique identifier for the chat session.
+            brain_id (UUID | None): An optional identifier for the brain associated with the chat.
+        """
         self.id = chat_id
         self.brain_id = brain_id
         # TODO(@aminediro): maybe use a deque() instead ?
         self._msgs: list[ChatMessage] = []
 
     def get_chat_history(self, newest_first: bool = False):
-        """Returns a ChatMessage list sorted by time
+        """
+        Retrieves the chat history, optionally sorted in reverse chronological order.
+
+        Args:
+            newest_first (bool, optional): If True, returns the messages in reverse order (newest first). Defaults to False.
 
         Returns:
-            list[ChatMessage]: list of chat messages
+            List[ChatMessage]: A sorted list of chat messages.
         """
         history = sorted(self._msgs, key=lambda msg: msg.message_time)
         if newest_first:
@@ -38,7 +52,11 @@ class ChatHistory:
         self, langchain_msg: AIMessage | HumanMessage, metadata: dict[str, Any] = {}
     ):
         """
-        Append a message to the chat history.
+        Appends a new message to the chat history.
+
+        Args:
+            langchain_msg (AIMessage | HumanMessage): The message content (either an AI or Human message).
+            metadata (dict[str, Any], optional): Additional metadata related to the message. Defaults to an empty dictionary.
         """
         chat_msg = ChatMessage(
             chat_id=self.id,
@@ -52,7 +70,13 @@ class ChatHistory:
 
     def iter_pairs(self) -> Generator[Tuple[HumanMessage, AIMessage], None, None]:
         """
-        Iterate over the chat history as pairs of HumanMessage and AIMessage.
+        Iterates over the chat history in pairs, returning a HumanMessage followed by an AIMessage.
+
+        Yields:
+            Tuple[HumanMessage, AIMessage]: Pairs of human and AI messages.
+
+        Raises:
+            AssertionError: If the messages in the pair are not in the expected order (i.e., a HumanMessage followed by an AIMessage).
         """
         # Reverse the chat_history, newest first
         it = iter(self.get_chat_history(newest_first=True))
@@ -66,7 +90,13 @@ class ChatHistory:
             yield (human_message.msg, ai_message.msg)
 
     def to_list(self) -> List[HumanMessage | AIMessage]:
-        """Format the chat history into a list of HumanMessage and AIMessage"""
+        """
+        Converts the chat history into a list of raw HumanMessage or AIMessage objects.
+
+        Returns:
+            list[HumanMessage | AIMessage]: A list of messages in their raw form, without metadata.
+        """
+
         return [_msg.msg for _msg in self._msgs]
 
     def __deepcopy__(self, memo):
