@@ -59,13 +59,13 @@ nav:
   - Home:
       - index.md
       - installation.md
-      - Storage:
-          - storage/index.md
-          - storage/base.md
       - Brain:
           - brain/index.md
           - brain/brain.md
-          - chat.md
+          - brain/chat.md
+      - Storage:
+          - storage/index.md
+          - storage/base.md
       - Parsers:
           - parsers/index.md
           - parsers/megaparse.md
@@ -79,6 +79,16 @@ nav:
           - Examples:
               - workflows/examples/chat.md
               - workflows/examples/rag_with_internet.md
+      - Workflows:
+          - workflows/index.md
+          - Examples:
+              - workflows/examples/chat.md
+              - workflows/examples/rag_with_internet.md
+      - Configuration:
+          - config/index.md
+          - config/base_config.md
+          - config/config.md
       - Examples:
           - examples/index.md
+          - examples/custom_storage.md
   - Enterprise: https://docs.quivr.app/
