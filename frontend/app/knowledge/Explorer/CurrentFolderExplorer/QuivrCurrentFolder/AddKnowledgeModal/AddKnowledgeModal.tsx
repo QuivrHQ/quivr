@@ -5,7 +5,9 @@ import { Checkbox } from "@/lib/components/ui/Checkbox/Checkbox";
 import { FileInput } from "@/lib/components/ui/FileInput/FileInput";
 import { Modal } from "@/lib/components/ui/Modal/Modal";
 import QuivrButton from "@/lib/components/ui/QuivrButton/QuivrButton";
+import { Tabs } from "@/lib/components/ui/Tabs/Tabs";
 import { AddKnowledgeData } from "@/lib/types/Knowledge";
+import { Tab } from "@/lib/types/Tab";
 
 import styles from "./AddKnowledgeModal.module.scss";
 
@@ -20,10 +22,26 @@ const AddKnowledgeModal = ({
 }: AddKnowledgeModalProps): JSX.Element => {
   const [loading, setLoading] = useState<boolean>(false);
   const [files, setFiles] = useState<File[]>([]);
+  const [selectedTab, setSelectedTab] = useState<string>("From Documents");
   const [selectedKnowledges, setSelectedKnowledges] = useState<File[]>([]);
   const { addKnowledge } = useKnowledgeApi();
 
   const FILE_TYPES = ["pdf", "docx", "doc", "txt"];
+
+  const tabs: Tab[] = [
+    {
+      label: "From Documents",
+      isSelected: selectedTab === "From Documents",
+      onClick: () => setSelectedTab("From Documents"),
+      iconName: "file",
+    },
+    {
+      label: "From URLs",
+      isSelected: selectedTab === "From URLs",
+      onClick: () => setSelectedTab("From URLs"),
+      iconName: "link",
+    },
+  ];
 
   const handleAddKnowledge = async () => {
     setLoading(true);
@@ -87,6 +105,7 @@ const AddKnowledgeModal = ({
       >
         <div className={styles.modal_content}>
           <div className={styles.top}>
+            <Tabs tabList={tabs} />
             <FileInput
               label="Upload Files"
               onFileChange={handleFileChange}
