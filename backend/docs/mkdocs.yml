@@ -61,7 +61,9 @@ nav:
       - vectorstores/index.md
       - vectorstores/faiss.md
       - vectorstores/pgvector.md
-    - brain.md
+    - Brain:
+      - brain/index.md
+      - brain/brain.md
     - Workflows:
       - workflows/index.md
       - Examples:

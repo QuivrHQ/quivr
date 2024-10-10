@@ -40,7 +40,3 @@ answer = brain.ask(
 print("Answer Quivr :", answer.answer)
 
 ```
-
-::: quivr_core.brain.brain
-    options:
-      heading_level: 2
