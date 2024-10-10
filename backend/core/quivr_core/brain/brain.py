@@ -92,16 +92,18 @@ class Brain:
     """
     A class representing a Brain.
 
-    This class allows for the creation of a brain, which is a collection of knowledge one wants to retrieve information from.
+    This class allows for the creation of a Brain, which is a collection of knowledge one wants to retrieve information from.
 
-    A brain is set to:
+    A Brain is set to:
+
     * Store files in the storage of your choice (local, S3, etc.)
     * Process the files in the storage to extract text and metadata in a wide range of format.
     * Store the processed files in the vector store of your choice (FAISS, PGVector, etc.) - default to FAISS.
     * Create an index of the processed files.
     * Use the *Quivr* workflow for the retrieval augmented generation.
 
-    A brain is able to:
+    A Brain is able to:
+
     * Search for information in the vector store.
     * Answer questions about the knowledges in the Brain.
     * Stream the answer to the question.
