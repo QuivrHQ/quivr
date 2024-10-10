@@ -60,6 +60,9 @@ nav:
       - index.md
       - installation.md
       - chat.md
+      - Storage:
+          - storage/index.md
+          - storage/base.md
       - Parsers:
           - parsers/index.md
           - parsers/megaparse.md
