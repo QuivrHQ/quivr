@@ -13,7 +13,11 @@ DIFF_PROMPT = PromptTemplate.from_template(
         * dénomination légale: nom du produit tel qu’il est défini par la réglementation, \
             en général cela inclut aussi avec des information sur son état (cuite, cru, gelé ... )
         * dénomination commercial: nom du produit tel qu’il est vendu au consommateur
-    * Ingrédients et allergènes, comprenant:
+    * Ingrédients et allergènes en français, comprenant:
+        * liste d’ingrédients
+        * traces d’allergènes
+        * Une sous-section pour chaque sous produit si il y a lieu;
+    * Ingrédients et allergènes en anglais, comprenant:
         * liste d’ingrédients
         * traces d’allergènes
         * Une sous-section pour chaque sous produit si il y a lieu;
@@ -35,18 +39,18 @@ DIFF_PROMPT = PromptTemplate.from_template(
     * Valeurs / informations nutritionnelles
     * Autres
 
-    Notes: 
+    Notes:
      -> Coup de Pates: Tradition & Innovation, est l'entreprise productrice / marque du produit.
 
     Chaque sections doivent être organisées comme suit et séparées par des lignes entre chaque avant et après:
-    
+
     ## section_name
-    
+
     **Avant** : ...
-    
+
     **Après** : ...
-    
-    **Modifications**: 
+
+    **Modifications**:
         * ...
         * ...
 
