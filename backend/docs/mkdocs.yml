@@ -45,28 +45,45 @@ theme:
         name: Switch to system preference
 
 plugins:
-- mkdocstrings:
-    default_handler: python
-
+  - mkdocstrings:
+      default_handler: python
+      handlers:
+        python:
+          docstring_style: google
+          options:
+            show_source: false
+            heading_level: 2
+            separate_signature: true
 
 nav:
-  - Home: 
-    - index.md
-    - installation.md
-    - Parsers:
-      - parsers/index.md
-      - parsers/megaparse.md
-      - parsers/simple.md
-    - Vector Stores:
-      - vectorstores/index.md
-      - vectorstores/faiss.md
-      - vectorstores/pgvector.md
-    - Workflows:
-      - workflows/index.md
+  - Home:
+      - index.md
+      - installation.md
+      - Brain:
+          - brain/index.md
+          - brain/brain.md
+          - brain/chat.md
+      - Storage:
+          - storage/index.md
+          - storage/base.md
+      - Parsers:
+          - parsers/index.md
+          - parsers/megaparse.md
+          - parsers/simple.md
+      - Vector Stores:
+          - vectorstores/index.md
+          - vectorstores/faiss.md
+          - vectorstores/pgvector.md
+      - Workflows:
+          - workflows/index.md
+          - Examples:
+              - workflows/examples/chat.md
+              - workflows/examples/rag_with_internet.md
+      - Configuration:
+          - config/index.md
+          - config/base_config.md
+          - config/config.md
       - Examples:
-        - workflows/examples/chat.md
-        - workflows/examples/rag_with_internet.md
-    - Examples:
-      - examples/index.md
+          - examples/index.md
+          - examples/custom_storage.md
   - Enterprise: https://docs.quivr.app/
-
