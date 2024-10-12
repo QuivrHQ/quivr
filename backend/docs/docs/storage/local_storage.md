@@ -1,4 +1,4 @@
-# StorageBase
+# LocalStorage
 
 ::: quivr_core.storage.local_storage
 options:
