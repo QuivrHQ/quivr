@@ -151,7 +151,10 @@ const CurrentFolderExplorerLine = ({
         </span>
       </div>
       <div className={styles.right}>
-        <ConnectedBrains connectedBrains={element.brains} />
+        <ConnectedBrains
+          connectedBrains={element.brains}
+          knowledgeStatus={element.status}
+        />
         <div className={element.is_folder ? styles.visible : styles.hidden}>
           <Icon
             name="chevronRight"

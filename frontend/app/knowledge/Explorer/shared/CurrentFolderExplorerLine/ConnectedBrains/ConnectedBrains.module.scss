@@ -10,6 +10,10 @@
   .brain_container {
     cursor: pointer;
 
+    &.waiting {
+      opacity: 0.4;
+    }
+
     .sample_wrapper {
       display: flex;
       justify-content: center;
@@ -22,5 +26,16 @@
       border-radius: Radius.$normal;
       font-size: Typography.$very_tiny;
     }
+  }
+
+  .waiting_icon {
+    min-width: 18px;
+    min-height: 18px;
+    max-width: 18px;
+    max-height: 18px;
+    position: absolute;
+    display: flex;
+    justify-content: center;
+    align-items: center;
   }
 }
