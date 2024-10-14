@@ -2,9 +2,9 @@ import os
 from enum import Enum
 from typing import Dict, List, Optional
 from uuid import UUID
-from sqlmodel import SQLModel
 
 from megaparse.config import MegaparseConfig
+from sqlmodel import SQLModel
 
 from quivr_core.base_config import QuivrBaseConfig
 from quivr_core.processor.splitter import SplitterConfig

@@ -10,7 +10,7 @@ from sqlalchemy.ext.asyncio import AsyncAttrs
 from sqlmodel import UUID as PGUUID
 from sqlmodel import Field, Relationship, SQLModel
 
-from quivr_api.modules.knowledge.dto.outputs import KnowledgeDTO
+from quivr_api.modules.knowledge.dto.outputs import KnowledgeDTO, sort_knowledge_dtos
 from quivr_api.modules.knowledge.entity.knowledge_brain import KnowledgeBrain
 from quivr_api.modules.sync.entity.sync_models import Sync
 
@@ -50,16 +50,23 @@ class KnowledgeDB(AsyncAttrs, SQLModel, table=True):
     created_at: datetime | None = Field(
         default=None,
         sa_column=Column(
-            TIMESTAMP(timezone=False),
+            TIMESTAMP(timezone=True),
             server_default=text("CURRENT_TIMESTAMP"),
         ),
     )
     updated_at: datetime | None = Field(
         default=None,
         sa_column=Column(
-            TIMESTAMP(timezone=False),
+            TIMESTAMP(timezone=True),
             server_default=text("CURRENT_TIMESTAMP"),
             onupdate=datetime.utcnow,
+        ),
+    )
+
+    last_synced_at: datetime | None = Field(
+        default=None,
+        sa_column=Column(
+            TIMESTAMP(timezone=True),
         ),
     )
     metadata_: Optional[Dict[str, str]] = Field(
@@ -99,10 +106,10 @@ class KnowledgeDB(AsyncAttrs, SQLModel, table=True):
         self, get_children: bool = True, get_parent: bool = True
     ) -> KnowledgeDTO:
         assert (
-            self.updated_at
+            await self.awaitable_attrs.updated_at
         ), "knowledge should be inserted before transforming to dto"
         assert (
-            self.created_at
+            await self.awaitable_attrs.created_at
         ), "knowledge should be inserted before transforming to dto"
         brains = await self.awaitable_attrs.brains
         children: list[KnowledgeDB] = (
@@ -111,6 +118,7 @@ class KnowledgeDB(AsyncAttrs, SQLModel, table=True):
         children_dto = await asyncio.gather(
             *[c.to_dto(get_children=False) for c in children]
         )
+        children_dto = sort_knowledge_dtos(children_dto)
         parent = await self.awaitable_attrs.parent if get_parent else None
         parent_dto = await parent.to_dto(get_children=False) if parent else None
 
@@ -125,8 +133,8 @@ class KnowledgeDB(AsyncAttrs, SQLModel, table=True):
             is_folder=self.is_folder,
             file_size=self.file_size or 0,
             file_sha1=self.file_sha1,
-            updated_at=self.updated_at,
-            created_at=self.created_at,
+            updated_at=await self.awaitable_attrs.updated_at,
+            created_at=await self.awaitable_attrs.created_at,
             metadata=self.metadata_,  # type: ignore
             brains=[b.model_dump() for b in brains],
             parent=parent_dto,
@@ -134,4 +142,5 @@ class KnowledgeDB(AsyncAttrs, SQLModel, table=True):
             user_id=self.user_id,
             sync_id=self.sync_id,
             sync_file_id=self.sync_file_id,
+            last_synced_at=self.last_synced_at,
         )

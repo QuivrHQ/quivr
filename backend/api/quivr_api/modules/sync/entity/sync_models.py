@@ -2,6 +2,7 @@ import hashlib
 import io
 from dataclasses import dataclass
 from datetime import datetime
+from enum import Enum, auto
 from typing import Dict, List, Optional
 from uuid import UUID
 
@@ -17,6 +18,7 @@ from sqlmodel import (  # noqa: F811
 )
 from sqlmodel import UUID as PGUUID
 
+from quivr_api.modules.sync.dto.inputs import SyncStatus
 from quivr_api.modules.sync.dto.outputs import SyncProvider, SyncsOutput
 from quivr_api.modules.user.entity.user_identity import User
 
@@ -49,6 +51,11 @@ class SyncFile(BaseModel):
     type: Optional[str] = None
 
 
+class SyncType(Enum):
+    FOLDER = auto()
+    FILE = auto()
+
+
 class Sync(SQLModel, table=True):
     __tablename__ = "syncs"  # type: ignore
 
@@ -62,6 +69,7 @@ class Sync(SQLModel, table=True):
         default=None, sa_column=Column("credentials", JSON)
     )
     state: Dict[str, str] | None = Field(default=None, sa_column=Column("state", JSON))
+    status: str = Field(default=SyncStatus.SYNCING)
     created_at: datetime | None = Field(
         default=None,
         sa_column=Column(
@@ -77,7 +85,6 @@ class Sync(SQLModel, table=True):
             onupdate=datetime.utcnow,
         ),
     )
-    last_synced_at: datetime | None = Field(default=None)
     additional_data: dict | None = Field(
         default=None, sa_column=Column("additional_data", JSON)
     )

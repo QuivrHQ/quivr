@@ -8,6 +8,7 @@ authors = [
 dependencies = [
     "quivr-core[all]",
     "quivr-api",
+    "quivr-diff-assistant",
     "celery[redis]>=5.0.0",
     "python-dotenv>=1.0.0",
     "playwright>=1.0.0",
@@ -48,3 +49,7 @@ path = "../quivr-core"
 [[tool.rye.sources]]
 name = "quivr-api"
 path = "../quivr-api"
+
+[[tool.rye.sources]]
+name = "quivr-diff-assistant"
+path = "./diff-assistant"

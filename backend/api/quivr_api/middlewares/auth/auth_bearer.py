@@ -1,6 +1,7 @@
 import os
 from typing import Optional
 
+import structlog
 from fastapi import Depends, HTTPException, Request
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 
@@ -12,6 +13,8 @@ from quivr_api.modules.api_key.service.api_key_service import ApiKeyService
 from quivr_api.modules.user.entity.user_identity import UserIdentity
 
 api_key_service = ApiKeyService()
+
+logger = structlog.stdlib.get_logger("quivr_api.access")
 
 
 class AuthBearer(HTTPBearer):
@@ -66,5 +69,10 @@ class AuthBearer(HTTPBearer):
 auth_bearer = AuthBearer()
 
 
-def get_current_user(user: UserIdentity = Depends(auth_bearer)) -> UserIdentity:
+async def get_current_user(user: UserIdentity = Depends(auth_bearer)) -> UserIdentity:
+    # Due to context switch in FastAPI executor we can't get this id back
+    # We log it as an additional log so we can get information if exception was raised
+    # https://www.structlog.org/en/stable/contextvars.html
+    structlog.contextvars.bind_contextvars(client_id=str(user.id))
+    logger.info("Authentication success")
     return user

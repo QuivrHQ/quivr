@@ -1,17 +1,17 @@
 import logging
 import os
 
-import litellm
 import sentry_sdk
 from dotenv import load_dotenv  # type: ignore
-from fastapi import FastAPI, HTTPException, Request
-from fastapi.responses import HTMLResponse, JSONResponse
+from fastapi import FastAPI, Request
+from fastapi.responses import HTMLResponse
 from pyinstrument import Profiler
 from sentry_sdk.integrations.fastapi import FastApiIntegration
 from sentry_sdk.integrations.starlette import StarletteIntegration
 
-from quivr_api.logger import get_logger
+from quivr_api.logger import get_logger, stop_log_queue
 from quivr_api.middlewares.cors import add_cors_middleware
+from quivr_api.middlewares.logging_middleware import LoggingMiddleware
 from quivr_api.modules.analytics.controller.analytics_routes import analytics_router
 from quivr_api.modules.api_key.controller import api_key_router
 from quivr_api.modules.assistant.controller import assistant_router
@@ -27,21 +27,13 @@ from quivr_api.modules.upload.controller import upload_router
 from quivr_api.modules.user.controller import user_router
 from quivr_api.routes.crawl_routes import crawl_router
 from quivr_api.routes.subscription_routes import subscription_router
-from quivr_api.utils import handle_request_validation_error
 from quivr_api.utils.telemetry import maybe_send_telemetry
 
 load_dotenv()
 
-# Set the logging level for all loggers to WARNING
+
 logging.basicConfig(level=logging.INFO)
-logging.getLogger("httpx").setLevel(logging.WARNING)
-logging.getLogger("LiteLLM").setLevel(logging.WARNING)
-logging.getLogger("litellm").setLevel(logging.WARNING)
-get_logger("quivr_core")
-litellm.set_verbose = False  # type: ignore
-
-
-logger = get_logger(__name__)
+logger = get_logger("quivr_api")
 
 
 def before_send(event, hint):
@@ -71,6 +63,9 @@ if sentry_dsn:
 
 app = FastAPI()
 add_cors_middleware(app)
+
+app.add_middleware(LoggingMiddleware)
+
 
 app.include_router(brain_router)
 app.include_router(chat_router)
@@ -106,15 +101,10 @@ if PROFILING:
             return await call_next(request)
 
 
-@app.exception_handler(HTTPException)
-async def http_exception_handler(_, exc):
-    return JSONResponse(
-        status_code=exc.status_code,
-        content={"detail": exc.detail},
-    )
+@app.on_event("shutdown")
+def shutdown_event():
+    stop_log_queue.set()
 
-
-handle_request_validation_error(app)
 
 if os.getenv("TELEMETRY_ENABLED") == "true":
     logger.info("Telemetry enabled, we use telemetry to collect anonymous usage data.")

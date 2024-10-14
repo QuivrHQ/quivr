@@ -3,9 +3,7 @@
 @import "tailwindcss/utilities";
 @import './colors.css';
 
-* {
-  @apply scrollbar;
-}
+
 
 main {
   @apply max-w-screen-xl mx-auto flex flex-col;
@@ -64,6 +62,7 @@ div:focus {
   --background-blur: rgba(0, 0, 0, 0.9);
   --background-success: var(--success-lightest);
   --background-error: var(--dangerous-lightest);
+  --background-pending: var(--background-3);
 
   /* Borders */
   --border-0: var(--grey-5);
@@ -101,6 +100,7 @@ body.dark_mode {
   --background-blur: rgba(0, 0, 0, 0.9);
   --background-success: var(--black-5);
   --background-error: var(--black-5);
+  --background-pending: var(--black-5);
  
   /* Borders */
   --border-0: var(--black-5);

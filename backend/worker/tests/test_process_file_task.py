@@ -183,6 +183,7 @@ async def test_process_sync_file(
     assert km.status == KnowledgeStatus.PROCESSED
     assert km.brains[0].brain_id == input_km.brains[0].brain_id
     assert km.file_sha1 is not None
+    assert km.last_synced_at is not None
 
     # Check vectors where added
     vecs = list(
@@ -229,6 +230,7 @@ async def test_process_sync_folder(
         assert km.brains[0]["brain_id"]
         assert km.brains[0]["brain_id"] == input_km.brains[0].brain_id
         assert km.file_sha1 is not None
+        assert km.last_synced_at is not None
 
     # Check vectors where added
     vecs = list((await session.exec(select(Vector))).all())

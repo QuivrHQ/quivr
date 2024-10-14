@@ -1,4 +1,4 @@
-# Knowledge Processing
+# Knowledge Processing Task
 
 ## Steps for Processing
 
@@ -35,11 +35,19 @@
 If an exception occurs during the parsing loop, the following steps are taken:
 
 1. Roll back the current transaction (this only affects the vectors) if they were set. The processing loop performs the following stateful operations in this order:
+
    - Creating knowledges (with `Processing` status).
-   - Downloading sync files from sync provider
    - Updating knowledges: linking them to brains.
    - Creating vectors.
    - Updating knowledges.
+
+   **Transaction Safety for Each Operation:**
+
+   - **Creating knowledge and linking to brains**: These operations can be retried safely. Knowledge is only recreated if it does not already exist in the database, allowing for safe retry.
+   - **Linking knowledge to brains**: Only links the brain if it is not already associated with the knowledge. Safe for retry.
+   - **Creating vectors**:
+     - This operation should be rolled back if an error occurs afterward. Otherwise, the knowledge could remain in `Processing` or `ERROR` status with associated vectors.
+     - Reprocessing the knowledge would result in reinserting the vectors into the database, leading to duplicate vectors for the same knowledge.
 
 **Transaction Safety for Each Operation:**
 
@@ -70,6 +78,36 @@ For `process_knowledge` tasks involving the processing of a sync folder, the fol
 Why can’t we set all children to `ERROR`? This introduces a potential race condition: Sync knowledge can be added to a brain independently from its parent, so it’s unclear if the `PROCESSING` status is tied to the failed task. Although keeping a `task_id` associated with `knowledge_id` could help, it’s error-prone and impacts the database schema, which would have significant consequences.
 
 However, sync knowledge added to a brain will be reprocessed after some time through the sync update task, ensuring that their status will eventually be set to the correct state.
+
+# Syncing Knowledge task
+
+1. **Syncing Knowledge Syncs of Type Files:**
+   - Outdated file syncs are fetched in batches.
+   - For each file, if the remote file's `last_modified_at` is newer than the local `last_synced_at`, the file is updated.
+   - If the file is missing remotely, the db knowledge is deleted.
+2. **Syncing Knowledge Folders:**
+   - Outdated folder syncs are retrieved in batches.
+   - For each folder, its children (files and subfolders) are fetched from both the database and the remote provider.
+   - Remote children missing from the local database are added and processed.
+   - **If a Folder is Not Found:**
+     - If a folder no longer exists remotely, it is deleted locally, along with all associated knowledge entries.
+
+🔴 **Key Considerations**
+
+- **Batch Processing:**
+
+  - Both file and folder syncs are handled in batches, ensuring the system can process large data efficiently.
+
+- **Error Handling:**
+
+  - The system logs errors such as missing credentials or files, allowing the sync process to continue or fail gracefully.
+
+- **Savepoints and Rollback:**
+
+  - During file and folder processing, savepoints are created. If an error occurs, the transaction can be rolled back, ensuring the original knowledge remains unmodified.
+
+- **Deleting Folders:**
+  - If a folder is missing remotely, it triggers the deletion of the folder and all associated knowledge entries from the local system.
 
 ---
 

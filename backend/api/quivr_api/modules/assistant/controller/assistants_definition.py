@@ -1,8 +1,11 @@
 from quivr_api.modules.assistant.dto.inputs import InputAssistant
 from quivr_api.modules.assistant.dto.outputs import (
     AssistantOutput,
+    ConditionalInput,
+    InputBoolean,
     InputFile,
     Inputs,
+    InputSelectText,
     Pricing,
 )
 
@@ -166,10 +169,10 @@ def validate_assistant_input(
 
 assistant1 = AssistantOutput(
     id=1,
-    name="Assistant 1",
-    description="Assistant 1 description",
+    name="Compliance Check",
+    description="Allows analyzing the compliance of the information contained in documents against charter or regulatory requirements.",
     pricing=Pricing(),
-    tags=["tag1", "tag2"],
+    tags=["Disabled"],
     input_description="Input description",
     output_description="Output description",
     inputs=Inputs(
@@ -183,19 +186,66 @@ assistant1 = AssistantOutput(
 
 assistant2 = AssistantOutput(
     id=2,
-    name="Assistant 2",
-    description="Assistant 2 description",
+    name="Consistency Check",
+    description="Ensures that the information in one document is replicated identically in another document.",
     pricing=Pricing(),
-    tags=["tag1", "tag2"],
+    tags=[],
     input_description="Input description",
     output_description="Output description",
     icon_url="https://example.com/icon.png",
     inputs=Inputs(
         files=[
-            InputFile(key="file_1", description="File description"),
-            InputFile(key="file_2", description="File description"),
+            InputFile(key="Document 1", description="File description"),
+            InputFile(key="Document 2", description="File description"),
+        ],
+        select_texts=[
+            InputSelectText(
+                key="DocumentsType",
+                description="Select Documents Type",
+                options=[
+                    "Etiquettes VS Cahier des charges",
+                    "Fiche Dev VS Cahier des charges",
+                ],
+            ),
         ],
     ),
 )
 
-assistants = [assistant1, assistant2]
+assistant3 = AssistantOutput(
+    id=3,
+    name="Difference Detection",
+    description="Highlights differences between one document and another after modifications.",
+    pricing=Pricing(),
+    tags=[],
+    input_description="Input description",
+    output_description="Output description",
+    icon_url="https://example.com/icon.png",
+    inputs=Inputs(
+        files=[
+            InputFile(key="Document 1", description="File description"),
+            InputFile(key="Document 2", description="File description"),
+        ],
+        booleans=[
+            InputBoolean(
+                key="Hard-to-Read Document?", description="Boolean description"
+            ),
+        ],
+        select_texts=[
+            InputSelectText(
+                key="DocumentsType",
+                description="Select Documents Type",
+                options=["Etiquettes", "Cahier des charges"],
+            ),
+        ],
+        conditional_inputs=[
+            ConditionalInput(
+                key="DocumentsType",
+                conditional_key="Hard-to-Read Document?",
+                condition="equals",
+                value="Etiquettes",
+            ),
+        ],
+    ),
+)
+
+assistants = [assistant1, assistant2, assistant3]

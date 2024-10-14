@@ -2,11 +2,16 @@ import asyncio
 import os
 from uuid import UUID
 
+import structlog
+import torch
+from celery import signals
+from celery.exceptions import SoftTimeLimitExceeded, TimeLimitExceeded
 from celery.schedules import crontab
 from celery.signals import worker_process_init
+from celery.utils.log import get_task_logger
 from dotenv import load_dotenv
 from quivr_api.celery_config import celery
-from quivr_api.logger import get_logger
+from quivr_api.logger import setup_logger
 from quivr_api.models.settings import settings
 from quivr_api.modules.brain.integrations.Notion.Notion_connector import NotionConnector
 from quivr_api.modules.dependencies import get_supabase_client
@@ -16,16 +21,27 @@ from sqlalchemy.ext.asyncio import AsyncEngine, create_async_engine
 from quivr_worker.assistants.assistants import aprocess_assistant_task
 from quivr_worker.check_premium import check_is_premium
 from quivr_worker.process import aprocess_file_task
+from quivr_worker.syncs.update_syncs import refresh_sync_files, refresh_sync_folders
 from quivr_worker.utils.utils import _patch_json
 
+torch.set_num_threads(1)
+
+setup_logger("worker.log", send_log_server=False)
 load_dotenv()
 
-get_logger("quivr_core")
-logger = get_logger("celery_worker")
+logger = structlog.wrap_logger(get_task_logger(__name__))
+
 _patch_json()
 
 supabase_client = get_supabase_client()
 async_engine: AsyncEngine | None = None
+
+
+@signals.task_prerun.connect
+def on_task_prerun(sender, task_id, task, args, kwargs, **_):
+    structlog.contextvars.bind_contextvars(task_id=task_id, task_name=task.name)
+    if vars := kwargs.get("contextvars", None):
+        structlog.contextvars.bind_contextvars(**vars)
 
 
 @worker_process_init.connect
@@ -51,8 +67,10 @@ def init_worker(**kwargs):
     retries=3,
     default_retry_delay=1,
     name="process_file_task",
-    autoretry_for=(Exception,),
-    dont_autoretry_for=(FileExistsError,),
+    time_limit=600,  # 10 min
+    soft_time_limit=300,
+    autoretry_for=(Exception,),  # SoftTimeLimitExceeded  should not included?
+    dont_autoretry_for=(SoftTimeLimitExceeded, TimeLimitExceeded),
 )
 def process_file_task(
     knowledge_id: UUID,
@@ -68,6 +86,37 @@ def process_file_task(
     loop.run_until_complete(
         aprocess_file_task(async_engine=async_engine, knowledge_id=knowledge_id)
     )
+
+
+@celery.task(
+    retries=3,
+    default_retry_delay=1,
+    name="refresh_sync_files_task",
+    soft_time_limit=3600,
+    autoretry_for=(Exception,),
+)
+def refresh_sync_files_task():
+    if async_engine is None:
+        init_worker()
+    assert async_engine
+    logger.info("Update sync task started")
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(refresh_sync_files(async_engine=async_engine))
+
+
+@celery.task(
+    retries=3,
+    default_retry_delay=1,
+    name="refresh_sync_folders_task",
+    autoretry_for=(Exception,),
+)
+def refresh_sync_folders_task():
+    if async_engine is None:
+        init_worker()
+    assert async_engine
+    logger.info("Update sync task started")
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(refresh_sync_folders(async_engine=async_engine))
 
 
 @celery.task(
@@ -123,60 +172,21 @@ def check_is_premium_task():
     check_is_premium(supabase_client)
 
 
-# @celery.task(name="process_notion_sync_task")
-# def process_notion_sync_task():
-#     global async_engine
-#     assert async_engine
-#     loop = asyncio.get_event_loop()
-#     loop.run_until_complete(process_notion_sync(async_engine))
-
-
-# @celery.task(name="fetch_and_store_notion_files_task")
-# def fetch_and_store_notion_files_task(
-#     access_token: str, user_id: UUID, sync_user_id: int
-# ):
-#     if async_engine is None:
-#         init_worker()
-#     assert async_engine
-#     try:
-#         logger.debug("Fetching and storing Notion files")
-#         loop = asyncio.get_event_loop()
-#         loop.run_until_complete(
-#             fetch_and_store_notion_files_async(
-#                 async_engine, access_token, user_id, sync_user_id
-#             )
-#         )
-#         sync_user_service.update_sync_user_status(
-#             sync_user_id=sync_user_id, status=str(SyncStatus.SYNCED)
-#         )
-#     except Exception:
-#         logger.error("Error fetching and storing Notion files")
-#         sync_user_service.update_sync_user_status(
-#             sync_user_id=sync_user_id, status=str(SyncStatus.ERROR)
-#         )
-
-
-# @celery.task(name="clean_notion_user_syncs")
-# def clean_notion_user_syncs():
-#     logger.debug("Cleaning Notion user syncs")
-#     sync_user_service.clean_notion_user_syncs()
-
-
 celery.conf.beat_schedule = {
     "ping_telemetry": {
         "task": f"{__name__}.ping_telemetry",
         "schedule": crontab(minute="*/30", hour="*"),
     },
-    # "process_active_syncs": {
-    #     "task": "process_active_syncs_task",
-    #     "schedule": crontab(minute="*/1", hour="*"),
-    # },
     "process_premium_users": {
         "task": "check_is_premium_task",
         "schedule": crontab(minute="*/1", hour="*"),
     },
-    "process_notion_sync": {
-        "task": "process_notion_sync_task",
-        "schedule": crontab(minute="0", hour="*/6"),
+    "refresh_sync_files": {
+        "task": "refresh_sync_files_task",
+        "schedule": crontab(hour="*/8"),
+    },
+    "refresh_sync_folders": {
+        "task": "refresh_sync_folders_task",
+        "schedule": crontab(hour="*/8"),
     },
 }

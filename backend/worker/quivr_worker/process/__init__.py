@@ -2,7 +2,8 @@ from uuid import UUID
 
 from sqlalchemy.ext.asyncio import AsyncEngine
 
-from quivr_worker.process.processor import KnowledgeProcessor, build_processor_services
+from quivr_worker.process.processor import KnowledgeProcessor
+from quivr_worker.utils.services import build_processor_services
 
 
 async def aprocess_file_task(async_engine: AsyncEngine, knowledge_id: UUID):

@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import Dict, List, Optional
 from uuid import UUID
 
@@ -45,10 +46,10 @@ class KnowledgeUpdate(BaseModel):
     source: Optional[str] = None
     source_link: Optional[str] = None
     metadata: Optional[Dict[str, str]] = None
+    last_synced_at: Optional[datetime] = None
 
 
 class LinkKnowledgeBrain(BaseModel):
-    bulk_id: UUID
     knowledge: KnowledgeDTO
     brain_ids: List[UUID]
 
