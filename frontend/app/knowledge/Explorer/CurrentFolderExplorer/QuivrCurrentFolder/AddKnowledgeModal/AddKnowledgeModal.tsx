@@ -7,7 +7,10 @@ import { Modal } from "@/lib/components/ui/Modal/Modal";
 import QuivrButton from "@/lib/components/ui/QuivrButton/QuivrButton";
 import { Tabs } from "@/lib/components/ui/Tabs/Tabs";
 import { TextInput } from "@/lib/components/ui/TextInput/TextInput";
-import { AddKnowledgeData } from "@/lib/types/Knowledge";
+import {
+  AddKnowledgeFileData,
+  AddKnowledgeUrlData,
+} from "@/lib/types/Knowledge";
 import { Tab } from "@/lib/types/Tab";
 
 import styles from "./AddKnowledgeModal.module.scss";
@@ -29,7 +32,7 @@ const AddKnowledgeModal = ({
   const [selectedKnowledges, setSelectedKnowledges] = useState<
     (File | string)[]
   >([]);
-  const { addKnowledge } = useKnowledgeApi();
+  const { addKnowledgeFile, addKnowledgeUrl } = useKnowledgeApi();
 
   const FILE_TYPES = ["pdf", "docx", "doc", "txt"];
 
@@ -54,12 +57,12 @@ const AddKnowledgeModal = ({
       await Promise.all(
         files.map(async (file) => {
           try {
-            await addKnowledge(
+            await addKnowledgeFile(
               {
                 file_name: file.name,
                 parent_id: null,
                 is_folder: false,
-              } as AddKnowledgeData,
+              } as AddKnowledgeFileData,
               file
             );
           } catch (error) {
@@ -71,14 +74,11 @@ const AddKnowledgeModal = ({
       await Promise.all(
         urls.map(async (url) => {
           try {
-            await addKnowledge(
-              {
-                file_name: url,
-                parent_id: null,
-                is_folder: false,
-              } as AddKnowledgeData,
-              new File([], url)
-            );
+            await addKnowledgeUrl({
+              url: url,
+              parent_id: null,
+              is_folder: false,
+            } as AddKnowledgeUrlData);
           } catch (error) {
             console.error("Failed to add knowledge from URL:", error);
           }
