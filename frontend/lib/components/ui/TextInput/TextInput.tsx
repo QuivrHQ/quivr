@@ -1,3 +1,5 @@
+import { useState } from "react";
+
 import styles from "./TextInput.module.scss";
 
 import { Icon } from "../Icon/Icon";
@@ -13,6 +15,7 @@ type TextInputProps = {
   crypted?: boolean;
   onKeyDown?: (event: React.KeyboardEvent) => void;
   small?: boolean;
+  url?: boolean;
 };
 
 export const TextInput = ({
@@ -26,7 +29,51 @@ export const TextInput = ({
   crypted,
   onKeyDown,
   small,
+  url,
 }: TextInputProps): JSX.Element => {
+  const [warning, setWarning] = useState<string>("");
+
+  const isValidUrl = (value: string): boolean => {
+    try {
+      new URL(value);
+
+      return true;
+    } catch (_) {
+      return false;
+    }
+  };
+
+  const handleSubmit = () => {
+    if (!url || isValidUrl(inputValue)) {
+      setWarning("");
+      onSubmit?.();
+    } else {
+      setWarning("Please enter a valid URL.");
+    }
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setInputValue?.(e.target.value);
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter") {
+      handleSubmit();
+    }
+    onKeyDown?.(e);
+  };
+
+  const getIconColor = () => {
+    if (!inputValue) {
+      return "grey";
+    }
+    if (url) {
+      return isValidUrl(inputValue) ? "accent" : "grey";
+    }
+
+    return "accent";
+  };
+
   return (
     <div
       className={`
@@ -40,21 +87,19 @@ export const TextInput = ({
         className={styles.text_input}
         type={crypted ? "password" : "text"}
         value={inputValue}
-        onChange={(e) => setInputValue?.(e.target.value)}
+        onChange={handleInputChange}
         placeholder={label}
-        onKeyDown={(e) => {
-          if (e.key === "Enter" && onSubmit) {
-            onSubmit();
-          }
-          onKeyDown?.(e);
-        }}
+        onKeyDown={handleKeyDown}
       />
+      {warning && !isValidUrl(inputValue) && (
+        <div className={styles.warning}>{warning}</div>
+      )}
       {!simple && iconName && (
         <Icon
           name={iconName}
           size={small ? "small" : "normal"}
-          color={onSubmit ? (inputValue ? "accent" : "grey") : "black"}
-          onClick={onSubmit}
+          color={getIconColor()}
+          onClick={handleSubmit}
         />
       )}
     </div>

@@ -52,4 +52,9 @@
       box-shadow: none;
     }
   }
+
+  .warning {
+    font-size: Typography.$tiny;
+    color: var(--dangerous);
+  }
 }

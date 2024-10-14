@@ -6,6 +6,7 @@ import { FileInput } from "@/lib/components/ui/FileInput/FileInput";
 import { Modal } from "@/lib/components/ui/Modal/Modal";
 import QuivrButton from "@/lib/components/ui/QuivrButton/QuivrButton";
 import { Tabs } from "@/lib/components/ui/Tabs/Tabs";
+import { TextInput } from "@/lib/components/ui/TextInput/TextInput";
 import { AddKnowledgeData } from "@/lib/types/Knowledge";
 import { Tab } from "@/lib/types/Tab";
 
@@ -21,24 +22,28 @@ const AddKnowledgeModal = ({
   setIsOpen,
 }: AddKnowledgeModalProps): JSX.Element => {
   const [loading, setLoading] = useState<boolean>(false);
+  const [currentUrl, setCurrentUrl] = useState<string>("");
   const [files, setFiles] = useState<File[]>([]);
-  const [selectedTab, setSelectedTab] = useState<string>("From Documents");
-  const [selectedKnowledges, setSelectedKnowledges] = useState<File[]>([]);
+  const [urls, setUrls] = useState<string[]>([]);
+  const [selectedTab, setSelectedTab] = useState<string>("Documents");
+  const [selectedKnowledges, setSelectedKnowledges] = useState<
+    (File | string)[]
+  >([]);
   const { addKnowledge } = useKnowledgeApi();
 
   const FILE_TYPES = ["pdf", "docx", "doc", "txt"];
 
   const tabs: Tab[] = [
     {
-      label: "From Documents",
-      isSelected: selectedTab === "From Documents",
-      onClick: () => setSelectedTab("From Documents"),
+      label: "Documents",
+      isSelected: selectedTab === "Documents",
+      onClick: () => setSelectedTab("Documents"),
       iconName: "file",
     },
     {
-      label: "From URLs",
-      isSelected: selectedTab === "From URLs",
-      onClick: () => setSelectedTab("From URLs"),
+      label: "Websites' pages",
+      isSelected: selectedTab === "Websites",
+      onClick: () => setSelectedTab("Websites"),
       iconName: "link",
     },
   ];
@@ -62,13 +67,32 @@ const AddKnowledgeModal = ({
           }
         })
       );
+
+      await Promise.all(
+        urls.map(async (url) => {
+          try {
+            await addKnowledge(
+              {
+                file_name: url,
+                parent_id: null,
+                is_folder: false,
+              } as AddKnowledgeData,
+              new File([], url)
+            );
+          } catch (error) {
+            console.error("Failed to add knowledge from URL:", error);
+          }
+        })
+      );
     } catch (error) {
       console.error("Failed to add all knowledges:", error);
     } finally {
       setLoading(false);
       setIsOpen(false);
       setFiles([]);
+      setUrls([]);
       setSelectedKnowledges([]);
+      setCurrentUrl("");
     }
   };
 
@@ -80,23 +104,26 @@ const AddKnowledgeModal = ({
     setFiles((prevFiles) => [...prevFiles, ...newFiles]);
   };
 
-  const handleCheckboxChange = (file: File, checked: boolean) => {
+  const handleCheckboxChange = (item: File | string, checked: boolean) => {
     if (checked) {
-      setSelectedKnowledges([...selectedKnowledges, file]);
+      setSelectedKnowledges([...selectedKnowledges, item]);
     } else {
-      setSelectedKnowledges(selectedKnowledges.filter((f) => f !== file));
+      setSelectedKnowledges(selectedKnowledges.filter((f) => f !== item));
     }
   };
 
-  const handleRemoveSelectedFiles = () => {
+  const handleRemoveSelectedItems = () => {
     setFiles(files.filter((file) => !selectedKnowledges.includes(file)));
+    setUrls(urls.filter((url) => !selectedKnowledges.includes(url)));
     setSelectedKnowledges([]);
   };
 
   useEffect(() => {
     if (!isOpen) {
       setFiles([]);
+      setUrls([]);
       setSelectedKnowledges([]);
+      setCurrentUrl("");
     }
   }, [isOpen]);
 
@@ -113,27 +140,46 @@ const AddKnowledgeModal = ({
         <div className={styles.modal_content}>
           <div className={styles.top}>
             <Tabs tabList={tabs} />
-            <FileInput
-              label="Upload Files"
-              onFileChange={handleFileChange}
-              acceptedFileTypes={FILE_TYPES}
-              hideFileName={true}
-              handleMultipleFiles={true}
-            />
-            {!!files.length && (
+            <div className={styles.inputs_wrapper}>
+              {selectedTab === "Documents" && (
+                <FileInput
+                  label="Upload Files"
+                  onFileChange={handleFileChange}
+                  acceptedFileTypes={FILE_TYPES}
+                  hideFileName={true}
+                  handleMultipleFiles={true}
+                />
+              )}
+              {selectedTab === "Websites" && (
+                <div className={styles.url_input}>
+                  <TextInput
+                    label="URL"
+                    inputValue={currentUrl}
+                    setInputValue={setCurrentUrl}
+                    iconName="followUp"
+                    url={true}
+                    onSubmit={() => {
+                      setCurrentUrl("");
+                      setUrls((prevUrls) => [...prevUrls, currentUrl]);
+                    }}
+                  />
+                </div>
+              )}
+            </div>
+            {(!!files.length || !!urls.length) && (
               <div className={styles.list_header}>
                 <QuivrButton
                   label="Remove"
                   iconName="delete"
                   color="dangerous"
-                  onClick={handleRemoveSelectedFiles}
+                  onClick={handleRemoveSelectedItems}
                   disabled={selectedKnowledges.length === 0}
                 />
               </div>
             )}
             <div
               className={`${styles.file_list} ${
-                !files.length ? styles.empty : ""
+                !files.length && !urls.length ? styles.empty : ""
               }`}
             >
               {files.map((file, index) => (
@@ -145,6 +191,15 @@ const AddKnowledgeModal = ({
                     }
                   />
                   <span>{file.name}</span>
+                </div>
+              ))}
+              {urls.map((url, index) => (
+                <div key={index} className={styles.file_item}>
+                  <Checkbox
+                    checked={selectedKnowledges.includes(url)}
+                    setChecked={(checked) => handleCheckboxChange(url, checked)}
+                  />
+                  <span>{url}</span>
                 </div>
               ))}
             </div>
@@ -162,7 +217,7 @@ const AddKnowledgeModal = ({
               color="primary"
               onClick={handleAddKnowledge}
               isLoading={loading}
-              disabled={files.length === 0}
+              disabled={files.length === 0 && urls.length === 0}
               important={true}
             />
           </div>
