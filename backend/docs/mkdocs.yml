@@ -66,6 +66,7 @@ nav:
       - Storage:
           - storage/index.md
           - storage/base.md
+          - storage/local_storage.md
       - Parsers:
           - parsers/index.md
           - parsers/megaparse.md
