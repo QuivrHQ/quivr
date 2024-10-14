@@ -59,7 +59,6 @@ class MegaparseProcessor(ProcessorBase):
     async def process_file_inner(self, file: QuivrFile) -> list[Document]:
         mega_parse = MegaParse(file_path=file.path, config=self.megaparse_config)  # type: ignore
         document: Document = await mega_parse.aload()
-        print("\n\n document: ", document.page_content)
         if len(document.page_content) > self.splitter_config.chunk_size:
             docs = self.text_splitter.split_documents([document])
             for doc in docs:

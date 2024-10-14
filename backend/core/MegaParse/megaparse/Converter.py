@@ -320,22 +320,28 @@ class PDFConverter:
         else:
             raise ValueError(f"Method {self.method} not supported")
 
-        if not gpt4o_cleaner:
-            return LangChainDocument(
-                page_content=parsed_md,
-                metadata={"filename": file_path.name, "type": "pdf"},
-            )
-        else:
+        if gpt4o_cleaner:
             md_processor = MarkdownProcessor(
                 parsed_md,
                 strict=True,
                 remove_pagination=True,
             )
             md_cleaned = md_processor.process(gpt4o_cleaner=gpt4o_cleaner)
-            return LangChainDocument(
-                page_content=md_cleaned,
-                metadata={"filename": file_path.name, "type": "pdf"},
-            )
+            parsed_md = md_cleaned
+
+        if (
+            len(parsed_md) < 5
+            and file_path.stat().st_size > 100
+            and self.strategy == "fast"
+        ):
+            logger.info(f"Switching to auto strategy for {file_path.name}")
+            self.strategy = "auto"
+            return await self.convert(file_path, model, gpt4o_cleaner=gpt4o_cleaner)
+
+        return LangChainDocument(
+            page_content=parsed_md,
+            metadata={"filename": file_path.name, "type": "pdf"},
+        )
 
     def save_md(self, md_content: str, file_path: Path | str) -> None:
         with open(file_path, "w") as f:

@@ -29,6 +29,7 @@ from quivr_api.modules.sync.service.sync_service import (
     ISyncService,
     ISyncUserService,
 )
+from quivr_api.modules.sync.utils.normalize import sanitize_filename
 from quivr_api.modules.sync.utils.sync import BaseSync
 from quivr_api.modules.upload.service.upload_file import (
     check_file_exists,
@@ -167,6 +168,8 @@ class SyncUtils:
             ".doc",
         ]:
             raise ValueError(f"Incompatible file extension for {downloaded_file}")
+
+        storage_path = sanitize_filename(storage_path)
 
         response = await upload_file_storage(
             downloaded_file.file_data,
