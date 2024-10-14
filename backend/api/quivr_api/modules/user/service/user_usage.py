@@ -56,11 +56,7 @@ class UserUsage(UserIdentity):
         """
         Fetch the user monthly usage from the database
         """
-        posthog = PostHogSettings()
         request = self.supabase_db.get_user_requests_count_for_month(self.id, date)
-        posthog.set_user_properties(
-            self.id, "MONTHLY_USAGE", {"monthly_chat_usage": request}
-        )
 
         return request
 
