@@ -13,18 +13,26 @@ logger = get_logger(__name__)
 
 class VectorService(BaseService[VectorRepository]):
     repository_cls = VectorRepository
-    _embedding: Embeddings = get_embedding_client()
 
-    def __init__(self, repository: VectorRepository):
+    def __init__(
+        self, repository: VectorRepository, embedder: Embeddings | None = None
+    ):
+        if embedder is None:
+            self.embedder = get_embedding_client()
+        else:
+            self.embedder = embedder
+
         self.repository = repository
 
-    def create_vectors(self, chunks: List[Document], knowledge_id: UUID) -> List[UUID]:
+    async def create_vectors(
+        self, chunks: List[Document], knowledge_id: UUID, autocommit: bool = True
+    ) -> List[UUID]:
         # Vector is created upon the user's first question asked
         logger.info(
             f"New vector entry in vectors table for knowledge_id {knowledge_id}"
         )
         # FIXME ADD a check in case of failure
-        embeddings = self._embedding.embed_documents(
+        embeddings = self.embedder.embed_documents(
             [chunk.page_content for chunk in chunks]
         )
         new_vectors = [
@@ -36,14 +44,14 @@ class VectorService(BaseService[VectorRepository]):
             )
             for i, chunk in enumerate(chunks)
         ]
-        created_vector = self.repository.create_vectors(new_vectors)
+        created_vector = await self.repository.create_vectors(new_vectors, autocommit)
 
         return [vector.id for vector in created_vector if vector.id]
 
-    def similarity_search(self, query: str, brain_id: UUID, k: int = 40):
-        vectors = self._embedding.embed_documents([query])
+    async def similarity_search(self, query: str, brain_id: UUID, k: int = 40):
+        vectors = self.embedder.embed_documents([query])
         query_embedding = vectors[0]
-        vectors = self.repository.similarity_search(
+        vectors = await self.repository.similarity_search(
             query_embedding=query_embedding, brain_id=brain_id, k=k
         )
 

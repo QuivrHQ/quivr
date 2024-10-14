@@ -5,17 +5,29 @@ from quivr_api.logger import get_logger
 from quivr_api.modules.dependencies import get_supabase_async_client
 from quivr_api.modules.knowledge.entity.knowledge import KnowledgeDB
 from quivr_api.modules.knowledge.repository.storage_interface import StorageInterface
+from supabase.client import AsyncClient
 
 logger = get_logger(__name__)
 
 
 class SupabaseS3Storage(StorageInterface):
-    def __init__(self):
-        self.client = None
+    def __init__(self, client: AsyncClient | None = None):
+        self.client = client
 
     async def _set_client(self):
         if self.client is None:
             self.client = await get_supabase_async_client()
+
+    async def download_file(
+        self,
+        knowledge: KnowledgeDB,
+        bucket_name: str = "quivr",
+    ) -> bytes:
+        await self._set_client()
+        assert self.client
+        path = self.get_storage_path(knowledge)
+        file_data = await self.client.storage.from_(bucket_name).download(path)
+        return file_data
 
     def get_storage_path(
         self,

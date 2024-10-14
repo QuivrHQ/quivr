@@ -1,8 +1,9 @@
 {
   "editor.codeActionsOnSave": {
     "source.organizeImports": "explicit",
+    "source.organizeImports.ruff": "explicit",
     "source.fixAll": "explicit",
-    "source.unusedImports": "explicit",
+    "source.unusedImports": "explicit"
   },
   "editor.formatOnSave": true,
   "editor.formatOnSaveMode": "file",
@@ -24,9 +25,7 @@
       "source.fixAll": "explicit"
     }
   },
-  "python.analysis.extraPaths": [
-    "./backend"
-  ],
+  "python.analysis.extraPaths": ["./backend"],
   "python.defaultInterpreterPath": "python3",
   "python.testing.pytestArgs": [
     "-v",
@@ -43,6 +42,5 @@
     "reportMissingImports": "error",
     "reportUnusedImport": "warning",
     "reportGeneralTypeIssues": "warning"
-  },
-  "makefile.configureOnOpen": false
+  }
 }

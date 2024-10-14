@@ -5,42 +5,44 @@ from quivr_api.logger import get_logger
 from quivr_api.modules.dependencies import BaseRepository
 from quivr_api.modules.vector.entity.vector import SimilaritySearchOutput, Vector
 from sqlalchemy import exc, text
-from sqlmodel import Session, select
+from sqlmodel import select
+from sqlmodel.ext.asyncio.session import AsyncSession
 
 logger = get_logger(__name__)
 
 
 class VectorRepository(BaseRepository):
-    def __init__(self, session: Session):
+    def __init__(self, session: AsyncSession):
         super().__init__(session)
         self.session = session
 
-    def create_vectors(self, new_vectors: List[Vector]) -> List[Vector]:
+    async def create_vectors(
+        self, new_vectors: List[Vector], autocommit: bool
+    ) -> List[Vector]:
         try:
-            # Use SQLAlchemy session to add and commit the new vector
             self.session.add_all(new_vectors)
-            self.session.commit()
+            # FIXME: @AmineDiro : check if this is possible with nested transactions
+            if autocommit:
+                await self.session.commit()
+                for vector in new_vectors:
+                    await self.session.refresh(vector)
+            await self.session.flush()
+            return new_vectors
         except exc.IntegrityError:
             # Rollback the session if there’s an IntegrityError
-            self.session.rollback()
+            await self.session.rollback()
             raise Exception("Integrity error occurred while creating vector.")
         except Exception as e:
-            self.session.rollback()
+            await self.session.rollback()
             print(f"Error: {e}")
             raise Exception(f"An error occurred while creating vector: {e}")
 
-        # Refresh the session to get any updated fields (like auto-generated IDs)
-        for vector in new_vectors:
-            self.session.refresh(vector)
-
-        return new_vectors
-
-    def get_vectors_by_knowledge_id(self, knowledge_id: UUID) -> Sequence[Vector]:
+    async def get_vectors_by_knowledge_id(self, knowledge_id: UUID) -> Sequence[Vector]:
         query = select(Vector).where(Vector.knowledge_id == knowledge_id)
-        results = self.session.execute(query)
+        results = await self.session.execute(query)
         return results.scalars().all()
 
-    def similarity_search(
+    async def similarity_search(
         self,
         query_embedding: List[float],
         brain_id: UUID,
@@ -94,13 +96,13 @@ class VectorRepository(BaseRepository):
         """)
 
         params = {
-            "query_embedding": query_embedding,
+            "query_embedding": str(query_embedding),
             "p_brain_id": brain_id,
             "k": k,
             "max_chunk_sum": max_chunk_sum,
         }
 
-        result = self.session.execute(sql_query, params=params)
+        result = await self.session.execute(sql_query, params=params)
         full_results = result.all()
         formated_result = [
             SimilaritySearchOutput(

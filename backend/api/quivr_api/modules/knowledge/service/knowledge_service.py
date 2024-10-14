@@ -1,5 +1,6 @@
 import asyncio
 import io
+from datetime import datetime
 from typing import Any, List
 from uuid import UUID
 
@@ -7,18 +8,22 @@ from fastapi import UploadFile
 from quivr_core.models import KnowledgeStatus
 from sqlalchemy.exc import NoResultFound
 
+from quivr_api.celery_config import celery
 from quivr_api.logger import get_logger
+from quivr_api.modules.brain.entity.brain_entity import Brain
 from quivr_api.modules.dependencies import BaseService
 from quivr_api.modules.knowledge.dto.inputs import (
     AddKnowledge,
     CreateKnowledgeProperties,
+    KnowledgeUpdate,
 )
-from quivr_api.modules.knowledge.dto.outputs import DeleteKnowledgeResponse
+from quivr_api.modules.knowledge.dto.outputs import (
+    DeleteKnowledgeResponse,
+    KnowledgeDTO,
+)
 from quivr_api.modules.knowledge.entity.knowledge import (
-    Knowledge,
     KnowledgeDB,
     KnowledgeSource,
-    KnowledgeUpdate,
 )
 from quivr_api.modules.knowledge.repository.knowledges import KnowledgeRepository
 from quivr_api.modules.knowledge.repository.storage import SupabaseS3Storage
@@ -28,11 +33,7 @@ from quivr_api.modules.knowledge.service.knowledge_exceptions import (
     KnowledgeForbiddenAccess,
     UploadError,
 )
-from quivr_api.modules.sync.entity.sync_models import (
-    DBSyncFile,
-    DownloadedSyncFile,
-    SyncFile,
-)
+from quivr_api.modules.sync.entity.sync_models import SyncFile, SyncType
 from quivr_api.modules.upload.service.upload_file import check_file_exists
 
 logger = get_logger(__name__)
@@ -44,16 +45,67 @@ class KnowledgeService(BaseService[KnowledgeRepository]):
     def __init__(
         self,
         repository: KnowledgeRepository,
-        storage: StorageInterface = SupabaseS3Storage(),
+        storage: StorageInterface = SupabaseS3Storage(client=None),
     ):
         self.repository = repository
         self.storage = storage
 
-    async def get_knowledge_sync(self, sync_id: int) -> Knowledge:
-        km_db = await self.repository.get_knowledge_by_sync_id(sync_id)
-        assert km_db.id, "Knowledge ID not generated"
-        km = await km_db.to_dto()
+    async def get_knowledge_sync(self, sync_id: int) -> KnowledgeDTO:
+        km = await self.repository.get_knowledge_by_sync_id(sync_id)
+        assert km.id, "Knowledge ID not generated"
+        km = await km.to_dto()
         return km
+
+    async def create_or_link_sync_knowledge(
+        self,
+        syncfile_id_to_knowledge: dict[str, KnowledgeDB],
+        parent_knowledge: KnowledgeDB,
+        sync_file: SyncFile,
+        autocommit: bool = True,
+    ):
+        existing_km = syncfile_id_to_knowledge.get(sync_file.id)
+        if existing_km is not None:
+            # NOTE: function called in worker processor
+            # The parent_knowledge was just added to db (we are processing it)
+            # This implies that we could have sync children files and folders that were processed before
+            # If SyncKnowledge already exists
+            #   IF STATUS == PROCESSED:
+            #   => It's already processed in some other brain !
+            #   => Link it to the parent and update its brains to the correct ones
+            #   ELSE Reprocess the file
+            km_brains = {km_brain.brain_id for km_brain in existing_km.brains}
+            for brain in filter(
+                lambda b: b.brain_id not in km_brains,
+                parent_knowledge.brains,
+            ):
+                await self.repository.update_knowledge(
+                    existing_km,
+                    KnowledgeUpdate(parent_id=parent_knowledge.id),
+                    autocommit=autocommit,
+                )
+                await self.repository.link_to_brain(
+                    existing_km, brain_id=brain.brain_id
+                )
+            return existing_km
+        else:
+            # create sync file knowledge
+            # automagically gets the brains associated with the parent
+            file_knowledge = await self.create_knowledge(
+                user_id=parent_knowledge.user_id,
+                knowledge_to_add=AddKnowledge(
+                    file_name=sync_file.name,
+                    is_folder=sync_file.is_folder,
+                    extension=sync_file.extension,
+                    source=parent_knowledge.source,  # same as parent
+                    source_link=sync_file.web_view_link,
+                    parent_id=parent_knowledge.id,
+                    sync_id=parent_knowledge.sync_id,
+                    sync_file_id=sync_file.id,
+                ),
+                status=KnowledgeStatus.PROCESSING,
+                upload_file=None,
+            )
+            return file_knowledge
 
     # TODO: this is temporary fix for getting knowledge path.
     # KM storage path should be unrelated to brain
@@ -72,6 +124,14 @@ class KnowledgeService(BaseService[KnowledgeRepository]):
             )
         except NoResultFound:
             raise FileNotFoundError(f"No knowledge for file_name: {file_name}")
+
+    async def map_syncs_knowledge_user(
+        self, sync_id: int, user_id: UUID
+    ) -> dict[str, KnowledgeDB]:
+        list_kms = await self.repository.get_all_knowledge_sync_user(
+            sync_id=sync_id, user_id=user_id
+        )
+        return {k.sync_file_id: k for k in list_kms if k.sync_file_id}
 
     async def list_knowledge(
         self, knowledge_id: UUID | None, user_id: UUID | None = None
@@ -93,60 +153,37 @@ class KnowledgeService(BaseService[KnowledgeRepository]):
 
     async def update_knowledge(
         self,
-        knowledge: KnowledgeDB,
-        payload: Knowledge | KnowledgeUpdate | dict[str, Any],
+        knowledge: KnowledgeDB | UUID,
+        payload: KnowledgeDTO | KnowledgeUpdate | dict[str, Any],
+        autocommit: bool = True,
     ):
-        return await self.repository.update_knowledge(knowledge, payload)
-
-    # TODO: Remove all of this
-    # TODO (@aminediro): Replace with ON CONFLICT smarter query...
-    # there is a chance of race condition but for now we let it crash in worker
-    # the tasks will be dealt with on retry
-    async def update_sha1_conflict(
-        self, knowledge: KnowledgeDB, brain_id: UUID, file_sha1: str
-    ) -> bool:
-        assert knowledge.id
-        knowledge.file_sha1 = file_sha1
-
-        try:
-            existing_knowledge = await self.repository.get_knowledge_by_sha1(
-                knowledge.file_sha1
-            )
-            logger.debug("The content of the knowledge already exists in the brain. ")
-            # Get existing knowledge sha1 and brains
-            if (
-                existing_knowledge.status == KnowledgeStatus.UPLOADED
-                or existing_knowledge.status == KnowledgeStatus.PROCESSING
-            ):
-                existing_brains = await existing_knowledge.awaitable_attrs.brains
-                if brain_id in [b.brain_id for b in existing_brains]:
-                    logger.debug("Added file to brain that already has the knowledge")
-                    raise FileExistsError(
-                        f"Existing file in brain {brain_id} with name {existing_knowledge.file_name}"
-                    )
-                else:
-                    await self.repository.link_to_brain(existing_knowledge, brain_id)
-                    await self.remove_knowledge_brain(brain_id, knowledge.id)
-                    return False
-            else:
-                logger.debug(f"Removing previous errored file {existing_knowledge.id}")
-                assert existing_knowledge.id
-                await self.remove_knowledge_brain(brain_id, existing_knowledge.id)
-                await self.update_file_sha1_knowledge(knowledge.id, knowledge.file_sha1)
-                return True
-        except NoResultFound:
-            logger.debug(
-                f"First knowledge with sha1. Updating file_sha1 of  {knowledge.id}"
-            )
-            await self.update_file_sha1_knowledge(knowledge.id, knowledge.file_sha1)
-            return True
+        if isinstance(knowledge, UUID):
+            knowledge = await self.repository.get_knowledge_by_id(knowledge)
+        return await self.repository.update_knowledge(knowledge, payload, autocommit)
 
     async def create_knowledge(
         self,
         user_id: UUID,
         knowledge_to_add: AddKnowledge,
         upload_file: UploadFile | None = None,
+        status: KnowledgeStatus = KnowledgeStatus.RESERVED,
+        link_brains: list[Brain] = [],
+        autocommit: bool = True,
+        process_async: bool = True,
     ) -> KnowledgeDB:
+        brains = []
+        if knowledge_to_add.parent_id:
+            parent_knowledge = await self.get_knowledge(knowledge_to_add.parent_id)
+            brains = await parent_knowledge.awaitable_attrs.brains
+        if len(link_brains) > 0:
+            brains.extend(
+                [
+                    b
+                    for b in link_brains
+                    if b.brain_id not in {b.brain_id for b in brains}
+                ]
+            )
+
         knowledgedb = KnowledgeDB(
             user_id=user_id,
             file_name=knowledge_to_add.file_name,
@@ -157,10 +194,17 @@ class KnowledgeService(BaseService[KnowledgeRepository]):
             source_link=knowledge_to_add.source_link,
             file_size=upload_file.size if upload_file else 0,
             metadata_=knowledge_to_add.metadata,  # type: ignore
-            status=KnowledgeStatus.RESERVED,
+            status=status,
             parent_id=knowledge_to_add.parent_id,
+            sync_id=knowledge_to_add.sync_id,
+            sync_file_id=knowledge_to_add.sync_file_id,
+            brains=brains,
         )
-        knowledge_db = await self.repository.create_knowledge(knowledgedb)
+
+        knowledge_db = await self.repository.create_knowledge(
+            knowledgedb, autocommit=autocommit
+        )
+
         try:
             if knowledgedb.source == KnowledgeSource.LOCAL and upload_file:
                 # NOTE(@aminediro): Unnecessary mem buffer because supabase doesnt accept FileIO..
@@ -169,23 +213,48 @@ class KnowledgeService(BaseService[KnowledgeRepository]):
                     knowledgedb, buff_reader
                 )
                 knowledgedb.source_link = storage_path
-            knowledge_db = await self.repository.update_knowledge(
-                knowledge_db,
-                KnowledgeUpdate(status=KnowledgeStatus.UPLOADED),  # type: ignore
-            )
-            return knowledge_db
+                knowledge_db = await self.repository.update_knowledge(
+                    knowledge_db,
+                    KnowledgeUpdate(status=KnowledgeStatus.UPLOADED),
+                    autocommit=autocommit,
+                )
+            if knowledge_db.brains and len(knowledge_db.brains) > 0 and process_async:
+                # Schedule this new knowledge to be processed
+                knowledge_db = await self.repository.update_knowledge(
+                    knowledge_db,
+                    KnowledgeUpdate(status=KnowledgeStatus.PROCESSING),
+                    autocommit=autocommit,
+                )
+                celery.send_task(
+                    "process_file_task",
+                    kwargs={
+                        "knowledge_id": knowledge_db.id,
+                    },
+                )
+                return knowledge_db
+            else:
+                knowledge_db = await self.repository.update_knowledge(
+                    knowledge_db,
+                    KnowledgeUpdate(status=KnowledgeStatus.UPLOADED),
+                    autocommit=autocommit,
+                )
+                return knowledge_db
+
         except Exception as e:
             logger.exception(
                 f"Error uploading knowledge {knowledgedb.id} to storage : {e}"
             )
-            await self.repository.remove_knowledge(knowledge=knowledge_db)
+            await self.repository.remove_knowledge(
+                knowledge=knowledge_db, autocommit=autocommit
+            )
             raise UploadError()
 
     async def insert_knowledge_brain(
         self,
         user_id: UUID,
         knowledge_to_add: CreateKnowledgeProperties,  # FIXME: (later) @Amine brain id should not be in CreateKnowledgeProperties but since storage is brain_id/file_name
-    ) -> Knowledge:
+    ) -> KnowledgeDTO:
+        # TODO: check input
         knowledge = KnowledgeDB(
             file_name=knowledge_to_add.file_name,
             url=knowledge_to_add.url,
@@ -207,7 +276,7 @@ class KnowledgeService(BaseService[KnowledgeRepository]):
         inserted_knowledge = await knowledge_db.to_dto()
         return inserted_knowledge
 
-    async def get_all_knowledge_in_brain(self, brain_id: UUID) -> List[Knowledge]:
+    async def get_all_knowledge_in_brain(self, brain_id: UUID) -> List[KnowledgeDTO]:
         brain = await self.repository.get_brain_by_id(brain_id, get_knowledge=True)
         all_knowledges: List[KnowledgeDB] = await brain.awaitable_attrs.knowledges
         knowledges = [
@@ -240,23 +309,33 @@ class KnowledgeService(BaseService[KnowledgeRepository]):
     async def update_file_sha1_knowledge(self, knowledge_id: UUID, file_sha1: str):
         return await self.repository.update_file_sha1_knowledge(knowledge_id, file_sha1)
 
-    async def remove_knowledge(self, knowledge: KnowledgeDB) -> DeleteKnowledgeResponse:
+    async def remove_knowledge(
+        self, knowledge: KnowledgeDB, autocommit: bool = True
+    ) -> DeleteKnowledgeResponse:
         assert knowledge.id
 
         try:
             # TODO:
             # - Notion folders are special, they are themselves files and should be removed from storage
-            children = await self.repository.get_all_children(knowledge.id)
-            km_paths = [
-                self.storage.get_storage_path(k) for k in children if not k.is_folder
-            ]
-            if not knowledge.is_folder:
-                km_paths.append(self.storage.get_storage_path(knowledge))
-
+            km_paths = []
+            if knowledge.source == KnowledgeSource.LOCAL:
+                if knowledge.is_folder:
+                    children = await self.repository.get_knowledge_tree(knowledge.id)
+                    km_paths.extend(
+                        [
+                            self.storage.get_storage_path(k)
+                            for k in children
+                            if not k.is_folder
+                        ]
+                    )
+                if not knowledge.is_folder:
+                    km_paths.append(self.storage.get_storage_path(knowledge))
             # recursively deletes files
-            deleted_km = await self.repository.remove_knowledge(knowledge)
+            deleted_km = await self.repository.remove_knowledge(
+                knowledge, autocommit=autocommit
+            )
+            # TODO: remove storage asynchronously in background task or in some task
             await asyncio.gather(*[self.storage.remove_file(p) for p in km_paths])
-
             return deleted_km
         except Exception as e:
             logger.error(f"Error while remove knowledge : {e}")
@@ -295,45 +374,30 @@ class KnowledgeService(BaseService[KnowledgeRepository]):
             f"All knowledge in brain {brain_id} removed successfully from table"
         )
 
-    # TODO: REDO THIS MESS !!!!
-    # REMOVE ALL SYNC TABLES and start from scratch
-    async def update_or_create_knowledge_sync(
-        self,
-        brain_id: UUID,
-        user_id: UUID,
-        file: SyncFile,
-        new_sync_file: DBSyncFile | None,
-        prev_sync_file: DBSyncFile | None,
-        downloaded_file: DownloadedSyncFile,
-        source: str,
-        source_link: str,
-    ) -> Knowledge:
-        sync_id = None
-        # TODO: THIS IS A HACK!! Remove all of this
-        if prev_sync_file:
-            prev_knowledge = await self.get_knowledge_sync(sync_id=prev_sync_file.id)
-            if len(prev_knowledge.brains) > 1:
-                await self.repository.remove_knowledge_from_brain(
-                    prev_knowledge.id, brain_id
-                )
-            else:
-                await self.repository.remove_knowledge_by_id(prev_knowledge.id)
-            sync_id = prev_sync_file.id
+    async def link_knowledge_tree_brains(
+        self, knowledge: KnowledgeDB | UUID, brains_ids: List[UUID], user_id: UUID
+    ) -> List[KnowledgeDB]:
+        if isinstance(knowledge, UUID):
+            knowledge = await self.repository.get_knowledge_by_id(knowledge)
+        return await self.repository.link_knowledge_tree_brains(
+            knowledge, brains_ids=brains_ids, user_id=user_id
+        )
 
-        sync_id = new_sync_file.id if new_sync_file else sync_id
-        knowledge_to_add = CreateKnowledgeProperties(
-            brain_id=brain_id,
-            file_name=file.name,
-            extension=downloaded_file.extension,
-            source=source,
-            status=KnowledgeStatus.PROCESSING,
-            source_link=source_link,
-            file_size=file.size if file.size else 0,
-            # FIXME (@aminediro): This is a temporary fix, redo in KMS
-            file_sha1=None,
-            metadata={"sync_file_id": str(sync_id)},
+    async def unlink_knowledge_tree_brains(
+        self, knowledge: KnowledgeDB | UUID, brains_ids: List[UUID], user_id: UUID
+    ) -> List[KnowledgeDB] | None:
+        if isinstance(knowledge, UUID):
+            knowledge = await self.repository.get_knowledge_by_id(knowledge)
+        return await self.repository.unlink_knowledge_tree_brains(
+            knowledge, brains_ids=brains_ids, user_id=user_id
         )
-        added_knowledge = await self.insert_knowledge_brain(
-            knowledge_to_add=knowledge_to_add, user_id=user_id
+
+    async def get_outdated_syncs(
+        self,
+        limit_time: datetime,
+        km_sync_type: SyncType,
+        batch_size: int = 1,
+    ) -> List[KnowledgeDB]:
+        return await self.repository.get_outdated_syncs(
+            limit_time=limit_time, batch_size=batch_size, km_sync_type=km_sync_type
         )
-        return added_knowledge

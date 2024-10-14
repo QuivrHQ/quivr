@@ -3,7 +3,7 @@ from typing import List
 from uuid import UUID
 
 from quivr_api.modules.brain.entity.brain_entity import (
-    BrainUser,
+    BrainUserDB,
     MinimalUserBrainEntity,
 )
 
@@ -56,7 +56,7 @@ class BrainsUsersInterface(ABC):
         pass
 
     @abstractmethod
-    def get_brain_users(self, brain_id: UUID) -> List[BrainUser]:
+    def get_brain_users(self, brain_id: UUID) -> List[BrainUserDB]:
         """
         Get all users for a brain
         """
@@ -88,7 +88,7 @@ class BrainsUsersInterface(ABC):
     @abstractmethod
     def update_brain_user_rights(
         self, brain_id: UUID, user_id: UUID, rights: str
-    ) -> BrainUser:
+    ) -> BrainUserDB:
         """
         Update the rights for a user in a brain
         """

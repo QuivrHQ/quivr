@@ -1,53 +1,19 @@
+from datetime import datetime
 from typing import List, Tuple
 from uuid import uuid4
 
 import pytest
 import pytest_asyncio
 from quivr_core.models import KnowledgeStatus
-from sqlmodel import select, text
+from sqlmodel import select
 from sqlmodel.ext.asyncio.session import AsyncSession
 
-from quivr_api.modules.brain.entity.brain_entity import Brain, BrainType
-from quivr_api.modules.knowledge.entity.knowledge import KnowledgeDB
+from quivr_api.modules.brain.entity.brain_entity import Brain
+from quivr_api.modules.knowledge.dto.outputs import KnowledgeDTO, sort_knowledge_dtos
+from quivr_api.modules.knowledge.entity.knowledge import KnowledgeDB, KnowledgeSource
 from quivr_api.modules.user.entity.user_identity import User
 
 TestData = Tuple[Brain, List[KnowledgeDB]]
-
-
-@pytest_asyncio.fixture(scope="function")
-async def other_user(session: AsyncSession):
-    sql = text(
-        """
-        INSERT INTO "auth"."users" ("instance_id", "id", "aud", "role", "email", "encrypted_password", "email_confirmed_at", "invited_at", "confirmation_token", "confirmation_sent_at", "recovery_token", "recovery_sent_at", "email_change_token_new", "email_change", "email_change_sent_at", "last_sign_in_at", "raw_app_meta_data", "raw_user_meta_data", "is_super_admin", "created_at", "updated_at", "phone", "phone_confirmed_at", "phone_change", "phone_change_token", "phone_change_sent_at", "email_change_token_current", "email_change_confirm_status", "banned_until", "reauthentication_token", "reauthentication_sent_at", "is_sso_user", "deleted_at") VALUES
-        ('00000000-0000-0000-0000-000000000000', :id , 'authenticated', 'authenticated', 'other@quivr.app', '$2a$10$vwKX0eMLlrOZvxQEA3Vl4e5V4/hOuxPjGYn9QK1yqeaZxa.42Uhze', '2024-01-22 22:27:00.166861+00', NULL, '', NULL, 'e91d41043ca2c83c3be5a6ee7a4abc8a4f4fb1afc0a8453c502af931', '2024-03-05 16:22:13.780421+00', '', '', NULL, '2024-03-30 23:21:12.077887+00', '{"provider": "email", "providers": ["email"]}', '{}', NULL, '2024-01-22 22:27:00.158026+00', '2024-04-01 17:40:15.332205+00', NULL, NULL, '', '', NULL, '', 0, NULL, '', NULL, false, NULL);
-        """
-    )
-    await session.execute(sql, params={"id": uuid4()})
-
-    other_user = (
-        await session.exec(select(User).where(User.email == "other@quivr.app"))
-    ).one()
-    return other_user
-
-
-@pytest_asyncio.fixture(scope="function")
-async def user(session):
-    user_1 = (
-        await session.exec(select(User).where(User.email == "admin@quivr.app"))
-    ).one()
-    return user_1
-
-
-@pytest_asyncio.fixture(scope="function")
-async def brain(session):
-    brain_1 = Brain(
-        name="test_brain",
-        description="this is a test brain",
-        brain_type=BrainType.integration,
-    )
-    session.add(brain_1)
-    await session.commit()
-    return brain_1
 
 
 @pytest_asyncio.fixture(scope="function")
@@ -175,7 +141,7 @@ async def test_knowledge_remove_folder_cascade(
 
 
 @pytest.mark.asyncio(loop_scope="session")
-async def test_knowledge_dto(session, user, brain):
+async def test_knowledge_dto(session, user, brain, sync):
     # add folder in brain
     folder = KnowledgeDB(
         file_name="folder_1",
@@ -201,6 +167,8 @@ async def test_knowledge_dto(session, user, brain):
         user_id=user.id,
         brains=[brain],
         parent=folder,
+        sync_file_id="file1",
+        sync=sync,
     )
     session.add(km)
     session.add(km)
@@ -220,10 +188,53 @@ async def test_knowledge_dto(session, user, brain):
     assert km_dto.file_sha1 == km.file_sha1
     assert km_dto.updated_at == km.updated_at
     assert km_dto.created_at == km.created_at
-    assert km_dto.metadata == km.metadata_  # type: ignor
+    assert km_dto.metadata == km.metadata_  # type: ignore
     assert km_dto.parent
     assert km_dto.parent.id == folder.id
+    # Syncs fields
+    assert km_dto.sync_id == km.sync_id
+    assert km_dto.sync_file_id == km.sync_file_id
 
     folder_dto = await folder.to_dto()
     assert folder_dto.brains[0] == brain.model_dump()
     assert folder_dto.children == [await km.to_dto()]
+
+
+def test_sort_knowledge_dtos():
+    user_id = uuid4()
+
+    data_dict = {
+        "extension": ".txt",
+        "status": None,
+        "user_id": user_id,
+        "created_at": datetime.now(),
+        "updated_at": datetime.now(),
+        "brains": [],
+        "source": KnowledgeSource.LOCAL,
+        "source_link": "://test.txt",
+        "sync_id": None,
+        "sync_file_id": None,
+        "parent": None,
+        "children": [],
+    }
+    dtos = [
+        KnowledgeDTO(id=uuid4(), is_folder=False, file_name=None, **data_dict),
+        KnowledgeDTO(id=uuid4(), is_folder=False, file_name="B", **data_dict),
+        KnowledgeDTO(id=uuid4(), is_folder=True, file_name="A", **data_dict),
+        KnowledgeDTO(id=uuid4(), is_folder=True, file_name=None, **data_dict),
+    ]
+
+    sorted_dtos = sort_knowledge_dtos(dtos)
+
+    # First element should be a folder with file_name="A"
+    assert sorted_dtos[0].is_folder is True
+    assert sorted_dtos[0].file_name == "A"
+    # Second element should be a folder with file_name=None
+    assert sorted_dtos[1].is_folder is True
+    assert sorted_dtos[1].file_name is None
+    # Third element should be a file with file_name="B"
+    assert sorted_dtos[2].is_folder is False
+    assert sorted_dtos[2].file_name == "B"
+    # Fourth element should be a file with file_name=None
+    assert sorted_dtos[3].is_folder is False
+    assert sorted_dtos[3].file_name is None

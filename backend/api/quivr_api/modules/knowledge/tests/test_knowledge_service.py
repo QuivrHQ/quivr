@@ -1,4 +1,5 @@
 import os
+from datetime import datetime, timedelta, timezone
 from io import BytesIO
 from typing import List, Tuple
 from uuid import uuid4
@@ -11,8 +12,13 @@ from sqlmodel import select, text
 from sqlmodel.ext.asyncio.session import AsyncSession
 
 from quivr_api.modules.brain.entity.brain_entity import Brain, BrainType
-from quivr_api.modules.knowledge.dto.inputs import AddKnowledge, KnowledgeStatus
-from quivr_api.modules.knowledge.entity.knowledge import KnowledgeDB, KnowledgeUpdate
+from quivr_api.modules.brain.entity.brain_user import BrainUserDB
+from quivr_api.modules.knowledge.dto.inputs import (
+    AddKnowledge,
+    KnowledgeStatus,
+    KnowledgeUpdate,
+)
+from quivr_api.modules.knowledge.entity.knowledge import KnowledgeDB, KnowledgeSource
 from quivr_api.modules.knowledge.entity.knowledge_brain import KnowledgeBrain
 from quivr_api.modules.knowledge.repository.knowledges import KnowledgeRepository
 from quivr_api.modules.knowledge.service.knowledge_exceptions import (
@@ -22,6 +28,8 @@ from quivr_api.modules.knowledge.service.knowledge_exceptions import (
 )
 from quivr_api.modules.knowledge.service.knowledge_service import KnowledgeService
 from quivr_api.modules.knowledge.tests.conftest import ErrorStorage, FakeStorage
+from quivr_api.modules.sync.dto.outputs import SyncProvider
+from quivr_api.modules.sync.entity.sync_models import Sync, SyncType
 from quivr_api.modules.upload.service.upload_file import upload_file_storage
 from quivr_api.modules.user.entity.user_identity import User
 from quivr_api.modules.vector.entity.vector import Vector
@@ -52,6 +60,66 @@ async def user(session: AsyncSession) -> User:
     ).one()
     assert user_1.id
     return user_1
+
+
+@pytest_asyncio.fixture(scope="function")
+async def brain_user(session, user: User) -> Brain:
+    assert user.id
+    brain_1 = Brain(
+        name="test_brain",
+        description="this is a test brain",
+        brain_type=BrainType.integration,
+    )
+    session.add(brain_1)
+    await session.commit()
+    await session.refresh(brain_1)
+    assert brain_1.brain_id
+    brain_user = BrainUserDB(
+        brain_id=brain_1.brain_id, user_id=user.id, default_brain=True, rights="Owner"
+    )
+    session.add(brain_user)
+    await session.commit()
+    return brain_1
+
+
+@pytest_asyncio.fixture(scope="function")
+async def brain_user2(session, user: User) -> Brain:
+    assert user.id
+    brain = Brain(
+        name="test_brain2",
+        description="this is a test brain",
+        brain_type=BrainType.integration,
+    )
+    session.add(brain)
+    await session.commit()
+    await session.refresh(brain)
+    assert brain.brain_id
+    brain_user = BrainUserDB(
+        brain_id=brain.brain_id, user_id=user.id, default_brain=True, rights="Owner"
+    )
+    session.add(brain_user)
+    await session.commit()
+    return brain
+
+
+@pytest_asyncio.fixture(scope="function")
+async def brain_user3(session, user: User) -> Brain:
+    assert user.id
+    brain = Brain(
+        name="test_brain2",
+        description="this is a test brain",
+        brain_type=BrainType.integration,
+    )
+    session.add(brain)
+    await session.commit()
+    await session.refresh(brain)
+    assert brain.brain_id
+    brain_user = BrainUserDB(
+        brain_id=brain.brain_id, user_id=user.id, default_brain=True, rights="Owner"
+    )
+    session.add(brain_user)
+    await session.commit()
+    return brain
 
 
 @pytest_asyncio.fixture(scope="function")
@@ -183,6 +251,31 @@ async def folder_km(session: AsyncSession, user: User):
 
     session.add(folder)
     session.add(knowledge_folder)
+    await session.commit()
+    await session.refresh(folder)
+    return folder
+
+
+@pytest_asyncio.fixture(scope="function")
+async def folder_km_brain(session: AsyncSession, brain_user: Brain):
+    "local folder linked to a brain"
+    user: User = (await brain_user.awaitable_attrs.users)[0]
+    assert user.id
+    folder = KnowledgeDB(
+        file_name="folder_1",
+        extension="",
+        status="UPLOADED",
+        source="local",
+        source_link="local",
+        file_size=0,
+        file_sha1=None,
+        brains=[brain_user],
+        children=[],
+        user_id=user.id,
+        is_folder=True,
+        parent_id=None,
+    )
+    session.add(folder)
     await session.commit()
     await session.refresh(folder)
     return folder
@@ -370,167 +463,6 @@ async def test_get_knowledge_in_brain(session: AsyncSession, test_data: TestData
 
 
 @pytest.mark.asyncio(loop_scope="session")
-async def test_should_process_knowledge_exists(
-    session: AsyncSession, test_data: TestData
-):
-    brain, [existing_knowledge, _] = test_data
-    assert brain.brain_id
-    new = KnowledgeDB(
-        file_name="new",
-        extension="txt",
-        status="PROCESSING",
-        source="test_source",
-        source_link="test_source_link",
-        file_size=100,
-        file_sha1=None,
-        brains=[brain],
-        user_id=existing_knowledge.user_id,
-    )
-    session.add(new)
-    await session.commit()
-    await session.refresh(new)
-    repo = KnowledgeRepository(session)
-    service = KnowledgeService(repo)
-    assert existing_knowledge.file_sha1
-    with pytest.raises(FileExistsError):
-        await service.update_sha1_conflict(
-            new, brain.brain_id, file_sha1=existing_knowledge.file_sha1
-        )
-
-
-@pytest.mark.asyncio(loop_scope="session")
-async def test_should_process_knowledge_link_brain(
-    session: AsyncSession, test_data: TestData
-):
-    repo = KnowledgeRepository(session)
-    service = KnowledgeService(repo)
-    brain, [existing_knowledge, _] = test_data
-    user_id = existing_knowledge.user_id
-    assert brain.brain_id
-    prev = KnowledgeDB(
-        file_name="prev",
-        extension=".txt",
-        status=KnowledgeStatus.UPLOADED,
-        source="test_source",
-        source_link="test_source_link",
-        file_size=100,
-        file_sha1="test1",
-        brains=[brain],
-        user_id=user_id,
-    )
-    brain_2 = Brain(
-        name="test_brain",
-        description="this is a test brain",
-        brain_type=BrainType.integration,
-    )
-    session.add(brain_2)
-    session.add(prev)
-    await session.commit()
-    await session.refresh(prev)
-    await session.refresh(brain_2)
-
-    assert prev.id
-    assert brain_2.brain_id
-
-    new = KnowledgeDB(
-        file_name="new",
-        extension="txt",
-        status="PROCESSING",
-        source="test_source",
-        source_link="test_source_link",
-        file_size=100,
-        file_sha1=None,
-        brains=[brain_2],
-        user_id=user_id,
-    )
-    session.add(new)
-    await session.commit()
-    await session.refresh(new)
-
-    incoming_knowledge = await new.to_dto()
-    assert prev.file_sha1
-
-    should_process = await service.update_sha1_conflict(
-        incoming_knowledge, brain_2.brain_id, file_sha1=prev.file_sha1
-    )
-    assert not should_process
-
-    # Check prev knowledge was linked
-    assert incoming_knowledge.file_sha1
-    prev_knowledge = await service.repository.get_knowledge_by_id(prev.id)
-    prev_brains = await prev_knowledge.awaitable_attrs.brains
-    assert {b.brain_id for b in prev_brains} == {
-        brain.brain_id,
-        brain_2.brain_id,
-    }
-    # Check new knowledge was removed
-    assert new.id
-    with pytest.raises(KnowledgeNotFoundException):
-        await service.repository.get_knowledge_by_id(new.id)
-
-
-@pytest.mark.asyncio(loop_scope="session")
-async def test_should_process_knowledge_prev_error(
-    session: AsyncSession, test_data: TestData
-):
-    repo = KnowledgeRepository(session)
-    service = KnowledgeService(repo)
-    brain, [existing_knowledge, _] = test_data
-    user_id = existing_knowledge.user_id
-    assert brain.brain_id
-    prev = KnowledgeDB(
-        file_name="prev",
-        extension="txt",
-        status=KnowledgeStatus.ERROR,
-        source="test_source",
-        source_link="test_source_link",
-        file_size=100,
-        file_sha1="test1",
-        brains=[brain],
-        user_id=user_id,
-    )
-    session.add(prev)
-    await session.commit()
-    await session.refresh(prev)
-
-    assert prev.id
-
-    new = KnowledgeDB(
-        file_name="new",
-        extension="txt",
-        status="PROCESSING",
-        source="test_source",
-        source_link="test_source_link",
-        file_size=100,
-        file_sha1=None,
-        brains=[brain],
-        user_id=user_id,
-    )
-    session.add(new)
-    await session.commit()
-    await session.refresh(new)
-
-    incoming_knowledge = await new.to_dto()
-    assert prev.file_sha1
-    should_process = await service.update_sha1_conflict(
-        incoming_knowledge, brain.brain_id, file_sha1=prev.file_sha1
-    )
-
-    # Checks we should process this file
-    assert should_process
-    # Previous errored file is cleaned up
-    with pytest.raises(KnowledgeNotFoundException):
-        await service.repository.get_knowledge_by_id(prev.id)
-
-    assert new.id
-    new = await service.repository.get_knowledge_by_id(new.id)
-    assert new.file_sha1
-
-
-@pytest.mark.skip(
-    reason="Bug: UnboundLocalError: cannot access local variable 'response'"
-)
-@pytest.mark.asyncio(loop_scope="session")
 async def test_get_knowledge_storage_path(session: AsyncSession, test_data: TestData):
     _, [knowledge, _] = test_data
     assert knowledge.file_name
@@ -586,6 +518,30 @@ async def test_create_knowledge_file(session: AsyncSession, user: User):
 
 
 @pytest.mark.asyncio(loop_scope="session")
+async def test_create_knowledge_web(session: AsyncSession, user: User):
+    assert user.id
+    storage = FakeStorage()
+    repository = KnowledgeRepository(session)
+    service = KnowledgeService(repository, storage)
+
+    km_to_add = AddKnowledge(
+        url="http://quivr.app",
+        source=KnowledgeSource.WEB,
+        is_folder=False,
+        parent_id=None,
+    )
+
+    km = await service.create_knowledge(
+        user_id=user.id, knowledge_to_add=km_to_add, upload_file=None
+    )
+
+    assert km.id
+    assert km.url == km_to_add.url
+    assert km.status == KnowledgeStatus.UPLOADED
+    assert not km.is_folder
+
+
+@pytest.mark.asyncio(loop_scope="session")
 async def test_create_knowledge_folder(session: AsyncSession, user: User):
     assert user.id
     storage = FakeStorage()
@@ -620,6 +576,57 @@ async def test_create_knowledge_folder(session: AsyncSession, user: User):
     assert km.status == KnowledgeStatus.UPLOADED
     # Knowledge was saved
     assert storage.knowledge_exists(km)
+
+
+@pytest.mark.asyncio(loop_scope="session")
+async def test_create_knowledge_file_in_folder_in_brain(
+    monkeypatch, session: AsyncSession, user: User, folder_km_brain: KnowledgeDB
+):
+    tasks = {}
+
+    def _send_task(*args, **kwargs):
+        tasks["args"] = args
+        tasks["kwargs"] = {**kwargs["kwargs"]}
+
+    monkeypatch.setattr("quivr_api.celery_config.celery.send_task", _send_task)
+    assert user.id
+    storage = FakeStorage()
+    repository = KnowledgeRepository(session)
+    service = KnowledgeService(repository, storage)
+
+    km_to_add = AddKnowledge(
+        file_name="test",
+        source="local",
+        is_folder=True,
+        parent_id=folder_km_brain.id,
+    )
+    km_data = BytesIO(os.urandom(128))
+    km = await service.create_knowledge(
+        user_id=user.id,
+        knowledge_to_add=km_to_add,
+        upload_file=UploadFile(file=km_data, size=128, filename=km_to_add.file_name),
+    )
+
+    assert km.file_name == km_to_add.file_name
+    assert km.id
+    # Knowledge properties
+    assert km.file_name == km_to_add.file_name
+    assert km.is_folder == km_to_add.is_folder
+    assert km.url == km_to_add.url
+    assert km.extension == km_to_add.extension
+    assert km.source == km_to_add.source
+    assert km.file_size == 128
+    assert km.metadata_ == km_to_add.metadata
+    assert km.is_folder == km_to_add.is_folder
+    assert km.status == KnowledgeStatus.PROCESSING
+    # Knowledge was saved
+    assert storage.knowledge_exists(km)
+    assert km.brains
+    assert len(km.brains) > 0
+    assert km.brains[0].brain_id == folder_km_brain.brains[0].brain_id
+
+    # Scheduled
+    assert len(tasks) > 0
 
 
 @pytest.mark.asyncio(loop_scope="session")
@@ -1020,3 +1027,319 @@ async def test_list_knowledge(session: AsyncSession, user: User):
 
     assert len(kms) == 1
     assert kms[0].id == nested_file.id
+
+
+@pytest.mark.asyncio(loop_scope="session")
+async def test_link_knowledge_brain(
+    session: AsyncSession, user: User, brain_user: Brain
+):
+    assert user.id
+    assert brain_user.brain_id
+
+    root_folder = KnowledgeDB(
+        file_name="folder",
+        extension="",
+        status="UPLOADED",
+        source="local",
+        source_link="local",
+        file_size=4,
+        file_sha1=None,
+        brains=[],
+        children=[],
+        user_id=user.id,
+        is_folder=True,
+    )
+    nested_file = KnowledgeDB(
+        file_name="file_2",
+        extension="",
+        status="UPLOADED",
+        source="local",
+        source_link="local",
+        file_size=10,
+        file_sha1=None,
+        user_id=user.id,
+        parent=root_folder,
+    )
+    session.add(nested_file)
+    session.add(root_folder)
+    await session.commit()
+    await session.refresh(root_folder)
+    await session.refresh(nested_file)
+
+    storage = FakeStorage()
+    repository = KnowledgeRepository(session)
+    service = KnowledgeService(repository, storage)
+
+    await service.link_knowledge_tree_brains(
+        root_folder, brains_ids=[brain_user.brain_id], user_id=user.id
+    )
+    kms = await service.get_all_knowledge_in_brain(brain_id=brain_user.brain_id)
+    assert len(kms) == 2
+    assert {k.id for k in kms} == {root_folder.id, nested_file.id}
+
+
+@pytest.mark.asyncio(loop_scope="session")
+async def test_link_knowledge_brain_existing_brains(
+    session: AsyncSession, user: User, brain_user: Brain
+):
+    """test knowledge already in brain and we add it to the same brain because we added his parent"""
+
+
+@pytest.mark.asyncio(loop_scope="session")
+async def test_unlink_knowledge_brain(
+    session: AsyncSession,
+    user: User,
+    brain_user: Brain,
+    brain_user2: Brain,
+    brain_user3: Brain,
+):
+    assert user.id
+    assert brain_user.brain_id
+    assert brain_user2.brain_id
+    assert brain_user3.brain_id
+
+    root_folder = KnowledgeDB(
+        file_name="folder",
+        extension="",
+        status="UPLOADED",
+        source="local",
+        source_link="local",
+        file_size=4,
+        file_sha1=None,
+        brains=[brain_user, brain_user2],
+        children=[],
+        user_id=user.id,
+        is_folder=True,
+    )
+    file = KnowledgeDB(
+        file_name="file_2",
+        extension="",
+        status="UPLOADED",
+        source="local",
+        source_link="local",
+        file_size=10,
+        file_sha1=None,
+        user_id=user.id,
+        parent=root_folder,
+        # 1 additional brain
+        brains=[brain_user, brain_user2, brain_user3],
+    )
+    session.add(file)
+    session.add(root_folder)
+    await session.commit()
+    await session.refresh(root_folder)
+    await session.refresh(file)
+
+    storage = FakeStorage()
+    repository = KnowledgeRepository(session)
+    service = KnowledgeService(repository, storage)
+
+    await service.unlink_knowledge_tree_brains(
+        root_folder,
+        brains_ids=[brain_user.brain_id, brain_user2.brain_id],
+        user_id=user.id,
+    )
+    kms = await service.get_all_knowledge_in_brain(brain_id=brain_user.brain_id)
+    assert len(kms) == 0
+
+    kms = await service.get_all_knowledge_in_brain(brain_id=brain_user2.brain_id)
+    assert len(kms) == 0
+
+    kms = await service.get_all_knowledge_in_brain(brain_id=brain_user3.brain_id)
+    assert len(kms) == 1
+    assert kms[0].id == file.id
+
+
+@pytest.mark.asyncio(loop_scope="session")
+async def test_get_outdated_sync_update_date(
+    session: AsyncSession, user: User, brain_user: Brain, sync: Sync
+):
+    assert user.id
+    assert brain_user.brain_id
+
+    file1 = KnowledgeDB(
+        file_name="folder",
+        extension="",
+        status=KnowledgeStatus.PROCESSED,
+        source=SyncProvider.GOOGLE,
+        source_link="drive://file2",
+        file_size=4,
+        file_sha1="",
+        brains=[brain_user],
+        user_id=user.id,
+        sync_id=sync.id,
+        sync_file_id="file2",
+        last_synced_at=datetime.now() - timedelta(days=2),
+    )
+    file2 = KnowledgeDB(
+        file_name="file_2",
+        extension=".txt",
+        status=KnowledgeStatus.PROCESSED,
+        source=SyncProvider.GOOGLE,
+        source_link="drive://file2",
+        file_size=10,
+        file_sha1=None,
+        brains=[brain_user],
+        user_id=user.id,
+        sync_id=sync.id,
+        sync_file_id="file2",
+        last_synced_at=datetime.now(),
+    )
+    session.add(file2)
+    session.add(file1)
+    await session.commit()
+    await session.refresh(file1)
+    await session.refresh(file2)
+
+    storage = FakeStorage()
+    repository = KnowledgeRepository(session)
+    service = KnowledgeService(repository, storage)
+
+    last_time = datetime.now(timezone.utc) - timedelta(hours=4)
+    kms = await service.get_outdated_syncs(
+        limit_time=last_time, batch_size=10, km_sync_type=SyncType.FILE
+    )
+    assert len(kms) == 1
+    assert kms[0].id == file1.id
+
+
+@pytest.mark.asyncio(loop_scope="session")
+async def test_get_outdated_sync_file_only_brains(
+    session: AsyncSession, user: User, brain_user: Brain, sync: Sync
+):
+    assert user.id
+    assert brain_user.brain_id
+
+    file2 = KnowledgeDB(
+        file_name="file",
+        extension=".txt",
+        status=KnowledgeStatus.PROCESSED,
+        source=KnowledgeSource.LOCAL,
+        source_link="path",
+        file_size=4,
+        file_sha1="",
+        brains=[],
+        user_id=user.id,
+    )
+
+    file1 = KnowledgeDB(
+        file_name="file",
+        extension=".txt",
+        status=KnowledgeStatus.PROCESSED,
+        source=SyncProvider.GOOGLE,
+        source_link="drive://file2",
+        file_size=4,
+        file_sha1="",
+        brains=[],
+        user_id=user.id,
+        sync_id=sync.id,
+        sync_file_id="file2",
+        last_synced_at=datetime.now() - timedelta(days=2),
+    )
+    session.add(file1)
+    session.add(file2)
+    await session.commit()
+    await session.refresh(file1)
+    await session.refresh(file2)
+
+    storage = FakeStorage()
+    repository = KnowledgeRepository(session)
+    service = KnowledgeService(repository, storage)
+
+    last_time = datetime.now(timezone.utc) - timedelta(hours=4)
+    kms = await service.get_outdated_syncs(
+        limit_time=last_time, batch_size=10, km_sync_type=SyncType.FILE
+    )
+    assert len(kms) == 0
+
+
+@pytest.mark.asyncio(loop_scope="session")
+async def test_get_outdated_sync_file_only(
+    session: AsyncSession, user: User, brain_user: Brain, sync: Sync
+):
+    assert user.id
+    assert brain_user.brain_id
+
+    file1 = KnowledgeDB(
+        file_name="folder",
+        extension="",
+        status=KnowledgeStatus.PROCESSED,
+        source=SyncProvider.GOOGLE,
+        source_link="drive://file2",
+        file_size=4,
+        file_sha1="",
+        brains=[brain_user],
+        user_id=user.id,
+        sync_id=sync.id,
+        sync_file_id="file2",
+        is_folder=True,
+        last_synced_at=datetime.now() - timedelta(days=2),
+    )
+    session.add(file1)
+    await session.commit()
+    await session.refresh(file1)
+
+    storage = FakeStorage()
+    repository = KnowledgeRepository(session)
+    service = KnowledgeService(repository, storage)
+
+    last_time = datetime.now(timezone.utc) - timedelta(hours=4)
+    kms = await service.get_outdated_syncs(
+        limit_time=last_time, batch_size=10, km_sync_type=SyncType.FILE
+    )
+    assert len(kms) == 0
+
+
+@pytest.mark.asyncio(loop_scope="session")
+async def test_get_outdated_folders_sync(
+    session: AsyncSession, user: User, brain_user: Brain, sync: Sync
+):
+    assert user.id
+    assert brain_user.brain_id
+
+    folder = KnowledgeDB(
+        file_name="folder",
+        extension="",
+        status=KnowledgeStatus.PROCESSED,
+        source=SyncProvider.GOOGLE,
+        source_link="drive://file2",
+        file_size=0,
+        file_sha1="",
+        brains=[brain_user],
+        user_id=user.id,
+        sync_id=sync.id,
+        sync_file_id="folder1",
+        is_folder=True,
+        last_synced_at=datetime.now() - timedelta(days=2),
+    )
+    file = KnowledgeDB(
+        file_name="file",
+        extension="",
+        status=KnowledgeStatus.PROCESSED,
+        source=SyncProvider.GOOGLE,
+        source_link="drive://file2",
+        file_size=4,
+        file_sha1="",
+        brains=[brain_user],
+        user_id=user.id,
+        sync_id=sync.id,
+        sync_file_id="file",
+        is_folder=False,
+        last_synced_at=datetime.now() - timedelta(days=2),
+        parent=folder,
+    )
+    session.add(folder)
+    session.add(file)
+    await session.commit()
+    await session.refresh(folder)
+
+    storage = FakeStorage()
+    repository = KnowledgeRepository(session)
+    service = KnowledgeService(repository, storage)
+
+    last_time = datetime.now(timezone.utc) - timedelta(hours=4)
+    kms = await service.get_outdated_syncs(
+        limit_time=last_time, batch_size=10, km_sync_type=SyncType.FOLDER
+    )
+    assert len(kms) == 1
+    assert kms[0].id == folder.id
