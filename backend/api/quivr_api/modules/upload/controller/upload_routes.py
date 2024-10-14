@@ -30,6 +30,7 @@ from quivr_api.modules.notification.entity.notification import NotificationsStat
 from quivr_api.modules.notification.service.notification_service import (
     NotificationService,
 )
+from quivr_api.modules.sync.utils.normalize import sanitize_filename
 from quivr_api.modules.upload.service.upload_file import (
     upload_file_storage,
 )
@@ -92,7 +93,7 @@ async def upload_file(
     )
 
     filename_with_brain_id = str(brain_id) + "/" + file_name
-    filename_with_brain_id = f"{filename_with_brain_id.split('.')[0]}.{filename_with_brain_id.split('.')[-1]}"
+    filename_with_brain_id = sanitize_filename(filename_with_brain_id)
 
     buff_reader = io.BufferedReader(uploadFile.file)  # type: ignore
     try:

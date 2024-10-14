@@ -329,8 +329,12 @@ class PDFConverter:
             md_cleaned = md_processor.process(gpt4o_cleaner=gpt4o_cleaner)
             parsed_md = md_cleaned
 
-        if len(parsed_md) < 5 and self.strategy == "fast":
-            logger.debug(f"Switching to auto strategy for {file_path.name}")
+        if (
+            len(parsed_md) < 5
+            and file_path.stat().st_size > 100
+            and self.strategy == "fast"
+        ):
+            logger.info(f"Switching to auto strategy for {file_path.name}")
             self.strategy = "auto"
             return await self.convert(file_path, model, gpt4o_cleaner=gpt4o_cleaner)
 
