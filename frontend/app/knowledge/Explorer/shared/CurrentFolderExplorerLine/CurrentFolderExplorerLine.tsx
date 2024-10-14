@@ -93,6 +93,7 @@ const CurrentFolderExplorerLine = ({
   };
 
   const handleClick = () => {
+    console.info("hey");
     if (element.is_folder) {
       setCurrentFolder({
         ...element,

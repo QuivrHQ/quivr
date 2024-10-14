@@ -19,7 +19,7 @@ const ConnectedBrains = ({
   connectedBrains,
   knowledgeStatus,
 }: ConnectedbrainsProps): JSX.Element => {
-  const [showAddTobrainModal, setShowAddToBrainModal] =
+  const [showAddToBrainModal, setShowAddToBrainModal] =
     useState<boolean>(false);
   const router = useRouter();
 
@@ -29,6 +29,16 @@ const ConnectedBrains = ({
 
   const isKnowledgeStatusWaiting = (status?: KnowledgeStatus): boolean => {
     return status === "RESERVED" || status === "PROCESSING";
+  };
+
+  const handleAddClick = (event: React.MouseEvent) => {
+    event.stopPropagation();
+    event.preventDefault();
+    setShowAddToBrainModal(true);
+  };
+
+  const handleModalClose = () => {
+    setShowAddToBrainModal(false);
   };
 
   return (
@@ -63,19 +73,17 @@ const ConnectedBrains = ({
           </Tooltip>
         ))}
         <Tooltip tooltip="Add to brains">
-          <div
-            onClick={() => {
-              setShowAddToBrainModal(true);
-            }}
-          >
+          <div onClick={handleAddClick}>
             <Icon name="add" color="black" size="normal" handleHover={true} />
           </div>
         </Tooltip>
       </div>
-      <AddToBrainsModal
-        isOpen={showAddTobrainModal}
-        setIsOpen={setShowAddToBrainModal}
-      />
+      {showAddToBrainModal && (
+        <AddToBrainsModal
+          isOpen={showAddToBrainModal}
+          setIsOpen={handleModalClose}
+        />
+      )}
     </>
   );
 };
