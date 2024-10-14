@@ -1,6 +1,7 @@
 import { UUID } from "crypto";
 import { useRouter } from "next/navigation";
 
+import { Icon } from "@/lib/components/ui/Icon/Icon";
 import Tooltip from "@/lib/components/ui/Tooltip/Tooltip";
 import { Brain } from "@/lib/context/BrainProvider/types";
 
@@ -38,6 +39,11 @@ const ConnectedBrains = ({
           </div>
         </Tooltip>
       ))}
+      <Tooltip tooltip="Add to brains">
+        <div>
+          <Icon name="add" color="black" size="normal" handleHover={true} />
+        </div>
+      </Tooltip>
     </div>
   );
 };
