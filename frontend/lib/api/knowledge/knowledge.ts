@@ -3,7 +3,8 @@ import { UUID } from "crypto";
 
 import {
   AddFolderData,
-  AddKnowledgeData,
+  AddKnowledgeFileData,
+  AddKnowledgeUrlData,
   CrawledKnowledge,
   Knowledge,
   UploadedKnowledge,
@@ -112,15 +113,30 @@ export const addFolder = async (
   ).data;
 };
 
-export const addKnowledge = async (
-  knowledgeData: AddKnowledgeData,
+export const addKnowledgeFile = async (
+  knowledgeData: AddKnowledgeFileData,
   file: File,
   axiosInstance: AxiosInstance
 ): Promise<BEKnowledge> => {
-  console.info("Adding knowledge", knowledgeData, file);
   const formData = new FormData();
   formData.append("knowledge_data", JSON.stringify(knowledgeData));
   formData.append("file", file);
+
+  return (
+    await axiosInstance.post<BEKnowledge>(`/knowledge/`, formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    })
+  ).data;
+};
+
+export const addKnowledgeUrl = async (
+  knowledgeData: AddKnowledgeUrlData,
+  axiosInstance: AxiosInstance
+): Promise<BEKnowledge> => {
+  const formData = new FormData();
+  formData.append("knowledge_data", JSON.stringify(knowledgeData));
 
   return (
     await axiosInstance.post<BEKnowledge>(`/knowledge/`, formData, {
