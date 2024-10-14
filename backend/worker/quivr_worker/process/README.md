@@ -49,8 +49,17 @@ If an exception occurs during the parsing loop, the following steps are taken:
      - This operation should be rolled back if an error occurs afterward. Otherwise, the knowledge could remain in `Processing` or `ERROR` status with associated vectors.
      - Reprocessing the knowledge would result in reinserting the vectors into the database, leading to duplicate vectors for the same knowledge.
 
-2. Set the knowledge status to `ERROR`.
-3. Continue processing.
+**Transaction Safety for Each Operation:**
+
+- **Creating knowledge and linking to brains**: These operations can be retried safely. Knowledge is only recreated if it does not already exist in the database, allowing for safe retry.
+- **Downloading sync files**: This operation is idempotent but is safe to retry. If a change has occured, we would download the last version of the file.
+- **Linking knowledge to brains**: Only links the brain if it is not already associated with the knowledge. Safe for retry.
+- **Creating vectors**:
+  - This operation should be rolled back if an error occurs afterward. Otherwise, the knowledge could remain in `Processing` or `ERROR` status with associated vectors.
+  - Reprocessing the knowledge would result in reinserting the vectors into the database, leading to duplicate vectors for the same knowledge.
+
+1. Set the knowledge status to `ERROR`.
+2. Continue processing.
 
 | Note: This means that some knowledges will remain in an errored state. Currently, they are not automatically rescheduled for processing.
 

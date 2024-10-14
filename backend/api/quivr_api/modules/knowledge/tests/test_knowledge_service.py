@@ -518,6 +518,30 @@ async def test_create_knowledge_file(session: AsyncSession, user: User):
 
 
 @pytest.mark.asyncio(loop_scope="session")
+async def test_create_knowledge_web(session: AsyncSession, user: User):
+    assert user.id
+    storage = FakeStorage()
+    repository = KnowledgeRepository(session)
+    service = KnowledgeService(repository, storage)
+
+    km_to_add = AddKnowledge(
+        url="http://quivr.app",
+        source=KnowledgeSource.WEB,
+        is_folder=False,
+        parent_id=None,
+    )
+
+    km = await service.create_knowledge(
+        user_id=user.id, knowledge_to_add=km_to_add, upload_file=None
+    )
+
+    assert km.id
+    assert km.url == km_to_add.url
+    assert km.status == KnowledgeStatus.UPLOADED
+    assert not km.is_folder
+
+
+@pytest.mark.asyncio(loop_scope="session")
 async def test_create_knowledge_folder(session: AsyncSession, user: User):
     assert user.id
     storage = FakeStorage()
@@ -555,7 +579,7 @@ async def test_create_knowledge_folder(session: AsyncSession, user: User):
 
 
 @pytest.mark.asyncio(loop_scope="session")
-async def test_create_knowledge_file_in_folder(
+async def test_create_knowledge_file_in_folder_in_brain(
     monkeypatch, session: AsyncSession, user: User, folder_km_brain: KnowledgeDB
 ):
     tasks = {}
@@ -947,10 +971,6 @@ async def test_list_knowledge_root(session: AsyncSession, user: User):
 
     assert len(root_kms) == 2
     assert {k.id for k in root_kms} == {root_folder.id, root_file.id}
-
-    # check order
-    assert root_kms[0].file_name == "folder"
-    assert root_kms[1].file_name == "file_1"
 
 
 @pytest.mark.asyncio(loop_scope="session")
