@@ -168,6 +168,8 @@ class SyncUtils:
         ]:
             raise ValueError(f"Incompatible file extension for {downloaded_file}")
 
+        storage_path = f"{storage_path.split('.')[0]}.{storage_path.split('.')[-1]}"
+
         response = await upload_file_storage(
             downloaded_file.file_data,
             storage_path,
