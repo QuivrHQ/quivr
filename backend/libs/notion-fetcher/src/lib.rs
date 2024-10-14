@@ -1,26 +1,25 @@
+use anyhow::bail;
 use notion::{
     self,
-    models::{
-        paging::{Paging, PagingCursor},
-        search::{DatabaseQuery, NotionSearch, SearchRequest},
-        ListResponse, Page,
-    },
+    models::{paging::PagingCursor, ListResponse, Page},
 };
-use pyo3::{exceptions::PyValueError, prelude::*};
+use pyo3::prelude::*;
 use reqwest::{
     header::{self, HeaderMap, HeaderValue},
     Client, ClientBuilder,
 };
 use serde_json::json;
+use sqlx::{Sqlite, SqlitePool};
 
 static NOTION_API_VERSION: &'static str = "2022-02-22";
 
 struct NotionFetcher {
     client: Client,
+    tx: tokio::sync::mpsc::Sender<Vec<Page>>,
 }
 
 impl NotionFetcher {
-    fn new(api_token: String) -> anyhow::Result<Self> {
+    fn new(api_token: String, tx: tokio::sync::mpsc::Sender<Vec<Page>>) -> anyhow::Result<Self> {
         let mut headers = HeaderMap::new();
         headers.insert(
             "Notion-Version",
@@ -30,17 +29,20 @@ impl NotionFetcher {
         auth_value.set_sensitive(true);
         headers.insert(header::AUTHORIZATION, auth_value);
         let client = ClientBuilder::new().default_headers(headers).build()?;
-        Ok(Self { client })
+        Ok(Self { client, tx })
     }
 
-    async fn get_all_pages(&self) -> anyhow::Result<Vec<String>> {
+    async fn get_all_pages(&self) -> anyhow::Result<()> {
         let url = "https://api.notion.com/v1/search";
-
         let mut next_cursor: Option<PagingCursor> = None;
-        let mut all_pages: Vec<String> = vec![];
         loop {
             let mut query = json!({
-                "query":""
+                "query":"",
+                "filter":{"propery":"object","value":"page"},
+                "sorts": [{
+                    "timestamp": "last_edited_time",
+                    "direction": "ascending",
+                }]
             });
             if let Some(cursor) = (&next_cursor).as_ref() {
                 query
@@ -60,51 +62,121 @@ impl NotionFetcher {
                 .json::<ListResponse<notion::models::Object>>()
                 .await?;
 
-            resp.results().iter().for_each(|o| match o {
-                notion::models::Object::Page { page } => {
-                    all_pages.push(page.title().unwrap_or_default())
-                }
-                _ => {}
-            });
+            let pages: Vec<Page> = resp
+                .results()
+                .into_iter()
+                .filter_map(|o| {
+                    if let notion::models::Object::Page { page } = o {
+                        Some(page.clone())
+                    } else {
+                        None
+                    }
+                })
+                .collect();
+            if resp.has_more {
+                dbg!(&next_cursor);
+                dbg!(&resp.next_cursor);
 
-            next_cursor = resp.next_cursor;
-            if next_cursor.is_none() {
-                break;
-            } else {
-                println!("Fetching more. Current page size {}", all_pages.len());
+                self.tx.send(pages).await?;
+
+                next_cursor = resp.next_cursor;
+                if next_cursor.is_none() {
+                    break;
+                }
             }
         }
-        println!("{:?}", all_pages);
-
-        Ok(all_pages)
+        Ok(())
     }
 }
 
-async fn fetch_inner(api_key: String) -> PyResult<()> {
-    let client = NotionFetcher::new(api_key)
+async fn save_sqlite<'a>(
+    pool: &SqlitePool,
+    mut rx: tokio::sync::mpsc::Receiver<Vec<Page>>,
+) -> anyhow::Result<()> {
+    while let Some(pages) = rx.recv().await {
+        println!("Received {} pages ", pages.len());
+        bulk_insert_pages(&pool, pages).await.unwrap();
+    }
+    Ok(())
+}
+
+async fn bulk_insert_pages<'a>(pool: &sqlx::Pool<Sqlite>, pages: Vec<Page>) -> anyhow::Result<()> {
+    for page in pages.iter() {
+        let parent_id = match &page.parent {
+            notion::models::Parent::Page { page_id } => Some(page_id.to_string()),
+            _ => None,
+        };
+        let icon = page
+            .icon
+            .as_ref()
+            .map(|i| match i {
+                notion::models::IconObject::Emoji { emoji } => Some(emoji.to_owned()),
+                _ => None,
+            })
+            .flatten();
+        let icon = icon.unwrap_or_default();
+        let page_id = page.id.to_string();
+        let title = page.title().unwrap_or_default();
+        match sqlx::query!(
+            r#"
+            SELECT id
+            FROM notion_pages
+            WHERE id = $1; "#,
+            page_id
+        )
+        .fetch_one(pool)
+        .await
+        {
+            Ok(_) => {
+                // println!("{} page exists. skipping...", page_id)
+            }
+            Err(sqlx::Error::RowNotFound) => {
+                let row_id =sqlx::query!(
+            r#"INSERT INTO notion_pages (id, created_time, last_edited_time, title, archived, parent_id, icon)
+            VALUES ($1,$2,$3,$4,$5,$6,$7)
+            "#,
+            page_id,
+            page.created_time,
+            page.last_edited_time,
+            title,
+            page.archived,
+            parent_id,
+            icon,
+        ).execute(pool).await?.last_insert_rowid();
+                println!("Last inserted row_id: {}", row_id);
+            }
+            Err(e) => {
+                bail!("error fetching record, {e}")
+            }
+        }
+    }
+
+    Ok(())
+}
+
+async fn fetch_save_inner(api_key: String, db_url: String) -> PyResult<()> {
+    let pool = SqlitePool::connect(&db_url).await.unwrap();
+
+    let (tx, rx) = tokio::sync::mpsc::channel(1000);
+    let client = NotionFetcher::new(api_key, tx)
         .map_err(|_| PyErr::new::<PyAny, _>("can't instanciate client"))?;
 
-    client.get_all_pages().await.unwrap();
+    let join = tokio::spawn(async move {
+        client.get_all_pages().await.unwrap();
+    });
 
-    // let mut response = client
-    //     .search(NotionSearch::Query(String::from("")))
-    //     .await
-    //     .map_err(|_| PyErr::new::<PyAny, _>("can't fetch the pages"))?;
+    save_sqlite(&pool, rx)
+        .await
+        .map_err(|_| PyErr::new::<PyAny, _>("error saving results to sqlite"))?;
 
-    // response.results().into_iter().for_each(|o| match o {
-    //     notion::models::Object::Page { page } => {
-    //         pages.push(page.to_owned());
-    //     }
-    //     _ => {}
-    // });
+    join.await.unwrap();
 
     PyResult::Ok(())
 }
 
 #[pyfunction]
-fn fetch_notion_pages(py: Python) -> PyResult<&PyAny> {
-    let api_key = "secret_ABCPUWFzI9dFiJqkXcaaZbjYlkcio85mHURvktFC6TC";
-    pyo3_asyncio::tokio::future_into_py(py, async move { fetch_inner(api_key.to_string()).await })
+fn fetch_notion_pages(py: Python, api_key: String, db_url: String) -> PyResult<&PyAny> {
+    pyo3_asyncio::tokio::future_into_py(py, async move { fetch_save_inner(api_key, db_url).await })
 }
 
 #[pymodule]
@@ -115,11 +187,16 @@ fn _lowlevel(_py: Python, m: &PyModule) -> PyResult<()> {
 
 #[cfg(test)]
 mod tests {
+    use std::env;
+
     use super::*;
+    use dotenvy::dotenv;
 
     #[tokio::test(flavor = "multi_thread", worker_threads = 1)]
     async fn test_fetch() {
-        let api_key = "secret_ABCPUWFzI9dFiJqkXcaaZbjYlkcio85mHURvktFC6TC";
-        fetch_inner(api_key.to_string()).await.unwrap();
+        dotenv().expect("can't load dotenv file");
+        let api_key = env::var("NOTION_API_KEY").expect("error loading api_key");
+        let db_url = env::var("DATABASE_URL").expect("error loading db_url");
+        fetch_save_inner(api_key, db_url).await.unwrap();
     }
 }
