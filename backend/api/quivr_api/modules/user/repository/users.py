@@ -110,17 +110,27 @@ class Users(UsersInterface):
         self.db.table("users").delete().filter("id", "eq", str(user_id)).execute()
 
     def get_user_credits(self, user_id):
-        user_usage_instance = user_usage.UserUsage(id=user_id)
+        try:
+            user_usage_instance = user_usage.UserUsage(id=user_id)
 
-        user_monthly_usage = user_usage_instance.get_user_monthly_usage(
-            time.strftime("%Y%m%d")
-        )
-        monthly_chat_credit = (
-            self.db.from_("user_settings")
-            .select("monthly_chat_credit")
-            .filter("user_id", "eq", str(user_id))
-            .execute()
-            .data[0]["monthly_chat_credit"]
-        )
+            user_monthly_usage = user_usage_instance.get_user_monthly_usage(
+                time.strftime("%Y%m%d")
+            )
+            
+            response = self.db.from_("user_settings").select("monthly_chat_credit").filter(
+                "user_id", "eq", str(user_id)
+            ).execute()
+            
+            if not response.data:
+                raise ValueError("No data found for user settings")
 
-        return monthly_chat_credit - user_monthly_usage
+            monthly_chat_credit = response.data[0].get("monthly_chat_credit")
+            if monthly_chat_credit is None:
+                raise ValueError("Monthly chat credit not found")
+
+            return monthly_chat_credit - user_monthly_usage
+
+        except Exception as e:
+            # Log the exception or handle it as needed
+            print(f"An error occurred while getting user credits: {e}")
+            return 25  # or a default value, depending on your needs
