@@ -75,25 +75,25 @@ async def upload_file(
         message = f"Brain will exceed maximum capacity. Maximum file allowed is : {convert_bytes(remaining_free_space)}"
         raise HTTPException(status_code=403, detail=message)
 
+    file_name = sanitize_filename(str(uploadFile.filename))
+
     # TODO:  Later
     upload_notification = notification_service.add_notification(
         CreateNotification(
             user_id=current_user.id,
             bulk_id=bulk_id,
             status=NotificationsStatusEnum.INFO,
-            title=f"{uploadFile.filename}",
+            title=file_name,
             category="upload",
             brain_id=str(brain_id),
         )
     )
-    file_name = f"{str(uploadFile.filename).split('.')[0]}.{str(uploadFile.filename).split('.')[-1]}"
 
     background_tasks.add_task(
         maybe_send_telemetry, "upload_file", {"file_name": file_name}
     )
 
     filename_with_brain_id = str(brain_id) + "/" + file_name
-    filename_with_brain_id = sanitize_filename(filename_with_brain_id)
 
     buff_reader = io.BufferedReader(uploadFile.file)  # type: ignore
     try:
