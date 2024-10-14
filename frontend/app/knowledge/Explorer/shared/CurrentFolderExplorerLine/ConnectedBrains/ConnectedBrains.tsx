@@ -1,11 +1,13 @@
 import { UUID } from "crypto";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 import { KnowledgeStatus } from "@/lib/api/sync/types";
 import { Icon } from "@/lib/components/ui/Icon/Icon";
 import Tooltip from "@/lib/components/ui/Tooltip/Tooltip";
 import { Brain } from "@/lib/context/BrainProvider/types";
 
+import AddToBrainsModal from "./AddToBrainsModal/AddToBrainsModal";
 import styles from "./ConnectedBrains.module.scss";
 
 interface ConnectedbrainsProps {
@@ -17,6 +19,8 @@ const ConnectedBrains = ({
   connectedBrains,
   knowledgeStatus,
 }: ConnectedbrainsProps): JSX.Element => {
+  const [showAddTobrainModal, setShowAddToBrainModal] =
+    useState<boolean>(false);
   const router = useRouter();
 
   const navigateToBrain = (brainId: UUID) => {
@@ -28,39 +32,53 @@ const ConnectedBrains = ({
   };
 
   return (
-    <div className={styles.main_container}>
-      {connectedBrains.map((brain) => (
-        <Tooltip key={brain.id} tooltip={brain.name}>
-          <>
-            <div
-              className={`${styles.brain_container} ${
-                isKnowledgeStatusWaiting(knowledgeStatus) ? styles.waiting : ""
-              }`}
-              onClick={() => {
-                navigateToBrain(brain.brain_id ?? brain.id);
-              }}
-            >
+    <>
+      <div className={styles.main_container}>
+        {connectedBrains.map((brain) => (
+          <Tooltip key={brain.id} tooltip={brain.name}>
+            <>
               <div
-                className={styles.sample_wrapper}
-                style={{ backgroundColor: brain.snippet_color }}
+                className={`${styles.brain_container} ${
+                  isKnowledgeStatusWaiting(knowledgeStatus)
+                    ? styles.waiting
+                    : ""
+                }`}
+                onClick={() => {
+                  navigateToBrain(brain.brain_id ?? brain.id);
+                }}
               >
-                <span>{brain.snippet_emoji}</span>
+                <div
+                  className={styles.sample_wrapper}
+                  style={{ backgroundColor: brain.snippet_color }}
+                >
+                  <span>{brain.snippet_emoji}</span>
+                </div>
               </div>
-            </div>
-            {isKnowledgeStatusWaiting(knowledgeStatus) && (
-              <div className={styles.waiting_icon}>
-                <Icon color="black" name="waiting" size="small" />
-              </div>
-            )}
-          </>
+              {isKnowledgeStatusWaiting(knowledgeStatus) && (
+                <div className={styles.waiting_icon}>
+                  <Icon color="black" name="waiting" size="small" />
+                </div>
+              )}
+            </>
+          </Tooltip>
+        ))}
+        <Tooltip tooltip="Add to brains">
+          <div>
+            <Icon
+              name="add"
+              color="black"
+              size="normal"
+              handleHover={true}
+              onClick={() => setShowAddToBrainModal(true)}
+            />
+          </div>
         </Tooltip>
-      ))}
-      <Tooltip tooltip="Add to brains">
-        <div>
-          <Icon name="add" color="black" size="normal" handleHover={true} />
-        </div>
-      </Tooltip>
-    </div>
+      </div>
+      <AddToBrainsModal
+        isOpen={showAddTobrainModal}
+        setIsOpen={setShowAddToBrainModal}
+      />
+    </>
   );
 };
 
