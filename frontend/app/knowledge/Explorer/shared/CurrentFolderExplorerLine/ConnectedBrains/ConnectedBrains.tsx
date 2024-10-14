@@ -63,14 +63,12 @@ const ConnectedBrains = ({
           </Tooltip>
         ))}
         <Tooltip tooltip="Add to brains">
-          <div>
-            <Icon
-              name="add"
-              color="black"
-              size="normal"
-              handleHover={true}
-              onClick={() => setShowAddToBrainModal(true)}
-            />
+          <div
+            onClick={() => {
+              setShowAddToBrainModal(true);
+            }}
+          >
+            <Icon name="add" color="black" size="normal" handleHover={true} />
           </div>
         </Tooltip>
       </div>

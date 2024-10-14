@@ -21,7 +21,7 @@ const AddToBrainsModal = ({
         Trigger={<div />}
         CloseTrigger={<div />}
       >
-        u
+        HAHAHAHA
       </Modal>
     </div>
   );
