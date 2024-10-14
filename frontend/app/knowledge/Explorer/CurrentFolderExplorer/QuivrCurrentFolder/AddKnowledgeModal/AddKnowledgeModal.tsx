@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 
+import { useKnowledgeContext } from "@/app/knowledge/KnowledgeProvider/hooks/useKnowledgeContext";
 import { useKnowledgeApi } from "@/lib/api/knowledge/useKnowledgeApi";
 import { Checkbox } from "@/lib/components/ui/Checkbox/Checkbox";
 import { FileInput } from "@/lib/components/ui/FileInput/FileInput";
@@ -33,6 +34,7 @@ const AddKnowledgeModal = ({
     (File | string)[]
   >([]);
   const { addKnowledgeFile, addKnowledgeUrl } = useKnowledgeApi();
+  const { currentFolder } = useKnowledgeContext();
 
   const FILE_TYPES = ["pdf", "docx", "doc", "txt"];
 
@@ -60,7 +62,7 @@ const AddKnowledgeModal = ({
             await addKnowledgeFile(
               {
                 file_name: file.name,
-                parent_id: null,
+                parent_id: currentFolder?.id ?? null,
                 is_folder: false,
               } as AddKnowledgeFileData,
               file
@@ -76,7 +78,7 @@ const AddKnowledgeModal = ({
           try {
             await addKnowledgeUrl({
               url: url,
-              parent_id: null,
+              parent_id: currentFolder?.id ?? null,
               is_folder: false,
             } as AddKnowledgeUrlData);
           } catch (error) {

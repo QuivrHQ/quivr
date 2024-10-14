@@ -39,6 +39,13 @@
     .name {
       @include Typography.EllipsisOverflow;
       flex: 1;
+
+      &.url {
+        &:hover {
+          cursor: pointer;
+          color: var(--primary-0);
+        }
+      }
     }
   }
 
