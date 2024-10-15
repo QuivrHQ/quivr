@@ -21,6 +21,8 @@ import {
   patchKnowledge,
 } from "./knowledge";
 
+import { KMSElement } from "../sync/types";
+
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export const useKnowledgeApi = () => {
   const { axiosInstance } = useAxios();
@@ -44,7 +46,7 @@ export const useKnowledgeApi = () => {
       addKnowledgeUrl(addKnowledgeData, axiosInstance),
     patchKnowledge: async (knowledgeId: UUID, parent_id: UUID | null) =>
       patchKnowledge(knowledgeId, axiosInstance, parent_id),
-    linkKnowledgeToBrains: async (knowledgeId: UUID, brainIds: UUID[]) =>
-      linkKnowledgeToBrains(knowledgeId, brainIds, axiosInstance),
+    linkKnowledgeToBrains: async (knowledge: KMSElement, brainIds: UUID[]) =>
+      linkKnowledgeToBrains(knowledge, brainIds, axiosInstance),
   };
 };

@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 
+import { useKnowledgeContext } from "@/app/knowledge/KnowledgeProvider/hooks/useKnowledgeContext";
 import { useKnowledgeApi } from "@/lib/api/knowledge/useKnowledgeApi";
 import { KMSElement } from "@/lib/api/sync/types";
 import { Checkbox } from "@/lib/components/ui/Checkbox/Checkbox";
@@ -23,9 +24,11 @@ const AddToBrainsModal = ({
 }: AddToBrainsModalProps): JSX.Element => {
   const [selectedBrains, setSelectedBrains] = useState<Brain[]>([]);
   const [initialBrains, setInitialBrains] = useState<Brain[]>([]);
+  const [saveLoading, setSaveLoading] = useState(false);
 
   const { allBrains } = useBrainContext();
   const { linkKnowledgeToBrains } = useKnowledgeApi();
+  const { setRefetchFolderMenu } = useKnowledgeContext();
 
   useEffect(() => {
     if (knowledge) {
@@ -62,14 +65,18 @@ const AddToBrainsModal = ({
       return;
     }
 
-    const knowledgeId = knowledge.id;
     const brainIds = selectedBrains.map((brain) => brain.id);
 
     try {
-      await linkKnowledgeToBrains(knowledgeId, brainIds);
+      setSaveLoading(true);
+      await linkKnowledgeToBrains(knowledge, brainIds);
       console.log("Knowledge linked to brains successfully");
     } catch (error) {
       console.error("Failed to link knowledge to brains", error);
+    } finally {
+      setSaveLoading(false);
+      setIsOpen(false);
+      setRefetchFolderMenu(true);
     }
   };
 
@@ -115,6 +122,7 @@ const AddToBrainsModal = ({
               iconName="upload"
               disabled={!hasChanges()}
               onClick={updateConnectedBrains}
+              isLoading={saveLoading}
             />
           </div>
         </div>
