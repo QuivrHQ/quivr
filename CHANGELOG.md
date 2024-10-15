@@ -1,5 +1,20 @@
 # Changelog
 
+## 0.0.322 (2024-10-15)
+
+## What's Changed
+* feat: Add new documentation files by @StanGirard in https://github.com/QuivrHQ/quivr/pull/3351
+* fix: separate english and french ingredients by @chloedia in https://github.com/QuivrHQ/quivr/pull/3358
+* docs(core): init by @StanGirard in https://github.com/QuivrHQ/quivr/pull/3365
+* docs: quivr core storage by @AmineDiro in https://github.com/QuivrHQ/quivr/pull/3366
+* fix: fixing pdf parsing by @jacopo-chevallard in https://github.com/QuivrHQ/quivr/pull/3349
+* feat: Improve user credit calculation in get_user_credits by @StanGirard in https://github.com/QuivrHQ/quivr/pull/3367
+* fix unwanted parsing effect by @chloedia in https://github.com/QuivrHQ/quivr/pull/3371
+* add fallback on llamaparse by @chloedia in https://github.com/QuivrHQ/quivr/pull/3374
+
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.321...v0.0.322
+
 ## 0.0.321 (2024-10-08)
 
 ## What's Changed
