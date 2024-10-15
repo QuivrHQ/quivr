@@ -37,11 +37,9 @@ const AddToBrainsModal = ({
 
   const handleCheckboxChange = (brain: Brain, checked: boolean) => {
     setSelectedBrains((prevSelectedBrains) => {
-      if (checked) {
-        return [...prevSelectedBrains, brain];
-      } else {
-        return prevSelectedBrains.filter((b) => b.id !== brain.id);
-      }
+      return checked
+        ? [...prevSelectedBrains, brain]
+        : prevSelectedBrains.filter((b) => b.id !== brain.id);
     });
   };
 
