@@ -20,16 +20,16 @@ const AddToBrainsModal = ({
   setIsOpen,
   knowledge,
 }: AddToBrainsModalProps): JSX.Element => {
-  const { allBrains } = useBrainContext();
   const [selectedBrains, setSelectedBrains] = useState<Brain[]>([]);
   const [initialBrains, setInitialBrains] = useState<Brain[]>([]);
+
+  const { allBrains } = useBrainContext();
 
   useEffect(() => {
     if (knowledge) {
       const initialSelectedBrains = allBrains.filter((brain) =>
         knowledge.brains.some((kb) => kb.brain_id === brain.id)
       );
-      console.info(knowledge.brains);
       setSelectedBrains(initialSelectedBrains);
       setInitialBrains(initialSelectedBrains);
     }
