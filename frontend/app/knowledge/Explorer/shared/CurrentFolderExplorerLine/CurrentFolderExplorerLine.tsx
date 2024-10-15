@@ -93,7 +93,6 @@ const CurrentFolderExplorerLine = ({
   };
 
   const handleClick = () => {
-    console.info("hey");
     if (element.is_folder) {
       setCurrentFolder({
         ...element,
@@ -152,10 +151,7 @@ const CurrentFolderExplorerLine = ({
         </span>
       </div>
       <div className={styles.right}>
-        <ConnectedBrains
-          connectedBrains={element.brains}
-          knowledgeStatus={element.status}
-        />
+        <ConnectedBrains connectedBrains={element.brains} knowledge={element} />
         <div className={element.is_folder ? styles.visible : styles.hidden}>
           <Icon
             name="chevronRight"

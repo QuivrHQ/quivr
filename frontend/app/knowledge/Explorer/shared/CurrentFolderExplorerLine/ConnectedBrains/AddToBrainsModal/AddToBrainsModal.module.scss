@@ -2,31 +2,42 @@
 @use "styles/Spacings.module.scss";
 @use "styles/Typography.module.scss";
 
-.brains_list {
+.content_wrapper {
   display: flex;
   flex-direction: column;
-  margin-top: Spacings.$spacing05;
-  border-top: 1px solid var(--border-0);
+  gap: Spacings.$spacing05;
 
-  .brain_line {
+  .brains_list {
     display: flex;
-    align-items: center;
-    gap: Spacings.$spacing03;
-    font-size: Typography.$small;
-    padding-block: Spacings.$spacing03;
-    border-bottom: 1px solid var(--border-0);
+    flex-direction: column;
+    margin-top: Spacings.$spacing05;
+    border-top: 1px solid var(--border-0);
 
-    .sample_wrapper {
+    .brain_line {
       display: flex;
-      justify-content: center;
       align-items: center;
-      border-radius: Radius.$normal;
-      min-width: 18px;
-      min-height: 18px;
-      max-width: 18px;
-      max-height: 18px;
-      border-radius: Radius.$normal;
-      font-size: Typography.$very_tiny;
+      gap: Spacings.$spacing03;
+      font-size: Typography.$small;
+      padding-block: Spacings.$spacing03;
+      border-bottom: 1px solid var(--border-0);
+
+      .sample_wrapper {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        border-radius: Radius.$normal;
+        min-width: 18px;
+        min-height: 18px;
+        max-width: 18px;
+        max-height: 18px;
+        border-radius: Radius.$normal;
+        font-size: Typography.$very_tiny;
+      }
     }
+  }
+
+  .button {
+    display: flex;
+    justify-content: flex-end;
   }
 }

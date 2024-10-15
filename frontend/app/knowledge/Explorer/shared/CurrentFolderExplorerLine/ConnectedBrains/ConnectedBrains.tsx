@@ -2,7 +2,7 @@ import { UUID } from "crypto";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
-import { KnowledgeStatus } from "@/lib/api/sync/types";
+import { KMSElement, KnowledgeStatus } from "@/lib/api/sync/types";
 import { Icon } from "@/lib/components/ui/Icon/Icon";
 import Tooltip from "@/lib/components/ui/Tooltip/Tooltip";
 import { Brain } from "@/lib/context/BrainProvider/types";
@@ -12,12 +12,12 @@ import styles from "./ConnectedBrains.module.scss";
 
 interface ConnectedbrainsProps {
   connectedBrains: Brain[];
-  knowledgeStatus?: KnowledgeStatus;
+  knowledge?: KMSElement;
 }
 
 const ConnectedBrains = ({
   connectedBrains,
-  knowledgeStatus,
+  knowledge,
 }: ConnectedbrainsProps): JSX.Element => {
   const [showAddToBrainModal, setShowAddToBrainModal] =
     useState<boolean>(false);
@@ -49,7 +49,7 @@ const ConnectedBrains = ({
             <>
               <div
                 className={`${styles.brain_container} ${
-                  isKnowledgeStatusWaiting(knowledgeStatus)
+                  isKnowledgeStatusWaiting(knowledge?.status)
                     ? styles.waiting
                     : ""
                 }`}
@@ -64,7 +64,7 @@ const ConnectedBrains = ({
                   <span>{brain.snippet_emoji}</span>
                 </div>
               </div>
-              {isKnowledgeStatusWaiting(knowledgeStatus) && (
+              {isKnowledgeStatusWaiting(knowledge?.status) && (
                 <div className={styles.waiting_icon}>
                   <Icon color="black" name="waiting" size="small" />
                 </div>
@@ -82,6 +82,7 @@ const ConnectedBrains = ({
         <AddToBrainsModal
           isOpen={showAddToBrainModal}
           setIsOpen={handleModalClose}
+          knowledge={knowledge}
         />
       )}
     </>
