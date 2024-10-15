@@ -17,6 +17,7 @@ import {
   getAllBrainKnowledge,
   GetAllKnowledgeInputProps,
   getFiles,
+  linkKnowledgeToBrains,
   patchKnowledge,
 } from "./knowledge";
 
@@ -43,5 +44,7 @@ export const useKnowledgeApi = () => {
       addKnowledgeUrl(addKnowledgeData, axiosInstance),
     patchKnowledge: async (knowledgeId: UUID, parent_id: UUID | null) =>
       patchKnowledge(knowledgeId, axiosInstance, parent_id),
+    linkKnowledgeToBrains: async (knowledgeId: UUID, brainIds: UUID[]) =>
+      linkKnowledgeToBrains(knowledgeId, brainIds, axiosInstance),
   };
 };

@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 
+import { useKnowledgeApi } from "@/lib/api/knowledge/useKnowledgeApi";
 import { KMSElement } from "@/lib/api/sync/types";
 import { Checkbox } from "@/lib/components/ui/Checkbox/Checkbox";
 import { Modal } from "@/lib/components/ui/Modal/Modal";
@@ -24,6 +25,7 @@ const AddToBrainsModal = ({
   const [initialBrains, setInitialBrains] = useState<Brain[]>([]);
 
   const { allBrains } = useBrainContext();
+  const { linkKnowledgeToBrains } = useKnowledgeApi();
 
   useEffect(() => {
     if (knowledge) {
@@ -53,6 +55,22 @@ const AddToBrainsModal = ({
     return !selectedBrainIds.every(
       (id, index) => id === initialBrainIds[index]
     );
+  };
+
+  const updateConnectedBrains = async () => {
+    if (!knowledge) {
+      return;
+    }
+
+    const knowledgeId = knowledge.id;
+    const brainIds = selectedBrains.map((brain) => brain.id);
+
+    try {
+      await linkKnowledgeToBrains(knowledgeId, brainIds);
+      console.log("Knowledge linked to brains successfully");
+    } catch (error) {
+      console.error("Failed to link knowledge to brains", error);
+    }
   };
 
   return (
@@ -96,6 +114,7 @@ const AddToBrainsModal = ({
               color="primary"
               iconName="upload"
               disabled={!hasChanges()}
+              onClick={updateConnectedBrains}
             />
           </div>
         </div>

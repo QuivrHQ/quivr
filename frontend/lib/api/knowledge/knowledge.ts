@@ -163,3 +163,23 @@ export const patchKnowledge = async (
 
   return response.data;
 };
+
+export const linkKnowledgeToBrains = async (
+  knowledgeId: UUID,
+  brainIds: UUID[],
+  axiosInstance: AxiosInstance
+): Promise<KMSElement[]> => {
+  console.info(knowledgeId, brainIds);
+  const response = await axiosInstance.post<KMSElement[]>(
+    `/knowledge/link_to_brains/`,
+    {
+      bulk_id: null,
+      knowledge: {
+        id: knowledgeId,
+      },
+      brain_ids: brainIds,
+    }
+  );
+
+  return response.data;
+};
