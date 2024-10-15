@@ -334,9 +334,15 @@ class PDFConverter:
             and file_path.stat().st_size > 100
             and self.strategy == "fast"
         ):
-            logger.info(f"Switching to auto strategy for {file_path.name}")
-            self.strategy = "auto"
-            return await self.convert(file_path, model, gpt4o_cleaner=gpt4o_cleaner)
+            if os.environ.get("LLAMA_PARSE_API_KEY"):
+                logger.info(f"Switching to llama parse strategy for {file_path.name}")
+                self.method = PdfParser.LLAMA_PARSE
+                self.llama_parse_api_key = os.environ.get("LLAMA_PARSE_API_KEY")
+                return await self.convert(file_path, model, gpt4o_cleaner=gpt4o_cleaner)
+            else:
+                logger.info(
+                    f"Unable to switch to llama parse strategy for {file_path.name}"
+                )
 
         return LangChainDocument(
             page_content=parsed_md,
