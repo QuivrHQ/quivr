@@ -64,6 +64,7 @@ const ConnectionKnowledges = ({
             index={index}
             singleAccount={providerGroup.syncs.length === 1}
             providerGroup={providerGroup}
+            parentFolded={folded}
           />
         ))}
       </div>

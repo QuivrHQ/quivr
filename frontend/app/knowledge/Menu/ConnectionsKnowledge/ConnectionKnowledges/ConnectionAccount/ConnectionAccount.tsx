@@ -16,6 +16,7 @@ interface ConnectionAccountProps {
   index: number;
   singleAccount?: boolean;
   providerGroup?: SyncsByProvider;
+  parentFolded?: boolean;
 }
 
 const ConnectionAccount = ({
@@ -23,6 +24,7 @@ const ConnectionAccount = ({
   index,
   singleAccount,
   providerGroup,
+  parentFolded,
 }: ConnectionAccountProps): JSX.Element => {
   const [loading, setLoading] = useState(false);
   const [syncElements, setKMSElements] = useState<KMSElement[]>();
@@ -56,14 +58,10 @@ const ConnectionAccount = ({
   };
 
   useEffect(() => {
-    getFiles();
-  }, []);
-
-  useEffect(() => {
-    if (singleAccount) {
+    if (!folded || (singleAccount && !parentFolded)) {
       getFiles();
     }
-  }, []);
+  }, [folded, parentFolded]);
 
   return (
     <div className={styles.account_section_wrapper}>

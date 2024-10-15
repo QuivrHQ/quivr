@@ -38,6 +38,7 @@ const ConnectionsKnowledges = (): JSX.Element => {
   };
 
   useEffect(() => {
+    console.info("hey");
     void fetchUserSyncs();
   }, []);
 

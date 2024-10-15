@@ -117,10 +117,14 @@ const CurrentFolderExplorerLine = ({
         element.is_folder ? styles.folder : ""
       } ${isDraggedOver && element.is_folder ? styles.dragged : ""}`}
       onClick={handleClick}
-      draggable
-      onDragStart={(event) => onDragStart?.(event, element)}
-      onDrop={handleDrop}
-      onDragOver={handleDragOver}
+      draggable={element.source === "local"}
+      onDragStart={
+        element.source === "local"
+          ? (event) => onDragStart?.(event, element)
+          : undefined
+      }
+      onDrop={element.source === "local" ? handleDrop : undefined}
+      onDragOver={element.source === "local" ? handleDragOver : undefined}
       onDragLeave={() => setIsDraggedOver(false)}
     >
       <div className={styles.left}>
