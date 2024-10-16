@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 
-import { useKnowledgeContext } from "@/app/knowledge/KnowledgeProvider/hooks/useKnowledgeContext";
 import { useKnowledgeApi } from "@/lib/api/knowledge/useKnowledgeApi";
+import { useKnowledgeContext } from "@/lib/components/KnowledgeManagementSystem/KnowledgeProvider/hooks/useKnowledgeContext";
 import { Checkbox } from "@/lib/components/ui/Checkbox/Checkbox";
 import { FileInput } from "@/lib/components/ui/FileInput/FileInput";
 import { Modal } from "@/lib/components/ui/Modal/Modal";

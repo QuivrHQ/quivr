@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 
-import { useKnowledgeContext } from "@/app/knowledge/KnowledgeProvider/hooks/useKnowledgeContext";
 import { useKnowledgeApi } from "@/lib/api/knowledge/useKnowledgeApi";
 import { KMSElement } from "@/lib/api/sync/types";
+import { useKnowledgeContext } from "@/lib/components/KnowledgeManagementSystem/KnowledgeProvider/hooks/useKnowledgeContext";
 import { Checkbox } from "@/lib/components/ui/Checkbox/Checkbox";
 import { Modal } from "@/lib/components/ui/Modal/Modal";
 import QuivrButton from "@/lib/components/ui/QuivrButton/QuivrButton";

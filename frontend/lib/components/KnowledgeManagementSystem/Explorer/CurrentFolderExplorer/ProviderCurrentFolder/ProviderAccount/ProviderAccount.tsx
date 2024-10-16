@@ -1,5 +1,5 @@
-import { useKnowledgeContext } from "@/app/knowledge/KnowledgeProvider/hooks/useKnowledgeContext";
 import { Sync } from "@/lib/api/sync/types";
+import { useKnowledgeContext } from "@/lib/components/KnowledgeManagementSystem/KnowledgeProvider/hooks/useKnowledgeContext";
 import { ConnectionIcon } from "@/lib/components/ui/ConnectionIcon/ConnectionIcon";
 import { Icon } from "@/lib/components/ui/Icon/Icon";
 

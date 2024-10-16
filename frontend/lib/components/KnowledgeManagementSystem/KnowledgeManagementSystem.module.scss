@@ -1,0 +1,62 @@
+@use "styles/BoxShadow.module.scss";
+@use "styles/Spacings.module.scss";
+@use "styles/Typography.module.scss";
+
+.content_wrapper {
+  display: flex;
+  min-height: 100%;
+  flex: 1;
+
+  .folders_wrapper {
+    padding-inline: Spacings.$spacing05;
+    padding-block: Spacings.$spacing05;
+    display: flex;
+    flex-direction: column;
+    gap: Spacings.$spacing06;
+    box-shadow: BoxShadow.$large;
+
+    .folders {
+      display: flex;
+      flex-direction: column;
+      gap: Spacings.$spacing04;
+      overflow-x: hidden;
+
+      .quivr_folder {
+        padding-top: Spacings.$spacing02;
+        padding-bottom: calc(Spacings.$spacing05 + 3px);
+        border-bottom: 1px solid var(--border-0);
+      }
+    }
+  }
+
+  $resizeWidth: 8px;
+
+  .resize_wrapper {
+    height: 100%;
+    width: $resizeWidth;
+    cursor: col-resize;
+    background-color: var(--background-0);
+
+    .resize_handle {
+      height: 100%;
+      margin-left: calc(#{$resizeWidth} - 1px);
+      width: 1px;
+      cursor: col-resize;
+      background-color: var(--border-0);
+    }
+
+    &:hover {
+      background-color: var(--background-3);
+
+      .resize_handle {
+        background-color: var(--background-3);
+      }
+    }
+  }
+
+  .folder_content {
+    flex: 1;
+    overflow-y: hidden;
+    background-color: red;
+  }
+}

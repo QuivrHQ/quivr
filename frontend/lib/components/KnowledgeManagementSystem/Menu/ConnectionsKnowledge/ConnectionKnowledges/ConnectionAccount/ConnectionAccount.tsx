@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 
-import { useKnowledgeContext } from "@/app/knowledge/KnowledgeProvider/hooks/useKnowledgeContext";
 import { KMSElement, Sync, SyncsByProvider } from "@/lib/api/sync/types"; // Assurez-vous que KMSElement est bien importé
 import { useSync } from "@/lib/api/sync/useSync";
+import { useKnowledgeContext } from "@/lib/components/KnowledgeManagementSystem/KnowledgeProvider/hooks/useKnowledgeContext";
 import { ConnectionIcon } from "@/lib/components/ui/ConnectionIcon/ConnectionIcon";
 import { Icon } from "@/lib/components/ui/Icon/Icon";
 import { LoaderIcon } from "@/lib/components/ui/LoaderIcon/LoaderIcon";
