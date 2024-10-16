@@ -3,9 +3,9 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import { useKnowledgeApi } from "@/lib/api/knowledge/useKnowledgeApi";
+import { KMSElement } from "@/lib/api/sync/types";
 import { useToast } from "@/lib/hooks";
 import { useUrlBrain } from "@/lib/hooks/useBrainIdFromUrl";
-import { Knowledge } from "@/lib/types/Knowledge";
 import { useEventTracking } from "@/services/analytics/june/useEventTracking";
 
 import { useKnowledge } from "../../../hooks/useKnowledge";
@@ -23,7 +23,7 @@ export const useKnowledgeItem = () => {
 
   const { t } = useTranslation(["translation", "explore"]);
 
-  const onDeleteKnowledge = async (knowledge: Knowledge) => {
+  const onDeleteKnowledge = async (knowledge: KMSElement) => {
     setIsDeleting(true);
     void track("DELETE_DOCUMENT");
     const knowledge_name =

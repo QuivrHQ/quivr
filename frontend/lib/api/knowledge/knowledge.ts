@@ -5,9 +5,6 @@ import {
   AddFolderData,
   AddKnowledgeFileData,
   AddKnowledgeUrlData,
-  CrawledKnowledge,
-  Knowledge,
-  UploadedKnowledge,
 } from "@/lib/types/Knowledge";
 
 import { KMSElement } from "../sync/types";
@@ -30,36 +27,12 @@ interface BEKnowledge {
 export const getAllBrainKnowledge = async (
   { brainId }: GetAllKnowledgeInputProps,
   axiosInstance: AxiosInstance
-): Promise<Knowledge[]> => {
+): Promise<KMSElement[]> => {
   const response = await axiosInstance.get<{
-    knowledges: BEKnowledge[];
+    knowledges: KMSElement[];
   }>(`/knowledge?brain_id=${brainId}`);
 
-  return response.data.knowledges.map((knowledge) => {
-    if (knowledge.file_name !== null) {
-      return {
-        id: knowledge.id,
-        brainId: knowledge.brain_id,
-        fileName: knowledge.file_name,
-        extension: knowledge.extension,
-        status: knowledge.status,
-        integration: knowledge.integration,
-        integration_link: knowledge.integration_link,
-      } as UploadedKnowledge;
-    } else if (knowledge.url !== null) {
-      return {
-        id: knowledge.id,
-        brainId: knowledge.brain_id,
-        url: knowledge.url,
-        extension: "URL",
-        status: knowledge.status,
-        integration: knowledge.integration,
-        integration_link: knowledge.integration_link,
-      } as CrawledKnowledge;
-    } else {
-      throw new Error(`Invalid knowledge ${knowledge.id}`);
-    }
-  });
+  return response.data.knowledges;
 };
 
 export type DeleteKnowledgeInputProps = {
