@@ -255,8 +255,6 @@ class LLMEndpointConfig(QuivrBaseConfig):
         This method sets up the initial configuration, including setting the LLM model
         config and API key.
 
-        Args:
-            **data: Keyword arguments for initializing the config.
         """
         super().__init__(**data)
         self.set_llm_model_config()
@@ -369,9 +367,6 @@ class RerankerConfig(QuivrBaseConfig):
     def __init__(self, **data):
         """
         Initialize the RerankerConfig.
-
-        Args:
-            **data: Keyword arguments for initializing the config.
         """
         super().__init__(**data)
         self.validate_model()

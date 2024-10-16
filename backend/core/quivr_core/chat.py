@@ -30,7 +30,7 @@ class ChatHistory:
         # TODO(@aminediro): maybe use a deque() instead ?
         self._msgs: list[ChatMessage] = []
 
-    def get_chat_history(self, newest_first: bool = False):
+    def get_chat_history(self, newest_first: bool = False) -> List[ChatMessage]:
         """
         Retrieves the chat history, optionally sorted in reverse chronological order.
 

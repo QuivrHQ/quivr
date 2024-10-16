@@ -217,7 +217,7 @@ class Brain:
             vector_db=vector_db,
         )
 
-    async def save(self, folder_path: str | Path):
+    async def save(self, folder_path: str | Path) -> str:
         """
         Save the brain to a folder path.
 
@@ -324,7 +324,7 @@ class Brain:
         embedder: Embeddings | None = None,
         skip_file_error: bool = False,
         processor_kwargs: dict[str, Any] | None = None,
-    ):
+    ) -> Self:
         """
         Create a brain from a list of file paths.
 

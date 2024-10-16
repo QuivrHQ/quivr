@@ -31,6 +31,7 @@ venv_sync= "uv pip sync --python ./.venv/bin/python ./requirements.lock"
 venv_create_sync = {chain = ["venv_create", "venv_sync"]}
 check_deps = "basedpyright --project ./pyproject.toml"
 docs = "mkdocs serve"
+build_docs = "mkdocs build --strict"
 
 [tool.basedpyright]
 include = ["src/"]

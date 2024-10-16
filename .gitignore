@@ -103,3 +103,4 @@ backend/core/examples/chatbot/.chainlit/translations/en-US.json
 .tox
 Pipfile
 *.pkl
+backend/docs/site/*
