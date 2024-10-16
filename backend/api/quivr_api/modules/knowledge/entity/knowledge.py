@@ -112,6 +112,7 @@ class KnowledgeDB(AsyncAttrs, SQLModel, table=True):
             await self.awaitable_attrs.created_at
         ), "knowledge should be inserted before transforming to dto"
         brains = await self.awaitable_attrs.brains
+        brains = sorted(brains, key=lambda b: (b is None, b.name))
         children: list[KnowledgeDB] = (
             await self.awaitable_attrs.children if get_children else []
         )
