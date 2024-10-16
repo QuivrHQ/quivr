@@ -2,6 +2,7 @@ from pathlib import Path
 
 import yaml
 from pydantic import BaseModel, ConfigDict
+from typing import Self
 
 
 class QuivrBaseConfig(BaseModel):
@@ -23,7 +24,7 @@ class QuivrBaseConfig(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     @classmethod
-    def from_yaml(cls, file_path: str | Path):
+    def from_yaml(cls, file_path: str | Path) -> Self:
         """
         Create an instance of the class from a YAML file.
 
