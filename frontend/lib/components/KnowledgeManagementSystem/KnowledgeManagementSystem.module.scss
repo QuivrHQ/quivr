@@ -22,7 +22,7 @@
       overflow-x: hidden;
 
       .quivr_folder {
-        padding-top: Spacings.$spacing02;
+        padding-top: Spacings.$spacing01;
         padding-bottom: calc(Spacings.$spacing05 + 3px);
         border-bottom: 1px solid var(--border-0);
       }
@@ -32,7 +32,7 @@
   $resizeWidth: 8px;
 
   .resize_wrapper {
-    height: 100%;
+    min-height: 100%;
     width: $resizeWidth;
     cursor: col-resize;
     background-color: var(--background-0);
