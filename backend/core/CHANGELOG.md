@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.0.18](https://github.com/QuivrHQ/quivr/compare/core-0.0.17...core-0.0.18) (2024-10-16)
+
+
+### Bug Fixes
+
+* **core:** megaparse config ([#3384](https://github.com/QuivrHQ/quivr/issues/3384)) ([ffe86ca](https://github.com/QuivrHQ/quivr/commit/ffe86ca7bac3d7800913937314170db6f91daf8e))
+
 ## [0.0.17](https://github.com/QuivrHQ/quivr/compare/core-0.0.16...core-0.0.17) (2024-10-16)
 
 
