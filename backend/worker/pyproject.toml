@@ -6,7 +6,7 @@ authors = [
     { name = "Stan Girard", email = "stan@quivr.app" }
 ]
 dependencies = [
-    "quivr-core[all]",
+    "quivr-core[all,megaparse]",
     "quivr-api",
     "quivr-diff-assistant",
     "celery[redis]>=5.0.0",

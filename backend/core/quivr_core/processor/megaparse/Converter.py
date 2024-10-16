@@ -20,10 +20,10 @@ from llama_parse.utils import Language, ResultType
 from pptx import Presentation
 from pptx.enum.shapes import MSO_SHAPE_TYPE
 
-from megaparse.config import MegaparseConfig, PdfParser
-from megaparse.markdown_processor import MarkdownProcessor
-from megaparse.multimodal_convertor.megaparse_vision import MegaParseVision
-from megaparse.unstructured_convertor import ModelEnum, UnstructuredParser
+from quivr_core.processor.megaparse.config import MegaparseConfig, PdfParser
+from quivr_core.processor.megaparse.markdown_processor import MarkdownProcessor
+from quivr_core.processor.megaparse.multimodal_convertor.megaparse_vision import MegaParseVision
+from quivr_core.processor.megaparse.unstructured_convertor import ModelEnum, UnstructuredParser
 
 logger = logging.getLogger("megaparse")
 
