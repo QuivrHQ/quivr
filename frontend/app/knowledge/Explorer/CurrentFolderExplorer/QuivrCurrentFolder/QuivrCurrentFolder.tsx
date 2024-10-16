@@ -33,7 +33,6 @@ const QuivrCurrentFolder = (): JSX.Element => {
   const fetchQuivrFiles = async (folderId: UUID | null) => {
     setLoading(true);
     try {
-      console.info("Hey2");
       const res = await getFiles(folderId);
       setQuivrElements(res);
     } catch (error) {

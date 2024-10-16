@@ -169,7 +169,6 @@ export const linkKnowledgeToBrains = async (
   brainIds: UUID[],
   axiosInstance: AxiosInstance
 ): Promise<KMSElement[]> => {
-  console.info(knowledge, brainIds);
   const response = await axiosInstance.post<KMSElement[]>(
     `/knowledge/link_to_brains/`,
     {
@@ -186,11 +185,13 @@ export const unlinkKnowledgeFromBrains = async (
   brainIds: UUID[],
   axiosInstance: AxiosInstance
 ): Promise<KMSElement[]> => {
-  const response = await axiosInstance.post<KMSElement[]>(
+  const response = await axiosInstance.delete<KMSElement[]>(
     `/knowledge/unlink_from_brains/`,
     {
-      knowledge_id,
-      brain_ids: brainIds,
+      data: {
+        knowledge_id,
+        brain_ids: brainIds,
+      },
     }
   );
 
