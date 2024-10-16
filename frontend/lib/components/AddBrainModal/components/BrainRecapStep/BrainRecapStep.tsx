@@ -5,11 +5,9 @@ import { MessageInfoBox } from "@/lib/components/ui/MessageInfoBox/MessageInfoBo
 import { QuivrButton } from "@/lib/components/ui/QuivrButton/QuivrButton";
 import { TextAreaInput } from "@/lib/components/ui/TextAreaInput/TextAreaInput";
 import { TextInput } from "@/lib/components/ui/TextInput/TextInput";
-import { useKnowledgeToFeedContext } from "@/lib/context/KnowledgeToFeedProvider/hooks/useKnowledgeToFeedContext";
 import { useOnboardingContext } from "@/lib/context/OnboardingProvider/hooks/useOnboardingContext";
 import { useUserData } from "@/lib/hooks/useUserData";
 
-import { BrainRecapCard } from "./BrainRecapCard/BrainRecapCard";
 import styles from "./BrainRecapStep.module.scss";
 
 import { useBrainCreationContext } from "../../brainCreation-provider";
@@ -19,7 +17,6 @@ import { useBrainCreationApi } from "../FeedBrainStep/hooks/useBrainCreationApi"
 export const BrainRecapStep = (): JSX.Element => {
   const { currentStepIndex, goToPreviousStep } = useBrainCreationSteps();
   const { creating, setCreating } = useBrainCreationContext();
-  const { knowledgeToFeed } = useKnowledgeToFeedContext();
   const { createBrain } = useBrainCreationApi();
   const { updateUserIdentity } = useUserApi();
   const { userIdentityData } = useUserData();
@@ -84,24 +81,6 @@ export const BrainRecapStep = (): JSX.Element => {
           </div>
         </div>
         <span className={styles.subtitle}>Knowledge From</span>
-        <div className={styles.cards_wrapper}>
-          <BrainRecapCard
-            label="URL"
-            number={
-              knowledgeToFeed.filter(
-                (knowledge) => knowledge.source === "crawl"
-              ).length
-            }
-          />
-          <BrainRecapCard
-            label="Document"
-            number={
-              knowledgeToFeed.filter(
-                (knowledge) => knowledge.source === "upload"
-              ).length
-            }
-          />
-        </div>
       </div>
       <div className={styles.buttons_wrapper}>
         <QuivrButton

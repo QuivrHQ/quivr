@@ -10,11 +10,7 @@ import { HelpWindow } from "@/lib/components/HelpWindow/HelpWindow";
 import { Menu } from "@/lib/components/Menu/Menu";
 import { useOutsideClickListener } from "@/lib/components/Menu/hooks/useOutsideClickListener";
 import { SearchModal } from "@/lib/components/SearchModal/SearchModal";
-import {
-  BrainProvider,
-  ChatProvider,
-  KnowledgeToFeedProvider,
-} from "@/lib/context";
+import { BrainProvider, ChatProvider } from "@/lib/context";
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
 import { ChatsProvider } from "@/lib/context/ChatsProvider";
 import { HelpProvider } from "@/lib/context/HelpProvider/help-provider";
@@ -32,7 +28,6 @@ import { usePageTracking } from "@/services/analytics/june/usePageTracking";
 
 import "../lib/config/LocaleConfig/i18n";
 import styles from "./App.module.scss";
-import { FromConnectionsProvider } from "./chat/[chatId]/components/ActionsBar/components/KnowledgeToFeed/components/FromConnections/FromConnectionsProvider/FromConnection-provider";
 
 if (
   process.env.NEXT_PUBLIC_POSTHOG_KEY != null &&
@@ -106,23 +101,19 @@ const AppWithQueryClient = ({ children }: PropsWithChildren): JSX.Element => {
       <UserSettingsProvider>
         <HelpProvider>
           <BrainProvider>
-            <KnowledgeToFeedProvider>
-              <BrainCreationProvider>
-                <NotificationsProvider>
-                  <MenuProvider>
-                    <OnboardingProvider>
-                      <FromConnectionsProvider>
-                        <ChatsProvider>
-                          <ChatProvider>
-                            <App>{children}</App>
-                          </ChatProvider>
-                        </ChatsProvider>
-                      </FromConnectionsProvider>
-                    </OnboardingProvider>
-                  </MenuProvider>
-                </NotificationsProvider>
-              </BrainCreationProvider>
-            </KnowledgeToFeedProvider>
+            <BrainCreationProvider>
+              <NotificationsProvider>
+                <MenuProvider>
+                  <OnboardingProvider>
+                    <ChatsProvider>
+                      <ChatProvider>
+                        <App>{children}</App>
+                      </ChatProvider>
+                    </ChatsProvider>
+                  </OnboardingProvider>
+                </MenuProvider>
+              </NotificationsProvider>
+            </BrainCreationProvider>
           </BrainProvider>
         </HelpProvider>
       </UserSettingsProvider>

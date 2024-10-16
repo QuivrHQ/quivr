@@ -1,21 +1,14 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { AxiosError } from "axios";
-import { UUID } from "crypto";
 import { useState } from "react";
 import { useFormContext } from "react-hook-form";
 import { useTranslation } from "react-i18next";
-import { v4 as uuidv4 } from "uuid";
 
-import { useFromConnectionsContext } from "@/app/chat/[chatId]/components/ActionsBar/components/KnowledgeToFeed/components/FromConnections/FromConnectionsProvider/hooks/useFromConnectionContext";
 import { PUBLIC_BRAINS_KEY } from "@/lib/api/brain/config";
 import { IntegrationSettings } from "@/lib/api/brain/types";
-import { useSync } from "@/lib/api/sync/useSync";
 import { CreateBrainProps } from "@/lib/components/AddBrainModal/types/types";
-import { useKnowledgeToFeedInput } from "@/lib/components/KnowledgeToFeedInput/hooks/useKnowledgeToFeedInput.ts";
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
-import { useKnowledgeToFeedContext } from "@/lib/context/KnowledgeToFeedProvider/hooks/useKnowledgeToFeedContext";
 import { useToast } from "@/lib/hooks";
-import { useKnowledgeToFeedFilesAndUrls } from "@/lib/hooks/useKnowledgeToFeed";
 
 import { useBrainCreationContext } from "../../../brainCreation-provider";
 
@@ -24,11 +17,8 @@ export const useBrainCreationApi = () => {
   const queryClient = useQueryClient();
   const { publish } = useToast();
   const { t } = useTranslation(["brain", "config"]);
-  const { files, urls } = useKnowledgeToFeedFilesAndUrls();
   const { getValues, reset } = useFormContext<CreateBrainProps>();
-  const { setKnowledgeToFeed } = useKnowledgeToFeedContext();
   const { createBrain: createBrainApi, setCurrentBrainId } = useBrainContext();
-  const { crawlWebsiteHandler, uploadFileHandler } = useKnowledgeToFeedInput();
   const {
     setIsBrainCreationModalOpened,
     setCreating,
@@ -36,35 +26,9 @@ export const useBrainCreationApi = () => {
     snippetColor,
     snippetEmoji,
   } = useBrainCreationContext();
-  const { setOpenedConnections } = useFromConnectionsContext();
   const [fields, setFields] = useState<
     { name: string; type: string; value: string }[]
   >([]);
-  const { syncFiles } = useSync();
-  const { openedConnections } = useFromConnectionsContext();
-
-  const handleFeedBrain = async (brainId: UUID): Promise<void> => {
-    const crawlBulkId: UUID = uuidv4().toString() as UUID;
-    const uploadBulkId: UUID = uuidv4().toString() as UUID;
-
-    const uploadPromises = files.map((file) =>
-      uploadFileHandler(file, brainId, uploadBulkId)
-    );
-
-    const crawlPromises = urls.map((url) =>
-      crawlWebsiteHandler(url, brainId, crawlBulkId)
-    );
-
-    await Promise.all([...uploadPromises, ...crawlPromises]);
-    await Promise.all(
-      openedConnections
-        .filter((connection) => connection.selectedFiles.files.length)
-        .map(async (openedConnection) => {
-          await syncFiles(openedConnection, brainId);
-        })
-    );
-    setKnowledgeToFeed([]);
-  };
 
   const createBrain = async (): Promise<void> => {
     const { name, description } = getValues();
@@ -99,12 +63,10 @@ export const useBrainCreationApi = () => {
       return;
     }
 
-    void handleFeedBrain(createdBrainId);
-
     setCurrentBrainId(createdBrainId);
     setIsBrainCreationModalOpened(false);
     setCreating(false);
-    setOpenedConnections([]);
+
     reset();
 
     void queryClient.invalidateQueries({
