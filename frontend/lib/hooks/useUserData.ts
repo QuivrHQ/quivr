@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 
-import { USER_DATA_KEY, USER_IDENTITY_DATA_KEY } from "../api/user/config";
+import { USER_DATA_KEY } from "../api/user/config";
 import { useUserApi } from "../api/user/useUserApi";
 import { UserIdentity } from "../api/user/user";
 import { UserStats } from "../types/User";
@@ -13,7 +13,7 @@ type UseUserDataProps = {
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export const useUserData = (): UseUserDataProps => {
   const { getUser } = useUserApi();
-  const { getUserIdentity } = useUserApi();
+  const { getUserIdentity, useUserIdentity } = useUserApi();
 
   const { data: userData } = useQuery({
     queryKey: [USER_DATA_KEY],
@@ -21,8 +21,8 @@ export const useUserData = (): UseUserDataProps => {
   });
 
   const { data: userIdentityData } = useQuery({
-    queryKey: [USER_IDENTITY_DATA_KEY],
-    queryFn: getUserIdentity,
+    queryKey: ['USER_IDENTITY_KEY'], // Replace with actual key if needed
+    queryFn: useUserIdentity,
   });
 
   return {

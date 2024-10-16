@@ -1,5 +1,6 @@
 import { AxiosInstance } from "axios";
 import { UUID } from "crypto";
+import useSWR from "swr";
 
 import { UserStats } from "@/lib/types/User";
 
@@ -51,6 +52,18 @@ export const getUserIdentity = async (
   return data;
 };
 
+
+const fetcher = (url: string, axiosInstance: AxiosInstance) =>
+  axiosInstance.get<UserIdentity>(url).then(res => res.data);
+
+export const useUserIdentity = (axiosInstance: AxiosInstance): UserIdentity | undefined => {
+  const { data } = useSWR<UserIdentity>(
+    `/user/identity`,
+    (url: string) => fetcher(url, axiosInstance)
+  );
+
+  return data;
+};
 export const getUser = async (
   axiosInstance: AxiosInstance
 ): Promise<UserStats> => (await axiosInstance.get<UserStats>("/user")).data;
