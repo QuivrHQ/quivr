@@ -9,10 +9,7 @@
 
   .brain_container {
     cursor: pointer;
-
-    &.waiting {
-      opacity: 0.4;
-    }
+    position: relative;
 
     .sample_wrapper {
       display: flex;
@@ -25,6 +22,10 @@
       max-height: 18px;
       border-radius: Radius.$normal;
       font-size: Typography.$very_tiny;
+
+      &.waiting {
+        opacity: 0.4;
+      }
     }
   }
 
@@ -37,5 +38,8 @@
     display: flex;
     justify-content: center;
     align-items: center;
+    top: 0;
+    left: 0;
+    opacity: 1;
   }
 }

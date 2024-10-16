@@ -34,7 +34,7 @@ const AddKnowledgeModal = ({
     (File | string)[]
   >([]);
   const { addKnowledgeFile, addKnowledgeUrl } = useKnowledgeApi();
-  const { currentFolder } = useKnowledgeContext();
+  const { currentFolder, setRefetchFolderExplorer } = useKnowledgeContext();
 
   const FILE_TYPES = ["pdf", "docx", "doc", "txt"];
 
@@ -95,6 +95,7 @@ const AddKnowledgeModal = ({
       setUrls([]);
       setSelectedKnowledges([]);
       setCurrentUrl("");
+      setRefetchFolderExplorer(true);
     }
   };
 

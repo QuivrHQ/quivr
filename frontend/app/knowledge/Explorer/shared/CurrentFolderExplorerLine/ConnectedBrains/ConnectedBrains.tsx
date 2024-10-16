@@ -7,6 +7,7 @@ import { Icon } from "@/lib/components/ui/Icon/Icon";
 import Tooltip from "@/lib/components/ui/Tooltip/Tooltip";
 import { Brain } from "@/lib/context/BrainProvider/types";
 
+import { LoaderIcon } from "@/lib/components/ui/LoaderIcon/LoaderIcon";
 import AddToBrainsModal from "./AddToBrainsModal/AddToBrainsModal";
 import styles from "./ConnectedBrains.module.scss";
 
@@ -48,27 +49,33 @@ const ConnectedBrains = ({
           <Tooltip key={brain.id} tooltip={brain.name}>
             <>
               <div
-                className={`${styles.brain_container} ${
-                  isKnowledgeStatusWaiting(knowledge?.status)
-                    ? styles.waiting
-                    : ""
-                }`}
+                className={styles.brain_container}
                 onClick={() => {
                   navigateToBrain(brain.brain_id ?? brain.id);
                 }}
               >
                 <div
-                  className={styles.sample_wrapper}
+                  className={`${styles.sample_wrapper} ${
+                    isKnowledgeStatusWaiting(knowledge?.status) ||
+                    knowledge?.status === "ERROR"
+                      ? styles.waiting
+                      : ""
+                  }`}
                   style={{ backgroundColor: brain.snippet_color }}
                 >
                   <span>{brain.snippet_emoji}</span>
                 </div>
+                {isKnowledgeStatusWaiting(knowledge?.status) && (
+                  <div className={styles.waiting_icon}>
+                    <LoaderIcon color="black" size="small" />
+                  </div>
+                )}
+                {knowledge?.status === "ERROR" && (
+                  <div className={styles.waiting_icon}>
+                    <Icon name="warning" color="black" size="small" />
+                  </div>
+                )}
               </div>
-              {isKnowledgeStatusWaiting(knowledge?.status) && (
-                <div className={styles.waiting_icon}>
-                  <Icon color="black" name="waiting" size="small" />
-                </div>
-              )}
             </>
           </Tooltip>
         ))}
