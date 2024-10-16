@@ -141,7 +141,7 @@ async def test_knowledge_remove_folder_cascade(
 
 
 @pytest.mark.asyncio(loop_scope="session")
-async def test_knowledge_dto(session, user, brain, sync):
+async def test_knowledge_dto(session, user, brain, brain2, sync):
     # add folder in brain
     folder = KnowledgeDB(
         file_name="folder_1",
@@ -165,7 +165,7 @@ async def test_knowledge_dto(session, user, brain, sync):
         file_size=100,
         file_sha1="test_sha1",
         user_id=user.id,
-        brains=[brain],
+        brains=[brain2, brain],
         parent=folder,
         sync_file_id="file1",
         sync=sync,
@@ -194,7 +194,11 @@ async def test_knowledge_dto(session, user, brain, sync):
     # Syncs fields
     assert km_dto.sync_id == km.sync_id
     assert km_dto.sync_file_id == km.sync_file_id
+    # Check brain_name order
+    assert len(km_dto.brains) == 2
+    assert km_dto.brains[1]["name"] > km_dto.brains[0]["name"]
 
+    # Check folder to dto
     folder_dto = await folder.to_dto()
     assert folder_dto.brains[0] == brain.model_dump()
     assert folder_dto.children == [await km.to_dto()]
