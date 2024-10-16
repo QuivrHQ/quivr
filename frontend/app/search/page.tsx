@@ -7,7 +7,6 @@ import { AddBrainModal } from "@/lib/components/AddBrainModal";
 import { useBrainCreationContext } from "@/lib/components/AddBrainModal/brainCreation-provider";
 import { OnboardingModal } from "@/lib/components/OnboardingModal/OnboardingModal";
 import { PageHeader } from "@/lib/components/PageHeader/PageHeader";
-import { UploadDocumentModal } from "@/lib/components/UploadDocumentModal/UploadDocumentModal";
 import { SearchBar } from "@/lib/components/ui/SearchBar/SearchBar";
 import { SmallTabs } from "@/lib/components/ui/SmallTabs/SmallTabs";
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
@@ -22,7 +21,6 @@ import BrainsList from "./BrainsList/BrainsList";
 import styles from "./page.module.scss";
 
 const projectName = process.env.NEXT_PUBLIC_PROJECT_NAME;
-
 
 const Search = (): JSX.Element => {
   const [selectedTab, setSelectedTab] = useState("Models");
@@ -113,7 +111,9 @@ const Search = (): JSX.Element => {
             <QuivrLogo size={80} color={isDarkMode ? "white" : "black"} />
             <div className={styles.quivr_text}>
               <span>Talk to </span>
-              <span className={styles.quivr_text_primary}>{projectName ? projectName : "Quivr"}</span>
+              <span className={styles.quivr_text_primary}>
+                {projectName ? projectName : "Quivr"}
+              </span>
             </div>
           </div>
           <div className={styles.search_bar_wrapper}>
@@ -132,7 +132,6 @@ const Search = (): JSX.Element => {
           </div>
         </div>
       </div>
-      <UploadDocumentModal />
       <AddBrainModal />
       <OnboardingModal />
     </div>

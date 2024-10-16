@@ -1,6 +1,5 @@
 import { Controller } from "react-hook-form";
 
-import { useFromConnectionsContext } from "@/app/chat/[chatId]/components/ActionsBar/components/KnowledgeToFeed/components/FromConnections/FromConnectionsProvider/hooks/useFromConnectionContext";
 import { useUserApi } from "@/lib/api/user/useUserApi";
 import { MessageInfoBox } from "@/lib/components/ui/MessageInfoBox/MessageInfoBox";
 import { QuivrButton } from "@/lib/components/ui/QuivrButton/QuivrButton";
@@ -24,7 +23,6 @@ export const BrainRecapStep = (): JSX.Element => {
   const { createBrain } = useBrainCreationApi();
   const { updateUserIdentity } = useUserApi();
   const { userIdentityData } = useUserData();
-  const { openedConnections } = useFromConnectionsContext();
   const { setIsBrainCreated } = useOnboardingContext();
 
   const feed = async (): Promise<void> => {
@@ -87,14 +85,6 @@ export const BrainRecapStep = (): JSX.Element => {
         </div>
         <span className={styles.subtitle}>Knowledge From</span>
         <div className={styles.cards_wrapper}>
-          <BrainRecapCard
-            label="Connection"
-            number={
-              openedConnections.filter(
-                (connection) => connection.selectedFiles.files.length
-              ).length
-            }
-          />
           <BrainRecapCard
             label="URL"
             number={
