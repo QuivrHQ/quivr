@@ -2,9 +2,9 @@
 import { UUID } from "crypto";
 import { AnimatePresence, motion } from "framer-motion";
 
+import { KMSElement } from "@/lib/api/sync/types";
 import { LoaderIcon } from "@/lib/components/ui/LoaderIcon/LoaderIcon";
 import { MessageInfoBox } from "@/lib/components/ui/MessageInfoBox/MessageInfoBox";
-import { Knowledge } from "@/lib/types/Knowledge";
 
 import styles from "./KnowledgeTab.module.scss";
 import KnowledgeTable from "./KnowledgeTable/KnowledgeTable";
@@ -13,7 +13,7 @@ import { useAddedKnowledge } from "./hooks/useAddedKnowledge";
 type KnowledgeTabProps = {
   brainId: UUID;
   hasEditRights: boolean;
-  allKnowledge: Knowledge[];
+  allKnowledge: KMSElement[];
 };
 export const KnowledgeTab = ({
   brainId,
@@ -58,7 +58,11 @@ export const KnowledgeTab = ({
       <div className={styles.knowledge_tab_wrapper}>
         <motion.div layout className="w-full flex flex-col gap-5">
           <AnimatePresence mode="popLayout">
-            <KnowledgeTable knowledgeList={allKnowledge} />
+            <KnowledgeTable
+              knowledgeList={allKnowledge.filter(
+                (knowledge) => !knowledge.is_folder
+              )}
+            />
           </AnimatePresence>
         </motion.div>
       </div>
