@@ -5,10 +5,8 @@ import { useEffect, useState } from "react";
 import { AddBrainModal } from "@/lib/components/AddBrainModal";
 import { useBrainCreationContext } from "@/lib/components/AddBrainModal/brainCreation-provider";
 import { PageHeader } from "@/lib/components/PageHeader/PageHeader";
-import { UploadDocumentModal } from "@/lib/components/UploadDocumentModal/UploadDocumentModal";
 import { Tabs } from "@/lib/components/ui/Tabs/Tabs";
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
-import { useKnowledgeToFeedContext } from "@/lib/context/KnowledgeToFeedProvider/hooks/useKnowledgeToFeedContext";
 import { useUserData } from "@/lib/hooks/useUserData";
 import { ButtonType } from "@/lib/types/QuivrButton";
 import { Tab } from "@/lib/types/Tab";
@@ -19,7 +17,6 @@ import styles from "./page.module.scss";
 
 const Studio = (): JSX.Element => {
   const [selectedTab, setSelectedTab] = useState("Manage my brains");
-  const { setShouldDisplayFeedCard } = useKnowledgeToFeedContext();
   const { setIsBrainCreationModalOpened } = useBrainCreationContext();
   const { allBrains } = useBrainContext();
   const { userData } = useUserData();
@@ -49,14 +46,6 @@ const Studio = (): JSX.Element => {
       iconName: "brain",
       tooltip:
         "You have reached the maximum number of brains allowed. Please upgrade your plan or delete some brains to create a new one.",
-    },
-    {
-      label: "Add knowledge",
-      color: "primary",
-      onClick: () => {
-        setShouldDisplayFeedCard(true);
-      },
-      iconName: "uploadFile",
     },
   ]);
 
@@ -93,7 +82,6 @@ const Studio = (): JSX.Element => {
         {selectedTab === "Manage my brains" && <ManageBrains />}
         {selectedTab === "Analytics" && <Analytics />}
       </div>
-      <UploadDocumentModal />
       <AddBrainModal />
     </div>
   );
