@@ -104,7 +104,7 @@ export const TextEditor = (): JSX.Element => {
         <div>
           <BubbleMenu
             shouldShow={() => {
-              return editor.isActive("aiHighlight", { type: "ai" });
+              return editor.isActive("aiHighlight", { type: "selection" });
             }}
             tippyOptions={{
               moveTransition: "transform 0.1s",
@@ -127,11 +127,6 @@ export const TextEditor = (): JSX.Element => {
             />
             <QuivrButton
               onClick={() => {
-                // editor
-                //   .chain()
-                //   .extendMarkRange("highlight")
-                //   .deleteSelection()
-                //   .run();
                 editor.commands.undo();
               }}
               label="Decline"
