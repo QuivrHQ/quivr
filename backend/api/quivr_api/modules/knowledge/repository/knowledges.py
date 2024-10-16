@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Any, List, Sequence
 from uuid import UUID
 
@@ -20,6 +20,7 @@ from quivr_api.modules.knowledge.dto.outputs import (
 )
 from quivr_api.modules.knowledge.entity.knowledge import (
     KnowledgeDB,
+    KnowledgeSource,
 )
 from quivr_api.modules.knowledge.service.knowledge_exceptions import (
     KnowledgeCreationError,
@@ -68,7 +69,7 @@ class KnowledgeRepository(BaseRepository):
                 update_data = payload.model_dump(exclude_unset=True)
             for field in update_data:
                 setattr(knowledge, field, update_data[field])
-
+            knowledge.updated_at = datetime.now(timezone.utc)
             self.session.add(knowledge)
             if autocommit:
                 await self.session.commit()
@@ -328,6 +329,7 @@ class KnowledgeRepository(BaseRepository):
             select(KnowledgeDB)
             .where(KnowledgeDB.parent_id.is_(None))  # type: ignore
             .where(KnowledgeDB.user_id == user_id)
+            .where(KnowledgeDB.source == KnowledgeSource.LOCAL)
             .options(joinedload(KnowledgeDB.children))  # type: ignore
         )
         result = await self.session.exec(query)

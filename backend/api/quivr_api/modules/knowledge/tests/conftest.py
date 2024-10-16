@@ -134,7 +134,19 @@ async def sync(session: AsyncSession, user: User) -> Sync:
 @pytest_asyncio.fixture(scope="function")
 async def brain(session):
     brain_1 = Brain(
-        name="test_brain",
+        name="brain_1",
+        description="this is a test brain",
+        brain_type=BrainType.integration,
+    )
+    session.add(brain_1)
+    await session.commit()
+    return brain_1
+
+
+@pytest_asyncio.fixture(scope="function")
+async def brain2(session):
+    brain_1 = Brain(
+        name="brain_2",
         description="this is a test brain",
         brain_type=BrainType.integration,
     )

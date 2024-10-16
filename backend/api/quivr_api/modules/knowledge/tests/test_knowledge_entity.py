@@ -1,4 +1,6 @@
+from datetime import datetime
 from typing import List, Tuple
+from uuid import uuid4
 
 import pytest
 import pytest_asyncio
@@ -7,7 +9,8 @@ from sqlmodel import select
 from sqlmodel.ext.asyncio.session import AsyncSession
 
 from quivr_api.modules.brain.entity.brain_entity import Brain
-from quivr_api.modules.knowledge.entity.knowledge import KnowledgeDB
+from quivr_api.modules.knowledge.dto.outputs import KnowledgeDTO, sort_knowledge_dtos
+from quivr_api.modules.knowledge.entity.knowledge import KnowledgeDB, KnowledgeSource
 from quivr_api.modules.user.entity.user_identity import User
 
 TestData = Tuple[Brain, List[KnowledgeDB]]
@@ -138,7 +141,7 @@ async def test_knowledge_remove_folder_cascade(
 
 
 @pytest.mark.asyncio(loop_scope="session")
-async def test_knowledge_dto(session, user, brain, sync):
+async def test_knowledge_dto(session, user, brain, brain2, sync):
     # add folder in brain
     folder = KnowledgeDB(
         file_name="folder_1",
@@ -162,7 +165,7 @@ async def test_knowledge_dto(session, user, brain, sync):
         file_size=100,
         file_sha1="test_sha1",
         user_id=user.id,
-        brains=[brain],
+        brains=[brain2, brain],
         parent=folder,
         sync_file_id="file1",
         sync=sync,
@@ -185,13 +188,57 @@ async def test_knowledge_dto(session, user, brain, sync):
     assert km_dto.file_sha1 == km.file_sha1
     assert km_dto.updated_at == km.updated_at
     assert km_dto.created_at == km.created_at
-    assert km_dto.metadata == km.metadata_  # type: ignor
+    assert km_dto.metadata == km.metadata_  # type: ignore
     assert km_dto.parent
     assert km_dto.parent.id == folder.id
     # Syncs fields
     assert km_dto.sync_id == km.sync_id
     assert km_dto.sync_file_id == km.sync_file_id
+    # Check brain_name order
+    assert len(km_dto.brains) == 2
+    assert km_dto.brains[1]["name"] > km_dto.brains[0]["name"]
 
+    # Check folder to dto
     folder_dto = await folder.to_dto()
     assert folder_dto.brains[0] == brain.model_dump()
     assert folder_dto.children == [await km.to_dto()]
+
+
+def test_sort_knowledge_dtos():
+    user_id = uuid4()
+
+    data_dict = {
+        "extension": ".txt",
+        "status": None,
+        "user_id": user_id,
+        "created_at": datetime.now(),
+        "updated_at": datetime.now(),
+        "brains": [],
+        "source": KnowledgeSource.LOCAL,
+        "source_link": "://test.txt",
+        "sync_id": None,
+        "sync_file_id": None,
+        "parent": None,
+        "children": [],
+    }
+    dtos = [
+        KnowledgeDTO(id=uuid4(), is_folder=False, file_name=None, **data_dict),
+        KnowledgeDTO(id=uuid4(), is_folder=False, file_name="B", **data_dict),
+        KnowledgeDTO(id=uuid4(), is_folder=True, file_name="A", **data_dict),
+        KnowledgeDTO(id=uuid4(), is_folder=True, file_name=None, **data_dict),
+    ]
+
+    sorted_dtos = sort_knowledge_dtos(dtos)
+
+    # First element should be a folder with file_name="A"
+    assert sorted_dtos[0].is_folder is True
+    assert sorted_dtos[0].file_name == "A"
+    # Second element should be a folder with file_name=None
+    assert sorted_dtos[1].is_folder is True
+    assert sorted_dtos[1].file_name is None
+    # Third element should be a file with file_name="B"
+    assert sorted_dtos[2].is_folder is False
+    assert sorted_dtos[2].file_name == "B"
+    # Fourth element should be a file with file_name=None
+    assert sorted_dtos[3].is_folder is False
+    assert sorted_dtos[3].file_name is None

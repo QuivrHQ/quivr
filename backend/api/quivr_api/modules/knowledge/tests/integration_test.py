@@ -1,6 +1,6 @@
 import asyncio
 import json
-from uuid import UUID, uuid4
+from uuid import UUID
 
 from httpx import AsyncClient
 
@@ -33,7 +33,6 @@ async def main():
         km = KnowledgeDTO.model_validate(response.json())
 
         json_data = LinkKnowledgeBrain(
-            bulk_id=uuid4(),
             brain_ids=[UUID("40ba47d7-51b2-4b2a-9247-89e29619efb0")],
             knowledge=km,
         ).model_dump_json()

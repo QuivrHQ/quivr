@@ -64,7 +64,7 @@ class SyncsRepository(BaseRepository):
 
         Returns:
         """
-        logger.info("Creating sync user with input: %s", sync_user_input)
+        logger.info(f"Creating sync user with input: {sync_user_input}")
         try:
             sync = Sync.model_validate(sync_user_input.model_dump())
             self.session.add(sync)
@@ -108,9 +108,7 @@ class SyncsRepository(BaseRepository):
             list: A list of sync users matching the criteria.
         """
         logger.info(
-            "Retrieving sync users for user_id: %s, sync_user_id: %s",
-            user_id,
-            sync_id,
+            f"Retrieving sync users for user_id: {user_id}, sync_user_id: {sync_id}",
         )
         query = select(Sync).where(Sync.user_id == user_id)
         if sync_id is not None:
@@ -128,7 +126,7 @@ class SyncsRepository(BaseRepository):
         Returns:
             dict or None: The sync user data matching the state or None if not found.
         """
-        logger.info("Getting sync user by state: %s", state)
+        logger.info(f"Getting sync user by state: {state}")
 
         query = select(Sync).where(Sync.state == state)
         result = await self.session.exec(query)
@@ -140,9 +138,7 @@ class SyncsRepository(BaseRepository):
         return None
 
     async def delete_sync(self, sync_id: int, user_id: UUID):
-        logger.info(
-            "Deleting sync user with sync_id: %s, user_id: %s", sync_id, user_id
-        )
+        logger.info(f"Deleting sync user with sync_id: {sync_id}, user_id: {user_id}")
         await self.session.execute(
             delete(Sync).where(Sync.id == sync_id).where(Sync.user_id == user_id)  # type: ignore
         )
@@ -151,9 +147,7 @@ class SyncsRepository(BaseRepository):
     async def update_sync(
         self, sync: Sync, sync_input: SyncUpdateInput | dict[str, Any]
     ):
-        logger.debug(
-            f"Updating sync {sync.id} with input: {sync_input}",
-        )
+        logger.debug(f"Updating sync user with user_id: {sync.id}")
         try:
             if isinstance(sync_input, dict):
                 update_data = sync_input
@@ -195,17 +189,12 @@ class SyncsRepository(BaseRepository):
         recursive: bool = False,
     ) -> List[SyncFile] | None:
         logger.info(
-            "Retrieving files for user sync with sync_active_id: %s, user_id: %s, folder_id: %s",
-            sync_id,
-            user_id,
-            folder_id,
+            f"Retrieving files for user sync with sync_active_id: {sync_id}, user_id: {user_id}, folder_id: {folder_id}",
         )
         sync = await self.get_sync_id(sync_id=sync_id, user_id=user_id)
         if not sync:
             logger.error(
-                "No sync user found for sync_active_id: %s, user_id: %s",
-                sync_id,
-                user_id,
+                f"No sync user found for sync_active_id: {sync_id}, user_id: {user_id}",
             )
             return None
 

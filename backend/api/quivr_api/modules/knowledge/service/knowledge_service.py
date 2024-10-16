@@ -231,8 +231,15 @@ class KnowledgeService(BaseService[KnowledgeRepository]):
                         "knowledge_id": knowledge_db.id,
                     },
                 )
+                return knowledge_db
+            else:
+                knowledge_db = await self.repository.update_knowledge(
+                    knowledge_db,
+                    KnowledgeUpdate(status=KnowledgeStatus.UPLOADED),
+                    autocommit=autocommit,
+                )
+                return knowledge_db
 
-            return knowledge_db
         except Exception as e:
             logger.exception(
                 f"Error uploading knowledge {knowledgedb.id} to storage : {e}"
