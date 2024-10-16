@@ -59,12 +59,12 @@ def create_query_engine(base_nodes, node_mappings):
         verbose=True,
     )
     return RetrieverQueryEngine.from_args(
-        recursive_retriever, llm=OpenAI(temperature=0, model="gpt-4")
+        recursive_retriever, llm=OpenAI(temperature=0, model="gpt-4o")
     )
 
 
 def compare_responses(response1, response2):
-    llm = OpenAI(temperature=0, model="gpt-4")
+    llm = OpenAI(temperature=0, model="gpt-4o")
     prompt = f"""
     Compare the following two responses and determine if they convey the same information:
     Response for document 1: {response1}
@@ -131,7 +131,7 @@ async def process_cdp_use_case_2(
     supabase_client = get_supabase_client()
     path = f"{task.assistant_id}/{task.pretty_id}/"
     logger.info(f"Path: {path} 📁")
-    
+
     await tasks_service.update_task(task_id, {"status": "processing"})
 
     before_file_data = supabase_client.storage.from_("quivr").download(
