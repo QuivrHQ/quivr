@@ -3,10 +3,10 @@ name: Run Tests with Tika Server
 on:
   push:
     paths:
-      - "backend/core/**"
+      - "core/**"
   pull_request:
     paths:
-      - "backend/core/**"
+      - "core/**"
   workflow_dispatch:
 
 jobs:

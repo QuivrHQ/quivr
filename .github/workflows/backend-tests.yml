@@ -2,8 +2,6 @@ name: Run Tests API and Worker
 
 on:
   pull_request:
-    paths:
-      - "backend/**"
   workflow_dispatch:
 
 jobs:
