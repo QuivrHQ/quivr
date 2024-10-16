@@ -11,7 +11,8 @@ use reqwest::{
 use serde_json::json;
 use sqlx::{Sqlite, SqlitePool};
 
-static NOTION_API_VERSION: &'static str = "2022-02-22";
+static NOTION_URL: &'static str = "https://api.notion.com/v1/search";
+static NOTION_API_VERSION: &'static str = "2022-06-28";
 
 struct NotionFetcher {
     client: Client,
@@ -25,6 +26,10 @@ impl NotionFetcher {
             "Notion-Version",
             HeaderValue::from_static(NOTION_API_VERSION),
         );
+        headers.insert(
+            header::CONTENT_TYPE,
+            HeaderValue::from_static("application/json"),
+        );
         let mut auth_value = HeaderValue::from_str(&format!("Bearer {}", api_token))?;
         auth_value.set_sensitive(true);
         headers.insert(header::AUTHORIZATION, auth_value);
@@ -33,16 +38,15 @@ impl NotionFetcher {
     }
 
     async fn get_all_pages(&self) -> anyhow::Result<()> {
-        let url = "https://api.notion.com/v1/search";
         let mut next_cursor: Option<PagingCursor> = None;
         loop {
             let mut query = json!({
                 "query":"",
-                "filter":{"propery":"object","value":"page"},
-                "sorts": [{
+                "filter":{"property":"object","value":"page"},
+                "sort": {
                     "timestamp": "last_edited_time",
-                    "direction": "ascending",
-                }]
+                    "direction": "ascending"
+                }
             });
             if let Some(cursor) = (&next_cursor).as_ref() {
                 query
@@ -52,38 +56,48 @@ impl NotionFetcher {
             }
             let query_str = query.to_string();
 
-            println!("Requesting query: URL: {}, query: {}", &url, &query_str);
-            let resp = self
+            println!(
+                "Requesting query: URL: {}, query: {}",
+                &NOTION_URL, &query_str
+            );
+            match self
                 .client
-                .post(url)
+                .post(NOTION_URL)
                 .body(query_str)
                 .send()
                 .await?
                 .json::<ListResponse<notion::models::Object>>()
-                .await?;
+                .await
+            {
+                Ok(resp) => {
+                    let pages: Vec<Page> = resp
+                        .results()
+                        .into_iter()
+                        .filter_map(|o| {
+                            if let notion::models::Object::Page { page } = o {
+                                Some(page.clone())
+                            } else {
+                                None
+                            }
+                        })
+                        .collect();
+                    if resp.has_more {
+                        dbg!(&next_cursor);
+                        dbg!(&resp.next_cursor);
 
-            let pages: Vec<Page> = resp
-                .results()
-                .into_iter()
-                .filter_map(|o| {
-                    if let notion::models::Object::Page { page } = o {
-                        Some(page.clone())
-                    } else {
-                        None
+                        self.tx.send(pages).await?;
+
+                        let _ = std::mem::replace(&mut next_cursor, resp.next_cursor);
+                        if next_cursor.is_none() {
+                            break;
+                        }
                     }
-                })
-                .collect();
-            if resp.has_more {
-                dbg!(&next_cursor);
-                dbg!(&resp.next_cursor);
-
-                self.tx.send(pages).await?;
-
-                next_cursor = resp.next_cursor;
-                if next_cursor.is_none() {
+                }
+                Err(e) => {
+                    println!("error parsing request: {:?}", e);
                     break;
                 }
-            }
+            };
         }
         Ok(())
     }
@@ -131,7 +145,7 @@ async fn bulk_insert_pages<'a>(pool: &sqlx::Pool<Sqlite>, pages: Vec<Page>) -> a
                 // println!("{} page exists. skipping...", page_id)
             }
             Err(sqlx::Error::RowNotFound) => {
-                let row_id =sqlx::query!(
+                sqlx::query!(
             r#"INSERT INTO notion_pages (id, created_time, last_edited_time, title, archived, parent_id, icon)
             VALUES ($1,$2,$3,$4,$5,$6,$7)
             "#,
@@ -142,8 +156,7 @@ async fn bulk_insert_pages<'a>(pool: &sqlx::Pool<Sqlite>, pages: Vec<Page>) -> a
             page.archived,
             parent_id,
             icon,
-        ).execute(pool).await?.last_insert_rowid();
-                println!("Last inserted row_id: {}", row_id);
+        ).execute(pool).await?;
             }
             Err(e) => {
                 bail!("error fetching record, {e}")

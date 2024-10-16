@@ -104,3 +104,7 @@ backend/core/examples/chatbot/.chainlit/translations/en-US.json
 Pipfile
 *.pkl
 backend/benchmarks/data.json
+
+# notion-fetcher
+*.db*
+*.so
