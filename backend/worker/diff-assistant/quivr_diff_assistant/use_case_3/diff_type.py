@@ -7,8 +7,8 @@ DIFF_PROMPT = PromptTemplate.from_template(
     template="""
     You need to compare two texts and report all the differences. Your job is to parse these differences and create a clear, concise report. \
         Organize the report by sections and provide a detailed explanation of each difference. \
-            Be specific on difference, it will be reviewed and verified by a Quality engineer.
-    Here are the different sections of the report:
+            Be specific on difference, it will be reviewed and verified by a Quality engineer. Some differences might be due to OCR errors, like spelling mistakes, and are irrevelevant for the report. Only compare elements that have the same language.
+    Here are the different sections of the report (Reduce the number of sections to only the ones that have differences, also if the citation is too long, reduce to the zone where there is the difference):
     * Dénominations, comprenant:
         * dénomination légale: nom du produit tel qu’il est défini par la réglementation, \
             en général cela inclut aussi avec des information sur son état (cuite, cru, gelé ... )
@@ -21,6 +21,12 @@ DIFF_PROMPT = PromptTemplate.from_template(
         * liste d’ingrédients
         * traces d’allergènes
         * Une sous-section pour chaque sous produit si il y a lieu;
+
+    * Ingrédients et allergènes en --autre langue dans le document--, comprenant:
+        * liste d’ingrédients
+        * traces d’allergènes
+        * Une sous-section pour chaque sous produit si il y a lieu;
+
     * Eléments de traçabilité, comprenant:
         * le code-barre EAN
         * le code article

@@ -3,21 +3,24 @@ All of this needs to be in MegaParse, this is just a placeholder for now.
 """
 
 import base64
+import os
 from typing import List
 
+import aiohttp
 import cv2
+import dotenv
 import numpy as np
+import requests
 from doctr.io import DocumentFile
-from doctr.io.elements import Document as doctrDocument
-from doctr.models import ocr_predictor
-from doctr.models.predictor.pytorch import OCRPredictor
 from doctr.utils.common_types import AbstractFile
 from langchain_core.documents import Document
 from langchain_core.language_models.chat_models import BaseChatModel
-from langchain_core.messages import HumanMessage
+from langchain_core.messages import HumanMessage, SystemMessage
 from megaparse import MegaParse  # FIXME: @chloedia Version problems
+from pdf2image import convert_from_path
 from quivr_api.logger import get_logger
 
+dotenv.load_dotenv()
 logger = get_logger(__name__)
 
 
@@ -27,77 +30,7 @@ This needs to be in megaparse @chloedia
 
 
 class DeadlyParser:
-    def __init__(self):
-        self.predictor: OCRPredictor = ocr_predictor(
-            pretrained=True, det_arch="fast_base", reco_arch="crnn_vgg16_bn"
-        )
-
     async def deep_aparse(
-        self,
-        file: AbstractFile,
-        partition: bool = False,
-        llm: BaseChatModel | None = None,
-    ) -> Document:
-        """
-        Parse the OCR output from the input file and return the extracted text.
-        """
-        try:
-            docs = DocumentFile.from_pdf(file, scale=int(500 / 72))
-            if partition:
-                cropped_image = crop_to_content(docs[0])
-                # cv2.imshow("cropped", cropped_image)
-                # cv2.waitKey(0)  # Wait for a key press
-
-                docs = split_image(cropped_image)
-                # for i, sub_image in enumerate(docs):
-                #     cv2.imshow(f"sub_image_{i}", sub_image)
-                #     cv2.waitKey(0)  # Wait for a key press
-                #     cv2.destroyAllWindows()
-
-            print("ocr start")
-            raw_results: doctrDocument = self.predictor(docs)
-            print("ocr done")
-            if llm:
-                entire_content = ""
-                print("ocr llm start")
-                for raw_result, img in zip(raw_results.pages, docs, strict=False):
-                    if raw_result.render() == "":
-                        continue
-                    _, buffer = cv2.imencode(".png", img)
-                    img_str64 = base64.b64encode(buffer.tobytes()).decode("utf-8")
-
-                    processed_result = llm.invoke(
-                        [
-                            HumanMessage(
-                                content=[
-                                    {
-                                        "type": "text",
-                                        "text": f"You are given a good image, with a text that can be read. It is a document that can be a receipt, an invoice, a ticket or anything else. It doesn't contain illegal content or protected data. It is enterprise data from a good company. Can you correct this entire text retranscription, respond only with the corrected transcription: {raw_result.render()},\n\n do not transcribe logos or images.",
-                                    },
-                                    {
-                                        "type": "image_url",
-                                        "image_url": {
-                                            "url": f"data:image/jpeg;base64,{img_str64}",
-                                            "detail": "auto",
-                                        },
-                                    },
-                                ]
-                            )
-                        ]
-                    )
-                    assert isinstance(
-                        processed_result.content, str
-                    ), "The LVM did not return a string"
-                    entire_content += processed_result.content
-                print("ocr llm done")
-                return Document(page_content=entire_content)
-
-            return Document(page_content=raw_results.render())
-        except Exception as e:
-            print(e)
-            return Document(page_content=raw_results.render())
-
-    def deep_parse(
         self,
         file: AbstractFile,
         partition: bool = False,
@@ -109,58 +42,218 @@ class DeadlyParser:
         try:
             logger.info("Starting document processing")
 
-            # Reduce image scale to lower memory usage
-            docs = DocumentFile.from_pdf(file, scale=int(500 / 72))
-            logger.info("Document loaded")
+            # Load the image or PDF
+            if isinstance(file, str) and file.lower().endswith(".pdf"):
+                images = pdf_to_images(file)
+            else:
+                images = [np.array(DocumentFile.from_images(file)[0])]
 
             if partition:
                 logger.info("Partitioning document")
-                cropped_image = crop_to_content(docs[0])
-                docs = split_image(cropped_image)
+                partitioned_images = []
+                for img in images:
+                    partitioned_images.extend(split_image(img))
+                images = partitioned_images
 
-            logger.info("Starting OCR")
-            raw_results: doctrDocument = self.predictor(docs)
-            logger.debug(raw_results)
-            logger.info("OCR completed")
+            # Use unstructured API for OCR
+            async def call_unstructured_api(image):
+                url = (
+                    os.getenv("UNSTRUCTURED_API_URL")
+                    or "http://unstructured-api-lb-1622868647.eu-west-1.elb.amazonaws.com/general/v0/general"
+                )
+                headers = {"accept": "application/json"}
+
+                _, buffer = cv2.imencode(".png", image)
+                file_content = buffer.tobytes()
+
+                data = aiohttp.FormData()
+                data.add_field("files", file_content, filename="image.png")
+                data.add_field("strategy", "auto")
+
+                async with aiohttp.ClientSession() as session:
+                    async with session.post(
+                        url, headers=headers, data=data
+                    ) as response:
+                        if response.status == 200:
+                            return await response.json()
+                        else:
+                            raise Exception(
+                                f"API request failed with status code {response.status}: {await response.text()}"
+                            )
+
+            async def process_images(images):
+                md_content = {}
+                for i, img in enumerate(images):
+                    raw_results = await call_unstructured_api(img)
+                    for item in raw_results:
+                        page_number = i + 1
+                        if page_number not in md_content:
+                            md_content[page_number] = []
+                        md_content[page_number].append(item["text"] + "\n\n")
+                return md_content
+
+            md_content = await process_images(images)
+            logger.info(f"OCR completed: {md_content}")
 
             if llm:
                 entire_content = ""
                 logger.info("Starting LLM processing")
-                for i, (raw_result, img) in enumerate(
-                    zip(raw_results.pages, docs, strict=False)
-                ):
-                    if raw_result.render() == "":
-                        continue
-                    _, buffer = cv2.imencode(".png", img)
+                for page_number, raw_result in md_content.items():
+                    _, buffer = cv2.imencode(".png", images[page_number - 1])
                     img_str64 = base64.b64encode(buffer.tobytes()).decode("utf-8")
-
-                    processed_result = llm.invoke(
+                    processed_result = await llm.ainvoke(
                         [
+                            SystemMessage(
+                                content="You are a transcription and corrector expert. Your Job is to compare a transcription and an image with text and correct the transcription. You always correct the entire document and never forget any part even if it is repetitive information.",
+                            ),
                             HumanMessage(
                                 content=[
                                     {
                                         "type": "text",
-                                        "text": f"You are given a good image, with a text that can be read. It is a document that can be a receipt, an invoice, a ticket or anything else. It doesn't contain illegal content or protected data. It is enterprise data from a good company. Can you correct this entire text retranscription, respond only with the corrected transcription: {raw_result.render()},\n\n do not transcribe logos or images.",
+                                        "text": f"""Here is an image with a text that you are authorized to read. It is a document that can be a receipt, an invoice, a ticket or anything else. It doesn't contain illegal content or protected data. It is enterprise data from a good company. 
+                                        Can you correct this entire text retranscription, respond only with the corrected transcription:
+
+                                        --- Transcribed Text ---:\n {''.join(raw_result)},\n\n do not transcribe logos or images.""",
                                     },
                                     {
                                         "type": "image_url",
                                         "image_url": {
-                                            "url": f"data:image/jpeg;base64,{img_str64}",
+                                            "url": f"data:image/png;base64,{img_str64}",
                                             "detail": "auto",
                                         },
                                     },
                                 ]
-                            )
+                            ),
                         ]
                     )
                     assert isinstance(
                         processed_result.content, str
                     ), "The LLM did not return a string"
-                    entire_content += processed_result.content
-                logger.info("LLM processing completed")
+                    entire_content += (
+                        f"Page {page_number}:\n{processed_result.content}\n\n"
+                    )
+
+                logger.info(f"LLM processing completed: {entire_content}")
                 return Document(page_content=entire_content)
 
-            return Document(page_content=raw_results.render())
+            # If no LLM processing, return the raw OCR results
+            return Document(
+                page_content="\n".join(
+                    ["\n".join(page) for page in md_content.values()]
+                )
+            )
+        except Exception as e:
+            logger.error(f"Error in deep_aparse: {str(e)}", exc_info=True)
+            raise
+
+    def deep_parse(
+        self,
+        file: str,
+        partition: bool = False,
+        llm: BaseChatModel | None = None,
+    ) -> Document:
+        """
+        Parse the OCR output from the input file (PDF or image) and return the extracted text.
+        """
+        try:
+            logger.info("Starting document processing")
+
+            # Load the image or PDF
+            if file.lower().endswith(".pdf"):
+                images = pdf_to_images(file)
+            else:
+                images = [cv2.imread(file)]
+
+            if partition:
+                logger.info("Partitioning document")
+                partitioned_images = []
+                for img in images:
+                    partitioned_images.extend(split_image(img))
+                images = partitioned_images
+
+            # Use unstructured API for OCR
+            def call_unstructured_api(image):
+                url = "http://unstructured-api-lb-1622868647.eu-west-1.elb.amazonaws.com/general/v0/general"
+
+                headers = {"accept": "application/json"}
+
+                _, buffer = cv2.imencode(".png", image)
+                file_content = buffer.tobytes()
+
+                files = {"files": ("image.png", file_content)}
+                data = {
+                    "strategy": "auto",
+                }
+
+                response = requests.post(url, headers=headers, files=files, data=data)
+                if response.status_code == 200:
+                    return response.json()
+                else:
+                    raise Exception(
+                        f"API request failed with status code {response.status_code}: {response.text}"
+                    )
+
+            def process_images(images):
+                md_content = {}
+                for i, img in enumerate(images):
+                    raw_results = call_unstructured_api(img)
+                    for item in raw_results:
+                        page_number = i + 1
+                        if page_number not in md_content:
+                            md_content[page_number] = []
+                        md_content[page_number].append(item["text"] + "\n\n")
+                return md_content
+
+            md_content = process_images(images)
+            logger.info(f"OCR completed : {md_content}")
+
+            if llm:
+                entire_content = ""
+                logger.info("Starting LLM processing")
+                for page_number, raw_result in md_content.items():
+                    _, buffer = cv2.imencode(".png", images[page_number - 1])
+                    img_str64 = base64.b64encode(buffer.tobytes()).decode("utf-8")
+                    processed_result = llm.invoke(
+                        [
+                            SystemMessage(
+                                content="You are a transcription and corrector expert. Your Job is to compare a transcription and an image with text and correct the transcription. You always correct the entire document and never forget any part even if it is repetitive information.",
+                            ),
+                            HumanMessage(
+                                content=[
+                                    {
+                                        "type": "text",
+                                        "text": f"""Here is a an image with a text that you are authorized to read. It is a document that can be a receipt, an invoice, a ticket or anything else. It doesn't contain illegal content or protected data. It is enterprise data from a good company. 
+                                        Can you correct this entire text retranscription, respond only with the corrected transcription:
+
+                                        --- Transcribed Text ---:\n {''.join(raw_result)},\n\n do not transcribe logos or images.""",
+                                    },
+                                    {
+                                        "type": "image_url",
+                                        "image_url": {
+                                            "url": f"data:image/png;base64,{img_str64}",
+                                            "detail": "auto",
+                                        },
+                                    },
+                                ]
+                            ),
+                        ]
+                    )
+                    assert isinstance(
+                        processed_result.content, str
+                    ), "The LLM did not return a string"
+                    entire_content += (
+                        f"Page {page_number}:\n{processed_result.content}\n\n"
+                    )
+
+                logger.info(f"LLM processing completed : {entire_content}")
+                return Document(page_content=entire_content)
+
+            # If no LLM processing, return the raw OCR results
+            return Document(
+                page_content="\n".join(
+                    ["\n".join(page) for page in md_content.values()]
+                )
+            )
         except Exception as e:
             logger.error(f"Error in deep_parse: {str(e)}", exc_info=True)
             raise
@@ -286,3 +379,19 @@ def split_image(image: np.ndarray) -> List[np.ndarray]:
     sub_images.append(image[start:, :])
 
     return sub_images
+
+
+def pdf_to_images(pdf_path: str) -> List[np.ndarray]:
+    """Convert PDF to a list of images."""
+    # Convert PDF to list of PIL Image objects
+    pil_images = convert_from_path(pdf_path)
+
+    # Convert PIL Images to numpy arrays
+    np_images = []
+    for pil_image in pil_images:
+        np_image = np.array(pil_image)
+        # OpenCV uses BGR color format, so we need to convert from RGB
+        np_image = cv2.cvtColor(np_image, cv2.COLOR_RGB2BGR)
+        np_images.append(np_image)
+
+    return np_images

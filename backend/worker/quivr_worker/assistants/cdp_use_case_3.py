@@ -6,10 +6,10 @@ from enum import Enum
 from pathlib import Path
 
 from diff_match_patch import diff_match_patch
+from langchain_anthropic import ChatAnthropic
 
 # get environment variables
 from langchain_core.language_models.chat_models import BaseChatModel
-from langchain_openai import ChatOpenAI
 from quivr_api.logger import get_logger
 from quivr_api.modules.assistant.dto.inputs import InputAssistant
 from quivr_api.modules.assistant.services.tasks_service import TasksService
@@ -97,10 +97,16 @@ async def process_cdp_use_case_3(
     assert before_file_data is not None
     assert after_file_data is not None
 
-    openai_gpt4o = ChatOpenAI(
-        model="gpt-4o",
+    # openai_gpt4o = ChatOpenAI(
+    #     model="gpt-4o",
+    #     temperature=0,
+    #     max_tokens=None,
+    #     max_retries=2,
+    # )
+    claude_sonnet_3_5 = ChatAnthropic(
+        model_name="claude-3-opus-20240229",
         temperature=0,
-        max_tokens=None,
+        max_tokens_to_sample=4096,
         max_retries=2,
     )
 
@@ -109,7 +115,7 @@ async def process_cdp_use_case_3(
         before_file=before_file_path,
         after_file=after_file_path,
         type=document_type,
-        llm=openai_gpt4o,
+        llm=claude_sonnet_3_5,
         partition=hard_to_read_document,
         use_llm_comparator=llm_comparator,
     )
