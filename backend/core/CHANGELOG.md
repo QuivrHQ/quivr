@@ -1,5 +1,25 @@
 # Changelog
 
+## [0.0.17](https://github.com/QuivrHQ/quivr/compare/core-0.0.16...core-0.0.17) (2024-10-16)
+
+
+### Features
+
+* **assistant:** cdp ([#3305](https://github.com/QuivrHQ/quivr/issues/3305)) ([b767f19](https://github.com/QuivrHQ/quivr/commit/b767f19f28b5478cef077b5d1587bf5195f2a668))
+* **assistants:** mock api ([#3195](https://github.com/QuivrHQ/quivr/issues/3195)) ([282fa0e](https://github.com/QuivrHQ/quivr/commit/282fa0e3f83f7c6fc8c84ca95f8f4ced4ed34b78))
+* introducing configurable retrieval workflows ([#3227](https://github.com/QuivrHQ/quivr/issues/3227)) ([ef90e8e](https://github.com/QuivrHQ/quivr/commit/ef90e8e672ca23d104c7d5bde7496f0929adf5d2))
+
+
+### Bug Fixes
+
+* fixing pdf parsing ([#3349](https://github.com/QuivrHQ/quivr/issues/3349)) ([367242a](https://github.com/QuivrHQ/quivr/commit/367242a3d5ea2df1928cb2908ad9e1906d1bba6f))
+
+
+### Documentation
+
+* **core:** init ([#3365](https://github.com/QuivrHQ/quivr/issues/3365)) ([bb572a2](https://github.com/QuivrHQ/quivr/commit/bb572a2a8d060f147461506aadd38704eb029a9a))
+* **fix:** fixed warnings from griffe ([#3381](https://github.com/QuivrHQ/quivr/issues/3381)) ([1a38798](https://github.com/QuivrHQ/quivr/commit/1a3879839a2d9e0881e18cb66809564fb76724ef))
+
 ## [0.0.16](https://github.com/QuivrHQ/quivr/compare/core-0.0.15...core-0.0.16) (2024-09-17)
 
 

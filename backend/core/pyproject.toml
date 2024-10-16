@@ -1,6 +1,6 @@
 [project]
 name = "quivr-core"
-version = "0.0.16"
+version = "0.0.17"
 description = "Quivr core RAG package"
 authors = [
     { name = "Stan Girard", email = "stan@quivr.app" }
