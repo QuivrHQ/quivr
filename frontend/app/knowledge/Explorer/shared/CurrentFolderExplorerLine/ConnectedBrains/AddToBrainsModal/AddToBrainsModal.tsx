@@ -90,7 +90,10 @@ const AddToBrainsModal = ({
   };
 
   return (
-    <div className={styles.main_container}>
+    <div
+      className={styles.main_container}
+      onClick={(event) => event.stopPropagation()}
+    >
       <Modal
         title="Add Knowledge To Brains"
         isOpen={isOpen}

@@ -1,7 +1,6 @@
 import { UUID } from "crypto";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { createPortal } from "react-dom";
 
 import { KMSElement, KnowledgeStatus } from "@/lib/api/sync/types";
 import { Icon } from "@/lib/components/ui/Icon/Icon";
@@ -79,15 +78,18 @@ const ConnectedBrains = ({
           </div>
         </Tooltip>
       </div>
-      {showAddToBrainModal &&
-        createPortal(
+      {showAddToBrainModal && (
+        <div
+          className={styles.modal_content}
+          onClick={(e) => e.stopPropagation()}
+        >
           <AddToBrainsModal
             isOpen={showAddToBrainModal}
             setIsOpen={handleModalClose}
             knowledge={knowledge}
-          />,
-          document.body
-        )}
+          />
+        </div>
+      )}
     </>
   );
 };
