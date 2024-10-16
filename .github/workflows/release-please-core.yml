@@ -47,7 +47,7 @@ jobs:
         uses: eifinger/setup-rye@v2
         with:
           enable-cache: true
-          working-directory: backend/
+          working-directory: core/
       - name: Rye Sync
         run: cd core/ && UV_INDEX_STRATEGY=unsafe-first-match rye sync --no-lock
       - name: Rye Build
