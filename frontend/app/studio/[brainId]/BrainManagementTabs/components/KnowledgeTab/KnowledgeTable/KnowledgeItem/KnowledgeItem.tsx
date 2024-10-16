@@ -37,7 +37,7 @@ const KnowledgeItem = ({
   const { brain } = useUrlBrain();
   const { generateSignedUrlKnowledge } = useKnowledgeApi();
   const { isMobile } = useDevice();
-  const { integrationIconUrls } = useSync();
+  const { providerIconUrls } = useSync();
 
   const getOptions = (): Option[] => [
     {
@@ -107,9 +107,7 @@ const KnowledgeItem = ({
       return knowledge.source !== "local" ? (
         <Image
           src={
-            integrationIconUrls[
-              knowledge.source as keyof typeof integrationIconUrls
-            ]
+            providerIconUrls[knowledge.source as keyof typeof providerIconUrls]
           }
           width="16"
           height="16"
