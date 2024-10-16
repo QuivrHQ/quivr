@@ -14,7 +14,7 @@ jobs:
   release-please:
     runs-on: ubuntu-latest
     outputs:
-      release_created: ${{ steps.release.outputs['backend/core--release_created'] }}
+      release_created: ${{ steps.release.outputs['core--release_created'] }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -30,7 +30,7 @@ jobs:
         id: release
         uses: google-github-actions/release-please-action@v4
         with:
-          path: backend/core
+          path: core
           token: ${{ secrets.RELEASE_PLEASE_TOKEN }}
        
 
@@ -40,7 +40,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: backend/
+        working-directory: 
     steps:
       - uses: actions/checkout@v4
       - name: Install Rye

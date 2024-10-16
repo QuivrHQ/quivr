@@ -6,6 +6,7 @@ authors = [
     { name = "Stan Girard", email = "stan@quivr.app" }
 ]
 dependencies = [
+    "quivr-core>=0.0.18",
     "mkdocs>=1.6.1",
     "mkdocstrings[python]>=0.26.0",
     "mkdocs-jupyter>=0.24.8",
