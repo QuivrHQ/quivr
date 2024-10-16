@@ -34,7 +34,7 @@ const TextEditorSearchBar = forwardRef<Editor, TextEditorSearchBarProps>(
 
       editor
         .chain()
-        .setHighlight({ color: "red", isAi: true, isSelection: false })
+        .setAiHighlight()
         .insertContent(messages[0].assistant)
         .focus()
         .run();

@@ -1,7 +1,6 @@
 "use client";
 import { Editor, Extension } from "@tiptap/core";
 import Focus from "@tiptap/extension-focus";
-import Highlight from "@tiptap/extension-highlight";
 import { Link } from "@tiptap/extension-link";
 import { BubbleMenu, EditorContent, useEditor } from "@tiptap/react";
 import { StarterKit } from "@tiptap/starter-kit";
@@ -12,9 +11,9 @@ import { useBrainMention } from "@/app/chat/[chatId]/components/ActionsBar/compo
 import styles from "./TextEditor.module.scss";
 import { TextEditorSearchBar } from "./components/TextEditorSearchBar/TextEditorSearchBar";
 import { Toolbar } from "./components/Toolbar/Toolbar";
-import { unsetMarkInDocument } from "./utils";
+import { AIHighlight } from "./extensions/AIHighlight";
 
-import QuivrButton from "../ui/QuivrButton/QuivrButton";
+import { QuivrButton } from "../ui/QuivrButton/QuivrButton";
 
 const defaultContent = `
   <h1>My Note</h1>
@@ -42,7 +41,7 @@ export const TextEditor = (): JSX.Element => {
           );
 
           if (selection) {
-            editor.commands.setHighlight({ isSelection: true });
+            editor.commands.setSelectionHighlight();
           }
 
           setSearchBarOpen(true);
@@ -71,22 +70,9 @@ export const TextEditor = (): JSX.Element => {
         }),
         BrainMention,
         FocusSearchBar,
-        Highlight.configure({
-          multicolor: true,
+        AIHighlight.configure({
           HTMLAttributes: {
-            // class: styles.ai_highlight,
-          },
-        }).extend({
-          addAttributes: () => {
-            return {
-              isAi: false,
-              isSelection: false,
-            };
-          },
-          onSelectionUpdate() {
-            unsetMarkInDocument(this.editor, "highlight", {
-              isSelection: true,
-            });
+            class: styles.ai_highlight,
           },
         }),
       ],
@@ -118,7 +104,7 @@ export const TextEditor = (): JSX.Element => {
         <div>
           <BubbleMenu
             shouldShow={() => {
-              return editor.isActive("highlight", { isAi: true });
+              return editor.isActive("aiHighlight", { type: "ai" });
             }}
             tippyOptions={{
               moveTransition: "transform 0.1s",
@@ -131,7 +117,7 @@ export const TextEditor = (): JSX.Element => {
               onClick={() => {
                 editor
                   .chain()
-                  .extendMarkRange("highlight")
+                  .extendMarkRange("aiHighlight")
                   .unsetHighlight()
                   .run();
               }}
