@@ -9,6 +9,7 @@ from quivr_api.logger import get_logger
 from quivr_api.middlewares.auth import AuthBearer, get_current_user
 from quivr_api.modules.dependencies import get_service
 from quivr_api.modules.sync.dto.inputs import SyncStatus, SyncUpdateInput
+from quivr_api.modules.sync.dto.outputs import SyncProvider
 from quivr_api.modules.sync.service.sync_service import SyncsService
 from quivr_api.modules.sync.utils.oauth2 import parse_oauth2_state
 from quivr_api.modules.user.entity.user_identity import UserIdentity
@@ -63,7 +64,7 @@ async def authorize_azure(
     )
     logger.debug(f"Authorizing Azure sync for user: {current_user.id}")
     state = await syncs_service.create_oauth2_state(
-        provider="Azure", name=name, user_id=current_user.id
+        provider=SyncProvider.AZURE, name=name, user_id=current_user.id
     )
     flow = client.initiate_auth_code_flow(
         scopes=SCOPE,
