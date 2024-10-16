@@ -221,7 +221,9 @@ const AssistantTab = ({ setSelectedTab }: AssistantTabProps): JSX.Element => {
                 </div>
                 <FileInput
                   label={input.key}
-                  onFileChange={(file) => handleFileChange(input.key, file)}
+                  onFileChange={(files) =>
+                    handleFileChange(input.key, files[0])
+                  }
                   acceptedFileTypes={FILE_TYPES}
                 />
               </div>

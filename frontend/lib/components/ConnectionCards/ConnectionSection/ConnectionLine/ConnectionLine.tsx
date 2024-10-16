@@ -1,6 +1,5 @@
 import { useState } from "react";
 
-import { useFromConnectionsContext } from "@/app/chat/[chatId]/components/ActionsBar/components/KnowledgeToFeed/components/FromConnections/FromConnectionsProvider/hooks/useFromConnectionContext";
 import { useSync } from "@/lib/api/sync/useSync";
 import { ConnectionIcon } from "@/lib/components/ui/ConnectionIcon/ConnectionIcon";
 import { Icon } from "@/lib/components/ui/Icon/Icon";
@@ -26,7 +25,6 @@ export const ConnectionLine = ({
   const [deleteModalOpened, setDeleteModalOpened] = useState(false);
 
   const { deleteUserSync } = useSync();
-  const { setHasToReload } = useFromConnectionsContext();
 
   return (
     <>
@@ -46,7 +44,6 @@ export const ConnectionLine = ({
                 setDeleteModalOpened(true);
               } else {
                 await deleteUserSync(id);
-                setHasToReload(true);
               }
             }}
           />
@@ -85,7 +82,6 @@ export const ConnectionLine = ({
                 setDeleteLoading(true);
                 await deleteUserSync(id);
                 setDeleteLoading(false);
-                setHasToReload(true);
                 setDeleteModalOpened(false);
               }}
             />

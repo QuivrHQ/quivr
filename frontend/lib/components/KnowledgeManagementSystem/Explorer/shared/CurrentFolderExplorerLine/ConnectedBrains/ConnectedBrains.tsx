@@ -4,10 +4,10 @@ import { useState } from "react";
 
 import { KMSElement, KnowledgeStatus } from "@/lib/api/sync/types";
 import { Icon } from "@/lib/components/ui/Icon/Icon";
+import { LoaderIcon } from "@/lib/components/ui/LoaderIcon/LoaderIcon";
 import Tooltip from "@/lib/components/ui/Tooltip/Tooltip";
 import { Brain } from "@/lib/context/BrainProvider/types";
 
-import { LoaderIcon } from "@/lib/components/ui/LoaderIcon/LoaderIcon";
 import AddToBrainsModal from "./AddToBrainsModal/AddToBrainsModal";
 import styles from "./ConnectedBrains.module.scss";
 

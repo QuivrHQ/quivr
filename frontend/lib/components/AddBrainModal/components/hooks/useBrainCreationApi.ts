@@ -10,7 +10,7 @@ import { CreateBrainProps } from "@/lib/components/AddBrainModal/types/types";
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
 import { useToast } from "@/lib/hooks";
 
-import { useBrainCreationContext } from "../../../brainCreation-provider";
+import { useBrainCreationContext } from "../../brainCreation-provider";
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export const useBrainCreationApi = () => {
