@@ -21,6 +21,8 @@ type KnowledgeContextType = {
   setSelectedKnowledges: React.Dispatch<React.SetStateAction<KMSElement[]>>;
   refetchFolderMenu: boolean;
   setRefetchFolderMenu: React.Dispatch<React.SetStateAction<boolean>>;
+  refetchFolderExplorer: boolean;
+  setRefetchFolderExplorer: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
 export const KnowledgeContext = createContext<KnowledgeContextType | undefined>(
@@ -46,6 +48,8 @@ export const KnowledgeProvider = ({
     []
   );
   const [refetchFolderMenu, setRefetchFolderMenu] = useState<boolean>(false);
+  const [refetchFolderExplorer, setRefetchFolderExplorer] =
+    useState<boolean>(false);
 
   return (
     <KnowledgeContext.Provider
@@ -62,6 +66,8 @@ export const KnowledgeProvider = ({
         setSelectedKnowledges,
         refetchFolderMenu,
         setRefetchFolderMenu,
+        refetchFolderExplorer,
+        setRefetchFolderExplorer,
       }}
     >
       {children}

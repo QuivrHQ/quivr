@@ -27,6 +27,8 @@ const QuivrCurrentFolder = (): JSX.Element => {
     selectedKnowledges,
     setSelectedKnowledges,
     setRefetchFolderMenu,
+    setRefetchFolderExplorer,
+    refetchFolderExplorer,
   } = useKnowledgeContext();
   const { getFiles, deleteKnowledge, patchKnowledge } = useKnowledgeApi();
 
@@ -74,10 +76,11 @@ const QuivrCurrentFolder = (): JSX.Element => {
   }, [addFolderModalOpened]);
 
   useEffect(() => {
-    if (!addKnowledgeModalOpened) {
+    if (refetchFolderExplorer) {
       void fetchQuivrFiles(currentFolder?.id ?? null);
+      setRefetchFolderExplorer(false);
     }
-  }, [addKnowledgeModalOpened]);
+  }, [refetchFolderExplorer]);
 
   useEffect(() => {
     const handleFetchQuivrFilesMissing = (event: CustomEvent) => {

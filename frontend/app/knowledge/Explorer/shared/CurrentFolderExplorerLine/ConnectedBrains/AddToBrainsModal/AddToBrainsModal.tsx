@@ -29,7 +29,7 @@ const AddToBrainsModal = ({
   const { allBrains } = useBrainContext();
   const { linkKnowledgeToBrains, unlinkKnowledgeFromBrains } =
     useKnowledgeApi();
-  const { setRefetchFolderMenu } = useKnowledgeContext();
+  const { setRefetchFolderExplorer } = useKnowledgeContext();
 
   useEffect(() => {
     if (knowledge) {
@@ -85,7 +85,7 @@ const AddToBrainsModal = ({
     } finally {
       setSaveLoading(false);
       setIsOpen(false);
-      setRefetchFolderMenu(true);
+      setRefetchFolderExplorer(true);
     }
   };
 
