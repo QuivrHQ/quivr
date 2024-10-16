@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.0.323 (2024-10-16)
+
+## What's Changed
+* docs(fix): fixed warnings from griffe by @StanGirard in https://github.com/QuivrHQ/quivr/pull/3381
+* chore(main): release core 0.0.17 by @StanGirard in https://github.com/QuivrHQ/quivr/pull/3221
+* fix(core): megaparse config by @StanGirard in https://github.com/QuivrHQ/quivr/pull/3384
+* chore(main): release core 0.0.18 by @StanGirard in https://github.com/QuivrHQ/quivr/pull/3385
+
+
+**Full Changelog**: https://github.com/QuivrHQ/quivr/compare/v0.0.322...v0.0.323
+
 ## 0.0.322 (2024-10-15)
 
 ## What's Changed
