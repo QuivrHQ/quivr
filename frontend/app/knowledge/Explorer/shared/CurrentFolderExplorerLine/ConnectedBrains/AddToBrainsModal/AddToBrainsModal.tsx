@@ -27,7 +27,8 @@ const AddToBrainsModal = ({
   const [saveLoading, setSaveLoading] = useState(false);
 
   const { allBrains } = useBrainContext();
-  const { linkKnowledgeToBrains } = useKnowledgeApi();
+  const { linkKnowledgeToBrains, unlinkKnowledgeFromBrains } =
+    useKnowledgeApi();
   const { setRefetchFolderMenu } = useKnowledgeContext();
 
   useEffect(() => {
@@ -65,14 +66,22 @@ const AddToBrainsModal = ({
       return;
     }
 
-    const brainIds = selectedBrains.map((brain) => brain.id);
+    const knowledgeId = knowledge.id;
+    const brainIdsToLink = selectedBrains.map((brain) => brain.id);
+    const brainIdsToUnlink = initialBrains
+      .filter((brain) => !selectedBrains.some((b) => b.id === brain.id))
+      .map((brain) => brain.id);
 
     try {
       setSaveLoading(true);
-      await linkKnowledgeToBrains(knowledge, brainIds);
-      console.log("Knowledge linked to brains successfully");
+      if (brainIdsToLink.length > 0) {
+        await linkKnowledgeToBrains(knowledge, brainIdsToLink);
+      }
+      if (brainIdsToUnlink.length > 0) {
+        await unlinkKnowledgeFromBrains(knowledgeId, brainIdsToUnlink);
+      }
     } catch (error) {
-      console.error("Failed to link knowledge to brains", error);
+      console.error("Failed to update knowledge to brains", error);
     } finally {
       setSaveLoading(false);
       setIsOpen(false);

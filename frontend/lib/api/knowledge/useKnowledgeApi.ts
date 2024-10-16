@@ -19,6 +19,7 @@ import {
   getFiles,
   linkKnowledgeToBrains,
   patchKnowledge,
+  unlinkKnowledgeFromBrains,
 } from "./knowledge";
 
 import { KMSElement } from "../sync/types";
@@ -48,5 +49,7 @@ export const useKnowledgeApi = () => {
       patchKnowledge(knowledgeId, axiosInstance, parent_id),
     linkKnowledgeToBrains: async (knowledge: KMSElement, brainIds: UUID[]) =>
       linkKnowledgeToBrains(knowledge, brainIds, axiosInstance),
+    unlinkKnowledgeFromBrains: async (knowledge_id: UUID, brainIds: UUID[]) =>
+      unlinkKnowledgeFromBrains(knowledge_id, brainIds, axiosInstance),
   };
 };

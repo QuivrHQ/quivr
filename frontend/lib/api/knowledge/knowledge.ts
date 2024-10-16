@@ -180,3 +180,19 @@ export const linkKnowledgeToBrains = async (
 
   return response.data;
 };
+
+export const unlinkKnowledgeFromBrains = async (
+  knowledge_id: UUID,
+  brainIds: UUID[],
+  axiosInstance: AxiosInstance
+): Promise<KMSElement[]> => {
+  const response = await axiosInstance.post<KMSElement[]>(
+    `/knowledge/unlink_from_brains/`,
+    {
+      knowledge_id,
+      brain_ids: brainIds,
+    }
+  );
+
+  return response.data;
+};
