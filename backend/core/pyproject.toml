@@ -30,6 +30,23 @@ all = [
     "megaparse"
 ]
 
+megaparse = [
+    "python-docx>=1.1.0",
+    "mammoth>=1.8.0",
+    "python-pptx>=1.0.2",
+    "llama-parse>=0.4.0",
+    "pdf2docx>=0.5.0",
+    "unstructured[pdf]>=0.15.0",
+    "langchain>=0.2.0",
+    "langchain-community>=0.2.0",
+    "langchain-openai>=0.1.0",
+    "langchain-core>=0.2.0",
+    "python-dotenv>=1.0.0",
+    "pycryptodome>=3.20.0",
+    "llama-index>=0.10.0",
+    "pdfplumber>=0.11.0",
+]
+
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"

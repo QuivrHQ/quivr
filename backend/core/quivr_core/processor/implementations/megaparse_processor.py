@@ -3,8 +3,8 @@ import logging
 import tiktoken
 from langchain_core.documents import Document
 from langchain_text_splitters import RecursiveCharacterTextSplitter, TextSplitter
-from megaparse import MegaParse
-from megaparse.config import MegaparseConfig
+from quivr_core.processor.megaparse import MegaParse
+from quivr_core.processor.megaparse.config import MegaparseConfig
 
 from quivr_core.files.file import QuivrFile
 from quivr_core.processor.processor_base import ProcessorBase

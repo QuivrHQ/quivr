@@ -18,9 +18,6 @@
 -e file:core
     # via quivr-api
     # via quivr-worker
--e file:core/MegaParse
-    # via quivr-core
-    # via quivr-diff-assistant
 -e file:worker
 -e file:worker/diff-assistant
     # via quivr-worker
@@ -398,6 +395,7 @@ langchain-experimental==0.0.64
 langchain-openai==0.1.25
     # via megaparse
     # via quivr-api
+    # via quivr-core
     # via quivr-diff-assistant
 langchain-text-splitters==0.2.2
     # via langchain
@@ -420,6 +418,7 @@ llama-cloud==0.0.13
     # via llama-index-indices-managed-llama-cloud
 llama-index==0.11.12
     # via megaparse
+    # via quivr-core
     # via quivr-diff-assistant
 llama-index-agent-openai==0.3.4
     # via llama-index
@@ -470,6 +469,7 @@ llama-parse==0.5.6
     # via llama-index-readers-llama-parse
     # via megaparse
     # via quivr-api
+    # via quivr-core
 llvmlite==0.43.0
     # via numba
 lxml==5.3.0
@@ -479,6 +479,7 @@ lxml==5.3.0
     # via unstructured
 mammoth==1.8.0
     # via megaparse
+    # via quivr-core
 markdown==3.7
     # via mkdocs
     # via mkdocs-autorefs
@@ -516,6 +517,9 @@ mdit-py-plugins==0.4.1
     # via jupytext
 mdurl==0.1.2
     # via markdown-it-py
+megaparse==0.0.31
+    # via quivr-core
+    # via quivr-diff-assistant
 mergedeep==1.3.4
     # via mkdocs
     # via mkdocs-get-deps
@@ -681,6 +685,7 @@ pathspec==0.12.1
     # via mkdocs
 pdf2docx==0.5.8
     # via megaparse
+    # via quivr-core
 pdf2image==1.17.0
     # via layoutparser
     # via unstructured
@@ -690,6 +695,7 @@ pdfminer-six==20231228
 pdfplumber==0.11.4
     # via layoutparser
     # via megaparse
+    # via quivr-core
 pexpect==4.9.0 ; sys_platform != 'emscripten' and sys_platform != 'win32'
     # via ipython
 pgvector==0.3.2
@@ -765,6 +771,7 @@ pycparser==2.22 ; platform_python_implementation != 'PyPy' or implementation_nam
     # via cffi
 pycryptodome==3.20.0
     # via megaparse
+    # via quivr-core
 pydantic==2.8.2
     # via anthropic
     # via cohere
@@ -837,12 +844,14 @@ python-doctr==0.9.0
 python-docx==1.1.2
     # via megaparse
     # via pdf2docx
+    # via quivr-core
     # via unstructured
 python-dotenv==1.0.1
     # via litellm
     # via megaparse
     # via pydantic-settings
     # via quivr-api
+    # via quivr-core
     # via quivr-diff-assistant
     # via quivr-worker
 python-iso639==2024.4.27
@@ -861,6 +870,7 @@ python-oxmsg==0.0.1
     # via unstructured
 python-pptx==1.0.2
     # via megaparse
+    # via quivr-core
     # via unstructured
 pytz==2024.1
     # via flower
