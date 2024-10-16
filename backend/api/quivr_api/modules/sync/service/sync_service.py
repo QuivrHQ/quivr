@@ -10,7 +10,7 @@ from quivr_api.modules.sync.dto.inputs import (
     SyncStatus,
     SyncUpdateInput,
 )
-from quivr_api.modules.sync.dto.outputs import SyncsOutput
+from quivr_api.modules.sync.dto.outputs import SyncProvider, SyncsOutput
 from quivr_api.modules.sync.repository.sync_repository import SyncsRepository
 from quivr_api.modules.sync.utils.oauth2 import Oauth2BaseState, Oauth2State
 
@@ -54,7 +54,7 @@ class SyncsService(BaseService[SyncsRepository]):
 
     async def create_oauth2_state(
         self,
-        provider: str,
+        provider: SyncProvider,
         name: str,
         user_id: UUID,
         additional_data: dict[str, Any] = {},
