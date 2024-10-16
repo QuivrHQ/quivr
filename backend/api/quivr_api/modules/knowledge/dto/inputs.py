@@ -26,14 +26,13 @@ class CreateKnowledgeProperties(BaseModel):
 class AddKnowledge(BaseModel):
     file_name: Optional[str] = None
     url: Optional[str] = None
-    extension: str = ".txt"
+    is_folder: bool = False
     source: str = "local"
     source_link: Optional[str] = None
-    metadata: Optional[Dict[str, str]] = None
-    is_folder: bool = False
     parent_id: UUID | None = None
     sync_id: int | None = None
     sync_file_id: str | None = None
+    metadata: Optional[Dict[str, str]] = None
 
 
 class KnowledgeUpdate(BaseModel):
