@@ -1,9 +1,7 @@
-use anyhow::bail;
 use notion::{
     self,
     models::{paging::PagingCursor, ListResponse, Page},
 };
-use pyo3::prelude::*;
 use reqwest::{
     header::{self, HeaderMap, HeaderValue},
     Client, ClientBuilder,
@@ -131,70 +129,56 @@ async fn bulk_insert_pages<'a>(pool: &sqlx::Pool<Sqlite>, pages: Vec<Page>) -> a
         let icon = icon.unwrap_or_default();
         let page_id = page.id.to_string();
         let title = page.title().unwrap_or_default();
-        match sqlx::query!(
-            r#"
-            SELECT id
-            FROM notion_pages
-            WHERE id = $1; "#,
-            page_id
-        )
-        .fetch_one(pool)
-        .await
-        {
-            Ok(_) => {
-                // println!("{} page exists. skipping...", page_id)
-            }
-            Err(sqlx::Error::RowNotFound) => {
-                sqlx::query!(
-            r#"INSERT INTO notion_pages (id, created_time, last_edited_time, title, archived, parent_id, icon)
-            VALUES ($1,$2,$3,$4,$5,$6,$7)
-            "#,
-            page_id,
-            page.created_time,
-            page.last_edited_time,
-            title,
-            page.archived,
-            parent_id,
-            icon,
-        ).execute(pool).await?;
-            }
-            Err(e) => {
-                bail!("error fetching record, {e}")
-            }
-        }
+        // match sqlx::query!(
+        //     r#"
+        //     SELECT id
+        //     FROM notion_pages
+        //     WHERE id = $1; "#,
+        //     page_id
+        // )
+        // .fetch_one(pool)
+        // .await
+        // {
+        //     Ok(_) => {
+        //         // println!("{} page exists. skipping...", page_id)
+        //     }
+        //     Err(sqlx::Error::RowNotFound) => {
+        //         sqlx::query!(
+        //     r#"INSERT INTO notion_pages (id, created_time, last_edited_time, title, archived, parent_id, icon)
+        //     VALUES ($1,$2,$3,$4,$5,$6,$7)
+        //     "#,
+        //     page_id,
+        //     page.created_time,
+        //     page.last_edited_time,
+        //     title,
+        //     page.archived,
+        //     parent_id,
+        //     icon,
+        // ).execute(pool).await?;
+        //     }
+        //     Err(e) => {
+        //         bail!("error fetching record, {e}")
+        //     }
+        // }
     }
 
     Ok(())
 }
 
-async fn fetch_save_inner(api_key: String, db_url: String) -> PyResult<()> {
+pub async fn fetch_and_save(api_key: String, db_url: String) -> anyhow::Result<()> {
     let pool = SqlitePool::connect(&db_url).await.unwrap();
 
     let (tx, rx) = tokio::sync::mpsc::channel(1000);
-    let client = NotionFetcher::new(api_key, tx)
-        .map_err(|_| PyErr::new::<PyAny, _>("can't instanciate client"))?;
+    let client = NotionFetcher::new(api_key, tx)?;
 
     let join = tokio::spawn(async move {
         client.get_all_pages().await.unwrap();
     });
 
-    save_sqlite(&pool, rx)
-        .await
-        .map_err(|_| PyErr::new::<PyAny, _>("error saving results to sqlite"))?;
+    save_sqlite(&pool, rx).await?;
 
     join.await.unwrap();
 
-    PyResult::Ok(())
-}
-
-#[pyfunction]
-fn fetch_notion_pages(py: Python, api_key: String, db_url: String) -> PyResult<&PyAny> {
-    pyo3_asyncio::tokio::future_into_py(py, async move { fetch_save_inner(api_key, db_url).await })
-}
-
-#[pymodule]
-fn _lowlevel(_py: Python, m: &PyModule) -> PyResult<()> {
-    m.add_function(wrap_pyfunction!(fetch_notion_pages, m)?)?;
     Ok(())
 }
 
@@ -210,6 +194,6 @@ mod tests {
         dotenv().expect("can't load dotenv file");
         let api_key = env::var("NOTION_API_KEY").expect("error loading api_key");
         let db_url = env::var("DATABASE_URL").expect("error loading db_url");
-        fetch_save_inner(api_key, db_url).await.unwrap();
+        fetch_and_save(api_key, &db_url).await.unwrap();
     }
 }

@@ -108,3 +108,4 @@ backend/benchmarks/data.json
 # notion-fetcher
 *.db*
 *.so
+target/

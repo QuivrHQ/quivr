@@ -1,0 +1,12 @@
+fuse:
+  dir: "/litefs"
+
+data:
+  dir: "/var/lib/litefs"
+
+lease:
+  type: "static"
+  advertise-url: "http://primary:20202"
+  candidate: $IS_PRIMARY
+# exec:
+#   - cmd: "python3 -m http.server 2000"

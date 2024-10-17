@@ -3,23 +3,15 @@ name = "notion-fetcher"
 version = "0.1.0"
 edition = "2021"
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-[lib]
-name = "notion_fetcher"
-crate-type = ["cdylib"]
 
 [dependencies]
 anyhow = "1.0.89"
+axum = { version = "0.7.7", features = ["tracing"] }
 chrono = { version = "0.4.38", features = ["serde"] }
 dotenvy = "0.15.7"
 notion = "0.6.0"
-pyo3 = "0.20.0"
-pyo3-asyncio = { version = "0.20.0", features = [
-    "tokio-runtime",
-    "attributes",
-] }
 reqwest = { version = "0.12.8", features = ["blocking", "json"] }
-rusqlite = { version = "0.32.1", features = ["chrono", "uuid"] }
+# rusqlite = { version = "1.32.1", features = ["chrono", "uuid"] }
 serde = { version = "1.0.210", features = ["derive"] }
 serde_json = "1.0.128"
 sqlx = { version = "0.8.2", features = [
@@ -30,6 +22,7 @@ sqlx = { version = "0.8.2", features = [
     "runtime-tokio",
 ] }
 tokio = { version = "1.40.0", features = ["full"] }
+tower-http = { version = "0.6.1", features = ["trace"] }
 tracing = "0.1.40"
-tracing-subscriber = "0.3.18"
+tracing-subscriber = { version = "0.3.18", features = ["env-filter"] }
 uuid = { version = "1.10.0", features = ["serde", "v4"] }
