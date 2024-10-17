@@ -6,11 +6,24 @@ use reqwest::{
     header::{self, HeaderMap, HeaderValue},
     Client, ClientBuilder,
 };
+use rusqlite::{params, Connection};
+use serde::{Deserialize, Serialize};
 use serde_json::json;
-use sqlx::{Sqlite, SqlitePool};
 
 static NOTION_URL: &'static str = "https://api.notion.com/v1/search";
 static NOTION_API_VERSION: &'static str = "2022-06-28";
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct FetchRequest {
+    pub sync_id: usize,
+    pub user_id: uuid::Uuid,
+    pub notion_api_key: String,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct FetchResponse {
+    pub db_path: String,
+}
 
 struct NotionFetcher {
     client: Client,
@@ -54,9 +67,10 @@ impl NotionFetcher {
             }
             let query_str = query.to_string();
 
-            println!(
-                "Requesting query: URL: {}, query: {}",
-                &NOTION_URL, &query_str
+            tracing::debug!(
+                "requesting query: URL: {}, query: {}",
+                &NOTION_URL,
+                &query_str
             );
             match self
                 .client
@@ -92,7 +106,7 @@ impl NotionFetcher {
                     }
                 }
                 Err(e) => {
-                    println!("error parsing request: {:?}", e);
+                    tracing::error!("stopping fetching pages. error parsing request: {:?}", e);
                     break;
                 }
             };
@@ -101,18 +115,9 @@ impl NotionFetcher {
     }
 }
 
-async fn save_sqlite<'a>(
-    pool: &SqlitePool,
-    mut rx: tokio::sync::mpsc::Receiver<Vec<Page>>,
-) -> anyhow::Result<()> {
-    while let Some(pages) = rx.recv().await {
-        println!("Received {} pages ", pages.len());
-        bulk_insert_pages(&pool, pages).await.unwrap();
-    }
-    Ok(())
-}
+fn bulk_insert_pages<'a>(conn: &Connection, pages: Vec<Page>) -> anyhow::Result<()> {
+    tracing::debug!("inserting {} pages.", pages.len());
 
-async fn bulk_insert_pages<'a>(pool: &sqlx::Pool<Sqlite>, pages: Vec<Page>) -> anyhow::Result<()> {
     for page in pages.iter() {
         let parent_id = match &page.parent {
             notion::models::Parent::Page { page_id } => Some(page_id.to_string()),
@@ -129,55 +134,73 @@ async fn bulk_insert_pages<'a>(pool: &sqlx::Pool<Sqlite>, pages: Vec<Page>) -> a
         let icon = icon.unwrap_or_default();
         let page_id = page.id.to_string();
         let title = page.title().unwrap_or_default();
-        // match sqlx::query!(
-        //     r#"
-        //     SELECT id
-        //     FROM notion_pages
-        //     WHERE id = $1; "#,
-        //     page_id
-        // )
-        // .fetch_one(pool)
-        // .await
-        // {
-        //     Ok(_) => {
-        //         // println!("{} page exists. skipping...", page_id)
-        //     }
-        //     Err(sqlx::Error::RowNotFound) => {
-        //         sqlx::query!(
-        //     r#"INSERT INTO notion_pages (id, created_time, last_edited_time, title, archived, parent_id, icon)
-        //     VALUES ($1,$2,$3,$4,$5,$6,$7)
-        //     "#,
-        //     page_id,
-        //     page.created_time,
-        //     page.last_edited_time,
-        //     title,
-        //     page.archived,
-        //     parent_id,
-        //     icon,
-        // ).execute(pool).await?;
-        //     }
-        //     Err(e) => {
-        //         bail!("error fetching record, {e}")
-        //     }
-        // }
+        conn.execute(
+            r#"INSERT OR IGNORE INTO notion_pages (id, created_time, last_edited_time, title, archived, parent_id, icon)
+            VALUES (?1,?2,?3,?4,?5,?6,?7)
+            "#,
+            params![
+            page_id,
+            page.created_time,
+            page.last_edited_time,
+            title,
+            page.archived,
+            parent_id,
+            icon,
+            ]
+        )?;
     }
 
     Ok(())
 }
 
-pub async fn fetch_and_save(api_key: String, db_url: String) -> anyhow::Result<()> {
-    let pool = SqlitePool::connect(&db_url).await.unwrap();
+pub async fn fetch_and_save(fetch_request: FetchRequest, db_url: String) -> anyhow::Result<()> {
+    let conn = Connection::open(&db_url)?;
+    conn.execute(
+        "
+    CREATE TABLE IF NOT EXISTS notion_pages(
+        id TEXT PRIMARY KEY,
+        created_time DATETIME,
+        last_edited_time DATETIME,
+        title TEXT,
+        archived BOOLEAN,
+        public_url TEXT,
+        parent_id TEXT,
+        cover TEXT,
+        icon TEXT,
+        properties JSON
+    );",
+        (),
+    )?;
 
-    let (tx, rx) = tokio::sync::mpsc::channel(1000);
-    let client = NotionFetcher::new(api_key, tx)?;
+    let (tx, mut rx) = tokio::sync::mpsc::channel(1000);
+    let client = NotionFetcher::new(fetch_request.notion_api_key, tx)?;
 
     let join = tokio::spawn(async move {
         client.get_all_pages().await.unwrap();
     });
 
-    save_sqlite(&pool, rx).await?;
+    while let Some(pages) = rx.recv().await {
+        match bulk_insert_pages(&conn, pages) {
+            Ok(_) => {}
+            Err(e) => {
+                tracing::error!("error inserting pages in {}: {:?}", &db_url, e)
+            }
+        };
+    }
 
-    join.await.unwrap();
+    match join.await {
+        Ok(_) => {
+            tracing::info!("finished fetching pages for {}", &db_url);
+        }
+        Err(e) => {
+            tracing::error!(
+                "error fetching pages from notion for user {} sync {}: {:?}",
+                fetch_request.user_id,
+                fetch_request.sync_id,
+                e
+            );
+        }
+    };
 
     Ok(())
 }
@@ -193,7 +216,12 @@ mod tests {
     async fn test_fetch() {
         dotenv().expect("can't load dotenv file");
         let api_key = env::var("NOTION_API_KEY").expect("error loading api_key");
-        let db_url = env::var("DATABASE_URL").expect("error loading db_url");
-        fetch_and_save(api_key, &db_url).await.unwrap();
+        let db_url = String::from("/tmp/notion-1.db");
+        let request = FetchRequest {
+            sync_id: 1,
+            user_id: uuid::Uuid::new_v4(),
+            notion_api_key: api_key,
+        };
+        fetch_and_save(request, db_url).await.unwrap();
     }
 }

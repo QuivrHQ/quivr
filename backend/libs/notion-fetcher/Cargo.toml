@@ -11,17 +11,11 @@ chrono = { version = "0.4.38", features = ["serde"] }
 dotenvy = "0.15.7"
 notion = "0.6.0"
 reqwest = { version = "0.12.8", features = ["blocking", "json"] }
-# rusqlite = { version = "1.32.1", features = ["chrono", "uuid"] }
+rusqlite = { version = "0.32.1", features = ["chrono", "uuid"] }
 serde = { version = "1.0.210", features = ["derive"] }
 serde_json = "1.0.128"
-sqlx = { version = "0.8.2", features = [
-    "chrono",
-    "derive",
-    "json",
-    "sqlite",
-    "runtime-tokio",
-] }
 tokio = { version = "1.40.0", features = ["full"] }
+tokio-rusqlite = "0.6.0"
 tower-http = { version = "0.6.1", features = ["trace"] }
 tracing = "0.1.40"
 tracing-subscriber = { version = "0.3.18", features = ["env-filter"] }

@@ -4,10 +4,12 @@ use axum::{
     routing::{get, post},
     Json, Router,
 };
-use notion_fetcher::fetch_and_save;
+use dotenvy::dotenv;
+use notion_fetcher::{fetch_and_save, FetchRequest, FetchResponse};
 use serde::{Deserialize, Serialize};
 use std::{
     collections::HashMap,
+    env,
     net::SocketAddr,
     sync::{Arc, Mutex},
 };
@@ -21,28 +23,33 @@ use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 
 #[derive(Clone, Default)]
 struct AppState {
+    db_base_path: String,
     handles: Arc<Mutex<HashMap<usize, JoinHandle<anyhow::Result<()>>>>>,
 }
 
 #[tokio::main]
 async fn main() {
+    dotenv().expect("can't load dotenv file");
     tracing_subscriber::registry()
         .with(
             tracing_subscriber::EnvFilter::try_from_default_env().unwrap_or_else(|_| {
-                format!(
-                    "{}=debug,tower_http=debug,axum::rejection=trace",
-                    env!("CARGO_CRATE_NAME")
-                )
-                .into()
+                format!("{}=debug,axum::rejection=trace", env!("CARGO_CRATE_NAME")).into()
             }),
         )
         .with(tracing_subscriber::fmt::layer())
         .init();
-    let state = AppState::default();
 
+    // Build the state
+    let db_base_path = env::var("DB_BASE_PATH").expect("error loading db_url");
+    let state = AppState {
+        db_base_path,
+        ..Default::default()
+    };
+
+    // Start router
     let app = Router::new()
         .route("/healthz", get(healthz))
-        .route("/v1", post(fetch_notion_pages))
+        .route("/v1/fetch_store_notion", post(fetch_notion_pages))
         .with_state(state)
         .layer(
             TraceLayer::new_for_http()
@@ -70,31 +77,20 @@ async fn fetch_notion_pages(
     Json(fetch_request): Json<FetchRequest>,
 ) -> (StatusCode, Json<FetchResponse>) {
     // TODO:
+    let FetchRequest { sync_id, .. } = fetch_request;
     let db_url = format!(
-        "/litefs/notion-{}-{}.db",
+        "{}/notion-{}-{}.db",
+        state.db_base_path,
         chrono::offset::Utc::now(),
         &fetch_request.sync_id
     );
     let db = db_url.clone();
-    let handle =
-        tokio::spawn(async move { fetch_and_save(fetch_request.notion_api_key, db).await });
-
     let mut handles = state.handles.lock().expect("can't get lock");
-    handles.insert(fetch_request.sync_id, handle);
+    let handle = tokio::spawn(async move { fetch_and_save(fetch_request, db).await });
+    handles.insert(sync_id, handle);
+
     (
         StatusCode::ACCEPTED,
         FetchResponse { db_path: db_url }.into(),
     )
-}
-
-#[derive(Serialize, Deserialize, Debug)]
-struct FetchRequest {
-    sync_id: usize,
-    user_id: uuid::Uuid,
-    notion_api_key: String,
-}
-
-#[derive(Serialize, Deserialize, Debug)]
-struct FetchResponse {
-    db_path: String,
 }
