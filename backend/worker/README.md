@@ -1,1 +1,0 @@
-# quivr-worker package
