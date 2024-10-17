@@ -27,7 +27,6 @@ all = [
     "unstructured[epub,docx,odt,doc,pptx,ppt,xlsx,md]>=0.15.5",
     "faiss-cpu>=1.8.0.post1",
     "docx2txt>=0.8",
-    "megaparse"
 ]
 
 megaparse = [

@@ -8,12 +8,12 @@ This example demonstrates how to create a simple chatbot using Quivr and Chainli
 
 ## Installation
 
-1. Clone the repository or navigate to the `backend/core/examples/chatbot` directory.
+1. Clone the repository or navigate to the `core/examples/chatbot` directory.
 
 2. Install the required dependencies:
 
    ```
-   pip install -r requirements.txt
+   pip install -r requirements.lock
    ```
 
 ## Running the Chatbot
