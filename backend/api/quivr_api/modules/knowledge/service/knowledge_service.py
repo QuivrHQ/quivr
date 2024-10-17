@@ -35,6 +35,7 @@ from quivr_api.modules.knowledge.service.knowledge_exceptions import (
 )
 from quivr_api.modules.sync.entity.sync_models import SyncFile, SyncType
 from quivr_api.modules.upload.service.upload_file import check_file_exists
+from quivr_api.utils.knowledge_utils import parse_file_extension
 
 logger = get_logger(__name__)
 
@@ -95,7 +96,6 @@ class KnowledgeService(BaseService[KnowledgeRepository]):
                 knowledge_to_add=AddKnowledge(
                     file_name=sync_file.name,
                     is_folder=sync_file.is_folder,
-                    extension=sync_file.extension,
                     source=parent_knowledge.source,  # same as parent
                     source_link=sync_file.web_view_link,
                     parent_id=parent_knowledge.id,
@@ -183,13 +183,19 @@ class KnowledgeService(BaseService[KnowledgeRepository]):
                     if b.brain_id not in {b.brain_id for b in brains}
                 ]
             )
+        # TODO: slugify url names here !!
+        extension = (
+            parse_file_extension(knowledge_to_add.file_name)
+            if knowledge_to_add.file_name
+            else ""
+        )
 
         knowledgedb = KnowledgeDB(
             user_id=user_id,
             file_name=knowledge_to_add.file_name,
             is_folder=knowledge_to_add.is_folder,
             url=knowledge_to_add.url,
-            extension=knowledge_to_add.extension,
+            extension=extension,
             source=knowledge_to_add.source,
             source_link=knowledge_to_add.source_link,
             file_size=upload_file.size if upload_file else 0,
