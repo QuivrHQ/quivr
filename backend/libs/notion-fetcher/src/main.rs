@@ -6,7 +6,6 @@ use axum::{
 };
 use dotenvy::dotenv;
 use notion_fetcher::{fetch_and_save, FetchRequest, FetchResponse};
-use serde::{Deserialize, Serialize};
 use std::{
     collections::HashMap,
     env,
@@ -16,8 +15,6 @@ use std::{
 use tokio::{net::TcpListener, task::JoinHandle};
 use tower_http::trace::{self, TraceLayer};
 use tracing::Level;
-
-use tracing::info;
 
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 
@@ -29,7 +26,7 @@ struct AppState {
 
 #[tokio::main]
 async fn main() {
-    dotenv().expect("can't load dotenv file");
+    dotenv().unwrap_or_default();
     tracing_subscriber::registry()
         .with(
             tracing_subscriber::EnvFilter::try_from_default_env().unwrap_or_else(|_| {
@@ -59,7 +56,7 @@ async fn main() {
 
     let listener = TcpListener::bind("0.0.0.0:3002").await.unwrap();
 
-    info!("listening on {}", listener.local_addr().unwrap());
+    tracing::info!("listening on {}.", listener.local_addr().unwrap(),);
     axum::serve(
         listener,
         app.into_make_service_with_connect_info::<SocketAddr>(),
@@ -79,10 +76,8 @@ async fn fetch_notion_pages(
     // TODO:
     let FetchRequest { sync_id, .. } = fetch_request;
     let db_url = format!(
-        "{}/notion-{}-{}.db",
-        state.db_base_path,
-        chrono::offset::Utc::now(),
-        &fetch_request.sync_id
+        "{}/notion-{}.db",
+        state.db_base_path, &fetch_request.sync_id
     );
     let db = db_url.clone();
     let mut handles = state.handles.lock().expect("can't get lock");
