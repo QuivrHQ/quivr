@@ -18,19 +18,40 @@
   transition: transform 0.2s ease-out, opacity 0.2s ease-out;
 
   &:focus-within,
-  &:hover {
+  &:hover,
+  &.active {
     transform: translateY(0%);
     opacity: 1;
   }
 }
 
+.bubble_menu {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: Spacings.$spacing03;
+  padding: Spacings.$spacing03;
+}
+
 .editor_wrapper {
   min-height: 100vh;
+
+  .bubble_menu {
+    background-color: var(--background-3);
+    border: solid 1px var(--border-0);
+    border-radius: Radius.$normal;
+  }
 
   .content_wrapper {
     color: var(--text-3);
     width: 100%;
     position: relative;
+
+    .ai_highlight {
+      color: white;
+      background-color: var(--primary-0);
+      padding: 2px 0 3px 0;
+    }
 
     .has_focus {
       position: relative;
