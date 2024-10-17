@@ -104,7 +104,7 @@ export const TextEditor = (): JSX.Element => {
         <div>
           <BubbleMenu
             shouldShow={() => {
-              return editor.isActive("aiHighlight", { type: "selection" });
+              return editor.isActive("aiHighlight", { type: "ai" });
             }}
             tippyOptions={{
               moveTransition: "transform 0.1s",
