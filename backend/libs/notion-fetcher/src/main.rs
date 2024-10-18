@@ -5,7 +5,10 @@ use axum::{
     Json, Router,
 };
 use dotenvy::dotenv;
-use notion_fetcher::{fetch_and_save, FetchRequest, FetchResponse};
+use notion_fetcher::{
+    fetch_and_save,
+    models::{FetchError, FetchRequest, FetchResponse},
+};
 use std::{
     collections::HashMap,
     env,
@@ -47,6 +50,7 @@ async fn main() {
     let app = Router::new()
         .route("/healthz", get(healthz))
         .route("/v1/fetch_store_notion", post(fetch_notion_pages))
+        .route("/v1/delete_notion", post(fetch_notion_pages))
         .with_state(state)
         .layer(
             TraceLayer::new_for_http()
@@ -72,8 +76,7 @@ async fn healthz() -> &'static str {
 async fn fetch_notion_pages(
     State(state): State<AppState>,
     Json(fetch_request): Json<FetchRequest>,
-) -> (StatusCode, Json<FetchResponse>) {
-    // TODO:
+) -> Result<(StatusCode, Json<FetchResponse>), FetchError> {
     let FetchRequest { sync_id, .. } = fetch_request;
     let db_url = format!(
         "{}/notion-{}.db",
@@ -81,11 +84,18 @@ async fn fetch_notion_pages(
     );
     let db = db_url.clone();
     let mut handles = state.handles.lock().expect("can't get lock");
+
+    if let Some(j) = handles.get(&sync_id) {
+        if !j.is_finished() {
+            return Err(FetchError::RunningFetchError);
+        }
+    }
+
     let handle = tokio::spawn(async move { fetch_and_save(fetch_request, db).await });
     handles.insert(sync_id, handle);
 
-    (
+    Ok((
         StatusCode::ACCEPTED,
         FetchResponse { db_path: db_url }.into(),
-    )
+    ))
 }

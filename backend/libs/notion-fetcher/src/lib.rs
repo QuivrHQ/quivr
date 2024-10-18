@@ -1,37 +1,29 @@
+pub mod models;
+use models::{ExtendedPage, FetchRequest};
 use notion::{
     self,
-    models::{paging::PagingCursor, ListResponse, Page},
+    models::{paging::PagingCursor, ListResponse},
 };
 use reqwest::{
     header::{self, HeaderMap, HeaderValue},
     Client, ClientBuilder,
 };
 use rusqlite::{params, Connection};
-use serde::{Deserialize, Serialize};
 use serde_json::json;
 
 static NOTION_URL: &'static str = "https://api.notion.com/v1/search";
 static NOTION_API_VERSION: &'static str = "2022-06-28";
 
-#[derive(Serialize, Deserialize, Debug)]
-pub struct FetchRequest {
-    pub sync_id: usize,
-    pub user_id: uuid::Uuid,
-    pub notion_api_key: String,
-}
-
-#[derive(Serialize, Deserialize, Debug)]
-pub struct FetchResponse {
-    pub db_path: String,
-}
-
 struct NotionFetcher {
     client: Client,
-    tx: tokio::sync::mpsc::Sender<Vec<Page>>,
+    tx: tokio::sync::mpsc::Sender<Vec<ExtendedPage>>,
 }
 
 impl NotionFetcher {
-    fn new(api_token: String, tx: tokio::sync::mpsc::Sender<Vec<Page>>) -> anyhow::Result<Self> {
+    fn new(
+        api_token: String,
+        tx: tokio::sync::mpsc::Sender<Vec<ExtendedPage>>,
+    ) -> anyhow::Result<Self> {
         let mut headers = HeaderMap::new();
         headers.insert(
             "Notion-Version",
@@ -78,25 +70,12 @@ impl NotionFetcher {
                 .body(query_str)
                 .send()
                 .await?
-                .json::<ListResponse<notion::models::Object>>()
+                .json::<ListResponse<ExtendedPage>>()
                 .await
             {
                 Ok(resp) => {
-                    let pages: Vec<Page> = resp
-                        .results()
-                        .into_iter()
-                        .filter_map(|o| {
-                            if let notion::models::Object::Page { page } = o {
-                                Some(page.clone())
-                            } else {
-                                None
-                            }
-                        })
-                        .collect();
+                    let pages: Vec<ExtendedPage> = resp.results().to_owned();
                     if resp.has_more {
-                        dbg!(&next_cursor);
-                        dbg!(&resp.next_cursor);
-
                         self.tx.send(pages).await?;
 
                         let _ = std::mem::replace(&mut next_cursor, resp.next_cursor);
@@ -115,15 +94,17 @@ impl NotionFetcher {
     }
 }
 
-fn bulk_insert_pages<'a>(conn: &Connection, pages: Vec<Page>) -> anyhow::Result<()> {
+fn bulk_insert_pages<'a>(conn: &Connection, pages: Vec<ExtendedPage>) -> anyhow::Result<()> {
     tracing::debug!("inserting {} pages.", pages.len());
 
     for page in pages.iter() {
-        let parent_id = match &page.parent {
+        let parent_id = match &page.page.parent {
+            notion::models::Parent::Workspace => None,
             notion::models::Parent::Page { page_id } => Some(page_id.to_string()),
-            _ => None,
+            _ => continue,
         };
         let icon = page
+            .page
             .icon
             .as_ref()
             .map(|i| match i {
@@ -132,18 +113,19 @@ fn bulk_insert_pages<'a>(conn: &Connection, pages: Vec<Page>) -> anyhow::Result<
             })
             .flatten();
         let icon = icon.unwrap_or_default();
-        let page_id = page.id.to_string();
-        let title = page.title().unwrap_or_default();
+        let page_id = page.page.id.to_string();
+        let title = page.page.title().unwrap_or_default();
         conn.execute(
-            r#"INSERT OR IGNORE INTO notion_pages (id, created_time, last_edited_time, title, archived, parent_id, icon)
-            VALUES (?1,?2,?3,?4,?5,?6,?7)
+            r#"INSERT OR IGNORE INTO notion_pages (id, created_time, last_edited_time, title, archived, public_url, parent_id, icon)
+            VALUES (?1,?2,?3,?4,?5,?6,?7,?8)
             "#,
             params![
             page_id,
-            page.created_time,
-            page.last_edited_time,
+            page.page.created_time,
+            page.page.last_edited_time,
             title,
-            page.archived,
+            page.page.archived,
+            page.url,
             parent_id,
             icon,
             ]
