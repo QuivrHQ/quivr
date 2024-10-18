@@ -84,13 +84,8 @@ export const TextEditor = (): JSX.Element => {
   );
 
   const toggleSearchBar = () => {
-    if (searchBarOpen) {
-      setSearchBarOpen(false);
-      editor?.commands.focus();
-    } else {
-      setSearchBarOpen(true);
-      searchEditorRef.current?.commands.focus();
-    }
+    setSearchBarOpen(!searchBarOpen);
+    (searchBarOpen ? editor : searchEditorRef.current)?.commands.focus();
   };
 
   if (!editor) {
@@ -104,7 +99,7 @@ export const TextEditor = (): JSX.Element => {
         <div>
           <BubbleMenu
             shouldShow={() => {
-              return editor.isActive("aiHighlight", { type: "ai" });
+              return editor.isActive(AIHighlight.name, { type: "ai" });
             }}
             tippyOptions={{
               moveTransition: "transform 0.1s",
@@ -117,7 +112,7 @@ export const TextEditor = (): JSX.Element => {
               onClick={() => {
                 editor
                   .chain()
-                  .extendMarkRange("aiHighlight")
+                  .extendMarkRange(AIHighlight.name)
                   .unsetHighlight()
                   .run();
               }}

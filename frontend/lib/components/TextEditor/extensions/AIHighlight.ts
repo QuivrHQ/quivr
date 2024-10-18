@@ -11,12 +11,11 @@ const unsetSelectionsInDocument: Command = ({ dispatch, state }) => {
 
   state.doc.descendants((node, pos) => {
     if (node.isText) {
-      node.marks.forEach((mark) => {
-        if (mark.type.name === "aiHighlight") {
-          if (mark.attrs["type"] !== "selection") {
-            return false;
-          }
-
+      node.marks.map((mark) => {
+        if (
+          mark.type.name === AIHighlight.name &&
+          mark.attrs["type"] === "selection"
+        ) {
           tr.removeMark(pos, pos + node.nodeSize, mark.type);
         }
       });
