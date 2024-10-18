@@ -1,7 +1,9 @@
 import { HighlightOptions } from "@tiptap/extension-highlight";
 
+export type AIHighlightType = "ai" | "selection";
+
 export type AIHighlightOptions = HighlightOptions & {
-  type: "ai" | "selection";
+  type: AIHighlightType;
 };
 
 declare module "@tiptap/core" {
@@ -26,7 +28,7 @@ declare module "@tiptap/core" {
        */
       setHighlight: (attributes?: {
         color?: string;
-        type?: "selection" | "ai";
+        type?: AIHighlightType;
       }) => ReturnType;
     };
   }
