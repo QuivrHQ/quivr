@@ -11,3 +11,9 @@ This project is licensed under the Apache 2.0 License
 ```bash
 pip install quivr-core
 ```
+
+## Usage
+
+```python
+from quivr_core import QuivrCore
+```
