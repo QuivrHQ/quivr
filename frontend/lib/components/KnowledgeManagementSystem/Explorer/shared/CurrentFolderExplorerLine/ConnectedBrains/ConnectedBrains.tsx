@@ -127,22 +127,24 @@ const ConnectedBrains = ({
           </Tooltip>
         ))}
         {showMore && (
-          <div
-            className={styles.more_brains}
-            onClick={() => setShowRemainingBrains(!showRemainingBrains)}
-          >
-            ...
-          </div>
-        )}
-        {showRemainingBrains && (
-          <div className={styles.remaining_brains_container}>
-            <RemainingBrainsTooltip
-              remainingBrains={remainingBrains}
-              navigateToBrain={navigateToBrain}
-              isKnowledgeStatusWaiting={isKnowledgeStatusWaiting}
-              knowledgeStatus={knowledge?.status}
-            />
-          </div>
+          <>
+            {showRemainingBrains && (
+              <div className={styles.remaining_brains_container}>
+                <RemainingBrainsTooltip
+                  remainingBrains={remainingBrains}
+                  navigateToBrain={navigateToBrain}
+                  isKnowledgeStatusWaiting={isKnowledgeStatusWaiting}
+                  knowledgeStatus={knowledge?.status}
+                />
+              </div>
+            )}
+            <div
+              className={styles.more_brains}
+              onClick={() => setShowRemainingBrains(!showRemainingBrains)}
+            >
+              ...
+            </div>
+          </>
         )}
         <Tooltip tooltip="Add to brains" delayDuration={250}>
           <div onClick={handleAddClick}>

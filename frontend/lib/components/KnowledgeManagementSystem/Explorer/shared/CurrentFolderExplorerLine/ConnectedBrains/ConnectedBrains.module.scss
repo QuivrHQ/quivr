@@ -49,6 +49,10 @@
   .waiting_icon {
     @include waiting-icon;
   }
+
+  .more_brains {
+    cursor: pointer;
+  }
 }
 
 .remaining_brains_tooltip {
@@ -62,4 +66,8 @@
   .waiting_icon {
     @include waiting-icon;
   }
+}
+
+.modal_content {
+  display: none;
 }
