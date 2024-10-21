@@ -1,8 +1,0 @@
-{
-  "title": "登出",
-  "subtitle": "下次见",
-  "areYouSure": "是否确实要登出？",
-  "cancel": "取消",
-  "error": "登出时出错 {{errorMessage}}",
-  "loggedOut": "登出成功"
-}

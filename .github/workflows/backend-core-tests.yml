@@ -3,10 +3,10 @@ name: Run Tests with Tika Server
 on:
   push:
     paths:
-      - "backend/core/**"
+      - "core/**"
   pull_request:
     paths:
-      - "backend/core/**"
+      - "core/**"
   workflow_dispatch:
 
 jobs:
@@ -30,7 +30,7 @@ jobs:
           working-directory: backend
       - name: 🔄 Sync dependencies
         run: |
-          cd backend
+          cd core
           UV_INDEX_STRATEGY=unsafe-first-match rye sync --no-lock
 
       - name: Run tests
@@ -40,7 +40,7 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y libmagic-dev poppler-utils libreoffice tesseract-ocr  pandoc
-          cd backend
+          cd core
           rye run python -c "from unstructured.nlp.tokenize import download_nltk_packages; download_nltk_packages()"
           rye run python -c "import nltk;nltk.download('punkt_tab'); nltk.download('averaged_perceptron_tagger_eng')"
           rye test -p quivr-core

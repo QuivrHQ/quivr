@@ -1,0 +1,20 @@
+[project]
+name = "chatbot"
+version = "0.1.0"
+description = "Add your description here"
+authors = [
+    { name = "Stan Girard", email = "stan@quivr.app" }
+]
+dependencies = [
+    "quivr-core[all]>=0.0.18",
+    "chainlit>=1.2.0",
+    "sqlmodel>=0.0.22",
+    "langchain-cohere>=0.2.0",
+]
+readme = "README.md"
+requires-python = ">= 3.11"
+
+[tool.rye]
+managed = true
+virtual = true
+dev-dependencies = []
