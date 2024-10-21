@@ -40,7 +40,7 @@ retrieval_config:
     supplier: "openai"
 
     # The model to use for the LLM for the given supplier
-    model: "gpt-3.5-turbo-0125"
+    model: "gpt-4o"
 
     max_input_tokens: 2000
 

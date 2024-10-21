@@ -15,4 +15,4 @@ if __name__ == "__main__":
         answer = brain.ask(
             "what is gold? asnwer in french"
         )
-        print("answer QuivrQARAGLangGraph :", answer)
+        print("answer QuivrQARAGLangGraph :", answer.answer)

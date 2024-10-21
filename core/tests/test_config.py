@@ -5,7 +5,7 @@ def test_default_llm_config():
     config = LLMEndpointConfig()
 
     assert config.model_dump(exclude={"llm_api_key"}) == LLMEndpointConfig(
-        model="gpt-3.5-turbo-0125",
+        model="gpt-4o",
         llm_base_url=None,
         llm_api_key=None,
         max_input_tokens=2000,
