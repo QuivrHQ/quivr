@@ -10,6 +10,7 @@ import { useDevice } from "@/lib/hooks/useDevice";
 
 import { useKnowledgeItem } from "./KnowledgeItem/hooks/useKnowledgeItem";
 // eslint-disable-next-line import/order
+import SwitchButton from "@/lib/components/ui/SwitchButton/SwitchButton";
 import KnowledgeItem from "./KnowledgeItem/KnowledgeItem";
 import styles from "./KnowledgeTable.module.scss";
 
@@ -72,6 +73,8 @@ const KnowledgeTable = React.forwardRef<HTMLDivElement, KnowledgeTableProps>(
     const [searchQuery, setSearchQuery] = useState<string>("");
     const [filteredKnowledgeList, setFilteredKnowledgeList] =
       useState<KMSElement[]>(knowledgeList);
+    const [allKnowledgeMode, setAllKnowledgeMode] = useState<boolean>(false);
+
     const { isMobile } = useDevice();
     const [sortConfig, setSortConfig] = useState<{
       key: string;
@@ -129,13 +132,20 @@ const KnowledgeTable = React.forwardRef<HTMLDivElement, KnowledgeTableProps>(
       <div ref={ref} className={styles.knowledge_table_wrapper}>
         <span className={styles.title}>Uploaded Knowledge</span>
         <div className={styles.table_header}>
-          <div className={styles.search}>
-            <TextInput
-              iconName="search"
-              label="Search"
-              inputValue={searchQuery}
-              setInputValue={setSearchQuery}
-              small={true}
+          <div className={styles.left}>
+            <div className={styles.search}>
+              <TextInput
+                iconName="search"
+                label="Search"
+                inputValue={searchQuery}
+                setInputValue={setSearchQuery}
+                small={true}
+              />
+            </div>
+            <SwitchButton
+              label="All Knowledge"
+              checked={allKnowledgeMode}
+              setChecked={setAllKnowledgeMode}
             />
           </div>
           <QuivrButton

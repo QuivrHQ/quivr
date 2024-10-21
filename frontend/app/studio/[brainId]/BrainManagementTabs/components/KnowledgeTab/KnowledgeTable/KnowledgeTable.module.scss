@@ -19,8 +19,13 @@
     align-items: center;
     gap: Spacings.$spacing03;
 
-    .search {
-      width: 250px;
+    .left {
+      display: flex;
+      align-items: center;
+      gap: Spacings.$spacing07;
+      .search {
+        width: 250px;
+      }
     }
   }
 

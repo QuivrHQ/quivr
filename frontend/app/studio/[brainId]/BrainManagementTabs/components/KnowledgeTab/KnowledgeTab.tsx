@@ -41,7 +41,7 @@ export const KnowledgeTab = ({
     return <LoaderIcon size="big" color="accent" />;
   }
 
-  if (allKnowledge.length === 0) {
+  if (allKnowledge.filter((knowledge) => !knowledge.is_folder).length === 0) {
     return (
       <div className={styles.knowledge_tab_container}>
         <div className={styles.knowledge_tab_wrapper}>
