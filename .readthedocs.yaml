@@ -14,8 +14,8 @@ build:
     - asdf install uv latest
     - asdf global uv latest
     - uv venv
-    - cd backend && UV_INDEX_STRATEGY=unsafe-first-match uv pip install -r requirements.lock
-    - cd backend/ && ls -la && NO_COLOR=1 ../.venv/bin/mkdocs build --strict --site-dir $READTHEDOCS_OUTPUT/html --config-file docs/mkdocs.yml
+    - cd docs && UV_INDEX_STRATEGY=unsafe-first-match uv pip install -r requirements.lock
+    - cd docs/ && ls -la && NO_COLOR=1 ../.venv/bin/mkdocs build --strict --site-dir $READTHEDOCS_OUTPUT/html --config-file mkdocs.yml
 
   
 

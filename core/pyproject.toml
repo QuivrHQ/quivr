@@ -1,6 +1,6 @@
 [project]
 name = "quivr-core"
-version = "0.0.18"
+version = "0.0.21"
 description = "Quivr core RAG package"
 authors = [
     { name = "Stan Girard", email = "stan@quivr.app" }
@@ -14,10 +14,13 @@ dependencies = [
     "rich>=13.7.1",
     "tiktoken>=0.7.0",
     "aiofiles>=23.1.0",
+    "langchain-openai>=0.1.0",
+    "langchain-cohere>=0.1.0",
     "langchain-community>=0.2.12",
     "langchain-anthropic>=0.1.23",
     "types-pyyaml>=6.0.12.20240808",
     "transformers[sentencepiece]>=4.44.2",
+    "faiss-cpu>=1.8.0.post1",
 ]
 readme = "README.md"
 requires-python = ">= 3.11"
@@ -25,27 +28,8 @@ requires-python = ">= 3.11"
 [project.optional-dependencies]
 all = [
     "unstructured[epub,docx,odt,doc,pptx,ppt,xlsx,md]>=0.15.5",
-    "faiss-cpu>=1.8.0.post1",
     "docx2txt>=0.8",
 ]
-
-megaparse = [
-    "python-docx>=1.1.0",
-    "mammoth>=1.8.0",
-    "python-pptx>=1.0.2",
-    "llama-parse>=0.4.0",
-    "pdf2docx>=0.5.0",
-    "unstructured[pdf]>=0.15.0",
-    "langchain>=0.2.0",
-    "langchain-community>=0.2.0",
-    "langchain-openai>=0.1.0",
-    "langchain-core>=0.2.0",
-    "python-dotenv>=1.0.0",
-    "pycryptodome>=3.20.0",
-    "llama-index>=0.10.0",
-    "pdfplumber>=0.11.0",
-]
-
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
@@ -84,4 +68,3 @@ markers = [
 [[tool.mypy.overrides]]
 module = "yaml"
 ignore_missing_imports = true
-

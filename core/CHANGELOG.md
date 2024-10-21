@@ -1,5 +1,27 @@
 # Changelog
 
+## [0.0.21](https://github.com/QuivrHQ/quivr/compare/core-0.0.20...core-0.0.21) (2024-10-21)
+
+
+### Features
+
+* **ci:** trigger ([b92774a](https://github.com/QuivrHQ/quivr/commit/b92774aa37ad2051b197daa29fe4b94d57a19986))
+
+## [0.0.20](https://github.com/QuivrHQ/quivr/compare/core-0.0.19...core-0.0.20) (2024-10-21)
+
+
+### Features
+
+* **ci:** trigger ([#3403](https://github.com/QuivrHQ/quivr/issues/3403)) ([68c09fc](https://github.com/QuivrHQ/quivr/commit/68c09fce85364432da2641d0a8da867516142553))
+* **docs:** trigger ci ([5644596](https://github.com/QuivrHQ/quivr/commit/56445967252eac20d17bebc4484d7c00c45d9238))
+
+## [0.0.19](https://github.com/QuivrHQ/quivr/compare/core-0.0.18...core-0.0.19) (2024-10-21)
+
+
+### Features
+
+* **quivr-core:** beginning ([#3388](https://github.com/QuivrHQ/quivr/issues/3388)) ([7acb52a](https://github.com/QuivrHQ/quivr/commit/7acb52a9637b74d53f3e4cc9dde4ae1ca3f481ad))
+
 ## [0.0.18](https://github.com/QuivrHQ/quivr/compare/core-0.0.17...core-0.0.18) (2024-10-16)
 
 

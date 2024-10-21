@@ -3,6 +3,8 @@ from uuid import uuid4
 import pytest
 from quivr_core.storage.file import FileExtension, QuivrFile
 
+unstructured = pytest.importorskip("unstructured")
+
 
 @pytest.fixture
 def txt_qfile(temp_data_file):
