@@ -40,14 +40,13 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: core/
+        working-directory: core
     steps:
       - uses: actions/checkout@v4
       - name: Install Rye
         uses: eifinger/setup-rye@v2
         with:
           enable-cache: true
-          working-directory: core/
       - name: Rye Sync
         run: cd core/ && UV_INDEX_STRATEGY=unsafe-first-match rye sync --no-lock
       - name: Rye Build
