@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.0.22](https://github.com/QuivrHQ/quivr/compare/core-0.0.21...core-0.0.22) (2024-10-21)
+
+
+### Features
+
+* **ask:** non-streaming now calls streaming ([#3409](https://github.com/QuivrHQ/quivr/issues/3409)) ([e71e46b](https://github.com/QuivrHQ/quivr/commit/e71e46bcdfbab0d583aef015604278343fd46c6f))
+
 ## [0.0.21](https://github.com/QuivrHQ/quivr/compare/core-0.0.20...core-0.0.21) (2024-10-21)
 
 
