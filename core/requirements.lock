@@ -26,6 +26,7 @@ anthropic==0.36.1
 anyio==4.6.2.post1
     # via anthropic
     # via httpx
+    # via openai
 attrs==24.2.0
     # via aiohttp
 certifi==2024.8.30
@@ -34,12 +35,19 @@ certifi==2024.8.30
     # via requests
 charset-normalizer==3.4.0
     # via requests
+cohere==5.11.1
+    # via langchain-cohere
 dataclasses-json==0.6.7
     # via langchain-community
 defusedxml==0.7.1
     # via langchain-anthropic
 distro==1.9.0
     # via anthropic
+    # via openai
+faiss-cpu==1.9.0
+    # via quivr-core
+fastavro==1.9.7
+    # via cohere
 filelock==3.16.1
     # via huggingface-hub
     # via transformers
@@ -56,10 +64,13 @@ httpcore==1.0.6
     # via httpx
 httpx==0.27.2
     # via anthropic
+    # via cohere
     # via langgraph-sdk
     # via langsmith
+    # via openai
     # via quivr-core
 httpx-sse==0.4.0
+    # via cohere
     # via langgraph-sdk
 huggingface-hub==0.25.2
     # via tokenizers
@@ -71,6 +82,7 @@ idna==3.10
     # via yarl
 jiter==0.6.1
     # via anthropic
+    # via openai
 jsonpatch==1.33
     # via langchain-core
 jsonpointer==3.0.0
@@ -80,15 +92,25 @@ langchain==0.2.16
     # via quivr-core
 langchain-anthropic==0.1.23
     # via quivr-core
+langchain-cohere==0.2.4
+    # via quivr-core
 langchain-community==0.2.17
+    # via langchain-experimental
     # via quivr-core
 langchain-core==0.2.41
     # via langchain
     # via langchain-anthropic
+    # via langchain-cohere
     # via langchain-community
+    # via langchain-experimental
+    # via langchain-openai
     # via langchain-text-splitters
     # via langgraph
     # via langgraph-checkpoint
+    # via quivr-core
+langchain-experimental==0.0.65
+    # via langchain-cohere
+langchain-openai==0.1.25
     # via quivr-core
 langchain-text-splitters==0.2.4
     # via langchain
@@ -116,31 +138,47 @@ multidict==6.1.0
 mypy-extensions==1.0.0
     # via typing-inspect
 numpy==1.26.4
+    # via faiss-cpu
     # via langchain
     # via langchain-community
+    # via pandas
     # via transformers
+openai==1.52.0
+    # via langchain-openai
 orjson==3.10.7
     # via langgraph-sdk
     # via langsmith
 packaging==24.1
+    # via faiss-cpu
     # via huggingface-hub
     # via langchain-core
     # via marshmallow
     # via transformers
+pandas==2.2.3
+    # via langchain-cohere
+parameterized==0.9.0
+    # via cohere
 propcache==0.2.0
     # via yarl
 protobuf==5.28.2
     # via transformers
 pydantic==2.9.2
     # via anthropic
+    # via cohere
     # via langchain
     # via langchain-core
     # via langsmith
+    # via openai
     # via quivr-core
 pydantic-core==2.23.4
+    # via cohere
     # via pydantic
 pygments==2.18.0
     # via rich
+python-dateutil==2.8.2
+    # via pandas
+pytz==2024.2
+    # via pandas
 pyyaml==6.0.2
     # via huggingface-hub
     # via langchain
@@ -151,6 +189,7 @@ regex==2024.9.11
     # via tiktoken
     # via transformers
 requests==2.32.3
+    # via cohere
     # via huggingface-hub
     # via langchain
     # via langchain-community
@@ -166,40 +205,55 @@ safetensors==0.4.5
     # via transformers
 sentencepiece==0.2.0
     # via transformers
+six==1.16.0
+    # via python-dateutil
 sniffio==1.3.1
     # via anthropic
     # via anyio
     # via httpx
+    # via openai
 sqlalchemy==2.0.36
     # via langchain
     # via langchain-community
+tabulate==0.9.0
+    # via langchain-cohere
 tenacity==8.5.0
     # via langchain
     # via langchain-community
     # via langchain-core
 tiktoken==0.8.0
+    # via langchain-openai
     # via quivr-core
 tokenizers==0.20.1
     # via anthropic
+    # via cohere
     # via transformers
 tqdm==4.66.5
     # via huggingface-hub
+    # via openai
     # via transformers
 transformers==4.45.2
     # via quivr-core
 types-pyyaml==6.0.12.20240917
     # via quivr-core
+types-requests==2.32.0.20241016
+    # via cohere
 typing-extensions==4.12.2
     # via anthropic
+    # via cohere
     # via huggingface-hub
     # via langchain-core
+    # via openai
     # via pydantic
     # via pydantic-core
     # via sqlalchemy
     # via typing-inspect
 typing-inspect==0.9.0
     # via dataclasses-json
+tzdata==2024.2
+    # via pandas
 urllib3==2.2.3
     # via requests
+    # via types-requests
 yarl==1.15.3
     # via aiohttp

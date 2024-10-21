@@ -6,10 +6,7 @@ authors = [
     { name = "Stan Girard", email = "stan@quivr.app" }
 ]
 dependencies = [
-    "quivr-core[all]>=0.0.18",
-    "sqlmodel>=0.0.22",
-    "langchain-cohere>=0.1.0",
-    "langchain-openai>=0.1.0",
+    "quivr-core @ file:///${PROJECT_ROOT}/../../core",
 ]
 readme = "README.md"
 requires-python = ">= 3.11"
