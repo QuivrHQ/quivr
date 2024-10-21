@@ -16,7 +16,9 @@ const ConnectionsKnowledges = (): JSX.Element => {
       const groupedByProvider: { [key: string]: Sync[] } = {};
 
       res
-        .filter((sync) => sync.credentials.token)
+        .filter(
+          (sync) => sync.credentials.token || sync.credentials.access_token
+        )
         .forEach((sync) => {
           const providerLowerCase = sync.provider.toLowerCase();
           if (!groupedByProvider[providerLowerCase]) {

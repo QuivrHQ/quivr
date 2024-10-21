@@ -43,6 +43,7 @@ export interface KMSElement {
 
 interface Credentials {
   token: string;
+  access_token: string;
 }
 
 export interface Sync {

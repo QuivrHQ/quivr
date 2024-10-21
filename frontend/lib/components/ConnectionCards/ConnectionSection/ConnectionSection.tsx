@@ -33,7 +33,6 @@ export const ConnectionSection = ({
   const fetchUserSyncs = async () => {
     try {
       const res: Sync[] = await getUserSyncs();
-      console.info(res);
       setExistingConnections(
         res.filter(
           (sync) =>
