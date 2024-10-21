@@ -153,7 +153,7 @@ export const ConnectionSection = ({
         <div className={styles.connection_section_header}>
           <div className={styles.left}>
             <Image
-              src={providerIconUrls[provider]}
+              src={providerIconUrls[provider.toLowerCase()]}
               alt={label}
               width={24}
               height={24}
