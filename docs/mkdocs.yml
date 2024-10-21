@@ -59,6 +59,7 @@ nav:
   - Home:
       - index.md
       - installation.md
+      - quickstart.md
       - Brain:
           - brain/index.md
           - brain/brain.md
