@@ -16,6 +16,10 @@ dev-build:
 	DOCKER_BUILDKIT=1 docker compose -f docker-compose.dev.yml build --no-cache
 	DOCKER_BUILDKIT=1 docker compose -f docker-compose.dev.yml up
 
+.PHONY: dev-local
+dev-local:
+	DOCKER_BUILDKIT=1 docker compose -f docker-compose.dev.local.yml up --build
+
 ## prod: Build and start production environment
 .PHONY: prod
 prod:
