@@ -1,22 +1,30 @@
 @use "styles/Spacings.module.scss";
 
-.loader {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 100%;
+.main_container {
   height: 100%;
-}
 
-.header_wrapper {
-  display: flex;
-  width: calc(100% + (Spacings.$spacing05 + Spacings.$spacing03));
-  margin-left: -(Spacings.$spacing05 + Spacings.$spacing03);
-  gap: Spacings.$spacing03;
-  align-items: center;
-  padding-top: Spacings.$spacing05;
-
-  .tabs {
+  .loader {
+    display: flex;
+    justify-content: center;
+    align-items: center;
     width: 100%;
+    height: 100%;
+  }
+
+  .header_wrapper {
+    display: flex;
+    width: calc(100% + (Spacings.$spacing05 + Spacings.$spacing03));
+    margin-left: -(Spacings.$spacing05 + Spacings.$spacing03);
+    gap: Spacings.$spacing03;
+    align-items: center;
+    padding-top: Spacings.$spacing05;
+
+    .tabs {
+      width: 100%;
+    }
+  }
+
+  .knowledge_tab {
+    height: 100%;
   }
 }

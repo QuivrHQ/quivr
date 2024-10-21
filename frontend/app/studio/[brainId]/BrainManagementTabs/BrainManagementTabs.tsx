@@ -69,7 +69,7 @@ export const BrainManagementTabs = (): JSX.Element => {
   }
 
   return (
-    <div>
+    <div className={styles.main_container}>
       <div className={styles.header_wrapper}>
         <Icon
           name="chevronLeft"
@@ -87,11 +87,13 @@ export const BrainManagementTabs = (): JSX.Element => {
       )}
       {selectedTab === "People" && <PeopleTab brainId={brainId} />}
       {selectedTab === "Knowledge" && (
-        <KnowledgeTab
-          brainId={brainId}
-          hasEditRights={hasEditRights}
-          allKnowledge={allKnowledge}
-        />
+        <div className={styles.knowledge_tab}>
+          <KnowledgeTab
+            brainId={brainId}
+            hasEditRights={hasEditRights}
+            allKnowledge={allKnowledge}
+          />
+        </div>
       )}
     </div>
   );

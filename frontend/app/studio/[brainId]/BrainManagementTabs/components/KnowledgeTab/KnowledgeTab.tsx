@@ -1,6 +1,5 @@
 "use client";
 import { UUID } from "crypto";
-import { AnimatePresence, motion } from "framer-motion";
 
 import { KMSElement } from "@/lib/api/sync/types";
 import { LoaderIcon } from "@/lib/components/ui/LoaderIcon/LoaderIcon";
@@ -56,15 +55,11 @@ export const KnowledgeTab = ({
   return (
     <div className={styles.knowledge_tab_container}>
       <div className={styles.knowledge_tab_wrapper}>
-        <motion.div layout className="w-full flex flex-col gap-5">
-          <AnimatePresence mode="popLayout">
-            <KnowledgeTable
-              knowledgeList={allKnowledge.filter(
-                (knowledge) => !knowledge.is_folder
-              )}
-            />
-          </AnimatePresence>
-        </motion.div>
+        <KnowledgeTable
+          knowledgeList={allKnowledge.filter(
+            (knowledge) => !knowledge.is_folder
+          )}
+        />
       </div>
     </div>
   );

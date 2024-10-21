@@ -2,10 +2,11 @@
 
 .brain_management_wrapper {
   width: 100%;
-  height: 100vh;
+  min-height: 100%;
 
   .content_wrapper {
     padding-block: Spacings.$spacing05;
     padding-inline: Spacings.$spacing09;
+    height: 100%;
   }
 }
