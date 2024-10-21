@@ -2,44 +2,64 @@
 @use "styles/Spacings.module.scss";
 @use "styles/Typography.module.scss";
 
+@mixin brain-container {
+  cursor: pointer;
+  position: relative;
+
+  .sample_wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: Radius.$normal;
+    min-width: 18px;
+    min-height: 18px;
+    max-width: 18px;
+    max-height: 18px;
+    font-size: Typography.$very_tiny;
+
+    &.waiting {
+      opacity: 0.4;
+    }
+  }
+}
+
+@mixin waiting-icon {
+  min-width: 18px;
+  min-height: 18px;
+  max-width: 18px;
+  max-height: 18px;
+  position: absolute;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  top: 0;
+  left: 0;
+  opacity: 1;
+}
+
 .main_container {
   display: flex;
   align-items: center;
   gap: Spacings.$spacing02;
 
   .brain_container {
-    cursor: pointer;
-    position: relative;
-
-    .sample_wrapper {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      border-radius: Radius.$normal;
-      min-width: 18px;
-      min-height: 18px;
-      max-width: 18px;
-      max-height: 18px;
-      border-radius: Radius.$normal;
-      font-size: Typography.$very_tiny;
-
-      &.waiting {
-        opacity: 0.4;
-      }
-    }
+    @include brain-container;
   }
 
   .waiting_icon {
-    min-width: 18px;
-    min-height: 18px;
-    max-width: 18px;
-    max-height: 18px;
-    position: absolute;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    top: 0;
-    left: 0;
-    opacity: 1;
+    @include waiting-icon;
+  }
+}
+
+.remaining_brains_tooltip {
+  display: flex;
+  gap: Spacings.$spacing02;
+
+  .brain_container {
+    @include brain-container;
+  }
+
+  .waiting_icon {
+    @include waiting-icon;
   }
 }

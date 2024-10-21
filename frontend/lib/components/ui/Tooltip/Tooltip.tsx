@@ -10,6 +10,7 @@ interface TooltipProps {
   tooltip?: ReactNode;
   small?: boolean;
   type?: "default" | "dangerous" | "success";
+  delayDuration?: number;
 }
 
 const Tooltip = ({
@@ -17,6 +18,7 @@ const Tooltip = ({
   tooltip,
   small,
   type,
+  delayDuration = 0,
 }: TooltipProps): JSX.Element => {
   const [open, setOpen] = useState(false);
 
@@ -25,7 +27,7 @@ const Tooltip = ({
       <TooltipPrimitive.Root
         onOpenChange={setOpen}
         open={open}
-        delayDuration={0}
+        delayDuration={delayDuration}
       >
         <TooltipPrimitive.Trigger asChild>{children}</TooltipPrimitive.Trigger>
         <AnimatePresence>

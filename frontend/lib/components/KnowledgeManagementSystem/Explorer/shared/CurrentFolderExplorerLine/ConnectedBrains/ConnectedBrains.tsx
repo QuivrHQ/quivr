@@ -16,6 +16,46 @@ interface ConnectedbrainsProps {
   knowledge?: KMSElement;
 }
 
+interface RemainingBrainsTooltipProps {
+  remainingBrains: Brain[];
+  navigateToBrain: (brainId: UUID) => void;
+  isKnowledgeStatusWaiting: (status?: KnowledgeStatus) => boolean;
+  knowledgeStatus?: KnowledgeStatus;
+}
+
+const RemainingBrainsTooltip = ({
+  remainingBrains,
+  navigateToBrain,
+  isKnowledgeStatusWaiting,
+  knowledgeStatus,
+}: RemainingBrainsTooltipProps): JSX.Element => {
+  return (
+    <div className={styles.remaining_brains_tooltip}>
+      {remainingBrains.map((brain) => (
+        <div
+          key={brain.id}
+          className={styles.brain_container}
+          onClick={() => {
+            navigateToBrain(brain.brain_id ?? brain.id);
+          }}
+        >
+          <div
+            className={`${styles.sample_wrapper} ${
+              isKnowledgeStatusWaiting(knowledgeStatus) ||
+              knowledgeStatus === "ERROR"
+                ? styles.waiting
+                : ""
+            }`}
+            style={{ backgroundColor: brain.snippet_color }}
+          >
+            <span>{brain.snippet_emoji}</span>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+};
+
 const ConnectedBrains = ({
   connectedBrains,
   knowledge,
@@ -42,10 +82,14 @@ const ConnectedBrains = ({
     setShowAddToBrainModal(false);
   };
 
+  const brainsToShow = connectedBrains.slice(0, 5);
+  const remainingBrains = connectedBrains.slice(5);
+  const showMore = connectedBrains.length > 5;
+
   return (
     <>
       <div className={styles.main_container}>
-        {connectedBrains.map((brain) => (
+        {brainsToShow.map((brain) => (
           <Tooltip key={brain.id} tooltip={brain.name}>
             <>
               <div
@@ -79,7 +123,21 @@ const ConnectedBrains = ({
             </>
           </Tooltip>
         ))}
-        <Tooltip tooltip="Add to brains">
+        {showMore && (
+          <Tooltip
+            tooltip={
+              <RemainingBrainsTooltip
+                remainingBrains={remainingBrains}
+                navigateToBrain={navigateToBrain}
+                isKnowledgeStatusWaiting={isKnowledgeStatusWaiting}
+                knowledgeStatus={knowledge?.status}
+              />
+            }
+          >
+            <div className={styles.more_brains}>...</div>
+          </Tooltip>
+        )}
+        <Tooltip tooltip="Add to brains" delayDuration={250}>
           <div onClick={handleAddClick}>
             <Icon name="add" color="black" size="normal" handleHover={true} />
           </div>
