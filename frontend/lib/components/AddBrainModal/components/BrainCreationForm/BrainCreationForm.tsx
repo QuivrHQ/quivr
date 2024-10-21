@@ -18,7 +18,7 @@ export const BrainCreationForm = (): JSX.Element => {
   const [instructions, setInstructions] = useState<string>("");
   const { snippetColor, setSnippetColor, snippetEmoji, setSnippetEmoji } =
     useBrainCreationContext();
-  const { setCreating } = useBrainCreationContext();
+  const { setCreating, creating } = useBrainCreationContext();
   const { createBrain } = useBrainCreationApi();
 
   const feed = (): void => {
@@ -97,6 +97,7 @@ export const BrainCreationForm = (): JSX.Element => {
             iconName="chevronRight"
             important={true}
             disabled={!name || !description || !instructions}
+            isLoading={creating}
           />
         </div>
       </div>
