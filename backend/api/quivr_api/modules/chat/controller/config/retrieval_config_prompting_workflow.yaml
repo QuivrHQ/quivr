@@ -1,5 +1,7 @@
 workflow_config:
   name: "standard RAG"
+  available_tools:
+    - "web search"
   nodes:
     - name: "START"
       conditional_edge:
@@ -24,10 +26,10 @@ workflow_config:
 
     - name: "dynamic_retrieve"
       conditional_edge:
-        routing_function: "websearch_split"
-        conditions: ["tavily_search", "generate_rag"]
+        routing_function: "tool_routing"
+        conditions: ["run_tool", "generate_rag"]
 
-    - name: "tavily_search"
+    - name: "run_tool"
       edges: ["generate_rag"]
 
     #- name: "dynamic_retrieve"
@@ -48,9 +50,6 @@ k: 40
 
 max_files: 10
 
-web_search_config:
-  supplier: "tavily"
-
 # Reranker configuration
 reranker_config:
   # The reranker supplier to use
@@ -66,7 +65,7 @@ reranker_config:
   # scores equal or above the relevance_score_threshold will be returned
   # to the LLM to generate the answer (allowed values are between 0 and 1,
   # a value of 0.1 works well with the cohere and jina rerankers)
-  relevance_score_threshold: 0.1
+  relevance_score_threshold: 0.01
 
 # LLM configuration
 llm_config:
