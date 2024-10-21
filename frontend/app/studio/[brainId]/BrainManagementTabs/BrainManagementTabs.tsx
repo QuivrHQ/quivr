@@ -17,7 +17,7 @@ import { useBrainFetcher } from "./hooks/useBrainFetcher";
 import { useBrainManagementTabs } from "./hooks/useBrainManagementTabs";
 
 export const BrainManagementTabs = (): JSX.Element => {
-  const [selectedTab, setSelectedTab] = useState("Knowledge");
+  const [selectedTab, setSelectedTab] = useState("Settings");
   const { brainId, hasEditRights } = useBrainManagementTabs();
   const { allKnowledge } = useAddedKnowledge({ brainId: brainId ?? undefined });
   const router = useRouter();
@@ -28,20 +28,24 @@ export const BrainManagementTabs = (): JSX.Element => {
 
   const brainManagementTabs: Tab[] = [
     {
+      label: "Settings",
+      isSelected: selectedTab === "Settings",
+      onClick: () => setSelectedTab("Settings"),
+      iconName: "settings",
+    },
+    {
       label: hasEditRights
-        ? `Knowledge${allKnowledge.length > 1 ? "s" : ""} (${
-            allKnowledge.length
+        ? `Knowledge${
+            allKnowledge.filter((knowledge) => !knowledge.is_folder).length > 1
+              ? "s"
+              : ""
+          } (${
+            allKnowledge.filter((knowledge) => !knowledge.is_folder).length
           })`
         : "Knowledge",
       isSelected: selectedTab === "Knowledge",
       onClick: () => setSelectedTab("Knowledge"),
       iconName: "knowledge",
-    },
-    {
-      label: "Settings",
-      isSelected: selectedTab === "Settings",
-      onClick: () => setSelectedTab("Settings"),
-      iconName: "settings",
     },
     {
       label: "People",
