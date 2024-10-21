@@ -14,7 +14,7 @@ declare module "@tiptap/core" {
        */
       setSelectionHighlight: () => ReturnType;
       /**
-       * Highlights selected text to be sent to context of ai
+       * Highlights newly generated text by ai
        */
       setAiHighlight: () => ReturnType;
       /**
