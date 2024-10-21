@@ -160,7 +160,7 @@ const ConnectedBrains = ({
           <AddToBrainsModal
             isOpen={showAddToBrainModal}
             setIsOpen={handleModalClose}
-            knowledge={knowledge}
+            knowledges={knowledge ? [knowledge] : []}
           />
         </div>
       )}

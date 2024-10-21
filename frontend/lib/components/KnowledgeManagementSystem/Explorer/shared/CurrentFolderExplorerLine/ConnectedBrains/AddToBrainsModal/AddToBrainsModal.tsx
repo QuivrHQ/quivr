@@ -14,13 +14,13 @@ import styles from "./AddToBrainsModal.module.scss";
 interface AddToBrainsModalProps {
   isOpen: boolean;
   setIsOpen: (isOpen: boolean) => void;
-  knowledge?: KMSElement;
+  knowledges?: KMSElement[];
 }
 
 const AddToBrainsModal = ({
   isOpen,
   setIsOpen,
-  knowledge,
+  knowledges,
 }: AddToBrainsModalProps): JSX.Element => {
   const [selectedBrains, setSelectedBrains] = useState<Brain[]>([]);
   const [initialBrains, setInitialBrains] = useState<Brain[]>([]);
@@ -32,14 +32,14 @@ const AddToBrainsModal = ({
   const { setRefetchFolderExplorer } = useKnowledgeContext();
 
   useEffect(() => {
-    if (knowledge) {
+    if (knowledges?.length === 1) {
       const initialSelectedBrains = allBrains.filter((brain) =>
-        knowledge.brains.some((kb) => kb.brain_id === brain.id)
+        knowledges[0].brains.some((kb) => kb.brain_id === brain.id)
       );
       setSelectedBrains(initialSelectedBrains);
       setInitialBrains(initialSelectedBrains);
     }
-  }, [knowledge, allBrains]);
+  }, [knowledges, allBrains]);
 
   const handleCheckboxChange = (brain: Brain, checked: boolean) => {
     setSelectedBrains((prevSelectedBrains) => {
@@ -61,11 +61,26 @@ const AddToBrainsModal = ({
     );
   };
 
-  const updateConnectedBrains = async () => {
-    if (!knowledge) {
-      return;
-    }
+  const connectBrains = async (knowledgesToConnect: KMSElement[]) => {
+    const brainIdsToLink = selectedBrains.map((brain) => brain.id);
 
+    try {
+      setSaveLoading(true);
+      await Promise.all(
+        knowledgesToConnect.map((knowledgeToConnect) =>
+          linkKnowledgeToBrains(knowledgeToConnect, brainIdsToLink)
+        )
+      );
+    } catch (error) {
+      console.error("Failed to connect brains to knowledge", error);
+    } finally {
+      setSaveLoading(false);
+      setIsOpen(false);
+      setRefetchFolderExplorer(true);
+    }
+  };
+
+  const updateConnectedBrains = async (knowledge: KMSElement) => {
     const knowledgeId = knowledge.id;
     const brainIdsToLink = selectedBrains.map((brain) => brain.id);
     const brainIdsToUnlink = initialBrains
@@ -133,7 +148,12 @@ const AddToBrainsModal = ({
               color="primary"
               iconName="upload"
               disabled={!hasChanges()}
-              onClick={updateConnectedBrains}
+              onClick={() =>
+                knowledges &&
+                (knowledges.length === 1
+                  ? updateConnectedBrains(knowledges[0])
+                  : connectBrains(knowledges))
+              }
               isLoading={saveLoading}
             />
           </div>

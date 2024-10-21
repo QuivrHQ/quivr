@@ -12,6 +12,7 @@ import AddKnowledgeModal from "./AddKnowledgeModal/AddKnowledgeModal";
 import styles from "./QuivrCurrentFolder.module.scss";
 
 import { useKnowledgeContext } from "../../../KnowledgeProvider/hooks/useKnowledgeContext";
+import AddToBrainsModal from "../../shared/CurrentFolderExplorerLine/ConnectedBrains/AddToBrainsModal/AddToBrainsModal";
 import CurrentFolderExplorerLine from "../../shared/CurrentFolderExplorerLine/CurrentFolderExplorerLine";
 import FolderExplorerHeader from "../../shared/FolderExplorerHeader/FolderExplorerHeader";
 
@@ -21,6 +22,8 @@ const QuivrCurrentFolder = (): JSX.Element => {
   const [addFolderModalOpened, setAddFolderModalOpened] = useState(false);
   const [addKnowledgeModalOpened, setAddKnowledgeModalOpened] = useState(false);
   const [quivrElements, setQuivrElements] = useState<KMSElement[]>();
+  const [showAddToBrainsModal, setShowAddToBrainsModal] =
+    useState<boolean>(false);
   const {
     currentFolder,
     exploringQuivr,
@@ -122,15 +125,26 @@ const QuivrCurrentFolder = (): JSX.Element => {
           ) : (
             <>
               <div className={styles.content_header}>
-                <QuivrButton
-                  iconName="delete"
-                  label="Delete"
-                  color="dangerous"
-                  onClick={() => void deleteKnowledges()}
-                  small={true}
-                  isLoading={deleteLoading}
-                  disabled={!selectedKnowledges.length}
-                />
+                <div className={styles.left}>
+                  <QuivrButton
+                    iconName="delete"
+                    label="Delete"
+                    color="dangerous"
+                    onClick={() => void deleteKnowledges()}
+                    small={true}
+                    isLoading={deleteLoading}
+                    disabled={!selectedKnowledges.length}
+                  />
+                  <QuivrButton
+                    iconName="sync"
+                    label="Connect to brains"
+                    color="primary"
+                    onClick={() => setShowAddToBrainsModal(true)}
+                    small={true}
+                    isLoading={deleteLoading}
+                    disabled={!selectedKnowledges.length}
+                  />
+                </div>
                 <div className={styles.right}>
                   <QuivrButton
                     iconName="add"
@@ -189,6 +203,18 @@ const QuivrCurrentFolder = (): JSX.Element => {
         isOpen={addKnowledgeModalOpened}
         setIsOpen={setAddKnowledgeModalOpened}
       />
+      {showAddToBrainsModal && (
+        <div
+          className={styles.modal_content}
+          onClick={(e) => e.stopPropagation()}
+        >
+          <AddToBrainsModal
+            isOpen={showAddToBrainsModal}
+            setIsOpen={() => setShowAddToBrainsModal(false)}
+            knowledges={selectedKnowledges}
+          />
+        </div>
+      )}
     </>
   );
 };

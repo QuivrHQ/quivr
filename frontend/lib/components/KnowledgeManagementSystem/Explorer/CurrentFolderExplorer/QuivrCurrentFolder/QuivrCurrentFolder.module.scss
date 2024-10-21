@@ -22,6 +22,12 @@
         align-items: center;
         gap: Spacings.$spacing03;
       }
+
+      .left {
+        display: flex;
+        align-items: center;
+        gap: Spacings.$spacing03;
+      }
     }
 
     .loading_icon {
