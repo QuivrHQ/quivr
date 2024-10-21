@@ -59,7 +59,6 @@ plugins:
 nav:
   - Home:
       - index.md
-      - installation.md
       - quickstart.md
       - Brain:
           - brain/index.md
@@ -86,7 +85,4 @@ nav:
           - config/index.md
           - config/base_config.md
           - config/config.md
-      - Examples:
-          - examples/index.md
-          - examples/custom_storage.md
   - Enterprise: https://docs.quivr.app/
