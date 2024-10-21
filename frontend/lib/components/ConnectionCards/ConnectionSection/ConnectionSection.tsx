@@ -33,11 +33,12 @@ export const ConnectionSection = ({
   const fetchUserSyncs = async () => {
     try {
       const res: Sync[] = await getUserSyncs();
+      console.info(res);
       setExistingConnections(
         res.filter(
           (sync) =>
             Object.keys(sync.credentials).length !== 0 &&
-            sync.provider === provider
+            sync.provider.toLowerCase() === provider.toLowerCase()
         )
       );
     } catch (error) {

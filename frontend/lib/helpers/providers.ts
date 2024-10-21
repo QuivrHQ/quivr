@@ -1,10 +1,10 @@
 export const transformConnectionLabel = (label: string): string => {
-  switch (label) {
-    case "Google":
+  switch (label.toLowerCase()) {
+    case "google":
       return "Google Drive";
-    case "Azure":
+    case "azure":
       return "Sharepoint";
-    case "DropBox":
+    case "dropbox":
       return "Dropbox";
     default:
       return label;

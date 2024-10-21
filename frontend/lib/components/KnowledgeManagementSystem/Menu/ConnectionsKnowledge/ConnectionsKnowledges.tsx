@@ -18,10 +18,11 @@ const ConnectionsKnowledges = (): JSX.Element => {
       res
         .filter((sync) => sync.credentials.token)
         .forEach((sync) => {
-          if (!groupedByProvider[sync.provider]) {
-            groupedByProvider[sync.provider] = [];
+          const providerLowerCase = sync.provider.toLowerCase();
+          if (!groupedByProvider[providerLowerCase]) {
+            groupedByProvider[providerLowerCase] = [];
           }
-          groupedByProvider[sync.provider].push(sync);
+          groupedByProvider[providerLowerCase].push(sync);
         });
 
       const syncsByProviderArray: SyncsByProvider[] = Object.keys(

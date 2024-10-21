@@ -3,7 +3,6 @@ import { useEffect } from "react";
 import styles from "./CurrentFolderExplorer.module.scss";
 import ProviderCurrentFolder from "./ProviderCurrentFolder/ProviderCurrentFolder";
 import QuivrCurrentFolder from "./QuivrCurrentFolder/QuivrCurrentFolder";
-import SyncCurrentFolder from "./SyncCurrentFolder/SyncCurrentFolder";
 
 import { useKnowledgeContext } from "../../KnowledgeProvider/hooks/useKnowledgeContext";
 
@@ -15,18 +14,12 @@ const CurrentFolderExplorer = (): JSX.Element => {
     setExploringQuivr(true);
   }, []);
 
-  useEffect(() => {
-    console.info(exploredProvider);
-  }, [exploredProvider]);
-
   return (
     <div className={styles.current_folder_explorer_container}>
-      {exploredProvider ? (
+      {exploredProvider || !exploringQuivr ? (
         <ProviderCurrentFolder />
-      ) : exploringQuivr ? (
-        <QuivrCurrentFolder />
       ) : (
-        <SyncCurrentFolder />
+        <QuivrCurrentFolder />
       )}
     </div>
   );
