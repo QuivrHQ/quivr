@@ -6,6 +6,7 @@ import { LoaderIcon } from "@/lib/components/ui/LoaderIcon/LoaderIcon";
 
 import styles from "./SyncCurrentFolder.module.scss";
 
+import QuivrButton from "@/lib/components/ui/QuivrButton/QuivrButton";
 import { useKnowledgeContext } from "../../../KnowledgeProvider/hooks/useKnowledgeContext";
 import CurrentFolderExplorerLine from "../../shared/CurrentFolderExplorerLine/CurrentFolderExplorerLine";
 import FolderExplorerHeader from "../../shared/FolderExplorerHeader/FolderExplorerHeader";
@@ -13,6 +14,8 @@ import FolderExplorerHeader from "../../shared/FolderExplorerHeader/FolderExplor
 const SyncCurrentFolder = (): JSX.Element => {
   const [loading, setLoading] = useState(false);
   const [syncElements, setKMSElements] = useState<KMSElement[]>();
+  const [showAddToBrainsModal, setShowAddToBrainsModal] =
+    useState<boolean>(false);
   const { currentFolder } = useKnowledgeContext();
   const { getSyncFiles } = useSync();
 
@@ -45,18 +48,31 @@ const SyncCurrentFolder = (): JSX.Element => {
             <LoaderIcon size="large" color="primary" />
           </div>
         ) : (
-          syncElements
-            ?.sort((a, b) => Number(b.is_folder) - Number(a.is_folder))
-            .map((syncElement, index) => (
-              <div key={index}>
-                <CurrentFolderExplorerLine
-                  element={{
-                    ...syncElement,
-                    parentKMSElement: currentFolder,
-                  }}
-                />
-              </div>
-            ))
+          <>
+            <div className={styles.content_header}>
+              aaaa
+              <QuivrButton
+                iconName="sync"
+                label="Connect to brains"
+                color="primary"
+                onClick={() => setShowAddToBrainsModal(true)}
+                small={true}
+                // disabled={!selectedKnowledges.length}
+              />
+            </div>
+            {syncElements
+              ?.sort((a, b) => Number(b.is_folder) - Number(a.is_folder))
+              .map((syncElement, index) => (
+                <div key={index}>
+                  <CurrentFolderExplorerLine
+                    element={{
+                      ...syncElement,
+                      parentKMSElement: currentFolder,
+                    }}
+                  />
+                </div>
+              ))}
+          </>
         )}
       </div>
     </div>

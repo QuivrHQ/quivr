@@ -129,12 +129,10 @@ const CurrentFolderExplorerLine = ({
     >
       <div className={styles.left}>
         <div className={styles.checkbox}>
-          {element.source === "local" && (
-            <Checkbox
-              checked={selectedKnowledges.includes(element)}
-              setChecked={(checked) => handleCheckboxChange(checked)}
-            />
-          )}
+          <Checkbox
+            checked={selectedKnowledges.includes(element)}
+            setChecked={(checked) => handleCheckboxChange(checked)}
+          />
         </div>
         <Icon
           name={getIconName(element, fileType)}

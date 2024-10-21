@@ -15,6 +15,10 @@ const CurrentFolderExplorer = (): JSX.Element => {
     setExploringQuivr(true);
   }, []);
 
+  useEffect(() => {
+    console.info(exploredProvider);
+  }, [exploredProvider]);
+
   return (
     <div className={styles.current_folder_explorer_container}>
       {exploredProvider ? (

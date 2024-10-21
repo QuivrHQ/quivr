@@ -147,7 +147,6 @@ const QuivrCurrentFolder = (): JSX.Element => {
                     color="primary"
                     onClick={() => setShowAddToBrainsModal(true)}
                     small={true}
-                    isLoading={deleteLoading}
                     disabled={!selectedKnowledges.length}
                   />
                 </div>

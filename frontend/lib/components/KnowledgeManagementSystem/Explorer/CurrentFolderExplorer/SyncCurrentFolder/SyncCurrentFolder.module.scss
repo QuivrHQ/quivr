@@ -9,12 +9,21 @@
     flex-direction: column;
     overflow: scroll;
 
-    .loading_icon {
-      width: 100%;
+    .content_header {
+      border-bottom: 1px solid var(--border-1);
+      padding-inline: Spacings.$spacing06;
+      padding-block: Spacings.$spacing05;
       display: flex;
-      align-items: center;
-      justify-content: center;
-      padding-top: Spacings.$spacing06;
+      justify-content: space-between;
+      width: 100%;
+
+      .loading_icon {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding-top: Spacings.$spacing06;
+      }
     }
   }
 }

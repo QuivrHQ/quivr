@@ -15,6 +15,8 @@ const ProviderCurrentFolder = (): JSX.Element => {
   const [providerRootElements, setproviderRootElements] =
     useState<KMSElement[]>();
   const [loading, setLoading] = useState(false);
+  const [showAddToBrainsModal, setShowAddToBrainsModal] =
+    useState<boolean>(false);
   const { exploredProvider, currentFolder, exploredSpecificAccount } =
     useKnowledgeContext();
   const { getSyncFiles } = useSync();
