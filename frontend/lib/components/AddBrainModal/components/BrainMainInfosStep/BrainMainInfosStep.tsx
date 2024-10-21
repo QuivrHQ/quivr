@@ -1,7 +1,5 @@
 import { useState } from "react";
-import { Controller, useFormContext } from "react-hook-form";
 
-import { CreateBrainProps } from "@/lib/components/AddBrainModal/types/types";
 import { BrainSnippet } from "@/lib/components/BrainSnippet/BrainSnippet";
 import { FieldHeader } from "@/lib/components/ui/FieldHeader/FieldHeader";
 import { QuivrButton } from "@/lib/components/ui/QuivrButton/QuivrButton";
@@ -11,27 +9,26 @@ import { TextInput } from "@/lib/components/ui/TextInput/TextInput";
 import styles from "./BrainMainInfosStep.module.scss";
 
 import { useBrainCreationContext } from "../../brainCreation-provider";
-import { useBrainCreationSteps } from "../../hooks/useBrainCreationSteps";
 
 export const BrainMainInfosStep = (): JSX.Element => {
   const [editSnippet, setEditSnippet] = useState<boolean>(false);
-  const { currentStepIndex, goToNextStep } = useBrainCreationSteps();
+  const [name, setName] = useState<string>("");
+  const [description, setDescription] = useState<string>("");
+  const [instructions, setInstructions] = useState<string>("");
   const { snippetColor, setSnippetColor, snippetEmoji, setSnippetEmoji } =
     useBrainCreationContext();
 
-  const { watch } = useFormContext<CreateBrainProps>();
-  const name = watch("name");
-  const description = watch("description");
-
-  const isDisabled = !name || !description;
-
-  const next = (): void => {
-    goToNextStep();
-  };
-
-  if (currentStepIndex !== 0) {
-    return <></>;
-  }
+  // const feed = async (): Promise<void> => {
+  //   if (!userIdentityData?.onboarded) {
+  //     await updateUserIdentity({
+  //       ...userIdentityData,
+  //       username: userIdentityData?.username ?? "",
+  //       onboarded: true,
+  //     });
+  //   }
+  //   setCreating(true);
+  //   createBrain();
+  // };
 
   return (
     <div className={styles.brain_main_infos_container}>
@@ -41,15 +38,10 @@ export const BrainMainInfosStep = (): JSX.Element => {
           <div className={styles.first_line_wrapper}>
             <div className={styles.name_field}>
               <FieldHeader iconName="brain" label="Name" mandatory={true} />
-              <Controller
-                name="name"
-                render={({ field }) => (
-                  <TextInput
-                    label="Enter your brain name"
-                    inputValue={field.value as string}
-                    setInputValue={field.onChange}
-                  />
-                )}
+              <TextInput
+                label="Enter your brain name"
+                inputValue={name}
+                setInputValue={setName}
               />
             </div>
             <div className={styles.brain_snippet_wrapper}>
@@ -79,25 +71,33 @@ export const BrainMainInfosStep = (): JSX.Element => {
               label="Description"
               mandatory={true}
             />
-            <Controller
-              name="description"
-              render={({ field }) => (
-                <TextAreaInput
-                  label="Enter your brain description"
-                  inputValue={field.value as string}
-                  setInputValue={field.onChange}
-                />
-              )}
+
+            <TextAreaInput
+              label="Enter your brain description"
+              inputValue={description}
+              setInputValue={setDescription}
+            />
+          </div>
+          <div>
+            <FieldHeader
+              iconName="paragraph"
+              label="Description"
+              mandatory={true}
+            />
+
+            <TextAreaInput
+              label="Enter your brain description"
+              inputValue={instructions}
+              setInputValue={setInstructions}
             />
           </div>
         </div>
         <div className={styles.buttons_wrapper}>
           <QuivrButton
             color="primary"
-            label="Next Step"
-            onClick={() => next()}
+            label="Create"
+            onClick={() => console.info("hey")}
             iconName="chevronRight"
-            disabled={isDisabled}
             important={true}
           />
         </div>
