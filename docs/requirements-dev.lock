@@ -25,6 +25,8 @@ anthropic==0.36.1
 anyio==4.6.2.post1
     # via anthropic
     # via httpx
+appnope==0.1.4
+    # via ipykernel
 asttokens==2.4.1
     # via stack-data
 attrs==24.2.0
@@ -76,8 +78,6 @@ fsspec==2024.9.0
     # via huggingface-hub
 ghp-import==2.1.0
     # via mkdocs
-greenlet==3.1.1
-    # via sqlalchemy
 griffe==1.2.0
     # via mkdocstrings-python
 h11==0.14.0

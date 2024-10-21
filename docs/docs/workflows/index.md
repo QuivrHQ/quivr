@@ -1,1 +1,3 @@
-# Configuration
+# Workflows
+
+![](ingestion.excalidraw.png)
