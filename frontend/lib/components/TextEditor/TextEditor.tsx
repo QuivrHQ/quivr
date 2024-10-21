@@ -2,15 +2,18 @@
 import { Editor, Extension } from "@tiptap/core";
 import Focus from "@tiptap/extension-focus";
 import { Link } from "@tiptap/extension-link";
-import { EditorContent, useEditor } from "@tiptap/react";
+import { BubbleMenu, EditorContent, useEditor } from "@tiptap/react";
 import { StarterKit } from "@tiptap/starter-kit";
-import { useRef } from "react";
+import { useRef, useState } from "react";
 
 import { useBrainMention } from "@/app/chat/[chatId]/components/ActionsBar/components/ChatInput/components/ChatEditor/Editor/hooks/useBrainMention";
 
 import styles from "./TextEditor.module.scss";
 import { TextEditorSearchBar } from "./components/TextEditorSearchBar/TextEditorSearchBar";
 import { Toolbar } from "./components/Toolbar/Toolbar";
+import { AIHighlight } from "./extensions/AIHighlight";
+
+import { QuivrButton } from "../ui/QuivrButton/QuivrButton";
 
 const defaultContent = `
   <h1>My Note</h1>
@@ -25,13 +28,28 @@ const defaultContent = `
 
 export const TextEditor = (): JSX.Element => {
   const { BrainMention, items } = useBrainMention();
+  const [searchBarOpen, setSearchBarOpen] = useState(true);
   const searchEditorRef = useRef<Editor>(null);
 
   const FocusSearchBar = Extension.create().extend({
     addKeyboardShortcuts: () => {
       return {
-        "Mod-f": () => {
-          searchEditorRef.current?.commands.focus();
+        "Mod-f": ({ editor }) => {
+          const selection = editor.state.doc.textBetween(
+            editor.state.selection.from,
+            editor.state.selection.to
+          );
+
+          if (selection) {
+            editor.commands.setSelectionHighlight();
+          }
+
+          setSearchBarOpen(true);
+          searchEditorRef.current
+            ?.chain()
+            .focus()
+            .setContent(selection, undefined, { preserveWhitespace: true })
+            .run();
 
           return true;
         },
@@ -52,6 +70,11 @@ export const TextEditor = (): JSX.Element => {
         }),
         BrainMention,
         FocusSearchBar,
+        AIHighlight.configure({
+          HTMLAttributes: {
+            class: styles.ai_highlight,
+          },
+        }),
       ],
       content: defaultContent,
       immediatelyRender: false,
@@ -59,6 +82,12 @@ export const TextEditor = (): JSX.Element => {
     },
     [items.length]
   );
+
+  const toggleSearchBar = () => {
+    setSearchBarOpen(!searchBarOpen);
+    (searchBarOpen ? editor : searchEditorRef.current)?.commands.focus();
+  };
+
   if (!editor) {
     return <></>;
   }
@@ -66,10 +95,49 @@ export const TextEditor = (): JSX.Element => {
   return (
     <div className={styles.main_container}>
       <div className={styles.editor_wrapper}>
-        <Toolbar searchBarEditor={searchEditorRef.current} editor={editor} />
+        <Toolbar toggleSearchBar={toggleSearchBar} editor={editor} />
+        <div>
+          <BubbleMenu
+            shouldShow={() => {
+              return editor.isActive(AIHighlight.name, { type: "ai" });
+            }}
+            tippyOptions={{
+              moveTransition: "transform 0.1s",
+              placement: "bottom-start",
+            }}
+            className={styles.bubble_menu}
+            editor={editor}
+          >
+            <QuivrButton
+              onClick={() => {
+                editor
+                  .chain()
+                  .extendMarkRange(AIHighlight.name)
+                  .unsetHighlight()
+                  .run();
+              }}
+              label="Accept"
+              color="primary"
+              iconName="check"
+            />
+            <QuivrButton
+              onClick={() => {
+                editor.commands.undo();
+              }}
+              label="Decline"
+              color="dangerous"
+              iconName="close"
+            />
+          </BubbleMenu>
+        </div>
+
         <EditorContent className={styles.content_wrapper} editor={editor} />
       </div>
-      <div className={styles.search_bar_wrapper}>
+      <div
+        className={`${styles.search_bar_wrapper} ${
+          searchBarOpen ? styles.active : ""
+        }`}
+      >
         <TextEditorSearchBar ref={searchEditorRef} editor={editor} />
       </div>
     </div>
