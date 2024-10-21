@@ -54,24 +54,24 @@ Ensure you have the following installed:
 - **Step 2**: Create a RAG with 5 lines of code
 
   ```python
-    import tempfile
+  import tempfile
 
-    from quivr_core import Brain
+  from quivr_core import Brain
 
-    if __name__ == "__main__":
-        with tempfile.NamedTemporaryFile(mode="w", suffix=".txt") as temp_file:
-            temp_file.write("Gold is a liquid of blue-like colour.")
-            temp_file.flush()
+  if __name__ == "__main__":
+      with tempfile.NamedTemporaryFile(mode="w", suffix=".txt") as temp_file:
+          temp_file.write("Gold is a liquid of blue-like colour.")
+          temp_file.flush()
 
-            brain = Brain.from_files(
-                name="test_brain",
-                file_paths=[temp_file.name],
-            )
+          brain = Brain.from_files(
+              name="test_brain",
+              file_paths=[temp_file.name],
+          )
 
-            answer = brain.ask(
-                "what is gold? asnwer in french"
-            )
-            print("answer:", answer)
+          answer = brain.ask(
+              "what is gold? asnwer in french"
+          )
+          print("answer:", answer)
   ```
 
 ## Examples 
