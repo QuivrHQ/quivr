@@ -1,7 +1,7 @@
 "use client";
 import * as TooltipPrimitive from "@radix-ui/react-tooltip";
 import { AnimatePresence, motion } from "framer-motion";
-import { ReactNode, useState } from "react";
+import { ReactNode, useEffect, useState } from "react";
 
 import styles from "./Tooltip.module.scss";
 
@@ -11,6 +11,7 @@ interface TooltipProps {
   small?: boolean;
   type?: "default" | "dangerous" | "success";
   delayDuration?: number;
+  open?: boolean; // Optional boolean prop
 }
 
 const Tooltip = ({
@@ -19,8 +20,15 @@ const Tooltip = ({
   small,
   type,
   delayDuration = 0,
+  open: controlledOpen, // Renamed to avoid conflict with state variable
 }: TooltipProps): JSX.Element => {
   const [open, setOpen] = useState(false);
+
+  useEffect(() => {
+    if (controlledOpen !== undefined) {
+      setOpen(controlledOpen);
+    }
+  }, [controlledOpen]);
 
   return (
     <TooltipPrimitive.Provider>

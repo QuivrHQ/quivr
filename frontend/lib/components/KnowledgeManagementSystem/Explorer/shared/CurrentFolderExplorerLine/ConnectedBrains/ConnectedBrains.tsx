@@ -32,25 +32,26 @@ const RemainingBrainsTooltip = ({
   return (
     <div className={styles.remaining_brains_tooltip}>
       {remainingBrains.map((brain) => (
-        <div
-          key={brain.id}
-          className={styles.brain_container}
-          onClick={() => {
-            navigateToBrain(brain.brain_id ?? brain.id);
-          }}
-        >
+        <Tooltip key={brain.id} tooltip={brain.name}>
           <div
-            className={`${styles.sample_wrapper} ${
-              isKnowledgeStatusWaiting(knowledgeStatus) ||
-              knowledgeStatus === "ERROR"
-                ? styles.waiting
-                : ""
-            }`}
-            style={{ backgroundColor: brain.snippet_color }}
+            className={styles.brain_container}
+            onClick={() => {
+              navigateToBrain(brain.brain_id ?? brain.id);
+            }}
           >
-            <span>{brain.snippet_emoji}</span>
+            <div
+              className={`${styles.sample_wrapper} ${
+                isKnowledgeStatusWaiting(knowledgeStatus) ||
+                knowledgeStatus === "ERROR"
+                  ? styles.waiting
+                  : ""
+              }`}
+              style={{ backgroundColor: brain.snippet_color }}
+            >
+              <span>{brain.snippet_emoji}</span>
+            </div>
           </div>
-        </div>
+        </Tooltip>
       ))}
     </div>
   );
@@ -61,6 +62,8 @@ const ConnectedBrains = ({
   knowledge,
 }: ConnectedbrainsProps): JSX.Element => {
   const [showAddToBrainModal, setShowAddToBrainModal] =
+    useState<boolean>(false);
+  const [showRemainingBrains, setShowRemainingBrains] =
     useState<boolean>(false);
   const router = useRouter();
 
@@ -124,18 +127,22 @@ const ConnectedBrains = ({
           </Tooltip>
         ))}
         {showMore && (
-          <Tooltip
-            tooltip={
-              <RemainingBrainsTooltip
-                remainingBrains={remainingBrains}
-                navigateToBrain={navigateToBrain}
-                isKnowledgeStatusWaiting={isKnowledgeStatusWaiting}
-                knowledgeStatus={knowledge?.status}
-              />
-            }
+          <div
+            className={styles.more_brains}
+            onClick={() => setShowRemainingBrains(!showRemainingBrains)}
           >
-            <div className={styles.more_brains}>...</div>
-          </Tooltip>
+            ...
+          </div>
+        )}
+        {showRemainingBrains && (
+          <div className={styles.remaining_brains_container}>
+            <RemainingBrainsTooltip
+              remainingBrains={remainingBrains}
+              navigateToBrain={navigateToBrain}
+              isKnowledgeStatusWaiting={isKnowledgeStatusWaiting}
+              knowledgeStatus={knowledge?.status}
+            />
+          </div>
         )}
         <Tooltip tooltip="Add to brains" delayDuration={250}>
           <div onClick={handleAddClick}>
