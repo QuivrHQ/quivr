@@ -48,8 +48,8 @@ jobs:
         with:
           enable-cache: true
       - name: Rye Sync
-        run: cd core/ && UV_INDEX_STRATEGY=unsafe-first-match rye sync --no-lock
+        run: UV_INDEX_STRATEGY=unsafe-first-match rye sync --no-lock
       - name: Rye Build
-        run: cd core/ && rye build
+        run: rye build
       - name: Rye Publish
         run: rye publish --token ${{ secrets.PYPI_API_TOKEN }} --yes --skip-existing
