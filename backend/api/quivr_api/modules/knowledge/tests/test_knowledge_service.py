@@ -549,7 +549,7 @@ async def test_create_knowledge_folder(session: AsyncSession, user: User):
     service = KnowledgeService(repository, storage)
 
     km_to_add = AddKnowledge(
-        file_name="test",
+        file_name="test.txt",
         source="local",
         is_folder=True,
         parent_id=None,
@@ -566,9 +566,9 @@ async def test_create_knowledge_folder(session: AsyncSession, user: User):
     assert km.id
     # Knowledge properties
     assert km.file_name == km_to_add.file_name
+    assert km.extension == ".txt"
     assert km.is_folder == km_to_add.is_folder
     assert km.url == km_to_add.url
-    assert km.extension == km_to_add.extension
     assert km.source == km_to_add.source
     assert km.file_size == 128
     assert km.metadata_ == km_to_add.metadata
@@ -613,7 +613,6 @@ async def test_create_knowledge_file_in_folder_in_brain(
     assert km.file_name == km_to_add.file_name
     assert km.is_folder == km_to_add.is_folder
     assert km.url == km_to_add.url
-    assert km.extension == km_to_add.extension
     assert km.source == km_to_add.source
     assert km.file_size == 128
     assert km.metadata_ == km_to_add.metadata

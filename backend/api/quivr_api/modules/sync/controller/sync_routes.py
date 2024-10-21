@@ -20,7 +20,7 @@ from quivr_api.modules.sync.controller.github_sync_routes import github_sync_rou
 from quivr_api.modules.sync.controller.google_sync_routes import google_sync_router
 from quivr_api.modules.sync.controller.notion_sync_routes import notion_sync_router
 from quivr_api.modules.sync.dto import SyncsDescription
-from quivr_api.modules.sync.dto.outputs import AuthMethodEnum
+from quivr_api.modules.sync.dto.outputs import AuthMethodEnum, SyncProvider
 from quivr_api.modules.sync.entity.sync_models import SyncFile
 from quivr_api.modules.sync.service.sync_service import SyncsService
 from quivr_api.modules.user.entity.user_identity import UserIdentity
@@ -51,31 +51,31 @@ sync_router.include_router(notion_sync_router)
 
 # Google sync description
 google_sync = SyncsDescription(
-    name="Google",
+    name=SyncProvider.GOOGLE,
     description="Sync your Google Drive with Quivr",
     auth_method=AuthMethodEnum.URI_WITH_CALLBACK,
 )
 
 azure_sync = SyncsDescription(
-    name="Azure",
+    name=SyncProvider.AZURE,
     description="Sync your Azure Drive with Quivr",
     auth_method=AuthMethodEnum.URI_WITH_CALLBACK,
 )
 
 dropbox_sync = SyncsDescription(
-    name="DropBox",
+    name=SyncProvider.DROPBOX,
     description="Sync your DropBox Drive with Quivr",
     auth_method=AuthMethodEnum.URI_WITH_CALLBACK,
 )
 
 notion_sync = SyncsDescription(
-    name="Notion",
+    name=SyncProvider.NOTION,
     description="Sync your Notion with Quivr",
     auth_method=AuthMethodEnum.URI_WITH_CALLBACK,
 )
 
 github_sync = SyncsDescription(
-    name="GitHub",
+    name=SyncProvider.GITHUB,
     description="Sync your GitHub Drive with Quivr",
     auth_method=AuthMethodEnum.URI_WITH_CALLBACK,
 )
