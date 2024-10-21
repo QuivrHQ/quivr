@@ -20,13 +20,13 @@ aiosignal==1.3.1
     # via aiohttp
 annotated-types==0.7.0
     # via pydantic
-anthropic==0.36.1
+anthropic==0.36.2
     # via langchain-anthropic
 anyio==4.6.2.post1
     # via anthropic
     # via httpx
     # via openai
-attrs==23.2.0
+attrs==24.2.0
     # via aiohttp
 certifi==2024.8.30
     # via httpcore
@@ -53,7 +53,7 @@ filelock==3.16.1
 frozenlist==1.4.1
     # via aiohttp
     # via aiosignal
-fsspec==2024.9.0
+fsspec==2024.10.0
     # via huggingface-hub
 greenlet==3.1.1
     # via sqlalchemy
@@ -71,7 +71,7 @@ httpx==0.27.2
 httpx-sse==0.4.0
     # via cohere
     # via langgraph-sdk
-huggingface-hub==0.25.2
+huggingface-hub==0.26.1
     # via tokenizers
     # via transformers
 idna==3.10
@@ -113,19 +113,19 @@ langchain-openai==0.1.25
     # via quivr-core
 langchain-text-splitters==0.2.4
     # via langchain
-langgraph==0.2.38
+langgraph==0.2.39
     # via quivr-core
 langgraph-checkpoint==2.0.1
     # via langgraph
 langgraph-sdk==0.1.33
     # via langgraph
-langsmith==0.1.135
+langsmith==0.1.136
     # via langchain
     # via langchain-community
     # via langchain-core
 markdown-it-py==3.0.0
     # via rich
-marshmallow==3.22.0
+marshmallow==3.23.0
     # via dataclasses-json
 mdurl==0.1.2
     # via markdown-it-py
@@ -144,7 +144,7 @@ numpy==1.26.4
     # via transformers
 openai==1.52.0
     # via langchain-openai
-orjson==3.10.7
+orjson==3.10.9
     # via langgraph-sdk
     # via langsmith
 packaging==24.1
@@ -159,7 +159,7 @@ parameterized==0.9.0
     # via cohere
 propcache==0.2.0
     # via yarl
-protobuf==4.25.5
+protobuf==5.28.2
     # via transformers
 pydantic==2.9.2
     # via anthropic
@@ -255,5 +255,5 @@ tzdata==2024.2
 urllib3==2.2.3
     # via requests
     # via types-requests
-yarl==1.15.4
+yarl==1.15.5
     # via aiohttp

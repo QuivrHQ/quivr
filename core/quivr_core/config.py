@@ -233,7 +233,7 @@ class LLMEndpointConfig(QuivrBaseConfig):
 
     Attributes:
         supplier (DefaultModelSuppliers): The LLM provider (default: OPENAI).
-        model (str): The specific model to use (default: "gpt-3.5-turbo-0125").
+        model (str): The specific model to use (default: "gpt-4o").
         context_length (int | None): The maximum context length for the model.
         tokenizer_hub (str | None): The tokenizer to use for this model.
         llm_base_url (str | None): Base URL for the LLM API.
@@ -247,7 +247,7 @@ class LLMEndpointConfig(QuivrBaseConfig):
     """
 
     supplier: DefaultModelSuppliers = DefaultModelSuppliers.OPENAI
-    model: str = "gpt-3.5-turbo-0125"
+    model: str = "gpt-4o"
     context_length: int | None = None
     tokenizer_hub: str | None = None
     llm_base_url: str | None = None
