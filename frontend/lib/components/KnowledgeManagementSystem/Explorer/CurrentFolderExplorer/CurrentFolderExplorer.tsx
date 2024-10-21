@@ -6,7 +6,13 @@ import QuivrCurrentFolder from "./QuivrCurrentFolder/QuivrCurrentFolder";
 
 import { useKnowledgeContext } from "../../KnowledgeProvider/hooks/useKnowledgeContext";
 
-const CurrentFolderExplorer = (): JSX.Element => {
+interface CurrentFolderExplorerProps {
+  fromBrainStudio?: boolean;
+}
+
+const CurrentFolderExplorer = ({
+  fromBrainStudio,
+}: CurrentFolderExplorerProps): JSX.Element => {
   const { exploringQuivr, exploredProvider, setExploringQuivr } =
     useKnowledgeContext();
 
@@ -17,9 +23,9 @@ const CurrentFolderExplorer = (): JSX.Element => {
   return (
     <div className={styles.current_folder_explorer_container}>
       {exploredProvider || !exploringQuivr ? (
-        <ProviderCurrentFolder />
+        <ProviderCurrentFolder fromBrainStudio={fromBrainStudio} />
       ) : (
-        <QuivrCurrentFolder />
+        <QuivrCurrentFolder fromBrainStudio={fromBrainStudio} />
       )}
     </div>
   );

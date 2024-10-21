@@ -83,7 +83,7 @@ const KnowledgeManagementSystem = ({
           ></div>
         </div>
         <div className={styles.folder_content}>
-          <CurrentFolderExplorer />
+          <CurrentFolderExplorer fromBrainStudio={fromBrainStudio} />
         </div>
       </div>
     </KnowledgeProvider>

@@ -13,7 +13,13 @@ import AddToBrainsModal from "../../shared/CurrentFolderExplorerLine/ConnectedBr
 import CurrentFolderExplorerLine from "../../shared/CurrentFolderExplorerLine/CurrentFolderExplorerLine";
 import FolderExplorerHeader from "../../shared/FolderExplorerHeader/FolderExplorerHeader";
 
-const ProviderCurrentFolder = (): JSX.Element => {
+interface ProviderCurrentFolderExplorerProps {
+  fromBrainStudio?: boolean;
+}
+
+const ProviderCurrentFolder = ({
+  fromBrainStudio,
+}: ProviderCurrentFolderExplorerProps): JSX.Element => {
   const [providerRootElements, setproviderRootElements] =
     useState<KMSElement[]>();
   const [loading, setLoading] = useState(false);
@@ -83,16 +89,18 @@ const ProviderCurrentFolder = (): JSX.Element => {
           </div>
         ) : (
           <>
-            <div className={styles.content_header}>
-              <QuivrButton
-                iconName="sync"
-                label="Connect to brains"
-                color="primary"
-                onClick={() => setShowAddToBrainsModal(true)}
-                small={true}
-                disabled={!selectedKnowledges.length}
-              />
-            </div>
+            {!fromBrainStudio && (
+              <div className={styles.content_header}>
+                <QuivrButton
+                  iconName="sync"
+                  label="Connect to brains"
+                  color="primary"
+                  onClick={() => setShowAddToBrainsModal(true)}
+                  small={true}
+                  disabled={!selectedKnowledges.length}
+                />
+              </div>
+            )}
             <div className={styles.current_folder_content}>
               {providerRootElements
                 ?.sort((a, b) => Number(b.is_folder) - Number(a.is_folder))

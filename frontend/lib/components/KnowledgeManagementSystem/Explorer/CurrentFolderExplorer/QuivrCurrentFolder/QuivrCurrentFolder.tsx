@@ -16,7 +16,13 @@ import AddToBrainsModal from "../../shared/CurrentFolderExplorerLine/ConnectedBr
 import CurrentFolderExplorerLine from "../../shared/CurrentFolderExplorerLine/CurrentFolderExplorerLine";
 import FolderExplorerHeader from "../../shared/FolderExplorerHeader/FolderExplorerHeader";
 
-const QuivrCurrentFolder = (): JSX.Element => {
+interface QuivrCurrentFolderExplorerProps {
+  fromBrainStudio?: boolean;
+}
+
+const QuivrCurrentFolder = ({
+  fromBrainStudio,
+}: QuivrCurrentFolderExplorerProps): JSX.Element => {
   const [loading, setLoading] = useState(false);
   const [deleteLoading, setDeleteLoading] = useState(false);
   const [addFolderModalOpened, setAddFolderModalOpened] = useState(false);
@@ -130,43 +136,45 @@ const QuivrCurrentFolder = (): JSX.Element => {
             </div>
           ) : (
             <>
-              <div className={styles.content_header}>
-                <div className={styles.left}>
-                  <QuivrButton
-                    iconName="delete"
-                    label="Delete"
-                    color="dangerous"
-                    onClick={() => void deleteKnowledges()}
-                    small={true}
-                    isLoading={deleteLoading}
-                    disabled={!selectedKnowledges.length}
-                  />
-                  <QuivrButton
-                    iconName="sync"
-                    label="Connect to brains"
-                    color="primary"
-                    onClick={() => setShowAddToBrainsModal(true)}
-                    small={true}
-                    disabled={!selectedKnowledges.length}
-                  />
+              {!fromBrainStudio && (
+                <div className={styles.content_header}>
+                  <div className={styles.left}>
+                    <QuivrButton
+                      iconName="delete"
+                      label="Delete"
+                      color="dangerous"
+                      onClick={() => void deleteKnowledges()}
+                      small={true}
+                      isLoading={deleteLoading}
+                      disabled={!selectedKnowledges.length}
+                    />
+                    <QuivrButton
+                      iconName="sync"
+                      label="Connect to brains"
+                      color="primary"
+                      onClick={() => setShowAddToBrainsModal(true)}
+                      small={true}
+                      disabled={!selectedKnowledges.length}
+                    />
+                  </div>
+                  <div className={styles.right}>
+                    <QuivrButton
+                      iconName="add"
+                      label="Create Folder"
+                      color="primary"
+                      onClick={() => setAddFolderModalOpened(true)}
+                      small={true}
+                    />
+                    <QuivrButton
+                      iconName="add"
+                      label="Add Knowledges"
+                      color="primary"
+                      onClick={() => setAddKnowledgeModalOpened(true)}
+                      small={true}
+                    />
+                  </div>
                 </div>
-                <div className={styles.right}>
-                  <QuivrButton
-                    iconName="add"
-                    label="Create Folder"
-                    color="primary"
-                    onClick={() => setAddFolderModalOpened(true)}
-                    small={true}
-                  />
-                  <QuivrButton
-                    iconName="add"
-                    label="Add Knowledges"
-                    color="primary"
-                    onClick={() => setAddKnowledgeModalOpened(true)}
-                    small={true}
-                  />
-                </div>
-              </div>
+              )}
               {quivrElements
                 ?.sort((a, b) => Number(b.is_folder) - Number(a.is_folder))
                 .map((element, index) => (
