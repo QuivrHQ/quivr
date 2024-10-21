@@ -66,13 +66,13 @@ brain = Brain.from_files(name = "my smart brain",
 
 Note : [Embeddings](https://python.langchain.com/docs/integrations/text_embedding/) is a langchain class that lets you chose from a large variety of embedding models. Please check out the following docs to know the panel of models you can try.
 
-## Launch with Streamlit
+## Launch with Chainlit
 
-If you want to quickly launch an interface with streamlit, you can simply do at the root of the project : 
+If you want to quickly launch an interface with Chainlit, you can simply do at the root of the project : 
 ```bash 
 cd examples/chatbot /
 rye sync /
-rye run streamlit run examples/chatbot/main.py /
+rye run chainlit run chainlit.py
 ```
 For more detail, go in [examples/chatbot/chainlit.md](https://github.com/QuivrHQ/quivr/tree/main/examples/chatbot)
 
