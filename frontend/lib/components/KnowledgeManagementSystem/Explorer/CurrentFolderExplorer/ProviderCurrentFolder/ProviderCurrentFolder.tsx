@@ -9,6 +9,7 @@ import ProviderAccount from "./ProviderAccount/ProviderAccount";
 import styles from "./ProviderCurrentFolder.module.scss";
 
 import QuivrButton from "@/lib/components/ui/QuivrButton/QuivrButton";
+import AddToBrainsModal from "../../shared/CurrentFolderExplorerLine/ConnectedBrains/AddToBrainsModal/AddToBrainsModal";
 import CurrentFolderExplorerLine from "../../shared/CurrentFolderExplorerLine/CurrentFolderExplorerLine";
 import FolderExplorerHeader from "../../shared/FolderExplorerHeader/FolderExplorerHeader";
 
@@ -98,6 +99,18 @@ const ProviderCurrentFolder = (): JSX.Element => {
           </>
         )}
       </div>
+      {showAddToBrainsModal && (
+        <div
+          className={styles.modal_content}
+          onClick={(e) => e.stopPropagation()}
+        >
+          <AddToBrainsModal
+            isOpen={showAddToBrainsModal}
+            setIsOpen={() => setShowAddToBrainsModal(false)}
+            knowledges={selectedKnowledges}
+          />
+        </div>
+      )}
     </div>
   );
 };
