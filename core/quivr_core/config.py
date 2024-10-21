@@ -3,12 +3,35 @@ from enum import Enum
 from typing import Dict, List, Optional
 from uuid import UUID
 
-from quivr_core.processor.megaparse.config import MegaparseConfig
-from sqlmodel import SQLModel
+import yaml
+from pydantic import BaseModel
 
 from quivr_core.base_config import QuivrBaseConfig
 from quivr_core.processor.splitter import SplitterConfig
 from quivr_core.prompts import CustomPromptsModel
+
+
+class PdfParser(str, Enum):
+    LLAMA_PARSE = "llama_parse"
+    UNSTRUCTURED = "unstructured"
+    MEGAPARSE_VISION = "megaparse_vision"
+
+
+class MegaparseBaseConfig(BaseModel):
+    @classmethod
+    def from_yaml(cls, file_path: str):
+        # Load the YAML file
+        with open(file_path, "r") as stream:
+            config_data = yaml.safe_load(stream)
+
+        # Instantiate the class using the YAML data
+        return cls(**config_data)
+
+
+class MegaparseConfig(MegaparseBaseConfig):
+    strategy: str = "fast"
+    llama_parse_api_key: str | None = None
+    pdf_parser: PdfParser = PdfParser.UNSTRUCTURED
 
 
 class BrainConfig(QuivrBaseConfig):
@@ -320,7 +343,7 @@ class LLMEndpointConfig(QuivrBaseConfig):
         self.set_llm_model_config()
         self.set_api_key(force_reset=True)
 
-    def set_from_sqlmodel(self, sqlmodel: SQLModel, mapping: Dict[str, str]):
+    def set_from_sqlmodel(self, sqlmodel: BaseModel, mapping: Dict[str, str]):
         """
         Set attributes in LLMEndpointConfig from SQLModel attributes using a field mapping.
 
@@ -442,7 +465,7 @@ class RetrievalConfig(QuivrBaseConfig):
         max_files (int): Maximum number of files to process (default: 20).
         prompt (str | None): Custom prompt for the retrieval process.
     """
-    
+
     workflow_config: WorkflowConfig | None = None
     reranker_config: RerankerConfig = RerankerConfig()
     llm_config: LLMEndpointConfig = LLMEndpointConfig()

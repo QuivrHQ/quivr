@@ -5,6 +5,8 @@ import pytest
 from quivr_core.files.file import FileExtension, QuivrFile
 from quivr_core.processor.implementations.default import EpubProcessor
 
+unstructured = pytest.importorskip("unstructured")
+
 
 @pytest.mark.unstructured
 @pytest.mark.asyncio
