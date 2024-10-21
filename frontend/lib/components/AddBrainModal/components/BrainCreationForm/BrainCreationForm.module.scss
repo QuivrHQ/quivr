@@ -16,10 +16,6 @@
     gap: Spacings.$spacing05;
     position: relative;
 
-    .title {
-      @include Typography.H3;
-    }
-
     .inputs_wrapper {
       display: flex;
       flex-direction: column;
@@ -79,6 +75,12 @@
             gap: Spacings.$spacing03;
           }
         }
+      }
+
+      .text_areas_wrapper {
+        display: flex;
+        flex-direction: column;
+        gap: Spacings.$spacing06;
       }
     }
 

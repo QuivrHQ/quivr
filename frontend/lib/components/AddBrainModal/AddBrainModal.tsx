@@ -6,7 +6,7 @@ import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainConte
 
 import styles from "./AddBrainModal.module.scss";
 import { useBrainCreationContext } from "./brainCreation-provider";
-import { BrainMainInfosStep } from "./components/BrainMainInfosStep/BrainMainInfosStep";
+import { BrainCreationForm } from "./components/BrainCreationForm/BrainCreationForm";
 
 export const AddBrainModal = (): JSX.Element => {
   const { t } = useTranslation(["translation", "brain", "config"]);
@@ -38,7 +38,7 @@ export const AddBrainModal = (): JSX.Element => {
     >
       <div className={styles.add_brain_modal_container}>
         <div className={styles.content_wrapper}>
-          <BrainMainInfosStep />
+          <BrainCreationForm />
         </div>
       </div>
     </Modal>
