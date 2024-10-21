@@ -8,6 +8,7 @@ import { LoaderIcon } from "@/lib/components/ui/LoaderIcon/LoaderIcon";
 import ProviderAccount from "./ProviderAccount/ProviderAccount";
 import styles from "./ProviderCurrentFolder.module.scss";
 
+import QuivrButton from "@/lib/components/ui/QuivrButton/QuivrButton";
 import CurrentFolderExplorerLine from "../../shared/CurrentFolderExplorerLine/CurrentFolderExplorerLine";
 import FolderExplorerHeader from "../../shared/FolderExplorerHeader/FolderExplorerHeader";
 
@@ -17,8 +18,13 @@ const ProviderCurrentFolder = (): JSX.Element => {
   const [loading, setLoading] = useState(false);
   const [showAddToBrainsModal, setShowAddToBrainsModal] =
     useState<boolean>(false);
-  const { exploredProvider, currentFolder, exploredSpecificAccount } =
-    useKnowledgeContext();
+  const {
+    exploredProvider,
+    currentFolder,
+    exploredSpecificAccount,
+    selectedKnowledges,
+    setSelectedKnowledges,
+  } = useKnowledgeContext();
   const { getSyncFiles } = useSync();
 
   const fetchCurrentFolderElements = (sync: Sync) => {
@@ -31,6 +37,7 @@ const ProviderCurrentFolder = (): JSX.Element => {
         );
         setproviderRootElements(res);
         setLoading(false);
+        setSelectedKnowledges([]);
       } catch (error) {
         console.error("Failed to get sync files:", error);
       }
@@ -64,19 +71,31 @@ const ProviderCurrentFolder = (): JSX.Element => {
             <LoaderIcon color="primary" size="large" />
           </div>
         ) : (
-          <div className={styles.current_folder_content}>
-            {providerRootElements
-              ?.sort((a, b) => Number(b.is_folder) - Number(a.is_folder))
-              .map((element, index) => (
-                <CurrentFolderExplorerLine
-                  key={index}
-                  element={{
-                    ...element,
-                    parentKMSElement: currentFolder,
-                  }}
-                />
-              ))}
-          </div>
+          <>
+            <div className={styles.content_header}>
+              <QuivrButton
+                iconName="sync"
+                label="Connect to brains"
+                color="primary"
+                onClick={() => setShowAddToBrainsModal(true)}
+                small={true}
+                disabled={!selectedKnowledges.length}
+              />
+            </div>
+            <div className={styles.current_folder_content}>
+              {providerRootElements
+                ?.sort((a, b) => Number(b.is_folder) - Number(a.is_folder))
+                .map((element, index) => (
+                  <CurrentFolderExplorerLine
+                    key={index}
+                    element={{
+                      ...element,
+                      parentKMSElement: currentFolder,
+                    }}
+                  />
+                ))}
+            </div>
+          </>
         )}
       </div>
     </div>

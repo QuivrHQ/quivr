@@ -9,6 +9,15 @@
     flex-direction: column;
     overflow: scroll;
 
+    .content_header {
+      border-bottom: 1px solid var(--border-1);
+      padding-inline: Spacings.$spacing06;
+      padding-block: Spacings.$spacing05;
+      display: flex;
+      justify-content: space-between;
+      width: 100%;
+    }
+
     .loading_icon {
       width: 100%;
       display: flex;
