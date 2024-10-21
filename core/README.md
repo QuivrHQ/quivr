@@ -12,8 +12,4 @@ This project is licensed under the Apache 2.0 License
 pip install quivr-core
 ```
 
-## Usage
 
-```python
-from quivr_core import QuivrCore
-```
