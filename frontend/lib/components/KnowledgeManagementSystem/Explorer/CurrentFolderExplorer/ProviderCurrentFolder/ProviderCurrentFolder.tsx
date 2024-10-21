@@ -46,6 +46,16 @@ const ProviderCurrentFolder = (): JSX.Element => {
   };
 
   useEffect(() => {
+    if (!showAddToBrainsModal && exploredProvider) {
+      if (exploredProvider.syncs.length === 1) {
+        void fetchCurrentFolderElements(exploredProvider.syncs[0]);
+      } else if (exploredSpecificAccount) {
+        void fetchCurrentFolderElements(exploredSpecificAccount);
+      }
+    }
+  }, [showAddToBrainsModal]);
+
+  useEffect(() => {
     if (exploredProvider) {
       if (exploredProvider.syncs.length === 1) {
         void fetchCurrentFolderElements(exploredProvider.syncs[0]);
