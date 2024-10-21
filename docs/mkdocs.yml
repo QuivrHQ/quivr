@@ -45,6 +45,7 @@ theme:
         name: Switch to system preference
 
 plugins:
+  - search
   - mkdocstrings:
       default_handler: python
       handlers:
