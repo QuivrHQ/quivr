@@ -15,12 +15,10 @@ export const AddBrainModal = (): JSX.Element => {
   const {
     isBrainCreationModalOpened,
     setIsBrainCreationModalOpened,
-    setCurrentSelectedBrain,
     setCreating,
   } = useBrainCreationContext();
 
   useEffect(() => {
-    setCurrentSelectedBrain(undefined);
     setCreating(false);
     if (isBrainCreationModalOpened) {
       setCurrentBrainId(null);
