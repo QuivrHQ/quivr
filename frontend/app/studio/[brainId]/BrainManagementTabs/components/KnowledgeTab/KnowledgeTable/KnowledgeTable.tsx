@@ -131,35 +131,35 @@ const KnowledgeTable = React.forwardRef<HTMLDivElement, KnowledgeTableProps>(
 
     return (
       <div ref={ref} className={styles.knowledge_table_wrapper}>
-        <span className={styles.title}>Uploaded Knowledge</span>
-        <div className={styles.table_header}>
-          <div className={styles.left}>
-            <div className={styles.search}>
-              <TextInput
-                iconName="search"
-                label="Search"
-                inputValue={searchQuery}
-                setInputValue={setSearchQuery}
-                small={true}
-              />
-            </div>
-            <SwitchButton
-              label="My Knowledge"
-              checked={allKnowledgeMode}
-              setChecked={setAllKnowledgeMode}
-            />
-          </div>
-          <QuivrButton
-            label="Delete"
-            iconName="delete"
-            color="dangerous"
-            disabled={selectedKnowledge.length === 0}
-            onClick={handleDelete}
+        <div className={styles.content_header}>
+          <span className={styles.title}>Uploaded Knowledge</span>
+          <SwitchButton
+            label="My Knowledge"
+            checked={allKnowledgeMode}
+            setChecked={setAllKnowledgeMode}
           />
         </div>
         <div className={styles.content}>
           {!allKnowledgeMode ? (
             <>
+              <div className={styles.table_header}>
+                <div className={styles.search}>
+                  <TextInput
+                    iconName="search"
+                    label="Search"
+                    inputValue={searchQuery}
+                    setInputValue={setSearchQuery}
+                    small={true}
+                  />
+                </div>
+                <QuivrButton
+                  label="Delete"
+                  iconName="delete"
+                  color="dangerous"
+                  disabled={selectedKnowledge.length === 0}
+                  onClick={handleDelete}
+                />
+              </div>
               <div
                 className={`${styles.first_line} ${
                   filteredKnowledgeList.length === 0 ? styles.empty : ""
@@ -220,7 +220,7 @@ const KnowledgeTable = React.forwardRef<HTMLDivElement, KnowledgeTableProps>(
             </>
           ) : (
             <div className={styles.kms}>
-              <KnowledgeManagementSystem />
+              <KnowledgeManagementSystem fromBrainStudio={true} />
             </div>
           )}
         </div>

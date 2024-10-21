@@ -8,7 +8,13 @@ import { KnowledgeProvider } from "./KnowledgeProvider/knowledge-provider";
 import ConnectionsKnowledges from "./Menu/ConnectionsKnowledge/ConnectionsKnowledges";
 import QuivrKnowledges from "./Menu/QuivrKnowledge/QuivrKnowledges";
 
-const KnowledgeManagementSystem = (): JSX.Element => {
+interface KnowledgeManagementSystemProps {
+  fromBrainStudio?: boolean;
+}
+
+const KnowledgeManagementSystem = ({
+  fromBrainStudio,
+}: KnowledgeManagementSystemProps): JSX.Element => {
   const [isResizing, setIsResizing] = useState(false);
   const [foldersWidth, setFoldersWidth] = useState(400);
   const [initialMouseX, setInitialMouseX] = useState(0);
@@ -44,7 +50,11 @@ const KnowledgeManagementSystem = (): JSX.Element => {
 
   return (
     <KnowledgeProvider>
-      <div className={styles.content_wrapper}>
+      <div
+        className={`${styles.content_wrapper} ${
+          fromBrainStudio ? styles.from_brain_studio : ""
+        }`}
+      >
         <div
           className={styles.folders_wrapper}
           ref={foldersRef}

@@ -10,8 +10,14 @@
   border-radius: Radius.$normal;
   height: 100%;
 
-  .title {
-    @include Typography.H2;
+  .content_header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    .title {
+      @include Typography.H2;
+    }
   }
 
   .table_header {
@@ -19,14 +25,10 @@
     justify-content: space-between;
     align-items: center;
     gap: Spacings.$spacing03;
+    padding-bottom: Spacings.$spacing05;
 
-    .left {
-      display: flex;
-      align-items: center;
-      gap: Spacings.$spacing07;
-      .search {
-        width: 250px;
-      }
+    .search {
+      width: 250px;
     }
   }
 
@@ -99,6 +101,7 @@
 
     .kms {
       height: 100vh;
+      margin-inline: -(Spacings.$spacing09);
     }
   }
 }

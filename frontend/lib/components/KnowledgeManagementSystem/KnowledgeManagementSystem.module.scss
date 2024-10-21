@@ -7,6 +7,10 @@
   min-height: 100%;
   flex: 1;
 
+  &.from_brain_studio {
+    border-top: 1px solid var(--border-0);
+  }
+
   .folders_wrapper {
     padding-inline: Spacings.$spacing05;
     padding-block: Spacings.$spacing05;
