@@ -201,6 +201,7 @@ const QuivrCurrentFolder = ({
                       onDragOver={
                         element.is_folder ? handleDragOver : undefined
                       }
+                      fromBrainStudio={fromBrainStudio}
                     />
                   </div>
                 ))}

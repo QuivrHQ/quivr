@@ -21,6 +21,7 @@ interface CurrentFolderExplorerLineProps {
     element: KMSElement
   ) => void;
   onDragOver?: (event: React.DragEvent<HTMLDivElement>) => void;
+  fromBrainStudio?: boolean;
 }
 
 const getFileType = (fileName?: string): string => {
@@ -75,6 +76,7 @@ const CurrentFolderExplorerLine = ({
   onDragStart,
   onDrop,
   onDragOver,
+  fromBrainStudio,
 }: CurrentFolderExplorerLineProps): JSX.Element => {
   const { setCurrentFolder } = useKnowledgeContext();
   const { selectedKnowledges, setSelectedKnowledges } = useKnowledgeContext();
@@ -128,12 +130,14 @@ const CurrentFolderExplorerLine = ({
       onDragLeave={() => setIsDraggedOver(false)}
     >
       <div className={styles.left}>
-        <div className={styles.checkbox}>
-          <Checkbox
-            checked={selectedKnowledges.includes(element)}
-            setChecked={(checked) => handleCheckboxChange(checked)}
-          />
-        </div>
+        {!fromBrainStudio && (
+          <div className={styles.checkbox}>
+            <Checkbox
+              checked={selectedKnowledges.includes(element)}
+              setChecked={(checked) => handleCheckboxChange(checked)}
+            />
+          </div>
+        )}
         <Icon
           name={getIconName(element, fileType)}
           size="small"

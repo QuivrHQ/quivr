@@ -111,6 +111,7 @@ const ProviderCurrentFolder = ({
                       ...element,
                       parentKMSElement: currentFolder,
                     }}
+                    fromBrainStudio={fromBrainStudio}
                   />
                 ))}
             </div>
