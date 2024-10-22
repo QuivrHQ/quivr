@@ -4,6 +4,7 @@ import { KMSElement } from "@/lib/api/sync/types";
 import KnowledgeManagementSystem from "@/lib/components/KnowledgeManagementSystem/KnowledgeManagementSystem";
 import { Checkbox } from "@/lib/components/ui/Checkbox/Checkbox";
 import { Icon } from "@/lib/components/ui/Icon/Icon";
+import { MessageInfoBox } from "@/lib/components/ui/MessageInfoBox/MessageInfoBox";
 import { QuivrButton } from "@/lib/components/ui/QuivrButton/QuivrButton";
 import { SwitchButton } from "@/lib/components/ui/SwitchButton/SwitchButton";
 import { TextInput } from "@/lib/components/ui/TextInput/TextInput";
@@ -128,94 +129,110 @@ const KnowledgeTable = React.forwardRef<HTMLDivElement, KnowledgeTableProps>(
       });
     };
 
+    const isKnowledgeListEmpty =
+      knowledgeList.filter((knowledge) => !knowledge.is_folder).length === 0;
+
     return (
       <div ref={ref} className={styles.knowledge_table_wrapper}>
         <div className={styles.content_header}>
-          <span className={styles.title}>Uploaded Knowledge</span>
+          <span className={styles.title}>
+            {allKnowledgeMode ? "My Knowledge" : "Uploaded Knowledge"}
+          </span>
           <SwitchButton
             label="My Knowledge"
             checked={allKnowledgeMode}
             setChecked={setAllKnowledgeMode}
           />
         </div>
+        {isKnowledgeListEmpty && (
+          <div className={styles.knowledge_tab_wrapper}>
+            <MessageInfoBox type="warning">
+              <div className={styles.message}>This brain is empty!</div>
+            </MessageInfoBox>
+          </div>
+        )}
         <div className={styles.content}>
           {!allKnowledgeMode ? (
             <>
-              <div className={styles.table_header}>
-                <div className={styles.search}>
-                  <TextInput
-                    iconName="search"
-                    label="Search"
-                    inputValue={searchQuery}
-                    setInputValue={setSearchQuery}
-                    small={true}
-                  />
-                </div>
-                <QuivrButton
-                  label="Delete"
-                  iconName="delete"
-                  color="dangerous"
-                  disabled={selectedKnowledge.length === 0}
-                  onClick={handleDelete}
-                />
-              </div>
-              <div
-                className={`${styles.first_line} ${
-                  filteredKnowledgeList.length === 0 ? styles.empty : ""
-                }`}
-              >
-                <div className={styles.left}>
-                  <Checkbox
-                    checked={allChecked}
-                    setChecked={(checked) => {
-                      setAllChecked(checked);
-                      setSelectedKnowledge(
-                        checked ? filteredKnowledgeList : []
-                      );
-                    }}
-                  />
-                  <div
-                    className={styles.name}
-                    onClick={() => handleSort("name")}
-                  >
-                    Name
-                    <div className={styles.icon}>
-                      <Icon name="sort" size="small" color="black" />
+              {!isKnowledgeListEmpty && (
+                <>
+                  <div className={styles.table_header}>
+                    <div className={styles.search}>
+                      <TextInput
+                        iconName="search"
+                        label="Search"
+                        inputValue={searchQuery}
+                        setInputValue={setSearchQuery}
+                        small={true}
+                      />
                     </div>
+                    <QuivrButton
+                      label="Delete"
+                      iconName="delete"
+                      color="dangerous"
+                      disabled={selectedKnowledge.length === 0}
+                      onClick={handleDelete}
+                    />
                   </div>
-                </div>
-                <div className={styles.right}>
-                  {!isMobile && (
-                    <div
-                      className={styles.status}
-                      onClick={() => handleSort("status")}
-                    >
-                      Status
-                      <div className={styles.icon}>
-                        <Icon name="sort" size="small" color="black" />
+                  <div
+                    className={`${styles.first_line} ${
+                      filteredKnowledgeList.length === 0 ? styles.empty : ""
+                    }`}
+                  >
+                    <div className={styles.left}>
+                      <Checkbox
+                        checked={allChecked}
+                        setChecked={(checked) => {
+                          setAllChecked(checked);
+                          setSelectedKnowledge(
+                            checked ? filteredKnowledgeList : []
+                          );
+                        }}
+                      />
+                      <div
+                        className={styles.name}
+                        onClick={() => handleSort("name")}
+                      >
+                        Name
+                        <div className={styles.icon}>
+                          <Icon name="sort" size="small" color="black" />
+                        </div>
                       </div>
                     </div>
-                  )}
-                  <span className={styles.actions}>Actions</span>
-                </div>
-              </div>
-              {filteredKnowledgeList.map((knowledge, index) => (
-                <div
-                  key={knowledge.id}
-                  onClick={(event) => handleSelect(knowledge, index, event)}
-                >
-                  <KnowledgeItem
-                    knowledge={knowledge}
-                    selected={selectedKnowledge.some(
-                      (item) => item.id === knowledge.id
-                    )}
-                    setSelected={(_selected, event) =>
-                      handleSelect(knowledge, index, event)
-                    }
-                    lastChild={index === filteredKnowledgeList.length - 1}
-                  />
-                </div>
-              ))}
+                    <div className={styles.right}>
+                      {!isMobile && (
+                        <div
+                          className={styles.status}
+                          onClick={() => handleSort("status")}
+                        >
+                          Status
+                          <div className={styles.icon}>
+                            <Icon name="sort" size="small" color="black" />
+                          </div>
+                        </div>
+                      )}
+                      <span className={styles.actions}>Actions</span>
+                    </div>
+                  </div>
+                  {filteredKnowledgeList.map((knowledge, index) => (
+                    <div
+                      key={knowledge.id}
+                      onClick={(event) => handleSelect(knowledge, index, event)}
+                    >
+                      <KnowledgeItem
+                        knowledge={knowledge}
+                        selected={selectedKnowledge.some(
+                          (item) => item.id === knowledge.id
+                        )}
+                        setSelected={(_selected, event) =>
+                          handleSelect(knowledge, index, event)
+                        }
+                        lastChild={index === filteredKnowledgeList.length - 1}
+                      />
+                    </div>
+                  ))}
+                </>
+              )}
             </>
           ) : (
             <div className={styles.kms}>

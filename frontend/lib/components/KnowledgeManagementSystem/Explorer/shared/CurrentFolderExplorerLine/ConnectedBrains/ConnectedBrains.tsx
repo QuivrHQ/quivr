@@ -3,6 +3,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 import { useBrainManagement } from "@/app/studio/[brainId]/hooks/useBrainManagement";
+import { useKnowledgeApi } from "@/lib/api/knowledge/useKnowledgeApi";
 import { KMSElement, KnowledgeStatus } from "@/lib/api/sync/types";
 import { Icon } from "@/lib/components/ui/Icon/Icon";
 import { LoaderIcon } from "@/lib/components/ui/LoaderIcon/LoaderIcon";
@@ -60,16 +61,21 @@ const RemainingBrainsTooltip = ({
 };
 
 const ConnectedBrains = ({
-  connectedBrains,
+  connectedBrains: initialConnectedBrains,
   knowledge,
   fromBrainStudio,
 }: ConnectedbrainsProps): JSX.Element => {
+  const [connectedBrains, setConnectedBrains] = useState<Brain[]>(
+    initialConnectedBrains
+  );
   const [showAddToBrainModal, setShowAddToBrainModal] =
     useState<boolean>(false);
   const [showRemainingBrains, setShowRemainingBrains] =
     useState<boolean>(false);
   const router = useRouter();
   const { brain } = useBrainManagement();
+  const { linkKnowledgeToBrains, unlinkKnowledgeFromBrains } =
+    useKnowledgeApi();
 
   const brainsToShow = connectedBrains.slice(0, 5);
   const remainingBrains = connectedBrains.slice(5);
@@ -91,6 +97,23 @@ const ConnectedBrains = ({
 
   const handleModalClose = () => {
     setShowAddToBrainModal(false);
+  };
+
+  const quickManagement = async (event: React.MouseEvent) => {
+    event.stopPropagation();
+    event.preventDefault();
+
+    if (knowledge && brain) {
+      if (isBrainConnected()) {
+        await unlinkKnowledgeFromBrains(knowledge.id, [brain.id]);
+        setConnectedBrains((prevBrains) =>
+          prevBrains.filter((connectedBrain) => connectedBrain.id !== brain.id)
+        );
+      } else {
+        await linkKnowledgeToBrains(knowledge, [brain.id]);
+        setConnectedBrains((prevBrains) => [...prevBrains, brain]);
+      }
+    }
   };
 
   const isBrainConnected = (): boolean => {
@@ -157,7 +180,7 @@ const ConnectedBrains = ({
           </>
         )}
         <Tooltip tooltip="Add to brains" delayDuration={250}>
-          <div onClick={handleAddClick}>
+          <div onClick={fromBrainStudio ? quickManagement : handleAddClick}>
             {fromBrainStudio && isBrainConnected() ? (
               <Icon
                 key="brain-icon"
