@@ -2,6 +2,7 @@ import { UUID } from "crypto";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
+import { useBrainManagement } from "@/app/studio/[brainId]/hooks/useBrainManagement";
 import { KMSElement, KnowledgeStatus } from "@/lib/api/sync/types";
 import { Icon } from "@/lib/components/ui/Icon/Icon";
 import { LoaderIcon } from "@/lib/components/ui/LoaderIcon/LoaderIcon";
@@ -14,6 +15,7 @@ import styles from "./ConnectedBrains.module.scss";
 interface ConnectedbrainsProps {
   connectedBrains: Brain[];
   knowledge?: KMSElement;
+  fromBrainStudio?: boolean;
 }
 
 interface RemainingBrainsTooltipProps {
@@ -60,12 +62,18 @@ const RemainingBrainsTooltip = ({
 const ConnectedBrains = ({
   connectedBrains,
   knowledge,
+  fromBrainStudio,
 }: ConnectedbrainsProps): JSX.Element => {
   const [showAddToBrainModal, setShowAddToBrainModal] =
     useState<boolean>(false);
   const [showRemainingBrains, setShowRemainingBrains] =
     useState<boolean>(false);
   const router = useRouter();
+  const { brain } = useBrainManagement();
+
+  const brainsToShow = connectedBrains.slice(0, 5);
+  const remainingBrains = connectedBrains.slice(5);
+  const showMore = connectedBrains.length > 5;
 
   const navigateToBrain = (brainId: UUID) => {
     router.push(`/studio/${brainId}`);
@@ -85,20 +93,22 @@ const ConnectedBrains = ({
     setShowAddToBrainModal(false);
   };
 
-  const brainsToShow = connectedBrains.slice(0, 5);
-  const remainingBrains = connectedBrains.slice(5);
-  const showMore = connectedBrains.length > 5;
+  const isBrainConnected = (): boolean => {
+    return connectedBrains.some(
+      (connectedBrain) => connectedBrain.brain_id === brain?.id
+    );
+  };
 
   return (
     <>
       <div className={styles.main_container}>
-        {brainsToShow.map((brain) => (
-          <Tooltip key={brain.id} tooltip={brain.name}>
+        {brainsToShow.map((brainToShow) => (
+          <Tooltip key={brainToShow.id} tooltip={brainToShow.name}>
             <>
               <div
                 className={styles.brain_container}
                 onClick={() => {
-                  navigateToBrain(brain.brain_id ?? brain.id);
+                  navigateToBrain(brainToShow.brain_id ?? brainToShow.id);
                 }}
               >
                 <div
@@ -108,9 +118,9 @@ const ConnectedBrains = ({
                       ? styles.waiting
                       : ""
                   }`}
-                  style={{ backgroundColor: brain.snippet_color }}
+                  style={{ backgroundColor: brainToShow.snippet_color }}
                 >
-                  <span>{brain.snippet_emoji}</span>
+                  <span>{brainToShow.snippet_emoji}</span>
                 </div>
                 {isKnowledgeStatusWaiting(knowledge?.status) && (
                   <div className={styles.waiting_icon}>
@@ -148,7 +158,23 @@ const ConnectedBrains = ({
         )}
         <Tooltip tooltip="Add to brains" delayDuration={250}>
           <div onClick={handleAddClick}>
-            <Icon name="add" color="black" size="normal" handleHover={true} />
+            {fromBrainStudio && isBrainConnected() ? (
+              <Icon
+                key="brain-icon"
+                name="remove"
+                color="black"
+                size="normal"
+                handleHover={true}
+              />
+            ) : (
+              <Icon
+                key="add-icon"
+                name="add"
+                color="black"
+                size="normal"
+                handleHover={true}
+              />
+            )}
           </div>
         </Tooltip>
       </div>
