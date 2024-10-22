@@ -1,0 +1,74 @@
+@use "styles/Spacings.module.scss";
+@use "styles/Typography.module.scss";
+
+.folder_explorer_line_wrapper {
+  display: flex;
+  align-items: center;
+  padding-inline: Spacings.$spacing06;
+  padding-block: Spacings.$spacing03;
+  font-size: Typography.$small;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border: 1px solid transparent;
+  border-bottom: 1px solid var(--border-1);
+  width: 100%;
+  overflow: hidden;
+  gap: Spacings.$spacing05;
+
+  &.dragged {
+    border-color: var(--accent);
+  }
+
+  .left {
+    display: flex;
+    flex: 1;
+    align-items: center;
+    gap: Spacings.$spacing03;
+    overflow: hidden;
+
+    .checkbox {
+      padding-right: Spacings.$spacing03;
+    }
+
+    .file_icon {
+      height: 12px;
+      width: 12px;
+    }
+
+    .name {
+      @include Typography.EllipsisOverflow;
+      flex: 1;
+
+      &.url {
+        &:hover {
+          cursor: pointer;
+          color: var(--primary-0);
+        }
+      }
+    }
+  }
+
+  .right {
+    display: flex;
+    align-items: center;
+    gap: Spacings.$spacing03;
+
+    .visible {
+      visibility: visible;
+    }
+
+    .hidden {
+      visibility: hidden;
+    }
+  }
+
+  &.folder {
+    font-weight: 550;
+
+    &:hover {
+      cursor: pointer;
+      background-color: var(--background-2);
+    }
+  }
+}

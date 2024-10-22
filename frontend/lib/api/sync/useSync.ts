@@ -13,37 +13,24 @@ import {
   syncGoogleDrive,
   syncNotion,
   syncSharepoint,
-  updateActiveSync
+  updateActiveSync,
 } from "./sync";
-import { Integration, OpenedConnection, Provider } from "./types";
+import { OpenedConnection } from "./types";
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export const useSync = () => {
   const { axiosInstance } = useAxios();
 
-  const providerIconUrls: Record<Provider, string> = {
-    Google:
+  const providerIconUrls: Record<string, string> = {
+    google:
       "https://quivr-cms.s3.eu-west-3.amazonaws.com/gdrive_8316d080fd.png",
-    Azure:
+    azure:
       "https://quivr-cms.s3.eu-west-3.amazonaws.com/sharepoint_8c41cfdb09.png",
-    DropBox:
+    dropbox:
       "https://quivr-cms.s3.eu-west-3.amazonaws.com/dropbox_dce4f3d753.png",
-    Notion:
+    notion:
       "https://quivr-cms.s3.eu-west-3.amazonaws.com/Notion_app_logo_004168672c.png",
-    GitHub:
-      "https://quivr-cms.s3.eu-west-3.amazonaws.com/dropbox_dce4f3d753.png",
-  };
-
-  const integrationIconUrls: Record<Integration, string> = {
-    "Google Drive":
-      "https://quivr-cms.s3.eu-west-3.amazonaws.com/gdrive_8316d080fd.png",
-    "Share Point":
-      "https://quivr-cms.s3.eu-west-3.amazonaws.com/sharepoint_8c41cfdb09.png",
-    Dropbox:
-      "https://quivr-cms.s3.eu-west-3.amazonaws.com/dropbox_dce4f3d753.png",
-    Notion:
-      "https://quivr-cms.s3.eu-west-3.amazonaws.com/Notion_app_logo_004168672c.png",
-    GitHub:
+    github:
       "https://quivr-cms.s3.eu-west-3.amazonaws.com/dropbox_dce4f3d753.png",
   };
 
@@ -62,7 +49,6 @@ export const useSync = () => {
     getUserSyncs: async () => getUserSyncs(axiosInstance),
     getSyncFiles: async (userSyncId: number, folderId?: string) =>
       getSyncFiles(axiosInstance, userSyncId, folderId),
-    integrationIconUrls,
     providerIconUrls,
     syncFiles: async (openedConnection: OpenedConnection, brainId: UUID) =>
       syncFiles(axiosInstance, openedConnection, brainId),

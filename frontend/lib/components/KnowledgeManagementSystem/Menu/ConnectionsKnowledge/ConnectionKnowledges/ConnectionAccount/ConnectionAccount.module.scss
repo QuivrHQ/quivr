@@ -1,0 +1,58 @@
+@use "styles/Radius.module.scss";
+@use "styles/Spacings.module.scss";
+@use "styles/Typography.module.scss";
+
+.account_section_wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: Spacings.$spacing03;
+
+  .account_line_wrapper {
+    display: flex;
+    align-items: center;
+    gap: Spacings.$spacing02;
+    padding-left: Spacings.$spacing03;
+    font-size: Typography.$small;
+    font-weight: 500;
+
+    .hoverable {
+      display: flex;
+      align-items: center;
+      gap: Spacings.$spacing03;
+      padding-inline: Spacings.$spacing02;
+      width: 100%;
+
+      .name {
+        @include Typography.EllipsisOverflow;
+      }
+
+      &:hover {
+        background-color: var(--background-3);
+        cursor: pointer;
+        border-radius: Radius.$small;
+      }
+    }
+  }
+
+  .loader_icon {
+    padding-left: Spacings.$spacing06;
+  }
+
+  .sync_elements_wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: Spacings.$spacing02;
+    font-size: Typography.$small;
+    margin-left: Spacings.$spacing05;
+    border-left: 0.5px solid var(--border-0);
+
+    &.empty {
+      height: 0;
+    }
+
+    &.single_account {
+      border-left: none;
+      margin-left: 0;
+    }
+  }
+}

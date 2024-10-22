@@ -1,19 +1,13 @@
 import { AxiosInstance } from "axios";
 import { UUID } from "crypto";
 
-import {
-  ActiveSync,
-  OpenedConnection,
-  Sync,
-  SyncElement,
-  SyncElements,
-} from "./types";
+import { ActiveSync, KMSElement, OpenedConnection, Sync } from "./types";
 
-const createFilesSettings = (files: SyncElement[]) =>
-  files.filter((file) => !file.is_folder).map((file) => file.id);
+const createFilesSettings = (files: KMSElement[]) =>
+  files.filter((file) => !file.is_folder).map((file) => file.sync_file_id);
 
-const createFoldersSettings = (files: SyncElement[]) =>
-  files.filter((file) => file.is_folder).map((file) => file.id);
+const createFoldersSettings = (files: KMSElement[]) =>
+  files.filter((file) => file.is_folder).map((file) => file.sync_file_id);
 
 export const syncGoogleDrive = async (
   name: string,
@@ -57,7 +51,7 @@ export const syncNotion = async (
       `/sync/notion/authorize?name=${name}`
     )
   ).data;
-}
+};
 
 export const getUserSyncs = async (
   axiosInstance: AxiosInstance
@@ -69,12 +63,12 @@ export const getSyncFiles = async (
   axiosInstance: AxiosInstance,
   userSyncId: number,
   folderId?: string
-): Promise<SyncElements> => {
+): Promise<KMSElement[]> => {
   const url = folderId
     ? `/sync/${userSyncId}/files?user_sync_id=${userSyncId}&folder_id=${folderId}`
     : `/sync/${userSyncId}/files?user_sync_id=${userSyncId}`;
 
-  return (await axiosInstance.get<SyncElements>(url)).data;
+  return (await axiosInstance.get<KMSElement[]>(url)).data;
 };
 
 export const syncFiles = async (
@@ -87,8 +81,8 @@ export const syncFiles = async (
       name: openedConnection.name,
       syncs_user_id: openedConnection.user_sync_id,
       settings: {
-        files: createFilesSettings(openedConnection.selectedFiles.files),
-        folders: createFoldersSettings(openedConnection.selectedFiles.files),
+        files: createFilesSettings(openedConnection.selectedFiles),
+        folders: createFoldersSettings(openedConnection.selectedFiles),
       },
       brain_id: brainId,
     })
@@ -103,8 +97,8 @@ export const updateActiveSync = async (
     await axiosInstance.put<void>(`/sync/active/${openedConnection.id}`, {
       name: openedConnection.name,
       settings: {
-        files: createFilesSettings(openedConnection.selectedFiles.files),
-        folders: createFoldersSettings(openedConnection.selectedFiles.files),
+        files: createFilesSettings(openedConnection.selectedFiles),
+        folders: createFoldersSettings(openedConnection.selectedFiles),
       },
       last_synced: openedConnection.last_synced,
     })

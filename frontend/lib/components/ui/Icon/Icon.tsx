@@ -10,7 +10,8 @@ import styles from "./Icon.module.scss";
 interface IconProps {
   name: keyof typeof iconList;
   size: IconSize;
-  color: Color;
+  color?: Color;
+  customColor?: string;
   disabled?: boolean;
   classname?: string;
   hovered?: boolean;
@@ -22,8 +23,9 @@ export const Icon = ({
   name,
   size,
   color,
-  disabled,
+  customColor,
   classname,
+  disabled,
   hovered,
   handleHover,
   onClick,
@@ -56,10 +58,11 @@ export const Icon = ({
       className={`
         ${classname} 
         ${styles[size]} 
-        ${styles[color]}
+        ${!customColor && color ? styles[color] : ""}
         ${disabled ? styles.disabled : ""}
         ${iconHovered || hovered ? styles.hovered : ""}
       `}
+      style={{ color: customColor }}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
       onClick={onClick}

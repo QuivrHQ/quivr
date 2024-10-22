@@ -1,6 +1,6 @@
 import { MotionConfig } from "framer-motion";
 import { usePathname, useRouter } from "next/navigation";
-import { useFeatureFlagEnabled } from 'posthog-js/react';
+import { useFeatureFlagEnabled } from "posthog-js/react";
 import { useState } from "react";
 
 import { MenuControlButton } from "@/app/chat/[chatId]/components/ActionsBar/components/ChatInput/components/MenuControlButton/MenuControlButton";
@@ -15,6 +15,7 @@ import styles from "./Menu.module.scss";
 import { AnimatedDiv } from "./components/AnimationDiv";
 import { DiscussionButton } from "./components/DiscussionButton/DiscussionButton";
 import { HomeButton } from "./components/HomeButton/HomeButton";
+import { KnowledgeButton } from "./components/KnowledgeButton/KnowledgeButton";
 import { Notifications } from "./components/Notifications/Notifications";
 import { NotificationsButton } from "./components/NotificationsButton/NotificationsButton";
 import { ProfileButton } from "./components/ProfileButton/ProfileButton";
@@ -23,7 +24,6 @@ import { SocialsButtons } from "./components/SocialsButtons/SocialsButtons";
 import { StudioButton } from "./components/StudioButton/StudioButton";
 import { ThreadsButton } from "./components/ThreadsButton/ThreadsButton";
 import { UpgradeToPlusButton } from "./components/UpgradeToPlusButton/UpgradeToPlusButton";
-
 
 const showUpgradeButton = process.env.NEXT_PUBLIC_SHOW_TOKENS === "true";
 
@@ -34,8 +34,7 @@ export const Menu = (): JSX.Element => {
   const pathname = usePathname() ?? "";
   const [isLogoHovered, setIsLogoHovered] = useState<boolean>(false);
   const { isDarkMode } = useUserSettingsContext();
-  const flagEnabled = useFeatureFlagEnabled('show-quality-assistant')
-
+  const flagEnabled = useFeatureFlagEnabled("show-quality-assistant");
 
   useChatsList();
 
@@ -46,6 +45,7 @@ export const Menu = (): JSX.Element => {
   const displayedOnPages = [
     "/assistants",
     "/chat",
+    "/knowledge",
     "/library",
     "/search",
     "studio",
@@ -65,8 +65,9 @@ export const Menu = (): JSX.Element => {
     <div>
       <MotionConfig transition={{ mass: 1, damping: 10, duration: 0.1 }}>
         <div
-          className={`${styles.menu_container} ${!isOpened ? styles.hidden : ""
-            }`}
+          className={`${styles.menu_container} ${
+            !isOpened ? styles.hidden : ""
+          }`}
         >
           <AnimatedDiv>
             <div className={styles.menu_wrapper}>
@@ -91,6 +92,7 @@ export const Menu = (): JSX.Element => {
 
                   {flagEnabled && <QualityAssistantButton />}
                   <StudioButton />
+                  <KnowledgeButton />
                   <NotificationsButton />
                   <ThreadsButton />
                 </div>

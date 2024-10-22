@@ -1,0 +1,41 @@
+@use "styles/Spacings.module.scss";
+
+.main_container {
+  height: 100%;
+  width: 100%;
+
+  .current_folder_content {
+    display: flex;
+    flex-direction: column;
+    overflow: scroll;
+
+    .content_header {
+      border-bottom: 1px solid var(--border-1);
+      padding-inline: Spacings.$spacing06;
+      padding-block: Spacings.$spacing05;
+      display: flex;
+      justify-content: space-between;
+      width: 100%;
+
+      .right {
+        display: flex;
+        align-items: center;
+        gap: Spacings.$spacing03;
+      }
+
+      .left {
+        display: flex;
+        align-items: center;
+        gap: Spacings.$spacing03;
+      }
+    }
+
+    .loading_icon {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding-top: Spacings.$spacing06;
+    }
+  }
+}

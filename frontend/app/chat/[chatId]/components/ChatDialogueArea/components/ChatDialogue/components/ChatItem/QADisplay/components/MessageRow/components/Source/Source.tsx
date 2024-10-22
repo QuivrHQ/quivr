@@ -19,7 +19,7 @@ export const SourceCitations = ({ sourceFile }: SourceProps): JSX.Element => {
   const [isCitationModalOpened, setIsCitationModalOpened] =
     useState<boolean>(false);
   const [citationIndex, setCitationIndex] = useState<number>(0);
-  const { integrationIconUrls } = useSync();
+  const { providerIconUrls } = useSync();
 
   return (
     <div>
@@ -44,7 +44,11 @@ export const SourceCitations = ({ sourceFile }: SourceProps): JSX.Element => {
               <span className={styles.filename}>{sourceFile.filename}</span>
               {sourceFile.integration ? (
                 <Image
-                  src={integrationIconUrls[sourceFile.integration]}
+                  src={
+                    providerIconUrls[
+                      sourceFile.integration as keyof typeof providerIconUrls
+                    ]
+                  }
                   width="16"
                   height="16"
                   alt="integration_icon"

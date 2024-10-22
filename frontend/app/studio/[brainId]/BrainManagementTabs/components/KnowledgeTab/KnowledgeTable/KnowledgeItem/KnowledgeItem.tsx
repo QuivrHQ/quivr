@@ -4,6 +4,7 @@ import Image from "next/image";
 import React, { useEffect, useRef, useState } from "react";
 
 import { useKnowledgeApi } from "@/lib/api/knowledge/useKnowledgeApi";
+import { KMSElement } from "@/lib/api/sync/types";
 import { useSync } from "@/lib/api/sync/useSync";
 import { Checkbox } from "@/lib/components/ui/Checkbox/Checkbox";
 import { Icon } from "@/lib/components/ui/Icon/Icon";
@@ -12,7 +13,6 @@ import { Tag } from "@/lib/components/ui/Tag/Tag";
 import { iconList } from "@/lib/helpers/iconList";
 import { useUrlBrain } from "@/lib/hooks/useBrainIdFromUrl";
 import { useDevice } from "@/lib/hooks/useDevice";
-import { isUploadedKnowledge, Knowledge } from "@/lib/types/Knowledge";
 import { Option } from "@/lib/types/Options";
 
 import { useKnowledgeItem } from "./hooks/useKnowledgeItem";
@@ -25,7 +25,7 @@ const KnowledgeItem = ({
   setSelected,
   lastChild,
 }: {
-  knowledge: Knowledge;
+  knowledge: KMSElement;
   selected: boolean;
   setSelected: (selected: boolean, event: React.MouseEvent) => void;
   lastChild?: boolean;
@@ -37,7 +37,7 @@ const KnowledgeItem = ({
   const { brain } = useUrlBrain();
   const { generateSignedUrlKnowledge } = useKnowledgeApi();
   const { isMobile } = useDevice();
-  const { integrationIconUrls } = useSync();
+  const { providerIconUrls } = useSync();
 
   const getOptions = (): Option[] => [
     {
@@ -52,12 +52,12 @@ const KnowledgeItem = ({
       onClick: () => void downloadFile(),
       iconName: "download",
       iconColor: "primary",
-      disabled: brain?.role !== "Owner" || !isUploadedKnowledge(knowledge),
+      disabled: brain?.role !== "Owner" || !!knowledge.url,
     },
   ];
 
   const downloadFile = async () => {
-    if (isUploadedKnowledge(knowledge)) {
+    if (!knowledge.url && knowledge.file_name) {
       const downloadUrl = await generateSignedUrlKnowledge({
         knowledgeId: knowledge.id,
       });
@@ -71,7 +71,7 @@ const KnowledgeItem = ({
 
         const a = document.createElement("a");
         a.href = blobUrl;
-        a.download = knowledge.fileName;
+        a.download = knowledge.file_name;
         document.body.appendChild(a);
         a.click();
 
@@ -103,14 +103,10 @@ const KnowledgeItem = ({
   }, []);
 
   const renderIcon = () => {
-    if (isUploadedKnowledge(knowledge)) {
-      return knowledge.integration ? (
+    if (!knowledge.url) {
+      return knowledge.source !== "local" ? (
         <Image
-          src={
-            integrationIconUrls[
-              knowledge.integration as keyof typeof integrationIconUrls
-            ]
-          }
+          src={providerIconUrls[knowledge.source]}
           width="16"
           height="16"
           alt="integration_icon"
@@ -132,8 +128,8 @@ const KnowledgeItem = ({
   };
 
   const renderFileNameOrUrl = () => {
-    if (isUploadedKnowledge(knowledge)) {
-      return <span className={styles.file_name}>{knowledge.fileName}</span>;
+    if (!knowledge.url) {
+      return <span className={styles.file_name}>{knowledge.file_name}</span>;
     }
 
     return (
@@ -161,7 +157,7 @@ const KnowledgeItem = ({
         {!isMobile && (
           <div className={styles.status}>
             <Tag
-              name={capitalCase(knowledge.status)}
+              name={capitalCase(knowledge.status ?? "")}
               color={
                 knowledge.status === "ERROR"
                   ? "dangerous"

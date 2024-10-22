@@ -2,7 +2,6 @@ import _debounce from "lodash/debounce";
 import { useCallback, useEffect, useRef } from "react";
 
 import { useChat } from "@/app/chat/[chatId]/hooks/useChat";
-import { useKnowledgeToFeedContext } from "@/lib/context/KnowledgeToFeedProvider/hooks/useKnowledgeToFeedContext";
 
 //TODO: link this to chat input to get the right height
 const chatInputHeightEstimation = 100;
@@ -11,7 +10,6 @@ const chatInputHeightEstimation = 100;
 export const useChatDialogue = () => {
   const chatListRef = useRef<HTMLDivElement | null>(null);
   const { messages } = useChat();
-  const { shouldDisplayFeedCard } = useKnowledgeToFeedContext();
 
   const scrollToBottom = useCallback(
     _debounce(() => {
@@ -45,7 +43,7 @@ export const useChatDialogue = () => {
 
   useEffect(() => {
     scrollToBottom();
-  }, [messages, scrollToBottom, shouldDisplayFeedCard]);
+  }, [messages, scrollToBottom]);
 
   return {
     chatListRef,

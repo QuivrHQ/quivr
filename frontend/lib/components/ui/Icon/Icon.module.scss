@@ -44,7 +44,11 @@
 }
 
 .dark-grey {
-  color: var(--icon-2);
+  color: var(--icon-4);
+
+  &.hovered {
+    color: var(--primary-0);
+  }
 }
 
 .grey {

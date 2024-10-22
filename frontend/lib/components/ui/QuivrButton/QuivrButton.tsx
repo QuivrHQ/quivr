@@ -77,7 +77,7 @@ export const QuivrButton = ({
     </div>
   );
 
-  return disabled ? (
+  return disabled && tooltip ? (
     <Tooltip tooltip={tooltip}>{ButtonContent}</Tooltip>
   ) : (
     ButtonContent

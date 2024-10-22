@@ -2,18 +2,11 @@ import { AiOutlineLoading3Quarters } from "react-icons/ai";
 import { BiCoin } from "react-icons/bi";
 import {
   BsArrowRightShort,
-  BsFiletypeCsv,
   BsFiletypeDocx,
   BsFiletypeHtml,
   BsFiletypeMd,
-  BsFiletypeMp3,
-  BsFiletypeMp4,
-  BsFiletypePdf,
-  BsFiletypePptx,
   BsFiletypePy,
   BsFiletypeTxt,
-  BsFiletypeXls,
-  BsFiletypeXlsx,
   BsTextParagraph,
 } from "react-icons/bs";
 import { CgSoftwareDownload } from "react-icons/cg";
@@ -25,11 +18,14 @@ import {
   FaDiscord,
   FaFile,
   FaFileAlt,
+  FaFileCsv,
   FaGithub,
   FaLinkedin,
   FaQuestionCircle,
   FaRegFileAlt,
   FaRegFileAudio,
+  FaRegFileExcel,
+  FaRegFilePdf,
   FaRegFolder,
   FaRegKeyboard,
   FaRegStar,
@@ -40,9 +36,9 @@ import {
   FaTwitter,
   FaUnlock,
 } from "react-icons/fa";
-import { FaInfo } from "react-icons/fa6";
+import { FaInfo, FaRegFilePowerpoint, FaRegFileWord } from "react-icons/fa6";
 import { FiUpload } from "react-icons/fi";
-import { GoLightBulb } from "react-icons/go";
+import { GoLightBulb, GoTable } from "react-icons/go";
 import { HiBuildingOffice } from "react-icons/hi2";
 import {
   IoIosAdd,
@@ -56,11 +52,13 @@ import {
 import {
   IoArrowUpCircleOutline,
   IoBookOutline,
+  IoCameraOutline,
   IoChatbubbleEllipsesOutline,
   IoCloudDownloadOutline,
   IoFootsteps,
   IoHelp,
   IoHomeOutline,
+  IoMusicalNote,
   IoShareSocial,
   IoWarningOutline,
 } from "react-icons/io5";
@@ -68,6 +66,7 @@ import { LiaFileVideo, LiaRobotSolid } from "react-icons/lia";
 import { IconType } from "react-icons/lib";
 import {
   LuArrowLeftFromLine,
+  LuBook,
   LuBrain,
   LuBrainCircuit,
   LuChevronDown,
@@ -77,12 +76,12 @@ import {
   LuExternalLink,
   LuGoal,
   LuPlusCircle,
+  LuPresentation,
   LuSearch,
 } from "react-icons/lu";
 import {
   MdDarkMode,
   MdDashboardCustomize,
-  MdDeleteOutline,
   MdDynamicFeed,
   MdHistory,
   MdLink,
@@ -101,6 +100,7 @@ import {
 import { PiOfficeChairFill } from "react-icons/pi";
 import {
   RiDeleteBackLine,
+  RiDeleteBin6Line,
   RiHashtag,
   RiNotification2Line,
 } from "react-icons/ri";
@@ -128,11 +128,12 @@ export const iconList: { [name: string]: IconType } = {
   coin: BiCoin,
   color: MdOutlinePalette,
   copy: LuCopy,
+  csv: FaFileCsv,
   custom: MdDashboardCustomize,
-  delete: MdDeleteOutline,
+  delete: RiDeleteBin6Line,
   discord: FaDiscord,
-  doc: BsFiletypeDocx,
-  docx: BsFiletypeDocx,
+  doc: FaRegFileAlt,
+  docx: FaRegFileWord,
   download: IoCloudDownloadOutline,
   edit: MdOutlineModeEditOutline,
   email: MdOutlineMail,
@@ -159,7 +160,9 @@ export const iconList: { [name: string]: IconType } = {
   info: FaInfo,
   invite: IoIosSend,
   ipynb: BsFiletypePy,
+  jpg: IoCameraOutline,
   key: MdOutlineVpnKey,
+  knowledge: LuBook,
   link: MdLink,
   linkedin: FaLinkedin,
   loader: AiOutlineLoading3Quarters,
@@ -168,8 +171,8 @@ export const iconList: { [name: string]: IconType } = {
   markdown: BsFiletypeMd,
   md: BsFiletypeMd,
   moon: MdDarkMode,
-  mp3: BsFiletypeMp3,
-  mp4: BsFiletypeMp4,
+  mp3: IoMusicalNote,
+  mp4: IoMusicalNote,
   mpga: FaRegFileAudio,
   mpeg: LiaFileVideo,
   notifications: RiNotification2Line,
@@ -177,7 +180,10 @@ export const iconList: { [name: string]: IconType } = {
   odt: BsFiletypeDocx,
   options: SlOptionsVertical,
   paragraph: BsTextParagraph,
-  pptx: BsFiletypePptx,
+  png: IoCameraOutline,
+  pdf: FaRegFilePdf,
+  ppt: LuPresentation,
+  pptx: FaRegFilePowerpoint,
   prompt: FaRegKeyboard,
   py: BsFiletypePy,
   question: FaQuestionCircle,
@@ -199,6 +205,7 @@ export const iconList: { [name: string]: IconType } = {
   thumbsDown: FaRegThumbsDown,
   thumbsUp: FaRegThumbsUp,
   twitter: FaTwitter,
+  txt: BsFiletypeTxt,
   unfold: MdUnfoldMore,
   unlock: FaUnlock,
   unread: MdMarkEmailUnread,
@@ -210,9 +217,6 @@ export const iconList: { [name: string]: IconType } = {
   wav: FaRegFileAudio,
   webm: LiaFileVideo,
   website: TbNetwork,
-  xls: BsFiletypeXls,
-  xlsx: BsFiletypeXlsx,
-  txt: BsFiletypeTxt,
-  csv: BsFiletypeCsv,
-  pdf: BsFiletypePdf,
+  xls: GoTable,
+  xlsx: FaRegFileExcel,
 };

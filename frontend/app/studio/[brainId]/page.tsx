@@ -3,9 +3,7 @@
 import { useEffect } from "react";
 
 import { PageHeader } from "@/lib/components/PageHeader/PageHeader";
-import { UploadDocumentModal } from "@/lib/components/UploadDocumentModal/UploadDocumentModal";
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
-import { useKnowledgeToFeedContext } from "@/lib/context/KnowledgeToFeedProvider/hooks/useKnowledgeToFeedContext";
 import { useSearchModalContext } from "@/lib/context/SearchModalProvider/hooks/useSearchModalContext";
 import { ButtonType } from "@/lib/types/QuivrButton";
 
@@ -30,7 +28,6 @@ const BrainsManagement = (): JSX.Element => {
     brainId: brain?.id,
     userAccessibleBrains: allBrains,
   });
-  const { setShouldDisplayFeedCard } = useKnowledgeToFeedContext();
   const { setCurrentBrainId } = useBrainContext();
 
   const buttons: ButtonType[] = [
@@ -44,15 +41,6 @@ const BrainsManagement = (): JSX.Element => {
         }
       },
       iconName: "chat",
-    },
-    {
-      label: "Add knowledge",
-      color: "primary",
-      onClick: () => {
-        setShouldDisplayFeedCard(true);
-      },
-      iconName: "uploadFile",
-      hidden: !isOwnedByCurrentUser || !brain?.max_files,
     },
     {
       label: isOwnedByCurrentUser ? "Delete Brain" : "Unsubscribe from Brain",
@@ -88,7 +76,6 @@ const BrainsManagement = (): JSX.Element => {
           <BrainManagementTabs />
         </div>
       </div>
-      <UploadDocumentModal />
       <DeleteOrUnsubscribeConfirmationModal
         isOpen={isDeleteOrUnsubscribeModalOpened}
         setOpen={setIsDeleteOrUnsubscribeModalOpened}

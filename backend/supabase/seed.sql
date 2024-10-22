@@ -298,7 +298,7 @@ INSERT INTO "public"."user_daily_usage" ("user_id", "email", "date", "daily_requ
 --
 
 INSERT INTO "public"."user_identity" ("user_id", "openai_api_key", "company", "onboarded", "username", "company_size", "usage_purpose") VALUES
-	('39418e3b-0258-4452-af60-7acfcc1263ff', NULL, 'Stan', true, 'Stan', NULL, '');
+	('39418e3b-0258-4452-af60-7acfcc1263ff', NULL, 'Quivr Local', true, 'Quivr Local', NULL, '');
 
 
 --

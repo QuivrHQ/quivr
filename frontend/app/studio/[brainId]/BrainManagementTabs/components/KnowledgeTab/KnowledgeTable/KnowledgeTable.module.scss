@@ -8,9 +8,16 @@
   gap: Spacings.$spacing05;
   padding-bottom: Spacings.$spacing10;
   border-radius: Radius.$normal;
+  height: 100%;
 
-  .title {
-    @include Typography.H2;
+  .content_header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    .title {
+      @include Typography.H2;
+    }
   }
 
   .table_header {
@@ -18,73 +25,83 @@
     justify-content: space-between;
     align-items: center;
     gap: Spacings.$spacing03;
+    padding-bottom: Spacings.$spacing05;
 
     .search {
       width: 250px;
     }
   }
 
-  .first_line {
-    display: flex;
-    justify-content: space-between;
-    padding-left: calc(Spacings.$spacing06);
-    padding-right: Spacings.$spacing04;
-    padding-block: Spacings.$spacing02;
-    font-weight: 500;
-    background-color: var(--background-1);
-    font-size: Typography.$small;
-    border: 1px solid var(--border-0);
-    border-radius: Radius.$normal Radius.$normal 0 0;
-    border-bottom: none;
+  .content {
+    height: 100%;
 
-    &.empty {
+    .first_line {
+      display: flex;
+      justify-content: space-between;
+      padding-left: calc(Spacings.$spacing06);
+      padding-right: Spacings.$spacing04;
+      padding-block: Spacings.$spacing02;
+      font-weight: 500;
+      background-color: var(--background-1);
+      font-size: Typography.$small;
       border: 1px solid var(--border-0);
-      border-radius: Radius.$normal;
-    }
+      border-radius: Radius.$normal Radius.$normal 0 0;
+      border-bottom: none;
 
-    .left {
-      display: flex;
-      align-items: center;
-      gap: calc(Spacings.$spacing06 + 6px);
+      &.empty {
+        border: 1px solid var(--border-0);
+        border-radius: Radius.$normal;
+      }
 
-      .name {
+      .left {
         display: flex;
         align-items: center;
-        gap: Spacings.$spacing02;
-        cursor: pointer;
+        gap: calc(Spacings.$spacing06 + 6px);
 
-        .icon {
-          visibility: hidden;
-        }
+        .name {
+          display: flex;
+          align-items: center;
+          gap: Spacings.$spacing02;
+          cursor: pointer;
 
-        &:hover {
           .icon {
-            visibility: visible;
+            visibility: hidden;
+          }
+
+          &:hover {
+            .icon {
+              visibility: visible;
+            }
+          }
+        }
+      }
+
+      .right {
+        display: flex;
+        gap: calc(Spacings.$spacing06 + 12px);
+
+        .status {
+          display: flex;
+          align-items: center;
+          gap: Spacings.$spacing02;
+          cursor: pointer;
+
+          .icon {
+            visibility: hidden;
+          }
+
+          &:hover {
+            .icon {
+              visibility: visible;
+            }
           }
         }
       }
     }
 
-    .right {
-      display: flex;
-      gap: calc(Spacings.$spacing06 + 12px);
-
-      .status {
-        display: flex;
-        align-items: center;
-        gap: Spacings.$spacing02;
-        cursor: pointer;
-
-        .icon {
-          visibility: hidden;
-        }
-
-        &:hover {
-          .icon {
-            visibility: visible;
-          }
-        }
-      }
+    .kms {
+      height: 100vh;
+      margin-inline: -(Spacings.$spacing09);
     }
   }
 }

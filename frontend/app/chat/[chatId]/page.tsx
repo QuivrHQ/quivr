@@ -5,30 +5,19 @@ import { useEffect } from "react";
 import { AddBrainModal } from "@/lib/components/AddBrainModal";
 import { useBrainCreationContext } from "@/lib/components/AddBrainModal/brainCreation-provider";
 import { PageHeader } from "@/lib/components/PageHeader/PageHeader";
-import { UploadDocumentModal } from "@/lib/components/UploadDocumentModal/UploadDocumentModal";
 import { useChatContext } from "@/lib/context";
 import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
-import { useKnowledgeToFeedContext } from "@/lib/context/KnowledgeToFeedProvider/hooks/useKnowledgeToFeedContext";
-import { useCustomDropzone } from "@/lib/hooks/useDropzone";
 import { ButtonType } from "@/lib/types/QuivrButton";
 import { cn } from "@/lib/utils";
 
 import { ActionsBar } from "./components/ActionsBar";
 import { ChatDialogueArea } from "./components/ChatDialogueArea/ChatDialogue";
-import { useChatNotificationsSync } from "./hooks/useChatNotificationsSync";
 import styles from "./page.module.scss";
 
 const SelectedChatPage = (): JSX.Element => {
-  const { getRootProps } = useCustomDropzone();
-
-  const { setShouldDisplayFeedCard, shouldDisplayFeedCard } =
-    useKnowledgeToFeedContext();
   const { setIsBrainCreationModalOpened } = useBrainCreationContext();
-
   const { currentBrain, setCurrentBrainId } = useBrainContext();
   const { messages } = useChatContext();
-
-  useChatNotificationsSync();
 
   const buttons: ButtonType[] = [
     {
@@ -38,15 +27,6 @@ const SelectedChatPage = (): JSX.Element => {
         setIsBrainCreationModalOpened(true);
       },
       iconName: "brain",
-    },
-    {
-      label: "Add knowledge",
-      color: "primary",
-      onClick: () => {
-        setShouldDisplayFeedCard(true);
-      },
-      iconName: "uploadFile",
-      hidden: !currentBrain?.max_files,
     },
     {
       label: "Manage current brain",
@@ -74,10 +54,7 @@ const SelectedChatPage = (): JSX.Element => {
       <div className={styles.page_header}>
         <PageHeader iconName="chat" label="Thread" buttons={buttons} />
       </div>
-      <div
-        className={styles.chat_page_container}
-        {...(shouldDisplayFeedCard ? {} : getRootProps())}
-      >
+      <div className={styles.chat_page_container}>
         <div
           className={cn(
             "flex flex-col flex-1 items-center justify-stretch w-full h-full overflow-hidden",
@@ -93,7 +70,6 @@ const SelectedChatPage = (): JSX.Element => {
             <ActionsBar />
           </div>
         </div>
-        <UploadDocumentModal />
         <AddBrainModal />
       </div>
     </div>

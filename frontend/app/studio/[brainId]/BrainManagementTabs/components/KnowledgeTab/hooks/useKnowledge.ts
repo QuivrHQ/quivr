@@ -8,10 +8,10 @@ import { useKnowledgeApi } from "@/lib/api/knowledge/useKnowledgeApi";
 export const useKnowledge = ({ brainId }: { brainId?: UUID }) => {
   const queryClient = useQueryClient();
 
-  const { getAllKnowledge } = useKnowledgeApi();
+  const { getAllBrainKnowledge } = useKnowledgeApi();
   const { data: allKnowledge, isLoading: isPending } = useQuery({
     queryKey: brainId ? [getKnowledgeDataKey(brainId)] : [],
-    queryFn: () => (brainId ? getAllKnowledge({ brainId: brainId }) : []),
+    queryFn: () => (brainId ? getAllBrainKnowledge({ brainId: brainId }) : []),
     enabled: brainId !== undefined,
   });
 

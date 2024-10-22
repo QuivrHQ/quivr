@@ -1,3 +1,7 @@
+import { UUID } from "crypto";
+
+import { Brain } from "@/lib/context/BrainProvider/types";
+
 export type Provider = "Google" | "Azure" | "DropBox" | "Notion" | "GitHub";
 
 export type Integration =
@@ -9,19 +13,37 @@ export type Integration =
 
 export type SyncStatus = "SYNCING" | "SYNCED" | "ERROR" | "REMOVED";
 
-export interface SyncElement {
-  name?: string;
-  id: string;
+export type KnowledgeStatus =
+  | "ERROR"
+  | "RESERVED"
+  | "PROCESSING"
+  | "PROCESSED"
+  | "UPLOADED";
+
+export interface KMSElement {
+  brains: Brain[];
+  id: UUID;
+  file_name?: string;
+  sync_file_id: string | null;
   is_folder: boolean;
   icon?: string;
-}
-
-export interface SyncElements {
-  files: SyncElement[];
+  sync_id: number | null;
+  parent_id: string | null;
+  parentKMSElement?: KMSElement;
+  fromProvider?: SyncsByProvider;
+  source: "local" | string;
+  last_synced_at: string;
+  url?: string;
+  extension?: string;
+  status?: KnowledgeStatus;
+  file_sha1?: string;
+  source_link?: string;
+  metadata?: string;
 }
 
 interface Credentials {
   token: string;
+  access_token: string;
 }
 
 export interface Sync {
@@ -31,6 +53,11 @@ export interface Sync {
   credentials: Credentials;
   email: string;
   status: SyncStatus;
+}
+
+export interface SyncsByProvider {
+  provider: Provider;
+  syncs: Sync[];
 }
 
 export interface SyncSettings {
@@ -57,7 +84,7 @@ export interface OpenedConnection {
   id: number | undefined;
   provider: Provider;
   submitted: boolean;
-  selectedFiles: SyncElements;
+  selectedFiles: KMSElement[];
   name: string;
   last_synced: string;
   cleaned?: boolean;

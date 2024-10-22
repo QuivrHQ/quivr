@@ -1,0 +1,46 @@
+@use "styles/Radius.module.scss";
+@use "styles/Spacings.module.scss";
+@use "styles/Typography.module.scss";
+
+.folder_wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: Spacings.$spacing02;
+  margin-left: Spacings.$spacing03;
+
+  &.empty {
+    gap: 0;
+  }
+
+  .folder_line_wrapper {
+    display: flex;
+    align-items: center;
+    font-size: Typography.$tiny;
+
+    .name {
+      @include Typography.EllipsisOverflow;
+      padding: Spacings.$spacing01;
+      padding-inline: Spacings.$spacing03;
+
+      &:hover,
+      &.selected {
+        background-color: var(--background-6);
+        cursor: pointer;
+        border-radius: Radius.$normal;
+      }
+    }
+  }
+
+  .loader_icon {
+    padding-left: Spacings.$spacing06;
+  }
+
+  .sync_elements_wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: Spacings.$spacing02;
+    border-left: 0.5px solid var(--border-0);
+    margin-left: Spacings.$spacing03;
+    font-size: Typography.$small;
+  }
+}
