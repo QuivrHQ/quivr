@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useKnowledgeApi } from "@/lib/api/knowledge/useKnowledgeApi";
 import { KMSElement } from "@/lib/api/sync/types";
 import { LoaderIcon } from "@/lib/components/ui/LoaderIcon/LoaderIcon";
-import QuivrButton from "@/lib/components/ui/QuivrButton/QuivrButton";
+import { QuivrButton } from "@/lib/components/ui/QuivrButton/QuivrButton";
 import { handleDragOver, handleDrop } from "@/lib/helpers/kms";
 
 import AddFolderModal from "./AddFolderModal/AddFolderModal";

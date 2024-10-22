@@ -4,11 +4,11 @@ import { KMSElement, Sync } from "@/lib/api/sync/types";
 import { useSync } from "@/lib/api/sync/useSync";
 import { useKnowledgeContext } from "@/lib/components/KnowledgeManagementSystem/KnowledgeProvider/hooks/useKnowledgeContext";
 import { LoaderIcon } from "@/lib/components/ui/LoaderIcon/LoaderIcon";
+import { QuivrButton } from "@/lib/components/ui/QuivrButton/QuivrButton";
 
 import ProviderAccount from "./ProviderAccount/ProviderAccount";
 import styles from "./ProviderCurrentFolder.module.scss";
 
-import QuivrButton from "@/lib/components/ui/QuivrButton/QuivrButton";
 import AddToBrainsModal from "../../shared/CurrentFolderExplorerLine/ConnectedBrains/AddToBrainsModal/AddToBrainsModal";
 import CurrentFolderExplorerLine from "../../shared/CurrentFolderExplorerLine/CurrentFolderExplorerLine";
 import FolderExplorerHeader from "../../shared/FolderExplorerHeader/FolderExplorerHeader";

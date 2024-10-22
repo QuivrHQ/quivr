@@ -3,7 +3,7 @@ import { useState } from "react";
 import { useKnowledgeApi } from "@/lib/api/knowledge/useKnowledgeApi";
 import { useKnowledgeContext } from "@/lib/components/KnowledgeManagementSystem/KnowledgeProvider/hooks/useKnowledgeContext";
 import { Modal } from "@/lib/components/ui/Modal/Modal";
-import QuivrButton from "@/lib/components/ui/QuivrButton/QuivrButton";
+import { QuivrButton } from "@/lib/components/ui/QuivrButton/QuivrButton";
 import { TextInput } from "@/lib/components/ui/TextInput/TextInput";
 
 import styles from "./AddFolderModal.module.scss";

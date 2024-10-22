@@ -1,18 +1,17 @@
 import React, { useEffect, useState } from "react";
 
 import { KMSElement } from "@/lib/api/sync/types";
+import KnowledgeManagementSystem from "@/lib/components/KnowledgeManagementSystem/KnowledgeManagementSystem";
 import { Checkbox } from "@/lib/components/ui/Checkbox/Checkbox";
 import { Icon } from "@/lib/components/ui/Icon/Icon";
 import { QuivrButton } from "@/lib/components/ui/QuivrButton/QuivrButton";
+import { SwitchButton } from "@/lib/components/ui/SwitchButton/SwitchButton";
 import { TextInput } from "@/lib/components/ui/TextInput/TextInput";
 import { updateSelectedItems } from "@/lib/helpers/table";
 import { useDevice } from "@/lib/hooks/useDevice";
 
-import { useKnowledgeItem } from "./KnowledgeItem/hooks/useKnowledgeItem";
-// eslint-disable-next-line import/order
-import KnowledgeManagementSystem from "@/lib/components/KnowledgeManagementSystem/KnowledgeManagementSystem";
-import SwitchButton from "@/lib/components/ui/SwitchButton/SwitchButton";
 import KnowledgeItem from "./KnowledgeItem/KnowledgeItem";
+import { useKnowledgeItem } from "./KnowledgeItem/hooks/useKnowledgeItem";
 import styles from "./KnowledgeTable.module.scss";
 
 interface KnowledgeTableProps {

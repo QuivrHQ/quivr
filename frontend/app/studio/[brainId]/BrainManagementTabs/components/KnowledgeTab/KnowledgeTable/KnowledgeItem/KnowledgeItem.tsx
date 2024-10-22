@@ -106,9 +106,7 @@ const KnowledgeItem = ({
     if (!knowledge.url) {
       return knowledge.source !== "local" ? (
         <Image
-          src={
-            providerIconUrls[knowledge.source as keyof typeof providerIconUrls]
-          }
+          src={providerIconUrls[knowledge.source]}
           width="16"
           height="16"
           alt="integration_icon"
