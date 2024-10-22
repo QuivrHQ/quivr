@@ -1,5 +1,7 @@
 import logging
+import os
 
+import requests
 import tiktoken
 from langchain_core.documents import Document
 from langchain_text_splitters import RecursiveCharacterTextSplitter, TextSplitter
@@ -55,14 +57,35 @@ class MegaparseProcessor(ProcessorBase):
         }
 
     async def process_file_inner(self, file: QuivrFile) -> list[Document]:
-        # mega_parse = MegaParse(file_path=file.path, config=self.megaparse_config)  # type: ignore
-        # document: Document = await mega_parse.aload()
-        # if len(document.page_content) > self.splitter_config.chunk_size:
-        #     docs = self.text_splitter.split_documents([document])
-        #     for doc in docs:
-        #         # if "Production Fonts (maximum)" in doc.page_content:
-        #         #    print('Doc: ', doc.page_content)
-        #         doc.metadata = {"chunk_size": len(self.enc.encode(doc.page_content))}
-        #     return docs
-        # return [document]
-        return []
+        megaparse_url = os.getenv("MEGAPARSE_URL_API")
+        with open(file.path, "rb") as f:
+            files = {"file": (os.path.basename(file.path), f)}
+            response = requests.post(f"{megaparse_url}/file", files=files)
+
+        if response.status_code == 200:
+            result = response.json().get("result")
+            document = Document(page_content=result)
+            if len(document.page_content) > self.splitter_config.chunk_size:
+                docs = self.text_splitter.split_documents([document])
+                for doc in docs:
+                    doc.metadata = {
+                        "chunk_size": len(self.enc.encode(doc.page_content))
+                    }
+                return docs
+            return [document]
+        else:
+            logger.error(f"Failed to process file: {response.text}")
+            return []
+
+    # async def process_file_inner(self, file: QuivrFile) -> list[Document]:
+    # mega_parse = MegaParse(file_path=file.path, config=self.megaparse_config)  # type: ignore
+    # document: Document = await mega_parse.aload()
+    # if len(document.page_content) > self.splitter_config.chunk_size:
+    #     docs = self.text_splitter.split_documents([document])
+    #     for doc in docs:
+    #         # if "Production Fonts (maximum)" in doc.page_content:
+    #         #    print('Doc: ', doc.page_content)
+    #         doc.metadata = {"chunk_size": len(self.enc.encode(doc.page_content))}
+    #     return docs
+    # return [document]
+    # return []
