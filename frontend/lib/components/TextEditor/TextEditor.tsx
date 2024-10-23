@@ -30,6 +30,7 @@ export const TextEditor = (): JSX.Element => {
   const { BrainMention, items } = useBrainMention();
   const [searchBarOpen, setSearchBarOpen] = useState(true);
   const searchEditorRef = useRef<Editor>(null);
+  const [aiContext, setAiContext] = useState("");
 
   const FocusSearchBar = Extension.create().extend({
     addKeyboardShortcuts: () => {
@@ -48,8 +49,10 @@ export const TextEditor = (): JSX.Element => {
           searchEditorRef.current
             ?.chain()
             .focus()
-            .setContent(selection, undefined, { preserveWhitespace: true })
+            // .setContent(selection, undefined, { preserveWhitespace: true })
             .run();
+
+          setAiContext(selection);
 
           return true;
         },
@@ -138,7 +141,11 @@ export const TextEditor = (): JSX.Element => {
           searchBarOpen ? styles.active : ""
         }`}
       >
-        <TextEditorSearchBar ref={searchEditorRef} editor={editor} />
+        <TextEditorSearchBar
+          aiContext={aiContext}
+          ref={searchEditorRef}
+          editor={editor}
+        />
       </div>
     </div>
   );

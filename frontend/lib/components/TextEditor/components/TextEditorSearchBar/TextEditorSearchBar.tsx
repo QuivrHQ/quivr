@@ -8,13 +8,14 @@ import { useChat } from "@/app/chat/[chatId]/hooks/useChat";
 import { ChatBar } from "@/lib/components/ui/ChatBar/ChatBar";
 
 type TextEditorSearchBarProps = {
+  aiContext?: string;
   onSearch?: () => void;
   newBrain?: boolean;
   editor: Editor;
 };
 
 const TextEditorSearchBar = forwardRef<Editor, TextEditorSearchBarProps>(
-  ({ onSearch, newBrain, editor }, ref): JSX.Element => {
+  ({ aiContext, onSearch, newBrain, editor }, ref): JSX.Element => {
     const { submitQuestion, ...chatInput } = useChatInput();
     const { messages } = useChat();
     const router = useRouter();
@@ -48,7 +49,9 @@ const TextEditorSearchBar = forwardRef<Editor, TextEditorSearchBarProps>(
         ref={ref}
         onSearch={onSearch}
         newBrain={newBrain}
-        submitQuestion={(question) => submitQuestion(question, false)}
+        submitQuestion={(question) =>
+          submitQuestion(`${aiContext ?? ""} \n ${question}`, false)
+        }
         {...chatInput}
       />
     );
