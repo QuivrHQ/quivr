@@ -20,7 +20,7 @@ Quivr, helps you build your second brain, utilizes the power of GenerativeAI to 
 
 >We take care of the RAG so you can focus on your product. Simply install quivr-core and add it to your project. You can now ingest your files and ask questions.*
 
-**We will be improving the RAG and adding more features everything, stay tuned!**
+**We will be improving the RAG and adding more features, stay tuned!**
 
 
 This is the core of Quivr, the brain of Quivr.com.
@@ -53,7 +53,7 @@ Ensure you have the following installed:
 
 - **Step 2**: Create a RAG with 5 lines of code
 
-```python
+  ```python
   import tempfile
 
   from quivr_core import Brain
@@ -72,7 +72,7 @@ Ensure you have the following installed:
               "what is gold? asnwer in french"
           )
           print("answer:", answer)
-```
+  ```
 
 ## Examples 
 

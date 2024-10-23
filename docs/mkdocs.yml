@@ -45,6 +45,7 @@ theme:
         name: Switch to system preference
 
 plugins:
+  - search
   - mkdocstrings:
       default_handler: python
       handlers:
@@ -58,7 +59,6 @@ plugins:
 nav:
   - Home:
       - index.md
-      - installation.md
       - quickstart.md
       - Brain:
           - brain/index.md

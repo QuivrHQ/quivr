@@ -545,34 +545,28 @@ class Brain:
         print(answer.answer)
         ```
         """
-        llm = self.llm
+        async def collect_streamed_response():
+            full_answer = ""
+            async for response in self.ask_streaming(
+                question=question,
+                retrieval_config=retrieval_config,
+                rag_pipeline=rag_pipeline,
+                list_files=list_files,
+                chat_history=chat_history
+            ):
+                full_answer += response.answer
+            return full_answer
 
-        # If you passed a different llm model we'll override the brain  one
-        if retrieval_config:
-            if retrieval_config.llm_config != self.llm.get_config():
-                llm = LLMEndpoint.from_config(config=retrieval_config.llm_config)
-        else:
-            retrieval_config = RetrievalConfig(llm_config=self.llm.get_config())
-
-        if rag_pipeline is None:
-            rag_pipeline = QuivrQARAGLangGraph
-
-        rag_instance = rag_pipeline(
-            retrieval_config=retrieval_config, llm=llm, vector_store=self.vector_db
-        )
+        # Run the async function in the event loop
+        loop = asyncio.get_event_loop()
+        full_answer = loop.run_until_complete(collect_streamed_response())
 
         chat_history = self.default_chat if chat_history is None else chat_history
-        list_files = [] if list_files is None else list_files
-
-        parsed_response = rag_instance.answer(
-            question=question, history=chat_history, list_files=list_files
-        )
-
         chat_history.append(HumanMessage(content=question))
-        chat_history.append(AIMessage(content=parsed_response.answer))
+        chat_history.append(AIMessage(content=full_answer))
 
-        # Save answer to the chat history
-        return parsed_response
+        # Return the final response
+        return ParsedRAGResponse(answer=full_answer)
 
     async def ask_streaming(
         self,
@@ -635,3 +629,4 @@ class Brain:
         chat_history.append(HumanMessage(content=question))
         chat_history.append(AIMessage(content=full_answer))
         yield response
+
