@@ -79,10 +79,14 @@ nav:
       - Workflows:
           - workflows/index.md
           - Examples:
-              - workflows/examples/chat.md
-              - workflows/examples/rag_with_internet.md
+              - workflows/examples/basic_ingestion.md
+              - workflows/examples/basic_rag.md
+              - workflows/examples/rag_with_web_search.md
       - Configuration:
           - config/index.md
-          - config/base_config.md
           - config/config.md
+          - config/base_config.md
+      - Examples:
+          - examples/index.md
+          - examples/custom_storage.md
   - Enterprise: https://docs.quivr.app/
