@@ -144,7 +144,7 @@ const KnowledgeTable = React.forwardRef<HTMLDivElement, KnowledgeTableProps>(
             setChecked={setAllKnowledgeMode}
           />
         </div>
-        {isKnowledgeListEmpty && (
+        {isKnowledgeListEmpty && !allKnowledgeMode && (
           <div className={styles.knowledge_tab_wrapper}>
             <MessageInfoBox type="warning">
               <div className={styles.message}>This brain is empty!</div>

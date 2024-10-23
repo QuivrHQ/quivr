@@ -107,7 +107,10 @@ const ConnectedBrains = ({
       if (isBrainConnected()) {
         await unlinkKnowledgeFromBrains(knowledge.id, [brain.id]);
         setConnectedBrains((prevBrains) =>
-          prevBrains.filter((connectedBrain) => connectedBrain.id !== brain.id)
+          prevBrains.filter(
+            (connectedBrain) =>
+              (connectedBrain.brain_id ?? connectedBrain.id) !== brain.id
+          )
         );
       } else {
         await linkKnowledgeToBrains(knowledge, [brain.id]);
@@ -118,7 +121,8 @@ const ConnectedBrains = ({
 
   const isBrainConnected = (): boolean => {
     return connectedBrains.some(
-      (connectedBrain) => connectedBrain.brain_id === brain?.id
+      (connectedBrain) =>
+        connectedBrain.brain_id ?? connectedBrain.id === brain?.id
     );
   };
 
@@ -179,7 +183,14 @@ const ConnectedBrains = ({
             </div>
           </>
         )}
-        <Tooltip tooltip="Add to brains" delayDuration={250}>
+        <Tooltip
+          tooltip={
+            isBrainConnected() && fromBrainStudio
+              ? "Remove from Brain"
+              : "Add to Brain"
+          }
+          delayDuration={500}
+        >
           <div onClick={fromBrainStudio ? quickManagement : handleAddClick}>
             {fromBrainStudio && isBrainConnected() ? (
               <Icon
