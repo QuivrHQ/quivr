@@ -54,7 +54,7 @@ And now you are all set up to talk with your brain !
 ## Custom Brain
 If you want to change the language or embeddings model, you can modify the parameters of the brain.
 
-Let's say you want to use Mistral llm and a specific embedding model :
+Let's say you want to use a LLM from Mistral and a specific embedding model :
 ```python
 from quivr_core import Brain
 from langchain_core.embeddings import Embeddings
