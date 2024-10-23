@@ -38,7 +38,7 @@ workflow_config:
 # to include in the context of the answer
 max_history: 10
 
-# Configuration for the reranker
+# Reranker configuration
 reranker_config:
   # The reranker supplier to use
   supplier: "cohere"
