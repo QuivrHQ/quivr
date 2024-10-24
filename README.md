@@ -31,7 +31,7 @@ https://github.com/quivrhq/quivr/assets/19614572/a6463b73-76c7-4bc0-978d-70562dc
 
 ## Getting Started 🚀
 
-You can find everything on the [documentation](https://core.quivr.app/).
+You can find everything on the [documentation](https://core.quivr.com/).
 
 ### Prerequisites 📋
 
