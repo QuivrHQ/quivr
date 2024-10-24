@@ -4,7 +4,7 @@ import tempfile
 from dotenv import load_dotenv
 from quivr_core import Brain
 from quivr_core.quivr_rag import QuivrQARAG
-from quivr_core.quivr_rag_langgraph import QuivrQARAGLangGraph
+from quivr_core.rag.quivr_rag_langgraph import QuivrQARAGLangGraph
 
 
 async def main():

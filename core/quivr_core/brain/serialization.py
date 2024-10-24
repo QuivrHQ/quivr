@@ -4,9 +4,9 @@ from uuid import UUID
 
 from pydantic import BaseModel, Field, SecretStr
 
-from quivr_core.config import LLMEndpointConfig
+from quivr_core.rag.entities.config import LLMEndpointConfig
+from quivr_core.rag.entities.models import ChatMessage
 from quivr_core.files.file import QuivrFileSerialized
-from quivr_core.models import ChatMessage
 
 
 class EmbedderConfig(BaseModel):

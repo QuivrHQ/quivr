@@ -5,10 +5,10 @@ from uuid import uuid4
 from langchain_core.embeddings import DeterministicFakeEmbedding
 from langchain_core.messages.ai import AIMessageChunk
 from langchain_core.vectorstores import InMemoryVectorStore
-from quivr_core.chat import ChatHistory
-from quivr_core.config import LLMEndpointConfig, RetrievalConfig
+from quivr_core.rag.entities.chat import ChatHistory
+from quivr_core.rag.entities.config import LLMEndpointConfig, RetrievalConfig
 from quivr_core.llm import LLMEndpoint
-from quivr_core.quivr_rag_langgraph import QuivrQARAGLangGraph
+from quivr_core.rag.quivr_rag_langgraph import QuivrQARAGLangGraph
 
 
 async def main():

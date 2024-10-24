@@ -4,7 +4,7 @@ from langchain_core.documents import Document
 from langchain_core.embeddings import Embeddings
 from langchain_core.vectorstores import VectorStore
 
-from quivr_core.config import LLMEndpointConfig
+from quivr_core.rag.entities.config import LLMEndpointConfig
 from quivr_core.llm import LLMEndpoint
 
 logger = logging.getLogger("quivr_core")
