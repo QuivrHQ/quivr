@@ -1,11 +1,11 @@
 from uuid import uuid4
 
 import pytest
-from quivr_core.chat import ChatHistory
-from quivr_core.config import LLMEndpointConfig, RetrievalConfig
+from quivr_core.rag.entities.chat import ChatHistory
+from quivr_core.rag.entities.config import LLMEndpointConfig, RetrievalConfig
 from quivr_core.llm import LLMEndpoint
-from quivr_core.models import ParsedRAGChunkResponse, RAGResponseMetadata
-from quivr_core.quivr_rag_langgraph import QuivrQARAGLangGraph
+from quivr_core.rag.entities.models import ParsedRAGChunkResponse, RAGResponseMetadata
+from quivr_core.rag.quivr_rag_langgraph import QuivrQARAGLangGraph
 
 
 @pytest.fixture(scope="function")

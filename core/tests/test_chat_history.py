@@ -3,7 +3,7 @@ from uuid import uuid4
 
 import pytest
 from langchain_core.messages import AIMessage, HumanMessage
-from quivr_core.chat import ChatHistory
+from quivr_core.rag.entities.chat import ChatHistory
 
 
 @pytest.fixture
