@@ -1,10 +1,10 @@
 "use client";
-import { Editor, Extension, Range } from "@tiptap/core";
+import { Editor, Extension } from "@tiptap/core";
 import Focus from "@tiptap/extension-focus";
 import { Link } from "@tiptap/extension-link";
 import { BubbleMenu, EditorContent, useEditor } from "@tiptap/react";
 import { StarterKit } from "@tiptap/starter-kit";
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 
 import { useBrainMention } from "@/app/chat/[chatId]/components/ActionsBar/components/ChatInput/components/ChatEditor/Editor/hooks/useBrainMention";
 
@@ -12,6 +12,7 @@ import styles from "./TextEditor.module.scss";
 import { TextEditorSearchBar } from "./components/TextEditorSearchBar/TextEditorSearchBar";
 import { Toolbar } from "./components/Toolbar/Toolbar";
 import { AIHighlight } from "./extensions/AIHighlight";
+import { useAiContext } from "./hooks/useAiContext";
 
 import { QuivrButton } from "../ui/QuivrButton/QuivrButton";
 
@@ -30,12 +31,8 @@ export const TextEditor = (): JSX.Element => {
   const { BrainMention, items } = useBrainMention();
   const [searchBarOpen, setSearchBarOpen] = useState(true);
   const searchEditorRef = useRef<Editor>(null);
-  // const [aiContext, setAiContext] = useState("");
-
-  const [aiContextState, setAiContextState] = useState<{
-    range: Range;
-    content: string;
-  } | null>(null);
+  const { setAiContextAndHighlightRange} =
+    useAiContext();
 
   const FocusSearchBar = Extension.create().extend({
     addKeyboardShortcuts: () => {
@@ -51,10 +48,8 @@ export const TextEditor = (): JSX.Element => {
           }
 
           setSearchBarOpen(true);
-          setAiContextState({ content, range: editor.state.selection });
+          setAiContextAndHighlightRange(editor.state.selection, editor);
           searchEditorRef.current?.chain().focus().run();
-
-          // setAiContext(selection);
 
           return true;
         },
@@ -87,20 +82,6 @@ export const TextEditor = (): JSX.Element => {
     },
     [items.length]
   );
-
-  useEffect(() => {
-    if (!editor || !aiContextState) {
-      return;
-    }
-    // editor.chain().unsetSelectionsInDocument().focus().run();
-    editor
-      .chain()
-      .unsetSelectionsInDocument()
-      .setTextSelection(aiContextState.range)
-      .setHighlight({ type: "selection" })
-      .focus(aiContextState.range.to)
-      .run();
-  }, [aiContextState?.range, editor]);
 
   const toggleSearchBar = () => {
     setSearchBarOpen(!searchBarOpen);
@@ -158,7 +139,6 @@ export const TextEditor = (): JSX.Element => {
         }`}
       >
         <TextEditorSearchBar
-          aiContext={aiContextState?.content}
           ref={searchEditorRef}
           editor={editor}
         />
