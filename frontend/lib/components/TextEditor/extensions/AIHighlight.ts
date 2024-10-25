@@ -51,9 +51,9 @@ export const AIHighlight = Highlight.extend<AIHighlightOptions>({
       },
     };
   },
-  onSelectionUpdate() {
-    this.editor.commands.unsetSelectionsInDocument();
-  },
+  // onSelectionUpdate() {
+  //   this.editor.commands.unsetSelectionsInDocument();
+  // },
 }).configure({
   multicolor: true,
   type: "selection",
