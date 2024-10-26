@@ -9,6 +9,8 @@ export type AiContextType = {
   type: AIHighlightType;
   setAiContextAndHighlightRange: (range: Range, editor: Editor) => void;
   updateContent: (newContent: string, editor: Editor) => void;
+  clearHighlight: (editor: Editor) => void;
+  undo: (editor: Editor) => void;
 };
 
 export const AiContext = createContext<AiContextType | null>(null);
@@ -20,6 +22,7 @@ const AiProvider = ({
 }): JSX.Element => {
   const [range, setRange] = useState<Range | null>(null);
   const [content, setContent] = useState("");
+  const [prevContent, setPrevContent] = useState("");
   const [type, setType] = useState<AIHighlightType>("selection");
 
   const setAiContextAndHighlightRange = (
@@ -28,12 +31,7 @@ const AiProvider = ({
     newType: AIHighlightType = "selection"
   ) => {
     setRange(newRange);
-    console.log({
-      from: newRange.from,
-      to: newRange.to,
-      content,
-      newType,
-    });
+    setPrevContent(content);
     setContent(editor.state.doc.textBetween(newRange.from, newRange.to));
     setType(newType);
     editor
@@ -58,6 +56,29 @@ const AiProvider = ({
     );
   };
 
+  const clearHighlight = (editor: Editor) => {
+    setRange(null);
+    setContent("");
+    setPrevContent("");
+    setType("selection");
+
+    editor.chain().unsetSelectionsInDocument().focus().run();
+  };
+
+  const undo = (editor: Editor) => {
+    if (!range) {
+      return;
+    }
+    if (type === "ai") {
+      editor.chain().deleteRange(range).insertContent(prevContent).run();
+      setAiContextAndHighlightRange(
+        { from: range.from, to: range.from + prevContent.length },
+        editor,
+        "selection"
+      );
+    }
+  };
+
   return (
     <AiContext.Provider
       value={{
@@ -66,6 +87,8 @@ const AiProvider = ({
         setAiContextAndHighlightRange,
         type,
         updateContent,
+        clearHighlight,
+        undo,
       }}
     >
       {children}

@@ -31,8 +31,11 @@ export const TextEditor = (): JSX.Element => {
   const { BrainMention, items } = useBrainMention();
   const [searchBarOpen, setSearchBarOpen] = useState(true);
   const searchEditorRef = useRef<Editor>(null);
-  const { setAiContextAndHighlightRange} =
-    useAiContext();
+  const {
+    setAiContextAndHighlightRange,
+    clearHighlight: clear,
+    undo: undoAi,
+  } = useAiContext();
 
   const FocusSearchBar = Extension.create().extend({
     addKeyboardShortcuts: () => {
@@ -110,11 +113,7 @@ export const TextEditor = (): JSX.Element => {
           >
             <QuivrButton
               onClick={() => {
-                editor
-                  .chain()
-                  .extendMarkRange(AIHighlight.name)
-                  .unsetHighlight()
-                  .run();
+                clear(editor);
               }}
               label="Accept"
               color="primary"
@@ -122,7 +121,7 @@ export const TextEditor = (): JSX.Element => {
             />
             <QuivrButton
               onClick={() => {
-                editor.commands.undo();
+                undoAi(editor);
               }}
               label="Decline"
               color="dangerous"
@@ -138,10 +137,7 @@ export const TextEditor = (): JSX.Element => {
           searchBarOpen ? styles.active : ""
         }`}
       >
-        <TextEditorSearchBar
-          ref={searchEditorRef}
-          editor={editor}
-        />
+        <TextEditorSearchBar ref={searchEditorRef} editor={editor} />
       </div>
     </div>
   );
