@@ -23,7 +23,7 @@ logger = logging.getLogger("quivr_core")
 
 
 def model_supports_function_calling(model_name: str):
-    models_not_supporting_function_calls: list[str] = []
+    models_not_supporting_function_calls: list[str] = ["llama2", "test", "ollama3"]
 
     return model_name not in models_not_supporting_function_calls
 
