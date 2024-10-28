@@ -104,8 +104,8 @@ async def test_brain_get_history(
         vector_db=mem_vector_store,
     )
 
-    brain.ask("question")
-    brain.ask("question")
+    await brain.aask("question")
+    await brain.aask("question")
 
     assert len(brain.default_chat) == 4
 
