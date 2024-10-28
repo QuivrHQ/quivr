@@ -1,5 +1,6 @@
 import os
 import re
+import logging
 from enum import Enum
 from typing import Dict, Hashable, List, Optional, Union, Any, Type
 from uuid import UUID
@@ -14,6 +15,8 @@ from quivr_core.base_config import QuivrBaseConfig
 from quivr_core.processor.splitter import SplitterConfig
 from quivr_core.rag.prompts import CustomPromptsModel
 from quivr_core.llm_tools.llm_tools import LLMToolFactory, TOOLS_CATEGORIES, TOOLS_LISTS
+
+logger = logging.getLogger("quivr_core")
 
 
 def normalize_to_env_variable_name(name: str) -> str:
@@ -188,8 +191,8 @@ class LLMModelConfig:
 
 
 class LLMEndpointConfig(QuivrBaseConfig):
-    supplier: DefaultModelSuppliers | None = None
-    model: str | None = None
+    supplier: DefaultModelSuppliers = DefaultModelSuppliers.OPENAI
+    model: str = "gpt-4o"
     context_length: int | None = None
     tokenizer_hub: str | None = None
     llm_base_url: str | None = None
@@ -217,7 +220,6 @@ class LLMEndpointConfig(QuivrBaseConfig):
             return
 
         # Check if the corresponding API key environment variable is set
-
         if not self.env_variable_name:
             self.env_variable_name = (
                 f"{normalize_to_env_variable_name(self.supplier)}_API_KEY"
@@ -227,10 +229,7 @@ class LLMEndpointConfig(QuivrBaseConfig):
             self.llm_api_key = os.getenv(self.env_variable_name)
 
         if not self.llm_api_key:
-            raise ValueError(
-                f"The API key for supplier '{self.supplier}' is not set. "
-                f"Please set the environment variable: {self.env_variable_name}"
-            )
+            logger.warning(f"The API key for supplier '{self.supplier}' is not set. ")
 
     def set_llm_model_config(self):
         # Automatically set context_length and tokenizer_hub based on the supplier and model
@@ -436,6 +435,7 @@ class RetrievalConfig(QuivrBaseConfig):
 
     def __init__(self, **data):
         super().__init__(**data)
+        self.llm_config.set_api_key(force_reset=True)
 
 
 class ParserConfig(QuivrBaseConfig):
