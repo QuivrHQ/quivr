@@ -10,7 +10,7 @@ from langchain_core.documents import Document
 from langchain_core.embeddings import Embeddings
 from langchain_core.messages import AIMessage, HumanMessage
 from langchain_core.vectorstores import VectorStore
-from core.quivr_core.models import ParsedRAGResponse
+from quivr_core.rag.entities.models import ParsedRAGResponse
 from langchain_openai import OpenAIEmbeddings
 from quivr_core.rag.quivr_rag import QuivrQARAG
 from rich.console import Console
@@ -490,55 +490,6 @@ class Brain:
         # add it to vectorstore
         raise NotImplementedError
 
-    def ask(
-        self,
-        question: str,
-        retrieval_config: RetrievalConfig | None = None,
-        rag_pipeline: Type[Union[QuivrQARAG, QuivrQARAGLangGraph]] | None = None,
-        list_files: list[QuivrKnowledge] | None = None,
-        chat_history: ChatHistory | None = None,
-    ) -> ParsedRAGResponse:
-        """
-        Ask a question to the brain and get a generated answer.
-        Args:
-            question (str): The question to ask.
-            retrieval_config (RetrievalConfig | None): The retrieval configuration (see RetrievalConfig docs).
-            rag_pipeline (Type[Union[QuivrQARAG, QuivrQARAGLangGraph]] | None): The RAG pipeline to use.
-            list_files (list[QuivrKnowledge] | None): The list of files to include in the RAG pipeline.
-            chat_history (ChatHistory | None): The chat history to use.
-        Returns:
-            ParsedRAGResponse: The generated answer.
-        Example:
-        ```python
-        brain = Brain.from_files(name="My Brain", file_paths=["file1.pdf", "file2.pdf"])
-        answer = brain.ask("What is the meaning of life?")
-        print(answer.answer)
-        ```
-        """
-
-        async def collect_streamed_response():
-            full_answer = ""
-            async for response in self.ask_streaming(
-                question=question,
-                retrieval_config=retrieval_config,
-                rag_pipeline=rag_pipeline,
-                list_files=list_files,
-                chat_history=chat_history,
-            ):
-                full_answer += response.answer
-            return full_answer
-
-        # Run the async function in the event loop
-        loop = asyncio.get_event_loop()
-        full_answer = loop.run_until_complete(collect_streamed_response())
-
-        chat_history = self.default_chat if chat_history is None else chat_history
-        chat_history.append(HumanMessage(content=question))
-        chat_history.append(AIMessage(content=full_answer))
-
-        # Return the final response
-        return ParsedRAGResponse(answer=full_answer)
-
     async def ask_streaming(
         self,
         question: str,
@@ -596,3 +547,65 @@ class Brain:
         chat_history.append(HumanMessage(content=question))
         chat_history.append(AIMessage(content=full_answer))
         yield response
+
+    async def aask(
+        self,
+        question: str,
+        retrieval_config: RetrievalConfig | None = None,
+        rag_pipeline: Type[Union[QuivrQARAG, QuivrQARAGLangGraph]] | None = None,
+        list_files: list[QuivrKnowledge] | None = None,
+        chat_history: ChatHistory | None = None,
+    ) -> ParsedRAGResponse:
+        """
+        Synchronous version that asks a question to the brain and gets a generated answer.
+        Args:
+            question (str): The question to ask.
+            retrieval_config (RetrievalConfig | None): The retrieval configuration (see RetrievalConfig docs).
+            rag_pipeline (Type[Union[QuivrQARAG, QuivrQARAGLangGraph]] | None): The RAG pipeline to use.
+            list_files (list[QuivrKnowledge] | None): The list of files to include in the RAG pipeline.
+            chat_history (ChatHistory | None): The chat history to use.
+        Returns:
+            ParsedRAGResponse: The generated answer.
+        """
+        full_answer = ""
+
+        async for response in self.ask_streaming(
+            question=question,
+            retrieval_config=retrieval_config,
+            rag_pipeline=rag_pipeline,
+            list_files=list_files,
+            chat_history=chat_history,
+        ):
+            full_answer += response.answer
+
+        return ParsedRAGResponse(answer=full_answer)
+
+    def ask(
+        self,
+        question: str,
+        retrieval_config: RetrievalConfig | None = None,
+        rag_pipeline: Type[Union[QuivrQARAG, QuivrQARAGLangGraph]] | None = None,
+        list_files: list[QuivrKnowledge] | None = None,
+        chat_history: ChatHistory | None = None,
+    ) -> ParsedRAGResponse:
+        """
+        Fully synchronous version that asks a question to the brain and gets a generated answer.
+        Args:
+            question (str): The question to ask.
+            retrieval_config (RetrievalConfig | None): The retrieval configuration (see RetrievalConfig docs).
+            rag_pipeline (Type[Union[QuivrQARAG, QuivrQARAGLangGraph]] | None): The RAG pipeline to use.
+            list_files (list[QuivrKnowledge] | None): The list of files to include in the RAG pipeline.
+            chat_history (ChatHistory | None): The chat history to use.
+        Returns:
+            ParsedRAGResponse: The generated answer.
+        """
+        loop = asyncio.get_event_loop()
+        return loop.run_until_complete(
+            self.aask(
+                question=question,
+                retrieval_config=retrieval_config,
+                rag_pipeline=rag_pipeline,
+                list_files=list_files,
+                chat_history=chat_history,
+            )
+        )
