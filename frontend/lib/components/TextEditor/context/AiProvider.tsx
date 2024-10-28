@@ -10,7 +10,7 @@ export type AiContextType = {
   setAiContextAndHighlightRange: (range: Range, editor: Editor) => void;
   updateContent: (newContent: string, editor: Editor) => void;
   clearHighlight: (editor: Editor) => void;
-  undo: (editor: Editor) => void;
+  decline: (editor: Editor) => void;
 };
 
 export const AiContext = createContext<AiContextType | null>(null);
@@ -57,15 +57,26 @@ const AiProvider = ({
   };
 
   const clearHighlight = (editor: Editor) => {
+    if (!range) {
+      return;
+    }
+    editor
+      .chain()
+      .setTextSelection(range)
+      .unsetHighlight()
+      .setTextSelection(range.to)
+      .focus()
+      .run();
+
     setRange(null);
     setContent("");
     setPrevContent("");
     setType("selection");
 
-    editor.chain().unsetSelectionsInDocument().focus().run();
+    // editor.chain().unsetSelectionsInDocument().focus().run();
   };
 
-  const undo = (editor: Editor) => {
+  const decline = (editor: Editor) => {
     if (!range) {
       return;
     }
@@ -87,8 +98,8 @@ const AiProvider = ({
         setAiContextAndHighlightRange,
         type,
         updateContent,
+        decline,
         clearHighlight,
-        undo,
       }}
     >
       {children}

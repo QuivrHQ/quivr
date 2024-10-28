@@ -31,11 +31,8 @@ export const TextEditor = (): JSX.Element => {
   const { BrainMention, items } = useBrainMention();
   const [searchBarOpen, setSearchBarOpen] = useState(true);
   const searchEditorRef = useRef<Editor>(null);
-  const {
-    setAiContextAndHighlightRange,
-    clearHighlight: clear,
-    undo: undoAi,
-  } = useAiContext();
+  const { setAiContextAndHighlightRange, decline, clearHighlight } =
+    useAiContext();
 
   const FocusSearchBar = Extension.create().extend({
     addKeyboardShortcuts: () => {
@@ -113,7 +110,7 @@ export const TextEditor = (): JSX.Element => {
           >
             <QuivrButton
               onClick={() => {
-                clear(editor);
+                clearHighlight(editor);
               }}
               label="Accept"
               color="primary"
@@ -121,9 +118,30 @@ export const TextEditor = (): JSX.Element => {
             />
             <QuivrButton
               onClick={() => {
-                undoAi(editor);
+                decline(editor);
               }}
               label="Decline"
+              color="dangerous"
+              iconName="close"
+            />
+          </BubbleMenu>
+
+          <BubbleMenu
+            shouldShow={() => {
+              return editor.isActive(AIHighlight.name, { type: "selection" });
+            }}
+            tippyOptions={{
+              moveTransition: "transform 0.1s",
+              placement: "bottom-start",
+            }}
+            className={styles.bubble_menu}
+            editor={editor}
+          >
+            <QuivrButton
+              onClick={() => {
+                clearHighlight(editor);
+              }}
+              label="Clear selection"
               color="dangerous"
               iconName="close"
             />
