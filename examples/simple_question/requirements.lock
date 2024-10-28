@@ -55,8 +55,6 @@ frozenlist==1.4.1
     # via aiosignal
 fsspec==2024.10.0
     # via huggingface-hub
-greenlet==3.1.1
-    # via sqlalchemy
 h11==0.14.0
     # via httpcore
 httpcore==1.0.6
@@ -169,6 +167,7 @@ pydantic==2.9.2
     # via langsmith
     # via openai
     # via quivr-core
+    # via sqlmodel
 pydantic-core==2.23.4
     # via cohere
     # via pydantic
@@ -176,6 +175,8 @@ pygments==2.18.0
     # via rich
 python-dateutil==2.9.0.post0
     # via pandas
+python-dotenv==1.0.1
+    # via quivr-core
 pytz==2024.2
     # via pandas
 pyyaml==6.0.2
@@ -185,6 +186,8 @@ pyyaml==6.0.2
     # via langchain-core
     # via transformers
 quivr-core @ file:///${PROJECT_ROOT}/../../core
+rapidfuzz==3.10.1
+    # via quivr-core
 regex==2024.9.11
     # via tiktoken
     # via transformers
@@ -215,6 +218,9 @@ sniffio==1.3.1
 sqlalchemy==2.0.36
     # via langchain
     # via langchain-community
+    # via sqlmodel
+sqlmodel==0.0.22
+    # via quivr-core
 tabulate==0.9.0
     # via langchain-cohere
 tenacity==8.5.0
