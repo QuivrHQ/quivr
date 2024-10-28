@@ -6,7 +6,7 @@ from uuid import UUID
 from sqlmodel import SQLModel
 from langgraph.graph import START, END
 from langchain_core.tools import BaseTool
-from megaparse.config import MegaparseConfig
+from quivr_core.config import MegaparseConfig
 from rapidfuzz import process, fuzz
 
 
@@ -188,12 +188,12 @@ class LLMModelConfig:
 
 
 class LLMEndpointConfig(QuivrBaseConfig):
-    supplier: DefaultModelSuppliers = DefaultModelSuppliers.OPENAI
-    model: str = "gpt-4o"
+    supplier: DefaultModelSuppliers | None = None
+    model: str | None = None
     context_length: int | None = None
     tokenizer_hub: str | None = None
     llm_base_url: str | None = None
-    env_variable_name: str = f"{normalize_to_env_variable_name(supplier)}_API_KEY"
+    env_variable_name: str | None = None
     llm_api_key: str | None = None
     max_context_tokens: int = 2000
     max_output_tokens: int = 2000
@@ -213,7 +213,16 @@ class LLMEndpointConfig(QuivrBaseConfig):
         self.set_api_key()
 
     def set_api_key(self, force_reset: bool = False):
+        if not self.supplier:
+            return
+
         # Check if the corresponding API key environment variable is set
+
+        if not self.env_variable_name:
+            self.env_variable_name = (
+                f"{normalize_to_env_variable_name(self.supplier)}_API_KEY"
+            )
+
         if not self.llm_api_key or force_reset:
             self.llm_api_key = os.getenv(self.env_variable_name)
 
@@ -353,6 +362,24 @@ class NodeConfig(QuivrBaseConfig):
             ]
 
 
+class DefaultWorkflow(str, Enum):
+    RAG = "rag"
+
+    @property
+    def nodes(self) -> List[NodeConfig]:
+        # Mapping of workflow types to their default node configurations
+        workflows = {
+            self.RAG: [
+                NodeConfig(name=START, edges=["filter_history"]),
+                NodeConfig(name="filter_history", edges=["rewrite"]),
+                NodeConfig(name="rewrite", edges=["retrieve"]),
+                NodeConfig(name="retrieve", edges=["generate_rag"]),
+                NodeConfig(name="generate_rag", edges=[END]),
+            ]
+        }
+        return workflows[self]
+
+
 class WorkflowConfig(QuivrBaseConfig):
     name: str | None = None
     nodes: List[NodeConfig] = []
@@ -405,7 +432,7 @@ class RetrievalConfig(QuivrBaseConfig):
     max_files: int = 20
     k: int = 40  # Number of chunks returned by the retriever
     prompt: str | None = None
-    workflow_config: WorkflowConfig = WorkflowConfig()
+    workflow_config: WorkflowConfig = WorkflowConfig(nodes=DefaultWorkflow.RAG.nodes)
 
     def __init__(self, **data):
         super().__init__(**data)

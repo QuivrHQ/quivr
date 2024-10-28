@@ -426,7 +426,11 @@ class QuivrQARAGLangGraph:
             dict: The updated state with re-phrased question
         """
 
-        tasks = state["tasks"]
+        tasks = (
+            state["tasks"]
+            if "tasks" in state and state["tasks"]
+            else [state["messages"][0].content]
+        )
 
         # Prepare the async tasks for all user tsks
         async_tasks = []
@@ -733,9 +737,8 @@ class QuivrQARAGLangGraph:
     def bind_tools_to_llm(self, node_name: str):
         if self.llm_endpoint.supports_func_calling():
             tools = self.retrieval_config.workflow_config.get_node_tools(node_name)
-            # llm_copy = self.llm_endpoint.clone_llm()  # Clone the LLM
-            # llm_copy = llm_copy.bind_tools(tools, tool_choice="any")
-            return self.llm_endpoint._llm.bind_tools(tools, tool_choice="any")
+            if tools:  # Only bind tools if there are any available
+                return self.llm_endpoint._llm.bind_tools(tools, tool_choice="any")
         return self.llm_endpoint._llm
 
     def generate_rag(self, state: AgentState) -> AgentState:
@@ -827,14 +830,11 @@ class QuivrQARAGLangGraph:
         workflow = StateGraph(AgentState)
         self.final_nodes = []
 
-        if self.retrieval_config.workflow_config:
-            self._build_custom_workflow(workflow)
-        else:
-            self._build_default_workflow(workflow)
+        self._build_workflow(workflow)
 
         return workflow.compile()
 
-    def _build_custom_workflow(self, workflow: StateGraph):
+    def _build_workflow(self, workflow: StateGraph):
         for node in self.retrieval_config.workflow_config.nodes:
             if node.name not in [START, END]:
                 workflow.add_node(node.name, getattr(self, node.name))
@@ -857,17 +857,6 @@ class QuivrQARAGLangGraph:
                 self.final_nodes.append(node.name)
         else:
             raise ValueError("Node should have at least one edge or conditional_edge")
-
-    def _build_default_workflow(self, workflow: StateGraph):
-        nodes = ["filter_history", "rewrite", "retrieve", "generate"]
-        for node in nodes:
-            workflow.add_node(node, getattr(self, node))
-
-        workflow.set_entry_point("filter_history")
-        for i in range(len(nodes) - 1):
-            workflow.add_edge(nodes[i], nodes[i + 1])
-        workflow.add_edge("generate", END)
-        self.final_nodes = ["generate"]
 
     async def answer_astream(
         self,
@@ -897,6 +886,8 @@ class QuivrQARAGLangGraph:
             version="v1",
             config={"metadata": metadata},
         ):
+            # print('\nevent', event)
+            # input("Press Enter to continue...")  # Add this line
             if self._is_final_node_with_docs(event):
                 docs = event["data"]["output"]["docs"]
 
