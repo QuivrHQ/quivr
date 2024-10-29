@@ -85,11 +85,21 @@ def parse_chunk_response(
     supports_func_calling: bool,
     previous_content: str = "",
 ) -> Tuple[AIMessageChunk, str, str]:
+    """Parse a chunk response
+    Args:
+        rolling_msg: The accumulated message so far
+        raw_chunk: The new chunk to add
+        supports_func_calling: Whether function calling is supported
+        previous_content: The previous content string
+    Returns:
+        Tuple of (updated rolling message, new content only, full content)
+    """
     rolling_msg += raw_chunk
 
     if not supports_func_calling or not rolling_msg.tool_calls:
-        new_content = rolling_msg.content[len(previous_content) :]
-        return rolling_msg, new_content, rolling_msg.content
+        new_content = raw_chunk.content  # Just the new chunk's content
+        full_content = rolling_msg.content  # The full accumulated content
+        return rolling_msg, new_content, full_content
 
     current_answers = get_answers_from_tool_calls(rolling_msg.tool_calls)
     full_answer = "\n\n".join(current_answers)
