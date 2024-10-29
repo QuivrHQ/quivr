@@ -5,7 +5,6 @@ import httpx
 import tiktoken
 from langchain_core.documents import Document
 from langchain_text_splitters import RecursiveCharacterTextSplitter, TextSplitter
-
 from quivr_core.config import MegaparseConfig
 from quivr_core.files.file import QuivrFile
 from quivr_core.processor.processor_base import ProcessorBase
@@ -30,7 +29,24 @@ class MegaparseProcessor(ProcessorBase):
 
     """
 
-    supported_extensions = [FileExtension.pdf]
+    supported_extensions = [
+        FileExtension.pdf,
+        FileExtension.docx,
+        FileExtension.doc,
+        FileExtension.pptx,
+        FileExtension.xls,
+        FileExtension.xlsx,
+        FileExtension.csv,
+        FileExtension.epub,
+        FileExtension.bib,
+        FileExtension.odt,
+        FileExtension.html,
+        FileExtension.py,
+        FileExtension.markdown,
+        FileExtension.md,
+        FileExtension.mdx,
+        FileExtension.ipynb,
+    ]
 
     def __init__(
         self,
