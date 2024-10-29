@@ -886,8 +886,6 @@ class QuivrQARAGLangGraph:
             version="v1",
             config={"metadata": metadata},
         ):
-            # print('\nevent', event)
-            # input("Press Enter to continue...")  # Add this line
             if self._is_final_node_with_docs(event):
                 docs = event["data"]["output"]["docs"]
 
