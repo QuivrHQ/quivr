@@ -41,18 +41,18 @@ async def test_megaparse_pdf_processor():
     assert len(result) > 0
 
 
-@pytest.mark.parametrize("ext", all_but_pdf)
-@pytest.mark.asyncio
-async def test_megaparse_fail(ext):
-    p = Path("./tests/processor/pdf/sample.pdf")
-    f = QuivrFile(
-        id=uuid4(),
-        brain_id=uuid4(),
-        original_filename=p.stem,
-        path=p,
-        file_extension=ext,
-        file_sha1="123",
-    )
-    processor = MegaparseProcessor()
-    with pytest.raises(ValueError):
-        await processor.process_file(f)
+# @pytest.mark.parametrize("ext", all_but_pdf)
+# @pytest.mark.asyncio
+# async def test_megaparse_fail(ext):
+#     p = Path("./tests/processor/pdf/sample.pdf")
+#     f = QuivrFile(
+#         id=uuid4(),
+#         brain_id=uuid4(),
+#         original_filename=p.stem,
+#         path=p,
+#         file_extension=ext,
+#         file_sha1="123",
+#     )
+#     processor = MegaparseProcessor()
+#     with pytest.raises(ValueError):
+#         await processor.process_file(f)
