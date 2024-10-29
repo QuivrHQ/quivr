@@ -7,7 +7,7 @@ from langchain_core.documents import Document
 from langchain_core.messages import AIMessage, HumanMessage
 from langchain_core.pydantic_v1 import BaseModel as BaseModelV1
 from langchain_core.pydantic_v1 import Field as FieldV1
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from typing_extensions import TypedDict
 
 
@@ -73,9 +73,9 @@ class ChatLLMMetadata(BaseModel):
 
 
 class RAGResponseMetadata(BaseModel):
-    citations: list[int] | None = None
-    followup_questions: list[str] | None = None
-    sources: list[Any] | None = None
+    citations: list[int] = Field(default_factory=list)
+    followup_questions: list[str] = Field(default_factory=list)
+    sources: list[Any] = Field(default_factory=list)
     metadata_model: ChatLLMMetadata | None = None
 
 

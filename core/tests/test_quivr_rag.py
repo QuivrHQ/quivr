@@ -12,14 +12,40 @@ from quivr_core.rag.quivr_rag_langgraph import QuivrQARAGLangGraph
 def mock_chain_qa_stream(monkeypatch, chunks_stream_answer):
     class MockQAChain:
         async def astream_events(self, *args, **kwargs):
-            for c in chunks_stream_answer:
+            default_metadata = {
+                "langgraph_node": "generate",
+                "is_final_node": False,
+                "citations": None,
+                "followup_questions": None,
+                "sources": None,
+                "metadata_model": None,
+            }
+
+            # Send all chunks except the last one
+            for chunk in chunks_stream_answer[:-1]:
                 yield {
                     "event": "on_chat_model_stream",
-                    "metadata": {"langgraph_node": "generate"},
-                    "data": {"chunk": c},
+                    "metadata": default_metadata,
+                    "data": {"chunk": chunk["answer"]},
                 }
 
+            # Send the last chunk
+            yield {
+                "event": "end",
+                "metadata": {
+                    "langgraph_node": "generate",
+                    "is_final_node": True,
+                    "citations": [],
+                    "followup_questions": None,
+                    "sources": [],
+                    "metadata_model": None,
+                },
+                "data": {"chunk": chunks_stream_answer[-1]["answer"]},
+            }
+
     def mock_qa_chain(*args, **kwargs):
+        self = args[0]
+        self.final_nodes = ["generate"]
         return MockQAChain()
 
     monkeypatch.setattr(QuivrQARAGLangGraph, "build_chain", mock_qa_chain)
@@ -48,11 +74,13 @@ async def test_quivrqaraglanggraph(
     ):
         stream_responses.append(resp)
 
+    # This assertion passed
     assert all(
         not r.last_chunk for r in stream_responses[:-1]
     ), "Some chunks before last have last_chunk=True"
     assert stream_responses[-1].last_chunk
 
+    # Let's check this assertion
     for idx, response in enumerate(stream_responses[1:-1]):
         assert (
             len(response.answer) > 0
