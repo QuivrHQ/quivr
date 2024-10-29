@@ -48,7 +48,7 @@ def test_append_proc_mapping_empty():
 
     _append_proc_mapping(
         proc_mapping,
-        file_ext=FileExtension.txt,
+        file_exts=[FileExtension.txt],
         cls_mod="test.test",
         errtxt="error",
         priority=None,
@@ -72,7 +72,7 @@ def test_append_proc_mapping_priority():
     }
     _append_proc_mapping(
         proc_mapping,
-        file_ext=FileExtension.txt,
+        file_exts=[FileExtension.txt],
         cls_mod="test.test",
         errtxt="error",
         priority=0,
@@ -97,7 +97,7 @@ def test_append_proc_mapping():
     }
     _append_proc_mapping(
         proc_mapping,
-        file_ext=FileExtension.txt,
+        file_exts=[FileExtension.txt],
         cls_mod="test.test",
         errtxt="error",
         priority=None,

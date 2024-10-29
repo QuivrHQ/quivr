@@ -1,7 +1,7 @@
 import logging
 import os
 
-import requests
+import httpx
 import tiktoken
 from langchain_core.documents import Document
 from langchain_text_splitters import RecursiveCharacterTextSplitter, TextSplitter
@@ -57,35 +57,34 @@ class MegaparseProcessor(ProcessorBase):
         }
 
     async def process_file_inner(self, file: QuivrFile) -> list[Document]:
-        megaparse_url = os.getenv("MEGAPARSE_URL_API")
+        megaparse_url = os.getenv("MEGAPARSE_URL_API", "http://localhost:8000")
+        print(f"megaparse_url: {megaparse_url}")
         with open(file.path, "rb") as f:
             files = {"file": (os.path.basename(file.path), f)}
-            response = requests.post(f"{megaparse_url}/file", files=files)
+            data = {
+                "method": self.megaparse_config.method,
+                "strategy": self.megaparse_config.strategy,
+                "check_table": self.megaparse_config.check_table,
+                "language": self.megaparse_config.language,
+                "parsing_instruction": self.megaparse_config.parsing_instruction,
+                "model_name": self.megaparse_config.model_name,
+            }
+            async with httpx.AsyncClient(timeout=httpx.Timeout(60)) as client:
+                response = await client.post(
+                    f"{megaparse_url}/file", files=files, data=data
+                )
 
         if response.status_code == 200:
             result = response.json().get("result")
             document = Document(page_content=result)
-            if len(document.page_content) > self.splitter_config.chunk_size:
+            if len(document.page_content) > 0:
                 docs = self.text_splitter.split_documents([document])
                 for doc in docs:
                     doc.metadata = {
                         "chunk_size": len(self.enc.encode(doc.page_content))
                     }
                 return docs
-            return [document]
+            raise Exception("Failed to parse file, we were returned an empty result")
         else:
             logger.error(f"Failed to process file: {response.text}")
             return []
-
-    # async def process_file_inner(self, file: QuivrFile) -> list[Document]:
-    # mega_parse = MegaParse(file_path=file.path, config=self.megaparse_config)  # type: ignore
-    # document: Document = await mega_parse.aload()
-    # if len(document.page_content) > self.splitter_config.chunk_size:
-    #     docs = self.text_splitter.split_documents([document])
-    #     for doc in docs:
-    #         # if "Production Fonts (maximum)" in doc.page_content:
-    #         #    print('Doc: ', doc.page_content)
-    #         doc.metadata = {"chunk_size": len(self.enc.encode(doc.page_content))}
-    #     return docs
-    # return [document]
-    # return []
