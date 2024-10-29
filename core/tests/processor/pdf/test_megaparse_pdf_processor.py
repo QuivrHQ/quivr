@@ -7,8 +7,6 @@ from quivr_core.files.file import FileExtension, QuivrFile
 from quivr_core.processor.implementations.megaparse_processor import MegaparseProcessor
 from quivr_core.processor.registry import get_processor_class
 
-all_but_pdf = list(filter(lambda ext: ext != ".pdf", list(FileExtension)))
-
 # unstructured = pytest.importorskip("unstructured")
 
 
