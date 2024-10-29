@@ -3,12 +3,16 @@ from uuid import uuid4
 
 import pytest
 from quivr_core.files.file import FileExtension, QuivrFile
-from quivr_core.processor.implementations.default import DOCXProcessor
 
-unstructured = pytest.importorskip("unstructured")
+from core.quivr_core.config import Language, MegaparseConfig, ParserType, StrategyEnum
+from core.quivr_core.processor.implementations.megaparse_processor import (
+    MegaparseProcessor,
+)
+
+megaparse = pytest.importorskip("megaparse")
 
 
-@pytest.mark.unstructured
+@pytest.mark.megaparse
 @pytest.mark.asyncio
 async def test_docx_filedocx():
     p = Path("./tests/processor/docx/demo.docx")
@@ -20,14 +24,30 @@ async def test_docx_filedocx():
         file_extension=FileExtension.docx,
         file_sha1="123",
     )
-    processor = DOCXProcessor()
+    megaparse_config = MegaparseConfig(
+        method=ParserType.UNSTRUCTURED,
+        strategy=StrategyEnum.FAST,
+        check_table=False,
+        language=Language.ENGLISH,
+        parsing_instruction=None,
+        model_name="gpt-4o",
+    )
+    processor = MegaparseProcessor(megaparse_config=megaparse_config)
     result = await processor.process_file(f)
     assert len(result) > 0
 
 
-@pytest.mark.unstructured
+@pytest.mark.megaparse
 @pytest.mark.asyncio
 async def test_docx_processor_fail(quivr_txt):
-    processor = DOCXProcessor()
+    megaparse_config = MegaparseConfig(
+        method=ParserType.UNSTRUCTURED,
+        strategy=StrategyEnum.FAST,
+        check_table=False,
+        language=Language.ENGLISH,
+        parsing_instruction=None,
+        model_name="gpt-4o",
+    )
+    processor = MegaparseProcessor(megaparse_config=megaparse_config)
     with pytest.raises(ValueError):
         await processor.process_file(quivr_txt)
