@@ -663,21 +663,8 @@ class QuivrQARAGLangGraph:
         return {**state, "docs": docs}
 
     def get_rag_context_length(self, state: AgentState, docs: List[Document]) -> int:
-        messages = state["messages"]
-        user_question = messages[0].content
-        files = state["files"]
-
-        prompt = self.retrieval_config.prompt
-
-        final_inputs = {}
-        final_inputs["question"] = user_question
-        final_inputs["custom_instructions"] = prompt if prompt else "None"
-        final_inputs["files"] = files if files else "None"
-        final_inputs["chat_history"] = state["chat_history"].to_list()
-
-        final_inputs["context"] = combine_documents(docs) if docs else "None"
+        final_inputs = self._build_rag_prompt_inputs(state, docs)
         msg = custom_prompts.RAG_ANSWER_PROMPT.format(**final_inputs)
-
         return self.llm_endpoint.count_tokens(msg)
 
     def reduce_rag_context(
@@ -742,42 +729,17 @@ class QuivrQARAGLangGraph:
         return self.llm_endpoint._llm
 
     def generate_rag(self, state: AgentState) -> AgentState:
-        messages = state["messages"]
-        user_question = messages[0].content
-        files = state["files"]
-
         docs: List[Document] | None = state["docs"]
-
-        prompt = self.retrieval_config.prompt
-
-        final_inputs = {}
-        final_inputs["context"] = combine_documents(docs) if docs else "None"
-        final_inputs["question"] = user_question
-        final_inputs["rephrased_task"] = state["tasks"]
-        final_inputs["custom_instructions"] = prompt if prompt else "None"
-        final_inputs["files"] = files if files else "None"
-        final_inputs["chat_history"] = state["chat_history"].to_list()
-        final_inputs["reasoning"] = (
-            state["reasoning"] if "reasoning" in state else "None"
-        )
-        available_tools, activated_tools = collect_tools(
-            self.retrieval_config.workflow_config
-        )
-        final_inputs["tools"] = available_tools
+        final_inputs = self._build_rag_prompt_inputs(state, docs)
 
         reduced_inputs, docs = self.reduce_rag_context(
             final_inputs, custom_prompts.RAG_ANSWER_PROMPT, docs
         )
 
         msg = custom_prompts.RAG_ANSWER_PROMPT.format(**reduced_inputs)
-
         llm = self.bind_tools_to_llm(self.generate_rag.__name__)
-
-        # Uncomment and update this section if you want to use structured output
-        # response: FinalAnswer = self.invoke_structured_output(msg, FinalAnswer)
-        # return {**state, "messages": [response.answer], "docs": docs if docs else []}
-
         response = llm.invoke(msg)
+
         return {**state, "messages": [response], "docs": docs if docs else []}
 
     def generate_chat_llm(self, state: AgentState) -> AgentState:
@@ -937,3 +899,32 @@ class QuivrQARAGLangGraph:
         except openai.BadRequestError:
             structured_llm = self.llm_endpoint._llm.with_structured_output(output_class)
             return structured_llm.invoke(prompt)
+
+    def _build_rag_prompt_inputs(
+        self, state: AgentState, docs: List[Document] | None
+    ) -> Dict[str, Any]:
+        """Build the input dictionary for RAG_ANSWER_PROMPT.
+
+        Args:
+            state: Current agent state
+            docs: List of documents or None
+
+        Returns:
+            Dictionary containing all inputs needed for RAG_ANSWER_PROMPT
+        """
+        messages = state["messages"]
+        user_question = messages[0].content
+        files = state["files"]
+        prompt = self.retrieval_config.prompt
+        available_tools, _ = collect_tools(self.retrieval_config.workflow_config)
+
+        return {
+            "context": combine_documents(docs) if docs else "None",
+            "question": user_question,
+            "rephrased_task": state["tasks"],
+            "custom_instructions": prompt if prompt else "None",
+            "files": files if files else "None",
+            "chat_history": state["chat_history"].to_list(),
+            "reasoning": state["reasoning"] if "reasoning" in state else "None",
+            "tools": available_tools,
+        }
