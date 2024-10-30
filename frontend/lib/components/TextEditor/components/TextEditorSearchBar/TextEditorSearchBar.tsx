@@ -18,7 +18,7 @@ type TextEditorSearchBarProps = {
 const TextEditorSearchBar = forwardRef<Editor, TextEditorSearchBarProps>(
   ({ onSearch, newBrain, editor }, ref): JSX.Element => {
     const { submitQuestion, ...chatInput } = useChatInput();
-    const { content, updateContent } = useAiContext();
+    const { aiContext, deleteContent } = useAiContext();
     const { messages } = useChat();
     const router = useRouter();
 
@@ -29,14 +29,11 @@ const TextEditorSearchBar = forwardRef<Editor, TextEditorSearchBarProps>(
         return;
       }
 
-      updateContent(messages[0].assistant, editor);
-
-      // editor
-      //   .chain()
-      //   .setAiHighlight()
-      //   .insertContent(messages[0].assistant)
-      //   .focus()
-      //   .run();
+      deleteContent(editor);
+      editor.commands.createAiResponse({
+        content: messages[0].assistant,
+        context: aiContext,
+      });
     }, [messages.length, router, editor, chatInput.generatingAnswer]);
 
     useEffect(() => {
@@ -54,7 +51,7 @@ const TextEditorSearchBar = forwardRef<Editor, TextEditorSearchBarProps>(
         onSearch={onSearch}
         newBrain={newBrain}
         submitQuestion={(question) =>
-          submitQuestion(`${content} \n ${question}`, false)
+          submitQuestion(`${aiContext} \n ${question}`, false)
         }
         {...chatInput}
       />

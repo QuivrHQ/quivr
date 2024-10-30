@@ -1,0 +1,30 @@
+@use "styles/Spacings.module.scss";
+@use "styles/IconSizes.module.scss";
+@use "styles/Radius.module.scss";
+@use "styles/ZIndexes.module.scss";
+
+.wrapper {
+  padding: Spacings.$spacing05;
+  display: flex;
+  flex-direction: column;
+  gap: Spacings.$spacing07;
+  border: solid 1px var(--border-2);
+  background-color: var(--background-1);
+  border-radius: Radius.$normal;
+}
+
+.content {
+}
+
+.context {
+  padding: Spacings.$spacing05;
+  border: solid 1px var(--border-2);
+  background-color: var(--background-2);
+  border-radius: Radius.$normal;
+  opacity: 0.5;
+}
+
+.actions_wrapper {
+  display: flex;
+  gap: Spacings.$spacing04;
+}

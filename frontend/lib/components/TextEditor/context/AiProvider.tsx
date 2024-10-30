@@ -1,16 +1,14 @@
 import { Editor, Range } from "@tiptap/core";
-import { createContext, useState } from "react";
-
-import { AIHighlightType } from "../extensions/types";
+import { createContext, Dispatch, SetStateAction, useState } from "react";
 
 export type AiContextType = {
   range: Range | null;
-  content: string;
-  type: AIHighlightType;
+  aiContext: string;
   setAiContextAndHighlightRange: (range: Range, editor: Editor) => void;
-  updateContent: (newContent: string, editor: Editor) => void;
   clearHighlight: (editor: Editor) => void;
-  decline: (editor: Editor) => void;
+  deleteContent: (editor: Editor) => void;
+  restorePrev: (editor: Editor) => void;
+  setAiContext: Dispatch<SetStateAction<string>>;
 };
 
 export const AiContext = createContext<AiContextType | null>(null);
@@ -21,39 +19,20 @@ const AiProvider = ({
   children: React.ReactNode;
 }): JSX.Element => {
   const [range, setRange] = useState<Range | null>(null);
-  const [content, setContent] = useState("");
-  const [prevContent, setPrevContent] = useState("");
-  const [type, setType] = useState<AIHighlightType>("selection");
+  const [aiContext, setAiContext] = useState("");
+  const [prevAiContext, setPrevAiContext] = useState("");
 
-  const setAiContextAndHighlightRange = (
-    newRange: Range,
-    editor: Editor,
-    newType: AIHighlightType = "selection"
-  ) => {
+  const setAiContextAndHighlightRange = (newRange: Range, editor: Editor) => {
     setRange(newRange);
-    setPrevContent(content);
-    setContent(editor.state.doc.textBetween(newRange.from, newRange.to));
-    setType(newType);
+    setPrevAiContext(aiContext);
+    setAiContext(editor.state.doc.textBetween(newRange.from, newRange.to));
     editor
       .chain()
       .unsetSelectionsInDocument()
       .setTextSelection(newRange)
-      .setHighlight({ type: newType })
+      .setHighlight({ type: "selection" })
       .focus(newRange.to)
       .run();
-  };
-
-  const updateContent = (newContent: string, editor: Editor) => {
-    if (range === null) {
-      return;
-    }
-    editor.chain().deleteRange(range).insertContent(newContent).run();
-    const finalPos = range.from + newContent.length;
-    setAiContextAndHighlightRange(
-      { from: range.from, to: finalPos },
-      editor,
-      "ai"
-    );
   };
 
   const clearHighlight = (editor: Editor) => {
@@ -69,37 +48,39 @@ const AiProvider = ({
       .run();
 
     setRange(null);
-    setContent("");
-    setPrevContent("");
-    setType("selection");
-
-    // editor.chain().unsetSelectionsInDocument().focus().run();
+    setPrevAiContext(aiContext);
+    setAiContext("");
   };
 
-  const decline = (editor: Editor) => {
+  const restorePrev = (editor: Editor) => {
+    editor.chain().insertContent(prevAiContext).run();
+    // setAiContextAndHighlightRange(
+    //   { from: range.from, to: range.from + prevContent.length },
+    //   editor,
+    //   "selection"
+    // );
+  };
+
+  const deleteContent = (editor: Editor) => {
     if (!range) {
       return;
     }
-    if (type === "ai") {
-      editor.chain().deleteRange(range).insertContent(prevContent).run();
-      setAiContextAndHighlightRange(
-        { from: range.from, to: range.from + prevContent.length },
-        editor,
-        "selection"
-      );
-    }
+    editor.chain().deleteRange(range).focus(range.from).run();
+    setRange(null);
+    setPrevAiContext(aiContext);
+    setAiContext("");
   };
 
   return (
     <AiContext.Provider
       value={{
         range,
-        content,
+        aiContext,
         setAiContextAndHighlightRange,
-        type,
-        updateContent,
-        decline,
+        restorePrev,
         clearHighlight,
+        deleteContent,
+        setAiContext,
       }}
     >
       {children}

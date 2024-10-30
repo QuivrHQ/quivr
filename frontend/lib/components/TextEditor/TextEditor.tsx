@@ -12,6 +12,7 @@ import styles from "./TextEditor.module.scss";
 import { TextEditorSearchBar } from "./components/TextEditorSearchBar/TextEditorSearchBar";
 import { Toolbar } from "./components/Toolbar/Toolbar";
 import { AIHighlight } from "./extensions/AIHighlight";
+import { AiResponse } from "./extensions/AiResponse";
 import { useAiContext } from "./hooks/useAiContext";
 
 import { QuivrButton } from "../ui/QuivrButton/QuivrButton";
@@ -31,8 +32,7 @@ export const TextEditor = (): JSX.Element => {
   const { BrainMention, items } = useBrainMention();
   const [searchBarOpen, setSearchBarOpen] = useState(true);
   const searchEditorRef = useRef<Editor>(null);
-  const { setAiContextAndHighlightRange, decline, clearHighlight } =
-    useAiContext();
+  const { setAiContextAndHighlightRange } = useAiContext();
 
   const FocusSearchBar = Extension.create().extend({
     addKeyboardShortcuts: () => {
@@ -44,11 +44,11 @@ export const TextEditor = (): JSX.Element => {
           );
 
           if (content) {
-            editor.commands.setSelectionHighlight();
+            // editor.commands.setSelectionHighlight();
+            setAiContextAndHighlightRange(editor.state.selection, editor);
           }
 
           setSearchBarOpen(true);
-          setAiContextAndHighlightRange(editor.state.selection, editor);
           searchEditorRef.current?.chain().focus().run();
 
           return true;
@@ -75,6 +75,7 @@ export const TextEditor = (): JSX.Element => {
             class: styles.ai_highlight,
           },
         }),
+        AiResponse,
       ],
       content: defaultContent,
       immediatelyRender: false,
@@ -110,7 +111,7 @@ export const TextEditor = (): JSX.Element => {
           >
             <QuivrButton
               onClick={() => {
-                clearHighlight(editor);
+                // editor.commands.unset
               }}
               label="Accept"
               color="primary"
@@ -118,7 +119,7 @@ export const TextEditor = (): JSX.Element => {
             />
             <QuivrButton
               onClick={() => {
-                decline(editor);
+                // decline(editor);
               }}
               label="Decline"
               color="dangerous"
@@ -128,7 +129,10 @@ export const TextEditor = (): JSX.Element => {
 
           <BubbleMenu
             shouldShow={() => {
-              return editor.isActive(AIHighlight.name, { type: "selection" });
+              return (
+                editor.isActive(AIHighlight.name, { type: "selection" }) &&
+                editor.isFocused
+              );
             }}
             tippyOptions={{
               moveTransition: "transform 0.1s",
@@ -139,7 +143,7 @@ export const TextEditor = (): JSX.Element => {
           >
             <QuivrButton
               onClick={() => {
-                clearHighlight(editor);
+                // clearHighlight(editor);
               }}
               label="Clear selection"
               color="dangerous"

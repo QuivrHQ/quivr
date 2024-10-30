@@ -6,6 +6,10 @@ export type AIHighlightOptions = HighlightOptions & {
   type: AIHighlightType;
 };
 
+export type AIResponseOptions = HighlightOptions & {
+  context: string;
+};
+
 declare module "@tiptap/core" {
   interface Commands<ReturnType> {
     aiHighlight: {
@@ -30,6 +34,11 @@ declare module "@tiptap/core" {
         color?: string;
         type?: AIHighlightType;
       }) => ReturnType;
+    };
+    aiResponse: {
+      createAiResponse: ({ content: string, context: string }) => ReturnType;
+      acceptAiResponse: ({ content: string }) => ReturnType;
+      declineAiResponse: ({ prevContent: string }) => ReturnType;
     };
   }
 }
