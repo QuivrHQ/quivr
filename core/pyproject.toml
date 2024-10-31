@@ -24,11 +24,6 @@ dependencies = [
 ]
 readme = "README.md"
 requires-python = ">= 3.11"
-
-[project.optional-dependencies]
-all = [
-    "docx2txt>=0.8",
-]
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"

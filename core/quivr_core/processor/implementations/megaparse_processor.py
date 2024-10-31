@@ -74,20 +74,22 @@ class MegaparseProcessor(ProcessorBase):
 
     async def process_file_inner(self, file: QuivrFile) -> list[Document]:
         megaparse_url = os.getenv("MEGAPARSE_URL_API", "http://localhost:8000")
-        print(f"megaparse_url: {megaparse_url}")
+        megaparse_api_key = os.getenv("MEGAPARSE_API_KEY", "megaparse_api_key")
         with open(file.path, "rb") as f:
             files = {"file": (os.path.basename(file.path), f)}
             data = {
                 "method": self.megaparse_config.method,
                 "strategy": self.megaparse_config.strategy,
                 "check_table": self.megaparse_config.check_table,
-                "language": self.megaparse_config.language,
                 "parsing_instruction": self.megaparse_config.parsing_instruction,
                 "model_name": self.megaparse_config.model_name,
             }
-            async with httpx.AsyncClient(timeout=httpx.Timeout(60)) as client:
+            headers = {"Authorization": f"Bearer {megaparse_api_key}"}
+            async with httpx.AsyncClient(
+                timeout=self.megaparse_config.timeout
+            ) as client:
                 response = await client.post(
-                    f"{megaparse_url}/file", files=files, data=data
+                    f"{megaparse_url}/file", files=files, data=data, headers=headers
                 )
 
         if response.status_code == 200:
