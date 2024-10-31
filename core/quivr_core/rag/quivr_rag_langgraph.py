@@ -67,7 +67,7 @@ class SplittedInput(BaseModel):
         description="The reasoning that leads to identifying the explicit or implicit user tasks and questions",
     )
     tasks: Optional[List[str]] = Field(
-        default="No explicit or implicit task found",
+        default_factory=lambda: ["No explicit or implicit tasks found"],
         description="The list of standalone, self-contained tasks or questions.",
     )
 
@@ -78,7 +78,7 @@ class TasksCompletion(BaseModel):
         description="The reasoning that leads to identifying the user tasks or questions that can be completed using the provided context and chat history.",
     )
     completable_tasks: Optional[List[str]] = Field(
-        default=None,
+        default_factory=list,
         description="The user tasks or questions that can be completed using the provided context and chat history.",
     )
 
@@ -87,7 +87,7 @@ class TasksCompletion(BaseModel):
         description="The reasoning that leads to identifying the user tasks or questions that cannot be completed using the provided context and chat history.",
     )
     non_completable_tasks: Optional[List[str]] = Field(
-        default=None,
+        default_factory=list,
         description="The user tasks or questions that need a tool to be completed.",
     )
 
@@ -96,7 +96,7 @@ class TasksCompletion(BaseModel):
         description="The reasoning that leads to identifying the tool that shall be used to complete the tasks.",
     )
     tool: Optional[str] = Field(
-        default=None,
+        default_factory=list,
         description="The tool that shall be used to complete the tasks.",
     )
 
@@ -126,10 +126,10 @@ class UpdatedPromptAndTools(BaseModel):
         description="The reasoning that leads to activating and deactivating the tools",
     )
     tools_to_activate: Optional[List[str]] = Field(
-        default=None, description="The list of tools to activate"
+        default_factory=list, description="The list of tools to activate"
     )
     tools_to_deactivate: Optional[List[str]] = Field(
-        default=None, description="The list of tools to deactivate"
+        default_factory=list, description="The list of tools to deactivate"
     )
 
 
