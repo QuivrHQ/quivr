@@ -146,19 +146,6 @@ class AgentState(TypedDict):
     tool: str
 
 
-class InstructionsState(TypedDict):
-    instructions: str
-
-
-class QuestionsState(TypedDict):
-    individual_chat_history: ChatHistory
-    question: str
-
-
-class GenerateInputState(AgentState, QuestionsState):
-    pass
-
-
 class IdempotentCompressor(BaseDocumentCompressor):
     def compress_documents(
         self,
@@ -309,20 +296,6 @@ class QuivrQARAGLangGraph:
 
         return []
 
-    # Here we generate a joke, given a subject
-    # def generate_joke(state: JokeState):
-    #     prompt = joke_prompt.format(subject=state["subject"])
-    #     response = model.with_structured_output(Joke).invoke(prompt)
-    #     return {"jokes": [response.joke]}
-
-    # # Here we define the logic to map out over the generated subjects
-    # # We will use this an edge in the graph
-    # def continue_to_jokes(state: OverallState):
-    #     # We will return a list of `Send` objects
-    #     # Each `Send` object consists of the name of a node in the graph
-    #     # as well as the state to send to that node
-    #     return [Send("generate_joke", {"subject": s}) for s in state["subjects"]]
-
     def update_active_tools(self, updated_prompt_and_tools: UpdatedPromptAndTools):
         if updated_prompt_and_tools.tools_to_activate:
             for tool in updated_prompt_and_tools.tools_to_activate:
@@ -366,12 +339,6 @@ class QuivrQARAGLangGraph:
         self.update_active_tools(response)
         self.retrieval_config.prompt = response.prompt
 
-        # message = f"Updated system prompt: {response.content}"
-
-        # formatted_response = {
-        #     "answer": message,  # Assuming the last message contains the final answer
-        # }
-        # return {"messages": [message], "final_response": formatted_response}
         reasoning = [response.prompt_reasoning] if response.prompt_reasoning else []
         reasoning += [response.tools_reasoning] if response.tools_reasoning else []
 
