@@ -4,7 +4,7 @@ import logging
 from enum import Enum
 from typing import Dict, Hashable, List, Optional, Union, Any, Type
 from uuid import UUID
-from sqlmodel import SQLModel
+from pydantic import BaseModel
 from langgraph.graph import START, END
 from langchain_core.tools import BaseTool
 from quivr_core.config import MegaparseConfig
@@ -252,7 +252,7 @@ class LLMEndpointConfig(QuivrBaseConfig):
         self.set_llm_model_config()
         self.set_api_key(force_reset=True)
 
-    def set_from_sqlmodel(self, sqlmodel: SQLModel, mapping: Dict[str, str]):
+    def set_from_sqlmodel(self, sqlmodel: BaseModel, mapping: Dict[str, str]):
         """
         Set attributes in LLMEndpointConfig from Model attributes using a field mapping.
 

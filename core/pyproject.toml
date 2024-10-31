@@ -21,7 +21,6 @@ dependencies = [
     "types-pyyaml>=6.0.12.20240808",
     "transformers[sentencepiece]>=4.44.2",
     "faiss-cpu>=1.8.0.post1",
-    "sqlmodel>=0.0.22",
     "rapidfuzz>=3.10.1",
 ]
 readme = "README.md"
