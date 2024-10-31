@@ -5,7 +5,7 @@ from pathlib import Path
 
 import dotenv
 from quivr_core import Brain
-from quivr_core.config import AssistantConfig
+from quivr_core.rag.entities.config import AssistantConfig
 from rich.traceback import install as rich_install
 
 ConsoleOutputHandler = logging.StreamHandler()

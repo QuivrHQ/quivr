@@ -5,7 +5,7 @@ import pytest
 from langchain_core.documents import Document
 from langchain_core.embeddings import Embeddings
 from quivr_core.brain import Brain
-from quivr_core.chat import ChatHistory
+from quivr_core.rag.entities.chat import ChatHistory
 from quivr_core.llm import LLMEndpoint
 from quivr_core.storage.local_storage import TransparentStorage
 
@@ -104,8 +104,8 @@ async def test_brain_get_history(
         vector_db=mem_vector_store,
     )
 
-    brain.ask("question")
-    brain.ask("question")
+    await brain.aask("question")
+    await brain.aask("question")
 
     assert len(brain.default_chat) == 4
 

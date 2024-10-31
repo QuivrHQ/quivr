@@ -56,8 +56,6 @@ frozenlist==1.4.1
     # via aiosignal
 fsspec==2024.9.0
     # via huggingface-hub
-greenlet==3.1.1
-    # via sqlalchemy
 h11==0.14.0
     # via httpcore
 httpcore==1.0.6
@@ -185,6 +183,8 @@ pyyaml==6.0.2
     # via langchain-community
     # via langchain-core
     # via transformers
+rapidfuzz==3.10.1
+    # via quivr-core
 regex==2024.9.11
     # via tiktoken
     # via transformers

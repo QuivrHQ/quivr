@@ -3,7 +3,7 @@ from uuid import uuid4
 import pytest
 from langchain_core.messages.ai import AIMessageChunk
 from langchain_core.messages.tool import ToolCall
-from quivr_core.utils import (
+from quivr_core.rag.utils import (
     get_prev_message_str,
     model_supports_function_calling,
     parse_chunk_response,
@@ -43,13 +43,9 @@ def test_get_prev_message_str():
 
 def test_parse_chunk_response_nofunc_calling():
     rolling_msg = AIMessageChunk(content="")
-    chunk = {
-        "answer": AIMessageChunk(
-            content="next ",
-        )
-    }
+    chunk = AIMessageChunk(content="next ")
     for i in range(10):
-        rolling_msg, parsed_chunk = parse_chunk_response(rolling_msg, chunk, False)
+        rolling_msg, parsed_chunk, _ = parse_chunk_response(rolling_msg, chunk, False)
         assert rolling_msg.content == "next " * (i + 1)
         assert parsed_chunk == "next "
 
@@ -70,8 +66,9 @@ def test_parse_chunk_response_func_calling(chunks_stream_answer):
     answer_str_history: list[str] = []
 
     for chunk in chunks_stream_answer:
-        # This is done
-        rolling_msg, answer_str = parse_chunk_response(rolling_msg, chunk, True)
+        # Extract the AIMessageChunk from the chunk dictionary
+        chunk_msg = chunk["answer"]  # Get the AIMessageChunk from the dict
+        rolling_msg, answer_str, _ = parse_chunk_response(rolling_msg, chunk_msg, True)
         rolling_msgs_history.append(rolling_msg)
         answer_str_history.append(answer_str)
 

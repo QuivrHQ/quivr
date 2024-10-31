@@ -4,7 +4,7 @@ from langchain_core.documents import Document
 from langchain_core.embeddings import Embeddings
 from langchain_core.vectorstores import VectorStore
 
-from quivr_core.config import LLMEndpointConfig
+from quivr_core.rag.entities.config import DefaultModelSuppliers, LLMEndpointConfig
 from quivr_core.llm import LLMEndpoint
 
 logger = logging.getLogger("quivr_core")
@@ -46,7 +46,9 @@ def default_embedder() -> Embeddings:
 def default_llm() -> LLMEndpoint:
     try:
         logger.debug("Loaded ChatOpenAI as default LLM for brain")
-        llm = LLMEndpoint.from_config(LLMEndpointConfig())
+        llm = LLMEndpoint.from_config(
+            LLMEndpointConfig(supplier=DefaultModelSuppliers.OPENAI, model="gpt-4o")
+        )
         return llm
 
     except ImportError as e:

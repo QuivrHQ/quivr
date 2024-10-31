@@ -10,8 +10,8 @@ from langchain_openai import AzureChatOpenAI, ChatOpenAI
 from pydantic.v1 import SecretStr
 
 from quivr_core.brain.info import LLMInfo
-from quivr_core.config import DefaultModelSuppliers, LLMEndpointConfig
-from quivr_core.utils import model_supports_function_calling
+from quivr_core.rag.entities.config import DefaultModelSuppliers, LLMEndpointConfig
+from quivr_core.rag.utils import model_supports_function_calling
 
 logger = logging.getLogger("quivr_core")
 
@@ -70,6 +70,7 @@ class LLMEndpoint:
                     else None,
                     azure_endpoint=azure_endpoint,
                     max_tokens=config.max_output_tokens,
+                    temperature=config.temperature,
                 )
             elif config.supplier == DefaultModelSuppliers.ANTHROPIC:
                 _llm = ChatAnthropic(
@@ -79,6 +80,7 @@ class LLMEndpoint:
                     else None,
                     base_url=config.llm_base_url,
                     max_tokens=config.max_output_tokens,
+                    temperature=config.temperature,
                 )
             elif config.supplier == DefaultModelSuppliers.OPENAI:
                 _llm = ChatOpenAI(
@@ -88,6 +90,7 @@ class LLMEndpoint:
                     else None,
                     base_url=config.llm_base_url,
                     max_tokens=config.max_output_tokens,
+                    temperature=config.temperature,
                 )
             else:
                 _llm = ChatOpenAI(
@@ -97,6 +100,7 @@ class LLMEndpoint:
                     else None,
                     base_url=config.llm_base_url,
                     max_tokens=config.max_output_tokens,
+                    temperature=config.temperature,
                 )
             return cls(llm=_llm, llm_config=config)
 
@@ -118,3 +122,7 @@ class LLMEndpoint:
             max_tokens=self._config.max_output_tokens,
             supports_function_calling=self.supports_func_calling(),
         )
+
+    def clone_llm(self):
+        """Create a new instance of the LLM with the same configuration."""
+        return self._llm.__class__(**self._llm.__dict__)

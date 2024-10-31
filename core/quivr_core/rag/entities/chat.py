@@ -1,11 +1,10 @@
-from copy import deepcopy
 from datetime import datetime
-from typing import Any, Generator, List, Tuple
+from typing import Any, Generator, Tuple, List
 from uuid import UUID, uuid4
 
 from langchain_core.messages import AIMessage, HumanMessage
 
-from quivr_core.models import ChatMessage
+from quivr_core.rag.entities.models import ChatMessage
 
 
 class ChatHistory:
@@ -98,17 +97,3 @@ class ChatHistory:
         """
 
         return [_msg.msg for _msg in self._msgs]
-
-    def __deepcopy__(self, memo):
-        """
-        Support for deepcopy of ChatHistory.
-        This method ensures that mutable objects (like lists) are copied deeply.
-        """
-        # Create a new instance of ChatHistory
-        new_copy = ChatHistory(self.id, deepcopy(self.brain_id, memo))
-
-        # Perform a deepcopy of the _msgs list
-        new_copy._msgs = deepcopy(self._msgs, memo)
-
-        # Return the deep copied instance
-        return new_copy

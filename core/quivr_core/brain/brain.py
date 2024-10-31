@@ -10,7 +10,9 @@ from langchain_core.documents import Document
 from langchain_core.embeddings import Embeddings
 from langchain_core.messages import AIMessage, HumanMessage
 from langchain_core.vectorstores import VectorStore
+from quivr_core.rag.entities.models import ParsedRAGResponse
 from langchain_openai import OpenAIEmbeddings
+from quivr_core.rag.quivr_rag import QuivrQARAG
 from rich.console import Console
 from rich.panel import Panel
 
@@ -22,19 +24,17 @@ from quivr_core.brain.serialization import (
     LocalStorageConfig,
     TransparentStorageConfig,
 )
-from quivr_core.chat import ChatHistory
-from quivr_core.config import RetrievalConfig
+from quivr_core.rag.entities.chat import ChatHistory
+from quivr_core.rag.entities.config import RetrievalConfig
 from quivr_core.files.file import load_qfile
 from quivr_core.llm import LLMEndpoint
-from quivr_core.models import (
+from quivr_core.rag.entities.models import (
     ParsedRAGChunkResponse,
-    ParsedRAGResponse,
     QuivrKnowledge,
     SearchResult,
 )
 from quivr_core.processor.registry import get_processor_class
-from quivr_core.quivr_rag import QuivrQARAG
-from quivr_core.quivr_rag_langgraph import QuivrQARAGLangGraph
+from quivr_core.rag.quivr_rag_langgraph import QuivrQARAGLangGraph
 from quivr_core.storage.local_storage import LocalStorage, TransparentStorage
 from quivr_core.storage.storage_base import StorageBase
 
@@ -49,19 +49,15 @@ async def process_files(
     """
     Process files in storage.
     This function takes a StorageBase and return a list of langchain documents.
-
     Args:
         storage (StorageBase): The storage containing the files to process.
         skip_file_error (bool): Whether to skip files that cannot be processed.
         processor_kwargs (dict[str, Any]): Additional arguments for the processor.
-
     Returns:
         list[Document]: List of processed documents in the Langchain Document format.
-
     Raises:
         ValueError: If a file cannot be processed and skip_file_error is False.
         Exception: If no processor is found for a file of a specific type and skip_file_error is False.
-
     """
 
     knowledge = []
@@ -91,23 +87,17 @@ async def process_files(
 class Brain:
     """
     A class representing a Brain.
-
     This class allows for the creation of a Brain, which is a collection of knowledge one wants to retrieve information from.
-
     A Brain is set to:
-
     * Store files in the storage of your choice (local, S3, etc.)
     * Process the files in the storage to extract text and metadata in a wide range of format.
     * Store the processed files in the vector store of your choice (FAISS, PGVector, etc.) - default to FAISS.
     * Create an index of the processed files.
     * Use the *Quivr* workflow for the retrieval augmented generation.
-
     A Brain is able to:
-
     * Search for information in the vector store.
     * Answer questions about the knowledges in the Brain.
     * Stream the answer to the question.
-
     Attributes:
         name (str): The name of the brain.
         id (UUID): The unique identifier of the brain.
@@ -115,16 +105,14 @@ class Brain:
         llm (LLMEndpoint): The language model used to generate the answer.
         vector_db (VectorStore): The vector store used to store the processed files.
         embedder (Embeddings): The embeddings used to create the index of the processed files.
-
-
     """
 
     def __init__(
         self,
         *,
         name: str,
-        id: UUID,
         llm: LLMEndpoint,
+        id: UUID | None = None,
         vector_db: VectorStore | None = None,
         embedder: Embeddings | None = None,
         storage: StorageBase | None = None,
@@ -156,19 +144,15 @@ class Brain:
     def load(cls, folder_path: str | Path) -> Self:
         """
         Load a brain from a folder path.
-
         Args:
             folder_path (str | Path): The path to the folder containing the brain.
-
         Returns:
             Brain: The brain loaded from the folder path.
-
         Example:
         ```python
         brain_loaded = Brain.load("path/to/brain")
         brain_loaded.print_info()
         ```
-
         """
         if isinstance(folder_path, str):
             folder_path = Path(folder_path)
@@ -217,16 +201,13 @@ class Brain:
             vector_db=vector_db,
         )
 
-    async def save(self, folder_path: str | Path) -> str:
+    async def save(self, folder_path: str | Path):
         """
         Save the brain to a folder path.
-
         Args:
             folder_path (str | Path): The path to the folder where the brain will be saved.
-
         Returns:
             str: The path to the folder where the brain was saved.
-
         Example:
         ```python
         await brain.save("path/to/brain")
@@ -324,10 +305,9 @@ class Brain:
         embedder: Embeddings | None = None,
         skip_file_error: bool = False,
         processor_kwargs: dict[str, Any] | None = None,
-    ) -> Self:
+    ):
         """
         Create a brain from a list of file paths.
-
         Args:
             name (str): The name of the brain.
             file_paths (list[str | Path]): The list of file paths to add to the brain.
@@ -337,10 +317,8 @@ class Brain:
             embedder (Embeddings | None): The embeddings used to create the index of the processed files.
             skip_file_error (bool): Whether to skip files that cannot be processed.
             processor_kwargs (dict[str, Any] | None): Additional arguments for the processor.
-
         Returns:
             Brain: The brain created from the file paths.
-
         Example:
         ```python
         brain = await Brain.afrom_files(name="My Brain", file_paths=["file1.pdf", "file2.pdf"])
@@ -429,7 +407,6 @@ class Brain:
     ) -> Self:
         """
         Create a brain from a list of langchain documents.
-
         Args:
             name (str): The name of the brain.
             langchain_documents (list[Document]): The list of langchain documents to add to the brain.
@@ -437,10 +414,8 @@ class Brain:
             storage (StorageBase): The storage used to store the files.
             llm (LLMEndpoint | None): The language model used to generate the answer.
             embedder (Embeddings | None): The embeddings used to create the index of the processed files.
-
         Returns:
             Brain: The brain created from the langchain documents.
-
         Example:
         ```python
         from langchain_core.documents import Document
@@ -449,6 +424,7 @@ class Brain:
         brain.print_info()
         ```
         """
+
         if llm is None:
             llm = default_llm()
 
@@ -481,16 +457,13 @@ class Brain:
     ) -> list[SearchResult]:
         """
         Search for relevant documents in the brain based on a query.
-
         Args:
             query (str | Document): The query to search for.
             n_results (int): The number of results to return.
             filter (Callable | Dict[str, Any] | None): The filter to apply to the search.
             fetch_n_neighbors (int): The number of neighbors to fetch.
-
         Returns:
             list[SearchResult]: The list of retrieved chunks.
-
         Example:
         ```python
         brain = Brain.from_files(name="My Brain", file_paths=["file1.pdf", "file2.pdf"])
@@ -517,57 +490,6 @@ class Brain:
         # add it to vectorstore
         raise NotImplementedError
 
-    def ask(
-        self,
-        question: str,
-        retrieval_config: RetrievalConfig | None = None,
-        rag_pipeline: Type[Union[QuivrQARAG, QuivrQARAGLangGraph]] | None = None,
-        list_files: list[QuivrKnowledge] | None = None,
-        chat_history: ChatHistory | None = None,
-    ) -> ParsedRAGResponse:
-        """
-        Ask a question to the brain and get a generated answer.
-
-        Args:
-            question (str): The question to ask.
-            retrieval_config (RetrievalConfig | None): The retrieval configuration (see RetrievalConfig docs).
-            rag_pipeline (Type[Union[QuivrQARAG, QuivrQARAGLangGraph]] | None): The RAG pipeline to use.
-            list_files (list[QuivrKnowledge] | None): The list of files to include in the RAG pipeline.
-            chat_history (ChatHistory | None): The chat history to use.
-
-        Returns:
-            ParsedRAGResponse: The generated answer.
-
-        Example:
-        ```python
-        brain = Brain.from_files(name="My Brain", file_paths=["file1.pdf", "file2.pdf"])
-        answer = brain.ask("What is the meaning of life?")
-        print(answer.answer)
-        ```
-        """
-        async def collect_streamed_response():
-            full_answer = ""
-            async for response in self.ask_streaming(
-                question=question,
-                retrieval_config=retrieval_config,
-                rag_pipeline=rag_pipeline,
-                list_files=list_files,
-                chat_history=chat_history
-            ):
-                full_answer += response.answer
-            return full_answer
-
-        # Run the async function in the event loop
-        loop = asyncio.get_event_loop()
-        full_answer = loop.run_until_complete(collect_streamed_response())
-
-        chat_history = self.default_chat if chat_history is None else chat_history
-        chat_history.append(HumanMessage(content=question))
-        chat_history.append(AIMessage(content=full_answer))
-
-        # Return the final response
-        return ParsedRAGResponse(answer=full_answer)
-
     async def ask_streaming(
         self,
         question: str,
@@ -578,24 +500,20 @@ class Brain:
     ) -> AsyncGenerator[ParsedRAGChunkResponse, ParsedRAGChunkResponse]:
         """
         Ask a question to the brain and get a streamed generated answer.
-
         Args:
             question (str): The question to ask.
             retrieval_config (RetrievalConfig | None): The retrieval configuration (see RetrievalConfig docs).
             rag_pipeline (Type[Union[QuivrQARAG, QuivrQARAGLangGraph]] | None): The RAG pipeline to use.
-            list_files (list[QuivrKnowledge] | None): The list of files to include in the RAG pipeline.
+        list_files (list[QuivrKnowledge] | None): The list of files to include in the RAG pipeline.
             chat_history (ChatHistory | None): The chat history to use.
-
         Returns:
             AsyncGenerator[ParsedRAGChunkResponse, ParsedRAGChunkResponse]: The streamed generated answer.
-
         Example:
         ```python
         brain = Brain.from_files(name="My Brain", file_paths=["file1.pdf", "file2.pdf"])
         async for chunk in brain.ask_streaming("What is the meaning of life?"):
             print(chunk.answer)
         ```
-
         """
         llm = self.llm
 
@@ -630,3 +548,64 @@ class Brain:
         chat_history.append(AIMessage(content=full_answer))
         yield response
 
+    async def aask(
+        self,
+        question: str,
+        retrieval_config: RetrievalConfig | None = None,
+        rag_pipeline: Type[Union[QuivrQARAG, QuivrQARAGLangGraph]] | None = None,
+        list_files: list[QuivrKnowledge] | None = None,
+        chat_history: ChatHistory | None = None,
+    ) -> ParsedRAGResponse:
+        """
+        Synchronous version that asks a question to the brain and gets a generated answer.
+        Args:
+            question (str): The question to ask.
+            retrieval_config (RetrievalConfig | None): The retrieval configuration (see RetrievalConfig docs).
+            rag_pipeline (Type[Union[QuivrQARAG, QuivrQARAGLangGraph]] | None): The RAG pipeline to use.
+            list_files (list[QuivrKnowledge] | None): The list of files to include in the RAG pipeline.
+            chat_history (ChatHistory | None): The chat history to use.
+        Returns:
+            ParsedRAGResponse: The generated answer.
+        """
+        full_answer = ""
+
+        async for response in self.ask_streaming(
+            question=question,
+            retrieval_config=retrieval_config,
+            rag_pipeline=rag_pipeline,
+            list_files=list_files,
+            chat_history=chat_history,
+        ):
+            full_answer += response.answer
+
+        return ParsedRAGResponse(answer=full_answer)
+
+    def ask(
+        self,
+        question: str,
+        retrieval_config: RetrievalConfig | None = None,
+        rag_pipeline: Type[Union[QuivrQARAG, QuivrQARAGLangGraph]] | None = None,
+        list_files: list[QuivrKnowledge] | None = None,
+        chat_history: ChatHistory | None = None,
+    ) -> ParsedRAGResponse:
+        """
+        Fully synchronous version that asks a question to the brain and gets a generated answer.
+        Args:
+            question (str): The question to ask.
+            retrieval_config (RetrievalConfig | None): The retrieval configuration (see RetrievalConfig docs).
+            rag_pipeline (Type[Union[QuivrQARAG, QuivrQARAGLangGraph]] | None): The RAG pipeline to use.
+            list_files (list[QuivrKnowledge] | None): The list of files to include in the RAG pipeline.
+            chat_history (ChatHistory | None): The chat history to use.
+        Returns:
+            ParsedRAGResponse: The generated answer.
+        """
+        loop = asyncio.get_event_loop()
+        return loop.run_until_complete(
+            self.aask(
+                question=question,
+                retrieval_config=retrieval_config,
+                rag_pipeline=rag_pipeline,
+                list_files=list_files,
+                chat_history=chat_history,
+            )
+        )

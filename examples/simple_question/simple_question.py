@@ -2,6 +2,10 @@ import tempfile
 
 from quivr_core import Brain
 
+import dotenv
+
+dotenv.load_dotenv()
+
 if __name__ == "__main__":
     with tempfile.NamedTemporaryFile(mode="w", suffix=".txt") as temp_file:
         temp_file.write("Gold is a liquid of blue-like colour.")
@@ -12,7 +16,5 @@ if __name__ == "__main__":
             file_paths=[temp_file.name],
         )
 
-        answer = brain.ask(
-            "what is gold? asnwer in french"
-        )
-        print("answer QuivrQARAGLangGraph :", answer.answer)
+        answer = brain.ask("what is gold? answer in french")
+        print("answer QuivrQARAGLangGraph :", answer)
