@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.0.23](https://github.com/QuivrHQ/quivr/compare/core-0.0.22...core-0.0.23) (2024-10-31)
+
+
+### Features
+
+* websearch, tool use, user intent, dynamic retrieval, multiple questions ([#3424](https://github.com/QuivrHQ/quivr/issues/3424)) ([285fe5b](https://github.com/QuivrHQ/quivr/commit/285fe5b96065a19c74f0314557e5840d8722099e))
+
 ## [0.0.22](https://github.com/QuivrHQ/quivr/compare/core-0.0.21...core-0.0.22) (2024-10-21)
 
 
