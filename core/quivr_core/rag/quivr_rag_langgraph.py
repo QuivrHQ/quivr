@@ -13,7 +13,6 @@ from typing import (
 )
 from uuid import uuid4
 import asyncio
-from copy import deepcopy
 
 # TODO(@aminediro): this is the only dependency to langchain package, we should remove it
 from langchain.retrievers import ContextualCompressionRetriever
@@ -647,7 +646,6 @@ class QuivrQARAGLangGraph:
 
         msg = prompt.format(**inputs)
         n = self.llm_endpoint.count_tokens(msg)
-        reduced_inputs = deepcopy(inputs)
 
         max_context_tokens = (
             max_context_tokens
@@ -656,14 +654,10 @@ class QuivrQARAGLangGraph:
         )
 
         while n > max_context_tokens * SECURITY_FACTOR:
-            chat_history = (
-                reduced_inputs["chat_history"]
-                if "chat_history" in reduced_inputs
-                else []
-            )
+            chat_history = inputs["chat_history"] if "chat_history" in inputs else []
 
             if len(chat_history) > 0:
-                reduced_inputs["chat_history"] = chat_history[2:]
+                inputs["chat_history"] = chat_history[2:]
             elif docs and len(docs) > 1:
                 docs = docs[:-1]
             else:
@@ -673,10 +667,10 @@ class QuivrQARAGLangGraph:
                 )
                 break
 
-            if docs and "context" in reduced_inputs:
-                reduced_inputs["context"] = combine_documents(docs)
+            if docs and "context" in inputs:
+                inputs["context"] = combine_documents(docs)
 
-            msg = prompt.format(**reduced_inputs)
+            msg = prompt.format(**inputs)
             n = self.llm_endpoint.count_tokens(msg)
 
             iteration += 1
@@ -686,7 +680,7 @@ class QuivrQARAGLangGraph:
                 )
                 break
 
-        return reduced_inputs, docs
+        return inputs, docs
 
     def bind_tools_to_llm(self, node_name: str):
         if self.llm_endpoint.supports_func_calling():
