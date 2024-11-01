@@ -2,7 +2,7 @@
 import { Editor, Extension } from "@tiptap/core";
 import Focus from "@tiptap/extension-focus";
 import { Link } from "@tiptap/extension-link";
-import { BubbleMenu, EditorContent, useEditor } from "@tiptap/react";
+import { EditorContent, useEditor } from "@tiptap/react";
 import { StarterKit } from "@tiptap/starter-kit";
 import { useRef, useState } from "react";
 
@@ -13,9 +13,6 @@ import { TextEditorSearchBar } from "./components/TextEditorSearchBar/TextEditor
 import { Toolbar } from "./components/Toolbar/Toolbar";
 import { AIHighlight } from "./extensions/AIHighlight";
 import { AiResponse } from "./extensions/AiResponse";
-import { useAiContext } from "./hooks/useAiContext";
-
-import { QuivrButton } from "../ui/QuivrButton/QuivrButton";
 
 const defaultContent = `
   <h1>My Note</h1>
@@ -32,7 +29,6 @@ export const TextEditor = (): JSX.Element => {
   const { BrainMention, items } = useBrainMention();
   const [searchBarOpen, setSearchBarOpen] = useState(true);
   const searchEditorRef = useRef<Editor>(null);
-  const { setAiContextAndHighlightRange } = useAiContext();
 
   const FocusSearchBar = Extension.create().extend({
     addKeyboardShortcuts: () => {
@@ -44,8 +40,7 @@ export const TextEditor = (): JSX.Element => {
           );
 
           if (content) {
-            // editor.commands.setSelectionHighlight();
-            setAiContextAndHighlightRange(editor.state.selection, editor);
+            editor.commands.setSelectionHighlight();
           }
 
           setSearchBarOpen(true);
@@ -97,61 +92,6 @@ export const TextEditor = (): JSX.Element => {
     <div className={styles.main_container}>
       <div className={styles.editor_wrapper}>
         <Toolbar toggleSearchBar={toggleSearchBar} editor={editor} />
-        <div>
-          <BubbleMenu
-            shouldShow={() => {
-              return editor.isActive(AIHighlight.name, { type: "ai" });
-            }}
-            tippyOptions={{
-              moveTransition: "transform 0.1s",
-              placement: "bottom-start",
-            }}
-            className={styles.bubble_menu}
-            editor={editor}
-          >
-            <QuivrButton
-              onClick={() => {
-                // editor.commands.unset
-              }}
-              label="Accept"
-              color="primary"
-              iconName="check"
-            />
-            <QuivrButton
-              onClick={() => {
-                // decline(editor);
-              }}
-              label="Decline"
-              color="dangerous"
-              iconName="close"
-            />
-          </BubbleMenu>
-
-          <BubbleMenu
-            shouldShow={() => {
-              return (
-                editor.isActive(AIHighlight.name, { type: "selection" }) &&
-                editor.isFocused
-              );
-            }}
-            tippyOptions={{
-              moveTransition: "transform 0.1s",
-              placement: "bottom-start",
-            }}
-            className={styles.bubble_menu}
-            editor={editor}
-          >
-            <QuivrButton
-              onClick={() => {
-                // clearHighlight(editor);
-              }}
-              label="Clear selection"
-              color="dangerous"
-              iconName="close"
-            />
-          </BubbleMenu>
-        </div>
-
         <EditorContent className={styles.content_wrapper} editor={editor} />
       </div>
       <div

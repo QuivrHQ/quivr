@@ -7,8 +7,6 @@ import { useChatInput } from "@/app/chat/[chatId]/components/ActionsBar/componen
 import { useChat } from "@/app/chat/[chatId]/hooks/useChat";
 import { ChatBar } from "@/lib/components/ui/ChatBar/ChatBar";
 
-import { useAiContext } from "../../hooks/useAiContext";
-
 type TextEditorSearchBarProps = {
   onSearch?: () => void;
   newBrain?: boolean;
@@ -18,7 +16,6 @@ type TextEditorSearchBarProps = {
 const TextEditorSearchBar = forwardRef<Editor, TextEditorSearchBarProps>(
   ({ onSearch, newBrain, editor }, ref): JSX.Element => {
     const { submitQuestion, ...chatInput } = useChatInput();
-    const { aiContext, deleteContent } = useAiContext();
     const { messages } = useChat();
     const router = useRouter();
 
@@ -29,11 +26,21 @@ const TextEditorSearchBar = forwardRef<Editor, TextEditorSearchBarProps>(
         return;
       }
 
-      deleteContent(editor);
-      editor.commands.createAiResponse({
-        content: messages[0].assistant,
-        context: aiContext,
-      });
+      const context = editor.state.doc.textBetween(
+        editor.state.selection.from,
+        editor.state.selection.to
+      );
+
+      if (context) {
+        editor
+          .chain()
+          .deleteSelection()
+          .createAiResponse({
+            content: messages[0].assistant,
+            context: context,
+          })
+          .run();
+      }
     }, [messages.length, router, editor, chatInput.generatingAnswer]);
 
     useEffect(() => {
@@ -51,7 +58,13 @@ const TextEditorSearchBar = forwardRef<Editor, TextEditorSearchBarProps>(
         onSearch={onSearch}
         newBrain={newBrain}
         submitQuestion={(question) =>
-          submitQuestion(`${aiContext} \n ${question}`, false)
+          submitQuestion(
+            `${editor.state.doc.textBetween(
+              editor.state.selection.from,
+              editor.state.selection.to
+            )} \n ${question}`,
+            false
+          )
         }
         {...chatInput}
       />
