@@ -2,7 +2,6 @@ import logging
 from abc import ABC, abstractmethod
 from importlib.metadata import PackageNotFoundError, version
 from typing import Any
-from uuid import uuid4
 
 from langchain_core.documents import Document
 
@@ -43,7 +42,6 @@ class ProcessorBase(ABC):
                 "utf-8"
             )
             doc.metadata = {
-                "id": uuid4(),
                 "chunk_index": idx,
                 "quivr_core_version": qvr_version,
                 **file.metadata,

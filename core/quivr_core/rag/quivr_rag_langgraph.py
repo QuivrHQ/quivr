@@ -1,20 +1,20 @@
+import asyncio
 import logging
 from typing import (
     Annotated,
+    Any,
     AsyncGenerator,
+    Dict,
     List,
     Optional,
     Sequence,
     Tuple,
-    TypedDict,
-    Dict,
-    Any,
     Type,
+    TypedDict,
 )
 from uuid import uuid4
-import asyncio
 
-# TODO(@aminediro): this is the only dependency to langchain package, we should remove it
+import openai
 from langchain.retrievers import ContextualCompressionRetriever
 from langchain_cohere import CohereRerank
 from langchain_community.document_compressors import JinaRerank
@@ -22,20 +22,17 @@ from langchain_core.callbacks import Callbacks
 from langchain_core.documents import BaseDocumentCompressor, Document
 from langchain_core.messages import BaseMessage
 from langchain_core.messages.ai import AIMessageChunk
-from langchain_core.vectorstores import VectorStore
 from langchain_core.prompts.base import BasePromptTemplate
-from langgraph.graph import START, END, StateGraph
+from langchain_core.vectorstores import VectorStore
+from langgraph.graph import END, START, StateGraph
 from langgraph.graph.message import add_messages
 from langgraph.types import Send
-
-
 from pydantic import BaseModel, Field
-import openai
 
-from quivr_core.rag.entities.chat import ChatHistory
-from quivr_core.rag.entities.config import DefaultRerankers, NodeConfig, RetrievalConfig
 from quivr_core.llm import LLMEndpoint
 from quivr_core.llm_tools.llm_tools import LLMToolFactory
+from quivr_core.rag.entities.chat import ChatHistory
+from quivr_core.rag.entities.config import DefaultRerankers, NodeConfig, RetrievalConfig
 from quivr_core.rag.entities.models import (
     ParsedRAGChunkResponse,
     QuivrKnowledge,
