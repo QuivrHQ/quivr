@@ -39,10 +39,11 @@ class ChatMessage(BaseModelV1):
 
 
 class KnowledgeStatus(str, Enum):
-    PROCESSING = "PROCESSING"
-    UPLOADED = "UPLOADED"
     ERROR = "ERROR"
     RESERVED = "RESERVED"
+    PROCESSING = "PROCESSING"
+    PROCESSED = "PROCESSED"
+    UPLOADED = "UPLOADED"
 
 
 class Source(BaseModel):

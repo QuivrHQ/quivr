@@ -112,9 +112,9 @@ class QuivrFile:
         id: UUID,
         original_filename: str,
         path: Path,
-        brain_id: UUID,
         file_sha1: str,
         file_extension: FileExtension | str,
+        brain_id: UUID | None = None,
         file_size: int | None = None,
         metadata: dict[str, Any] | None = None,
     ) -> None:

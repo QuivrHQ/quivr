@@ -3,6 +3,7 @@ import logging
 import tiktoken
 from langchain_core.documents import Document
 from langchain_text_splitters import RecursiveCharacterTextSplitter, TextSplitter
+from megaparse import MegaParse
 
 from quivr_core.config import MegaparseConfig
 from quivr_core.files.file import QuivrFile
@@ -55,14 +56,11 @@ class MegaparseProcessor(ProcessorBase):
         }
 
     async def process_file_inner(self, file: QuivrFile) -> list[Document]:
-        # mega_parse = MegaParse(file_path=file.path, config=self.megaparse_config)  # type: ignore
-        # document: Document = await mega_parse.aload()
-        # if len(document.page_content) > self.splitter_config.chunk_size:
-        #     docs = self.text_splitter.split_documents([document])
-        #     for doc in docs:
-        #         # if "Production Fonts (maximum)" in doc.page_content:
-        #         #    print('Doc: ', doc.page_content)
-        #         doc.metadata = {"chunk_size": len(self.enc.encode(doc.page_content))}
-        #     return docs
-        # return [document]
-        return []
+        mega_parse = MegaParse(file_path=file.path, config=self.megaparse_config)  # type: ignore
+        document: Document = await mega_parse.aload()
+        if len(document.page_content) > self.splitter_config.chunk_size:
+            docs = self.text_splitter.split_documents([document])
+            for doc in docs:
+                doc.metadata = {"chunk_size": len(self.enc.encode(doc.page_content))}
+            return docs
+        return [document]

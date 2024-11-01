@@ -1,4 +1,5 @@
 import logging
+import os
 from typing import AsyncIterable
 
 import httpx
@@ -28,7 +29,7 @@ class TikaProcessor(ProcessorBase):
 
     def __init__(
         self,
-        tika_url: str = "http://localhost:9998/tika",
+        tika_url: str = os.getenv("TIKA_SERVER_URL", "http://localhost:9998/tika"),
         splitter: TextSplitter | None = None,
         splitter_config: SplitterConfig = SplitterConfig(),
         timeout: float = 5.0,
