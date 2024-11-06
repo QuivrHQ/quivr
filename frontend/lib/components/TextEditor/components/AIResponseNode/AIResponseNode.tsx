@@ -11,9 +11,7 @@ const AIResponseNode = (props: NodeViewProps): JSX.Element => {
 
   return (
     <NodeViewWrapper className={styles.wrapper}>
-      {attrs.context ? (
-        <div className={styles.context}>{attrs.context}</div>
-      ) : null}
+      {attrs.context && <div className={styles.context}>{attrs.context}</div>}
       <NodeViewContent className={styles.content} />
       <div className={styles.actions_wrapper}>
         <QuivrButton
