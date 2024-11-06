@@ -40,6 +40,11 @@ const TextEditorSearchBar = forwardRef<Editor, TextEditorSearchBarProps>(
             context: context,
           })
           .run();
+      } else {
+        editor.commands.createAiResponse({
+          content: messages[0].assistant,
+          context: null,
+        });
       }
     }, [messages.length, router, editor, chatInput.generatingAnswer]);
 
