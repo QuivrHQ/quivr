@@ -23,11 +23,13 @@ export const ToolbarSectionSeparator = (): JSX.Element => {
 
 type ToolbarProps = {
   editor: Editor;
+  searchBarOpen: boolean;
   toggleSearchBar: () => void;
 };
 
 export const Toolbar = ({
   editor,
+  searchBarOpen,
   toggleSearchBar,
 }: ToolbarProps): JSX.Element => {
   const [linkModalOpen, setLinkModalOpen] = useState(false);
@@ -180,7 +182,7 @@ export const Toolbar = ({
       <div className={styles.focusSearchBarBtn}>
         <QuivrButton
           onClick={toggleSearchBar}
-          label="Ask Brain"
+          label={searchBarOpen ? "Close Search Bar" : "Ask Brain"}
           color="primary"
           iconName={"chat"}
         />

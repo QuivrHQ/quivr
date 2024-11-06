@@ -91,7 +91,11 @@ export const TextEditor = (): JSX.Element => {
   return (
     <div className={styles.main_container}>
       <div className={styles.editor_wrapper}>
-        <Toolbar toggleSearchBar={toggleSearchBar} editor={editor} />
+        <Toolbar
+          searchBarOpen={searchBarOpen}
+          toggleSearchBar={toggleSearchBar}
+          editor={editor}
+        />
         <EditorContent className={styles.content_wrapper} editor={editor} />
       </div>
       <div
