@@ -22,15 +22,12 @@ dependencies = [
     "transformers[sentencepiece]>=4.44.2",
     "faiss-cpu>=1.8.0.post1",
     "rapidfuzz>=3.10.1",
+    "megaparse-sdk>=0.1.2",
+    "markupsafe>=2.1.5",
 ]
 readme = "README.md"
 requires-python = ">= 3.11"
 
-[project.optional-dependencies]
-all = [
-    "unstructured[epub,docx,odt,doc,pptx,ppt,xlsx,md]>=0.15.5",
-    "docx2txt>=0.8",
-]
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"

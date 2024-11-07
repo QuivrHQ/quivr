@@ -3,7 +3,7 @@ import logging
 import types
 from dataclasses import dataclass, field
 from heapq import heappop, heappush
-from typing import Type, TypeAlias
+from typing import List, Type, TypeAlias
 
 from quivr_core.files.file import FileExtension
 
@@ -49,37 +49,41 @@ base_processors: ProcMapping = {
 
 def _append_proc_mapping(
     mapping: ProcMapping,
-    file_ext: FileExtension | str,
+    file_exts: List[FileExtension] | List[str],
     cls_mod: str,
     errtxt: str,
     priority: int | None,
 ):
-    if file_ext in mapping:
-        try:
-            prev_proc = heappop(mapping[file_ext])
-            proc_entry = ProcEntry(
-                priority=priority if priority is not None else prev_proc.priority - 1,
-                cls_mod=cls_mod,
-                err=errtxt,
-            )
-            # Push the previous processor back
-            heappush(mapping[file_ext], prev_proc)
-            heappush(mapping[file_ext], proc_entry)
-        except IndexError:
+    for file_ext in file_exts:
+        if file_ext in mapping:
+            try:
+                prev_proc = heappop(mapping[file_ext])
+                proc_entry = ProcEntry(
+                    priority=priority
+                    if priority is not None
+                    else prev_proc.priority - 1,
+                    cls_mod=cls_mod,
+                    err=errtxt,
+                )
+                # Push the previous processor back
+                heappush(mapping[file_ext], prev_proc)
+                heappush(mapping[file_ext], proc_entry)
+            except IndexError:
+                proc_entry = ProcEntry(
+                    priority=priority if priority is not None else _LOWEST_PRIORITY,
+                    cls_mod=cls_mod,
+                    err=errtxt,
+                )
+                heappush(mapping[file_ext], proc_entry)
+
+        else:
             proc_entry = ProcEntry(
                 priority=priority if priority is not None else _LOWEST_PRIORITY,
                 cls_mod=cls_mod,
                 err=errtxt,
             )
-            heappush(mapping[file_ext], proc_entry)
 
-    else:
-        proc_entry = ProcEntry(
-            priority=priority if priority is not None else _LOWEST_PRIORITY,
-            cls_mod=cls_mod,
-            err=errtxt,
-        )
-        mapping[file_ext] = [proc_entry]
+            mapping[file_ext] = [proc_entry]
 
 
 def defaults_to_proc_entries(
@@ -109,7 +113,7 @@ def defaults_to_proc_entries(
             ext_str = ext.value if isinstance(ext, FileExtension) else ext
             _append_proc_mapping(
                 mapping=base_processors,
-                file_ext=ext,
+                file_exts=[ext],
                 cls_mod=f"quivr_core.processor.implementations.default.{processor_name}",
                 errtxt=f"can't import {processor_name}. Please install quivr-core[{ext_str}] to access {processor_name}",
                 priority=None,
@@ -117,13 +121,30 @@ def defaults_to_proc_entries(
 
     # TODO(@aminediro): Megaparse should register itself
     # Append Megaparse
-    # _append_proc_mapping(
-    #     mapping=base_processors,
-    #     file_ext=FileExtension.pdf,
-    #     cls_mod="quivr_core.processor.implementations.megaparse_processor.MegaparseProcessor",
-    #     errtxt=f"can't import MegaparseProcessor. Please install quivr-core[{ext_str}] to access MegaparseProcessor",
-    #     priority=None,
-    # )
+    _append_proc_mapping(
+        mapping=base_processors,
+        file_exts=[
+            FileExtension.pdf,
+            FileExtension.docx,
+            FileExtension.doc,
+            FileExtension.pptx,
+            FileExtension.xls,
+            FileExtension.xlsx,
+            FileExtension.csv,
+            FileExtension.epub,
+            FileExtension.bib,
+            FileExtension.odt,
+            FileExtension.html,
+            FileExtension.py,
+            FileExtension.markdown,
+            FileExtension.md,
+            FileExtension.mdx,
+            FileExtension.ipynb,
+        ],
+        cls_mod="quivr_core.processor.implementations.megaparse_processor.MegaparseProcessor",
+        errtxt=f"can't import MegaparseProcessor. Please install quivr-core[{ext_str}] to access MegaparseProcessor",
+        priority=None,
+    )
     return base_processors
 
 
@@ -181,7 +202,7 @@ def register_processor(
             if all(proc_cls != proc.cls_mod for proc in known_processors[file_ext]):
                 _append_proc_mapping(
                     known_processors,
-                    file_ext=file_ext,
+                    file_exts=[file_ext],
                     cls_mod=proc_cls,
                     errtxt=errtxt
                     or f"{proc_cls} import failed for processor of {file_ext}",
