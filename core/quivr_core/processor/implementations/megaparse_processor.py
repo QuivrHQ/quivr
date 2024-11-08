@@ -1,9 +1,10 @@
 import logging
+import os
 
 import tiktoken
 from langchain_core.documents import Document
 from langchain_text_splitters import RecursiveCharacterTextSplitter, TextSplitter
-from megaparse import MegaParse
+from megaparse_sdk import MegaParseSDK
 
 from quivr_core.config import MegaparseConfig
 from quivr_core.files.file import QuivrFile
@@ -29,7 +30,24 @@ class MegaparseProcessor(ProcessorBase):
 
     """
 
-    supported_extensions = [FileExtension.pdf]
+    supported_extensions = [
+        FileExtension.pdf,
+        FileExtension.docx,
+        FileExtension.doc,
+        FileExtension.pptx,
+        FileExtension.xls,
+        FileExtension.xlsx,
+        FileExtension.csv,
+        FileExtension.epub,
+        FileExtension.bib,
+        FileExtension.odt,
+        FileExtension.html,
+        FileExtension.py,
+        FileExtension.markdown,
+        FileExtension.md,
+        FileExtension.mdx,
+        FileExtension.ipynb,
+    ]
 
     def __init__(
         self,
@@ -56,9 +74,24 @@ class MegaparseProcessor(ProcessorBase):
         }
 
     async def process_file_inner(self, file: QuivrFile) -> list[Document]:
-        mega_parse = MegaParse(file_path=file.path, config=self.megaparse_config)  # type: ignore
-        document: Document = await mega_parse.aload()
-        if len(document.page_content) > self.splitter_config.chunk_size:
+        api_key = str(os.getenv("MEGAPARSE_API_KEY"))
+        megaparse = MegaParseSDK(api_key)
+        logger.info(f"Uploading file {file.path} to MegaParse")
+        data = {
+            "method": self.megaparse_config.method,
+            "strategy": self.megaparse_config.strategy,
+            "check_table": self.megaparse_config.check_table,
+            "parsing_instruction": self.megaparse_config.parsing_instruction,
+            "model_name": self.megaparse_config.model_name,
+        }
+        response = await megaparse.file.upload(
+            file_path=str(file.path),
+            **data,
+        )
+        document = Document(
+            page_content=response["result"],
+        )
+        if len(response) > self.splitter_config.chunk_size:
             docs = self.text_splitter.split_documents([document])
             for doc in docs:
                 doc.metadata = {"chunk_size": len(self.enc.encode(doc.page_content))}

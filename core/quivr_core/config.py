@@ -4,10 +4,20 @@ import yaml
 from pydantic import BaseModel
 
 
-class PdfParser(str, Enum):
-    LLAMA_PARSE = "llama_parse"
+class ParserType(str, Enum):
+    """Parser type enumeration."""
+
     UNSTRUCTURED = "unstructured"
+    LLAMA_PARSER = "llama_parser"
     MEGAPARSE_VISION = "megaparse_vision"
+
+
+class StrategyEnum(str, Enum):
+    """Method to use for the conversion"""
+
+    FAST = "fast"
+    AUTO = "auto"
+    HI_RES = "hi_res"
 
 
 class MegaparseBaseConfig(BaseModel):
@@ -22,6 +32,8 @@ class MegaparseBaseConfig(BaseModel):
 
 
 class MegaparseConfig(MegaparseBaseConfig):
-    strategy: str = "fast"
-    llama_parse_api_key: str | None = None
-    pdf_parser: PdfParser = PdfParser.UNSTRUCTURED
+    method: ParserType = ParserType.UNSTRUCTURED
+    strategy: StrategyEnum = StrategyEnum.AUTO
+    check_table: bool = False
+    parsing_instruction: str | None = None
+    model_name: str = "gpt-4o"
