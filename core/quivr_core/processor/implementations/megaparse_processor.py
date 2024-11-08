@@ -77,15 +77,19 @@ class MegaparseProcessor(ProcessorBase):
         api_key = str(os.getenv("MEGAPARSE_API_KEY"))
         megaparse = MegaParseSDK(api_key)
         logger.info(f"Uploading file {file.path} to MegaParse")
+        data = {
+            "method": self.megaparse_config.method,
+            "strategy": self.megaparse_config.strategy,
+            "check_table": self.megaparse_config.check_table,
+            "parsing_instruction": self.megaparse_config.parsing_instruction,
+            "model_name": self.megaparse_config.model_name,
+        }
         response = await megaparse.file.upload(
-            file_path=file.path,
-            method="unstructured",  # type: ignore  # unstructured, llama_parser, megaparse_vision
-            strategy="auto",
+            file_path=str(file.path),
+            **data,
         )
-        logger.info(f"Parsed file : {response}")
-
         document = Document(
-            page_content=response,
+            page_content=response["result"],
         )
         if len(response) > self.splitter_config.chunk_size:
             docs = self.text_splitter.split_documents([document])

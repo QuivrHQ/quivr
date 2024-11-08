@@ -37,4 +37,3 @@ class MegaparseConfig(MegaparseBaseConfig):
     check_table: bool = False
     parsing_instruction: str | None = None
     model_name: str = "gpt-4o"
-    timeout: int = 60  # FIXME: Chloé not sure necessary
