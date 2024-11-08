@@ -8,12 +8,6 @@ RUN apt-get clean && apt-get update && apt-get install -y \
     autoconf \
     automake \
     build-essential \
-    # Additional dependencies for document handling
-    libmagic-dev \
-    tesseract-ocr \
-    poppler-utils \
-    libreoffice \
-    pandoc && \
     rm -rf /var/lib/apt/lists/*
 
 # Set the working directory
