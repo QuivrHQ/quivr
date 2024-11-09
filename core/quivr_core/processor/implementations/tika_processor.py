@@ -1,3 +1,4 @@
+import tiktoken
 import logging
 import os
 from typing import AsyncIterable
@@ -39,6 +40,7 @@ class TikaProcessor(ProcessorBase):
         self.max_retries = max_retries
         self._client = httpx.AsyncClient(timeout=timeout)
 
+        self.enc = tiktoken.get_encoding("cl100k_base")
         self.splitter_config = splitter_config
 
         if splitter:
@@ -73,5 +75,7 @@ class TikaProcessor(ProcessorBase):
             txt = await self._send_parse_tika(f)
         document = Document(page_content=txt)
         docs = self.text_splitter.split_documents([document])
+        for doc in docs:
+            doc.metadata = {"chunk_size": len(self.enc.encode(doc.page_content))}
 
         return docs
