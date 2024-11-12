@@ -33,7 +33,7 @@ class MegaparseBaseConfig(BaseModel):
 
 class MegaparseConfig(MegaparseBaseConfig):
     method: ParserType = ParserType.UNSTRUCTURED
-    strategy: StrategyEnum = StrategyEnum.AUTO
+    strategy: StrategyEnum = StrategyEnum.FAST
     check_table: bool = False
     parsing_instruction: str | None = None
     model_name: str = "gpt-4o"
