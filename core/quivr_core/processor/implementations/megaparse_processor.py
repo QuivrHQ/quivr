@@ -91,7 +91,7 @@ class MegaparseProcessor(ProcessorBase):
         document = Document(
             page_content=response["result"],
         )
-        if len(response) > self.splitter_config.chunk_size:
+        if len(response["result"]) > self.splitter_config.chunk_size:
             docs = self.text_splitter.split_documents([document])
             for doc in docs:
                 doc.metadata = {"chunk_size": len(self.enc.encode(doc.page_content))}

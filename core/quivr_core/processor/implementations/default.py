@@ -3,18 +3,10 @@ from typing import Any, List, Type, TypeVar
 
 import tiktoken
 from langchain_community.document_loaders import (
-    BibtexLoader,
     CSVLoader,
     Docx2txtLoader,
     NotebookLoader,
     PythonLoader,
-    UnstructuredEPubLoader,
-    UnstructuredExcelLoader,
-    UnstructuredHTMLLoader,
-    UnstructuredMarkdownLoader,
-    UnstructuredODTLoader,
-    UnstructuredPDFLoader,
-    UnstructuredPowerPointLoader,
 )
 from langchain_community.document_loaders.base import BaseLoader
 from langchain_community.document_loaders.text import TextLoader
@@ -99,31 +91,7 @@ TikTokenTxtProcessor = _build_processor(
 DOCXProcessor = _build_processor(
     "DOCXProcessor", Docx2txtLoader, [FileExtension.docx, FileExtension.doc]
 )
-XLSXProcessor = _build_processor(
-    "XLSXProcessor", UnstructuredExcelLoader, [FileExtension.xlsx, FileExtension.xls]
-)
-PPTProcessor = _build_processor(
-    "PPTProcessor", UnstructuredPowerPointLoader, [FileExtension.pptx]
-)
-MarkdownProcessor = _build_processor(
-    "MarkdownProcessor",
-    UnstructuredMarkdownLoader,
-    [FileExtension.md, FileExtension.mdx, FileExtension.markdown],
-)
-EpubProcessor = _build_processor(
-    "EpubProcessor", UnstructuredEPubLoader, [FileExtension.epub]
-)
-BibTexProcessor = _build_processor("BibTexProcessor", BibtexLoader, [FileExtension.bib])
-ODTProcessor = _build_processor(
-    "ODTProcessor", UnstructuredODTLoader, [FileExtension.odt]
-)
-HTMLProcessor = _build_processor(
-    "HTMLProcessor", UnstructuredHTMLLoader, [FileExtension.html]
-)
 PythonProcessor = _build_processor("PythonProcessor", PythonLoader, [FileExtension.py])
 NotebookProcessor = _build_processor(
     "NotebookProcessor", NotebookLoader, [FileExtension.ipynb]
-)
-UnstructuredPDFProcessor = _build_processor(
-    "UnstructuredPDFProcessor", UnstructuredPDFLoader, [FileExtension.pdf]
 )
