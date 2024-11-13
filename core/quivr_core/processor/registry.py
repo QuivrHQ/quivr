@@ -1,5 +1,6 @@
 import importlib
 import logging
+from os import getenv
 import types
 from dataclasses import dataclass, field
 from heapq import heappop, heappush
@@ -119,32 +120,32 @@ def defaults_to_proc_entries(
                 priority=None,
             )
 
-    # TODO(@aminediro): Megaparse should register itself
-    # Append Megaparse
-    _append_proc_mapping(
-        mapping=base_processors,
-        file_exts=[
-            FileExtension.pdf,
-            FileExtension.docx,
-            FileExtension.doc,
-            FileExtension.pptx,
-            FileExtension.xls,
-            FileExtension.xlsx,
-            FileExtension.csv,
-            FileExtension.epub,
-            FileExtension.bib,
-            FileExtension.odt,
-            FileExtension.html,
-            FileExtension.py,
-            FileExtension.markdown,
-            FileExtension.md,
-            FileExtension.mdx,
-            FileExtension.ipynb,
-        ],
-        cls_mod="quivr_core.processor.implementations.megaparse_processor.MegaparseProcessor",
-        errtxt=f"can't import MegaparseProcessor. Please install quivr-core[{ext_str}] to access MegaparseProcessor",
-        priority=None,
-    )
+    # TODO(@aminediro @chloedia): Megaparse should register itself
+    if getenv("MEGAPARSE_URL") and getenv("MEGAPARSE_API_KEY"):
+        _append_proc_mapping(
+            mapping=base_processors,
+            file_exts=[
+                FileExtension.pdf,
+                FileExtension.docx,
+                FileExtension.doc,
+                FileExtension.pptx,
+                FileExtension.xls,
+                FileExtension.xlsx,
+                FileExtension.csv,
+                FileExtension.epub,
+                FileExtension.bib,
+                FileExtension.odt,
+                FileExtension.html,
+                FileExtension.py,
+                FileExtension.markdown,
+                FileExtension.md,
+                FileExtension.mdx,
+                FileExtension.ipynb,
+            ],
+            cls_mod="quivr_core.processor.implementations.megaparse_processor.MegaparseProcessor",
+            errtxt=f"can't import MegaparseProcessor. Please install quivr-core[{ext_str}] to access MegaparseProcessor",
+            priority=None,
+        )
     return base_processors
 
 
