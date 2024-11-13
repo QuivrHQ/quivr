@@ -23,7 +23,7 @@ dependencies = [
     "faiss-cpu>=1.8.0.post1",
     "rapidfuzz>=3.10.1",
     "markupsafe>=2.1.5",
-    "megaparse[all] @ file:///Users/chloed./Documents/quivr/MegaParse",
+    "megaparse[all]== 0.0.42",
 ]
 readme = "README.md"
 requires-python = ">= 3.11"
