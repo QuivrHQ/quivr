@@ -82,12 +82,11 @@ class MegaparseProcessor(ProcessorBase):
         document = Document(
             page_content=response,
         )
-        if len(response) > self.splitter_config.chunk_size:
-            docs = self.text_splitter.split_documents([document])
-            for doc in docs:
-                doc.metadata = {"chunk_size": len(self.enc.encode(doc.page_content))}
-            return docs
-        return [document]
+
+        docs = self.text_splitter.split_documents([document])
+        for doc in docs:
+            doc.metadata = {"chunk_size": len(self.enc.encode(doc.page_content))}
+        return docs
 
     # async def process_file_inner(self, file: QuivrFile) -> list[Document]:
     #     api_key = str(os.getenv("MEGAPARSE_API_KEY"))
