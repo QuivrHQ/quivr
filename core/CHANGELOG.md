@@ -1,5 +1,20 @@
 # Changelog
 
+## [0.0.24](https://github.com/QuivrHQ/quivr/compare/core-0.0.23...core-0.0.24) (2024-11-14)
+
+
+### Features
+
+* kms-migration ([#3446](https://github.com/QuivrHQ/quivr/issues/3446)) ([1356d87](https://github.com/QuivrHQ/quivr/commit/1356d87098ae84776a5d47b631d07a1c8e92e291))
+* **megaparse:** add sdk ([#3462](https://github.com/QuivrHQ/quivr/issues/3462)) ([190d971](https://github.com/QuivrHQ/quivr/commit/190d971bd71333924b88ba747d3c6a833ca65d92))
+
+
+### Bug Fixes
+
+* added chunk_size in tika processor ([#3466](https://github.com/QuivrHQ/quivr/issues/3466)) ([063bbd3](https://github.com/QuivrHQ/quivr/commit/063bbd323dfca2dfc22fc5416c1617ed61d2e2ab))
+* modify megaparse strategy ([#3474](https://github.com/QuivrHQ/quivr/issues/3474)) ([da97b2c](https://github.com/QuivrHQ/quivr/commit/da97b2cf145c86ed577be698ae837b3dc26f6921))
+* supported extensions for megaparse ([#3477](https://github.com/QuivrHQ/quivr/issues/3477)) ([72b979d](https://github.com/QuivrHQ/quivr/commit/72b979d4e4d6e6efc45d47c7aba942eb909adc3e))
+
 ## [0.0.23](https://github.com/QuivrHQ/quivr/compare/core-0.0.22...core-0.0.23) (2024-10-31)
 
 
