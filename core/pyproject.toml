@@ -22,8 +22,8 @@ dependencies = [
     "transformers[sentencepiece]>=4.44.2",
     "faiss-cpu>=1.8.0.post1",
     "rapidfuzz>=3.10.1",
-    "megaparse-sdk>=0.1.2",
     "markupsafe>=2.1.5",
+    "megaparse[all]== 0.0.43",
 ]
 readme = "README.md"
 requires-python = ">= 3.11"

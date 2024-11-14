@@ -1,10 +1,10 @@
 import logging
-import os
 
 import tiktoken
 from langchain_core.documents import Document
 from langchain_text_splitters import RecursiveCharacterTextSplitter, TextSplitter
-from megaparse_sdk import MegaParseSDK
+from megaparse.core.megaparse import MegaParse
+from megaparse.core.parser.unstructured_parser import UnstructuredParser
 
 from quivr_core.config import MegaparseConfig
 from quivr_core.files.file import QuivrFile
@@ -74,26 +74,41 @@ class MegaparseProcessor(ProcessorBase):
         }
 
     async def process_file_inner(self, file: QuivrFile) -> list[Document]:
-        api_key = str(os.getenv("MEGAPARSE_API_KEY"))
-        megaparse = MegaParseSDK(api_key)
         logger.info(f"Uploading file {file.path} to MegaParse")
-        data = {
-            "method": self.megaparse_config.method,
-            "strategy": self.megaparse_config.strategy,
-            "check_table": self.megaparse_config.check_table,
-            "parsing_instruction": self.megaparse_config.parsing_instruction,
-            "model_name": self.megaparse_config.model_name,
-        }
-        response = await megaparse.file.upload(
-            file_path=str(file.path),
-            **data,
-        )
+        parser = UnstructuredParser(**self.megaparse_config.model_dump())
+        megaparse = MegaParse(parser)
+        response = await megaparse.aload(file.path)
+        logger.info(f"File :  {response}")
         document = Document(
-            page_content=response["result"],
+            page_content=response,
         )
-        if len(response) > self.splitter_config.chunk_size:
-            docs = self.text_splitter.split_documents([document])
-            for doc in docs:
-                doc.metadata = {"chunk_size": len(self.enc.encode(doc.page_content))}
-            return docs
-        return [document]
+
+        docs = self.text_splitter.split_documents([document])
+        for doc in docs:
+            doc.metadata = {"chunk_size": len(self.enc.encode(doc.page_content))}
+        return docs
+
+    # async def process_file_inner(self, file: QuivrFile) -> list[Document]:
+    #     api_key = str(os.getenv("MEGAPARSE_API_KEY"))
+    #     megaparse = MegaParseSDK(api_key)
+    #     logger.info(f"Uploading file {file.path} to MegaParse")
+    #     data = {
+    #         "method": self.megaparse_config.method,
+    #         "strategy": self.megaparse_config.strategy,
+    #         "check_table": self.megaparse_config.check_table,
+    #         "parsing_instruction": self.megaparse_config.parsing_instruction,
+    #         "model_name": self.megaparse_config.model_name,
+    #     }
+    #     response = await megaparse.file.upload(
+    #         file_path=str(file.path),
+    #         **data,
+    #     )
+    #     document = Document(
+    #         page_content=response["result"],
+    #     )
+    #     if len(response) > self.splitter_config.chunk_size:
+    #         docs = self.text_splitter.split_documents([document])
+    #         for doc in docs:
+    #             doc.metadata = {"chunk_size": len(self.enc.encode(doc.page_content))}
+    #         return docs
+    #     return [document]
