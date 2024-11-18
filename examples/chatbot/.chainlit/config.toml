@@ -88,33 +88,33 @@ cot = "full"
 
 [UI.theme]
     default = "dark"
-    #layout = "wide"
-    #font_family = "Inter, sans-serif"
+    font_family = "Tahoma,Verdana,Segoe,sans-serif"
+
 # Override default MUI light theme. (Check theme.ts)
 [UI.theme.light]
-    #background = "#FAFAFA"
-    #paper = "#FFFFFF"
+    background = "#fcfcfc"
+    paper = "#f8f8f8"
 
     [UI.theme.light.primary]
-        #main = "#F80061"
-        #dark = "#980039"
-        #light = "#FFE7EB"
+        main = "#6142d4"
+        dark = "#6e53cf"
+        light = "#6e53cf30"
     [UI.theme.light.text]
-        #primary = "#212121"
-        #secondary = "#616161"
+        primary = "#1f1f1f"
+        secondary = "#818080"
 
 # Override default MUI dark theme. (Check theme.ts)
 [UI.theme.dark]
-    #background = "#FAFAFA"
-    #paper = "#FFFFFF"
+    background = "#252525"
+    paper = "#1f1f1f"
 
     [UI.theme.dark.primary]
-        #main = "#F80061"
-        #dark = "#980039"
-        #light = "#FFE7EB"
+        main = "#6142d4"
+        dark = "#6e53cf"
+        light = "#6e53cf30"
     [UI.theme.dark.text]
-        #primary = "#EEEEEE"
-        #secondary = "#BDBDBD"
+        primary = "#f4f4f4"
+        secondary = "#c8c8c8"
 
 [meta]
 generated_by = "1.1.402"

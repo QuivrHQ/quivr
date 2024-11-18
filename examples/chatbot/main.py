@@ -1,3 +1,4 @@
+import os
 import tempfile
 
 import chainlit as cl
@@ -53,11 +54,14 @@ async def main(message: cl.Message):
         return
 
     # Prepare the message for streaming
-    msg = cl.Message(content="")
+    msg = cl.Message(content="", elements=[])
     await msg.send()
 
     # Use the ask_stream method for streaming responses
     async for chunk in brain.ask_streaming(message.content):
         await msg.stream_token(chunk.answer)
+        for source in chunk.metadata.sources:
+            print(source.metadata)
+            msg.elements.append(cl.Text(name=source.metadata['original_file_name'], content="source", display="inline"))
 
     await msg.send()
