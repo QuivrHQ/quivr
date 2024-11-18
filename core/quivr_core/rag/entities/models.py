@@ -36,7 +36,8 @@ class ChatMessage(BaseModelV1):
     msg: AIMessage | HumanMessage
     message_time: datetime
     metadata: dict[str, Any]
-
+    class Config:
+        arbitrary_types_allowed = True
 
 class KnowledgeStatus(str, Enum):
     ERROR = "ERROR"
@@ -112,3 +113,6 @@ class QuivrKnowledge(BaseModel):
 class SearchResult(BaseModelV1):
     chunk: Document
     distance: float
+
+    class Config:
+        arbitrary_types_allowed = True
