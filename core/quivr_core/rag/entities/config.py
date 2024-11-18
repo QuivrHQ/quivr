@@ -220,7 +220,7 @@ class LLMEndpointConfig(QuivrBaseConfig):
             return
 
         # Check if the corresponding API key environment variable is set
-        if not self.env_variable_name:
+        if force_reset or not self.env_variable_name:
             self.env_variable_name = (
                 f"{normalize_to_env_variable_name(self.supplier)}_API_KEY"
             )
