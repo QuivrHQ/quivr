@@ -62,7 +62,7 @@ class SplittedInput(BaseModel):
         default=None,
         description="The reasoning that leads to identifying the explicit or implicit user tasks and questions",
     )
-    tasks: Optional[List[str]] = Field(
+    task_list: Optional[List[str]] = Field(
         default_factory=lambda: ["No explicit or implicit tasks found"],
         description="The list of standalone, self-contained tasks or questions.",
     )
@@ -257,19 +257,19 @@ class QuivrQARAGLangGraph:
 
         if instructions:
             send_list.append(Send("edit_system_prompt", {"instructions": instructions}))
-        elif response.tasks:
+        elif response.task_list:
             chat_history = state["chat_history"]
             send_list.append(
                 Send(
                     "filter_history",
-                    {"chat_history": chat_history, "tasks": response.tasks},
+                    {"chat_history": chat_history, "tasks": response.task_list},
                 )
             )
 
         return send_list
 
     def routing_split(self, state: AgentState):
-        response = self.invoke_structured_output(
+        response: SplittedInput = self.invoke_structured_output(
             custom_prompts.SPLIT_PROMPT.format(
                 chat_history=state["chat_history"].to_list(),
                 user_input=state["messages"][0].content,
@@ -278,7 +278,7 @@ class QuivrQARAGLangGraph:
         )
 
         instructions = response.instructions or self.retrieval_config.prompt
-        tasks = response.tasks or []
+        tasks = response.task_list or []
 
         if instructions:
             return [
@@ -447,13 +447,15 @@ class QuivrQARAGLangGraph:
 
         docs = state["docs"]
 
-        _, activated_tools = collect_tools(self.retrieval_config.workflow_config)
+        validated_tools, activated_tools = collect_tools(
+            self.retrieval_config.workflow_config
+        )
 
         input = {
             "chat_history": state["chat_history"].to_list(),
             "tasks": state["tasks"],
             "context": docs,
-            "activated_tools": activated_tools,
+            "activated_tools": validated_tools,
         }
 
         input, _ = self.reduce_rag_context(
@@ -483,10 +485,10 @@ class QuivrQARAGLangGraph:
 
     async def run_tool(self, state: AgentState) -> AgentState:
         tool = state["tool"]
-        if tool not in [
-            t.name for t in self.retrieval_config.workflow_config.activated_tools
-        ]:
-            raise ValueError(f"Tool {tool} not activated")
+        # if tool not in [
+        #     t.name for t in self.retrieval_config.workflow_config.activated_tools
+        # ]:
+        #     raise ValueError(f"Tool {tool} not activated")
 
         tasks = state["tasks"]
 
@@ -874,7 +876,7 @@ class QuivrQARAGLangGraph:
         user_question = messages[0].content
         files = state["files"]
         prompt = self.retrieval_config.prompt
-        available_tools, _ = collect_tools(self.retrieval_config.workflow_config)
+        # available_tools, _ = collect_tools(self.retrieval_config.workflow_config)
 
         return {
             "context": combine_documents(docs) if docs else "None",
@@ -884,5 +886,5 @@ class QuivrQARAGLangGraph:
             "files": files if files else "None",
             "chat_history": state["chat_history"].to_list(),
             "reasoning": state["reasoning"] if "reasoning" in state else "None",
-            "tools": available_tools,
+            # "tools": available_tools,
         }
