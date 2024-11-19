@@ -60,7 +60,7 @@ async def main(message: cl.Message):
         return
 
     # Prepare the message for streaming
-    msg = cl.Message(content="", elements=[])
+    msg = cl.Message(content="", elements=[], author="Quivr", type="assistant_message")
     await msg.send()
 
     saved_sources = set()
