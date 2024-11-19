@@ -51,6 +51,18 @@ async def on_chat_start():
 
 @cl.on_message
 async def main(message: cl.Message):
+
+    task_list = cl.TaskList(name="State")
+    task_list.status = "Running..."
+
+    think = cl.Task(title="Thinking", status=cl.TaskStatus.RUNNING)
+    await task_list.add_task(think)
+
+    tts = cl.Task(title="Text to speech")
+    await task_list.add_task(tts)
+
+    await task_list.send()
+
     brain = cl.user_session.get("brain")  # type: Brain
     path_config = "basic_rag_workflow.yaml"
     retrieval_config = RetrievalConfig.from_yaml(path_config)
@@ -77,6 +89,10 @@ async def main(message: cl.Message):
                 print(source)
                 elements.append(cl.Text(name=source.metadata["original_file_name"], content=source.page_content, display="side"))
     
+    think.status = cl.TaskStatus.DONE
+    tts.status = cl.TaskStatus.RUNNING
+    await task_list.update()
+    
     audio_file = await text_to_speech(msg.content)
     elements.append(cl.Audio(content=audio_file, auto_play=True, mime="audio/mpeg"))
 
@@ -86,6 +102,12 @@ async def main(message: cl.Message):
     msg.elements = elements
     msg.content = msg.content + f"\n\nSources:\n{sources}"
     await msg.update()
+
+    tts.status = cl.TaskStatus.DONE
+    task_list.status = "Done"
+    await task_list.update()
+    await cl.sleep(1)
+    await task_list.remove()
 
 async_openai_client = AsyncOpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
 
@@ -123,6 +145,14 @@ async def on_audio_chunk(chunk: cl.AudioChunk):
 @cl.on_audio_end
 async def on_audio_end(elements: list[Element]):
     # Get the audio buffer from the session
+    task_list = cl.TaskList(name="State")
+    task_list.status = "Running..."
+
+    stt = cl.Task(title="Speech to text", status=cl.TaskStatus.RUNNING)
+    await task_list.add_task(stt)
+
+    await task_list.send()
+
     audio_buffer: BytesIO = cl.user_session.get("audio_buffer")
     audio_buffer.seek(0)  # Move the file pointer to the beginning
     audio_file = audio_buffer.read()
@@ -142,5 +172,11 @@ async def on_audio_end(elements: list[Element]):
     transcription = await speech_to_text(whisper_input)
 
     msg = cl.Message(author="You", content=transcription, elements=elements)
+
+    stt.status = cl.TaskStatus.DONE
+    task_list.status = "Done"
+    await task_list.update()
+    await cl.sleep(1)
+    await task_list.remove()
 
     await main(message=msg)
