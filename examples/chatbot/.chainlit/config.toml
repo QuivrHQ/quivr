@@ -53,10 +53,10 @@ edit_message = true
 
 [UI]
 # Name of the assistant.
-name = "Assistant"
+name = "Quivr"
 
 # Description of the assistant. This is used for HTML tags.
-# description = ""
+description = "Demo of Quivr"
 
 # Large size content are by default collapsed for a cleaner ui
 default_collapse_content = true
@@ -65,11 +65,11 @@ default_collapse_content = true
 cot = "full"
 
 # Link to your github repo. This will add a github button in the UI's header.
-# github = ""
+github = "https://github.com/quivrhq/quivr"
 
 # Specify a CSS file that can be used to customize the user interface.
 # The CSS file can be served from the public directory or via an external link.
-# custom_css = "/public/test.css"
+# custom_css = "/public/custom.css"
 
 # Specify a Javascript file that can be used to customize the user interface.
 # The Javascript file can be served from the public directory.
