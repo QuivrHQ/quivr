@@ -625,7 +625,18 @@ class QuivrQARAGLangGraph:
             number_of_relevant_chunks = max(_n)
             i += 1
 
+        docs = self._sort_docs_by_relevance(docs)
+
         return {**state, "docs": docs}
+
+    def _sort_docs_by_relevance(self, docs: List[Document]) -> List[Document]:
+        return sorted(
+            docs,
+            key=lambda x: x.metadata[
+                self.retrieval_config.reranker_config.relevance_score_key
+            ],
+            reverse=True,
+        )
 
     def get_rag_context_length(self, state: AgentState, docs: List[Document]) -> int:
         final_inputs = self._build_rag_prompt_inputs(state, docs)
