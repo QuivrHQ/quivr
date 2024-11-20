@@ -169,6 +169,9 @@ class RecordingHandler {
         );
       }
     });
+
+    recordBtn.innerText = "Listening...";
+    recordBtn.classList.add("processing");
   }
 
   stopRecording() {
@@ -181,6 +184,7 @@ class RecordingHandler {
   }
 
   async handleRecordingStop() {
+    recordBtn.innerText = "Processing...";
     console.log("Processing recording...");
 
     const audioBlob = new Blob(state.chunks, { type: "audio/wav" });
@@ -210,6 +214,7 @@ class RecordingHandler {
     const data = await response.json();
 
     await this.handleResponse(data);
+    recordBtn.innerText = "Ask a question to Quivr";
   }
 
   async handleResponse(data) {
