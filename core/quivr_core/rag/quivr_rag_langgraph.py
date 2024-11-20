@@ -12,7 +12,7 @@ from typing import (
     Type,
     TypedDict,
 )
-from uuid import uuid4
+from uuid import UUID, uuid4
 
 import openai
 from langchain.retrievers import ContextualCompressionRetriever
@@ -68,7 +68,7 @@ class SplittedInput(BaseModel):
     )
 
 
-class TasksCompletion(BaseModel):
+class TasksCompletion__(BaseModel):
     completable_tasks_reasoning: Optional[str] = Field(
         default=None,
         description="The reasoning that leads to identifying the user tasks or questions that can be completed using the provided context and chat history.",
@@ -94,6 +94,26 @@ class TasksCompletion(BaseModel):
     tool: Optional[str] = Field(
         default_factory=list,
         description="The tool that shall be used to complete the tasks.",
+    )
+
+
+class TasksCompletion(BaseModel):
+    is_task_completable_reasoning: Optional[str] = Field(
+        default=None,
+        description="The reasoning that leads to identifying whether the user task or question can be completed using the provided context and chat history.",
+    )
+
+    is_task_completable: bool = Field(
+        default=False,
+        description="Whether the user task or question can be completed using the provided context and chat history.",
+    )
+
+    tool_reasoning: Optional[str] = Field(
+        default=None,
+        description="The reasoning that leads to identifying the tool that shall be used to complete the task.",
+    )
+    tool: Optional[str] = Field(
+        description="The tool that shall be used to complete the task.",
     )
 
 
@@ -129,15 +149,104 @@ class UpdatedPromptAndTools(BaseModel):
     )
 
 
+class UserTaskEntity(BaseModel):
+    id: UUID
+    definition: str
+    docs: List[Document] = Field(default_factory=list)
+    completable: bool = Field(
+        default=False, description="Whether the task has been completed or not"
+    )
+    tool: Optional[str] = Field(
+        default=None, description="The tool that shall be used to complete the task"
+    )
+
+    def has_tool(self) -> bool:
+        return bool(self.tool)
+
+    def is_completable(self) -> bool:
+        return self.completable
+
+
+class UserTasks:
+    def __init__(self, task_definitions: List[str] | None = None):
+        self.user_tasks = {}
+        if task_definitions:
+            for definition in task_definitions:
+                id = uuid4()
+                self.user_tasks[id] = UserTaskEntity(
+                    id=id, definition=definition, docs=[]
+                )
+
+    def __iter__(self):
+        return iter(self.user_tasks.values())
+
+    def set_docs(self, id: UUID, docs: List[Document]):
+        if self.user_tasks:
+            if id in self.user_tasks:
+                self.user_tasks[id].docs = docs
+            else:
+                raise ValueError(f"Task with id {id} not found")
+
+    def set_definition(self, id: UUID, definition: str):
+        if self.user_tasks:
+            if id in self.user_tasks:
+                self.user_tasks[id].definition = definition
+            else:
+                raise ValueError(f"Task with id {id} not found")
+
+    def set_completion(self, id: UUID, completable: bool):
+        if self.user_tasks:
+            if id in self.user_tasks:
+                self.user_tasks[id].completable = completable
+            else:
+                raise ValueError(f"Task with id {id} not found")
+
+    def set_tool(self, id: UUID, tool: str):
+        if self.user_tasks:
+            if id in self.user_tasks:
+                self.user_tasks[id].tool = tool
+            else:
+                raise ValueError(f"Task with id {id} not found")
+
+    def __call__(self, id: UUID) -> UserTaskEntity:
+        return self.user_tasks[id]
+
+    def has_tasks(self) -> bool:
+        return bool(self.user_tasks)
+
+    def has_non_completable_tasks(self) -> bool:
+        return bool(self.non_completable_tasks)
+
+    @property
+    def non_completable_tasks(self) -> List[UserTaskEntity]:
+        return [task for task in self.user_tasks.values() if not task.is_completable()]
+
+    @property
+    def completable_tasks(self) -> List[UserTaskEntity]:
+        return [task for task in self.user_tasks.values() if task.is_completable()]
+
+    @property
+    def ids(self) -> List[UUID]:
+        return list(self.user_tasks.keys())
+
+    @property
+    def definitions(self) -> List[str]:
+        return [task.definition for task in self.user_tasks.values()]
+
+    @property
+    def docs(self) -> List[Document]:
+        # Return the concatenation of all docs
+        return [doc for task in self.user_tasks.values() for doc in task.docs]
+
+
 class AgentState(TypedDict):
     # The add_messages function defines how an update should be processed
     # Default is to replace. add_messages says "append"
     messages: Annotated[Sequence[BaseMessage], add_messages]
     reasoning: List[str]
     chat_history: ChatHistory
-    docs: list[Document]
     files: str
-    tasks: List[str]
+    tasks: UserTasks
     instructions: str
     tool: str
 
@@ -262,7 +371,10 @@ class QuivrQARAGLangGraph:
             send_list.append(
                 Send(
                     "filter_history",
-                    {"chat_history": chat_history, "tasks": response.task_list},
+                    {
+                        "chat_history": chat_history,
+                        "tasks": UserTasks(response.task_list),
+                    },
                 )
             )
 
@@ -278,7 +390,7 @@ class QuivrQARAGLangGraph:
         )
 
         instructions = response.instructions or self.retrieval_config.prompt
-        tasks = response.task_list or []
+        tasks = UserTasks(response.task_list) if response.task_list else None
 
         if instructions:
             return [
@@ -389,33 +501,36 @@ class QuivrQARAGLangGraph:
             dict: The updated state with re-phrased question
         """
 
-        tasks = (
-            state["tasks"]
-            if "tasks" in state and state["tasks"]
-            else [state["messages"][0].content]
-        )
+        if "tasks" in state and state["tasks"]:
+            tasks = state["tasks"]
+        else:
+            tasks = UserTasks([state["messages"][0].content])
 
         # Prepare the async tasks for all user tsks
-        async_tasks = []
-        for task in tasks:
+        async_jobs = []
+        for task_id in tasks.ids:
             msg = custom_prompts.CONDENSE_QUESTION_PROMPT.format(
                 chat_history=state["chat_history"].to_list(),
-                question=task,
+                question=tasks(task_id).definition,
             )
 
             model = self.llm_endpoint._llm
             # Asynchronously invoke the model for each question
-            async_tasks.append(model.ainvoke(msg))
+            async_jobs.append((model.ainvoke(msg), task_id))
 
         # Gather all the responses asynchronously
-        responses = await asyncio.gather(*async_tasks) if async_tasks else []
+        responses = (
+            await asyncio.gather(*(jobs[0] for jobs in async_jobs))
+            if async_jobs
+            else []
+        )
+        task_ids = [jobs[1] for jobs in async_jobs] if async_jobs else []
 
         # Replace each question with its condensed version
-        condensed_questions = []
-        for response in responses:
-            condensed_questions.append(response.content)
+        for response, task_id in zip(responses, task_ids):
+            tasks.set_definition(task_id, response.content)
 
-        return {**state, "tasks": condensed_questions}
+        return {**state, "tasks": tasks}
 
     def filter_chunks_by_relevance(self, chunks: List[Document], **kwargs):
         config = self.retrieval_config.reranker_config
@@ -440,51 +555,51 @@ class QuivrQARAGLangGraph:
 
         return filtered_chunks
 
-    def tool_routing(self, state: AgentState):
+    async def tool_routing(self, state: AgentState):
         tasks = state["tasks"]
-        if not tasks:
+        if not tasks.has_tasks():
             return [Send("generate_rag", state)]
 
-        docs = state["docs"]
+        validated_tools, _ = collect_tools(self.retrieval_config.workflow_config)
 
-        validated_tools, activated_tools = collect_tools(
-            self.retrieval_config.workflow_config
+        async_jobs = []
+        for task_id in tasks.ids:
+            input = {
+                "chat_history": state["chat_history"].to_list(),
+                "tasks": tasks(task_id).definition,
+                "context": combine_documents(tasks(task_id).docs),
+                "activated_tools": validated_tools,
+            }
+
+            msg = custom_prompts.TOOL_ROUTING_PROMPT.format(**input)
+            async_jobs.append(
+                (self.ainvoke_structured_output(msg, TasksCompletion), task_id)
+            )
+
+        responses: List[TasksCompletion] = (
+            await asyncio.gather(*(jobs[0] for jobs in async_jobs))
+            if async_jobs
+            else []
         )
+        task_ids = [jobs[1] for jobs in async_jobs] if async_jobs else []
 
-        input = {
-            "chat_history": state["chat_history"].to_list(),
-            "tasks": state["tasks"],
-            "context": docs,
-            "activated_tools": validated_tools,
-        }
-
-        input, _ = self.reduce_rag_context(
-            inputs=input,
-            prompt=custom_prompts.TOOL_ROUTING_PROMPT,
-            docs=docs,
-            # max_context_tokens=2000,
-        )
-
-        msg = custom_prompts.TOOL_ROUTING_PROMPT.format(**input)
-
-        response: TasksCompletion = self.invoke_structured_output(msg, TasksCompletion)
+        for response, task_id in zip(responses, task_ids):
+            tasks.set_completion(task_id, response.is_task_completable)
+            if not response.is_task_completable and response.tool:
+                tasks.set_tool(task_id, response.tool)
 
         send_list: List[Send] = []
 
-        if response.non_completable_tasks and response.tool:
-            payload = {
-                **state,
-                "tasks": response.non_completable_tasks,
-                "tool": response.tool,
-            }
+        payload = {**state, "tasks": tasks}
+
+        if tasks.has_non_completable_tasks():
             send_list.append(Send("run_tool", payload))
         else:
-            send_list.append(Send("generate_rag", state))
+            send_list.append(Send("generate_rag", payload))
 
         return send_list
 
     async def run_tool(self, state: AgentState) -> AgentState:
-        tool = state["tool"]
         # if tool not in [
         #     t.name for t in self.retrieval_config.workflow_config.activated_tools
         # ]:
@@ -492,25 +607,29 @@ class QuivrQARAGLangGraph:
 
         tasks = state["tasks"]
 
-        tool_wrapper = LLMToolFactory.create_tool(tool, {})
-
         # Prepare the async tasks for all questions
-        async_tasks = []
-        for task in tasks:
-            formatted_input = tool_wrapper.format_input(task)
-            # Asynchronously invoke the model for each question
-            async_tasks.append(tool_wrapper.tool.ainvoke(formatted_input))
+        async_jobs = []
+        for task_id in tasks.ids:
+            if not tasks(task_id).is_completable() and tasks(task_id).has_tool():
+                tool = tasks(task_id).tool
+                tool_wrapper = LLMToolFactory.create_tool(tool, {})
+                formatted_input = tool_wrapper.format_input(tasks(task_id).definition)
+                async_jobs.append((tool_wrapper.tool.ainvoke(formatted_input), task_id))
 
         # Gather all the responses asynchronously
-        responses = await asyncio.gather(*async_tasks) if async_tasks else []
+        responses = (
+            await asyncio.gather(*(jobs[0] for jobs in async_jobs))
+            if async_jobs
+            else []
+        )
+        task_ids = [jobs[1] for jobs in async_jobs] if async_jobs else []
 
-        docs = []
-        for response in responses:
+        for response, task_id in zip(responses, task_ids):
             _docs = tool_wrapper.format_output(response)
             _docs = self.filter_chunks_by_relevance(_docs)
-            docs += _docs
+            tasks.set_docs(task_id, _docs)
 
-        return {**state, "docs": state["docs"] + docs}
+        return {**state, "tasks": tasks}
 
     async def retrieve(self, state: AgentState) -> AgentState:
         """
@@ -524,8 +643,8 @@ class QuivrQARAGLangGraph:
         """
 
         tasks = state["tasks"]
-        if not tasks:
-            return {**state, "docs": []}
+        if not tasks.has_tasks():
+            return {**state}
 
         kwargs = {
             "search_kwargs": {
@@ -542,20 +661,27 @@ class QuivrQARAGLangGraph:
         )
 
         # Prepare the async tasks for all questions
-        async_tasks = []
-        for task in tasks:
-            # Asynchronously invoke the model for each question
-            async_tasks.append(compression_retriever.ainvoke(task))
+        async_jobs = []
+        for task_id in tasks.ids:
+            # Create a tuple of the retrieval task and task_id
+            async_jobs.append(
+                (compression_retriever.ainvoke(tasks(task_id).definition), task_id)
+            )
 
         # Gather all the responses asynchronously
-        responses = await asyncio.gather(*async_tasks) if async_tasks else []
+        responses = (
+            await asyncio.gather(*(task[0] for task in async_jobs))
+            if async_jobs
+            else []
+        )
+        task_ids = [task[1] for task in async_jobs] if async_jobs else []
 
-        docs = []
-        for response in responses:
+        # Process responses and associate docs with tasks
+        for response, task_id in zip(responses, task_ids):
             _docs = self.filter_chunks_by_relevance(response)
-            docs += _docs
+            tasks.set_docs(task_id, _docs)  # Associate docs with the specific task
 
-        return {**state, "docs": docs}
+        return {**state, "tasks": tasks}
 
     async def dynamic_retrieve(self, state: AgentState) -> AgentState:
         """
@@ -569,8 +695,8 @@ class QuivrQARAGLangGraph:
         """
 
         tasks = state["tasks"]
-        if not tasks:
-            return {**state, "docs": []}
+        if not tasks.has_tasks():
+            return {**state}
 
         k = self.retrieval_config.k
         top_n = self.retrieval_config.reranker_config.top_n
@@ -596,21 +722,28 @@ class QuivrQARAGLangGraph:
             )
 
             # Prepare the async tasks for all questions
-            async_tasks = []
-            for task in tasks:
+            async_jobs = []
+            for task_id in tasks.ids:
                 # Asynchronously invoke the model for each question
-                async_tasks.append(compression_retriever.ainvoke(task))
+                async_jobs.append(
+                    (compression_retriever.ainvoke(tasks(task_id).definition), task_id)
+                )
 
             # Gather all the responses asynchronously
-            responses = await asyncio.gather(*async_tasks) if async_tasks else []
+            responses = (
+                await asyncio.gather(*(jobs[0] for jobs in async_jobs))
+                if async_jobs
+                else []
+            )
+            task_ids = [jobs[1] for jobs in async_jobs] if async_jobs else []
 
-            docs = []
             _n = []
-            for response in responses:
+            for response, task_id in zip(responses, task_ids):
                 _docs = self.filter_chunks_by_relevance(response)
                 _n.append(len(_docs))
-                docs += _docs
+                tasks.set_docs(task_id, _docs)
 
+            docs = tasks.docs
             if not docs:
                 break
 
@@ -625,9 +758,7 @@ class QuivrQARAGLangGraph:
             number_of_relevant_chunks = max(_n)
             i += 1
 
-        docs = self._sort_docs_by_relevance(docs)
-
-        return {**state, "docs": docs}
+        return {**state, "tasks": tasks}
 
     def _sort_docs_by_relevance(self, docs: List[Document]) -> List[Document]:
         return sorted(
@@ -645,15 +776,17 @@ class QuivrQARAGLangGraph:
 
     def reduce_rag_context(
         self,
+        state: AgentState,
         inputs: Dict[str, Any],
         prompt: BasePromptTemplate,
-        docs: List[Document] | None = None,
         max_context_tokens: int | None = None,
-    ) -> Tuple[Dict[str, Any], List[Document] | None]:
+    ) -> Tuple[AgentState, Dict[str, Any]]:
         MAX_ITERATION = 100
         SECURITY_FACTOR = 0.85
         iteration = 0
 
+        tasks = state["tasks"] if "tasks" in state else None
+        docs = tasks.docs if tasks else []
         msg = prompt.format(**inputs)
         n = self.llm_endpoint.count_tokens(msg)
 
@@ -663,13 +796,34 @@ class QuivrQARAGLangGraph:
             else self.retrieval_config.llm_config.max_context_tokens
         )
 
+        # Get token counts for each doc in each task
+        if tasks:
+            task_token_counts = {}
+            for task_id in tasks.ids:
+                doc_tokens = [
+                    self.llm_endpoint.count_tokens(doc.page_content)
+                    for doc in tasks(task_id).docs
+                ]
+                task_token_counts[task_id] = {
+                    "docs": doc_tokens,
+                    "total": sum(doc_tokens),
+                }
+
         while n > max_context_tokens * SECURITY_FACTOR:
             chat_history = inputs["chat_history"] if "chat_history" in inputs else []
 
             if len(chat_history) > 0:
                 inputs["chat_history"] = chat_history[2:]
-            elif docs and len(docs) > 1:
-                docs = docs[:-1]
+            elif tasks:
+                longest_task_id = max(
+                    task_token_counts.items(), key=lambda x: x[1]["total"]
+                )[0]
+
+                # Remove last doc from that task
+                if task_token_counts[longest_task_id]["docs"]:
+                    removed_tokens = task_token_counts[longest_task_id]["docs"].pop()
+                    task_token_counts[longest_task_id]["total"] -= removed_tokens
+                    tasks.set_docs(longest_task_id, tasks(longest_task_id).docs[:-1])
             else:
                 logging.warning(
                     f"Not enough context to reduce. The context length is {n} "
@@ -677,8 +831,8 @@ class QuivrQARAGLangGraph:
                 )
                 break
 
-            if docs and "context" in inputs:
-                inputs["context"] = combine_documents(docs)
+            docs = tasks.docs if tasks else []
+            inputs["context"] = combine_documents(docs)
 
             msg = prompt.format(**inputs)
             n = self.llm_endpoint.count_tokens(msg)
@@ -690,7 +844,7 @@ class QuivrQARAGLangGraph:
                 )
                 break
 
-        return inputs, docs
+        return {**state, "tasks": tasks}, inputs
 
     def bind_tools_to_llm(self, node_name: str):
         if self.llm_endpoint.supports_func_calling():
@@ -700,18 +854,18 @@ class QuivrQARAGLangGraph:
         return self.llm_endpoint._llm
 
     def generate_rag(self, state: AgentState) -> AgentState:
-        docs: List[Document] | None = state["docs"]
-        final_inputs = self._build_rag_prompt_inputs(state, docs)
-
-        reduced_inputs, docs = self.reduce_rag_context(
-            final_inputs, custom_prompts.RAG_ANSWER_PROMPT, docs
+        tasks = state["tasks"]
+        docs = tasks.docs if tasks else []
+        inputs = self._build_rag_prompt_inputs(state, docs)
+        state, inputs = self.reduce_rag_context(
+            state, inputs, custom_prompts.RAG_ANSWER_PROMPT
         )
 
-        msg = custom_prompts.RAG_ANSWER_PROMPT.format(**reduced_inputs)
+        msg = custom_prompts.RAG_ANSWER_PROMPT.format(**inputs)
         llm = self.bind_tools_to_llm(self.generate_rag.__name__)
         response = llm.invoke(msg)
 
-        return {**state, "messages": [response], "docs": docs if docs else []}
+        return {**state, "messages": [response]}
 
     def generate_chat_llm(self, state: AgentState) -> AgentState:
         """
@@ -737,8 +891,8 @@ class QuivrQARAGLangGraph:
         # LLM
         llm = self.llm_endpoint._llm
 
-        reduced_inputs, _ = self.reduce_rag_context(
-            final_inputs, custom_prompts.CHAT_LLM_PROMPT, None
+        state, reduced_inputs = self.reduce_rag_context(
+            state, final_inputs, custom_prompts.CHAT_LLM_PROMPT
         )
 
         msg = custom_prompts.CHAT_LLM_PROMPT.format(**reduced_inputs)
@@ -820,7 +974,8 @@ class QuivrQARAGLangGraph:
             config={"metadata": metadata},
         ):
             if self._is_final_node_with_docs(event):
-                docs = event["data"]["output"]["docs"]
+                tasks = event["data"]["output"]["tasks"]
+                docs = tasks.docs if tasks else []
 
             if self._is_final_node_and_chat_model_stream(event):
                 chunk = event["data"]["chunk"]
@@ -848,7 +1003,7 @@ class QuivrQARAGLangGraph:
         return (
             "output" in event["data"]
             and event["data"]["output"] is not None
-            and "docs" in event["data"]["output"]
+            and "tasks" in event["data"]["output"]
             and event["metadata"]["langgraph_node"] in self.final_nodes
         )
 
@@ -858,6 +1013,18 @@ class QuivrQARAGLangGraph:
             and "langgraph_node" in event["metadata"]
             and event["metadata"]["langgraph_node"] in self.final_nodes
         )
+
+    async def ainvoke_structured_output(
+        self, prompt: str, output_class: Type[BaseModel]
+    ) -> Any:
+        try:
+            structured_llm = self.llm_endpoint._llm.with_structured_output(
+                output_class, method="json_schema"
+            )
+            return await structured_llm.ainvoke(prompt)
+        except openai.BadRequestError:
+            structured_llm = self.llm_endpoint._llm.with_structured_output(output_class)
+            return await structured_llm.ainvoke(prompt)
 
     def invoke_structured_output(
         self, prompt: str, output_class: Type[BaseModel]
@@ -892,10 +1059,10 @@ class QuivrQARAGLangGraph:
         return {
             "context": combine_documents(docs) if docs else "None",
             "question": user_question,
-            "rephrased_task": state["tasks"],
+            "rephrased_task": state["tasks"].definitions,
             "custom_instructions": prompt if prompt else "None",
             "files": files if files else "None",
             "chat_history": state["chat_history"].to_list(),
-            "reasoning": state["reasoning"] if "reasoning" in state else "None",
+            # "reasoning": state["reasoning"] if "reasoning" in state else "None",
             # "tools": available_tools,
         }
