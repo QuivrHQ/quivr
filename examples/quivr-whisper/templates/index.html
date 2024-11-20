@@ -9,11 +9,12 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
 
-<body class="bg-gray-100 flex flex-col items-center justify-center h-screen">
+<body class="dark bg-background flex flex-col items-center justify-center h-screen">
     <h1 class="text-6xl font-bold mb-8">Quivr.app</h1>
     <div id="app" class="text-center">
-        <button id="record-btn"
-            class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full cursor-pointer">
+        <input type="file" name="fileInput" id="fileInput">
+        <button type="button" id="record-btn"
+            class="bg-primary text-white font-bold py-2 px-4 rounded-md cursor-pointer">
             Ask a question to Quivr
         </button>
         <canvas id="audio-visualizer" width="640" height="100"

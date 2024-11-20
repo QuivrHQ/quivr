@@ -44,5 +44,6 @@
     "reportUnusedImport": "warning",
     "reportGeneralTypeIssues": "warning"
   },
-  "makefile.configureOnOpen": false
+  "makefile.configureOnOpen": false,
+  "djlint.showInstallError": false
 }
