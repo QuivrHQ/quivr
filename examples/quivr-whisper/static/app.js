@@ -6,7 +6,7 @@ const audioPlayback = document.getElementById("audio-playback");
 const canvasCtx = audioVisualizer.getContext("2d");
 
 // Configuration
-const SILENCE_THRESHOLD = 0.01;
+const SILENCE_THRESHOLD = 128; // Adjusted for byte data (128 is middle)
 const SILENCE_DURATION = 1500;
 const FFT_SIZE = 2048;
 
@@ -31,9 +31,8 @@ class AudioAnalyzer {
     this.analyser.fftSize = FFT_SIZE;
     source.connect(this.analyser);
 
-    // Change to Float32Array for time domain data
     this.bufferLength = this.analyser.frequencyBinCount;
-    this.dataArray = new Float32Array(this.bufferLength);
+    this.dataArray = new Uint8Array(this.bufferLength); // Changed to Uint8Array
 
     return this.analyser;
   }
@@ -64,12 +63,12 @@ class Visualizer {
   }
 
   draw(currentAnalyser, onSilence) {
-    if (!currentAnalyser) return;
+    if (!currentAnalyser || this.analyzer.dataArray === null) return;
 
     requestAnimationFrame(() => this.draw(currentAnalyser, onSilence));
 
-    // Use getFloatTimeDomainData instead of getByteTimeDomainData
-    currentAnalyser.getFloatTimeDomainData(this.analyzer.dataArray);
+    // Use getByteTimeDomainData instead of getFloatTimeDomainData
+    currentAnalyser.getByteTimeDomainData(this.analyzer.dataArray);
 
     // Clear canvas
     this.ctx.fillStyle = "#252525";
@@ -82,16 +81,14 @@ class Visualizer {
     const sliceWidth = (this.canvas.width * 1.0) / this.analyzer.bufferLength;
     let x = 0;
     let sum = 0;
-    let maxAmplitude = 0;
 
     // Draw waveform
     for (let i = 0; i < this.analyzer.bufferLength; i++) {
-      // Values are already normalized (-1 to 1), no need to normalize
-      const v = this.analyzer.dataArray[i];
-      const y = (v * this.canvas.height) / 2 + this.canvas.height / 2;
+      // Scale byte data (0-255) to canvas height
+      const v = this.analyzer.dataArray[i] / 128.0; // normalize to 0-2
+      const y = (v - 1) * (this.canvas.height / 2) + this.canvas.height / 2;
 
-      sum += Math.abs(v);
-      maxAmplitude = Math.max(maxAmplitude, Math.abs(v));
+      sum += Math.abs(v - 1); // Calculate distance from center (128)
 
       if (i === 0) {
         this.ctx.moveTo(x, y);
@@ -105,12 +102,13 @@ class Visualizer {
     this.ctx.lineTo(this.canvas.width, this.canvas.height / 2);
     this.ctx.stroke();
 
-    // Check for silence during recording with proper thresholds
+    // Check for silence during recording with adjusted thresholds for byte data
     if (state.isRecording) {
       const averageAmplitude = sum / this.analyzer.bufferLength;
-      if (averageAmplitude < SILENCE_THRESHOLD) {
+      if (averageAmplitude < 0.1) {
+        // Adjusted threshold for normalized data
         // Reset silence timer if we detect sound
-        if (averageAmplitude > SILENCE_THRESHOLD / 2) {
+        if (averageAmplitude > 0.05) {
           clearTimeout(state.silenceTimer);
           state.silenceTimer = null;
         } else {
