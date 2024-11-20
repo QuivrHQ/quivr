@@ -69,7 +69,7 @@ def _define_custom_prompts() -> CustomPromptsDict:
 
     context_template = (
         "\n"
-        "- You have access to the following internal reasoning to provide an answer: {reasoning}\n"
+        # "- You have access to the following internal reasoning to provide an answer: {reasoning}\n"
         "- You have access to the following files to answer the user question (limited to first 20 files): {files}\n"
         "- You have access to the following context to answer the user question: {context}\n"
         "- Follow these user instruction when crafting the answer: {custom_instructions}\n"
@@ -88,6 +88,9 @@ def _define_custom_prompts() -> CustomPromptsDict:
     template_answer = (
         "Original task: {question}\n"
         "Rephrased and contextualized task: {rephrased_task}\n"
+        "Remember, you shall answer ALL questions and tasks.\n"
+        "Remember: if you cannot provide an answer using ONLY the provided context and CITING the sources, "
+        "just answer that you don't have the answer.\n"
     )
 
     RAG_ANSWER_PROMPT = ChatPromptTemplate.from_messages(
