@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Audio Interaction WebApp</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+
+<body class="bg-gray-100 flex flex-col items-center justify-center h-screen">
+    <h1 class="text-6xl font-bold mb-8">Quivr.app</h1>
+    <div id="app" class="text-center">
+        <button id="record-btn"
+            class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full cursor-pointer">
+            Ask a question to Quivr
+        </button>
+        <canvas id="audio-visualizer" width="640" height="100"
+            class="hidden bg-white rounded-lg cursor-pointer"></canvas>
+        <audio id="audio-playback" controls class="hidden mt-4"></audio>
+    </div>
+    <script src="{{ url_for('static', filename='app.js') }}"></script>
+</body>
+
+</html>

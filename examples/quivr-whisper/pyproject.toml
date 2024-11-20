@@ -1,0 +1,28 @@
+[project]
+name = "quivr-whisper"
+version = "0.1.0"
+description = "Add your description here"
+authors = [
+    { name = "Stan Girard", email = "stan@quivr.app" }
+]
+dependencies = [
+    "flask>=3.1.0",
+    "openai>=1.54.5",
+    "quivr-core>=0.0.24",
+]
+readme = "README.md"
+requires-python = ">= 3.11"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.rye]
+managed = true
+dev-dependencies = []
+
+[tool.hatch.metadata]
+allow-direct-references = true
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/quivr_whisper"]
