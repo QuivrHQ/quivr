@@ -91,6 +91,7 @@ def _define_custom_prompts() -> CustomPromptsDict:
         "Remember, you shall answer ALL questions and tasks.\n"
         "Remember: if you cannot provide an answer using ONLY the provided context and CITING the sources, "
         "just answer that you don't have the answer.\n"
+        "If the provided context contains contradictory or conflicting information, state so providing the conflicting information.\n"
     )
 
     RAG_ANSWER_PROMPT = ChatPromptTemplate.from_messages(

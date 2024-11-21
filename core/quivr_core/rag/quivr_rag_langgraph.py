@@ -75,7 +75,6 @@ class TasksCompletion(BaseModel):
     )
 
     is_task_completable: bool = Field(
-        default=False,
         description="Whether the user task or question can be completed using the provided context and chat history.",
     )
 
@@ -665,6 +664,8 @@ class QuivrQARAGLangGraph:
             dict: The retrieved chunks
         """
 
+        MAX_ITERATIONS = 3
+
         tasks = state["tasks"]
         if not tasks.has_tasks():
             return {**state}
@@ -674,7 +675,7 @@ class QuivrQARAGLangGraph:
         number_of_relevant_chunks = top_n
         i = 1
 
-        while number_of_relevant_chunks == top_n:
+        while number_of_relevant_chunks == top_n and i <= MAX_ITERATIONS:
             top_n = self.retrieval_config.reranker_config.top_n * i
             kwargs = {"top_n": top_n}
             reranker = self.get_reranker(**kwargs)
@@ -752,7 +753,7 @@ class QuivrQARAGLangGraph:
         prompt: BasePromptTemplate,
         max_context_tokens: int | None = None,
     ) -> Tuple[AgentState, Dict[str, Any]]:
-        MAX_ITERATION = 100
+        MAX_ITERATIONS = 20
         SECURITY_FACTOR = 0.85
         iteration = 0
 
@@ -809,9 +810,9 @@ class QuivrQARAGLangGraph:
             n = self.llm_endpoint.count_tokens(msg)
 
             iteration += 1
-            if iteration > MAX_ITERATION:
+            if iteration > MAX_ITERATIONS:
                 logging.warning(
-                    f"Attained the maximum number of iterations ({MAX_ITERATION})"
+                    f"Attained the maximum number of iterations ({MAX_ITERATIONS})"
                 )
                 break
 
