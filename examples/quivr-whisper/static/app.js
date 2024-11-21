@@ -31,6 +31,7 @@ const FFT_SIZE = 2048;
 // State
 const state = {
   isRecording: false,
+  isVisualizing: false,
   chunks: [],
   silenceTimer: null,
   lastAudioLevel: 0,
@@ -125,7 +126,7 @@ class Visualizer {
     // Clear canvas
     this.ctx.fillStyle = "#252525";
     this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
-    if (!state.isRecording) return;
+    if (!state.isVisualizing) return;
 
     this.ctx.lineWidth = 2;
     this.ctx.strokeStyle = "#6142d4";
@@ -205,6 +206,7 @@ class RecordingHandler {
   }
 
   startRecording() {
+    state.isVisualizing = true;
     state.chunks = [];
     state.isRecording = true;
     this.mediaRecorder.start();
@@ -231,6 +233,7 @@ class RecordingHandler {
 
   stopRecording() {
     if (state.isRecording) {
+      state.isVisualizing = false;
       state.isRecording = false;
       this.mediaRecorder.stop();
       clearTimeout(state.silenceTimer);
@@ -285,11 +288,13 @@ class RecordingHandler {
 
       this.visualizer.draw(analyser, () => {});
       audioPlayback.play();
+      state.isVisualizing = true;
     };
 
     audioPlayback.onended = () => {
       this.audioAnalyzer.cleanup();
       recordBtn.dataset.pending = false;
+      state.isVisualizing = false;
     };
   }
 }
