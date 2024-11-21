@@ -1,9 +1,27 @@
 // DOM Elements
 const recordBtn = document.getElementById("record-btn");
 const fileInput = document.getElementById("fileInput");
+const fileName = document.getElementById("fileName");
+
 const audioVisualizer = document.getElementById("audio-visualizer");
 const audioPlayback = document.getElementById("audio-playback");
 const canvasCtx = audioVisualizer.getContext("2d");
+
+window.addEventListener("load", () => {
+  audioVisualizer.width = window.innerWidth;
+  audioVisualizer.height = window.innerHeight;
+});
+
+window.addEventListener("resize", (e) => {
+  audioVisualizer.width = window.innerWidth;
+  audioVisualizer.height = window.innerHeight;
+});
+
+fileInput.addEventListener("change", () => {
+  fileName.textContent =
+    fileInput.files.length > 0 ? fileInput.files[0].name : "No file chosen";
+  fileName.classList.toggle("file-selected", fileInput.files.length > 0);
+});
 
 // Configuration
 const SILENCE_THRESHOLD = 128; // Adjusted for byte data (128 is middle)
@@ -24,6 +42,7 @@ class AudioAnalyzer {
     this.analyser = null;
     this.dataArray = null;
     this.bufferLength = null;
+    this.source = null;
   }
 
   setup(source, audioContext) {
@@ -32,23 +51,56 @@ class AudioAnalyzer {
     source.connect(this.analyser);
 
     this.bufferLength = this.analyser.frequencyBinCount;
-    this.dataArray = new Uint8Array(this.bufferLength); // Changed to Uint8Array
+    this.dataArray = new Uint8Array(this.bufferLength);
 
     return this.analyser;
   }
 
   setupForPlayback(audioElement, audioContext) {
-    const source = audioContext.createMediaElementSource(audioElement);
-    const analyser = this.setup(source, audioContext);
-    analyser.connect(audioContext.destination);
-    return analyser;
+    // Disconnect existing source if it exists
+    if (this.source) {
+      try {
+        this.source.disconnect();
+      } catch (e) {
+        // Ignore if already disconnected
+      }
+    }
+
+    // Create a new source, ignoring previous connections
+    audioElement.pause();
+    audioElement.currentTime = 0;
+    this.source = audioContext.createMediaElementSource(audioElement);
+
+    this.analyser = audioContext.createAnalyser();
+    this.analyser.fftSize = FFT_SIZE;
+
+    // Connect the source to the analyser and then to destination
+    this.source.connect(this.analyser);
+    this.analyser.connect(audioContext.destination);
+
+    this.bufferLength = this.analyser.frequencyBinCount;
+    this.dataArray = new Uint8Array(this.bufferLength);
+
+    return this.analyser;
   }
 
   cleanup() {
-    if (this.analyser) {
-      this.analyser.disconnect();
-      this.analyser = null;
+    if (this.source) {
+      try {
+        this.source.disconnect();
+      } catch (e) {
+        // Ignore disconnect errors
+      }
     }
+    if (this.analyser) {
+      try {
+        this.analyser.disconnect();
+      } catch (e) {
+        // Ignore disconnect errors
+      }
+    }
+    this.source = null;
+    this.analyser = null;
     this.dataArray = null;
     this.bufferLength = null;
   }
@@ -73,12 +125,13 @@ class Visualizer {
     // Clear canvas
     this.ctx.fillStyle = "#252525";
     this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+    if (!state.isRecording) return;
 
     this.ctx.lineWidth = 2;
     this.ctx.strokeStyle = "#6142d4";
     this.ctx.beginPath();
 
-    const sliceWidth = (this.canvas.width * 1.0) / this.analyzer.bufferLength;
+    const sliceWidth = (this.canvas.width * 1) / this.analyzer.bufferLength;
     let x = 0;
     let sum = 0;
 
@@ -125,6 +178,7 @@ class RecordingHandler {
     this.mediaRecorder = null;
     this.audioAnalyzer = new AudioAnalyzer();
     this.visualizer = new Visualizer(audioVisualizer, this.audioAnalyzer);
+    this.audioContext = null;
   }
 
   async initialize() {
@@ -132,6 +186,9 @@ class RecordingHandler {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       this.mediaRecorder = new MediaRecorder(stream);
       this.setupRecordingEvents();
+      if (!this.audioContext)
+        this.audioContext = new (window.AudioContext ||
+          window.webkitAudioContext)();
     } catch (err) {
       console.error(`Media device error: ${err}`);
     }
@@ -152,13 +209,11 @@ class RecordingHandler {
     state.isRecording = true;
     this.mediaRecorder.start();
 
-    const audioContext = new (window.AudioContext ||
-      window.webkitAudioContext)();
-    const source = audioContext.createMediaStreamSource(
+    const source = this.audioContext.createMediaStreamSource(
       this.mediaRecorder.stream
     );
 
-    const analyser = this.audioAnalyzer.setup(source, audioContext);
+    const analyser = this.audioAnalyzer.setup(source, this.audioContext);
     audioVisualizer.classList.remove("hidden");
 
     this.visualizer.draw(analyser, () => {
@@ -170,7 +225,7 @@ class RecordingHandler {
       }
     });
 
-    recordBtn.innerText = "Listening...";
+    recordBtn.dataset.recording = true;
     recordBtn.classList.add("processing");
   }
 
@@ -180,15 +235,17 @@ class RecordingHandler {
       this.mediaRecorder.stop();
       clearTimeout(state.silenceTimer);
       state.silenceTimer = null;
+      recordBtn.dataset.recording = false;
     }
   }
 
   async handleRecordingStop() {
-    recordBtn.innerText = "Processing...";
     console.log("Processing recording...");
+    recordBtn.dataset.pending = true;
 
-    const audioBlob = new Blob(state.chunks, { type: "audio/wav" });
+    const audioBlob = new Blob(state.chunks, { type: "audio/mpeg" });
     if (!fileInput.files.length) {
+      recordBtn.dataset.pending = false;
       alert("Please select a file.");
       return;
     }
@@ -214,19 +271,15 @@ class RecordingHandler {
     const data = await response.json();
 
     await this.handleResponse(data);
-    recordBtn.innerText = "Ask a question to Quivr";
   }
 
   async handleResponse(data) {
     audioPlayback.src = "data:audio/wav;base64," + data.audio_base64;
 
-    const audioContext = new (window.AudioContext ||
-      window.webkitAudioContext)();
-
     audioPlayback.onloadedmetadata = () => {
       const analyser = this.audioAnalyzer.setupForPlayback(
         audioPlayback,
-        audioContext
+        this.audioContext
       );
       audioVisualizer.classList.remove("hidden");
 
@@ -236,6 +289,7 @@ class RecordingHandler {
 
     audioPlayback.onended = () => {
       this.audioAnalyzer.cleanup();
+      recordBtn.dataset.pending = false;
     };
   }
 }

@@ -1,27 +1,30 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Audio Interaction WebApp</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
-</head>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='styles.css') }}"
+    />
+  </head>
 
-<body class="dark bg-background flex flex-col items-center justify-center h-screen">
-    <h1 class="text-6xl font-bold mb-8">Quivr</h1>
-    <div id="app" class="text-center flex flex-col gap-2">
-        <input class="" type="file" name="fileInput" required id="fileInput">
-        <button type="button" id="record-btn"
-            class="bg-primary text-white font-bold py-2 px-4 rounded-md cursor-pointer">
-            Ask a question to Quivr
-        </button>
-        <canvas id="audio-visualizer" width="640" height="100"
-            class="bg-background rounded-lg cursor-pointer"></canvas>
-        <audio id="audio-playback" controls class="hidden mt-4"></audio>
+  <body>
+    <button
+      type="button"
+      id="record-btn"
+      class="record-btn"
+      data-recording="false"
+      data-pending="false"
+    ></button>
+    <div class="custom-file-input">
+      <label for="fileInput">Choose a file</label>
+      <input type="file" name="fileInput" required id="fileInput" />
+      <span id="fileName">No file chosen</span>
     </div>
+    <canvas id="audio-visualizer" class=""></canvas>
+    <audio id="audio-playback" controls class="hidden"></audio>
     <script src="{{ url_for('static', filename='app.js') }}"></script>
-</body>
-
+  </body>
 </html>
