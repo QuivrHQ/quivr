@@ -2,6 +2,7 @@ import tempfile
 
 import chainlit as cl
 from quivr_core import Brain
+from quivr_core.rag.entities.config import RetrievalConfig
 
 
 @cl.on_chat_start
@@ -26,7 +27,7 @@ async def on_chat_start():
         text = f.read()
 
     with tempfile.NamedTemporaryFile(
-        mode="w", suffix=".txt", delete=False
+        mode="w", suffix=file.name, delete=False
     ) as temp_file:
         temp_file.write(text)
         temp_file.flush()
@@ -47,17 +48,36 @@ async def on_chat_start():
 @cl.on_message
 async def main(message: cl.Message):
     brain = cl.user_session.get("brain")  # type: Brain
+    path_config = "basic_rag_workflow.yaml"
+    retrieval_config = RetrievalConfig.from_yaml(path_config)
 
     if brain is None:
         await cl.Message(content="Please upload a file first.").send()
         return
 
     # Prepare the message for streaming
-    msg = cl.Message(content="")
+    msg = cl.Message(content="", elements=[])
     await msg.send()
+
+    saved_sources = set()
+    saved_sources_complete = []
+    elements = []
 
     # Use the ask_stream method for streaming responses
-    async for chunk in brain.ask_streaming(message.content):
+    async for chunk in brain.ask_streaming(message.content, retrieval_config=retrieval_config):
         await msg.stream_token(chunk.answer)
+        for source in chunk.metadata.sources:
+            if source.page_content not in saved_sources:
+                saved_sources.add(source.page_content)
+                saved_sources_complete.append(source)
+                print(source)
+                elements.append(cl.Text(name=source.metadata["original_file_name"], content=source.page_content, display="side"))
 
+    
     await msg.send()
+    sources = ""
+    for source in saved_sources_complete:
+        sources += f"- {source.metadata['original_file_name']}\n"
+    msg.elements = elements
+    msg.content = msg.content + f"\n\nSources:\n{sources}"
+    await msg.update()

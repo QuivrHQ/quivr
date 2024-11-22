@@ -497,7 +497,7 @@ onnx==1.17.0
     # via unstructured-inference
 onnxruntime==1.20.0
     # via unstructured-inference
-openai==1.51.2
+openai==1.54.5
     # via langchain-openai
     # via llama-index-agent-openai
     # via llama-index-embeddings-openai
