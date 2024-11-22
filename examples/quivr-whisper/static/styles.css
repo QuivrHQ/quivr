@@ -92,7 +92,7 @@ canvas {
 }
 
 .custom-file-input label {
-  background-color: #6142d4;
+  border: solid 2px #6142d4;
   color: white;
   padding: 8px 16px;
   border-radius: 4px;

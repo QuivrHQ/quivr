@@ -301,6 +301,7 @@ class RecordingHandler {
 }
 
 const uploadFile = async (e) => {
+  uploadBtn.innerText = "Uploading File...";
   e.preventDefault();
   const file = fileInput.files[0];
 
@@ -321,6 +322,7 @@ const uploadFile = async (e) => {
     recordBtn.classList.add("hidden");
     fileInputContainer.classList.remove("hidden");
     console.error("Error uploading file:", error);
+    uploadBtn.innerText = "Upload Failed. Try again";
   }
 };
 
