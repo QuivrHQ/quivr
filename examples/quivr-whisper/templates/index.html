@@ -14,7 +14,7 @@
     <button
       type="button"
       id="record-btn"
-      class="record-btn"
+      class="record-btn hidden"
       data-recording="false"
       data-pending="false"
     ></button>
@@ -22,6 +22,7 @@
       <label for="fileInput">Choose a file</label>
       <input type="file" name="fileInput" required id="fileInput" />
       <span id="fileName">No file chosen</span>
+      <button id="upload-btn" class="upload-btn">Upload</button>
     </div>
     <canvas id="audio-visualizer" class=""></canvas>
     <audio id="audio-playback" controls class="hidden"></audio>

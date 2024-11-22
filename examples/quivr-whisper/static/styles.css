@@ -76,7 +76,8 @@ canvas {
 }
 
 .hidden {
-    display: none;
+    display: none !important;
+    visibility: hidden;
 }
 
 .custom-file-input {

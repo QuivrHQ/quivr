@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify, session
 import openai
 import base64
 import os
@@ -12,20 +12,22 @@ from asyncio import to_thread
 import asyncio
 
 
-UPLOAD_FOLDER = 'uploads'
-ALLOWED_EXTENSIONS = {'txt'}
+UPLOAD_FOLDER = "uploads"
+ALLOWED_EXTENSIONS = {"txt"}
 
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 app = Flask(__name__)
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+app.secret_key = "secret"
+app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
+app.config["CACHE_TYPE"] = "SimpleCache"  # In-memory cache for development
+app.config["CACHE_DEFAULT_TIMEOUT"] = 60 * 60  # 1 hour cache timeout
 load_dotenv()
 
 openai.api_key = os.getenv("OPENAI_API_KEY")
 
-def allowed_file(filename):
-    return '.' in filename and \
-           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+brains = {}
+
 
 @app.route("/")
 def index():
@@ -43,26 +45,59 @@ def run_in_event_loop(func, *args, **kwargs):
     return result
 
 
-@app.route('/ask', methods=['POST'])
-async def ask():
-    if 'file' not in request.files:
+def allowed_file(filename):
+    return "." in filename and filename.rsplit(".", 1)[1].lower() in ALLOWED_EXTENSIONS
+
+
+@app.route("/upload", methods=["POST"])
+async def upload_file():
+    if "file" not in request.files:
         return "No file part", 400
 
-    file = request.files['file']
+    file = request.files["file"]
 
-    if file.filename == '':
+    if file.filename == "":
         return "No selected file", 400
     if not (file and file.filename and allowed_file(file.filename)):
         return "Invalid file type", 400
 
     filename = secure_filename(file.filename)
-    filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+    filepath = os.path.join(app.config["UPLOAD_FOLDER"], filename)
     file.save(filepath)
 
-    print("Uploading file...")
-    brain: Brain = await to_thread(run_in_event_loop, Brain.from_files, name="user_brain", file_paths=[filepath])
+    print(f"File uploaded and saved at: {filepath}")
 
-    print(f"{filepath} saved to brain.")
+    print("Creating brain instance...")
+
+    brain: Brain = await to_thread(
+        run_in_event_loop, Brain.from_files, name="user_brain", file_paths=[filepath]
+    )
+
+    # Store brain instance in cache
+    session_id = session.sid if hasattr(session, "sid") else os.urandom(16).hex()
+    session["session_id"] = session_id
+    # cache.set(session_id, brain)  # Store the brain instance in the cache
+    brains[session_id] = brain
+    print(f"Brain instance created and stored in cache for session ID: {session_id}")
+
+    return jsonify({"message": "Brain created successfully"})
+
+
+@app.route("/ask", methods=["POST"])
+async def ask():
+    if "audio_data" not in request.files:
+        return "Missing audio data", 400
+
+    # Retrieve the brain instance from the cache using the session ID
+    session_id = session.get("session_id")
+    if not session_id:
+        return "Session ID not found. Upload a file first.", 400
+
+    brain = brains.get(session_id)
+    if not brain:
+        return "Brain instance not found in dict. Upload a file first.", 400
+
+    print("Brain instance loaded from cache.")
 
     print("Speech to text...")
     audio_file = request.files["audio_data"]

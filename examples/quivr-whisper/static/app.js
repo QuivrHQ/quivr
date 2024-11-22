@@ -1,6 +1,7 @@
 // DOM Elements
 const recordBtn = document.getElementById("record-btn");
 const fileInput = document.getElementById("fileInput");
+const fileInputContainer = document.querySelector(".custom-file-input");
 const fileName = document.getElementById("fileName");
 
 const audioVisualizer = document.getElementById("audio-visualizer");
@@ -246,7 +247,7 @@ class RecordingHandler {
     console.log("Processing recording...");
     recordBtn.dataset.pending = true;
 
-    const audioBlob = new Blob(state.chunks, { type: "audio/mpeg" });
+    const audioBlob = new Blob(state.chunks, { type: "audio/wav" });
     if (!fileInput.files.length) {
       recordBtn.dataset.pending = false;
       alert("Please select a file.");
@@ -298,6 +299,33 @@ class RecordingHandler {
     };
   }
 }
+
+const uploadFile = async (e) => {
+  e.preventDefault();
+  const file = fileInput.files[0];
+
+  if (!file) {
+    alert("Please select a file.");
+    return;
+  }
+  const formData = new FormData();
+  formData.append("file", file);
+  try {
+    await fetch("/upload", {
+      method: "POST",
+      body: formData,
+    });
+    recordBtn.classList.remove("hidden");
+    fileInputContainer.classList.add("hidden");
+  } catch (error) {
+    recordBtn.classList.add("hidden");
+    fileInputContainer.classList.remove("hidden");
+    console.error("Error uploading file:", error);
+  }
+};
+
+const uploadBtn = document.getElementById("upload-btn");
+uploadBtn.addEventListener("click", uploadFile);
 
 // Main initialization
 async function initializeApp() {
