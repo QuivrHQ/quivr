@@ -3,8 +3,7 @@ import logging
 import tiktoken
 from langchain_core.documents import Document
 from langchain_text_splitters import RecursiveCharacterTextSplitter, TextSplitter
-from megaparse.core.megaparse import MegaParse
-from megaparse.core.parser.unstructured_parser import UnstructuredParser
+from megaparse_sdk.client import MegaParseNATSClient
 
 from quivr_core.config import MegaparseConfig
 from quivr_core.files.file import QuivrFile
@@ -75,9 +74,9 @@ class MegaparseProcessor(ProcessorBase):
 
     async def process_file_inner(self, file: QuivrFile) -> list[Document]:
         logger.info(f"Uploading file {file.path} to MegaParse")
-        parser = UnstructuredParser(**self.megaparse_config.model_dump())
-        megaparse = MegaParse(parser)
-        response = await megaparse.aload(file.path)
+        client = MegaParseNATSClient()
+        response = await client.parse_file(file=file.path)
+        client.close()
         logger.info(f"File :  {response}")
         document = Document(
             page_content=response,
