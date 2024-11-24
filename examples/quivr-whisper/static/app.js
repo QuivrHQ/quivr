@@ -41,70 +41,74 @@ const state = {
 // Audio Analysis
 class AudioAnalyzer {
   constructor() {
+    this.reset();
+  }
+
+  reset() {
     this.analyser = null;
     this.dataArray = null;
     this.bufferLength = null;
     this.source = null;
+    this.cleanup();
   }
 
   setup(source, audioContext) {
-    this.analyser = audioContext.createAnalyser();
-    this.analyser.fftSize = FFT_SIZE;
+    this.cleanup();
+
+    this.analyser = this._createAnalyser(audioContext);
     source.connect(this.analyser);
 
-    this.bufferLength = this.analyser.frequencyBinCount;
-    this.dataArray = new Uint8Array(this.bufferLength);
-
+    this._initializeBuffer();
     return this.analyser;
   }
 
-  setupForPlayback(audioElement, audioContext) {
-    // Disconnect existing source if it exists
-    if (this.source) {
-      try {
-        this.source.disconnect();
-      } catch (e) {
-        // Ignore if already disconnected
-      }
+  setupForPlayback(audioElement, audioContext, connectToDestination = true) {
+    // Reuse existing MediaElementSourceNode if it already exists for this audio element
+    if (!this.source || this.source.mediaElement !== audioElement) {
+      this.cleanup(); // Ensure any previous connections are cleaned up
+      this.source = audioContext.createMediaElementSource(audioElement);
     }
 
-    // Create a new source, ignoring previous connections
-    audioElement.pause();
-    audioElement.currentTime = 0;
-    this.source = audioContext.createMediaElementSource(audioElement);
+    this.analyser = this._createAnalyser(audioContext);
 
-    this.analyser = audioContext.createAnalyser();
-    this.analyser.fftSize = FFT_SIZE;
-
-    // Connect the source to the analyser and then to destination
     this.source.connect(this.analyser);
-    this.analyser.connect(audioContext.destination);
 
-    this.bufferLength = this.analyser.frequencyBinCount;
-    this.dataArray = new Uint8Array(this.bufferLength);
+    if (connectToDestination) {
+      this.analyser.connect(audioContext.destination);
+    }
 
+    this._initializeBuffer();
     return this.analyser;
   }
 
   cleanup() {
     if (this.source) {
-      try {
-        this.source.disconnect();
-      } catch (e) {
-        // Ignore disconnect errors
-      }
+      this._safeDisconnect(this.source);
     }
     if (this.analyser) {
+      this._safeDisconnect(this.analyser);
+    }
+  }
+
+  _createAnalyser(audioContext) {
+    const analyser = audioContext.createAnalyser();
+    analyser.fftSize = FFT_SIZE;
+    return analyser;
+  }
+
+  _initializeBuffer() {
+    this.bufferLength = this.analyser.frequencyBinCount;
+    this.dataArray = new Uint8Array(this.bufferLength);
+  }
+
+  _safeDisconnect(node) {
+    if (node) {
       try {
-        this.analyser.disconnect();
-      } catch (e) {
+        node.disconnect();
+      } catch {
         // Ignore disconnect errors
       }
     }
-    this.source = null;
-    this.analyser = null;
-    this.dataArray = null;
-    this.bufferLength = null;
   }
 }
 
