@@ -250,10 +250,12 @@ class RecordingHandler {
   async handleRecordingStop() {
     console.log("Processing recording...");
     recordBtn.dataset.pending = true;
+    recordBtn.disabled = true;
 
     const audioBlob = new Blob(state.chunks, { type: "audio/wav" });
     if (!fileInput.files.length) {
       recordBtn.dataset.pending = false;
+      recordBtn.disabled = false;
       alert("Please select a file.");
       return;
     }
@@ -299,6 +301,7 @@ class RecordingHandler {
     audioPlayback.onended = () => {
       this.audioAnalyzer.cleanup();
       recordBtn.dataset.pending = false;
+      recordBtn.disabled = false;
       state.isVisualizing = false;
     };
   }
