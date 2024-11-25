@@ -75,8 +75,9 @@ class MegaparseProcessor(ProcessorBase):
 
     async def process_file_inner(self, file: QuivrFile) -> list[Document]:
         logger.info(f"Uploading file {file.path} to MegaParse")
-        client = MegaParseNATSClient(ClientNATSConfig())
-        response = await client.parse_file(file=file.path)
+        async with MegaParseNATSClient(ClientNATSConfig()) as client:
+            response = await client.parse_file(file=file.path)
+
         logger.info(f"File :  {response}")
         document = Document(
             page_content=response,
