@@ -11,9 +11,7 @@ from rich.prompt import Prompt
 if __name__ == "__main__":
     brain = Brain.from_files(
         name="test_brain",
-        file_paths=[
-            "/Users/chloed./Documents/quivr/quivr/enterprise/backend/core/core/tests/processor/pdf/sample.pdf"
-        ],
+        file_paths=["./tests/processor/pdf/sample.pdf"],
         llm=LLMEndpoint(
             llm_config=LLMEndpointConfig(model="gpt-4o"),
             llm=ChatOpenAI(model="gpt-4o", api_key=str(os.getenv("OPENAI_API_KEY"))),
