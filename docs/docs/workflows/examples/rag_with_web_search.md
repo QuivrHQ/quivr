@@ -15,7 +15,8 @@ Follow the instructions below to create the agentic RAG workflow shown above, wh
 1. Add your API Keys to your environment variables
 ```python
 import os
-os.environ["OPENAI_API_KEY"] = "myopenai_apikey"
+os.environ["OPENAI_API_KEY"] = "my_openai_api_key"
+os.environ["TAVILY_API_KEY"] = "my_tavily_api_key"
 
 ```
 Check our `.env.example` file to see the possible environment variables you can configure. Quivr supports APIs from Anthropic, OpenAI, and Mistral. It also supports local models using Ollama.
