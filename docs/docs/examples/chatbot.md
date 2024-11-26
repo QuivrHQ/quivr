@@ -7,7 +7,7 @@ This example demonstrates a simple chatbot using **Quivr** and **Chainlit**, whe
 ## Prerequisites
 
 - **Python**: Version 3.8 or higher.
-- **OpenAI API Key**: Ensure you have a valid API key configured.
+- **OpenAI API Key**: Ensure you have a valid OpenAI API key.
 
 ---
 
