@@ -15,8 +15,8 @@ This example demonstrates a simple chatbot using **Flask** and **Quivr**, where 
 
 1. Clone the repository and navigate to the project directory:
     ```bash
-    git clone <repo-url>
-    cd chatbot
+    git clone https://github.com/QuivrHQ/quivr
+    cd examples/quivr-whisper
     ```
 
 2. Set the OpenAI API key as an environment variable:

@@ -15,8 +15,8 @@ This example demonstrates how to create a voice-enabled chatbot using **Quivr** 
 
 1. Clone the repository and navigate to the appropriate directory:
     ```bash
-    git clone <repo-url>
-    cd core/examples/chatbot
+    git clone https://github.com/QuivrHQ/quivr
+    cd examples/chatbot_voice
     ```
 
 2. Set the OpenAI API key as an environment variable:

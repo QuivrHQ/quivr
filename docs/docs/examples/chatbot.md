@@ -15,8 +15,8 @@ This example demonstrates a simple chatbot using **Quivr** and **Chainlit**, whe
 
 1. Clone the repository and navigate to the appropriate directory:
     ```bash
-    git clone <repo-url>
-    cd core/examples/chatbot
+    git clone https://github.com/QuivrHQ/quivr
+    cd examples/chatbot
     ```
 
 2. Set the OpenAI API key as an environment variable:
