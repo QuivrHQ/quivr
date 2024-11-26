@@ -32,6 +32,8 @@ anyio==4.6.2.post1
     # via httpx
     # via openai
     # via starlette
+asgiref==3.8.1
+    # via flask
 attrs==24.2.0
     # via aiohttp
 backoff==2.2.1
@@ -42,6 +44,8 @@ beautifulsoup4==4.12.3
     # via unstructured
 blinker==1.9.0
     # via flask
+cachelib==0.9.0
+    # via flask-caching
 cachetools==5.5.0
     # via google-auth
 certifi==2024.8.30
@@ -112,6 +116,9 @@ filetype==1.2.0
     # via llama-index-core
     # via unstructured
 flask==3.1.0
+    # via flask-caching
+    # via quivr-whisper
+flask-caching==2.3.0
     # via quivr-whisper
 flatbuffers==24.3.25
     # via onnxruntime
