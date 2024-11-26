@@ -89,4 +89,6 @@ nav:
       - Examples:
           - examples/index.md
           - examples/custom_storage.md
+          - examples/chatbot.md
+          - examples/chatbot_voice.md
   - Enterprise: https://docs.quivr.app/
