@@ -1,7 +1,10 @@
-# Voice Chatbot with Chainlit
+# Voice Chatbot with Flask
 
 This example demonstrates a simple chatbot using **Flask** and **Quivr**, where users can upload a `.txt` file and ask questions based on its content. It supports speech-to-text and text-to-speech capabilities for a seamless interactive experience.
 
+<video style="width:100%" muted="" controls="" alt="type:video">
+   <source src="../assets/chatbot_voice_flask.mp4" type="video/mp4">
+</video>
 ---
 
 ## Prerequisites
