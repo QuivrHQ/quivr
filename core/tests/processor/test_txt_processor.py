@@ -3,7 +3,7 @@ from uuid import uuid4
 import pytest
 from quivr_core.storage.file import FileExtension, QuivrFile
 
-unstructured = pytest.importorskip("unstructured")
+megaparse = pytest.importorskip("megaparse")
 
 
 @pytest.fixture
