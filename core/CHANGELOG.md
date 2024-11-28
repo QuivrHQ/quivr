@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.0.25](https://github.com/QuivrHQ/quivr/compare/core-0.0.24...core-0.0.25) (2024-11-28)
+
+
+### Bug Fixes
+
+* megaparse sdk with nats ([#3496](https://github.com/QuivrHQ/quivr/issues/3496)) ([e68b4f4](https://github.com/QuivrHQ/quivr/commit/e68b4f45698898f6b514d4779c8e5fd7332f2e67))
+
+
+### Documentation
+
+* Enhance example/chatbot with added instructions ([#3506](https://github.com/QuivrHQ/quivr/issues/3506)) ([d1d608d](https://github.com/QuivrHQ/quivr/commit/d1d608d19ffb9213910575981eff3527f7d232a0))
+
 ## [0.0.24](https://github.com/QuivrHQ/quivr/compare/core-0.0.23...core-0.0.24) (2024-11-14)
 
 
