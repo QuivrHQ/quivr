@@ -8,23 +8,32 @@ This example demonstrates how to create a simple chatbot using Quivr and Chainli
 
 ## Installation
 
-1. Clone the repository or navigate to the `core/examples/chatbot` directory.
+1. Clone the repository and navigate to the `examples/chatbot` directory.
 
-2. Install the required dependencies:
+2. Make sure you have [rye](https://rye.astral.sh/) installed.
 
+3. Install the requirements using `rye`:
+
+   ```sh
+   rye sync
    ```
-   pip install -r requirements.lock
+4. Activate the venv
+
+   ```sh
+   source ./venv/bin/activate
    ```
 
 ## Running the Chatbot
 
-1. Start the Chainlit server:
+1. Define your API key as environment variable. e.g. `export OPENAI_API_KEY=your-key-here`
+
+2. Start the Chainlit server:
 
    ```
    chainlit run main.py
    ```
 
-2. Open your web browser and go to the URL displayed in the terminal (usually `http://localhost:8000`).
+3. Open your web browser and go to the URL displayed in the terminal (usually `http://localhost:8000`).
 
 ## Using the Chatbot
 
