@@ -6,9 +6,10 @@ authors = [
     { name = "Stan Girard", email = "stan@quivr.app" }
 ]
 dependencies = [
-    "flask>=3.1.0",
+    "flask[async]>=3.1.0",
     "openai>=1.54.5",
     "quivr-core>=0.0.24",
+    "flask-caching>=2.3.0",
 ]
 readme = "README.md"
 requires-python = ">= 3.11"

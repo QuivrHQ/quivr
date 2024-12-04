@@ -1,209 +1,359 @@
-const recordBtn = document.getElementById('record-btn');
-const audioVisualizer = document.getElementById('audio-visualizer');
-const audioPlayback = document.getElementById('audio-playback');
-const canvasCtx = audioVisualizer.getContext('2d');
+// DOM Elements
+const recordBtn = document.getElementById("record-btn");
+const fileInput = document.getElementById("fileInput");
+const fileInputContainer = document.querySelector(".custom-file-input");
+const fileName = document.getElementById("fileName");
 
-let isRecording = false;
-let mediaRecorder;
-let audioChunks = [];
-let audioContext;
-let analyser;
-let dataArray;
-let bufferLength;
-let lastAudioLevel = 0;
-let silenceTimer;
+const audioVisualizer = document.getElementById("audio-visualizer");
+const audioPlayback = document.getElementById("audio-playback");
+const canvasCtx = audioVisualizer.getContext("2d");
 
-recordBtn.addEventListener('click', toggleRecording);
+window.addEventListener("load", () => {
+  audioVisualizer.width = window.innerWidth;
+  audioVisualizer.height = window.innerHeight;
+});
 
-function toggleRecording() {
-    if (!isRecording) {
-        recordBtn.classList.add('hidden');
-        audioVisualizer.classList.remove('hidden');
-        startRecording();
-    } else {
-        audioVisualizer.classList.add('hidden');
-        stopRecording();
+window.addEventListener("resize", (e) => {
+  audioVisualizer.width = window.innerWidth;
+  audioVisualizer.height = window.innerHeight;
+});
+
+fileInput.addEventListener("change", () => {
+  fileName.textContent =
+    fileInput.files.length > 0 ? fileInput.files[0].name : "No file chosen";
+  fileName.classList.toggle("file-selected", fileInput.files.length > 0);
+});
+
+// Configuration
+const SILENCE_THRESHOLD = 128; // Adjusted for byte data (128 is middle)
+const SILENCE_DURATION = 1500;
+const FFT_SIZE = 2048;
+
+// State
+const state = {
+  isRecording: false,
+  isVisualizing: false,
+  chunks: [],
+  silenceTimer: null,
+  lastAudioLevel: 0,
+};
+
+// Audio Analysis
+class AudioAnalyzer {
+  constructor() {
+    this.reset();
+  }
+
+  reset() {
+    this.analyser = null;
+    this.dataArray = null;
+    this.bufferLength = null;
+    this.source = null;
+    this.cleanup();
+  }
+
+  setup(source, audioContext) {
+    this.cleanup();
+
+    this.analyser = this._createAnalyser(audioContext);
+    source.connect(this.analyser);
+
+    this._initializeBuffer();
+    return this.analyser;
+  }
+
+  setupForPlayback(audioElement, audioContext, connectToDestination = true) {
+    // Reuse existing MediaElementSourceNode if it already exists for this audio element
+    if (!this.source || this.source.mediaElement !== audioElement) {
+      this.cleanup(); // Ensure any previous connections are cleaned up
+      this.source = audioContext.createMediaElementSource(audioElement);
     }
+
+    this.analyser = this._createAnalyser(audioContext);
+
+    this.source.connect(this.analyser);
+
+    if (connectToDestination) {
+      this.analyser.connect(audioContext.destination);
+    }
+
+    this._initializeBuffer();
+    return this.analyser;
+  }
+
+  cleanup() {
+    if (this.source) {
+      this._safeDisconnect(this.source);
+    }
+    if (this.analyser) {
+      this._safeDisconnect(this.analyser);
+    }
+  }
+
+  _createAnalyser(audioContext) {
+    const analyser = audioContext.createAnalyser();
+    analyser.fftSize = FFT_SIZE;
+    return analyser;
+  }
+
+  _initializeBuffer() {
+    this.bufferLength = this.analyser.frequencyBinCount;
+    this.dataArray = new Uint8Array(this.bufferLength);
+  }
+
+  _safeDisconnect(node) {
+    if (node) {
+      try {
+        node.disconnect();
+      } catch {
+        // Ignore disconnect errors
+      }
+    }
+  }
 }
 
-function drawWaveform() {
-    if (!analyser) return;
+// Visualization
+class Visualizer {
+  constructor(canvas, analyzer) {
+    this.canvas = canvas;
+    this.ctx = canvas.getContext("2d");
+    this.analyzer = analyzer;
+  }
 
-    requestAnimationFrame(drawWaveform);
+  draw(currentAnalyser, onSilence) {
+    if (!currentAnalyser || this.analyzer.dataArray === null) return;
 
-    analyser.getByteTimeDomainData(dataArray);
+    requestAnimationFrame(() => this.draw(currentAnalyser, onSilence));
 
-    canvasCtx.fillStyle = 'rgb(255, 255, 255)';
-    canvasCtx.fillRect(0, 0, audioVisualizer.width, audioVisualizer.height);
+    // Use getByteTimeDomainData instead of getFloatTimeDomainData
+    currentAnalyser.getByteTimeDomainData(this.analyzer.dataArray);
 
-    canvasCtx.lineWidth = 2;
-    canvasCtx.strokeStyle = 'rgb(0, 0, 0)';
+    // Clear canvas
+    this.ctx.fillStyle = "#252525";
+    this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+    if (!state.isVisualizing) return;
 
-    canvasCtx.beginPath();
+    this.ctx.lineWidth = 2;
+    this.ctx.strokeStyle = "#6142d4";
+    this.ctx.beginPath();
 
-    let sliceWidth = audioVisualizer.width * 1.0 / bufferLength;
+    const sliceWidth = (this.canvas.width * 1) / this.analyzer.bufferLength;
     let x = 0;
-
     let sum = 0;
 
-    for (let i = 0; i < bufferLength; i++) {
-        let v = dataArray[i] / 128.0;
-        let y = v * audioVisualizer.height / 2;
+    // Draw waveform
+    for (let i = 0; i < this.analyzer.bufferLength; i++) {
+      // Scale byte data (0-255) to canvas height
+      const v = this.analyzer.dataArray[i] / 128.0; // normalize to 0-2
+      const y = (v - 1) * (this.canvas.height / 2) + this.canvas.height / 2;
 
-        sum += v;
+      sum += Math.abs(v - 1); // Calculate distance from center (128)
 
-        if (i === 0) {
-            canvasCtx.moveTo(x, y);
+      if (i === 0) {
+        this.ctx.moveTo(x, y);
+      } else {
+        this.ctx.lineTo(x, y);
+      }
+
+      x += sliceWidth;
+    }
+
+    this.ctx.lineTo(this.canvas.width, this.canvas.height / 2);
+    this.ctx.stroke();
+
+    // Check for silence during recording with adjusted thresholds for byte data
+    if (state.isRecording) {
+      const averageAmplitude = sum / this.analyzer.bufferLength;
+      if (averageAmplitude < 0.1) {
+        // Adjusted threshold for normalized data
+        // Reset silence timer if we detect sound
+        if (averageAmplitude > 0.05) {
+          clearTimeout(state.silenceTimer);
+          state.silenceTimer = null;
         } else {
-            canvasCtx.lineTo(x, y);
+          onSilence();
         }
-
-        x += sliceWidth;
+      }
     }
-
-    canvasCtx.lineTo(audioVisualizer.width, audioVisualizer.height / 2);
-    canvasCtx.stroke();
-
-    let currentAudioLevel = sum / bufferLength;
-
-    if (isRecording && Math.abs(currentAudioLevel - lastAudioLevel) < 0.01) {
-        if (!silenceTimer) {
-            silenceTimer = setTimeout(stopRecording, 1000);
-        }
-    } else {
-        clearTimeout(silenceTimer);
-        silenceTimer = null;
-    }
-
-    lastAudioLevel = currentAudioLevel;
+  }
 }
 
-async function startRecording() {
-    audioChunks = [];
-    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-    mediaRecorder = new MediaRecorder(stream);
-    mediaRecorder.ondataavailable = event => {
-        audioChunks.push(event.data);
-    };
-    mediaRecorder.start();
-    isRecording = true;
+// Recording Handler
+class RecordingHandler {
+  constructor() {
+    this.mediaRecorder = null;
+    this.audioAnalyzer = new AudioAnalyzer();
+    this.visualizer = new Visualizer(audioVisualizer, this.audioAnalyzer);
+    this.audioContext = null;
+  }
 
-    audioContext = new (window.AudioContext || window.webkitAudioContext)();
-    analyser = audioContext.createAnalyser();
-    const source = audioContext.createMediaStreamSource(stream);
-
-    source.connect(analyser);
-    analyser.fftSize = 2048;
-    bufferLength = analyser.frequencyBinCount;
-    dataArray = new Uint8Array(bufferLength);
-
-    drawWaveform();
-}
-
-function stopRecording() {
-    mediaRecorder.stop();
-    mediaRecorder.onstop = async () => {
-        // The mediaRecorder has stopped; now we can process the chunks
-        const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
-        const formData = new FormData();
-        formData.append('audio_data', audioBlob);
-
-        // Now we're sending the audio to the server and waiting for a response
-        try {
-            const response = await fetch('/transcribe', {
-                method: 'POST',
-                body: formData
-            });
-            const data = await response.json();
-
-            // Once we have the response, we can source the playback element and play it
-            audioPlayback.src = 'data:audio/wav;base64,' + data.audio_base64;
-            audioPlayback.classList.remove('hidden');
-            audioVisualizer.classList.add('hidden'); // hide the visualizer while playing back the response
-            setupAIResponseVisualization();
-            audioPlayback.onloadedmetadata = () => {
-                // When metadata is loaded, start playback
-                audioPlayback.play();
-                visualizeAIResponse();
-            };
-
-            // We only reset the UI after the audio has finished playing
-            // audioPlayback.onended = () => {
-            //     resetUI();
-            // };
-        } catch (error) {
-            console.error('Error during fetch/transcription:', error);
-            resetUI();
-        } finally {
-            if (analyser) {
-                analyser.disconnect();
-                analyser = null;
-            }
-            isRecording = false;
-        }
-    };
-}
-function resetUI() {
-    document.getElementById('record-btn').classList.remove('hidden');
-    document.getElementById('audio-visualizer').classList.add('hidden');
-    document.getElementById('audio-playback').classList.add('hidden');
-    // Reset any other UI elements as necessary
-}
-
-function setupAIResponseVisualization() {
+  async initialize() {
     try {
-        // Create a new audio context for playback if it doesn't exist
-        if (!audioContext) {
-            audioContext = new (window.AudioContext || window.webkitAudioContext)();
-        }
-        // Resume the audio context in case it's in a suspended state
-        audioContext.resume().then(() => {
-            analyser = audioContext.createAnalyser();
-            const source = audioContext.createMediaElementSource(audioPlayback);
-            source.connect(analyser);
-            analyser.connect(audioContext.destination);
-            analyser.fftSize = 2048;
-            bufferLength = analyser.frequencyBinCount;
-            dataArray = new Uint8Array(bufferLength);
-        });
-    } catch (error) {
-        console.error('Error setting up AI response visualization:', error);
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      this.mediaRecorder = new MediaRecorder(stream);
+      this.setupRecordingEvents();
+      if (!this.audioContext)
+        this.audioContext = new (window.AudioContext ||
+          window.webkitAudioContext)();
+    } catch (err) {
+      console.error(`Media device error: ${err}`);
     }
-}
+  }
 
-function visualizeAIResponse() {
-    const draw = () => {
-        requestAnimationFrame(draw);
-
-        analyser.getByteTimeDomainData(dataArray);
-
-        canvasCtx.fillStyle = 'rgb(255, 255, 255)';
-        canvasCtx.fillRect(0, 0, audioVisualizer.width, audioVisualizer.height);
-
-        canvasCtx.lineWidth = 2;
-        canvasCtx.strokeStyle = 'rgb(0, 0, 0)';
-
-        canvasCtx.beginPath();
-
-        let sliceWidth = audioVisualizer.width * 1.0 / bufferLength;
-        let x = 0;
-
-        for (let i = 0; i < bufferLength; i++) {
-            let v = dataArray[i] / 128.0;
-            let y = v * audioVisualizer.height / 2;
-
-            if (i === 0) {
-                canvasCtx.moveTo(x, y);
-            } else {
-                canvasCtx.lineTo(x, y);
-            }
-
-            x += sliceWidth;
-        }
-
-        canvasCtx.lineTo(audioVisualizer.width, audioVisualizer.height / 2);
-        canvasCtx.stroke();
+  setupRecordingEvents() {
+    this.mediaRecorder.ondataavailable = (e) => {
+      state.chunks.push(e.data);
     };
 
-    draw();
+    this.mediaRecorder.onstop = async () => {
+      await this.handleRecordingStop();
+    };
+  }
+
+  startRecording() {
+    state.isVisualizing = true;
+    state.chunks = [];
+    state.isRecording = true;
+    this.mediaRecorder.start();
+
+    const source = this.audioContext.createMediaStreamSource(
+      this.mediaRecorder.stream
+    );
+
+    const analyser = this.audioAnalyzer.setup(source, this.audioContext);
+    audioVisualizer.classList.remove("hidden");
+
+    this.visualizer.draw(analyser, () => {
+      if (!state.silenceTimer) {
+        state.silenceTimer = setTimeout(
+          () => this.stopRecording(),
+          SILENCE_DURATION
+        );
+      }
+    });
+
+    recordBtn.dataset.recording = true;
+    recordBtn.classList.add("processing");
+  }
+
+  stopRecording() {
+    if (state.isRecording) {
+      state.isVisualizing = false;
+      state.isRecording = false;
+      this.mediaRecorder.stop();
+      clearTimeout(state.silenceTimer);
+      state.silenceTimer = null;
+      recordBtn.dataset.recording = false;
+    }
+  }
+
+  async handleRecordingStop() {
+    console.log("Processing recording...");
+    recordBtn.dataset.pending = true;
+    recordBtn.disabled = true;
+
+    const audioBlob = new Blob(state.chunks, { type: "audio/wav" });
+    if (!fileInput.files.length) {
+      recordBtn.dataset.pending = false;
+      recordBtn.disabled = false;
+      alert("Please select a file.");
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append("audio_data", audioBlob);
+    formData.append("file", fileInput.files[0]);
+
+    try {
+      await this.processRecording(formData);
+    } catch (error) {
+      console.error("Processing error:", error);
+    } finally {
+      this.audioAnalyzer.cleanup();
+    }
+  }
+
+  async processRecording(formData) {
+    const response = await fetch("/ask", {
+      method: "POST",
+      body: formData,
+    });
+    const data = await response.json();
+
+    await this.handleResponse(data);
+  }
+
+  async handleResponse(data) {
+    audioPlayback.src = "data:audio/wav;base64," + data.audio_base64;
+
+    audioPlayback.onloadedmetadata = () => {
+      const analyser = this.audioAnalyzer.setupForPlayback(
+        audioPlayback,
+        this.audioContext
+      );
+      audioVisualizer.classList.remove("hidden");
+
+      this.visualizer.draw(analyser, () => {});
+      audioPlayback.play();
+      state.isVisualizing = true;
+    };
+
+    audioPlayback.onended = () => {
+      this.audioAnalyzer.cleanup();
+      recordBtn.dataset.pending = false;
+      recordBtn.disabled = false;
+      state.isVisualizing = false;
+    };
+  }
 }
+
+const uploadFile = async (e) => {
+  uploadBtn.innerText = "Uploading File...";
+  e.preventDefault();
+  const file = fileInput.files[0];
+
+  if (!file) {
+    alert("Please select a file.");
+    return;
+  }
+  const formData = new FormData();
+  formData.append("file", file);
+  try {
+    await fetch("/upload", {
+      method: "POST",
+      body: formData,
+    });
+    recordBtn.classList.remove("hidden");
+    fileInputContainer.classList.add("hidden");
+  } catch (error) {
+    recordBtn.classList.add("hidden");
+    fileInputContainer.classList.remove("hidden");
+    console.error("Error uploading file:", error);
+    uploadBtn.innerText = "Upload Failed. Try again";
+  }
+};
+
+const uploadBtn = document.getElementById("upload-btn");
+uploadBtn.addEventListener("click", uploadFile);
+
+// Main initialization
+async function initializeApp() {
+  if (!navigator.mediaDevices) {
+    console.error("Media devices not supported");
+    return;
+  }
+
+  const recorder = new RecordingHandler();
+  await recorder.initialize();
+
+  recordBtn.onclick = () => {
+    if (recorder.mediaRecorder.state === "inactive") {
+      recorder.startRecording();
+    } else if (recorder.mediaRecorder.state === "recording") {
+      recorder.stopRecording();
+    }
+  };
+}
+
+// Start the application
+initializeApp();
