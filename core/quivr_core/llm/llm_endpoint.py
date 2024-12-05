@@ -7,7 +7,7 @@ import tiktoken
 from langchain_anthropic import ChatAnthropic
 from langchain_core.language_models.chat_models import BaseChatModel
 from langchain_openai import AzureChatOpenAI, ChatOpenAI
-from pydantic.v1 import SecretStr
+from pydantic import SecretStr
 
 from quivr_core.brain.info import LLMInfo
 from quivr_core.rag.entities.config import DefaultModelSuppliers, LLMEndpointConfig
