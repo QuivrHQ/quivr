@@ -59,7 +59,7 @@ class DefaultRerankers(str, Enum):
     def default_model(self) -> str:
         # Mapping of suppliers to their default models
         return {
-            self.COHERE: "rerank-multilingual-v3.0",
+            self.COHERE: "rerank-v3.5",
             self.JINA: "jina-reranker-v2-base-multilingual",
             # self.MIXEDBREAD: "rmxbai-rerank-large-v1",
         }[self]
@@ -220,7 +220,7 @@ class LLMEndpointConfig(QuivrBaseConfig):
             return
 
         # Check if the corresponding API key environment variable is set
-        if not self.env_variable_name:
+        if force_reset or not self.env_variable_name:
             self.env_variable_name = (
                 f"{normalize_to_env_variable_name(self.supplier)}_API_KEY"
             )
@@ -230,7 +230,9 @@ class LLMEndpointConfig(QuivrBaseConfig):
 
         if not self.llm_api_key:
             logger.warning(f"The API key for supplier '{self.supplier}' is not set. ")
-            logger.warning(f"Please set the environment variable: '{self.env_variable_name}'. ")
+            logger.warning(
+                f"Please set the environment variable: '{self.env_variable_name}'. "
+            )
 
     def set_llm_model_config(self):
         # Automatically set context_length and tokenizer_hub based on the supplier and model

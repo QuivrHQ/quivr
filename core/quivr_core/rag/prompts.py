@@ -61,23 +61,23 @@ def _define_custom_prompts() -> CustomPromptsDict:
         "- If no preferred language is provided, answer in the same language as the language used by the user.\n"
         "- You must use ONLY the provided context to answer the question. "
         "Do not use any prior knowledge or external information, even if you are certain of the answer.\n"
-        "- If you cannot provide an answer using ONLY the context provided, do not attempt to answer from your own knowledge."
-        "Instead, inform the user that the answer isn't available in the context and suggest using the available tools {tools}.\n"
+        # "- If you cannot provide an answer using ONLY the context provided, do not attempt to answer from your own knowledge."
+        # "Instead, inform the user that the answer isn't available in the context and suggest using the available tools {tools}.\n"
         "- Do not apologize when providing an answer.\n"
         "- Don't cite the source id in the answer objects, but you can use the source to answer the question.\n\n"
     )
 
     context_template = (
         "\n"
-        "- You have access to the following internal reasoning to provide an answer: {reasoning}\n"
+        # "- You have access to the following internal reasoning to provide an answer: {reasoning}\n"
         "- You have access to the following files to answer the user question (limited to first 20 files): {files}\n"
         "- You have access to the following context to answer the user question: {context}\n"
         "- Follow these user instruction when crafting the answer: {custom_instructions}\n"
         "- These user instructions shall take priority over any other previous instruction.\n"
-        "- Remember: if you cannot provide an answer using ONLY the provided context and CITING the sources, "
-        "inform the user that you don't have the answer and consider if any of the tools can help answer the question.\n"
-        "- Explain your reasoning about the potentiel tool usage in the answer.\n"
-        "- Only use binded tools to answer the question.\n"
+        # "- Remember: if you cannot provide an answer using ONLY the provided context and CITING the sources, "
+        # "inform the user that you don't have the answer and consider if any of the tools can help answer the question.\n"
+        # "- Explain your reasoning about the potentiel tool usage in the answer.\n"
+        # "- Only use binded tools to answer the question.\n"
         # "OFFER the user the possibility to ACTIVATE a relevant tool among "
         # "the tools which can be activated."
         # "Tools which can be activated: {tools}. If any of these tools can help in providing an answer "
@@ -88,6 +88,10 @@ def _define_custom_prompts() -> CustomPromptsDict:
     template_answer = (
         "Original task: {question}\n"
         "Rephrased and contextualized task: {rephrased_task}\n"
+        "Remember, you shall answer ALL questions and tasks.\n"
+        "Remember: if you cannot provide an answer using ONLY the provided context and CITING the sources, "
+        "just answer that you don't have the answer.\n"
+        "If the provided context contains contradictory or conflicting information, state so providing the conflicting information.\n"
     )
 
     RAG_ANSWER_PROMPT = ChatPromptTemplate.from_messages(
@@ -207,8 +211,8 @@ def _define_custom_prompts() -> CustomPromptsDict:
         "just reformulate them if needed and otherwise return them as is.\n"
         "- Remember, you shall NOT suggest or generate new tasks.\n"
         "- As an example, the user input 'What is Apple? Who is its CEO? When was it founded?' "
-        "shall be split into the questions 'What is Apple?', 'Who is the CEO of Apple?' and 'When was Apple founded?'.\n"
-        "- If no tasks are found, return the user input as is in the task.\n"
+        "shall be split into a list of tasks ['What is Apple?', 'Who is the CEO of Apple?', 'When was Apple founded?']\n"
+        "- If no tasks are found, return the user input as is in the task list.\n"
     )
 
     template_answer = "User input: {user_input}"

@@ -45,8 +45,8 @@ def create_tavily_tool(config: Dict[str, Any]) -> ToolWrapper:
                 page_content=d["content"],
                 metadata={
                     **metadata,
-                    "file_name": d["url"],
-                    "original_file_name": d["url"],
+                    "file_name": d["url"] if "url" in d else "",
+                    "original_file_name": d["url"] if "url" in d else "",
                 },
             )
             for d in response
