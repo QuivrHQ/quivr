@@ -96,13 +96,18 @@ def parse_chunk_response(
     """
     rolling_msg += raw_chunk
 
-    if not supports_func_calling or not rolling_msg.tool_calls:
+    tool_calls = rolling_msg.tool_calls
+
+    if not supports_func_calling or not tool_calls:
         new_content = raw_chunk.content  # Just the new chunk's content
         full_content = rolling_msg.content  # The full accumulated content
         return rolling_msg, new_content, full_content
 
-    current_answers = get_answers_from_tool_calls(rolling_msg.tool_calls)
+    current_answers = get_answers_from_tool_calls(tool_calls)
     full_answer = "\n\n".join(current_answers)
+    if not full_answer:
+        full_answer = previous_content
+
     new_content = full_answer[len(previous_content) :]
 
     return rolling_msg, new_content, full_answer
@@ -111,8 +116,12 @@ def parse_chunk_response(
 def get_answers_from_tool_calls(tool_calls):
     answers = []
     for tool_call in tool_calls:
-        if tool_call.get("name") == "cited_answer" and "args" in tool_call:
-            answers.append(tool_call["args"].get("answer", ""))
+        if tool_call.get("name") == "cited_answer":
+            args = tool_call.get("args", {})
+            if isinstance(args, dict):
+                answers.append(args.get("answer", ""))
+            else:
+                logger.warning(f"Expected dict for tool_call args, got {type(args)}")
     return answers
 
 
