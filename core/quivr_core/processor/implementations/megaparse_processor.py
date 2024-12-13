@@ -31,7 +31,6 @@ class MegaparseProcessor(ProcessorBase):
     """
 
     supported_extensions = [
-        FileExtension.txt,
         FileExtension.pdf,
         FileExtension.docx,
         FileExtension.doc,
@@ -43,9 +42,11 @@ class MegaparseProcessor(ProcessorBase):
         FileExtension.bib,
         FileExtension.odt,
         FileExtension.html,
+        FileExtension.py,
         FileExtension.markdown,
         FileExtension.md,
         FileExtension.mdx,
+        FileExtension.ipynb,
     ]
 
     def __init__(
