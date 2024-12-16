@@ -1,10 +1,8 @@
 [project]
 name = "quivr-core"
-version = "0.0.25"
+version = "0.0.27"
 description = "Quivr core RAG package"
-authors = [
-    { name = "Stan Girard", email = "stan@quivr.app" }
-]
+authors = [{ name = "Stan Girard", email = "stan@quivr.app" }]
 dependencies = [
     "pydantic>=2.8.2",
     "langchain-core>=0.3,<0.4",
@@ -23,7 +21,7 @@ dependencies = [
     "faiss-cpu>=1.8.0.post1",
     "rapidfuzz>=3.10.1",
     "markupsafe>=2.1.5",
-    "megaparse-sdk==0.1.7",
+    "megaparse-sdk>=0.1.9",
     "langchain-mistralai>=0.2.3",
 ]
 readme = "README.md"

@@ -1,5 +1,30 @@
 # Changelog
 
+## [0.0.27](https://github.com/QuivrHQ/quivr/compare/core-0.0.26...core-0.0.27) (2024-12-16)
+
+
+### Features
+
+* ensuring that max_context_tokens is never larger than what supported by models ([#3519](https://github.com/QuivrHQ/quivr/issues/3519)) ([d6e0ed4](https://github.com/QuivrHQ/quivr/commit/d6e0ed44df0ee7edafea85f704a15fd99969bafd))
+* send all to megaparse_sdk ([#3521](https://github.com/QuivrHQ/quivr/issues/3521)) ([e48044d](https://github.com/QuivrHQ/quivr/commit/e48044d36ffda613f65da24641ed8da290195177))
+
+
+### Bug Fixes
+
+* fixing errors arising when the user input contains no tasks ([#3525](https://github.com/QuivrHQ/quivr/issues/3525)) ([e28f7bc](https://github.com/QuivrHQ/quivr/commit/e28f7bcb9ab9534bc011664525ae1f9c2cf6393e))
+
+## [0.0.26](https://github.com/QuivrHQ/quivr/compare/core-0.0.25...core-0.0.26) (2024-12-10)
+
+
+### Features
+
+* first version (V0) of the Workflow Management System ([#3493](https://github.com/QuivrHQ/quivr/issues/3493)) ([6450a49](https://github.com/QuivrHQ/quivr/commit/6450a494e3efa8e8c267ca49aa0a7ec682586b4e))
+
+
+### Bug Fixes
+
+* dealing with empty tool_calls ([#3514](https://github.com/QuivrHQ/quivr/issues/3514)) ([e2f6389](https://github.com/QuivrHQ/quivr/commit/e2f6389189d911a382b2236ab39f28a1270528ac))
+
 ## [0.0.25](https://github.com/QuivrHQ/quivr/compare/core-0.0.24...core-0.0.25) (2024-11-28)
 
 
