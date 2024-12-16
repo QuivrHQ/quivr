@@ -31,7 +31,7 @@ class ChatMessage(BaseModel):
     chat_id: UUID
     message_id: UUID
     brain_id: UUID | None
-    msg: AIMessage | HumanMessage
+    msg: HumanMessage | AIMessage
     message_time: datetime
     metadata: dict[str, Any]
 
