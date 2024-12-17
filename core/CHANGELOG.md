@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.0.28](https://github.com/QuivrHQ/quivr/compare/core-0.0.27...core-0.0.28) (2024-12-17)
+
+
+### Features
+
+* remove dependencies on Pydantic v1 ([#3526](https://github.com/QuivrHQ/quivr/issues/3526)) ([ebc4eb8](https://github.com/QuivrHQ/quivr/commit/ebc4eb811c258ce0500032bbc52d96f333fabf89))
+
 ## [0.0.27](https://github.com/QuivrHQ/quivr/compare/core-0.0.26...core-0.0.27) (2024-12-16)
 
 
