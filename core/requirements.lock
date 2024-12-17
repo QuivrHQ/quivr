@@ -139,7 +139,7 @@ marshmallow==3.22.0
     # via dataclasses-json
 mdurl==0.1.2
     # via markdown-it-py
-megaparse-sdk==0.1.7
+megaparse-sdk==0.1.10
     # via quivr-core
 msgpack==1.1.0
     # via langgraph-checkpoint

@@ -62,6 +62,7 @@ httpcore==1.0.6
 httpx==0.27.2
     # via anthropic
     # via cohere
+    # via langchain-mistralai
     # via langgraph-sdk
     # via langsmith
     # via megaparse-sdk
@@ -70,6 +71,7 @@ httpx==0.27.2
 httpx-sse==0.4.0
     # via cohere
     # via langchain-community
+    # via langchain-mistralai
     # via langgraph-sdk
 huggingface-hub==0.26.1
     # via tokenizers
@@ -102,6 +104,7 @@ langchain-core==0.3.21
     # via langchain-cohere
     # via langchain-community
     # via langchain-experimental
+    # via langchain-mistralai
     # via langchain-openai
     # via langchain-text-splitters
     # via langgraph
@@ -109,6 +112,8 @@ langchain-core==0.3.21
     # via quivr-core
 langchain-experimental==0.3.3
     # via langchain-cohere
+langchain-mistralai==0.2.3
+    # via quivr-core
 langchain-openai==0.2.11
     # via quivr-core
 langchain-text-splitters==0.3.2
@@ -133,7 +138,7 @@ marshmallow==3.23.0
     # via dataclasses-json
 mdurl==0.1.2
     # via markdown-it-py
-megaparse-sdk==0.1.7
+megaparse-sdk==0.1.10
     # via quivr-core
 msgpack==1.1.0
     # via langgraph-checkpoint
@@ -180,6 +185,7 @@ pydantic==2.9.2
     # via langchain-anthropic
     # via langchain-cohere
     # via langchain-core
+    # via langchain-mistralai
     # via langsmith
     # via openai
     # via pydantic-settings
@@ -248,6 +254,7 @@ tiktoken==0.8.0
     # via quivr-core
 tokenizers==0.20.1
     # via cohere
+    # via langchain-mistralai
     # via transformers
 tqdm==4.66.5
     # via huggingface-hub
