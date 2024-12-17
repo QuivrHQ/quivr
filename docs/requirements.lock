@@ -20,11 +20,14 @@ aiosignal==1.3.1
     # via aiohttp
 annotated-types==0.7.0
     # via pydantic
-anthropic==0.36.1
+anthropic==0.40.0
     # via langchain-anthropic
 anyio==4.6.2.post1
     # via anthropic
     # via httpx
+    # via openai
+appnope==0.1.4
+    # via ipykernel
 asttokens==2.4.1
     # via stack-data
 attrs==24.2.0
@@ -46,6 +49,8 @@ charset-normalizer==3.3.2
 click==8.1.7
     # via mkdocs
     # via mkdocstrings
+cohere==5.13.2
+    # via langchain-cohere
 colorama==0.4.6
     # via griffe
     # via mkdocs-material
@@ -62,8 +67,13 @@ defusedxml==0.7.1
     # via nbconvert
 distro==1.9.0
     # via anthropic
+    # via openai
 executing==2.1.0
     # via stack-data
+faiss-cpu==1.9.0.post1
+    # via quivr-core
+fastavro==1.9.7
+    # via cohere
 fastjsonschema==2.20.0
     # via nbformat
 filelock==3.16.1
@@ -76,8 +86,6 @@ fsspec==2024.9.0
     # via huggingface-hub
 ghp-import==2.1.0
     # via mkdocs
-greenlet==3.1.1
-    # via sqlalchemy
 griffe==1.2.0
     # via mkdocstrings-python
 h11==0.14.0
@@ -86,10 +94,17 @@ httpcore==1.0.6
     # via httpx
 httpx==0.27.2
     # via anthropic
+    # via cohere
+    # via langchain-mistralai
     # via langgraph-sdk
     # via langsmith
+    # via megaparse-sdk
+    # via openai
     # via quivr-core
 httpx-sse==0.4.0
+    # via cohere
+    # via langchain-community
+    # via langchain-mistralai
     # via langgraph-sdk
 huggingface-hub==0.25.2
     # via tokenizers
@@ -112,6 +127,7 @@ jinja2==3.1.4
     # via nbconvert
 jiter==0.6.1
     # via anthropic
+    # via openai
 jsonpatch==1.33
     # via langchain-core
 jsonpointer==3.0.0
@@ -133,22 +149,35 @@ jupyterlab-pygments==0.3.0
     # via nbconvert
 jupytext==1.16.4
     # via mkdocs-jupyter
-langchain==0.2.16
+langchain==0.3.9
     # via langchain-community
     # via quivr-core
-langchain-anthropic==0.1.23
+langchain-anthropic==0.3.0
     # via quivr-core
-langchain-community==0.2.17
+langchain-cohere==0.3.3
     # via quivr-core
-langchain-core==0.2.41
+langchain-community==0.3.9
+    # via langchain-experimental
+    # via quivr-core
+langchain-core==0.3.21
     # via langchain
     # via langchain-anthropic
+    # via langchain-cohere
     # via langchain-community
+    # via langchain-experimental
+    # via langchain-mistralai
+    # via langchain-openai
     # via langchain-text-splitters
     # via langgraph
     # via langgraph-checkpoint
     # via quivr-core
-langchain-text-splitters==0.2.4
+langchain-experimental==0.3.3
+    # via langchain-cohere
+langchain-mistralai==0.2.3
+    # via quivr-core
+langchain-openai==0.2.11
+    # via quivr-core
+langchain-text-splitters==0.3.2
     # via langchain
 langgraph==0.2.38
     # via quivr-core
@@ -160,6 +189,8 @@ langsmith==0.1.135
     # via langchain
     # via langchain-community
     # via langchain-core
+loguru==0.7.2
+    # via megaparse-sdk
 markdown==3.7
     # via mkdocs
     # via mkdocs-autorefs
@@ -176,6 +207,7 @@ markupsafe==2.1.5
     # via mkdocs-autorefs
     # via mkdocstrings
     # via nbconvert
+    # via quivr-core
 marshmallow==3.22.0
     # via dataclasses-json
 matplotlib-inline==0.1.7
@@ -185,6 +217,8 @@ mdit-py-plugins==0.4.1
     # via jupytext
 mdurl==0.1.2
     # via markdown-it-py
+megaparse-sdk==0.1.10
+    # via quivr-core
 mergedeep==1.3.4
     # via mkdocs
     # via mkdocs-get-deps
@@ -220,6 +254,8 @@ multidict==6.1.0
     # via yarl
 mypy-extensions==1.0.0
     # via typing-inspect
+nats-py==2.9.0
+    # via megaparse-sdk
 nbclient==0.10.0
     # via nbconvert
 nbconvert==7.16.4
@@ -231,13 +267,18 @@ nbformat==5.10.4
 nest-asyncio==1.6.0
     # via ipykernel
 numpy==1.26.4
+    # via faiss-cpu
     # via langchain
     # via langchain-community
+    # via pandas
     # via transformers
+openai==1.56.2
+    # via langchain-openai
 orjson==3.10.7
     # via langgraph-sdk
     # via langsmith
 packaging==24.1
+    # via faiss-cpu
     # via huggingface-hub
     # via ipykernel
     # via jupytext
@@ -248,8 +289,12 @@ packaging==24.1
     # via transformers
 paginate==0.5.7
     # via mkdocs-material
+pandas==2.2.3
+    # via langchain-cohere
 pandocfilters==1.5.1
     # via nbconvert
+parameterized==0.9.0
+    # via cohere
 parso==0.8.4
     # via jedi
 pathspec==0.12.1
@@ -266,20 +311,32 @@ propcache==0.2.0
     # via yarl
 protobuf==5.28.2
     # via transformers
-psutil==6.0.0
+psutil==6.1.0
     # via ipykernel
+    # via megaparse-sdk
 ptyprocess==0.7.0
     # via pexpect
 pure-eval==0.2.3
     # via stack-data
+pycryptodome==3.21.0
+    # via megaparse-sdk
 pydantic==2.9.2
     # via anthropic
+    # via cohere
     # via langchain
+    # via langchain-anthropic
+    # via langchain-cohere
     # via langchain-core
+    # via langchain-mistralai
     # via langsmith
+    # via openai
+    # via pydantic-settings
     # via quivr-core
 pydantic-core==2.23.4
+    # via cohere
     # via pydantic
+pydantic-settings==2.6.1
+    # via langchain-community
 pygments==2.18.0
     # via ipython
     # via mkdocs-jupyter
@@ -292,6 +349,12 @@ pymdown-extensions==10.9
 python-dateutil==2.9.0.post0
     # via ghp-import
     # via jupyter-client
+    # via pandas
+python-dotenv==1.0.1
+    # via megaparse-sdk
+    # via pydantic-settings
+pytz==2024.2
+    # via pandas
 pyyaml==6.0.2
     # via huggingface-hub
     # via jupytext
@@ -308,7 +371,9 @@ pyyaml-env-tag==0.1
 pyzmq==26.2.0
     # via ipykernel
     # via jupyter-client
-quivr-core==0.0.18
+quivr-core @ file:///${PROJECT_ROOT}/../core
+rapidfuzz==3.10.1
+    # via quivr-core
 referencing==0.35.1
     # via jsonschema
     # via jsonschema-specifications
@@ -317,6 +382,7 @@ regex==2024.7.24
     # via tiktoken
     # via transformers
 requests==2.32.3
+    # via cohere
     # via huggingface-hub
     # via langchain
     # via langchain-community
@@ -344,6 +410,7 @@ sniffio==1.3.1
     # via anthropic
     # via anyio
     # via httpx
+    # via openai
 soupsieve==2.6
     # via beautifulsoup4
 sqlalchemy==2.0.36
@@ -351,22 +418,27 @@ sqlalchemy==2.0.36
     # via langchain-community
 stack-data==0.6.3
     # via ipython
+tabulate==0.9.0
+    # via langchain-cohere
 tenacity==8.5.0
     # via langchain
     # via langchain-community
     # via langchain-core
 tiktoken==0.8.0
+    # via langchain-openai
     # via quivr-core
 tinycss2==1.3.0
     # via nbconvert
 tokenizers==0.20.1
-    # via anthropic
+    # via cohere
+    # via langchain-mistralai
     # via transformers
 tornado==6.4.1
     # via ipykernel
     # via jupyter-client
 tqdm==4.66.5
     # via huggingface-hub
+    # via openai
     # via transformers
 traitlets==5.14.3
     # via comm
@@ -382,19 +454,26 @@ transformers==4.45.2
     # via quivr-core
 types-pyyaml==6.0.12.20240917
     # via quivr-core
+types-requests==2.32.0.20241016
+    # via cohere
 typing-extensions==4.12.2
     # via anthropic
+    # via cohere
     # via huggingface-hub
     # via ipython
     # via langchain-core
+    # via openai
     # via pydantic
     # via pydantic-core
     # via sqlalchemy
     # via typing-inspect
 typing-inspect==0.9.0
     # via dataclasses-json
+tzdata==2024.2
+    # via pandas
 urllib3==2.2.2
     # via requests
+    # via types-requests
 watchdog==5.0.0
     # via mkdocs
 wcwidth==0.2.13
