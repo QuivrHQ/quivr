@@ -479,9 +479,9 @@ class QuivrQARAGLangGraph:
         # Prepare the async tasks for all user tsks
         async_jobs = []
         for task_id in tasks.ids:
-            msg = custom_prompts.CONDENSE_QUESTION_PROMPT.format(
+            msg = custom_prompts.CONDENSE_TASK_PROMPT.format(
                 chat_history=state["chat_history"].to_list(),
-                question=tasks(task_id).definition,
+                task=tasks(task_id).definition,
             )
 
             model = self.llm_endpoint._llm
@@ -850,13 +850,13 @@ class QuivrQARAGLangGraph:
             dict: The updated state with re-phrased question
         """
         messages = state["messages"]
-        user_question = messages[0].content
+        user_task = messages[0].content
 
         # Prompt
         prompt = self.retrieval_config.prompt
 
         final_inputs = {}
-        final_inputs["question"] = user_question
+        final_inputs["task"] = user_task
         final_inputs["custom_instructions"] = prompt if prompt else "None"
         final_inputs["chat_history"] = state["chat_history"].to_list()
 
@@ -1023,14 +1023,14 @@ class QuivrQARAGLangGraph:
             Dictionary containing all inputs needed for RAG_ANSWER_PROMPT
         """
         messages = state["messages"]
-        user_question = messages[0].content
+        user_task = messages[0].content
         files = state["files"]
         prompt = self.retrieval_config.prompt
         # available_tools, _ = collect_tools(self.retrieval_config.workflow_config)
 
         return {
             "context": combine_documents(docs) if docs else "None",
-            "question": user_question,
+            "task": user_task,
             "rephrased_task": state["tasks"].definitions if state["tasks"] else "None",
             "custom_instructions": prompt if prompt else "None",
             "files": files if files else "None",
