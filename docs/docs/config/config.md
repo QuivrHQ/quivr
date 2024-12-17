@@ -1,22 +1,19 @@
 # Configuration
 
 ## Retrieval Configuration
-::: quivr_core.config.RetrievalConfig
+::: quivr_core.rag.entities.config.RetrievalConfig
 
 ## Workflow Configuration
-::: quivr_core.config.WorkflowConfig
+::: quivr_core.rag.entities.config.WorkflowConfig
 
 ## LLM Configuration
-::: quivr_core.config.LLMEndpointConfig
+::: quivr_core.rag.entities.config.LLMEndpointConfig
 
 ## Reranker Configuration
-::: quivr_core.config.RerankerConfig
+::: quivr_core.rag.entities.config.RerankerConfig
 
 ## Supported LLM Model Suppliers
-::: quivr_core.config.DefaultModelSuppliers
+::: quivr_core.rag.entities.config.DefaultModelSuppliers
 
 ## Supported Rerankers
-::: quivr_core.config.DefaultRerankers
-
-
-
+::: quivr_core.rag.entities.config.DefaultRerankers
