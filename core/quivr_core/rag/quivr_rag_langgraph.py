@@ -29,6 +29,8 @@ from langgraph.graph.message import add_messages
 from langgraph.types import Send
 from pydantic import BaseModel, Field
 
+from langfuse.callback import CallbackHandler
+
 from quivr_core.llm import LLMEndpoint
 from quivr_core.llm_tools.llm_tools import LLMToolFactory
 from quivr_core.rag.entities.chat import ChatHistory
@@ -47,6 +49,9 @@ from quivr_core.rag.utils import (
 )
 
 logger = logging.getLogger("quivr_core")
+
+# Initialize Langfuse CallbackHandler for Langchain (tracing)
+langfuse_handler = CallbackHandler()
 
 
 class SplittedInput(BaseModel):
@@ -943,7 +948,7 @@ class QuivrQARAGLangGraph:
                 "files": concat_list_files,
             },
             version="v1",
-            config={"metadata": metadata},
+            config={"metadata": metadata, "callbacks": [langfuse_handler]},
         ):
             if self._is_final_node_with_docs(event):
                 tasks = event["data"]["output"]["tasks"]
