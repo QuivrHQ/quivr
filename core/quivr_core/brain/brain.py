@@ -116,11 +116,14 @@ class Brain:
         vector_db: VectorStore | None = None,
         embedder: Embeddings | None = None,
         storage: StorageBase | None = None,
+        user_id: UUID | None = None,
+        chat_id: UUID | None = None,
     ):
         self.id = id
         self.name = name
         self.storage = storage
-
+        self.user_id = user_id
+        self.chat_id = chat_id
         # Chat history
         self._chats = self._init_chats()
         self.default_chat = list(self._chats.values())[0]
@@ -535,8 +538,15 @@ class Brain:
         list_files = [] if list_files is None else list_files
 
         full_answer = ""
+        metadata = {
+            "langfuse_user_id": str(self.user_id),
+            "langfuse_session_id": str(self.chat_id),
+        }
         async for response in rag_instance.answer_astream(
-            question=question, history=chat_history, list_files=list_files
+            question=question,
+            history=chat_history,
+            list_files=list_files,
+            metadata=metadata,
         ):
             # Format output to be correct servicedf;j
             if not response.last_chunk:
