@@ -178,3 +178,4 @@ class Language(str, Enum):
     YO = "yo"  # Yoruba
     YUE = "yue"  # Cantonese
     ZH = "zh"  # Chinese
+    UNKNOWN = "unknown"  # Unknown
