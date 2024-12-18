@@ -48,6 +48,10 @@ faiss-cpu==1.9.0
     # via quivr-core
 fastavro==1.9.7
     # via cohere
+fasttext==0.9.3
+    # via fasttext-langdetect
+fasttext-langdetect==1.0.5
+    # via quivr-core
 filelock==3.16.1
     # via huggingface-hub
     # via transformers
@@ -152,6 +156,7 @@ nats-py==2.9.0
     # via megaparse-sdk
 numpy==1.26.4
     # via faiss-cpu
+    # via fasttext
     # via langchain
     # via langchain-community
     # via pandas
@@ -177,6 +182,8 @@ protobuf==5.28.2
     # via transformers
 psutil==6.1.0
     # via megaparse-sdk
+pybind11==2.13.6
+    # via fasttext
 pycryptodome==3.21.0
     # via megaparse-sdk
 pydantic==2.9.2
@@ -218,6 +225,7 @@ regex==2024.9.11
     # via transformers
 requests==2.32.3
     # via cohere
+    # via fasttext-langdetect
     # via huggingface-hub
     # via langchain
     # via langchain-community
@@ -233,6 +241,8 @@ safetensors==0.4.5
     # via transformers
 sentencepiece==0.2.0
     # via transformers
+setuptools==75.6.0
+    # via fasttext
 six==1.16.0
     # via python-dateutil
 sniffio==1.3.1
