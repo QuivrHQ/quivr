@@ -27,20 +27,20 @@ def _define_custom_prompts() -> CustomPromptsDict:
     today_date = datetime.datetime.now().strftime("%B %d, %Y")
 
     # ---------------------------------------------------------------------------
-    # Prompt for question rephrasing
+    # Prompt for task rephrasing
     # ---------------------------------------------------------------------------
     system_message_template = (
-        "Given a chat history and the latest user question "
+        "Given a chat history and the latest user task "
         "which might reference context in the chat history, "
-        "formulate a standalone question which can be understood "
-        "without the chat history. Do NOT answer the question, "
+        "formulate a standalone task which can be understood "
+        "without the chat history. Do NOT complete the task, "
         "just reformulate it if needed and otherwise return it as is. "
-        "Do not output your reasoning, just the question."
+        "Do not output your reasoning, just the task."
     )
 
-    template_answer = "User question: {question}\n Standalone question:"
+    template_answer = "User task: {task}\n Standalone task:"
 
-    CONDENSE_QUESTION_PROMPT = ChatPromptTemplate.from_messages(
+    CONDENSE_TASK_PROMPT = ChatPromptTemplate.from_messages(
         [
             SystemMessagePromptTemplate.from_template(system_message_template),
             MessagesPlaceholder(variable_name="chat_history"),
@@ -48,7 +48,7 @@ def _define_custom_prompts() -> CustomPromptsDict:
         ]
     )
 
-    custom_prompts["CONDENSE_QUESTION_PROMPT"] = CONDENSE_QUESTION_PROMPT
+    custom_prompts["CONDENSE_TASK_PROMPT"] = CONDENSE_TASK_PROMPT
 
     # ---------------------------------------------------------------------------
     # Prompt for RAG
@@ -59,19 +59,19 @@ def _define_custom_prompts() -> CustomPromptsDict:
         "- When answering use markdown. Use markdown code blocks for code snippets.\n"
         "- Answer in a concise and clear manner.\n"
         "- If no preferred language is provided, answer in the same language as the language used by the user.\n"
-        "- You must use ONLY the provided context to answer the question. "
+        "- You must use ONLY the provided context to complete the task. "
         "Do not use any prior knowledge or external information, even if you are certain of the answer.\n"
         # "- If you cannot provide an answer using ONLY the context provided, do not attempt to answer from your own knowledge."
         # "Instead, inform the user that the answer isn't available in the context and suggest using the available tools {tools}.\n"
         "- Do not apologize when providing an answer.\n"
-        "- Don't cite the source id in the answer objects, but you can use the source to answer the question.\n\n"
+        "- Don't cite the source id in the answer objects, but you can use the source to complete the task.\n\n"
     )
 
     context_template = (
         "\n"
         # "- You have access to the following internal reasoning to provide an answer: {reasoning}\n"
-        "- You have access to the following files to answer the user question (limited to first 20 files): {files}\n"
-        "- You have access to the following context to answer the user question: {context}\n"
+        "- You have access to the following files to complete the task (limited to first 20 files): {files}\n"
+        "- You have access to the following context to complete the task: {context}\n"
         "- Follow these user instruction when crafting the answer: {custom_instructions}\n"
         "- These user instructions shall take priority over any other previous instruction.\n"
         # "- Remember: if you cannot provide an answer using ONLY the provided context and CITING the sources, "
@@ -86,9 +86,9 @@ def _define_custom_prompts() -> CustomPromptsDict:
     )
 
     template_answer = (
-        "Original task: {question}\n"
+        "Original task: {task}\n"
         "Rephrased and contextualized task: {rephrased_task}\n"
-        "Remember, you shall answer ALL questions and tasks.\n"
+        "Remember, you shall complete ALL tasks.\n"
         "Remember: if you cannot provide an answer using ONLY the provided context and CITING the sources, "
         "just answer that you don't have the answer.\n"
         "If the provided context contains contradictory or conflicting information, state so providing the conflicting information.\n"
@@ -123,7 +123,7 @@ def _define_custom_prompts() -> CustomPromptsDict:
     """
 
     template_answer = """
-    User Question: {question}
+    User Task: {task}
     Answer:
     """
     CHAT_LLM_PROMPT = ChatPromptTemplate.from_messages(
@@ -141,7 +141,7 @@ def _define_custom_prompts() -> CustomPromptsDict:
     system_message_template = (
         "Given the following user input, determine the user intent, in particular "
         "whether the user is providing instructions to the system or is asking the system to "
-        "execute a task:\n"
+        "complete a task:\n"
         "    - if the user is providing direct instructions to modify the system behaviour (for instance, "
         "'Can you reply in French?' or 'Answer in French' or 'You are an expert legal assistant' "
         "or 'You will behave as...'), the user intent is 'prompt';\n"
@@ -149,7 +149,7 @@ def _define_custom_prompts() -> CustomPromptsDict:
         "the intent is 'task'.\n"
     )
 
-    template_answer = "User input: {question}"
+    template_answer = "User input: {task}"
 
     USER_INTENT_PROMPT = ChatPromptTemplate.from_messages(
         [

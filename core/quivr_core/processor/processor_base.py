@@ -6,6 +6,7 @@ from typing import Any
 from langchain_core.documents import Document
 
 from quivr_core.files.file import FileExtension, QuivrFile
+from quivr_core.language.utils import detect_language
 
 logger = logging.getLogger("quivr_core")
 
@@ -44,6 +45,10 @@ class ProcessorBase(ABC):
             doc.metadata = {
                 "chunk_index": idx,
                 "quivr_core_version": qvr_version,
+                "language": detect_language(
+                    text=doc.page_content.replace("\\n", " ").replace("\n", " "),
+                    low_memory=True,
+                ).value,
                 **file.metadata,
                 **doc.metadata,
                 **self.processor_metadata,

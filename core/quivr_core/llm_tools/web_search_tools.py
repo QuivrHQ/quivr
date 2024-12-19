@@ -4,7 +4,7 @@ from langchain_community.tools import TavilySearchResults
 from langchain_community.utilities.tavily_search import TavilySearchAPIWrapper
 from quivr_core.llm_tools.entity import ToolsCategory
 import os
-from pydantic.v1 import SecretStr as SecretStrV1  # Ensure correct import
+from pydantic import SecretStr  # Ensure correct import
 from quivr_core.llm_tools.entity import ToolWrapper, ToolRegistry
 from langchain_core.documents import Document
 
@@ -23,7 +23,7 @@ def create_tavily_tool(config: Dict[str, Any]) -> ToolWrapper:
         )
 
     tavily_api_wrapper = TavilySearchAPIWrapper(
-        tavily_api_key=SecretStrV1(api_key),
+        tavily_api_key=SecretStr(api_key),
     )
     tool = TavilySearchResults(
         api_wrapper=tavily_api_wrapper,

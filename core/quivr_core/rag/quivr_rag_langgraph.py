@@ -29,6 +29,8 @@ from langgraph.graph.message import add_messages
 from langgraph.types import Send
 from pydantic import BaseModel, Field
 
+from langfuse.callback import CallbackHandler
+
 from quivr_core.llm import LLMEndpoint
 from quivr_core.llm_tools.llm_tools import LLMToolFactory
 from quivr_core.rag.entities.chat import ChatHistory
@@ -47,6 +49,9 @@ from quivr_core.rag.utils import (
 )
 
 logger = logging.getLogger("quivr_core")
+
+# Initialize Langfuse CallbackHandler for Langchain (tracing)
+langfuse_handler = CallbackHandler()
 
 
 class SplittedInput(BaseModel):
@@ -71,11 +76,11 @@ class SplittedInput(BaseModel):
 class TasksCompletion(BaseModel):
     is_task_completable_reasoning: Optional[str] = Field(
         default=None,
-        description="The reasoning that leads to identifying whether the user task or question can be completed using the provided context and chat history.",
+        description="The reasoning that leads to identifying whether the user task or question can be completed using the provided context and chat history BEFORE any tool is used.",
     )
 
     is_task_completable: bool = Field(
-        description="Whether the user task or question can be completed using the provided context and chat history.",
+        description="Whether the user task or question can be completed using the provided context and chat history BEFORE any tool is used.",
     )
 
     tool_reasoning: Optional[str] = Field(
@@ -479,9 +484,9 @@ class QuivrQARAGLangGraph:
         # Prepare the async tasks for all user tsks
         async_jobs = []
         for task_id in tasks.ids:
-            msg = custom_prompts.CONDENSE_QUESTION_PROMPT.format(
+            msg = custom_prompts.CONDENSE_TASK_PROMPT.format(
                 chat_history=state["chat_history"].to_list(),
-                question=tasks(task_id).definition,
+                task=tasks(task_id).definition,
             )
 
             model = self.llm_endpoint._llm
@@ -667,7 +672,7 @@ class QuivrQARAGLangGraph:
         MAX_ITERATIONS = 3
 
         tasks = state["tasks"]
-        if not tasks.has_tasks():
+        if not tasks or not tasks.has_tasks():
             return {**state}
 
         k = self.retrieval_config.k
@@ -850,13 +855,13 @@ class QuivrQARAGLangGraph:
             dict: The updated state with re-phrased question
         """
         messages = state["messages"]
-        user_question = messages[0].content
+        user_task = messages[0].content
 
         # Prompt
         prompt = self.retrieval_config.prompt
 
         final_inputs = {}
-        final_inputs["question"] = user_question
+        final_inputs["task"] = user_task
         final_inputs["custom_instructions"] = prompt if prompt else "None"
         final_inputs["chat_history"] = state["chat_history"].to_list()
 
@@ -943,7 +948,7 @@ class QuivrQARAGLangGraph:
                 "files": concat_list_files,
             },
             version="v1",
-            config={"metadata": metadata},
+            config={"metadata": metadata, "callbacks": [langfuse_handler]},
         ):
             if self._is_final_node_with_docs(event):
                 tasks = event["data"]["output"]["tasks"]
@@ -1023,15 +1028,15 @@ class QuivrQARAGLangGraph:
             Dictionary containing all inputs needed for RAG_ANSWER_PROMPT
         """
         messages = state["messages"]
-        user_question = messages[0].content
+        user_task = messages[0].content
         files = state["files"]
         prompt = self.retrieval_config.prompt
         # available_tools, _ = collect_tools(self.retrieval_config.workflow_config)
 
         return {
             "context": combine_documents(docs) if docs else "None",
-            "question": user_question,
-            "rephrased_task": state["tasks"].definitions,
+            "task": user_task,
+            "rephrased_task": state["tasks"].definitions if state["tasks"] else "None",
             "custom_instructions": prompt if prompt else "None",
             "files": files if files else "None",
             "chat_history": state["chat_history"].to_list(),

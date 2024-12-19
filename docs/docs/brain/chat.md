@@ -6,6 +6,6 @@ At each interaction with `Brain.ask_streaming` both your message and the LLM's r
 
 You can also get some cool info about the brain by printing its details with the `print_info()` method, which shows things like how many chats are stored, the current chat history, and more. This makes it easy to keep track of what’s going on in your conversations and manage the context being sent to the LLM!
 
-::: quivr_core.chat
+::: quivr_core.rag.entities.chat
 options:
 heading_level: 2

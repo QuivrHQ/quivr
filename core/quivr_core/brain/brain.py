@@ -10,9 +10,7 @@ from langchain_core.documents import Document
 from langchain_core.embeddings import Embeddings
 from langchain_core.messages import AIMessage, HumanMessage
 from langchain_core.vectorstores import VectorStore
-from quivr_core.rag.entities.models import ParsedRAGResponse
 from langchain_openai import OpenAIEmbeddings
-from quivr_core.rag.quivr_rag import QuivrQARAG
 from rich.console import Console
 from rich.panel import Panel
 
@@ -24,16 +22,18 @@ from quivr_core.brain.serialization import (
     LocalStorageConfig,
     TransparentStorageConfig,
 )
-from quivr_core.rag.entities.chat import ChatHistory
-from quivr_core.rag.entities.config import RetrievalConfig
 from quivr_core.files.file import load_qfile
 from quivr_core.llm import LLMEndpoint
+from quivr_core.processor.registry import get_processor_class
+from quivr_core.rag.entities.chat import ChatHistory
+from quivr_core.rag.entities.config import RetrievalConfig
 from quivr_core.rag.entities.models import (
     ParsedRAGChunkResponse,
+    ParsedRAGResponse,
     QuivrKnowledge,
     SearchResult,
 )
-from quivr_core.processor.registry import get_processor_class
+from quivr_core.rag.quivr_rag import QuivrQARAG
 from quivr_core.rag.quivr_rag_langgraph import QuivrQARAGLangGraph
 from quivr_core.storage.local_storage import LocalStorage, TransparentStorage
 from quivr_core.storage.storage_base import StorageBase
@@ -116,11 +116,14 @@ class Brain:
         vector_db: VectorStore | None = None,
         embedder: Embeddings | None = None,
         storage: StorageBase | None = None,
+        user_id: UUID | None = None,
+        chat_id: UUID | None = None,
     ):
         self.id = id
         self.name = name
         self.storage = storage
-
+        self.user_id = user_id
+        self.chat_id = chat_id
         # Chat history
         self._chats = self._init_chats()
         self.default_chat = list(self._chats.values())[0]
@@ -535,8 +538,15 @@ class Brain:
         list_files = [] if list_files is None else list_files
 
         full_answer = ""
+        metadata = {
+            "langfuse_user_id": str(self.user_id),
+            "langfuse_session_id": str(self.chat_id),
+        }
         async for response in rag_instance.answer_astream(
-            question=question, history=chat_history, list_files=list_files
+            question=question,
+            history=chat_history,
+            list_files=list_files,
+            metadata=metadata,
         ):
             # Format output to be correct servicedf;j
             if not response.last_chunk:
@@ -567,6 +577,7 @@ class Brain:
         Returns:
             ParsedRAGResponse: The generated answer.
         """
+        # question_language = detect_language(question) -- Commented until we use it
         full_answer = ""
 
         async for response in self.ask_streaming(
