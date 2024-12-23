@@ -11,7 +11,6 @@ from langchain_core.messages.ai import AIMessageChunk
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.runnables import RunnableLambda, RunnablePassthrough
 from langchain_core.vectorstores import VectorStore
-from langfuse.callback import CallbackHandler
 
 from quivr_core.llm import LLMEndpoint
 from quivr_core.rag.entities.chat import ChatHistory
@@ -25,6 +24,7 @@ from quivr_core.rag.entities.models import (
 )
 from quivr_core.rag.prompts import custom_prompts
 from quivr_core.rag.utils import (
+    LangfuseService,
     combine_documents,
     format_file_list,
     get_chunk_metadata,
@@ -33,7 +33,8 @@ from quivr_core.rag.utils import (
 )
 
 logger = logging.getLogger("quivr_core")
-langfuse_handler = CallbackHandler()
+langfuse_service = LangfuseService()
+langfuse_handler = langfuse_service.get_handler()
 
 
 class IdempotentCompressor(BaseDocumentCompressor):

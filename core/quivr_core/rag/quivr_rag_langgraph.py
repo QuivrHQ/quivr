@@ -29,8 +29,6 @@ from langgraph.graph.message import add_messages
 from langgraph.types import Send
 from pydantic import BaseModel, Field
 
-from langfuse.callback import CallbackHandler
-
 from quivr_core.llm import LLMEndpoint
 from quivr_core.llm_tools.llm_tools import LLMToolFactory
 from quivr_core.rag.entities.chat import ChatHistory
@@ -41,6 +39,7 @@ from quivr_core.rag.entities.models import (
 )
 from quivr_core.rag.prompts import custom_prompts
 from quivr_core.rag.utils import (
+    LangfuseService,
     collect_tools,
     combine_documents,
     format_file_list,
@@ -50,8 +49,8 @@ from quivr_core.rag.utils import (
 
 logger = logging.getLogger("quivr_core")
 
-# Initialize Langfuse CallbackHandler for Langchain (tracing)
-langfuse_handler = CallbackHandler()
+langfuse_service = LangfuseService()
+langfuse_handler = langfuse_service.get_handler()
 
 
 class SplittedInput(BaseModel):
@@ -502,7 +501,7 @@ class QuivrQARAGLangGraph:
         task_ids = [jobs[1] for jobs in async_jobs] if async_jobs else []
 
         # Replace each question with its condensed version
-        for response, task_id in zip(responses, task_ids):
+        for response, task_id in zip(responses, task_ids, strict=False):
             tasks.set_definition(task_id, response.content)
 
         return {**state, "tasks": tasks}
@@ -558,7 +557,7 @@ class QuivrQARAGLangGraph:
         )
         task_ids = [jobs[1] for jobs in async_jobs] if async_jobs else []
 
-        for response, task_id in zip(responses, task_ids):
+        for response, task_id in zip(responses, task_ids, strict=False):
             tasks.set_completion(task_id, response.is_task_completable)
             if not response.is_task_completable and response.tool:
                 tasks.set_tool(task_id, response.tool)
@@ -599,7 +598,7 @@ class QuivrQARAGLangGraph:
         )
         task_ids = [jobs[1] for jobs in async_jobs] if async_jobs else []
 
-        for response, task_id in zip(responses, task_ids):
+        for response, task_id in zip(responses, task_ids, strict=False):
             _docs = tool_wrapper.format_output(response)
             _docs = self.filter_chunks_by_relevance(_docs)
             tasks.set_docs(task_id, _docs)
@@ -652,7 +651,7 @@ class QuivrQARAGLangGraph:
         task_ids = [task[1] for task in async_jobs] if async_jobs else []
 
         # Process responses and associate docs with tasks
-        for response, task_id in zip(responses, task_ids):
+        for response, task_id in zip(responses, task_ids, strict=False):
             _docs = self.filter_chunks_by_relevance(response)
             tasks.set_docs(task_id, _docs)  # Associate docs with the specific task
 
@@ -715,7 +714,7 @@ class QuivrQARAGLangGraph:
             task_ids = [jobs[1] for jobs in async_jobs] if async_jobs else []
 
             _n = []
-            for response, task_id in zip(responses, task_ids):
+            for response, task_id in zip(responses, task_ids, strict=False):
                 _docs = self.filter_chunks_by_relevance(response)
                 _n.append(len(_docs))
                 tasks.set_docs(task_id, _docs)
