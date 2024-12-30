@@ -398,6 +398,7 @@ class ConditionalEdgeConfig(QuivrBaseConfig):
 
 class NodeConfig(QuivrBaseConfig):
     name: str
+    description: str | None = None
     edges: List[str] | None = None
     conditional_edge: ConditionalEdgeConfig | None = None
     tools: List[Dict[str, Any]] | None = None
