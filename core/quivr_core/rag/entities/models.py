@@ -76,6 +76,7 @@ class RAGResponseMetadata(BaseModel):
     followup_questions: list[str] = Field(default_factory=list)
     sources: list[Any] = Field(default_factory=list)
     metadata_model: ChatLLMMetadata | None = None
+    workflow_step: str | None = None
 
 
 class ParsedRAGResponse(BaseModel):
