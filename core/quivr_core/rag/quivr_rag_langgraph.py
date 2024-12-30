@@ -13,7 +13,6 @@ from typing import (
     TypedDict,
 )
 from uuid import UUID, uuid4
-
 import openai
 from langchain.retrievers import ContextualCompressionRetriever
 from langchain_cohere import CohereRerank
@@ -1009,8 +1008,6 @@ class QuivrQARAGLangGraph:
                 if node.name == name:
                     if node.description:
                         return node.description
-                    elif node.label:
-                        return node.label
                     else:
                         return node.name
         return ""
