@@ -24,12 +24,11 @@ from langchain_core.messages import BaseMessage
 from langchain_core.messages.ai import AIMessageChunk
 from langchain_core.prompts.base import BasePromptTemplate
 from langchain_core.vectorstores import VectorStore
+from langfuse.callback import CallbackHandler
 from langgraph.graph import END, START, StateGraph
 from langgraph.graph.message import add_messages
 from langgraph.types import Send
 from pydantic import BaseModel, Field
-
-from langfuse.callback import CallbackHandler
 
 from quivr_core.llm import LLMEndpoint
 from quivr_core.llm_tools.llm_tools import LLMToolFactory
@@ -502,7 +501,7 @@ class QuivrQARAGLangGraph:
         task_ids = [jobs[1] for jobs in async_jobs] if async_jobs else []
 
         # Replace each question with its condensed version
-        for response, task_id in zip(responses, task_ids):
+        for response, task_id in zip(responses, task_ids, strict=False):
             tasks.set_definition(task_id, response.content)
 
         return {**state, "tasks": tasks}
@@ -558,7 +557,7 @@ class QuivrQARAGLangGraph:
         )
         task_ids = [jobs[1] for jobs in async_jobs] if async_jobs else []
 
-        for response, task_id in zip(responses, task_ids):
+        for response, task_id in zip(responses, task_ids, strict=False):
             tasks.set_completion(task_id, response.is_task_completable)
             if not response.is_task_completable and response.tool:
                 tasks.set_tool(task_id, response.tool)
@@ -599,7 +598,7 @@ class QuivrQARAGLangGraph:
         )
         task_ids = [jobs[1] for jobs in async_jobs] if async_jobs else []
 
-        for response, task_id in zip(responses, task_ids):
+        for response, task_id in zip(responses, task_ids, strict=False):
             _docs = tool_wrapper.format_output(response)
             _docs = self.filter_chunks_by_relevance(_docs)
             tasks.set_docs(task_id, _docs)
@@ -634,7 +633,6 @@ class QuivrQARAGLangGraph:
         compression_retriever = ContextualCompressionRetriever(
             base_compressor=reranker, base_retriever=base_retriever
         )
-
         # Prepare the async tasks for all questions
         async_jobs = []
         for task_id in tasks.ids:
@@ -652,7 +650,7 @@ class QuivrQARAGLangGraph:
         task_ids = [task[1] for task in async_jobs] if async_jobs else []
 
         # Process responses and associate docs with tasks
-        for response, task_id in zip(responses, task_ids):
+        for response, task_id in zip(responses, task_ids, strict=False):
             _docs = self.filter_chunks_by_relevance(response)
             tasks.set_docs(task_id, _docs)  # Associate docs with the specific task
 
@@ -715,7 +713,7 @@ class QuivrQARAGLangGraph:
             task_ids = [jobs[1] for jobs in async_jobs] if async_jobs else []
 
             _n = []
-            for response, task_id in zip(responses, task_ids):
+            for response, task_id in zip(responses, task_ids, strict=False):
                 _docs = self.filter_chunks_by_relevance(response)
                 _n.append(len(_docs))
                 tasks.set_docs(task_id, _docs)
@@ -736,6 +734,10 @@ class QuivrQARAGLangGraph:
             i += 1
 
         return {**state, "tasks": tasks}
+
+    def retrieve_all_chunks_from_file(self, file_id: UUID) -> List[Document]:
+        retriever = self.get_retriever()
+        return retriever.get_by_ids(ids=[file_id])
 
     def _sort_docs_by_relevance(self, docs: List[Document]) -> List[Document]:
         return sorted(
@@ -1012,7 +1014,7 @@ class QuivrQARAGLangGraph:
             )
             return structured_llm.invoke(prompt)
         except openai.BadRequestError:
-            structured_llm = self.llm_endpoint._llm.with_structured_output(output_class)
+            structured_llm = self.llm_endpoint._llm.with_stuctured_output(output_class)
             return structured_llm.invoke(prompt)
 
     def _build_rag_prompt_inputs(
