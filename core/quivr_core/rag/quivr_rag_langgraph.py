@@ -13,7 +13,6 @@ from typing import (
     TypedDict,
 )
 from uuid import UUID, uuid4
-
 import openai
 from langchain.retrievers import ContextualCompressionRetriever
 from langchain_cohere import CohereRerank
@@ -36,6 +35,7 @@ from quivr_core.rag.entities.config import DefaultRerankers, NodeConfig, Retriev
 from quivr_core.rag.entities.models import (
     ParsedRAGChunkResponse,
     QuivrKnowledge,
+    RAGResponseMetadata,
 )
 from quivr_core.rag.prompts import custom_prompts
 from quivr_core.rag.utils import (
@@ -949,6 +949,8 @@ class QuivrQARAGLangGraph:
             version="v1",
             config={"metadata": metadata, "callbacks": [langfuse_handler]},
         ):
+            node_name = self._extract_node_name(event)
+
             if self._is_final_node_with_docs(event):
                 tasks = event["data"]["output"]["tasks"]
                 docs = tasks.docs if tasks else []
@@ -964,8 +966,16 @@ class QuivrQARAGLangGraph:
 
                 if new_content:
                     chunk_metadata = get_chunk_metadata(rolling_message, docs)
+                    if node_name:
+                        chunk_metadata.workflow_step = node_name
                     yield ParsedRAGChunkResponse(
                         answer=new_content, metadata=chunk_metadata
+                    )
+            else:
+                if node_name:
+                    yield ParsedRAGChunkResponse(
+                        answer="",
+                        metadata=RAGResponseMetadata(workflow_step=node_name),
                     )
 
         # Yield final metadata chunk
@@ -989,6 +999,17 @@ class QuivrQARAGLangGraph:
             and "langgraph_node" in event["metadata"]
             and event["metadata"]["langgraph_node"] in self.final_nodes
         )
+
+    def _extract_node_name(self, event: dict) -> str:
+        if "metadata" in event and "langgraph_node" in event["metadata"]:
+            name = event["metadata"]["langgraph_node"]
+            for node in self.retrieval_config.workflow_config.nodes:
+                if node.name == name:
+                    if node.description:
+                        return node.description
+                    else:
+                        return node.name
+        return ""
 
     async def ainvoke_structured_output(
         self, prompt: str, output_class: Type[BaseModel]
