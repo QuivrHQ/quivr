@@ -12,9 +12,9 @@ from langchain_core.output_parsers import StrOutputParser
 from langchain_core.runnables import RunnableLambda, RunnablePassthrough
 from langchain_core.vectorstores import VectorStore
 
+from quivr_core.llm import LLMEndpoint
 from quivr_core.rag.entities.chat import ChatHistory
 from quivr_core.rag.entities.config import RetrievalConfig
-from quivr_core.llm import LLMEndpoint
 from quivr_core.rag.entities.models import (
     ParsedRAGChunkResponse,
     ParsedRAGResponse,
@@ -24,6 +24,7 @@ from quivr_core.rag.entities.models import (
 )
 from quivr_core.rag.prompts import custom_prompts
 from quivr_core.rag.utils import (
+    LangfuseService,
     combine_documents,
     format_file_list,
     get_chunk_metadata,
@@ -32,6 +33,8 @@ from quivr_core.rag.utils import (
 )
 
 logger = logging.getLogger("quivr_core")
+langfuse_service = LangfuseService()
+langfuse_handler = langfuse_service.get_handler()
 
 
 class IdempotentCompressor(BaseDocumentCompressor):
@@ -173,7 +176,7 @@ class QuivrQARAG:
                 "chat_history": history,
                 "custom_instructions": (self.retrieval_config.prompt),
             },
-            config={"metadata": metadata},
+            config={"metadata": metadata, "callbacks": [langfuse_handler]},
         )
         response = parse_response(
             raw_llm_response, self.retrieval_config.llm_config.model
@@ -206,7 +209,7 @@ class QuivrQARAG:
                 "chat_history": history,
                 "custom_personality": (self.retrieval_config.prompt),
             },
-            config={"metadata": metadata},
+            config={"metadata": metadata, "callbacks": [langfuse_handler]},
         ):
             # Could receive this anywhere so we need to save it for the last chunk
             if "docs" in chunk:

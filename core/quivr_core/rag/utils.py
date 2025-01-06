@@ -4,6 +4,7 @@ from typing import Any, List, Tuple, no_type_check
 from langchain_core.messages import AIMessage, BaseMessage, HumanMessage, SystemMessage
 from langchain_core.messages.ai import AIMessageChunk
 from langchain_core.prompts import format_document
+from langfuse.callback import CallbackHandler
 
 from quivr_core.rag.entities.config import WorkflowConfig
 from quivr_core.rag.entities.models import (
@@ -195,3 +196,11 @@ def collect_tools(workflow_config: WorkflowConfig):
         activated_tools += f"Tool {i+1} description: {tool.description}\n\n"
 
     return validated_tools, activated_tools
+
+
+class LangfuseService:
+    def __init__(self):
+        self.langfuse_handler = CallbackHandler()
+
+    def get_handler(self):
+        return self.langfuse_handler
