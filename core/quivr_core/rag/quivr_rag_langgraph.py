@@ -615,8 +615,11 @@ class QuivrQARAGLangGraph:
         Returns:
             dict: The retrieved chunks
         """
+        if "tasks" in state:
+            tasks = state["tasks"]
+        else:
+            tasks = UserTasks([state["messages"][0].content])
 
-        tasks = state["tasks"]
         if not tasks.has_tasks():
             return {**state}
 
@@ -670,7 +673,11 @@ class QuivrQARAGLangGraph:
 
         MAX_ITERATIONS = 3
 
-        tasks = state["tasks"]
+        if "tasks" in state:
+            tasks = state["tasks"]
+        else:
+            tasks = UserTasks([state["messages"][0].content])
+
         if not tasks or not tasks.has_tasks():
             return {**state}
 
