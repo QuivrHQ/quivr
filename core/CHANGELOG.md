@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.0.30](https://github.com/QuivrHQ/quivr/compare/core-0.0.29...core-0.0.30) (2025-01-27)
+
+
+### Features
+
+* adding cache to LLMEndpoint ([#3555](https://github.com/QuivrHQ/quivr/issues/3555)) ([6072907](https://github.com/QuivrHQ/quivr/commit/6072907ca7370be748d2d6845fd674abbb6c83c3))
+
 ## [0.0.29](https://github.com/QuivrHQ/quivr/compare/core-0.0.28...core-0.0.29) (2025-01-20)
 
 
