@@ -86,73 +86,73 @@ class LLMModelConfig:
             "gpt-4o": LLMConfig(
                 max_context_tokens=128000,
                 max_output_tokens=16384,
-                tokenizer_hub="Xenova/gpt-4o",
+                tokenizer_hub="Quivr/gpt-4o",
             ),
             "gpt-4o-mini": LLMConfig(
                 max_context_tokens=128000,
                 max_output_tokens=16384,
-                tokenizer_hub="Xenova/gpt-4o",
+                tokenizer_hub="Quivr/gpt-4o",
             ),
             "gpt-4-turbo": LLMConfig(
                 max_context_tokens=128000,
                 max_output_tokens=4096,
-                tokenizer_hub="Xenova/gpt-4",
+                tokenizer_hub="Quivr/gpt-4",
             ),
             "gpt-4": LLMConfig(
                 max_context_tokens=8192,
                 max_output_tokens=8192,
-                tokenizer_hub="Xenova/gpt-4",
+                tokenizer_hub="Quivr/gpt-4",
             ),
             "gpt-3.5-turbo": LLMConfig(
                 max_context_tokens=16385,
                 max_output_tokens=4096,
-                tokenizer_hub="Xenova/gpt-3.5-turbo",
+                tokenizer_hub="Quivr/gpt-3.5-turbo",
             ),
             "text-embedding-3-large": LLMConfig(
-                max_context_tokens=8191, tokenizer_hub="Xenova/text-embedding-ada-002"
+                max_context_tokens=8191, tokenizer_hub="Quivr/text-embedding-ada-002"
             ),
             "text-embedding-3-small": LLMConfig(
-                max_context_tokens=8191, tokenizer_hub="Xenova/text-embedding-ada-002"
+                max_context_tokens=8191, tokenizer_hub="Quivr/text-embedding-ada-002"
             ),
             "text-embedding-ada-002": LLMConfig(
-                max_context_tokens=8191, tokenizer_hub="Xenova/text-embedding-ada-002"
+                max_context_tokens=8191, tokenizer_hub="Quivr/text-embedding-ada-002"
             ),
         },
         DefaultModelSuppliers.ANTHROPIC: {
             "claude-3-5-sonnet": LLMConfig(
                 max_context_tokens=200000,
                 max_output_tokens=8192,
-                tokenizer_hub="Xenova/claude-tokenizer",
+                tokenizer_hub="Quivr/claude-tokenizer",
             ),
             "claude-3-opus": LLMConfig(
                 max_context_tokens=200000,
                 max_output_tokens=4096,
-                tokenizer_hub="Xenova/claude-tokenizer",
+                tokenizer_hub="Quivr/claude-tokenizer",
             ),
             "claude-3-sonnet": LLMConfig(
                 max_context_tokens=200000,
                 max_output_tokens=4096,
-                tokenizer_hub="Xenova/claude-tokenizer",
+                tokenizer_hub="Quivr/claude-tokenizer",
             ),
             "claude-3-haiku": LLMConfig(
                 max_context_tokens=200000,
                 max_output_tokens=4096,
-                tokenizer_hub="Xenova/claude-tokenizer",
+                tokenizer_hub="Quivr/claude-tokenizer",
             ),
             "claude-2-1": LLMConfig(
                 max_context_tokens=200000,
                 max_output_tokens=4096,
-                tokenizer_hub="Xenova/claude-tokenizer",
+                tokenizer_hub="Quivr/claude-tokenizer",
             ),
             "claude-2-0": LLMConfig(
                 max_context_tokens=100000,
                 max_output_tokens=4096,
-                tokenizer_hub="Xenova/claude-tokenizer",
+                tokenizer_hub="Quivr/claude-tokenizer",
             ),
             "claude-instant-1-2": LLMConfig(
                 max_context_tokens=100000,
                 max_output_tokens=4096,
-                tokenizer_hub="Xenova/claude-tokenizer",
+                tokenizer_hub="Quivr/claude-tokenizer",
             ),
         },
         # Unclear for LLAMA models...
@@ -161,53 +161,53 @@ class LLMModelConfig:
             "llama-3.1": LLMConfig(
                 max_context_tokens=128000,
                 max_output_tokens=4096,
-                tokenizer_hub="Xenova/Meta-Llama-3.1-Tokenizer",
+                tokenizer_hub="Quivr/Meta-Llama-3.1-Tokenizer",
             ),
             "llama-3": LLMConfig(
                 max_context_tokens=8192,
                 max_output_tokens=2048,
-                tokenizer_hub="Xenova/llama3-tokenizer-new",
+                tokenizer_hub="Quivr/llama3-tokenizer-new",
             ),
             "code-llama": LLMConfig(
-                max_context_tokens=16384, tokenizer_hub="Xenova/llama-code-tokenizer"
+                max_context_tokens=16384, tokenizer_hub="Quivr/llama-code-tokenizer"
             ),
         },
         DefaultModelSuppliers.GROQ: {
             "llama-3.3-70b": LLMConfig(
                 max_context_tokens=128000,
                 max_output_tokens=32768,
-                tokenizer_hub="Xenova/Meta-Llama-3.1-Tokenizer",
+                tokenizer_hub="Quivr/Meta-Llama-3.1-Tokenizer",
             ),
             "llama-3.1-70b": LLMConfig(
                 max_context_tokens=128000,
                 max_output_tokens=32768,
-                tokenizer_hub="Xenova/Meta-Llama-3.1-Tokenizer",
+                tokenizer_hub="Quivr/Meta-Llama-3.1-Tokenizer",
             ),
             "llama-3": LLMConfig(
-                max_context_tokens=8192, tokenizer_hub="Xenova/llama3-tokenizer-new"
+                max_context_tokens=8192, tokenizer_hub="Quivr/llama3-tokenizer-new"
             ),
             "code-llama": LLMConfig(
-                max_context_tokens=16384, tokenizer_hub="Xenova/llama-code-tokenizer"
+                max_context_tokens=16384, tokenizer_hub="Quivr/llama-code-tokenizer"
             ),
         },
         DefaultModelSuppliers.MISTRAL: {
             "mistral-large": LLMConfig(
                 max_context_tokens=128000,
                 max_output_tokens=4096,
-                tokenizer_hub="Xenova/mistral-tokenizer-v3",
+                tokenizer_hub="Quivr/mistral-tokenizer-v3",
             ),
             "mistral-small": LLMConfig(
                 max_context_tokens=128000,
                 max_output_tokens=4096,
-                tokenizer_hub="Xenova/mistral-tokenizer-v3",
+                tokenizer_hub="Quivr/mistral-tokenizer-v3",
             ),
             "mistral-nemo": LLMConfig(
                 max_context_tokens=128000,
                 max_output_tokens=4096,
-                tokenizer_hub="Xenova/Mistral-Nemo-Instruct-Tokenizer",
+                tokenizer_hub="Quivr/Mistral-Nemo-Instruct-Tokenizer",
             ),
             "codestral": LLMConfig(
-                max_context_tokens=32000, tokenizer_hub="Xenova/mistral-tokenizer-v3"
+                max_context_tokens=32000, tokenizer_hub="Quivr/mistral-tokenizer-v3"
             ),
         },
     }
@@ -247,9 +247,9 @@ class LLMEndpointConfig(QuivrBaseConfig):
     llm_base_url: str | None = None
     env_variable_name: str | None = None
     llm_api_key: str | None = None
-    max_context_tokens: int = 10000
-    max_output_tokens: int = 4000
-    temperature: float = 0.7
+    max_context_tokens: int = 20000
+    max_output_tokens: int = 4096
+    temperature: float = 0.3
     streaming: bool = True
     prompt: CustomPromptsModel | None = None
 
