@@ -18,6 +18,8 @@ logger = logging.getLogger("quivr_core")
 
 
 class LLMEndpoint:
+    _cache: dict[int, "LLMEndpoint"] = {}
+
     def __init__(self, llm_config: LLMEndpointConfig, llm: BaseChatModel):
         self._config = llm_config
         self._llm = llm
@@ -55,6 +57,13 @@ class LLMEndpoint:
 
     @classmethod
     def from_config(cls, config: LLMEndpointConfig = LLMEndpointConfig()):
+        # Create a cache key from the config
+        cache_key = hash(str(config.model_dump()))
+
+        # Return cached instance if it exists
+        if cache_key in cls._cache:
+            return cls._cache[cache_key]
+
         _llm: Union[AzureChatOpenAI, ChatOpenAI, ChatAnthropic, ChatMistralAI]
         try:
             if config.supplier == DefaultModelSuppliers.AZURE:
@@ -112,7 +121,9 @@ class LLMEndpoint:
                     max_tokens=config.max_output_tokens,
                     temperature=config.temperature,
                 )
-            return cls(llm=_llm, llm_config=config)
+            instance = cls(llm=_llm, llm_config=config)
+            cls._cache[cache_key] = instance
+            return instance
 
         except ImportError as e:
             raise ImportError(
