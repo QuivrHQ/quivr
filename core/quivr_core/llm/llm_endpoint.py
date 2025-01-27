@@ -17,6 +17,75 @@ from quivr_core.rag.utils import model_supports_function_calling
 logger = logging.getLogger("quivr_core")
 
 
+class LLMTokenizer:
+    _cache: dict[int, "LLMTokenizer"] = {}
+
+    def __init__(self, tokenizer_hub: str | None, fallback_tokenizer: str):
+        self.tokenizer_hub = tokenizer_hub
+        self.fallback_tokenizer = fallback_tokenizer
+
+        if self.tokenizer_hub:
+            # To prevent the warning
+            # huggingface/tokenizers: The current process just got forked, after parallelism has already been used. Disabling parallelism to avoid deadlocks...
+            os.environ["TOKENIZERS_PARALLELISM"] = (
+                "false"
+                if not os.environ.get("TOKENIZERS_PARALLELISM")
+                else os.environ["TOKENIZERS_PARALLELISM"]
+            )
+            try:
+                if "text-embedding-ada-002" in self.tokenizer_hub:
+                    from transformers import GPT2TokenizerFast
+
+                    self.tokenizer = GPT2TokenizerFast.from_pretrained(
+                        self.tokenizer_hub
+                    )
+                else:
+                    from transformers import AutoTokenizer
+
+                    self.tokenizer = AutoTokenizer.from_pretrained(self.tokenizer_hub)
+            except OSError:  # if we don't manage to connect to huggingface and/or no cached models are present
+                logger.warning(
+                    f"Cannot acces the configured tokenizer from {self.tokenizer_hub}, using the default tokenizer {self.fallback_tokenizer}"
+                )
+                self.tokenizer = tiktoken.get_encoding(self.fallback_tokenizer)
+        else:
+            self.tokenizer = tiktoken.get_encoding(self.fallback_tokenizer)
+
+    @classmethod
+    def load(cls, tokenizer_hub: str, fallback_tokenizer: str):
+        cache_key = hash(str(tokenizer_hub))
+        if cache_key in cls._cache:
+            return cls._cache[cache_key]
+        instance = cls(tokenizer_hub, fallback_tokenizer)
+        cls._cache[cache_key] = instance
+        return instance
+
+    @classmethod
+    def preload_tokenizers(cls):
+        """Preload all available tokenizers from the models configuration into cache."""
+        from quivr_core.rag.entities.config import LLMModelConfig
+
+        unique_tokenizer_hubs = set()
+
+        # Collect all unique tokenizer hubs
+        for supplier_models in LLMModelConfig._model_defaults.values():
+            for config in supplier_models.values():
+                if config.tokenizer_hub:
+                    unique_tokenizer_hubs.add(config.tokenizer_hub)
+
+        # Load each unique tokenizer
+        for hub in unique_tokenizer_hubs:
+            try:
+                cls.load(hub, LLMEndpointConfig._FALLBACK_TOKENIZER)
+                logger.info(f"Successfully preloaded tokenizer: {hub}")
+            except Exception as e:
+                logger.warning(f"Failed to preload tokenizer {hub}: {str(e)}")
+
+
+# Preload tokenizers when module is imported
+LLMTokenizer.preload_tokenizers()
+
+
 class LLMEndpoint:
     _cache: dict[int, "LLMEndpoint"] = {}
 
@@ -27,29 +96,13 @@ class LLMEndpoint:
             self._config.model
         )
 
-        if llm_config.tokenizer_hub:
-            # To prevent the warning
-            # huggingface/tokenizers: The current process just got forked, after parallelism has already been used. Disabling parallelism to avoid deadlocks...
-            os.environ["TOKENIZERS_PARALLELISM"] = (
-                "false"
-                if not os.environ.get("TOKENIZERS_PARALLELISM")
-                else os.environ["TOKENIZERS_PARALLELISM"]
-            )
-            try:
-                from transformers import AutoTokenizer
-
-                self.tokenizer = AutoTokenizer.from_pretrained(llm_config.tokenizer_hub)
-            except OSError:  # if we don't manage to connect to huggingface and/or no cached models are present
-                logger.warning(
-                    f"Cannot acces the configured tokenizer from {llm_config.tokenizer_hub}, using the default tokenizer {llm_config.fallback_tokenizer}"
-                )
-                self.tokenizer = tiktoken.get_encoding(llm_config.fallback_tokenizer)
-        else:
-            self.tokenizer = tiktoken.get_encoding(llm_config.fallback_tokenizer)
+        self.llm_tokenizer = LLMTokenizer.load(
+            llm_config.tokenizer_hub, llm_config.fallback_tokenizer
+        )
 
     def count_tokens(self, text: str) -> int:
         # Tokenize the input text and return the token count
-        encoding = self.tokenizer.encode(text)
+        encoding = self.llm_tokenizer.tokenizer.encode(text)
         return len(encoding)
 
     def get_config(self):
