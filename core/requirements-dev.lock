@@ -296,6 +296,8 @@ pyflakes==3.2.0
 pygments==2.18.0
     # via ipython
     # via rich
+pympler==1.1
+    # via quivr-core
 pytest==8.3.3
     # via pytest-asyncio
     # via pytest-benchmark
