@@ -1,6 +1,6 @@
 import logging
 import os
-from typing import Union
+from typing import Union, Any
 from urllib.parse import parse_qs, urlparse
 
 import tiktoken
@@ -9,6 +9,8 @@ from langchain_mistralai import ChatMistralAI
 from langchain_core.language_models.chat_models import BaseChatModel
 from langchain_openai import AzureChatOpenAI, ChatOpenAI
 from pydantic import SecretStr
+import time
+from pympler import asizeof
 
 from quivr_core.brain.info import LLMInfo
 from quivr_core.rag.entities.config import DefaultModelSuppliers, LLMEndpointConfig
@@ -17,8 +19,17 @@ from quivr_core.rag.utils import model_supports_function_calling
 logger = logging.getLogger("quivr_core")
 
 
+def get_size(obj: Any, seen: set | None = None) -> int:
+    return asizeof.asizeof(obj)
+
+
 class LLMTokenizer:
-    _cache: dict[int, "LLMTokenizer"] = {}
+    _cache: dict[
+        int, tuple["LLMTokenizer", int, float]
+    ] = {}  # {hash: (tokenizer, size_bytes, last_access_time)}
+    _max_cache_size_mb: int = 50
+    _max_cache_count: int = 3  # Default maximum number of cached tokenizers
+    _current_cache_size: int = 0
 
     def __init__(self, tokenizer_hub: str | None, fallback_tokenizer: str):
         self.tokenizer_hub = tokenizer_hub
@@ -51,33 +62,106 @@ class LLMTokenizer:
         else:
             self.tokenizer = tiktoken.get_encoding(self.fallback_tokenizer)
 
+        # More accurate size estimation
+        self._size_bytes = get_size(self.tokenizer)
+
     @classmethod
     def load(cls, tokenizer_hub: str, fallback_tokenizer: str):
         cache_key = hash(str(tokenizer_hub))
+
+        # If in cache, update last access time and return
         if cache_key in cls._cache:
-            return cls._cache[cache_key]
+            tokenizer, size, _ = cls._cache[cache_key]
+            cls._cache[cache_key] = (tokenizer, size, time.time())
+            return tokenizer
+
+        # Create new instance
         instance = cls(tokenizer_hub, fallback_tokenizer)
-        cls._cache[cache_key] = instance
+
+        # Check if adding this would exceed either cache limit
+        while (
+            cls._current_cache_size + instance._size_bytes
+            > cls._max_cache_size_mb * 1024 * 1024
+            or len(cls._cache) >= cls._max_cache_count
+        ):
+            # Find least recently used item
+            oldest_key = min(
+                cls._cache.keys(),
+                key=lambda k: cls._cache[k][2],  # last_access_time
+            )
+            # Remove it
+            _, removed_size, _ = cls._cache.pop(oldest_key)
+            cls._current_cache_size -= removed_size
+
+        # Add new instance to cache with current timestamp
+        cls._cache[cache_key] = (instance, instance._size_bytes, time.time())
+        cls._current_cache_size += instance._size_bytes
         return instance
 
     @classmethod
-    def preload_tokenizers(cls):
-        """Preload all available tokenizers from the models configuration into cache."""
+    def set_max_cache_size_mb(cls, size_mb: int):
+        """Set the maximum cache size in megabytes."""
+        cls._max_cache_size_mb = size_mb
+        cls._cleanup_cache()
+
+    @classmethod
+    def set_max_cache_count(cls, count: int):
+        """Set the maximum number of tokenizers to cache."""
+        cls._max_cache_count = count
+        cls._cleanup_cache()
+
+    @classmethod
+    def _cleanup_cache(cls):
+        """Clean up cache when limits are exceeded."""
+        while (
+            cls._current_cache_size > cls._max_cache_size_mb * 1024 * 1024
+            or len(cls._cache) > cls._max_cache_count
+        ):
+            oldest_key = min(cls._cache.keys(), key=lambda k: cls._cache[k][2])
+            _, removed_size, _ = cls._cache.pop(oldest_key)
+            cls._current_cache_size -= removed_size
+
+    @classmethod
+    def preload_tokenizers(cls, models: list[str] | None = None):
+        """Preload tokenizers into cache.
+
+        Args:
+            models: Optional list of model names (e.g. 'gpt-4o', 'claude-3-5-sonnet').
+                   If None, preloads all available tokenizers.
+        """
         from quivr_core.rag.entities.config import LLMModelConfig
 
         unique_tokenizer_hubs = set()
 
-        # Collect all unique tokenizer hubs
-        for supplier_models in LLMModelConfig._model_defaults.values():
-            for config in supplier_models.values():
-                if config.tokenizer_hub:
-                    unique_tokenizer_hubs.add(config.tokenizer_hub)
+        # Collect tokenizer hubs based on provided models or all available
+        if models:
+            for model_name in models:
+                # Find matching model configurations
+                for supplier_models in LLMModelConfig._model_defaults.values():
+                    for base_model_name, config in supplier_models.items():
+                        # Check if the model name matches or starts with the base model name
+                        if (
+                            model_name.startswith(base_model_name)
+                            and config.tokenizer_hub
+                        ):
+                            unique_tokenizer_hubs.add(config.tokenizer_hub)
+                            break
+        else:
+            # Original behavior - collect all unique tokenizer hubs
+            for supplier_models in LLMModelConfig._model_defaults.values():
+                for config in supplier_models.values():
+                    if config.tokenizer_hub:
+                        unique_tokenizer_hubs.add(config.tokenizer_hub)
 
         # Load each unique tokenizer
         for hub in unique_tokenizer_hubs:
             try:
                 cls.load(hub, LLMEndpointConfig._FALLBACK_TOKENIZER)
-                logger.info(f"Successfully preloaded tokenizer: {hub}")
+                logger.info(
+                    f"Successfully preloaded tokenizer: {hub}. "
+                    f"Total cache size: {cls._current_cache_size / (1024 * 1024):.2f} MB. "
+                    f"Cache count: {len(cls._cache)}"
+                )
             except Exception as e:
                 logger.warning(f"Failed to preload tokenizer {hub}: {str(e)}")
 
