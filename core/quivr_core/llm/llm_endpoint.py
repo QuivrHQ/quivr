@@ -82,10 +82,6 @@ class LLMTokenizer:
                 logger.warning(f"Failed to preload tokenizer {hub}: {str(e)}")
 
 
-# Preload tokenizers when module is imported
-LLMTokenizer.preload_tokenizers()
-
-
 class LLMEndpoint:
     def __init__(self, llm_config: LLMEndpointConfig, llm: BaseChatModel):
         self._config = llm_config
