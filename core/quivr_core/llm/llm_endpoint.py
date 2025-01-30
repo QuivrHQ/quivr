@@ -25,6 +25,7 @@ class LLMTokenizer:
     _max_cache_size_mb: int = 50
     _max_cache_count: int = 5  # Default maximum number of cached tokenizers
     _current_cache_size: int = 0
+    _default_size: int = 5 * 1024 * 1024
 
     def __init__(self, tokenizer_hub: str | None, fallback_tokenizer: str):
         self.tokenizer_hub = tokenizer_hub
@@ -66,7 +67,7 @@ class LLMTokenizer:
         if not hasattr(self.tokenizer, "vocab_files_names") or not hasattr(
             self.tokenizer, "init_kwargs"
         ):
-            return 5 * 1024 * 1024
+            return self._default_size
 
         total_size = 0
 
@@ -80,7 +81,7 @@ class LLMTokenizer:
                 except (OSError, FileNotFoundError):
                     logger.debug(f"Could not access tokenizer file: {file_path}")
 
-        return total_size if total_size > 0 else 5 * 1024 * 1024
+        return total_size if total_size > 0 else self._default_size
 
     @classmethod
     def load(cls, tokenizer_hub: str, fallback_tokenizer: str):
