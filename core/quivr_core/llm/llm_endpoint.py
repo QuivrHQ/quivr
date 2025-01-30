@@ -1,6 +1,6 @@
 import logging
 import os
-from typing import Union, Any
+from typing import Union
 from urllib.parse import parse_qs, urlparse
 
 import tiktoken
@@ -10,7 +10,6 @@ from langchain_core.language_models.chat_models import BaseChatModel
 from langchain_openai import AzureChatOpenAI, ChatOpenAI
 from pydantic import SecretStr
 import time
-from pympler import asizeof
 
 from quivr_core.brain.info import LLMInfo
 from quivr_core.rag.entities.config import DefaultModelSuppliers, LLMEndpointConfig
@@ -19,17 +18,14 @@ from quivr_core.rag.utils import model_supports_function_calling
 logger = logging.getLogger("quivr_core")
 
 
-def get_size(obj: Any, seen: set | None = None) -> int:
-    return asizeof.asizeof(obj)
-
-
 class LLMTokenizer:
     _cache: dict[
         int, tuple["LLMTokenizer", int, float]
     ] = {}  # {hash: (tokenizer, size_bytes, last_access_time)}
     _max_cache_size_mb: int = 50
-    _max_cache_count: int = 3  # Default maximum number of cached tokenizers
+    _max_cache_count: int = 5  # Default maximum number of cached tokenizers
     _current_cache_size: int = 0
+    _default_size: int = 5 * 1024 * 1024
 
     def __init__(self, tokenizer_hub: str | None, fallback_tokenizer: str):
         self.tokenizer_hub = tokenizer_hub
@@ -63,7 +59,29 @@ class LLMTokenizer:
             self.tokenizer = tiktoken.get_encoding(self.fallback_tokenizer)
 
         # More accurate size estimation
-        self._size_bytes = get_size(self.tokenizer)
+        self._size_bytes = self._calculate_tokenizer_size()
+
+    def _calculate_tokenizer_size(self) -> int:
+        """Calculate size of tokenizer by summing the sizes of its vocabulary and model files"""
+        # By default, return a size of 5 MB
+        if not hasattr(self.tokenizer, "vocab_files_names") or not hasattr(
+            self.tokenizer, "init_kwargs"
+        ):
+            return self._default_size
+
+        total_size = 0
+
+        # Get the file keys from vocab_files_names
+        file_keys = self.tokenizer.vocab_files_names.keys()
+        # Look up these files in init_kwargs
+        for key in file_keys:
+            if file_path := self.tokenizer.init_kwargs.get(key):
+                try:
+                    total_size += os.path.getsize(file_path)
+                except (OSError, FileNotFoundError):
+                    logger.debug(f"Could not access tokenizer file: {file_path}")
+
+        return total_size if total_size > 0 else self._default_size
 
     @classmethod
     def load(cls, tokenizer_hub: str, fallback_tokenizer: str):
