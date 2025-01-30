@@ -214,8 +214,6 @@ pydantic-settings==2.6.1
     # via langchain-community
 pygments==2.18.0
     # via rich
-pympler==1.1
-    # via quivr-core
 python-dateutil==2.8.2
     # via pandas
 python-dotenv==1.0.1
