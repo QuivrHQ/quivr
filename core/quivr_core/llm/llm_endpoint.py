@@ -10,7 +10,7 @@ from langchain_core.language_models.chat_models import BaseChatModel
 from langchain_openai import AzureChatOpenAI, ChatOpenAI
 from pydantic import SecretStr
 import time
-from pympler import asizeof
+import sys
 
 from quivr_core.brain.info import LLMInfo
 from quivr_core.rag.entities.config import DefaultModelSuppliers, LLMEndpointConfig
@@ -20,7 +20,28 @@ logger = logging.getLogger("quivr_core")
 
 
 def get_size(obj: Any, seen: set | None = None) -> int:
-    return asizeof.asizeof(obj)
+    """Calculate approximate size of object in bytes recursively"""
+    if seen is None:
+        seen = set()
+
+    # Skip if object already seen or is None
+    obj_id = id(obj)
+    if obj_id in seen or obj is None:
+        return 0
+    seen.add(obj_id)
+
+    size = sys.getsizeof(obj)
+
+    if isinstance(obj, dict):
+        size += sum(get_size(k, seen) + get_size(v, seen) for k, v in obj.items())
+    elif isinstance(obj, (list, tuple, set)):
+        size += sum(get_size(item, seen) for item in obj)
+    elif hasattr(obj, "__dict__"):
+        size += get_size(obj.__dict__, seen)
+    elif hasattr(obj, "__slots__"):
+        size += sum(get_size(getattr(obj, slot, None), seen) for slot in obj.__slots__)
+
+    return size
 
 
 class LLMTokenizer:
