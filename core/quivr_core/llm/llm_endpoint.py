@@ -1,15 +1,15 @@
 import logging
 import os
+import time
 from typing import Union
 from urllib.parse import parse_qs, urlparse
 
 import tiktoken
 from langchain_anthropic import ChatAnthropic
-from langchain_mistralai import ChatMistralAI
 from langchain_core.language_models.chat_models import BaseChatModel
+from langchain_mistralai import ChatMistralAI
 from langchain_openai import AzureChatOpenAI, ChatOpenAI
 from pydantic import SecretStr
-import time
 
 from quivr_core.brain.info import LLMInfo
 from quivr_core.rag.entities.config import DefaultModelSuppliers, LLMEndpointConfig
@@ -242,7 +242,9 @@ class LLMEndpoint:
                     else None,
                     base_url=config.llm_base_url,
                     max_tokens=config.max_output_tokens,
-                    temperature=config.temperature,
+                    temperature=config.temperature
+                    if config.model.startswith("o")
+                    else 0,
                 )
             elif config.supplier == DefaultModelSuppliers.MISTRAL:
                 _llm = ChatMistralAI(
