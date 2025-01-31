@@ -1,20 +1,20 @@
+import logging
 import os
 import re
-import logging
 from enum import Enum
-from typing import Dict, Hashable, List, Optional, Union, Any, Type
+from typing import Any, Dict, Hashable, List, Optional, Type, Union
 from uuid import UUID
-from pydantic import BaseModel
-from langgraph.graph import START, END
-from langchain_core.tools import BaseTool
-from quivr_core.config import MegaparseConfig
-from rapidfuzz import process, fuzz
 
+from langchain_core.tools import BaseTool
+from langgraph.graph import END, START
+from pydantic import BaseModel
+from rapidfuzz import fuzz, process
 
 from quivr_core.base_config import QuivrBaseConfig
+from quivr_core.config import MegaparseConfig
+from quivr_core.llm_tools.llm_tools import TOOLS_CATEGORIES, TOOLS_LISTS, LLMToolFactory
 from quivr_core.processor.splitter import SplitterConfig
 from quivr_core.rag.prompts import CustomPromptsModel
-from quivr_core.llm_tools.llm_tools import LLMToolFactory, TOOLS_CATEGORIES, TOOLS_LISTS
 
 logger = logging.getLogger("quivr_core")
 
@@ -91,6 +91,26 @@ class LLMModelConfig:
             "gpt-4o-mini": LLMConfig(
                 max_context_tokens=128000,
                 max_output_tokens=16384,
+                tokenizer_hub="Quivr/gpt-4o",
+            ),
+            "o3-mini": LLMConfig(
+                max_context_tokens=200000,
+                max_output_tokens=100000,
+                tokenizer_hub="Quivr/gpt-4o",
+            ),
+            "o1-mini": LLMConfig(
+                max_context_tokens=128000,
+                max_output_tokens=65536,
+                tokenizer_hub="Quivr/gpt-4o",
+            ),
+            "o1-preview": LLMConfig(
+                max_context_tokens=128000,
+                max_output_tokens=32768,
+                tokenizer_hub="Quivr/gpt-4o",
+            ),
+            "o1": LLMConfig(
+                max_context_tokens=200000,
+                max_output_tokens=100000,
                 tokenizer_hub="Quivr/gpt-4o",
             ),
             "gpt-4-turbo": LLMConfig(
