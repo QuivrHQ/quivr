@@ -243,8 +243,8 @@ class LLMEndpoint:
                     base_url=config.llm_base_url,
                     max_tokens=config.max_output_tokens,
                     temperature=config.temperature
-                    if config.model.startswith("o")
-                    else 0,
+                    if not config.model.startswith("o")
+                    else None,
                 )
             elif config.supplier == DefaultModelSuppliers.MISTRAL:
                 _llm = ChatMistralAI(
