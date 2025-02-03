@@ -3,7 +3,7 @@
   "llm_config": { "temperature": 0.3, "max_context_tokens": 20000 },
   "max_history": 10,
   "reranker_config":
-    { "model": "rerank-v3.5", "top_n": 5, "supplier": "cohere" },
+    { "model": "rerank-v3.5", "top_n": 10, "supplier": "cohere" },
   "workflow_config":
     {
       "name": "Standard RAG",

@@ -1,5 +1,6 @@
 import asyncio
 import logging
+from collections import OrderedDict
 from typing import (
     Annotated,
     Any,
@@ -28,7 +29,6 @@ from langgraph.graph import END, START, StateGraph
 from langgraph.graph.message import add_messages
 from langgraph.types import Send
 from pydantic import BaseModel, Field
-from quivr_api.modules.vector.service.vector_service import VectorService
 
 from quivr_core.llm import LLMEndpoint
 from quivr_core.llm_tools.llm_tools import LLMToolFactory
@@ -250,7 +250,6 @@ class QuivrQARAGLangGraph:
         retrieval_config: RetrievalConfig,
         llm: LLMEndpoint,
         vector_store: VectorStore | None = None,
-        vector_service: VectorService | None = None,
     ):
         """
         Construct a QuivrQARAGLangGraph object.
@@ -264,7 +263,6 @@ class QuivrQARAGLangGraph:
         self.retrieval_config = retrieval_config
         self.vector_store = vector_store
         self.llm_endpoint = llm
-        self.vector_service = vector_service
 
         self.graph = None
 
@@ -756,7 +754,7 @@ class QuivrQARAGLangGraph:
             reverse=True,
         )
 
-    def retrieve_full_documents_context(self, state: AgentState) -> AgentState:
+    async def retrieve_full_documents_context(self, state: AgentState) -> AgentState:
         if "tasks" in state:
             tasks = state["tasks"]
         else:
@@ -774,24 +772,34 @@ class QuivrQARAGLangGraph:
             if knowledge_id in relevant_knowledge:
                 relevant_knowledge[knowledge_id]["count"] += 1
                 relevant_knowledge[knowledge_id]["max_similarity_score"] = max(
-                    relevant_knowledge[knowledge_id]["max_similarity"], similarity_score
+                    relevant_knowledge[knowledge_id]["max_similarity_score"],
+                    similarity_score,
+                )
+                relevant_knowledge[knowledge_id]["chunk_index"] = max(
+                    doc.metadata["chunk_index"],
+                    relevant_knowledge[knowledge_id]["chunk_index"],
                 )
             else:
                 relevant_knowledge[knowledge_id] = {
                     "count": 1,
                     "max_similarity_score": similarity_score,
-                    "index": doc.metadata["index"],
+                    "chunk_index": doc.metadata["chunk_index"],
                 }
 
+        top_n = min(3, len(relevant_knowledge))
         # FIXME: Tweak this to return the most relevant knowledges
-        top_knowledge_ids = sorted(
-            relevant_knowledge.keys(),
-            key=lambda x: (
-                relevant_knowledge[x]["max_similarity_score"],
-                relevant_knowledge[x]["count"],
-            ),
-            reverse=True,
-        )[:3]
+        top_knowledge_ids = OrderedDict(
+            sorted(
+                relevant_knowledge.items(),
+                key=lambda x: (
+                    x[1]["max_similarity_score"],
+                    x[1]["count"],
+                ),
+                reverse=True,
+            )[:top_n]
+        )
+
+        logger.info(f"Top knowledge IDs: {top_knowledge_ids}")
 
         _docs = []
 
@@ -801,8 +809,9 @@ class QuivrQARAGLangGraph:
 
         for knowledge_id in top_knowledge_ids:
             _docs.append(
-                self.vector_store.get_vectors_by_knowledge_id(  # type: ignore
-                    knowledge_id, end_index=top_knowledge_ids[knowledge_id]["index"]
+                await self.vector_store.get_vectors_by_knowledge_id(  # type: ignore
+                    knowledge_id,
+                    end_index=relevant_knowledge[knowledge_id]["chunk_index"],
                 )
             )
 
