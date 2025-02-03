@@ -757,8 +757,15 @@ class QuivrQARAGLangGraph:
         )
 
     def retrieve_full_documents_context(self, state: AgentState) -> AgentState:
-        task = state["tasks"]
-        docs = task.docs if task else []
+        if "tasks" in state:
+            tasks = state["tasks"]
+        else:
+            tasks = UserTasks([state["messages"][0].content])
+
+        if not tasks.has_tasks():
+            return {**state}
+
+        docs = tasks.docs if tasks else []
 
         relevant_knowledge = {}
         for doc in docs:
@@ -788,16 +795,22 @@ class QuivrQARAGLangGraph:
 
         _docs = []
 
+        assert hasattr(
+            self.vector_store, "get_vectors_by_knowledge_id"
+        ), "Vector store must have method 'get_vectors_by_knowledge_id', this is an enterprise only feature"
+
         for knowledge_id in top_knowledge_ids:
             _docs.append(
-                self.vector_service.get_vectors_by_knowledge_id(
+                self.vector_store.get_vectors_by_knowledge_id(  # type: ignore
                     knowledge_id, end_index=top_knowledge_ids[knowledge_id]["index"]
                 )
             )
 
-        task.set_docs(id=uuid4(), docs=_docs)  # FIXME what is supposed to be id ?
+        tasks.set_docs(
+            id=tasks.ids[0], docs=_docs
+        )  # FIXME If multiple IDs is not handled.
 
-        return {**state, "tasks": task}
+        return {**state, "tasks": tasks}
 
     def get_rag_context_length(self, state: AgentState, docs: List[Document]) -> int:
         final_inputs = self._build_rag_prompt_inputs(state, docs)
