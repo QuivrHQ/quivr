@@ -28,8 +28,6 @@ anyio==4.6.2.post1
     # via httpx
     # via langfuse
     # via openai
-appnope==0.1.4
-    # via ipykernel
 asttokens==2.4.1
     # via stack-data
 attrs==24.2.0
@@ -89,6 +87,8 @@ frozenlist==1.4.1
     # via aiosignal
 fsspec==2024.9.0
     # via huggingface-hub
+greenlet==3.1.1
+    # via sqlalchemy
 h11==0.14.0
     # via httpcore
 httpcore==1.0.6
@@ -148,7 +148,7 @@ langchain-cohere==0.3.3
 langchain-community==0.3.9
     # via langchain-experimental
     # via quivr-core
-langchain-core==0.3.21
+langchain-core==0.3.33
     # via langchain
     # via langchain-anthropic
     # via langchain-cohere
@@ -164,7 +164,7 @@ langchain-experimental==0.3.3
     # via langchain-cohere
 langchain-mistralai==0.2.3
     # via quivr-core
-langchain-openai==0.2.11
+langchain-openai==0.3.3
     # via quivr-core
 langchain-text-splitters==0.3.2
     # via langchain
@@ -220,7 +220,7 @@ numpy==1.26.4
     # via langchain-community
     # via pandas
     # via transformers
-openai==1.56.2
+openai==1.61.0
     # via langchain-openai
 orjson==3.10.7
     # via langgraph-sdk
