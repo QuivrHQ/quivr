@@ -914,9 +914,6 @@ class QuivrQARAGLangGraph:
             "similar_tickets": docs,
             "client_query": user_task,
         }
-        # state, inputs = self.reduce_rag_context(
-        #     state, inputs, custom_prompts.RAG_ANSWER_PROMPT
-        # )
 
         msg = custom_prompts.ZENDESK_TEMPLATE_PROMPT.format(**inputs)
         llm = self.bind_tools_to_llm(self.generate_zendesk_rag.__name__)
