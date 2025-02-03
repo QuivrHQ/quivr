@@ -1,14 +1,14 @@
 import datetime
-from pydantic import ConfigDict, create_model
 
-from langchain_core.prompts.base import BasePromptTemplate
 from langchain_core.prompts import (
     ChatPromptTemplate,
     HumanMessagePromptTemplate,
+    MessagesPlaceholder,
     PromptTemplate,
     SystemMessagePromptTemplate,
-    MessagesPlaceholder,
 )
+from langchain_core.prompts.base import BasePromptTemplate
+from pydantic import ConfigDict, create_model
 
 
 class CustomPromptsDict(dict):
@@ -257,6 +257,32 @@ def _define_custom_prompts() -> CustomPromptsDict:
     )
 
     custom_prompts["TOOL_ROUTING_PROMPT"] = TOOL_ROUTING_PROMPT
+
+    system_message_zendesk_template = """
+
+    - You are a Zendesk Agent.
+    - You are answering a client query.
+    - You must provide a response with all the information you have. Do not write areas to be filled like [your name], [your email], etc.
+    - Give a the most complete answer to the client query and give relevant links if needed.
+    - Based on the following similar client tickets, provide a response to the client query in the same format.
+
+    ------ Zendesk Similar Tickets ------
+    {similar_tickets}
+    -------------------------------------
+
+    ------ Client Query ------
+    {client_query}
+    --------------------------
+
+    Agent :
+    """
+
+    ZENDESK_TEMPLATE_PROMPT = ChatPromptTemplate.from_messages(
+        [
+            SystemMessagePromptTemplate.from_template(system_message_zendesk_template),
+        ]
+    )
+    custom_prompts["ZENDESK_TEMPLATE_PROMPT"] = ZENDESK_TEMPLATE_PROMPT
 
     return custom_prompts
 

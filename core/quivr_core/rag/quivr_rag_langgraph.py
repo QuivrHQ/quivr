@@ -1,5 +1,6 @@
 import asyncio
 import logging
+from collections import OrderedDict
 from typing import (
     Annotated,
     Any,
@@ -13,6 +14,7 @@ from typing import (
     TypedDict,
 )
 from uuid import UUID, uuid4
+
 import openai
 from langchain.retrievers import ContextualCompressionRetriever
 from langchain_cohere import CohereRerank
@@ -752,6 +754,73 @@ class QuivrQARAGLangGraph:
             reverse=True,
         )
 
+    async def retrieve_full_documents_context(self, state: AgentState) -> AgentState:
+        if "tasks" in state:
+            tasks = state["tasks"]
+        else:
+            tasks = UserTasks([state["messages"][0].content])
+
+        if not tasks.has_tasks():
+            return {**state}
+
+        docs = tasks.docs if tasks else []
+
+        relevant_knowledge = {}
+        for doc in docs:
+            knowledge_id = doc.metadata["knowledge_id"]
+            similarity_score = doc.metadata.get("similarity", 0)
+            if knowledge_id in relevant_knowledge:
+                relevant_knowledge[knowledge_id]["count"] += 1
+                relevant_knowledge[knowledge_id]["max_similarity_score"] = max(
+                    relevant_knowledge[knowledge_id]["max_similarity_score"],
+                    similarity_score,
+                )
+                relevant_knowledge[knowledge_id]["chunk_index"] = max(
+                    doc.metadata["chunk_index"],
+                    relevant_knowledge[knowledge_id]["chunk_index"],
+                )
+            else:
+                relevant_knowledge[knowledge_id] = {
+                    "count": 1,
+                    "max_similarity_score": similarity_score,
+                    "chunk_index": doc.metadata["chunk_index"],
+                }
+
+        top_n = min(3, len(relevant_knowledge))
+        # FIXME: Tweak this to return the most relevant knowledges
+        top_knowledge_ids = OrderedDict(
+            sorted(
+                relevant_knowledge.items(),
+                key=lambda x: (
+                    x[1]["max_similarity_score"],
+                    x[1]["count"],
+                ),
+                reverse=True,
+            )[:top_n]
+        )
+
+        logger.info(f"Top knowledge IDs: {top_knowledge_ids}")
+
+        _docs = []
+
+        assert hasattr(
+            self.vector_store, "get_vectors_by_knowledge_id"
+        ), "Vector store must have method 'get_vectors_by_knowledge_id', this is an enterprise only feature"
+
+        for knowledge_id in top_knowledge_ids:
+            _docs.append(
+                await self.vector_store.get_vectors_by_knowledge_id(  # type: ignore
+                    knowledge_id,
+                    end_index=relevant_knowledge[knowledge_id]["chunk_index"],
+                )
+            )
+
+        tasks.set_docs(
+            id=tasks.ids[0], docs=_docs
+        )  # FIXME If multiple IDs is not handled.
+
+        return {**state, "tasks": tasks}
+
     def get_rag_context_length(self, state: AgentState, docs: List[Document]) -> int:
         final_inputs = self._build_rag_prompt_inputs(state, docs)
         msg = custom_prompts.RAG_ANSWER_PROMPT.format(**final_inputs)
@@ -835,6 +904,22 @@ class QuivrQARAGLangGraph:
             if tools:  # Only bind tools if there are any available
                 return self.llm_endpoint._llm.bind_tools(tools, tool_choice="any")
         return self.llm_endpoint._llm
+
+    def generate_zendesk_rag(self, state: AgentState) -> AgentState:
+        tasks = state["tasks"]
+        docs = tasks.docs if tasks else []
+        messages = state["messages"]
+        user_task = messages[0].content
+        inputs = {
+            "similar_tickets": docs,
+            "client_query": user_task,
+        }
+
+        msg = custom_prompts.ZENDESK_TEMPLATE_PROMPT.format(**inputs)
+        llm = self.bind_tools_to_llm(self.generate_zendesk_rag.__name__)
+        response = llm.invoke(msg)
+
+        return {**state, "messages": [response]}
 
     def generate_rag(self, state: AgentState) -> AgentState:
         tasks = state["tasks"]
