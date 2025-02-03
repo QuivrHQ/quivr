@@ -13,6 +13,7 @@ from typing import (
     TypedDict,
 )
 from uuid import UUID, uuid4
+
 import openai
 from langchain.retrievers import ContextualCompressionRetriever
 from langchain_cohere import CohereRerank
@@ -27,6 +28,7 @@ from langgraph.graph import END, START, StateGraph
 from langgraph.graph.message import add_messages
 from langgraph.types import Send
 from pydantic import BaseModel, Field
+from quivr_api.modules.vector.service.vector_service import VectorService
 
 from quivr_core.llm import LLMEndpoint
 from quivr_core.llm_tools.llm_tools import LLMToolFactory
@@ -248,6 +250,7 @@ class QuivrQARAGLangGraph:
         retrieval_config: RetrievalConfig,
         llm: LLMEndpoint,
         vector_store: VectorStore | None = None,
+        vector_service: VectorService | None = None,
     ):
         """
         Construct a QuivrQARAGLangGraph object.
@@ -261,6 +264,7 @@ class QuivrQARAGLangGraph:
         self.retrieval_config = retrieval_config
         self.vector_store = vector_store
         self.llm_endpoint = llm
+        self.vector_service = vector_service
 
         self.graph = None
 
@@ -752,6 +756,49 @@ class QuivrQARAGLangGraph:
             reverse=True,
         )
 
+    def retrieve_full_documents_context(self, state: AgentState) -> AgentState:
+        task = state["tasks"]
+        docs = task.docs if task else []
+
+        relevant_knowledge = {}
+        for doc in docs:
+            knowledge_id = doc.metadata["knowledge_id"]
+            similarity_score = doc.metadata.get("similarity", 0)
+            if knowledge_id in relevant_knowledge:
+                relevant_knowledge[knowledge_id]["count"] += 1
+                relevant_knowledge[knowledge_id]["max_similarity_score"] = max(
+                    relevant_knowledge[knowledge_id]["max_similarity"], similarity_score
+                )
+            else:
+                relevant_knowledge[knowledge_id] = {
+                    "count": 1,
+                    "max_similarity_score": similarity_score,
+                    "index": doc.metadata["index"],
+                }
+
+        # FIXME: Tweak this to return the most relevant knowledges
+        top_knowledge_ids = sorted(
+            relevant_knowledge.keys(),
+            key=lambda x: (
+                relevant_knowledge[x]["max_similarity_score"],
+                relevant_knowledge[x]["count"],
+            ),
+            reverse=True,
+        )[:3]
+
+        _docs = []
+
+        for knowledge_id in top_knowledge_ids:
+            _docs.append(
+                self.vector_service.get_vectors_by_knowledge_id(
+                    knowledge_id, end_index=top_knowledge_ids[knowledge_id]["index"]
+                )
+            )
+
+        task.set_docs(id=uuid4(), docs=_docs)  # FIXME what is supposed to be id ?
+
+        return {**state, "tasks": task}
+
     def get_rag_context_length(self, state: AgentState, docs: List[Document]) -> int:
         final_inputs = self._build_rag_prompt_inputs(state, docs)
         msg = custom_prompts.RAG_ANSWER_PROMPT.format(**final_inputs)
@@ -835,6 +882,25 @@ class QuivrQARAGLangGraph:
             if tools:  # Only bind tools if there are any available
                 return self.llm_endpoint._llm.bind_tools(tools, tool_choice="any")
         return self.llm_endpoint._llm
+
+    def generate_zendesk_rag(self, state: AgentState) -> AgentState:
+        tasks = state["tasks"]
+        docs = tasks.docs if tasks else []
+        messages = state["messages"]
+        user_task = messages[0].content
+        inputs = {
+            "similar_tickets": docs,
+            "client_query": user_task,
+        }
+        # state, inputs = self.reduce_rag_context(
+        #     state, inputs, custom_prompts.RAG_ANSWER_PROMPT
+        # )
+
+        msg = custom_prompts.ZENDESK_TEMPLATE_PROMPT.format(**inputs)
+        llm = self.bind_tools_to_llm(self.generate_zendesk_rag.__name__)
+        response = llm.invoke(msg)
+
+        return {**state, "messages": [response]}
 
     def generate_rag(self, state: AgentState) -> AgentState:
         tasks = state["tasks"]
