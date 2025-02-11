@@ -116,7 +116,7 @@ class Brain:
         vector_db: VectorStore | None = None,
         embedder: Embeddings | None = None,
         storage: StorageBase | None = None,
-        workspace_id: int | None = None,
+        workspace_id: UUID | None = None,
         chat_id: UUID | None = None,
     ):
         self.id = id
