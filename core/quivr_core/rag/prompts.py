@@ -266,6 +266,13 @@ def _define_custom_prompts() -> CustomPromptsDict:
     - Give a the most complete answer to the client query and give relevant links if needed.
     - Based on the following similar client tickets, provide a response to the client query in the same format.
 
+    ------ Output Format ------
+    - You shouln't provide the greetings and the signature as those will be added automatically after generation.
+    - Avoid using lists or bullet points, or any other formatting that feels robotic in the response.
+    - Provide a neutral tone response, and a generalist answer, avoid specific.
+    - Keep the terms of the similar tickets and their response details in mind. Do not skip informations in the response you provide.
+
+
     ------ Zendesk Similar Tickets ------
     {similar_tickets}
     -------------------------------------
