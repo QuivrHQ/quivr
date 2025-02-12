@@ -5,17 +5,18 @@ from langchain_core.documents import Document
 from langchain_text_splitters import RecursiveCharacterTextSplitter, TextSplitter
 from megaparse_sdk.client import MegaParseNATSClient
 from megaparse_sdk.config import ClientNATSConfig
+from megaparse_sdk.schema.document import Document as MPDocument
 
 from quivr_core.config import MegaparseConfig
 from quivr_core.files.file import QuivrFile
-from quivr_core.processor.processor_base import ProcessorBase
+from quivr_core.processor.processor_base import ProcessedDocument, ProcessorBase
 from quivr_core.processor.registry import FileExtension
 from quivr_core.processor.splitter import SplitterConfig
 
 logger = logging.getLogger("quivr_core")
 
 
-class MegaparseProcessor(ProcessorBase):
+class MegaparseProcessor(ProcessorBase[MPDocument]):
     """
     Megaparse processor for PDF files.
 
@@ -72,17 +73,22 @@ class MegaparseProcessor(ProcessorBase):
             "chunk_overlap": self.splitter_config.chunk_overlap,
         }
 
-    async def process_file_inner(self, file: QuivrFile) -> list[Document]:
+    async def process_file_inner(
+        self, file: QuivrFile
+    ) -> ProcessedDocument[MPDocument | str]:
         logger.info(f"Uploading file {file.path} to MegaParse")
         async with MegaParseNATSClient(ClientNATSConfig()) as client:
             response = await client.parse_file(file=file.path)
 
-        logger.info(f"File :  {response}")
         document = Document(
-            page_content=response,
+            page_content=str(response),
         )
 
-        docs = self.text_splitter.split_documents([document])
-        for doc in docs:
-            doc.metadata = {"chunk_size": len(self.enc.encode(doc.page_content))}
-        return docs
+        chunks = self.text_splitter.split_documents([document])
+        for chunk in chunks:
+            chunk.metadata = {"chunk_size": len(self.enc.encode(chunk.page_content))}
+        return ProcessedDocument(
+            chunks=chunks,
+            processor_cls="MegaparseProcessor",
+            processor_response=response,
+        )
