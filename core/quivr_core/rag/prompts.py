@@ -269,9 +269,11 @@ def _define_custom_prompts() -> CustomPromptsDict:
     ------ Output Format ------
     - You shouln't provide the greetings and the signature as those will be added automatically after generation.
     - Avoid using lists or bullet points, or any other formatting that feels robotic in the response.
+    - Use paragraphs and sentences.
     - Provide a neutral tone response, and a generalist answer, avoid specific.
     - Keep the same lexical field as in the similar tickets agent responses.
-    - Always add the most relevant informations to the response, just like in similar tickets response.
+    - Always add the most relevant informations to the response, just like in similar tickets response so the user have all the informations needed.
+    - Stay as close as similar response as possible.
 
 
     ------ Zendesk Similar Tickets ------
