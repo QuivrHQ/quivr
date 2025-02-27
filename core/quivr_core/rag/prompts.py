@@ -280,6 +280,10 @@ def _define_custom_prompts() -> CustomPromptsDict:
     {similar_tickets}
     -------------------------------------
 
+    ------ Current Ticket History ------
+    {system_prompt}
+    -------------------------------------
+
     ------ Client Query ------
     {client_query}
     --------------------------

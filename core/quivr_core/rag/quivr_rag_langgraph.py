@@ -913,6 +913,9 @@ class QuivrQARAGLangGraph:
         inputs = {
             "similar_tickets": docs,
             "client_query": user_task,
+            "system_prompt": self.retrieval_config.prompt
+            if self.retrieval_config.prompt
+            else "",
         }
 
         msg = custom_prompts.ZENDESK_TEMPLATE_PROMPT.format(**inputs)
