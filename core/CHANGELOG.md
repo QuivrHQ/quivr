@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.0.34](https://github.com/QuivrHQ/quivr/compare/core-0.0.33...core-0.0.34) (2025-02-27)
+
+
+### Features
+
+* megaparse v54 ([#3594](https://github.com/QuivrHQ/quivr/issues/3594)) ([bc6d75d](https://github.com/QuivrHQ/quivr/commit/bc6d75df7348294bc5cde4409d7c17feb72cf2b2))
+
+
+### Bug Fixes
+
+* add system prompt to zendesk rag ([#3604](https://github.com/QuivrHQ/quivr/issues/3604)) ([501783b](https://github.com/QuivrHQ/quivr/commit/501783b53cf3751c0c9a48f2fcacc933fb4f161d))
+* ENT-673 ([501783b](https://github.com/QuivrHQ/quivr/commit/501783b53cf3751c0c9a48f2fcacc933fb4f161d))
+* Zendesk system prompt ([#3592](https://github.com/QuivrHQ/quivr/issues/3592)) ([699b549](https://github.com/QuivrHQ/quivr/commit/699b5495f5519e79fd2a6d0e362402c3c77d06b8))
+
 ## [0.0.33](https://github.com/QuivrHQ/quivr/compare/core-0.0.32...core-0.0.33) (2025-02-03)
 
 
