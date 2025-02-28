@@ -113,7 +113,7 @@ const Search = (): JSX.Element => {
             <div className={styles.quivr_text}>
               <span>Talk to </span>
               <span className={styles.quivr_text_primary}>
-                {projectName ? projectName : "Quivr"}
+                {projectName ? projectName : "Dobbie"}
               </span>
             </div>
           </div>

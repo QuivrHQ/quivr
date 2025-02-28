@@ -10,9 +10,9 @@ import "./globals.css";
 import styles from "./layout.module.scss";
 
 export const metadata = {
-  title: "Quivr - Get a Second Brain with Generative AI",
+  title: "Dobbie - Get a Second Brain with Generative AI",
   description:
-    "Quivr is your second brain in the cloud, designed to easily store and retrieve unstructured information.",
+    "Dobbie is your second brain in the cloud, designed to easily store and retrieve unstructured information.",
 };
 
 const RootLayout = async ({

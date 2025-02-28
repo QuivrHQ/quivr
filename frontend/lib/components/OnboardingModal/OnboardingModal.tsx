@@ -61,7 +61,7 @@ export const OnboardingModal = (): JSX.Element => {
   return (
     <FormProvider {...methods}>
       <Modal
-        title="Welcome to Quivr!"
+        title="Welcome to Dobbie!"
         desc="Let us know a bit more about you to get started."
         isOpen={isOnboardingModalOpened}
         setOpen={setIsOnboardingModalOpened}
@@ -104,7 +104,7 @@ export const OnboardingModal = (): JSX.Element => {
                   <SingleSelector
                     iconName="goal"
                     options={usagePurposeOptions}
-                    placeholder="In what context will you be using Quivr"
+                    placeholder="In what context will you be using Dobbie"
                     selectedOption={
                       field.value
                         ? {

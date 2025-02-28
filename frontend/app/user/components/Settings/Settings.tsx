@@ -39,10 +39,10 @@ export const Settings = ({
             </div>
           </InfoSection>
         )}
-        <InfoSection iconName="key" title="Quivr API Key">
+        <InfoSection iconName="key" title="Dobbie API Key">
           <div className={styles.text_and_button}>
             <span className={styles.text}>
-              The Quivr API key is a unique identifier that allows you to access
+              The Dobbie API key is a unique identifier that allows you to access
               and interact with{" "}
               <a
                 href="https://api.quivr.app/docs"
@@ -50,7 +50,7 @@ export const Settings = ({
                 rel="noopener noreferrer"
                 className={styles.link}
               >
-                Quivr&apos;s API.
+                Dobbie&apos;s API.
               </a>
             </span>
             <div className={styles.button}>

@@ -39,7 +39,7 @@ const Main = (): JSX.Element => {
         <p className={styles.title}>
           {t("talk_to", { ns: "login" })}{" "}
           <span className={styles.primary_text}>
-            {projectName ? projectName : "Quivr"}
+            {projectName ? projectName : "Dobbie"}
           </span>
         </p>
         <div className={styles.form_container}>

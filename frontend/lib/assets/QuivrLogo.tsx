@@ -24,5 +24,5 @@ export const QuivrLogo = ({
     }
   }, [color]);
 
-  return <Image src={src} alt="Quivr Logo" width={size} height={size} />;
+  return <Image src={src} alt="Dobbie Logo" width={size} height={size} />;
 };

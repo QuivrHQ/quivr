@@ -17,44 +17,8 @@ export const SocialsButtons = (): JSX.Element => {
     setLightModeIconName(isDarkMode ? "sun" : "moon");
   }, [isDarkMode]);
 
-  const handleClick = (url: string) => {
-    window.open(url, "_blank");
-  };
-
   return (
     <div className={styles.socials_buttons_wrapper}>
-      <div className={styles.left}>
-        <Icon
-          name="github"
-          color="black"
-          size="small"
-          handleHover={true}
-          onClick={() => handleClick("https://github.com/QuivrHQ/quivr")}
-        />
-        <Icon
-          name="linkedin"
-          color="black"
-          size="small"
-          handleHover={true}
-          onClick={() =>
-            handleClick("https://www.linkedin.com/company/getquivr")
-          }
-        />
-        <Icon
-          name="twitter"
-          color="black"
-          size="small"
-          handleHover={true}
-          onClick={() => handleClick("https://twitter.com/quivr_brain")}
-        />
-        <Icon
-          name="discord"
-          color="black"
-          size="small"
-          handleHover={true}
-          onClick={() => handleClick("https://discord.gg/HUpRgp2HG8")}
-        />
-      </div>
       <Icon
         name={lightModeIconName}
         color="black"
