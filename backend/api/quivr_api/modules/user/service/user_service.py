@@ -59,7 +59,7 @@ class UserService:
                     "rights": "Viewer"
                 })
                 
-            self.supabase.table("brains_users").insert(brain_user_entries).execute()
+            self.supabase_client.table("brains_users").insert(brain_user_entries).execute()
             
         return {
             "id": user_id,
