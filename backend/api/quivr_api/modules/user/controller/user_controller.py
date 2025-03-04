@@ -6,7 +6,7 @@ from quivr_api.middlewares.auth import AuthBearer, get_current_user
 from quivr_api.modules.brain.service.brain_user_service import BrainUserService
 from quivr_api.modules.dependencies import get_service
 from quivr_api.modules.models.service.model_service import ModelService
-from quivr_api.modules.user.dto.inputs import UserUpdatableProperties
+from quivr_api.modules.user.dto.inputs import CreateUserRequest, UserUpdatableProperties
 from quivr_api.modules.user.entity.user_identity import UserIdentity
 from quivr_api.modules.user.repository.users import Users
 from quivr_api.modules.user.service.user_usage import UserUsage
@@ -124,3 +124,23 @@ def get_user_credits(
     Get user remaining credits.
     """
     return user_repository.get_user_credits(current_user.id)
+
+
+@user_router.post("/user/create", tags=["User"])
+async def create_user_endpoint(
+    user_data: CreateUserRequest,
+    request: Request,
+    current_user: UserIdentity = Depends(get_current_user),
+):
+    """
+    Create a new user.
+
+    - `user_data`: The user data to create.
+    - `current_user`: The current authenticated user.
+
+    This endpoint creates a new user in the system. It requires admin privileges.
+    """
+    from quivr_api.modules.user.service.user_service import UserService
+    
+    user_service = UserService()
+    return user_service.create_user(user_data)

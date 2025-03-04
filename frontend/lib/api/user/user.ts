@@ -37,6 +37,19 @@ export type UserIdentity = {
   username: string;
 };
 
+export type CreateUserRequest = {
+  firstName: string;
+  lastName: string;
+  email: string;
+  brains: string[];
+};
+
+export type CreateUserResponse = {
+  id: string;
+  email: string;
+  username: string;
+};
+
 export const updateUserIdentity = async (
   userUpdatableProperties: UserIdentityUpdatableProperties,
   axiosInstance: AxiosInstance
@@ -49,6 +62,14 @@ export const getUserIdentity = async (
   const { data } = await axiosInstance.get<UserIdentity>(`/user/identity`);
 
   return data;
+};
+
+export const createUser = async (
+  userData: CreateUserRequest,
+  axiosInstance: AxiosInstance
+): Promise<CreateUserResponse> => {
+  const response = await axiosInstance.post('/user/create', userData);
+  return response.data;
 };
 
 export const getUser = async (

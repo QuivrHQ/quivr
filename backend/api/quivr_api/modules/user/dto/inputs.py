@@ -10,3 +10,10 @@ class UserUpdatableProperties(BaseModel):
     onboarded: Optional[bool] = None
     company_size: Optional[str] = None
     usage_purpose: Optional[str] = None
+
+
+class CreateUserRequest(BaseModel):
+    firstName: str
+    lastName: str
+    email: str
+    brains: list[str]

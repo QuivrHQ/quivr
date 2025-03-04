@@ -1,0 +1,49 @@
+.create_user_form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 100%;
+}
+
+.form_fields {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  width: 100%;
+}
+
+.form_field {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  width: 100%;
+
+  label {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-color);
+  }
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.error_message {
+  padding: 10px;
+  background-color: rgba(255, 0, 0, 0.1);
+  border: 1px solid rgba(255, 0, 0, 0.3);
+  border-radius: 4px;
+  color: #d32f2f;
+  font-size: 14px;
+  margin-bottom: 10px;
+}
+
+.error {
+  color: #d32f2f;
+  font-size: 12px;
+  margin-top: 4px;
+}
