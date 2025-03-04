@@ -1,0 +1,11 @@
+{
+	"deleteButton": "Xóa Brain",
+	"deleteConfirmQuestion": "Bạn có chắc chắn muốn xóa brain này không? Hành động này không thể hoàn tác.",
+	"deleteConfirmYes": "Có, xóa brain này",
+	"returnButton": "Quay lại",
+	"unsubscribeButton": "Hủy đăng ký brain",
+	"unsubscribeConfirmQuestion": "Bạn có chắc chắn muốn hủy đăng ký brain này không?",
+	"unsubscribeConfirmYes": "Có, hủy đăng ký brain này",
+	"successfully_deleted": "Brain đã được xóa thành công.",
+	"successfully_unsubscribed": "Bạn đã hủy đăng ký brain này thành công."
+}

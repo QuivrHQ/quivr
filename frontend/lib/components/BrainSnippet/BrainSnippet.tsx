@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 
 import { Tab } from "@/lib/types/Tab";
 
@@ -10,79 +11,81 @@ import { QuivrButton } from "../ui/QuivrButton/QuivrButton";
 import { Tabs } from "../ui/Tabs/Tabs";
 
 export const BrainSnippet = ({
-  setVisible,
-  initialColor,
-  initialEmoji,
-  onSave,
+	setVisible,
+	initialColor,
+	initialEmoji,
+	onSave,
 }: {
-  setVisible: React.Dispatch<React.SetStateAction<boolean>>;
-  initialColor?: string;
-  initialEmoji?: string;
-  onSave: (color: string, emoji: string) => Promise<void> | void;
+	setVisible: React.Dispatch<React.SetStateAction<boolean>>;
+	initialColor?: string;
+	initialEmoji?: string;
+	onSave: (color: string, emoji: string) => Promise<void> | void;
 }): JSX.Element => {
-  const [color, setColor] = useState(initialColor);
-  const [emoji, setEmoji] = useState(initialEmoji);
-  const [selectedTab, setSelectedTab] = useState("Emoji");
+	const { t } = useTranslation(["brain"]);
 
-  const wrapperRef = useRef<HTMLDivElement>(null);
+	const [color, setColor] = useState(initialColor);
+	const [emoji, setEmoji] = useState(initialEmoji);
+	const [selectedTab, setSelectedTab] = useState("Emoji");
 
-  const tabs: Tab[] = [
-    {
-      label: "Emoji",
-      isSelected: selectedTab === "Emoji",
-      onClick: () => setSelectedTab("Emoji"),
-      iconName: "emoji",
-    },
-    {
-      label: "Background",
-      isSelected: selectedTab === "Colors",
-      onClick: () => setSelectedTab("Colors"),
-      iconName: "color",
-    },
-  ];
+	const wrapperRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        wrapperRef.current &&
-        !wrapperRef.current.contains(event.target as Node)
-      ) {
-        setVisible(false);
-      }
-    };
+	const tabs: Tab[] = [
+		{
+			label: t("emoji", { ns: "brain" }),
+			isSelected: selectedTab === "Emoji",
+			onClick: () => setSelectedTab("Emoji"),
+			iconName: "emoji",
+		},
+		{
+			label: t("background", { ns: "brain" }),
+			isSelected: selectedTab === "Colors",
+			onClick: () => setSelectedTab("Colors"),
+			iconName: "color",
+		},
+	];
 
-    document.addEventListener("mousedown", handleClickOutside);
+	useEffect(() => {
+		const handleClickOutside = (event: MouseEvent) => {
+			if (
+				wrapperRef.current &&
+				!wrapperRef.current.contains(event.target as Node)
+			) {
+				setVisible(false);
+			}
+		};
 
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, [setVisible]);
+		document.addEventListener("mousedown", handleClickOutside);
 
-  return (
-    <div ref={wrapperRef} className={styles.brain_snippet_wrapper}>
-      <div className={styles.sample_wrapper} style={{ backgroundColor: color }}>
-        <span>{emoji}</span>
-      </div>
-      <div className={styles.selector_wrapper}>
-        <div className={styles.tabs}>
-          <Tabs tabList={tabs} />
-        </div>
-        {selectedTab === "Emoji" && <EmojiSelector onSelectEmoji={setEmoji} />}
-        {selectedTab === "Colors" && (
-          <ColorSelector onSelectColor={setColor} color={color ?? ""} />
-        )}
-      </div>
-      <div className={styles.button}>
-        <QuivrButton
-          label="Save"
-          onClick={async () => {
-            setVisible(false);
-            await onSave(color ?? "", emoji ?? "");
-          }}
-          iconName="upload"
-          color="primary"
-        />
-      </div>
-    </div>
-  );
+		return () => {
+			document.removeEventListener("mousedown", handleClickOutside);
+		};
+	}, [setVisible]);
+
+	return (
+		<div ref={wrapperRef} className={styles.brain_snippet_wrapper}>
+			<div className={styles.sample_wrapper} style={{ backgroundColor: color }}>
+				<span>{emoji}</span>
+			</div>
+			<div className={styles.selector_wrapper}>
+				<div className={styles.tabs}>
+					<Tabs tabList={tabs} />
+				</div>
+				{selectedTab === "Emoji" && <EmojiSelector onSelectEmoji={setEmoji} />}
+				{selectedTab === "Colors" && (
+					<ColorSelector onSelectColor={setColor} color={color ?? ""} />
+				)}
+			</div>
+			<div className={styles.button}>
+				<QuivrButton
+					label={t("saveButton", { ns: "translation" })}
+					onClick={async () => {
+						setVisible(false);
+						await onSave(color ?? "", emoji ?? "");
+					}}
+					iconName="upload"
+					color="primary"
+				/>
+			</div>
+		</div>
+	);
 };

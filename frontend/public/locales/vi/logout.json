@@ -1,0 +1,8 @@
+{
+	"title": "Đăng xuất",
+	"subtitle": "Hẹn gặp lại lần sau",
+	"areYouSure": "Bạn có chắc chắn muốn đăng xuất không?",
+	"cancel": "Hủy",
+	"error": "Lỗi khi đăng xuất {{errorMessage}}",
+	"loggedOut": "Đã đăng xuất thành công"
+}

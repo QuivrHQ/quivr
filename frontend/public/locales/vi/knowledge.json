@@ -1,0 +1,17 @@
+{
+	"addKnowledgeTitle": "Thêm tài liệu",
+	"addKnowledgeSubtitle": "Bổ sung kiến thức từ tài liệu hoặc trang web cho brain của bạn",
+	"uploaded_knowledge": "Tài liệu đã được tải lên",
+	"documents": "Tài liệu",
+	"connections": "Kết nối",
+	"websiste": "Trang web",
+	"feed_brain": "Thêm vào brain",
+	"enter_website_url": "Nhập URL trang web",
+	"choose_document": "Chọn tài liệu",
+	"or_drag_it_here": "hoặc kéo nó vào đây",
+	"choose_brain": "Chọn một brain",
+	"empty_folder": "Thư mục trống",
+	"back": "Quay lại",
+	"back_to_connections": "Quay lại kết nối",
+	"manage_current_brain": "Quản lý brain hiện tại"
+}

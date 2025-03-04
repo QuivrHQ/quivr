@@ -84,6 +84,23 @@ import monetization_ru from "../../../public/locales/ru/monetization.json";
 import translation_ru from "../../../public/locales/ru/translation.json";
 import upload_ru from "../../../public/locales/ru/upload.json";
 import user_ru from "../../../public/locales/ru/user.json";
+// import all namespaces Vietnamese
+import brain_vi from "../../../public/locales/vi/brain.json";
+import chat_vi from "../../../public/locales/vi/chat.json";
+import config_vi from "../../../public/locales/vi/config.json";
+import contact_vi from "../../../public/locales/vi/contact.json";
+import delete_brain_vi from "../../../public/locales/vi/deleteOrUnsubscribeFromBrain.json";
+import explore_vi from "../../../public/locales/vi/explore.json";
+import external_api_definition_vi from "../../../public/locales/vi/external_api_definition.json";
+import home_vi from "../../../public/locales/vi/home.json";
+import invitation_vi from "../../../public/locales/vi/invitation.json";
+import knowlegde_vi from "../../../public/locales/vi/knowledge.json";
+import login_vi from "../../../public/locales/vi/login.json";
+import logout_vi from "../../../public/locales/vi/logout.json";
+import monetization_vi from "../../../public/locales/vi/monetization.json";
+import translation_vi from "../../../public/locales/vi/translation.json";
+import upload_vi from "../../../public/locales/vi/upload.json";
+import user_vi from "../../../public/locales/vi/user.json";
 // import all namespaces Simplified Chinese
 import brain_zh_cn from "../../../public/locales/zh-cn/brain.json";
 import chat_zh_cn from "../../../public/locales/zh-cn/chat.json";
@@ -104,22 +121,22 @@ import user_zh_cn from "../../../public/locales/zh-cn/user.json";
 
 //type all translations
 export type Translations = {
-  brain: typeof import("../../../public/locales/en/brain.json");
-  chat: typeof import("../../../public/locales/en/chat.json");
-  config: typeof import("../../../public/locales/en/config.json");
-  contact: typeof import("../../../public/locales/en/contact.json");
+  brain: typeof import("../../../public/locales/vi/brain.json");
+  chat: typeof import("../../../public/locales/vi/chat.json");
+  config: typeof import("../../../public/locales/vi/config.json");
+  contact: typeof import("../../../public/locales/vi/contact.json");
   delete_or_unsubscribe_from_brain: typeof import("../../../public/locales/en/deleteOrUnsubscribeFromBrain.json");
-  explore: typeof import("../../../public/locales/en/explore.json");
-  home: typeof import("../../../public/locales/en/home.json");
-  invitation: typeof import("../../../public/locales/en/invitation.json");
-  login: typeof import("../../../public/locales/en/login.json");
-  logout: typeof import("../../../public/locales/en/logout.json");
-  monetization: typeof import("../../../public/locales/en/monetization.json");
-  translation: typeof import("../../../public/locales/en/translation.json");
-  upload: typeof import("../../../public/locales/en/upload.json");
-  user: typeof import("../../../public/locales/en/user.json");
-  knowledge: typeof import("../../../public/locales/en/knowledge.json");
-  external_api_definition: typeof import("../../../public/locales/en/external_api_definition.json");
+  explore: typeof import("../../../public/locales/vi/explore.json");
+  home: typeof import("../../../public/locales/vi/home.json");
+  invitation: typeof import("../../../public/locales/vi/invitation.json");
+  login: typeof import("../../../public/locales/vi/login.json");
+  logout: typeof import("../../../public/locales/vi/logout.json");
+  monetization: typeof import("../../../public/locales/vi/monetization.json");
+  translation: typeof import("../../../public/locales/vi/translation.json");
+  upload: typeof import("../../../public/locales/vi/upload.json");
+  user: typeof import("../../../public/locales/vi/user.json");
+  knowledge: typeof import("../../../public/locales/vi/knowledge.json");
+  external_api_definition: typeof import("../../../public/locales/vi/external_api_definition.json");
 };
 
 enum SupportedLanguages {
@@ -129,6 +146,7 @@ enum SupportedLanguages {
   ptbr = "ptbr",
   ru = "ru",
   zh_cn = "zh_cn",
+	vi = "vi",
 }
 
 export const defaultNS = "translation";
@@ -223,6 +241,24 @@ export const resources: Record<SupportedLanguages, Translations> = {
     knowledge: knowlegde_ru,
     external_api_definition: external_api_definition_ru,
   },
+	vi : {
+		brain: brain_vi,
+    chat: chat_vi,
+    config: config_vi,
+    contact: contact_vi,
+    explore: explore_vi,
+    home: home_vi,
+    invitation: invitation_vi,
+    login: login_vi,
+    logout: logout_vi,
+    monetization: monetization_vi,
+    translation: translation_vi,
+    upload: upload_vi,
+    user: user_vi,
+    delete_or_unsubscribe_from_brain: delete_brain_vi,
+    knowledge: knowlegde_vi,
+    external_api_definition: external_api_definition_vi,
+	},
   zh_cn: {
     brain: brain_zh_cn,
     chat: chat_zh_cn,
@@ -241,4 +277,5 @@ export const resources: Record<SupportedLanguages, Translations> = {
     knowledge: knowlegde_zh_cn,
     external_api_definition: external_api_definition_zh_cn,
   },
+
 } as const;

@@ -40,6 +40,7 @@
       font-size: Typography.$tiny;
       width: 1.75rem;
       align-items: center;
+			text-wrap-mode: nowrap;
 
       .step_index {
         white-space: nowrap;
