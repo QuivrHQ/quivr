@@ -9,7 +9,6 @@ import {
   SelectOptionProps,
 } from '@/lib/components/ui/MultiSelect/MultiSelect';
 import { useBrainContext } from '@/lib/context/BrainProvider/hooks/useBrainContext';
-import { useSupabase } from '@/lib/context/SupabaseProvider';
 
 import styles from './CreateUserModal.module.scss';
 
@@ -35,7 +34,6 @@ export const CreateUserModal = ({
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { t } = useTranslation(['translation']);
   const { allBrains } = useBrainContext();
-  const { supabase } = useSupabase();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const { createUser } = useUserApi();
@@ -61,7 +59,7 @@ export const CreateUserModal = ({
 
   const { register, handleSubmit, formState, setValue, watch, reset } = methods;
   const { errors } = formState;
-  
+
   // Watch form values
   const firstName = watch('firstName');
   const lastName = watch('lastName');
@@ -84,6 +82,7 @@ export const CreateUserModal = ({
       // Reset form
       reset();
       setSelectedBrains([]);
+      // eslint-disable-next-line @typescript-eslint/no-shadow
     } catch (error) {
       console.error('Error creating user:', error);
       setError(
@@ -101,7 +100,10 @@ export const CreateUserModal = ({
     setSelectedBrains(newSelectedBrains);
   };
 
-  const handleInputChange = (field: keyof CreateUserProps, value: string): void => {
+  const handleInputChange = (
+    field: keyof CreateUserProps,
+    value: string
+  ): void => {
     setValue(field, value, { shouldValidate: true });
   };
 
@@ -125,6 +127,7 @@ export const CreateUserModal = ({
               type='submit'
               variant='primary'
               isLoading={isSubmitting}
+              // eslint-disable-next-line @typescript-eslint/no-misused-promises
               onClick={handleSubmit(onSubmit)}
             >
               Create
@@ -146,9 +149,7 @@ export const CreateUserModal = ({
                 })}
               />
               {errors.firstName && (
-                <span className={styles.error}>
-                  {errors.firstName.message}
-                </span>
+                <span className={styles.error}>{errors.firstName.message}</span>
               )}
             </div>
 
@@ -163,9 +164,7 @@ export const CreateUserModal = ({
                 })}
               />
               {errors.lastName && (
-                <span className={styles.error}>
-                  {errors.lastName.message}
-                </span>
+                <span className={styles.error}>{errors.lastName.message}</span>
               )}
             </div>
 
@@ -184,9 +183,7 @@ export const CreateUserModal = ({
                 })}
               />
               {errors.email && (
-                <span className={styles.error}>
-                  {errors.email.message}
-                </span>
+                <span className={styles.error}>{errors.email.message}</span>
               )}
             </div>
 
