@@ -1,10 +1,12 @@
 {
-  "title": "{{user}}'s Brain Usage",
-  "fetching": "Fetching your data...",
-  "requestsCount": "Today's Requests: {{count}}",
-  "brainSize": "Remaining Brain size",
-  "empty": "Empty",
-  "Used": "Used",
-  "Unused": "Unused",
-  "brainUsage": "Brain Usage"
+	"title": "{{user}}'s Brain Usage",
+	"fetching": "Fetching your data...",
+	"requestsCount": "Today's Requests: {{count}}",
+	"brainSize": "Remaining Brain size",
+	"empty": "Empty",
+	"Used": "Used",
+	"Unused": "Unused",
+	"brainUsage": "Brain Usage",
+	"delete_account_description": "Are you sure you want to delete your account? All your data will be deleted and cannot be recovered.",
+	"delete_account": "Delete account"
 }
