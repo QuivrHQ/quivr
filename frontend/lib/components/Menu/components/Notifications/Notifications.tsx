@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 
 import { Icon } from "@/lib/components/ui/Icon/Icon";
 import { TextButton } from "@/lib/components/ui/TextButton/TextButton";
@@ -11,179 +12,181 @@ import { GenericNotification } from "./GenericNotification/GenericNotification";
 import styles from "./Notifications.module.scss";
 
 export const Notifications = (): JSX.Element => {
-  const { bulkNotifications, updateNotifications, setIsVisible } =
-    useNotificationsContext();
-  const { isMobile } = useDevice();
-  const { supabase } = useSupabase();
-  const [genericNotificationsDisplayed, setGenericNotificationsDisplayed] =
-    useState<boolean>(true);
-  const [feedingNotificationsDisplayed, setFeedingNotificationsDisplayed] =
-    useState<boolean>(true);
+	const { t } = useTranslation(["translation"]);
 
-  const deleteAllNotifications = async (
-    notificationType: "generic" | "feeding"
-  ) => {
-    if (notificationType === "generic") {
-      await supabase.from("notifications").delete().match({
-        category: "generic",
-      });
-    } else {
-      await supabase
-        .from("notifications")
-        .delete()
-        .not("category", "eq", "generic");
-    }
+	const { bulkNotifications, updateNotifications, setIsVisible } =
+		useNotificationsContext();
+	const { isMobile } = useDevice();
+	const { supabase } = useSupabase();
+	const [genericNotificationsDisplayed, setGenericNotificationsDisplayed] =
+		useState<boolean>(true);
+	const [feedingNotificationsDisplayed, setFeedingNotificationsDisplayed] =
+		useState<boolean>(true);
 
-    await updateNotifications();
-  };
+	const deleteAllNotifications = async (
+		notificationType: "generic" | "feeding"
+	) => {
+		if (notificationType === "generic") {
+			await supabase.from("notifications").delete().match({
+				category: "generic",
+			});
+		} else {
+			await supabase
+				.from("notifications")
+				.delete()
+				.not("category", "eq", "generic");
+		}
 
-  const handleClickOutside = (event: MouseEvent) => {
-    const target = event.target as Node;
-    const panel = document.getElementById("notifications-panel");
-    const button = document.getElementById("notifications-button");
+		await updateNotifications();
+	};
 
-    if (!panel || !button) {
-      return;
-    }
+	const handleClickOutside = (event: MouseEvent) => {
+		const target = event.target as Node;
+		const panel = document.getElementById("notifications-panel");
+		const button = document.getElementById("notifications-button");
 
-    if (!panel.contains(target) && !button.contains(target)) {
-      setIsVisible(false);
-    }
-  };
+		if (!panel || !button) {
+			return;
+		}
 
-  useEffect(() => {
-    document.addEventListener("mousedown", handleClickOutside);
+		if (!panel.contains(target) && !button.contains(target)) {
+			setIsVisible(false);
+		}
+	};
 
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, []);
+	useEffect(() => {
+		document.addEventListener("mousedown", handleClickOutside);
 
-  const hasGenericNotifications = () => {
-    return bulkNotifications.some((notif) => notif.category === "generic");
-  };
+		return () => {
+			document.removeEventListener("mousedown", handleClickOutside);
+		};
+	}, []);
 
-  const renderGenericNotifications = () => {
-    return (
-      <>
-        {bulkNotifications.map((notification, i) =>
-          notification.category === "generic" ? (
-            <GenericNotification key={i} bulkNotification={notification} />
-          ) : null
-        )}
-      </>
-    );
-  };
+	const hasGenericNotifications = () => {
+		return bulkNotifications.some((notif) => notif.category === "generic");
+	};
 
-  const renderFeedingNotifications = () => {
-    return (
-      <>
-        <div
-          className={styles.notifications_panel_header}
-          onClick={() =>
-            setFeedingNotificationsDisplayed(!feedingNotificationsDisplayed)
-          }
-        >
-          <div className={styles.left}>
-            {isMobile && !hasGenericNotifications() && (
-              <Icon
-                name="hide"
-                size="small"
-                handleHover={true}
-                color="black"
-                onClick={() => setIsVisible(false)}
-              />
-            )}
-            <span className={styles.title}>Knowledge feeding in progress</span>
-            <div className={styles.icon}>
-              <Icon
-                name={
-                  feedingNotificationsDisplayed ? "chevronRight" : "chevronDown"
-                }
-                size="normal"
-                color="black"
-              />
-            </div>
-          </div>
-          <div className={styles.buttons}>
-            <TextButton
-              label="Delete all"
-              color="black"
-              onClick={() => void deleteAllNotifications("feeding")}
-              small={true}
-            />
-          </div>
-        </div>
+	const renderGenericNotifications = () => {
+		return (
+			<>
+				{bulkNotifications.map((notification, i) =>
+					notification.category === "generic" ? (
+						<GenericNotification key={i} bulkNotification={notification} />
+					) : null
+				)}
+			</>
+		);
+	};
 
-        {feedingNotificationsDisplayed &&
-          bulkNotifications.map((notification, i) =>
-            notification.category !== "generic" ? (
-              <FeedingNotification key={i} bulkNotification={notification} />
-            ) : null
-          )}
-      </>
-    );
-  };
+	const renderFeedingNotifications = () => {
+		return (
+			<>
+				<div
+					className={styles.notifications_panel_header}
+					onClick={() =>
+						setFeedingNotificationsDisplayed(!feedingNotificationsDisplayed)
+					}
+				>
+					<div className={styles.left}>
+						{isMobile && !hasGenericNotifications() && (
+							<Icon
+								name="hide"
+								size="small"
+								handleHover={true}
+								color="black"
+								onClick={() => setIsVisible(false)}
+							/>
+						)}
+						<span className={styles.title}>{t("knowledge_feeding_in_progress", { ns: "translation" })}</span>
+						<div className={styles.icon}>
+							<Icon
+								name={
+									feedingNotificationsDisplayed ? "chevronRight" : "chevronDown"
+								}
+								size="normal"
+								color="black"
+							/>
+						</div>
+					</div>
+					<div className={styles.buttons}>
+						<TextButton
+							label={t("delete_all", { ns: "translation" })}
+							color="black"
+							onClick={() => void deleteAllNotifications("feeding")}
+							small={true}
+						/>
+					</div>
+				</div>
 
-  return (
-    <div id="notifications-panel" className={styles.notifications_wrapper}>
-      <div className={styles.notifications_panel}>
-        {(bulkNotifications.length === 0 || hasGenericNotifications()) && (
-          <div
-            className={styles.notifications_panel_header}
-            onClick={() =>
-              setGenericNotificationsDisplayed(!genericNotificationsDisplayed)
-            }
-          >
-            <div className={styles.left}>
-              {isMobile && (
-                <Icon
-                  name="hide"
-                  size="small"
-                  handleHover={true}
-                  color="black"
-                  onClick={() => setIsVisible(false)}
-                />
-              )}
-              <span className={styles.title}>Notifications</span>
-              <div className={styles.icon}>
-                <Icon
-                  name={
-                    genericNotificationsDisplayed
-                      ? "chevronRight"
-                      : "chevronDown"
-                  }
-                  size="normal"
-                  color="black"
-                />
-              </div>
-            </div>
-            <div className={styles.buttons}>
-              <TextButton
-                label="Delete all"
-                color="black"
-                onClick={() => void deleteAllNotifications("generic")}
-                small={true}
-              />
-            </div>
-          </div>
-        )}
+				{feedingNotificationsDisplayed &&
+					bulkNotifications.map((notification, i) =>
+						notification.category !== "generic" ? (
+							<FeedingNotification key={i} bulkNotification={notification} />
+						) : null
+					)}
+			</>
+		);
+	};
 
-        {bulkNotifications.length === 0 && (
-          <div className={styles.no_notifications}>
-            You have no notifications
-          </div>
-        )}
+	return (
+		<div id="notifications-panel" className={styles.notifications_wrapper}>
+			<div className={styles.notifications_panel}>
+				{(bulkNotifications.length === 0 || hasGenericNotifications()) && (
+					<div
+						className={styles.notifications_panel_header}
+						onClick={() =>
+							setGenericNotificationsDisplayed(!genericNotificationsDisplayed)
+						}
+					>
+						<div className={styles.left}>
+							{isMobile && (
+								<Icon
+									name="hide"
+									size="small"
+									handleHover={true}
+									color="black"
+									onClick={() => setIsVisible(false)}
+								/>
+							)}
+							<span className={styles.title}>{t("notifications", { ns: "translation" })}</span>
+							<div className={styles.icon}>
+								<Icon
+									name={
+										genericNotificationsDisplayed
+											? "chevronRight"
+											: "chevronDown"
+									}
+									size="normal"
+									color="black"
+								/>
+							</div>
+						</div>
+						<div className={styles.buttons}>
+							<TextButton
+								label={t("delete_all", { ns: "translation" })}
+								color="black"
+								onClick={() => void deleteAllNotifications("generic")}
+								small={true}
+							/>
+						</div>
+					</div>
+				)}
 
-        {hasGenericNotifications() &&
-          genericNotificationsDisplayed &&
-          renderGenericNotifications()}
+				{bulkNotifications.length === 0 && (
+					<div className={styles.no_notifications}>
+						{t("you_have_no_notifications", { ns: "translation" })}
+					</div>
+				)}
 
-        {bulkNotifications.some((notif) => notif.category !== "generic") &&
-          renderFeedingNotifications()}
-      </div>
-    </div>
-  );
+				{hasGenericNotifications() &&
+					genericNotificationsDisplayed &&
+					renderGenericNotifications()}
+
+				{bulkNotifications.some((notif) => notif.category !== "generic") &&
+					renderFeedingNotifications()}
+			</div>
+		</div>
+	);
 };
 
 export default Notifications;

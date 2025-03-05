@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 
 import { Icon } from "@/lib/components/ui/Icon/Icon";
 import { LoaderIcon } from "@/lib/components/ui/LoaderIcon/LoaderIcon";
@@ -17,78 +18,79 @@ import { useBrainFetcher } from "./hooks/useBrainFetcher";
 import { useBrainManagementTabs } from "./hooks/useBrainManagementTabs";
 
 export const BrainManagementTabs = (): JSX.Element => {
-  const [selectedTab, setSelectedTab] = useState("Knowledge");
-  const { brainId, hasEditRights } = useBrainManagementTabs();
-  const { allKnowledge } = useAddedKnowledge({ brainId: brainId ?? undefined });
-  const router = useRouter();
+	const { t } = useTranslation(["translation", "brain"]);
 
-  const { isLoading } = useBrainFetcher({
-    brainId,
-  });
+	const [selectedTab, setSelectedTab] = useState("Knowledge");
+	const { brainId, hasEditRights } = useBrainManagementTabs();
+	const { allKnowledge } = useAddedKnowledge({ brainId: brainId ?? undefined });
+	const router = useRouter();
 
-  const brainManagementTabs: Tab[] = [
-    {
-      label: hasEditRights
-        ? `Knowledge${allKnowledge.length > 1 ? "s" : ""} (${
-            allKnowledge.length
-          })`
-        : "Knowledge",
-      isSelected: selectedTab === "Knowledge",
-      onClick: () => setSelectedTab("Knowledge"),
-      iconName: "file",
-    },
-    {
-      label: "Settings",
-      isSelected: selectedTab === "Settings",
-      onClick: () => setSelectedTab("Settings"),
-      iconName: "settings",
-    },
-    {
-      label: "People",
-      isSelected: selectedTab === "People",
-      onClick: () => setSelectedTab("People"),
-      iconName: "user",
-      disabled: !hasEditRights,
-    },
-  ];
+	const { isLoading } = useBrainFetcher({
+		brainId,
+	});
 
-  if (!brainId) {
-    return <div />;
-  }
+	const brainManagementTabs: Tab[] = [
+		{
+			label: hasEditRights
+				? `${t("knowledge", { ns: "brain" })} (${allKnowledge.length
+				})`
+				: t("knowledge", { ns: "brain" }),
+			isSelected: selectedTab === "Knowledge",
+			onClick: () => setSelectedTab("Knowledge"),
+			iconName: "file",
+		},
+		{
+			label: t("settings", { ns: "brain" }),
+			isSelected: selectedTab === "Settings",
+			onClick: () => setSelectedTab("Settings"),
+			iconName: "settings",
+		},
+		{
+			label: t("people", { ns: "brain" }),
+			isSelected: selectedTab === "People",
+			onClick: () => setSelectedTab("People"),
+			iconName: "user",
+			disabled: !hasEditRights,
+		},
+	];
 
-  if (isLoading) {
-    return (
-      <div className={styles.loader}>
-        <LoaderIcon size="big" color="primary" />
-      </div>
-    );
-  }
+	if (!brainId) {
+		return <div />;
+	}
 
-  return (
-    <div>
-      <div className={styles.header_wrapper}>
-        <Icon
-          name="chevronLeft"
-          size="normal"
-          color="black"
-          handleHover={true}
-          onClick={() => router.push("/studio")}
-        />
-        <div className={styles.tabs}>
-          <Tabs tabList={brainManagementTabs} />
-        </div>
-      </div>
-      {selectedTab === "Settings" && (
-        <SettingsTab brainId={brainId} hasEditRights={hasEditRights} />
-      )}
-      {selectedTab === "People" && <PeopleTab brainId={brainId} />}
-      {selectedTab === "Knowledge" && (
-        <KnowledgeTab
-          brainId={brainId}
-          hasEditRights={hasEditRights}
-          allKnowledge={allKnowledge}
-        />
-      )}
-    </div>
-  );
+	if (isLoading) {
+		return (
+			<div className={styles.loader}>
+				<LoaderIcon size="big" color="primary" />
+			</div>
+		);
+	}
+
+	return (
+		<div>
+			<div className={styles.header_wrapper}>
+				<Icon
+					name="chevronLeft"
+					size="normal"
+					color="black"
+					handleHover={true}
+					onClick={() => router.push("/studio")}
+				/>
+				<div className={styles.tabs}>
+					<Tabs tabList={brainManagementTabs} />
+				</div>
+			</div>
+			{selectedTab === "Settings" && (
+				<SettingsTab brainId={brainId} hasEditRights={hasEditRights} />
+			)}
+			{selectedTab === "People" && <PeopleTab brainId={brainId} />}
+			{selectedTab === "Knowledge" && (
+				<KnowledgeTab
+					brainId={brainId}
+					hasEditRights={hasEditRights}
+					allKnowledge={allKnowledge}
+				/>
+			)}
+		</div>
+	);
 };

@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { LuSearch } from "react-icons/lu";
 
 import { Editor } from "@/app/chat/[chatId]/components/ActionsBar/components/ChatInput/components/ChatEditor/Editor/Editor";
@@ -14,88 +15,87 @@ import { CurrentBrain } from "../../CurrentBrain/CurrentBrain";
 import { LoaderIcon } from "../LoaderIcon/LoaderIcon";
 
 export const SearchBar = ({
-  onSearch,
-  newBrain,
+	onSearch,
+	newBrain,
 }: {
-  onSearch?: () => void;
-  newBrain?: boolean;
+	onSearch?: () => void;
+	newBrain?: boolean;
 }): JSX.Element => {
-  const [searching, setSearching] = useState(false);
-  const [isDisabled, setIsDisabled] = useState(true);
-  const [placeholder, setPlaceholder] = useState("Select a @brain");
-  const { message, setMessage } = useChatInput();
-  const { setMessages } = useChatContext();
-  const { addQuestion } = useChat();
-  const { currentBrain, setCurrentBrainId } = useBrainContext();
-  const { remainingCredits } = useUserSettingsContext();
+	const { t } = useTranslation(["chat"]);
 
-  useEffect(() => {
-    setCurrentBrainId(null);
-  }, []);
+	const [searching, setSearching] = useState(false);
+	const [isDisabled, setIsDisabled] = useState(true);
+	const [placeholder, setPlaceholder] = useState(t("select_brain", { ns: "chat" }));
+	const { message, setMessage } = useChatInput();
+	const { setMessages } = useChatContext();
+	const { addQuestion } = useChat();
+	const { currentBrain, setCurrentBrainId } = useBrainContext();
+	const { remainingCredits } = useUserSettingsContext();
 
-  useEffect(() => {
-    setIsDisabled(message === "");
-  }, [message]);
+	useEffect(() => {
+		setCurrentBrainId(null);
+	}, []);
 
-  useEffect(() => {
-    setPlaceholder(currentBrain ? "Ask a question..." : "Select a @brain");
-  }, [currentBrain]);
+	useEffect(() => {
+		setIsDisabled(message === "");
+	}, [message]);
 
-  const submit = async (): Promise<void> => {
-    if (!!remainingCredits && !!currentBrain && !searching) {
-      setSearching(true);
-      setMessages([]);
-      try {
-        if (onSearch) {
-          onSearch();
-        }
-        await addQuestion(message);
-      } catch (error) {
-        console.error(error);
-      } finally {
-        setSearching(false);
-      }
-    }
-  };
+	useEffect(() => {
+		setPlaceholder(currentBrain ? t("ask_question", { ns: "chat" }) : t("select_brain", { ns: "chat" }));
+	}, [currentBrain]);
 
-  return (
-    <div
-      className={`${styles.search_bar_wrapper} ${
-        newBrain ? styles.new_brain : ""
-      }`}
-    >
-      <CurrentBrain
-        allowingRemoveBrain={true}
-        remainingCredits={remainingCredits}
-        isNewBrain={newBrain}
-      />
-      <div
-        className={`${styles.editor_wrapper} ${
-          !remainingCredits ? styles.disabled : ""
-        } ${currentBrain ? styles.current : ""}`}
-      >
-        <Editor
-          message={message}
-          setMessage={setMessage}
-          onSubmit={() => void submit()}
-          placeholder={placeholder}
-        ></Editor>
-        {searching ? (
-          <LoaderIcon size="big" color="accent" />
-        ) : (
-          <LuSearch
-            className={`
-          ${styles.search_icon} 
-          ${
-            isDisabled || !remainingCredits || !currentBrain
-              ? styles.disabled
-              : ""
-          }
+	const submit = async (): Promise<void> => {
+		if (!!remainingCredits && !!currentBrain && !searching) {
+			setSearching(true);
+			setMessages([]);
+			try {
+				if (onSearch) {
+					onSearch();
+				}
+				await addQuestion(message);
+			} catch (error) {
+				console.error(error);
+			} finally {
+				setSearching(false);
+			}
+		}
+	};
+
+	return (
+		<div
+			className={`${styles.search_bar_wrapper} ${newBrain ? styles.new_brain : ""
+				}`}
+		>
+			<CurrentBrain
+				allowingRemoveBrain={true}
+				remainingCredits={remainingCredits}
+				isNewBrain={newBrain}
+			/>
+			<div
+				className={`${styles.editor_wrapper} ${!remainingCredits ? styles.disabled : ""
+					} ${currentBrain ? styles.current : ""}`}
+			>
+				<Editor
+					message={message}
+					setMessage={setMessage}
+					onSubmit={() => void submit()}
+					placeholder={placeholder}
+				></Editor>
+				{searching ? (
+					<LoaderIcon size="big" color="accent" />
+				) : (
+					<LuSearch
+						className={`
+          ${styles.search_icon}
+          ${isDisabled || !remainingCredits || !currentBrain
+								? styles.disabled
+								: ""
+							}
           `}
-            onClick={() => void submit()}
-          />
-        )}
-      </div>
-    </div>
-  );
+						onClick={() => void submit()}
+					/>
+				)}
+			</div>
+		</div>
+	);
 };

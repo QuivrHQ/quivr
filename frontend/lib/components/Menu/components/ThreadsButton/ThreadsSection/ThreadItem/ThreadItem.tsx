@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 
 import { ChatEntity } from "@/app/chat/[chatId]/types";
 import { Icon } from "@/lib/components/ui/Icon/Icon";
@@ -11,109 +12,111 @@ import styles from "./ThreadItem.module.scss";
 import { useChatsListItem } from "../../hooks/useChatsListItem";
 
 type ChatHistoryItemProps = {
-  chatHistoryItem: ChatEntity;
+	chatHistoryItem: ChatEntity;
 };
 
 export const ThreadItem = ({
-  chatHistoryItem,
+	chatHistoryItem,
 }: ChatHistoryItemProps): JSX.Element => {
-  const [optionsOpened, setOptionsOpened] = useState<boolean>(false);
+	const { t } = useTranslation(["chat"]);
 
-  const {
-    chatName,
-    deleteChat,
-    editingName,
-    handleEditNameClick,
-    setChatName,
-  } = useChatsListItem(chatHistoryItem);
+	const [optionsOpened, setOptionsOpened] = useState<boolean>(false);
 
-  const onNameEdited = () => {
-    handleEditNameClick();
-  };
+	const {
+		chatName,
+		deleteChat,
+		editingName,
+		handleEditNameClick,
+		setChatName,
+	} = useChatsListItem(chatHistoryItem);
 
-  const optionsRef = useRef<HTMLDivElement | null>(null);
-  const iconRef = useRef<HTMLDivElement | null>(null);
+	const onNameEdited = () => {
+		handleEditNameClick();
+	};
 
-  const options: Option[] = [
-    {
-      label: "Edit",
-      onClick: () => onNameEdited(),
-      iconName: "edit",
-      iconColor: "primary",
-    },
-    {
-      label: "Delete",
-      onClick: () => void deleteChat(),
-      iconName: "delete",
-      iconColor: "dangerous",
-    },
-  ];
+	const optionsRef = useRef<HTMLDivElement | null>(null);
+	const iconRef = useRef<HTMLDivElement | null>(null);
 
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        iconRef.current &&
-        !iconRef.current.contains(event.target as Node) &&
-        optionsRef.current &&
-        !optionsRef.current.contains(event.target as Node)
-      ) {
-        setOptionsOpened(false);
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
+	const options: Option[] = [
+		{
+			label: t("edit", { ns: "chat" }),
+			onClick: () => onNameEdited(),
+			iconName: "edit",
+			iconColor: "primary",
+		},
+		{
+			label: t("delete", { ns: "chat" }),
+			onClick: () => void deleteChat(),
+			iconName: "delete",
+			iconColor: "dangerous",
+		},
+	];
 
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, []);
+	useEffect(() => {
+		const handleClickOutside = (event: MouseEvent) => {
+			if (
+				iconRef.current &&
+				!iconRef.current.contains(event.target as Node) &&
+				optionsRef.current &&
+				!optionsRef.current.contains(event.target as Node)
+			) {
+				setOptionsOpened(false);
+			}
+		};
+		document.addEventListener("mousedown", handleClickOutside);
 
-  return (
-    <>
-      <div className={styles.thread_item_wrapper}>
-        {editingName ? (
-          <input
-            className={styles.edit_thread_name}
-            onChange={(event) => setChatName(event.target.value)}
-            value={chatName}
-            onKeyDown={(event) => {
-              if (event.key === "Enter") {
-                onNameEdited();
-              }
-            }}
-            autoFocus
-          />
-        ) : (
-          <Link
-            className={styles.thread_item_name}
-            href={`/chat/${chatHistoryItem.chat_id}`}
-          >
-            {chatName.trim()}
-          </Link>
-        )}
-        <div
-          ref={iconRef}
-          onClick={(event: React.MouseEvent<HTMLElement>) => {
-            event.nativeEvent.stopImmediatePropagation();
-            if (editingName) {
-              onNameEdited();
-            } else {
-              setOptionsOpened(!optionsOpened);
-            }
-          }}
-        >
-          <div className={styles.icon_wrapper}>
-            <Icon
-              name={editingName ? "check" : "options"}
-              size="small"
-              color="black"
-              handleHover={true}
-            />
-          </div>
-          <div ref={optionsRef} className={styles.options_modal}>
-            {optionsOpened && <OptionsModal options={options} />}
-          </div>
-        </div>
-      </div>
-    </>
-  );
+		return () => {
+			document.removeEventListener("mousedown", handleClickOutside);
+		};
+	}, []);
+
+	return (
+		<>
+			<div className={styles.thread_item_wrapper}>
+				{editingName ? (
+					<input
+						className={styles.edit_thread_name}
+						onChange={(event) => setChatName(event.target.value)}
+						value={chatName}
+						onKeyDown={(event) => {
+							if (event.key === "Enter") {
+								onNameEdited();
+							}
+						}}
+						autoFocus
+					/>
+				) : (
+					<Link
+						className={styles.thread_item_name}
+						href={`/chat/${chatHistoryItem.chat_id}`}
+					>
+						{chatName.trim()}
+					</Link>
+				)}
+				<div
+					ref={iconRef}
+					onClick={(event: React.MouseEvent<HTMLElement>) => {
+						event.nativeEvent.stopImmediatePropagation();
+						if (editingName) {
+							onNameEdited();
+						} else {
+							setOptionsOpened(!optionsOpened);
+						}
+					}}
+				>
+					<div className={styles.icon_wrapper}>
+						<Icon
+							name={editingName ? "check" : "options"}
+							size="small"
+							color="black"
+							handleHover={true}
+						/>
+					</div>
+					<div ref={optionsRef} className={styles.options_modal}>
+						{optionsOpened && <OptionsModal options={options} />}
+					</div>
+				</div>
+			</div>
+		</>
+	);
 };

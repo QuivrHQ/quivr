@@ -2,6 +2,7 @@ import axios from "axios";
 import { capitalCase } from "change-case";
 import Image from "next/image";
 import React, { useEffect, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 
 import { useKnowledgeApi } from "@/lib/api/knowledge/useKnowledgeApi";
 import { useSync } from "@/lib/api/sync/useSync";
@@ -20,174 +21,175 @@ import { useKnowledgeItem } from "./hooks/useKnowledgeItem";
 import styles from "./KnowledgeItem.module.scss";
 
 const KnowledgeItem = ({
-  knowledge,
-  selected,
-  setSelected,
-  lastChild,
+	knowledge,
+	selected,
+	setSelected,
+	lastChild,
 }: {
-  knowledge: Knowledge;
-  selected: boolean;
-  setSelected: (selected: boolean, event: React.MouseEvent) => void;
-  lastChild?: boolean;
+	knowledge: Knowledge;
+	selected: boolean;
+	setSelected: (selected: boolean, event: React.MouseEvent) => void;
+	lastChild?: boolean;
 }): JSX.Element => {
-  const [optionsOpened, setOptionsOpened] = useState<boolean>(false);
-  const iconRef = useRef<HTMLDivElement | null>(null);
-  const optionsRef = useRef<HTMLDivElement | null>(null);
-  const { onDeleteKnowledge } = useKnowledgeItem();
-  const { brain } = useUrlBrain();
-  const { generateSignedUrlKnowledge } = useKnowledgeApi();
-  const { isMobile } = useDevice();
-  const { integrationIconUrls } = useSync();
+	const { t } = useTranslation();
 
-  const getOptions = (): Option[] => [
-    {
-      label: "Delete",
-      onClick: () => void onDeleteKnowledge(knowledge),
-      iconName: "delete",
-      iconColor: "dangerous",
-      disabled: brain?.role !== "Owner",
-    },
-    {
-      label: "Download",
-      onClick: () => void downloadFile(),
-      iconName: "download",
-      iconColor: "primary",
-      disabled: brain?.role !== "Owner" || !isUploadedKnowledge(knowledge),
-    },
-  ];
+	const [optionsOpened, setOptionsOpened] = useState<boolean>(false);
+	const iconRef = useRef<HTMLDivElement | null>(null);
+	const optionsRef = useRef<HTMLDivElement | null>(null);
+	const { onDeleteKnowledge } = useKnowledgeItem();
+	const { brain } = useUrlBrain();
+	const { generateSignedUrlKnowledge } = useKnowledgeApi();
+	const { isMobile } = useDevice();
+	const { integrationIconUrls } = useSync();
 
-  const downloadFile = async () => {
-    if (isUploadedKnowledge(knowledge)) {
-      const downloadUrl = await generateSignedUrlKnowledge({
-        knowledgeId: knowledge.id,
-      });
+	const getOptions = (): Option[] => [
+		{
+			label: t("deleteButton"),
+			onClick: () => void onDeleteKnowledge(knowledge),
+			iconName: "delete",
+			iconColor: "dangerous",
+			disabled: brain?.role !== "Owner",
+		},
+		{
+			label: t("download"),
+			onClick: () => void downloadFile(),
+			iconName: "download",
+			iconColor: "primary",
+			disabled: brain?.role !== "Owner" || !isUploadedKnowledge(knowledge),
+		},
+	];
 
-      try {
-        const response = await axios.get(downloadUrl, {
-          responseType: "blob",
-        });
+	const downloadFile = async () => {
+		if (isUploadedKnowledge(knowledge)) {
+			const downloadUrl = await generateSignedUrlKnowledge({
+				knowledgeId: knowledge.id,
+			});
 
-        const blobUrl = window.URL.createObjectURL(new Blob([response.data]));
+			try {
+				const response = await axios.get(downloadUrl, {
+					responseType: "blob",
+				});
 
-        const a = document.createElement("a");
-        a.href = blobUrl;
-        a.download = knowledge.fileName;
-        document.body.appendChild(a);
-        a.click();
+				const blobUrl = window.URL.createObjectURL(new Blob([response.data]));
 
-        window.URL.revokeObjectURL(blobUrl);
-      } catch (error) {
-        console.error("Error downloading the file:", error);
-      }
-    }
-    setOptionsOpened(false);
-  };
+				const a = document.createElement("a");
+				a.href = blobUrl;
+				a.download = knowledge.fileName;
+				document.body.appendChild(a);
+				a.click();
 
-  const handleClickOutside = (event: MouseEvent) => {
-    if (
-      iconRef.current &&
-      !iconRef.current.contains(event.target as Node) &&
-      optionsRef.current &&
-      !optionsRef.current.contains(event.target as Node)
-    ) {
-      setOptionsOpened(false);
-    }
-  };
+				window.URL.revokeObjectURL(blobUrl);
+			} catch (error) {
+				console.error("Error downloading the file:", error);
+			}
+		}
+		setOptionsOpened(false);
+	};
 
-  useEffect(() => {
-    document.addEventListener("mousedown", handleClickOutside);
+	const handleClickOutside = (event: MouseEvent) => {
+		if (
+			iconRef.current &&
+			!iconRef.current.contains(event.target as Node) &&
+			optionsRef.current &&
+			!optionsRef.current.contains(event.target as Node)
+		) {
+			setOptionsOpened(false);
+		}
+	};
 
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, []);
+	useEffect(() => {
+		document.addEventListener("mousedown", handleClickOutside);
 
-  const renderIcon = () => {
-    if (isUploadedKnowledge(knowledge)) {
-      return knowledge.integration ? (
-        <Image
-          src={
-            integrationIconUrls[
-              knowledge.integration as keyof typeof integrationIconUrls
-            ]
-          }
-          width="16"
-          height="16"
-          alt="integration_icon"
-        />
-      ) : (
-        <Icon
-          name={
-            knowledge.extension
-              ? (knowledge.extension.slice(1) as keyof typeof iconList)
-              : "file"
-          }
-          size="small"
-          color="black"
-        />
-      );
-    }
+		return () => {
+			document.removeEventListener("mousedown", handleClickOutside);
+		};
+	}, []);
 
-    return <Icon name="link" size="small" color="black" />;
-  };
+	const renderIcon = () => {
+		if (isUploadedKnowledge(knowledge)) {
+			return knowledge.integration ? (
+				<Image
+					src={
+						integrationIconUrls[
+						knowledge.integration as keyof typeof integrationIconUrls
+						]
+					}
+					width="16"
+					height="16"
+					alt="integration_icon"
+				/>
+			) : (
+				<Icon
+					name={
+						knowledge.extension
+							? (knowledge.extension.slice(1) as keyof typeof iconList)
+							: "file"
+					}
+					size="small"
+					color="black"
+				/>
+			);
+		}
 
-  const renderFileNameOrUrl = () => {
-    if (isUploadedKnowledge(knowledge)) {
-      return <span className={styles.file_name}>{knowledge.fileName}</span>;
-    }
+		return <Icon name="link" size="small" color="black" />;
+	};
 
-    return (
-      <a href={knowledge.url} target="_blank" rel="noopener noreferrer">
-        {knowledge.url}
-      </a>
-    );
-  };
+	const renderFileNameOrUrl = () => {
+		if (isUploadedKnowledge(knowledge)) {
+			return <span className={styles.file_name}>{knowledge.fileName}</span>;
+		}
 
-  return (
-    <div
-      className={`${styles.knowledge_item_wrapper} ${
-        lastChild ? styles.last : ""
-      }`}
-    >
-      <div className={styles.left}>
-        <Checkbox
-          checked={selected}
-          setChecked={(checked, event) => setSelected(checked, event)}
-        />
-        <div className={styles.icon}>{renderIcon()}</div>
-        {renderFileNameOrUrl()}
-      </div>
-      <div className={styles.right}>
-        {!isMobile && (
-          <div className={styles.status}>
-            <Tag
-              name={capitalCase(knowledge.status)}
-              color={
-                knowledge.status === "ERROR"
-                  ? "dangerous"
-                  : knowledge.status === "PROCESSING"
-                  ? "primary"
-                  : "success"
-              }
-            />
-          </div>
-        )}
-        <div
-          ref={iconRef}
-          onClick={(event: React.MouseEvent<HTMLElement>) => {
-            event.stopPropagation();
-            event.preventDefault();
-            setOptionsOpened(!optionsOpened);
-          }}
-        >
-          <Icon name="options" size="small" color="black" handleHover={true} />
-        </div>
-      </div>
-      <div ref={optionsRef} className={styles.options_modal}>
-        {optionsOpened && <OptionsModal options={getOptions()} />}
-      </div>
-    </div>
-  );
+		return (
+			<a href={knowledge.url} target="_blank" rel="noopener noreferrer">
+				{knowledge.url}
+			</a>
+		);
+	};
+
+	return (
+		<div
+			className={`${styles.knowledge_item_wrapper} ${lastChild ? styles.last : ""
+				}`}
+		>
+			<div className={styles.left}>
+				<Checkbox
+					checked={selected}
+					setChecked={(checked, event) => setSelected(checked, event)}
+				/>
+				<div className={styles.icon}>{renderIcon()}</div>
+				{renderFileNameOrUrl()}
+			</div>
+			<div className={styles.right}>
+				{!isMobile && (
+					<div className={styles.status}>
+						<Tag
+							name={capitalCase(knowledge.status)}
+							color={
+								knowledge.status === "ERROR"
+									? "dangerous"
+									: knowledge.status === "PROCESSING"
+										? "primary"
+										: "success"
+							}
+						/>
+					</div>
+				)}
+				<div
+					ref={iconRef}
+					onClick={(event: React.MouseEvent<HTMLElement>) => {
+						event.stopPropagation();
+						event.preventDefault();
+						setOptionsOpened(!optionsOpened);
+					}}
+				>
+					<Icon name="options" size="small" color="black" handleHover={true} />
+				</div>
+			</div>
+			<div ref={optionsRef} className={styles.options_modal}>
+				{optionsOpened && <OptionsModal options={getOptions()} />}
+			</div>
+		</div>
+	);
 };
 
 export default KnowledgeItem;

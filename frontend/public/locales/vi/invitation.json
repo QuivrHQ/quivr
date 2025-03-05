@@ -1,0 +1,13 @@
+{
+	"wellcome": "Chào mừng đến với {{brain}}!",
+	"invitationMessage": "Bạn đã được mời tham gia brain này với vai trò {{role}} và bắt đầu khám phá. Bạn có chấp nhận hành trình thú vị này không?",
+	"processingRequest": "Đang xử lý yêu cầu của bạn...",
+	"accept": "Có, hãy tính tôi vào!",
+	"reject": "Không, cảm ơn.",
+	"invitationNotFound": "Lời mời này không hợp lệ.",
+	"errorCheckingInvitation": "Đã xảy ra lỗi không xác định khi kiểm tra lời mời",
+	"accepted": "Lời mời đã được chấp nhận",
+	"errorAccepting": "Đã xảy ra lỗi không xác định khi chấp nhận lời mời",
+	"declined": "Lời mời đã bị từ chối",
+	"errorDeclining": "Đã xảy ra lỗi không xác định khi từ chối lời mời"
+}

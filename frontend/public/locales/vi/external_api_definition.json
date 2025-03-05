@@ -1,0 +1,14 @@
+{
+	"method_label": "Phương thức",
+	"url_placeholder": "URL",
+	"searchParams": "Tham số Tìm kiếm",
+	"headers": "Tiêu đề",
+	"params": "Tham số",
+	"key": "Khóa",
+	"type": "Kiểu (chuỗi hoặc số)",
+	"description": "Mô tả",
+	"secrets": "Bí mật",
+	"paramsTabDescription": "Các giá trị này được gửi dưới dạng nội dung yêu cầu.",
+	"searchParamsTabDescription": "Các giá trị này được gửi dưới dạng chuỗi truy vấn.",
+	"secretsTabDescription": "Các giá trị này được gửi dưới dạng khóa tiêu đề"
+}

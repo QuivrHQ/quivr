@@ -1,0 +1,15 @@
+{
+	"title": "Khám phá dữ liệu đã tải lên",
+	"subtitle": "Xem, tải xuống hoặc xóa kiến thức được sử dụng bởi brain của bạn",
+	"empty": "Ôi không, Brain của bạn trống rỗng.",
+	"noBrain": "Không tìm thấy ID brain",
+	"sessionNotFound": "Không tìm thấy phiên người dùng",
+	"deleted": "{{fileName}} đã được xóa khỏi brain {{brain}}",
+	"errorDeleting": "Lỗi khi xóa {{fileName}}",
+	"view": "Xem",
+	"chunkNumber": "Số lượng đoạn (chunks): {{quantity}}",
+	"notAvailable": "Không có sẵn",
+	"deleteConfirmTitle": "Xác nhận",
+	"deleteConfirmText": "Bạn có thực sự muốn xóa không?",
+	"feed_brain_instructions": "Để thêm kiến thức vào brain, hãy vào trang trò chuyện sau đó nhấp vào nút cộng ở bên trái của ô nhập trò chuyện"
+}

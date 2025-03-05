@@ -1,0 +1,36 @@
+{
+	"sign_in": "Đăng nhập",
+	"docs": "Tài liệu",
+	"pricing": "Giá",
+	"sign_up": "Đăng ký",
+	"star_us": "Thả sao cho chúng tôi trên Github",
+	"blog": "Blog",
+	"sponsored_by": "Được tài trợ bởi",
+	"useCases": {
+		"title": "Trải nghiệm ngay bây giờ.",
+		"subtitle": "Kiểm tra ví dụ của chúng tôi về cách sử dụng Quivr"
+	},
+	"intro": {
+		"title": "Nhận một Bộ Não Thứ Hai với",
+		"subtitle": "Trợ lý năng suất của bạn được kết nối với các tệp và ứng dụng yêu thích của bạn",
+		"try_demo": "Thử demo miễn phí",
+		"contact_sales": "Liên hệ với đội ngũ bán hàng"
+	},
+	"demo": {
+		"title": "Video demo",
+		"start_now": "Bắt đầu ngay"
+	},
+	"security": {
+		"cta": "Bắt đầu ngay hôm nay"
+	},
+	"footer": {
+		"title": "Bắt đầu ngay hôm nay",
+		"description_1": "Trợ lý cá nhân của bạn hoạt động như Bộ Não Thứ Hai của bạn.",
+		"description_2": "Chỉ cần tải lên các tệp của bạn và đặt câu hỏi cho nó.",
+		"start_using": "Bắt đầu sử dụng Quivr",
+		"contact_sales": "Liên hệ với đội ngũ bán hàng"
+	},
+	"testimonials": {
+		"title": "Mọi người nói gì về"
+	}
+}
