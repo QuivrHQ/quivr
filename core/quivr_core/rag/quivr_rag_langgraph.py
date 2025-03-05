@@ -24,6 +24,7 @@ from langchain_core.documents import BaseDocumentCompressor, Document
 from langchain_core.messages import BaseMessage
 from langchain_core.messages.ai import AIMessageChunk
 from langchain_core.prompts.base import BasePromptTemplate
+from langchain_core.runnables.schema import StreamEvent
 from langchain_core.vectorstores import VectorStore
 from langgraph.graph import END, START, StateGraph
 from langgraph.graph.message import add_messages
@@ -39,7 +40,7 @@ from quivr_core.rag.entities.models import (
     QuivrKnowledge,
     RAGResponseMetadata,
 )
-from quivr_core.rag.prompts import custom_prompts
+from quivr_core.rag.prompts import TemplatePromptName, custom_prompts
 from quivr_core.rag.utils import (
     LangfuseService,
     collect_tools,
@@ -224,6 +225,8 @@ class AgentState(TypedDict):
     files: str
     tasks: UserTasks
     instructions: str
+    ticket_metadata: Optional[dict[str, str]]
+    user_metadata: Optional[dict[str, str]]
     tool: str
 
 
@@ -314,7 +317,7 @@ class QuivrQARAGLangGraph:
             dict: The next state of the agent.
         """
 
-        msg = custom_prompts.SPLIT_PROMPT.format(
+        msg = custom_prompts[TemplatePromptName.SPLIT_PROMPT].format(
             user_input=state["messages"][0].content,
         )
 
@@ -358,7 +361,7 @@ class QuivrQARAGLangGraph:
 
     def routing_split(self, state: AgentState):
         response: SplittedInput = self.invoke_structured_output(
-            custom_prompts.SPLIT_PROMPT.format(
+            custom_prompts[TemplatePromptName.SPLIT_PROMPT].format(
                 chat_history=state["chat_history"].to_list(),
                 user_input=state["messages"][0].content,
             ),
@@ -414,7 +417,7 @@ class QuivrQARAGLangGraph:
             "activated_tools": activated_tools,
         }
 
-        msg = custom_prompts.UPDATE_PROMPT.format(**inputs)
+        msg = custom_prompts[TemplatePromptName.UPDATE_PROMPT].format(**inputs)
 
         response: UpdatedPromptAndTools = self.invoke_structured_output(
             msg, UpdatedPromptAndTools
@@ -465,7 +468,6 @@ class QuivrQARAGLangGraph:
 
         return {**state, "chat_history": _chat_history}
 
-    ### Nodes
     async def rewrite(self, state: AgentState) -> AgentState:
         """
         Transform the query to produce a better question.
@@ -485,7 +487,7 @@ class QuivrQARAGLangGraph:
         # Prepare the async tasks for all user tsks
         async_jobs = []
         for task_id in tasks.ids:
-            msg = custom_prompts.CONDENSE_TASK_PROMPT.format(
+            msg = custom_prompts[TemplatePromptName.CONDENSE_TASK_PROMPT].format(
                 chat_history=state["chat_history"].to_list(),
                 task=tasks(task_id).definition,
             )
@@ -547,7 +549,7 @@ class QuivrQARAGLangGraph:
                 "activated_tools": validated_tools,
             }
 
-            msg = custom_prompts.TOOL_ROUTING_PROMPT.format(**input)
+            msg = custom_prompts[TemplatePromptName.TOOL_ROUTING_PROMPT].format(**input)
             async_jobs.append(
                 (self.ainvoke_structured_output(msg, TasksCompletion), task_id)
             )
@@ -823,7 +825,9 @@ class QuivrQARAGLangGraph:
 
     def get_rag_context_length(self, state: AgentState, docs: List[Document]) -> int:
         final_inputs = self._build_rag_prompt_inputs(state, docs)
-        msg = custom_prompts.RAG_ANSWER_PROMPT.format(**final_inputs)
+        msg = custom_prompts[TemplatePromptName.RAG_ANSWER_PROMPT].format(
+            **final_inputs
+        )
         return self.llm_endpoint.count_tokens(msg)
 
     def reduce_rag_context(
@@ -907,18 +911,25 @@ class QuivrQARAGLangGraph:
 
     def generate_zendesk_rag(self, state: AgentState) -> AgentState:
         tasks = state["tasks"]
-        docs = tasks.docs if tasks else []
+        docs: List[Document] = tasks.docs if tasks else []
         messages = state["messages"]
         user_task = messages[0].content
+        ticket_metadata = state["ticket_metadata"]
+        user_metadata = state["user_metadata"]
         inputs = {
-            "similar_tickets": docs,
+            "similar_tickets": "\n".join([doc.page_content for doc in docs]),
+            "ticket_metadata": ticket_metadata,
+            "user_metadata": user_metadata,
             "client_query": user_task,
             "system_prompt": self.retrieval_config.prompt
             if self.retrieval_config.prompt
             else "",
         }
 
-        msg = custom_prompts.ZENDESK_TEMPLATE_PROMPT.format(**inputs)
+        msg = custom_prompts[TemplatePromptName.ZENDESK_TEMPLATE_PROMPT].format(
+            **inputs
+        )
+        breakpoint()
         llm = self.bind_tools_to_llm(self.generate_zendesk_rag.__name__)
         response = llm.invoke(msg)
 
@@ -928,11 +939,9 @@ class QuivrQARAGLangGraph:
         tasks = state["tasks"]
         docs = tasks.docs if tasks else []
         inputs = self._build_rag_prompt_inputs(state, docs)
-        state, inputs = self.reduce_rag_context(
-            state, inputs, custom_prompts.RAG_ANSWER_PROMPT
-        )
-
-        msg = custom_prompts.RAG_ANSWER_PROMPT.format(**inputs)
+        prompt = custom_prompts[TemplatePromptName.RAG_ANSWER_PROMPT]
+        state, inputs = self.reduce_rag_context(state, inputs, prompt)
+        msg = prompt.format(**inputs)
         llm = self.bind_tools_to_llm(self.generate_rag.__name__)
         response = llm.invoke(msg)
 
@@ -961,12 +970,10 @@ class QuivrQARAGLangGraph:
 
         # LLM
         llm = self.llm_endpoint._llm
+        prompt = custom_prompts[TemplatePromptName.CHAT_LLM_PROMPT]
+        state, reduced_inputs = self.reduce_rag_context(state, final_inputs, prompt)
 
-        state, reduced_inputs = self.reduce_rag_context(
-            state, final_inputs, custom_prompts.CHAT_LLM_PROMPT
-        )
-
-        msg = custom_prompts.CHAT_LLM_PROMPT.format(**reduced_inputs)
+        msg = prompt.format(**reduced_inputs)
 
         # Run
         response = llm.invoke(msg)
@@ -1022,6 +1029,7 @@ class QuivrQARAGLangGraph:
         history: ChatHistory,
         list_files: list[QuivrKnowledge],
         metadata: dict[str, str] = {},
+        **input_kwargs,
     ) -> AsyncGenerator[ParsedRAGChunkResponse, ParsedRAGChunkResponse]:
         """
         Answer a question using the langgraph chain and yield each chunk of the answer separately.
@@ -1037,9 +1045,15 @@ class QuivrQARAGLangGraph:
 
         async for event in conversational_qa_chain.astream_events(
             {
-                "messages": [("user", question)],
+                "messages": [
+                    (
+                        "user",
+                        question,
+                    )
+                ],
                 "chat_history": history,
                 "files": concat_list_files,
+                **input_kwargs,
             },
             version="v1",
             config={"metadata": metadata, "callbacks": [langfuse_handler]},
@@ -1080,7 +1094,7 @@ class QuivrQARAGLangGraph:
             last_chunk=True,
         )
 
-    def _is_final_node_with_docs(self, event: dict) -> bool:
+    def _is_final_node_with_docs(self, event: StreamEvent) -> bool:
         return (
             "output" in event["data"]
             and event["data"]["output"] is not None
@@ -1088,14 +1102,14 @@ class QuivrQARAGLangGraph:
             and event["metadata"]["langgraph_node"] in self.final_nodes
         )
 
-    def _is_final_node_and_chat_model_stream(self, event: dict) -> bool:
+    def _is_final_node_and_chat_model_stream(self, event: StreamEvent) -> bool:
         return (
             event["event"] == "on_chat_model_stream"
             and "langgraph_node" in event["metadata"]
             and event["metadata"]["langgraph_node"] in self.final_nodes
         )
 
-    def _extract_node_name(self, event: dict) -> str:
+    def _extract_node_name(self, event: StreamEvent) -> str:
         if "metadata" in event and "langgraph_node" in event["metadata"]:
             name = event["metadata"]["langgraph_node"]
             for node in self.retrieval_config.workflow_config.nodes:
