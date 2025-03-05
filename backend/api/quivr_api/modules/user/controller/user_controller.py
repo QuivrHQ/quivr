@@ -145,7 +145,7 @@ async def create_user_endpoint(
     return user_service.create_user(user_data)
 
 
-@user_router.get("/user/list", dependencies=[Depends(AuthBearer())], tags=["User"])
+@user_router.get("/users", dependencies=[Depends(AuthBearer())], tags=["User"])
 async def get_all_users_endpoint(
     current_user: UserIdentity = Depends(get_current_user),
 ) -> List[UserIdentity]:

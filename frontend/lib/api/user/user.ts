@@ -70,7 +70,7 @@ export const getUserIdentity = async (
 export const getAllUsers = async (
   axiosInstance: AxiosInstance
 ): Promise<UserIdentity[]> => {
-  const { data } = await axiosInstance.get<UserIdentity[]>(`/user/list`);
+  const { data } = await axiosInstance.get<UserIdentity[]>(`/users`);
 
   return data;
 };
