@@ -4,7 +4,6 @@ import { useEffect, useState } from 'react';
 
 import { AddBrainModal } from '@/lib/components/AddBrainModal';
 import { useBrainCreationContext } from '@/lib/components/AddBrainModal/brainCreation-provider';
-import { CreateUserModal } from '@/lib/components/CreateUserModal/CreateUserModal';
 import { PageHeader } from '@/lib/components/PageHeader/PageHeader';
 import { UploadDocumentModal } from '@/lib/components/UploadDocumentModal/UploadDocumentModal';
 import { Tabs } from '@/lib/components/ui/Tabs/Tabs';
@@ -24,19 +23,22 @@ const Studio = (): JSX.Element => {
   const { setIsBrainCreationModalOpened } = useBrainCreationContext();
   const { allBrains } = useBrainContext();
   const { userData } = useUserData();
-  const [isCreateUserModalOpen, setIsCreateUserModalOpen] = useState(false);
 
   const studioTabs: Tab[] = [
     {
       label: 'Manage my brains',
       isSelected: selectedTab === 'Manage my brains',
-      onClick: () => setSelectedTab('Manage my brains'),
+      onClick: () => {
+        setSelectedTab('Manage my brains');
+      },
       iconName: 'edit',
     },
     {
       label: 'Analytics',
       isSelected: selectedTab === 'Analytics',
-      onClick: () => setSelectedTab('Analytics'),
+      onClick: () => {
+        setSelectedTab('Analytics');
+      },
       iconName: 'graph',
     },
   ];
@@ -51,14 +53,6 @@ const Studio = (): JSX.Element => {
       iconName: 'brain',
       tooltip:
         'You have reached the maximum number of brains allowed. Please upgrade your plan or delete some brains to create a new one.',
-    },
-    {
-      label: 'Create user',
-      color: 'primary',
-      onClick: () => {
-        setIsCreateUserModalOpen(true);
-      },
-      iconName: 'user',
     },
     {
       label: 'Add knowledge',
@@ -105,10 +99,6 @@ const Studio = (): JSX.Element => {
       </div>
       <UploadDocumentModal />
       <AddBrainModal />
-      <CreateUserModal 
-        isOpen={isCreateUserModalOpen}
-        setOpen={setIsCreateUserModalOpen}
-      />
     </div>
   );
 };

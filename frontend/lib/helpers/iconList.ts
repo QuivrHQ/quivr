@@ -168,6 +168,7 @@ export const iconList: { [name: string]: IconType } = {
   markdown: BsFiletypeMd,
   md: BsFiletypeMd,
   moon: MdDarkMode,
+  more: SlOptionsVertical,
   mp3: BsFiletypeMp3,
   mp4: BsFiletypeMp4,
   mpga: FaRegFileAudio,

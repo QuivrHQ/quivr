@@ -1,4 +1,5 @@
 import time
+from typing import List
 
 from quivr_api.modules.dependencies import get_supabase_client
 from quivr_api.modules.user.entity.user_identity import UserIdentity
@@ -46,7 +47,7 @@ class Users(UsersInterface):
     def get_user_identity(self, user_id):
         response = (
             self.db.from_("user_identity")
-            .select("*, users (email)")
+            .select("*, users (email, last_sign_in_at)")
             .filter("user_id", "eq", str(user_id))
             .execute()
         )
@@ -58,7 +59,53 @@ class Users(UsersInterface):
 
         user_identity["id"] = user_id  # Add 'id' field to the dictionary
         user_identity["email"] = user_identity["users"]["email"]
+        user_identity["last_sign_in_at"] = user_identity["users"]["last_sign_in_at"]
+        
+        # Get user's brains
+        brains_response = (
+            self.db.from_("brains_users")
+            .select("brain_id")
+            .filter("user_id", "eq", str(user_id))
+            .execute()
+        )
+        
+        user_identity["brains"] = [brain["brain_id"] for brain in brains_response.data]
+        
         return UserIdentity(**user_identity)
+        
+    def get_all_users(self) -> List[UserIdentity]:
+        """
+        Get all users in the system
+        
+        Returns a list of all user identities with their associated brains and last login time
+        """
+        response = (
+            self.db.from_("user_identity")
+            .select("*, users (email, last_sign_in_at)")
+            .execute()
+        )
+        
+        users = []
+        for user_data in response.data:
+            user_id = user_data.get("user_id")
+            if user_id:
+                user_data["id"] = user_id
+                user_data["email"] = user_data["users"]["email"] if user_data["users"] else None
+                user_data["last_sign_in_at"] = user_data["users"]["last_sign_in_at"] if user_data["users"] else None
+                
+                # Get user's brains
+                brains_response = (
+                    self.db.from_("brains_users")
+                    .select("brain_id")
+                    .filter("user_id", "eq", str(user_id))
+                    .execute()
+                )
+                
+                user_data["brains"] = [brain["brain_id"] for brain in brains_response.data]
+                
+                users.append(UserIdentity(**user_data))
+                
+        return users
 
     def get_user_id_by_user_email(self, email):
         response = (

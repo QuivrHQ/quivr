@@ -5,10 +5,12 @@ import {
   CreateUserRequest,
   CreateUserResponse,
   deleteUserData,
+  getAllUsers,
   getUser,
   getUserCredits,
   getUserIdentity,
   updateUserIdentity,
+  UserIdentity,
   UserIdentityUpdatableProperties,
 } from './user';
 
@@ -24,6 +26,7 @@ export const useUserApi = () => {
       userIdentityUpdatableProperties: UserIdentityUpdatableProperties
     ) => updateUserIdentity(userIdentityUpdatableProperties, axiosInstance),
     getUserIdentity: async () => getUserIdentity(axiosInstance),
+    getAllUsers: async (): Promise<UserIdentity[]> => getAllUsers(axiosInstance),
     getUser: async () => getUser(axiosInstance),
     deleteUserData: async () => deleteUserData(axiosInstance),
     getUserCredits: async () => getUserCredits(axiosInstance),

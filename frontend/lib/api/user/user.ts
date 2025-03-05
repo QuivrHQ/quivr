@@ -35,6 +35,9 @@ export type UserIdentity = {
   id: UUID;
   onboarded: boolean;
   username: string;
+  email?: string;
+  brains?: string[];
+  last_sign_in_at?: string;
 };
 
 export type CreateUserRequest = {
@@ -60,6 +63,14 @@ export const getUserIdentity = async (
   axiosInstance: AxiosInstance
 ): Promise<UserIdentity> => {
   const { data } = await axiosInstance.get<UserIdentity>(`/user/identity`);
+
+  return data;
+};
+
+export const getAllUsers = async (
+  axiosInstance: AxiosInstance
+): Promise<UserIdentity[]> => {
+  const { data } = await axiosInstance.get<UserIdentity[]>(`/user/list`);
 
   return data;
 };

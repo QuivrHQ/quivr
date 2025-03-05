@@ -1,6 +1,8 @@
+from typing import List
 from uuid import UUID
 
 from quivr_api.modules.user.dto.inputs import CreateUserRequest, UserUpdatableProperties
+from quivr_api.modules.user.entity.user_identity import UserIdentity
 from quivr_api.modules.user.repository.users import Users
 from quivr_api.modules.user.repository.users_interface import UsersInterface
 from quivr_api.modules.dependencies import get_supabase_client
@@ -18,6 +20,14 @@ class UserService:
 
     def get_user_email_by_user_id(self, user_id: UUID) -> str | None:
         return self.repository.get_user_email_by_user_id(user_id)
+    
+    def get_all_users(self) -> List[UserIdentity]:
+        """
+        Get all users in the system
+        
+        Returns a list of all user identities
+        """
+        return self.repository.get_all_users()
         
     def create_user(self, user_data: CreateUserRequest):
         """Create a new user with Supabase Auth and associate with brains"""

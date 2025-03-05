@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from typing import List
 from uuid import UUID
 
 from quivr_api.modules.user.dto.inputs import UserUpdatableProperties
@@ -59,5 +60,14 @@ class UsersInterface(ABC):
     def get_user_credits(self, user_id: UUID) -> int:
         """
         Get user remaining credits
+        """
+        pass
+        
+    @abstractmethod
+    def get_all_users(self) -> List[UserIdentity]:
+        """
+        Get all users in the system
+        
+        Returns a list of all user identities
         """
         pass

@@ -1,0 +1,17 @@
+.page_wrapper {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+}
+
+.page_header {
+  padding: 1rem 2rem;
+}
+
+.content_wrapper {
+  flex: 1;
+  padding: 0 2rem 2rem;
+  overflow-y: auto;
+}

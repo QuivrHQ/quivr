@@ -1,4 +1,4 @@
-from typing import Annotated
+from typing import Annotated, List
 
 from fastapi import APIRouter, Depends, Request
 
@@ -9,12 +9,14 @@ from quivr_api.modules.models.service.model_service import ModelService
 from quivr_api.modules.user.dto.inputs import CreateUserRequest, UserUpdatableProperties
 from quivr_api.modules.user.entity.user_identity import UserIdentity
 from quivr_api.modules.user.repository.users import Users
+from quivr_api.modules.user.service.user_service import UserService
 from quivr_api.modules.user.service.user_usage import UserUsage
 
 user_router = APIRouter()
 brain_user_service = BrainUserService()
 ModelServiceDep = Annotated[ModelService, Depends(get_service(ModelService))]
 user_repository = Users()
+user_service = UserService()
 
 
 @user_router.get("/user", dependencies=[Depends(AuthBearer())], tags=["User"])
@@ -140,7 +142,18 @@ async def create_user_endpoint(
 
     This endpoint creates a new user in the system. It requires admin privileges.
     """
-    from quivr_api.modules.user.service.user_service import UserService
-    
-    user_service = UserService()
     return user_service.create_user(user_data)
+
+
+@user_router.get("/user/list", dependencies=[Depends(AuthBearer())], tags=["User"])
+async def get_all_users_endpoint(
+    current_user: UserIdentity = Depends(get_current_user),
+) -> List[UserIdentity]:
+    """
+    Get all users in the system.
+    
+    - `current_user`: The current authenticated user.
+    
+    This endpoint retrieves a list of all users in the system. It requires authentication.
+    """
+    return user_service.get_all_users()
