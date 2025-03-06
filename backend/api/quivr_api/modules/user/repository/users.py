@@ -81,27 +81,17 @@ class Users(UsersInterface):
         try:
             # First, get all user identities from the public schema
             user_identity_response = (
-                self.db.from_("users")
+                self.db.from_("user_identity")
                 .select("*")
                 .execute()
             )
+            print(f"user_identity_response: {user_identity_response}")
             
             # Get all users from the auth schema using the auth admin API
             auth_users_response = self.db.auth.admin.list_users()
             print(f"auth_users_response type: {type(auth_users_response)}")
-            print(f"auth_users_response dir: {dir(auth_users_response)}")
-            
-            # Try to inspect the structure more deeply
-            if hasattr(auth_users_response, "users"):
-                print(f"Has 'users' attribute with {len(auth_users_response.users)} items")
-            elif isinstance(auth_users_response, list):
-                print(f"Is a list with {len(auth_users_response)} items")
-                if len(auth_users_response) > 0:
-                    print(f"First item type: {type(auth_users_response[0])}")
-                    print(f"First item dir: {dir(auth_users_response[0])}")
-            elif hasattr(auth_users_response, "data"):
-                print(f"Has 'data' attribute with {len(auth_users_response.data)} items")
-            
+            print(f"auth_users_response: {auth_users_response}")
+
             # Create a mapping of user IDs to auth user data for easy lookup
             # Handle different possible response structures
             auth_users_map = {}
