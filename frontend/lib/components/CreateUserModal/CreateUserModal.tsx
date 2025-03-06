@@ -231,6 +231,7 @@ export const CreateUserModal = ({
                 label='Email'
                 inputValue={email}
                 setInputValue={(value) => handleInputChange('email', value)}
+                disabled={isEditMode}
                 {...register('email', {
                   required: 'Email is required',
                   pattern: {

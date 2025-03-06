@@ -93,7 +93,7 @@ class UserService:
             self.supabase_client.table("brains_users").insert(brain_user_entries).execute()
 
         return {
-            "id": user_id,
+            "id": str(user_id),
             "email": user_data.email,
             "username": f"{user_data.firstName} {user_data.lastName}"
         }
@@ -196,7 +196,7 @@ class UserService:
             self.supabase_client.table("brains_users").delete().eq("user_id", str(user_id)).eq("brain_id", brain_id).execute()
         
         return {
-            "id": user_id,
+            "id": str(user_id),
             "email": user_data.email,
             "username": f"{user_data.firstName} {user_data.lastName}"
         }
