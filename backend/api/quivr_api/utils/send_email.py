@@ -4,7 +4,9 @@ from typing import Dict
 import resend
 
 from quivr_api.models.settings import ResendSettings
-
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+import smtplib
 
 def send_email(params: Dict):
     settings = ResendSettings()
@@ -25,18 +27,24 @@ def send_email(params: Dict):
                 if smtp_username and smtp_password:
                     server.login(smtp_username, smtp_password)
 
-                from_address = params.get("from", "mail@team.quivr.app")
+                from_address = params.get("from", "mail@team.medzavy.app")
                 to_addresses = params.get("to", [])
                 subject = params.get("subject", "")
                 html_content = params.get("html", "")
 
-                message = f"From: {from_address}\n"
-                message += f"To: {', '.join(to_addresses)}\n"
-                message += f"Subject: {subject}\n"
-                message += "Content-Type: text/html\n\n"
-                message += html_content
+                msg = MIMEMultipart()
+                msg["From"] = from_address
+                msg["To"] = ", ".join(to_addresses)
+                msg["Subject"] = subject
+                msg.attach(MIMEText(html_content, "html", "utf-8"))
 
-                server.sendmail(from_address, to_addresses, message)
+                # message = f"From: {from_address}\n"
+                # message += f"To: {', '.join(to_addresses)}\n"
+                # message += f"Subject: {subject}\n"
+                # message += "Content-Type: text/html\n\n"
+                # message += html_content
+
+                server.sendmail(from_address, to_addresses, msg.as_string())
 
             return {"message": "Email sent successfully"}
         except Exception as e:
