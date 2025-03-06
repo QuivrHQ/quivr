@@ -86,7 +86,7 @@ class UserService:
             for brain_id in user_data.brains:
                 brain_user_entries.append({
                     "brain_id": brain_id,
-                    "user_id": user_id,
+                    "user_id": str(user_id),
                     "rights": "Viewer"
                 })
 
@@ -184,8 +184,8 @@ class UserService:
             brain_user_entries = []
             for brain_id in brains_to_add:
                 brain_user_entries.append({
-                    "brain_id": brain_id,
-                    "user_id": user_id,
+                    "brain_id": str(brain_id),
+                    "user_id": str(user_id),
                     "rights": "Viewer"
                 })
             
