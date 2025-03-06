@@ -31,16 +31,16 @@
 		"answer": {
 			"how_to_use_quivr": "Check the documentation https://brain.quivr.app/docs/intro.html",
 			"what_is_brain": "A brain is a virtual folder for organizing information on a specific topic. It can store documents and connect to external apps or APIs. For instance, a 'Medical Science' brain could contain health-related data, and a 'Legal' brain could have legal information. Brains can be made public for others to use without revealing the contents, promoting knowledge sharing.",
-			"what_is_quivr": "Quivr is a helpful assistant. You can easily drag and drop files into the chat or the knowledge section to interact with them. It's not just a chat tool; you can also communicate with apps using APIs.\nTo keep your work organized, you can create brains, essentially virtual folders, and subscribe to others' brains in the explore section for seamless collaboration and information sharing."
+			"what_is_quivr": "Dobbie is a helpful assistant. You can easily drag and drop files into the chat or the knowledge section to interact with them. It's not just a chat tool; you can also communicate with apps using APIs.\nTo keep your work organized, you can create brains, essentially virtual folders, and subscribe to others' brains in the explore section for seamless collaboration and information sharing."
 		},
-		"how_to_use_quivr": "How to use Quivr ?",
+		"how_to_use_quivr": "How to use Dobbie ?",
 		"step_1_1": "1. Drag and drop file on the chat or in the 📎.",
-		"step_1_2": "Don't have a file ? Download 'Quivr documentation'",
+		"step_1_2": "Don't have a file ? Download 'Dobbie documentation'",
 		"step_2": "2. Start chatting with your file",
 		"step_3": "3. Enjoy !",
-		"title": "Hi 👋🏻 Want to discover Quivr ? 😇",
+		"title": "Hi 👋🏻 Want to discover Dobbie ? 😇",
 		"what_is_brain": "What is a brain ?",
-		"what_is_quivr": "What is Quivr ?"
+		"what_is_quivr": "What is Dobbie ?"
 	},
 	"parameters": "Parameters",
 	"receivedResponse": "Received response. Starting to handle stream...",

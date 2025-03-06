@@ -35,8 +35,8 @@ def resend_invitation_email(
     brain_name = invitation_brain.name
 
     html_body = f"""
-    <p>Brain {brain_name} has been shared with you by {inviter_email}.</p>
-    <p><a href='{brain_url}'>Click here</a> to access your brain.</p>
+    <p>Brain {brain_name} đã được {inviter_email} chia sẻ với bạn.</p>
+    <p><a href='{brain_url}'>Bấm vào đây</a> để truy cập Brain của bạn.</p>
     """
 
     try:
@@ -44,8 +44,8 @@ def resend_invitation_email(
             {
                 "from": brains_settings.resend_email_address,
                 "to": [brain_subscription.email],
-                "subject": "Quivr - Brain Shared With You",
-                "reply_to": "no-reply@quivr.app",
+                "subject": "Medzavy - Mời tham gia Brain",
+                "reply_to": "no-reply@medzavy.app",
                 "html": html_body,
             }
         )
