@@ -128,11 +128,21 @@ class Users(UsersInterface):
                         # Handle different object structures (dict vs object)
                         if isinstance(auth_user, dict):
                             user_data["email"] = auth_user.get("email")
-                            user_data["last_sign_in_at"] = auth_user.get("last_sign_in_at")
+                            last_sign_in = auth_user.get("last_sign_in_at")
+                            # Convert datetime to string if needed
+                            if last_sign_in and not isinstance(last_sign_in, str):
+                                user_data["last_sign_in_at"] = last_sign_in.isoformat() if hasattr(last_sign_in, "isoformat") else str(last_sign_in)
+                            else:
+                                user_data["last_sign_in_at"] = last_sign_in
                         else:
                             # Handle object-like structure
                             user_data["email"] = getattr(auth_user, "email", None)
-                            user_data["last_sign_in_at"] = getattr(auth_user, "last_sign_in_at", None)
+                            last_sign_in = getattr(auth_user, "last_sign_in_at", None)
+                            # Convert datetime to string if needed
+                            if last_sign_in and not isinstance(last_sign_in, str):
+                                user_data["last_sign_in_at"] = last_sign_in.isoformat() if hasattr(last_sign_in, "isoformat") else str(last_sign_in)
+                            else:
+                                user_data["last_sign_in_at"] = last_sign_in
                     else:
                         # Try to get email from get_user_email_by_user_id method
                         try:
@@ -158,7 +168,19 @@ class Users(UsersInterface):
                     user_data["brains"] = brain_ids
                     user_data["brain_names"] = brain_names
                     
-                    users.append(UserIdentity(**user_data))
+                    # Debug the user_data before creating UserIdentity
+                    print(f"User data for {user_id}: {user_data}")
+                    
+                    try:
+                        # Convert user_id to UUID if it's a string
+                        if isinstance(user_data["id"], str):
+                            from uuid import UUID
+                            user_data["id"] = UUID(user_data["id"])
+                            
+                        user_identity = UserIdentity(**user_data)
+                        users.append(user_identity)
+                    except Exception as e:
+                        print(f"Error creating UserIdentity for user {user_id}: {str(e)}")
             
             return users
         except Exception as e:
