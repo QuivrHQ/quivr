@@ -37,6 +37,7 @@ export type UserIdentity = {
   username: string;
   email?: string;
   brains?: string[];
+  brain_names?: string[];
   last_sign_in_at?: string;
 };
 

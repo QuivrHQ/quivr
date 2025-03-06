@@ -81,16 +81,30 @@ class Users(UsersInterface):
         try:
             # First, get all user identities from the public schema
             user_identity_response = (
-                self.db.from_("user_identity")
+                self.db.from_("users")
                 .select("*")
                 .execute()
             )
             
             # Get all users from the auth schema using the auth admin API
             auth_users_response = self.db.auth.admin.list_users()
+            print(f"auth_users_response: {auth_users_response}")
             
             # Create a mapping of user IDs to auth user data for easy lookup
             auth_users_map = {user["id"]: user for user in auth_users_response.users} if hasattr(auth_users_response, "users") else {}
+            
+            print(f"auth_users_map: {auth_users_map}")
+            
+            # Fetch all brains to create a mapping of brain IDs to brain names
+            brains_response = (
+                self.db.from_("brains")
+                .select("brain_id, name")
+                .execute()
+            )
+            
+            # Create a mapping of brain IDs to brain names for easy lookup
+            brain_id_to_name = {str(brain["brain_id"]): brain["name"] for brain in brains_response.data}
+            print(f"brain_id_to_name: {brain_id_to_name}")
             
             users = []
             for user_data in user_identity_response.data:
@@ -103,24 +117,32 @@ class Users(UsersInterface):
                     auth_user = auth_users_map.get(user_id)
                     if auth_user:
                         user_data["email"] = auth_user.get("email")
+                        # Directly access last_sign_in_at from auth user data
                         user_data["last_sign_in_at"] = auth_user.get("last_sign_in_at")
                     else:
                         # Try to get email from get_user_email_by_user_id method
                         try:
                             user_data["email"] = self.get_user_email_by_user_id(user_id)
-                        except Exception:
+                        except Exception as e:
                             user_data["email"] = None
-                        user_data["last_sign_in_at"] = None
                     
                     # Get user's brains
-                    brains_response = (
+                    brains_users_response = (
                         self.db.from_("brains_users")
                         .select("brain_id")
                         .filter("user_id", "eq", str(user_id))
                         .execute()
                     )
                     
-                    user_data["brains"] = [brain["brain_id"] for brain in brains_response.data]
+                    print(f"brains_users_response for user {user_id}: {brains_users_response}")
+                    
+                    # Map brain IDs to brain names
+                    brain_ids = [brain["brain_id"] for brain in brains_users_response.data]
+                    brain_names = [brain_id_to_name.get(str(brain_id), f"Unknown Brain ({brain_id})") for brain_id in brain_ids]
+                    
+                    # Store both brain IDs and brain names
+                    user_data["brains"] = brain_ids
+                    user_data["brain_names"] = brain_names
                     
                     users.append(UserIdentity(**user_data))
             

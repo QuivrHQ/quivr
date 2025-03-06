@@ -50,6 +50,7 @@ export const ListAllUsers = (): JSX.Element => {
         header: 'Brains',
         cell: ({ row }) => {
           const brains = row.original.brains ?? [];
+          const brainNames = row.original.brain_names ?? [];
           const userId = row.original.id;
 
           return (
@@ -64,8 +65,8 @@ export const ListAllUsers = (): JSX.Element => {
                 }}
               >
                 {brains.length > 0
-                  ? `Admin and ${brains.length} other brain${
-                      brains.length > 1 ? 's' : ''
+                  ? `Admin and ${brains.length - 1} other brain${
+                      brains.length > 2 ? 's' : ''
                     }`
                   : 'No brain'}{' '}
                 <Icon name='chevronDown' size='small' color='primary' />
@@ -76,22 +77,15 @@ export const ListAllUsers = (): JSX.Element => {
                   className={styles.brains_dropdown_menu}
                   onClick={(e) => e.stopPropagation()}
                 >
-                  <div className={styles.brains_dropdown_group_label}>
-                    Brains
-                  </div>
-
-                  {brains.length > 0 ? (
-                    brains.map((brain, index) => (
+                  {brainNames.length > 0 ? (
+                    brainNames.map((brainName, index) => (
                       <div key={index} className={styles.brains_dropdown_item}>
-                        <span>{brain}</span>
-                        {index === 2 && (
-                          <Icon name='check' size='small' color='success' />
-                        )}
+                        <span>{brainName}</span>
                       </div>
                     ))
                   ) : (
                     <div className={styles.brains_dropdown_item}>
-                      <span>No brains assigned</span>
+                      <span>No groups assigned</span>
                     </div>
                   )}
                 </div>
@@ -120,24 +114,30 @@ export const ListAllUsers = (): JSX.Element => {
     [showBrainsDropdown]
   );
 
+  // Simple function to load users data
+  const loadUsers = async () => {
+    try {
+      setIsLoading(true);
+      const fetchedUsers = await getAllUsers();
+      setUsers(fetchedUsers);
+      setError(null);
+    } catch (err) {
+      console.error('Error fetching users:', err);
+      setError('Failed to load users. Please try again later.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Load users on component mount
   useEffect(() => {
-    const fetchUsers = async () => {
-      try {
-        setIsLoading(true);
-        const fetchedUsers = await getAllUsers();
-        setUsers(fetchedUsers);
-        setIsLoading(false);
+    void loadUsers();
+  }, []);
 
-        setError(null);
-      } catch (err) {
-        console.error('Error fetching users:', err);
-        setError('Failed to load users. Please try again later.');
-        setIsLoading(false);
-      }
-    };
-
-    void fetchUsers();
-  }, [getAllUsers]);
+  // Function to manually refresh data
+  const refreshData = () => {
+    void loadUsers();
+  };
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -154,7 +154,7 @@ export const ListAllUsers = (): JSX.Element => {
     };
   }, [showBrainsDropdown]);
 
-  if (isLoading) {
+  if (isLoading && users.length === 0) {
     return (
       <div className={styles.loading_container}>
         <Spinner />
@@ -175,13 +175,23 @@ export const ListAllUsers = (): JSX.Element => {
   return (
     <Card className={styles.users_card}>
       <div className={styles.card_header}>
-        <h2>All Users</h2>
-        <p>Total users: {users.length}</p>
+        <div className={styles.header_left}>
+          <h2>All Users</h2>
+          <p>Total users: {users.length}</p>
+        </div>
+        <button
+          className={styles.refresh_button}
+          onClick={refreshData}
+          disabled={isLoading}
+        >
+          <Icon name='sync' size='small' color='primary' />
+          {isLoading ? 'Loading...' : 'Refresh'}
+        </button>
       </div>
       <Table
         data={users}
         columns={columns}
-        pageSize={5}
+        pageSize={10}
         className={styles.users_table}
       />
     </Card>

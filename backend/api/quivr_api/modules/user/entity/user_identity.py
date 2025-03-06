@@ -28,4 +28,5 @@ class UserIdentity(BaseModel):
     company_size: Optional[str] = None
     usage_purpose: Optional[str] = None
     brains: Optional[List[str]] = None
+    brain_names: Optional[List[str]] = None
     last_sign_in_at: Optional[str] = None

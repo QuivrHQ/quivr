@@ -19,14 +19,44 @@
   align-items: center;
   margin-bottom: 1rem;
   padding: 0 1rem;
+}
+
+.header_left {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
 
   h2 {
     font-size: 1.5rem;
     font-weight: 600;
+    margin: 0;
   }
 
   p {
     color: var(--text-secondary);
+    margin: 0;
+  }
+}
+
+.refresh_button {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background-color: var(--background-light);
+  border: 1px solid var(--border-color);
+  border-radius: 0.25rem;
+  cursor: pointer;
+  font-size: 0.875rem;
+  transition: all 0.2s ease;
+  
+  &:hover {
+    background-color: var(--background-hover);
+  }
+  
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
   }
 }
 
