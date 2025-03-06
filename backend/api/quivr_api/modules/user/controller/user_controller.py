@@ -1,6 +1,6 @@
 from typing import Annotated, List
 
-from fastapi import APIRouter, Depends, Request
+from fastapi import APIRouter, Depends, Request, HTTPException
 
 from quivr_api.middlewares.auth import AuthBearer, get_current_user
 from quivr_api.modules.brain.service.brain_user_service import BrainUserService
@@ -11,7 +11,9 @@ from quivr_api.modules.user.entity.user_identity import UserIdentity
 from quivr_api.modules.user.repository.users import Users
 from quivr_api.modules.user.service.user_service import UserService
 from quivr_api.modules.user.service.user_usage import UserUsage
+from quivr_api.logger import get_logger
 
+logger = get_logger(__name__)
 user_router = APIRouter()
 brain_user_service = BrainUserService()
 ModelServiceDep = Annotated[ModelService, Depends(get_service(ModelService))]
@@ -156,4 +158,9 @@ async def get_all_users_endpoint(
     
     This endpoint retrieves a list of all users in the system. It requires authentication.
     """
-    return user_service.get_all_users()
+    try:
+        logger.info(f"Getting all users. Requested by user: {current_user.id}")
+        return user_service.get_all_users()
+    except Exception as e:
+        logger.error(f"Error getting all users: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Error getting users: {str(e)}")
