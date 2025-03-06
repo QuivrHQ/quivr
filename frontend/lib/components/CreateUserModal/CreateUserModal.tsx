@@ -1,8 +1,9 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
 import { useUserApi } from '@/lib/api/user/useUserApi';
+import { UserIdentity } from '@/lib/api/user/user';
 import { Modal } from '@/lib/components/ui/Modal/Modal';
 import {
   MultiSelect,
@@ -15,28 +16,35 @@ import styles from './CreateUserModal.module.scss';
 import Button from '../ui/Button';
 import { TextInput } from '../ui/TextInput/TextInput';
 
-type CreateUserProps = {
+type UserFormProps = {
   firstName: string;
   lastName: string;
   email: string;
   brains: string[];
+  id?: string;
 };
 
 type CreateUserModalProps = {
   isOpen: boolean;
   setOpen: (isOpen: boolean) => void;
+  isEditMode?: boolean;
+  userData?: UserIdentity;
+  onSuccess?: () => void;
 };
 
 export const CreateUserModal = ({
   isOpen,
   setOpen,
+  isEditMode = false,
+  userData,
+  onSuccess,
 }: CreateUserModalProps): JSX.Element => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { t } = useTranslation(['translation']);
   const { allBrains } = useBrainContext();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const { createUser } = useUserApi();
+  const { createUser, updateUser } = useUserApi();
 
   const brainOptions: SelectOptionProps<string>[] = allBrains.map((brain) => ({
     label: brain.name,
@@ -47,12 +55,13 @@ export const CreateUserModal = ({
     SelectOptionProps<string>[]
   >([]);
 
-  const methods = useForm<CreateUserProps>({
+  const methods = useForm<UserFormProps>({
     defaultValues: {
       firstName: '',
       lastName: '',
       email: '',
       brains: [],
+      id: '',
     },
     mode: 'onChange',
   });
@@ -65,7 +74,34 @@ export const CreateUserModal = ({
   const lastName = watch('lastName');
   const email = watch('email');
 
-  const onSubmit = async (data: CreateUserProps): Promise<void> => {
+  // Effect to populate form when in edit mode
+  useEffect(() => {
+    if (isEditMode && userData) {
+      // Extract first and last name from username
+      const nameParts = userData.username.split(' ');
+      // eslint-disable-next-line @typescript-eslint/no-shadow
+      const firstName = nameParts[0] ?? '';
+      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition, @typescript-eslint/no-shadow
+      const lastName = nameParts.slice(1).join(' ') ?? '';
+
+      // Set form values
+      setValue('firstName', firstName);
+      setValue('lastName', lastName);
+      setValue('email', userData.email ?? '');
+      setValue('id', userData.id);
+
+      // Set selected brains
+      if (userData.brains && userData.brain_names) {
+        const userBrainOptions = userData.brains.map((brainId, index) => ({
+          value: brainId,
+          label: userData.brain_names?.[index] ?? brainId,
+        }));
+        setSelectedBrains(userBrainOptions);
+      }
+    }
+  }, [isEditMode, userData, setValue]);
+
+  const onSubmit = async (data: UserFormProps): Promise<void> => {
     try {
       setIsSubmitting(true);
       setError(null);
@@ -73,20 +109,41 @@ export const CreateUserModal = ({
       // Add the selected brains to the form data
       data.brains = selectedBrains.map((brain) => brain.value);
 
-      // Call the backend API to create the user
-      await createUser(data);
+      if (isEditMode && userData) {
+        // Call the backend API to update the user
+        await updateUser({
+          ...data,
+          id: userData.id,
+        });
+        console.log('User updated successfully');
+      } else {
+        // Call the backend API to create the user
+        await createUser(data);
+        console.log('User created successfully');
+      }
 
-      console.log('User created successfully');
       setOpen(false);
 
-      // Reset form
-      reset();
-      setSelectedBrains([]);
+      // Call onSuccess callback if provided
+      if (onSuccess) {
+        onSuccess();
+      }
+
+      // Reset form if not in edit mode
+      if (!isEditMode) {
+        reset();
+        setSelectedBrains([]);
+      }
       // eslint-disable-next-line @typescript-eslint/no-shadow
     } catch (error) {
-      console.error('Error creating user:', error);
+      console.error(
+        `Error ${isEditMode ? 'updating' : 'creating'} user:`,
+        error
+      );
       setError(
-        error instanceof Error ? error.message : 'Failed to create user'
+        error instanceof Error
+          ? error.message
+          : `Failed to ${isEditMode ? 'update' : 'create'} user`
       );
     } finally {
       setIsSubmitting(false);
@@ -101,7 +158,7 @@ export const CreateUserModal = ({
   };
 
   const handleInputChange = (
-    field: keyof CreateUserProps,
+    field: keyof UserFormProps,
     value: string
   ): void => {
     setValue(field, value, { shouldValidate: true });
@@ -110,7 +167,7 @@ export const CreateUserModal = ({
   return (
     <FormProvider {...methods}>
       <Modal
-        title='New user'
+        title={isEditMode ? 'Edit user' : 'New user'}
         isOpen={isOpen}
         setOpen={setOpen}
         size='normal'
@@ -130,7 +187,7 @@ export const CreateUserModal = ({
               // eslint-disable-next-line @typescript-eslint/no-misused-promises
               onClick={handleSubmit(onSubmit)}
             >
-              Create
+              {isEditMode ? 'Save changes' : 'Create'}
             </Button>
           </div>
         }
@@ -188,12 +245,12 @@ export const CreateUserModal = ({
             </div>
 
             <div className={styles.form_field}>
-              <label htmlFor='brains'>Brains</label>
+              <label htmlFor='brains'>Groups</label>
               <MultiSelect
                 options={brainOptions}
                 selectedOptions={selectedBrains}
                 onChange={handleBrainsChange}
-                placeholder='Select brains'
+                placeholder='Select groups'
                 iconName='brain'
               />
             </div>

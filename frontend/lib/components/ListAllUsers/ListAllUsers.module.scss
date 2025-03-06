@@ -10,7 +10,7 @@
 
 .users_card {
   width: 100%;
-  margin-top: 1rem;
+  margin-top: 4rem;
 }
 
 .card_header {
@@ -143,6 +143,7 @@
 .actions_container {
   display: flex;
   justify-content: center;
+  position: relative;
 }
 
 .action_button {
@@ -154,5 +155,35 @@
   
   &:hover {
     background-color: var(--background-light);
+  }
+}
+
+.actions_dropdown_menu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  width: 180px;
+  background-color: white;
+  border-radius: 0.5rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  z-index: 100;
+  overflow: hidden;
+  margin-top: 0.5rem;
+  border: 1px solid var(--border-color);
+}
+
+.actions_dropdown_item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  cursor: pointer;
+  
+  &:hover {
+    background-color: var(--background-light);
+  }
+  
+  span {
+    font-size: 0.875rem;
   }
 }

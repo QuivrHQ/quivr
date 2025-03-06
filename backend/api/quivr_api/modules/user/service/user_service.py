@@ -1,7 +1,9 @@
 from typing import List
 from uuid import UUID, uuid4
+from typing import List, Dict, Any
+from uuid import UUID
 
-from quivr_api.modules.user.dto.inputs import CreateUserRequest, UserUpdatableProperties
+from quivr_api.modules.user.dto.inputs import CreateUserRequest, UserUpdatableProperties, UpdateUserRequest
 from quivr_api.modules.user.entity.user_identity import UserIdentity
 from quivr_api.modules.user.repository.users import Users
 from quivr_api.modules.user.repository.users_interface import UsersInterface
@@ -138,3 +140,63 @@ class UserService:
             return
 
         return r
+
+        
+    def update_user(self, user_data: UpdateUserRequest) -> Dict[str, Any]:
+        """Update an existing user and their brain associations"""
+        user_id = user_data.id
+        
+        # Update user metadata in Supabase Auth
+        auth_response = self.supabase_client.auth.admin.update_user_by_id(
+            user_id,
+            {
+                "email": user_data.email,
+                "user_metadata": {
+                    "first_name": user_data.firstName,
+                    "last_name": user_data.lastName,
+                }
+            }
+        )
+        
+        if not auth_response.user:
+            raise Exception("Failed to update user in Supabase Auth")
+        
+        # Update username in user identity
+        self.repository.update_user_properties(
+            user_id,
+            UserUpdatableProperties(
+                username=f"{user_data.firstName} {user_data.lastName}"
+            )
+        )
+        
+        # Update brain associations
+        # First, get current brain associations
+        current_brains_response = self.supabase_client.table("brains_users").select("brain_id").eq("user_id", str(user_id)).execute()
+        current_brain_ids = [item["brain_id"] for item in current_brains_response.data]
+        
+        # Determine brains to add and remove
+        brains_to_add = [brain_id for brain_id in user_data.brains if brain_id not in current_brain_ids]
+        brains_to_remove = [brain_id for brain_id in current_brain_ids if brain_id not in user_data.brains]
+        
+        # Add new brain associations
+        if brains_to_add:
+            brain_user_entries = []
+            for brain_id in brains_to_add:
+                brain_user_entries.append({
+                    "brain_id": brain_id,
+                    "user_id": user_id,
+                    "rights": "Viewer"
+                })
+            
+            self.supabase_client.table("brains_users").insert(brain_user_entries).execute()
+        
+        # Remove brain associations
+        for brain_id in brains_to_remove:
+            self.supabase_client.table("brains_users").delete().eq("user_id", str(user_id)).eq("brain_id", brain_id).execute()
+        
+        return {
+            "id": user_id,
+            "email": user_data.email,
+            "username": f"{user_data.firstName} {user_data.lastName}"
+        }
+

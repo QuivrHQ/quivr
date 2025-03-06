@@ -3,6 +3,7 @@
   overflow-x: auto;
   border-radius: 0.5rem;
   background-color: var(--background-light);
+  min-height: calc(100vh - 200px);
 }
 
 .table {

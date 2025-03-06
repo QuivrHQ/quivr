@@ -48,7 +48,21 @@ export type CreateUserRequest = {
   brains: string[];
 };
 
+export type UpdateUserRequest = {
+  id: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  brains: string[];
+};
+
 export type CreateUserResponse = {
+  id: string;
+  email: string;
+  username: string;
+};
+
+export type UpdateUserResponse = {
   id: string;
   email: string;
   username: string;
@@ -81,6 +95,16 @@ export const createUser = async (
   axiosInstance: AxiosInstance
 ): Promise<CreateUserResponse> => {
   const response = await axiosInstance.post('/user/create', userData);
+
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+  return response.data;
+};
+
+export const updateUser = async (
+  userData: UpdateUserRequest,
+  axiosInstance: AxiosInstance
+): Promise<UpdateUserResponse> => {
+  const response = await axiosInstance.put('/user/update', userData);
 
   // eslint-disable-next-line @typescript-eslint/no-unsafe-return
   return response.data;

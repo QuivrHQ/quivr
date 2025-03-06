@@ -1,4 +1,5 @@
 from typing import Optional
+from uuid import UUID
 
 from pydantic import BaseModel
 
@@ -13,6 +14,14 @@ class UserUpdatableProperties(BaseModel):
 
 
 class CreateUserRequest(BaseModel):
+    firstName: str
+    lastName: str
+    email: str
+    brains: list[str]
+
+
+class UpdateUserRequest(BaseModel):
+    id: UUID
     firstName: str
     lastName: str
     email: str

@@ -6,7 +6,7 @@ from quivr_api.middlewares.auth import AuthBearer, get_current_user
 from quivr_api.modules.brain.service.brain_user_service import BrainUserService
 from quivr_api.modules.dependencies import get_service
 from quivr_api.modules.models.service.model_service import ModelService
-from quivr_api.modules.user.dto.inputs import CreateUserRequest, UserUpdatableProperties
+from quivr_api.modules.user.dto.inputs import CreateUserRequest, UserUpdatableProperties, UpdateUserRequest
 from quivr_api.modules.user.entity.user_identity import UserIdentity
 from quivr_api.modules.user.repository.users import Users
 from quivr_api.modules.user.service.user_service import UserService
@@ -145,6 +145,28 @@ async def create_user_endpoint(
     This endpoint creates a new user in the system. It requires admin privileges.
     """
     return user_service.create_user(user_data)
+
+
+@user_router.put("/user/update", tags=["User"])
+async def update_user_endpoint(
+    user_data: UpdateUserRequest,
+    request: Request,
+    current_user: UserIdentity = Depends(get_current_user),
+):
+    """
+    Update an existing user.
+
+    - `user_data`: The updated user data.
+    - `current_user`: The current authenticated user.
+
+    This endpoint updates an existing user in the system. It requires admin privileges.
+    """
+    try:
+        logger.info(f"Updating user {user_data.id}. Requested by user: {current_user.id}")
+        return user_service.update_user(user_data)
+    except Exception as e:
+        logger.error(f"Error updating user: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Error updating user: {str(e)}")
 
 
 @user_router.get("/users", dependencies=[Depends(AuthBearer())], tags=["User"])

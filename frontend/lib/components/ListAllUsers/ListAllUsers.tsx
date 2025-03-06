@@ -3,6 +3,7 @@ import { useEffect, useMemo, useState } from 'react';
 
 import { useUserApi } from '@/lib/api/user/useUserApi';
 import { UserIdentity } from '@/lib/api/user/user';
+import { CreateUserModal } from '@/lib/components/CreateUserModal/CreateUserModal';
 import Card from '@/lib/components/ui/Card';
 import { Icon } from '@/lib/components/ui/Icon/Icon';
 import Spinner from '@/lib/components/ui/Spinner';
@@ -17,6 +18,11 @@ export const ListAllUsers = (): JSX.Element => {
   const [showBrainsDropdown, setShowBrainsDropdown] = useState<string | null>(
     null
   );
+  const [showActionsDropdown, setShowActionsDropdown] = useState<string | null>(
+    null
+  );
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [selectedUser, setSelectedUser] = useState<UserIdentity | null>(null);
   const { getAllUsers } = useUserApi();
 
   const formatDate = (dateString: string | undefined): string => {
@@ -85,7 +91,7 @@ export const ListAllUsers = (): JSX.Element => {
                     ))
                   ) : (
                     <div className={styles.brains_dropdown_item}>
-                      <span>No groups assigned</span>
+                      <span>No brains assigned</span>
                     </div>
                   )}
                 </div>
@@ -102,16 +108,55 @@ export const ListAllUsers = (): JSX.Element => {
       {
         id: 'actions',
         header: 'Actions',
-        cell: () => (
-          <div className={styles.actions_container}>
-            <button className={styles.action_button}>
-              <Icon name='more' size='small' color='primary' />
-            </button>
-          </div>
-        ),
+        cell: ({ row }) => {
+          const userId = row.original.id;
+
+          return (
+            <div className={styles.actions_container}>
+              <button
+                className={styles.action_button}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setShowActionsDropdown(
+                    showActionsDropdown === userId ? null : userId
+                  );
+                }}
+              >
+                <Icon name='more' size='small' color='primary' />
+              </button>
+
+              {showActionsDropdown === userId && (
+                <div
+                  className={styles.actions_dropdown_menu}
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <div
+                    className={styles.actions_dropdown_item}
+                    onClick={() => {
+                      setSelectedUser(row.original);
+                      setIsEditModalOpen(true);
+                      setShowActionsDropdown(null);
+                    }}
+                  >
+                    <Icon name='edit' size='small' color='primary' />
+                    <span>Edit user</span>
+                  </div>
+                  <div className={styles.actions_dropdown_item}>
+                    <Icon name='key' size='small' color='primary' />
+                    <span>Reset password</span>
+                  </div>
+                  <div className={styles.actions_dropdown_item}>
+                    <Icon name='delete' size='small' color='dangerous' />
+                    <span>Deactivate user</span>
+                  </div>
+                </div>
+              )}
+            </div>
+          );
+        },
       },
     ],
-    [showBrainsDropdown]
+    [showBrainsDropdown, showActionsDropdown]
   );
 
   // Simple function to load users data
@@ -139,11 +184,14 @@ export const ListAllUsers = (): JSX.Element => {
     void loadUsers();
   };
 
-  // Close dropdown when clicking outside
+  // Close dropdowns when clicking outside
   useEffect(() => {
     const handleClickOutside = () => {
       if (showBrainsDropdown !== null) {
         setShowBrainsDropdown(null);
+      }
+      if (showActionsDropdown !== null) {
+        setShowActionsDropdown(null);
       }
     };
 
@@ -152,7 +200,7 @@ export const ListAllUsers = (): JSX.Element => {
     return () => {
       document.removeEventListener('click', handleClickOutside);
     };
-  }, [showBrainsDropdown]);
+  }, [showBrainsDropdown, showActionsDropdown]);
 
   if (isLoading && users.length === 0) {
     return (
@@ -194,6 +242,16 @@ export const ListAllUsers = (): JSX.Element => {
         pageSize={10}
         className={styles.users_table}
       />
+
+      {selectedUser && (
+        <CreateUserModal
+          isOpen={isEditModalOpen}
+          setOpen={setIsEditModalOpen}
+          isEditMode={true}
+          userData={selectedUser}
+          onSuccess={refreshData}
+        />
+      )}
     </Card>
   );
 };
