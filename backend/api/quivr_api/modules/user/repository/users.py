@@ -88,10 +88,29 @@ class Users(UsersInterface):
             
             # Get all users from the auth schema using the auth admin API
             auth_users_response = self.db.auth.admin.list_users()
-            print(f"auth_users_response: {auth_users_response}")
+            print(f"auth_users_response type: {type(auth_users_response)}")
+            print(f"auth_users_response dir: {dir(auth_users_response)}")
+            
+            # Try to inspect the structure more deeply
+            if hasattr(auth_users_response, "users"):
+                print(f"Has 'users' attribute with {len(auth_users_response.users)} items")
+            elif isinstance(auth_users_response, list):
+                print(f"Is a list with {len(auth_users_response)} items")
+                if len(auth_users_response) > 0:
+                    print(f"First item type: {type(auth_users_response[0])}")
+                    print(f"First item dir: {dir(auth_users_response[0])}")
+            elif hasattr(auth_users_response, "data"):
+                print(f"Has 'data' attribute with {len(auth_users_response.data)} items")
             
             # Create a mapping of user IDs to auth user data for easy lookup
-            auth_users_map = {user["id"]: user for user in auth_users_response.users} if hasattr(auth_users_response, "users") else {}
+            # Handle different possible response structures
+            auth_users_map = {}
+            if hasattr(auth_users_response, "users"):
+                auth_users_map = {user["id"]: user for user in auth_users_response.users}
+            elif isinstance(auth_users_response, list):
+                auth_users_map = {user.id: user for user in auth_users_response}
+            elif hasattr(auth_users_response, "data") and isinstance(auth_users_response.data, list):
+                auth_users_map = {user["id"]: user for user in auth_users_response.data}
             
             print(f"auth_users_map: {auth_users_map}")
             
@@ -116,9 +135,14 @@ class Users(UsersInterface):
                     # Get auth user data if available
                     auth_user = auth_users_map.get(user_id)
                     if auth_user:
-                        user_data["email"] = auth_user.get("email")
-                        # Directly access last_sign_in_at from auth user data
-                        user_data["last_sign_in_at"] = auth_user.get("last_sign_in_at")
+                        # Handle different object structures (dict vs object)
+                        if isinstance(auth_user, dict):
+                            user_data["email"] = auth_user.get("email")
+                            user_data["last_sign_in_at"] = auth_user.get("last_sign_in_at")
+                        else:
+                            # Handle object-like structure
+                            user_data["email"] = getattr(auth_user, "email", None)
+                            user_data["last_sign_in_at"] = getattr(auth_user, "last_sign_in_at", None)
                     else:
                         # Try to get email from get_user_email_by_user_id method
                         try:
