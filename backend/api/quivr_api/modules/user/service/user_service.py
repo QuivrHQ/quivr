@@ -165,7 +165,8 @@ class UserService:
         self.repository.update_user_properties(
             user_id,
             UserUpdatableProperties(
-                username=f"{user_data.firstName} {user_data.lastName}"
+                username=f"{user_data.firstName} {user_data.lastName}",
+                onboarded=True
             )
         )
         
