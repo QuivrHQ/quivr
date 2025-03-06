@@ -1,14 +1,44 @@
 {
-  "speak_to": "Speak to our",
-  "sales_team": "Sales team",
-  "pricing": "Pricing",
-  "form": {
-    "email": "Work Email",
-    "question": "Question",
-    "submit": "Contact",
-    "placeholder_question": "How can we help you?",
-    "thank_you": "Thank you!",
-    "thank_you_text": "We will get back to you as soon as possible.",
-    "sending_mail_error": "There was an error sending your message. Please try again later."
-  }
+	"speak_to": "Speak to our",
+	"sales_team": "Sales team",
+	"pricing": "Pricing",
+	"form": {
+		"email": "Work Email",
+		"question": "Question",
+		"submit": "Contact",
+		"placeholder_question": "How can we help you?",
+		"thank_you": "Thank you!",
+		"thank_you_text": "We will get back to you as soon as possible.",
+		"sending_mail_error": "There was an error sending your message. Please try again later."
+	},
+	"help_window": {
+		"title": "🧠 What is Dobbie?",
+		"build_your_second_brains": "🧱 Build your second brain",
+		"brain_description": " in Dobbie is an advanced knowledge system designed to integrate and leverage information from various sources.",
+		"knowledge_integration": "📁 Knowledge Integration",
+		"connect_to_and_pull_data": "Connect to and pull data from different platforms such as ",
+		"you_can_also_incorporate_data_from": ". You can also incorporate data from ",
+		"ai_models": "🤖 AI Models",
+		"utilize_powerful_models": "Utilize powerful models such as ",
+		"to_process_and_understand": "to process and understand the integrated information.",
+		"customization": "🔧 Customization",
+		"tailor_the_behavior": "Tailor the behavior of your brain with ",
+		"custom_prompts": "custom prompts",
+		"settings": "settings",
+		"such_as": "such as ",
+		"and": "and ",
+		"max_tokens": "Maximum tokens",
+		"to_better_suit_your_needs": "to better suit your needs.",
+		"you_can_also": "You can also ",
+		"share": "share",
+		"your_brains_with_other_dobbie": "your brain with other Dobbie users, allowing them to access and benefit from your knowledge systems. 🤝",
+		"talk_to_ai_models": "🤖 Talk to AI models",
+		"dobbie_allows_you_to": "Dobbie allows you to ",
+		"interact_directly": "interact directly",
+		"with_ai_models_such_as": "with AI models such as ",
+		"simply_start_conversation": ". Simply start a conversation with AI to receive answers and support based on a wide range of data and knowledge. 🤖✨",
+		"select_assistant": "🎯 Select Assistant",
+		"press": "Press",
+		"to_choose_the_AI_model": " to choose the AI model or Brain you want to interact with."
+	}
 }

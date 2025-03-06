@@ -13,9 +13,9 @@ export type SelectOptionsProps = {
   value: BrainRoleType;
 };
 export const availableRoles: SelectOptionsProps[] = [
-  { label: "Viewer", value: "Viewer" },
-  { label: "Editor", value: "Editor" },
-  { label: "Owner", value: "Owner" },
+  { label: "Người xem", value: "Viewer" },
+  { label: "Người chỉnh sửa", value: "Editor" },
+  { label: "Người sở hữu", value: "Owner" },
 ];
 
 export const userRoleToAssignableRoles: Record<
@@ -24,13 +24,13 @@ export const userRoleToAssignableRoles: Record<
 > = {
   Viewer: [],
   Editor: [
-    { label: "Viewer", value: "Viewer" },
-    { label: "Editor", value: "Editor" },
+    { label: "Người xem", value: "Viewer" },
+    { label: "Người chỉnh sửa", value: "Editor" },
   ],
 
   Owner: [
-    { label: "Viewer", value: "Viewer" },
-    { label: "Editor", value: "Editor" },
-    { label: "Owner", value: "Owner" },
+    { label: "Người xem", value: "Viewer" },
+    { label: "Người chỉnh sửa", value: "Editor" },
+    { label: "Người sở hữu", value: "Owner" },
   ],
 };

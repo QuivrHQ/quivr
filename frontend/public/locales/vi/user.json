@@ -1,0 +1,12 @@
+{
+	"title": "Sử dụng Brain của {{user}}",
+	"fetching": "Đang lấy dữ liệu của bạn...",
+	"requestsCount": "Yêu cầu hôm nay: {{count}}",
+	"brainSize": "Dung lượng Brain còn lại",
+	"empty": "Trống",
+	"Used": "Đã sử dụng",
+	"Unused": "Chưa sử dụng",
+	"brainUsage": "Sử dụng Brain",
+	"delete_account_description": "Bạn có chắc chắn muốn xóa tài khoản của mình không? Tất cả dữ liệu của bạn sẽ bị xóa và không thể khôi phục.",
+	"delete_account": "Xóa tài khoản"
+}

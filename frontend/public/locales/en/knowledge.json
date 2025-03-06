@@ -1,4 +1,17 @@
 {
-  "addKnowledgeTitle": "Add Knowledge",
-  "addKnowledgeSubtitle": "Feed your brain with knowledges from documents or websites"
+	"addKnowledgeTitle": "Add Knowledge",
+	"addKnowledgeSubtitle": "Feed your brain with knowledges from documents or websites",
+	"uploaded_knowledge": "Uploaded knowledge",
+	"documents": "Documents",
+	"connections": "Connections",
+	"websiste": "Website",
+	"feed_brain": "Add to brain",
+	"enter_website_url": "Enter website URL",
+	"choose_document": "Choose document",
+	"or_drag_it_here": "or drag it here",
+	"choose_brain": "Select a brain",
+	"empty_folder": "Empty folder",
+	"back": "Back",
+	"back_to_connections": "Back to connections",
+	"manage_current_brain": "Manage current brain"
 }

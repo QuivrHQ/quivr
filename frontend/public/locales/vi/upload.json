@@ -1,0 +1,20 @@
+{
+	"title": "Tải lên tài liệu",
+	"subtitle": "Hỗ trợ văn bản, tài liệu, bảng tính, bản trình bày, âm thanh, video và URL",
+	"drop": "Thả tệp vào đây...",
+	"webSite": "Chèn URL trang web",
+	"success": "Tải tệp lên thành công",
+	"uploadFailed": "Không thể tải tệp lên: {{message}}",
+	"maxSizeError": "Tệp quá lớn",
+	"alreadyAdded": "{{fileName}} đã được thêm nhưng chưa được gửi đến brain của bạn",
+	"addFiles": "Vui lòng thêm tệp để tải lên",
+	"selectBrain": "Vui lòng chọn hoặc tạo một brain để tải tệp lên",
+	"invalidUrl": "URL không hợp lệ",
+	"crawlFailed": "Không thể thu thập trang web: {{message}}",
+	"ohNo": "Ôi không!",
+	"selectBrainFirst": "Bạn cần chọn một brain trước. 🧠💡🥲",
+	"missingNecessaryRole": "Bạn không có vai trò cần thiết để tải nội dung lên brain đã chọn. 🧠💡🥲",
+	"invalidFileType": "Loại tệp không hợp lệ",
+	"feed_form_submit_button": "Gửi đến brain của tôi",
+	"selected_brain_select_label": "Chọn một brain"
+}
