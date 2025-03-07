@@ -235,7 +235,7 @@ class KnowledgeRepository(BaseRepository):
         query = (
             select(KnowledgeDB)
             .where(KnowledgeDB.id == knowledge_id)
-            .options(joinedload(KnowledgeDB.parent), joinedload(KnowledgeDB.children))  # type: ignore
+            .options(joinedload(KnowledgeDB.parent), joinedload(KnowledgeDB.children), joinedload(KnowledgeDB.brains))  # type: ignore
         )
         if user_id:
             query = query.where(KnowledgeDB.user_id == user_id)

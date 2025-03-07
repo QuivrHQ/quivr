@@ -101,7 +101,7 @@ async def generate_signed_url_endpoint(
             detail="knowledge not associated with brains yet.",
         )
 
-    brain_id = knowledge.brains[0]["brain_id"]
+    brain_id = knowledge.brains[0].brain_id
 
     validate_brain_authorization(brain_id=brain_id, user_id=current_user.id)
 
