@@ -1,42 +1,42 @@
-'use client';
+"use client";
 
-import { FormEvent, useState } from 'react';
+import { FormEvent, useState } from "react";
 
-import { useUserApi } from '@/lib/api/user/useUserApi';
-import { ResetPasswordRequest } from '@/lib/api/user/user';
-import { QuivrButton } from '@/lib/components/ui/QuivrButton/QuivrButton';
+import { useUserApi } from "@/lib/api/user/useUserApi";
+import { ResetPasswordRequest } from "@/lib/api/user/user";
+import { QuivrButton } from "@/lib/components/ui/QuivrButton/QuivrButton";
 
-import styles from './ResetPassword.module.scss';
+import styles from "./ResetPassword.module.scss";
 
 interface ResetPasswordProps {
   onClose: () => void;
 }
 
 export const ResetPassword = ({ onClose }: ResetPasswordProps): JSX.Element => {
-  // const { t } = useTranslation(['translation', 'user', 'logout']);
+  // const { t } = useTranslation(["translation", "user", "logout"]);
   const { resetPassword } = useUserApi();
 
   // Reset password state
-  const [currentPassword, setCurrentPassword] = useState('');
-  const [newPassword, setNewPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [passwordError, setPasswordError] = useState('');
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [passwordError, setPasswordError] = useState("");
   const [isResettingPassword, setIsResettingPassword] = useState(false);
   const [resetSuccess, setResetSuccess] = useState(false);
 
   const handleSubmit = async (e: FormEvent): Promise<void> => {
     e.preventDefault();
-    setPasswordError('');
+    setPasswordError("");
 
     // Validate passwords
     if (newPassword.length < 6) {
-      setPasswordError('New password must be at least 6 characters long');
+      setPasswordError("New password must be at least 6 characters long");
 
       return;
     }
 
     if (newPassword !== confirmPassword) {
-      setPasswordError('New password and confirmation do not match');
+      setPasswordError("New password and confirmation do not match");
 
       return;
     }
@@ -50,7 +50,7 @@ export const ResetPassword = ({ onClose }: ResetPasswordProps): JSX.Element => {
         confirm_password: confirmPassword,
       };
 
-      console.log('passwordData', passwordData);
+      console.log("passwordData", passwordData);
 
       await resetPassword(passwordData);
       setResetSuccess(true);
@@ -58,7 +58,7 @@ export const ResetPassword = ({ onClose }: ResetPasswordProps): JSX.Element => {
       if (error instanceof Error) {
         setPasswordError(error.message);
       } else {
-        setPasswordError('An error occurred while resetting your password');
+        setPasswordError("An error occurred while resetting your password");
       }
     } finally {
       setIsResettingPassword(false);
@@ -76,9 +76,9 @@ export const ResetPassword = ({ onClose }: ResetPasswordProps): JSX.Element => {
             onClick={() => {
               onClose();
               setResetSuccess(false);
-              setCurrentPassword('');
-              setNewPassword('');
-              setConfirmPassword('');
+              setCurrentPassword("");
+              setNewPassword("");
+              setConfirmPassword("");
             }}
             color='primary'
             label='Close'

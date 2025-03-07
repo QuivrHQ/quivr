@@ -39,7 +39,7 @@ export const PageHeader = ({
               <span>{snippetEmoji}</span>
             </div>
           ) : (
-            <Icon name={iconName} size="large" color="primary" />
+            <Icon name={iconName} size='large' color='primary' />
           )}
           <span>{label}</span>
         </div>
@@ -62,7 +62,7 @@ export const PageHeader = ({
         className={styles.help_button}
         onClick={() => setIsVisible(!isVisible)}
       >
-        <Icon name="help" size="normal" color="black" />
+        <Icon name='help' size='normal' color='black' />
       </div>
     </>
   );

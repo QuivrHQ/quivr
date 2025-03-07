@@ -1,20 +1,20 @@
-import { useEffect, useState } from 'react';
-import { FormProvider, useForm } from 'react-hook-form';
-import { useTranslation } from 'react-i18next';
+import { useEffect, useState } from "react";
+import { FormProvider, useForm } from "react-hook-form";
+import { useTranslation } from "react-i18next";
 
-import { useUserApi } from '@/lib/api/user/useUserApi';
-import { UserIdentity } from '@/lib/api/user/user';
-import { Modal } from '@/lib/components/ui/Modal/Modal';
+import { useUserApi } from "@/lib/api/user/useUserApi";
+import { UserIdentity } from "@/lib/api/user/user";
+import { Modal } from "@/lib/components/ui/Modal/Modal";
 import {
   MultiSelect,
   SelectOptionProps,
-} from '@/lib/components/ui/MultiSelect/MultiSelect';
-import { useBrainContext } from '@/lib/context/BrainProvider/hooks/useBrainContext';
+} from "@/lib/components/ui/MultiSelect/MultiSelect";
+import { useBrainContext } from "@/lib/context/BrainProvider/hooks/useBrainContext";
 
-import styles from './CreateUserModal.module.scss';
+import styles from "./CreateUserModal.module.scss";
 
-import Button from '../ui/Button';
-import { TextInput } from '../ui/TextInput/TextInput';
+import Button from "../ui/Button";
+import { TextInput } from "../ui/TextInput/TextInput";
 
 type UserFormProps = {
   firstName: string;
@@ -40,7 +40,7 @@ export const CreateUserModal = ({
   onSuccess,
 }: CreateUserModalProps): JSX.Element => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const { t } = useTranslation(['translation']);
+  const { t } = useTranslation(["translation"]);
   const { allBrains } = useBrainContext();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -57,38 +57,38 @@ export const CreateUserModal = ({
 
   const methods = useForm<UserFormProps>({
     defaultValues: {
-      firstName: '',
-      lastName: '',
-      email: '',
+      firstName: "",
+      lastName: "",
+      email: "",
       brains: [],
-      id: '',
+      id: "",
     },
-    mode: 'onChange',
+    mode: "onChange",
   });
 
   const { register, handleSubmit, formState, setValue, watch, reset } = methods;
   const { errors } = formState;
 
   // Watch form values
-  const firstName = watch('firstName');
-  const lastName = watch('lastName');
-  const email = watch('email');
+  const firstName = watch("firstName");
+  const lastName = watch("lastName");
+  const email = watch("email");
 
   // Effect to populate form when in edit mode
   useEffect(() => {
     if (isEditMode && userData) {
       // Extract first and last name from username
-      const nameParts = userData.username.split(' ');
+      const nameParts = userData.username.split(" ");
       // eslint-disable-next-line @typescript-eslint/no-shadow
-      const firstName = nameParts[0] ?? '';
+      const firstName = nameParts[0] ?? "";
       // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition, @typescript-eslint/no-shadow
-      const lastName = nameParts.slice(1).join(' ') ?? '';
+      const lastName = nameParts.slice(1).join(" ") ?? "";
 
       // Set form values
-      setValue('firstName', firstName);
-      setValue('lastName', lastName);
-      setValue('email', userData.email ?? '');
-      setValue('id', userData.id);
+      setValue("firstName", firstName);
+      setValue("lastName", lastName);
+      setValue("email", userData.email ?? "");
+      setValue("id", userData.id);
 
       // Set selected brains
       if (userData.brains && userData.brain_names) {
@@ -115,11 +115,11 @@ export const CreateUserModal = ({
           ...data,
           id: userData.id,
         });
-        console.log('User updated successfully');
+        console.log("User updated successfully");
       } else {
         // Call the backend API to create the user
         await createUser(data);
-        console.log('User created successfully');
+        console.log("User created successfully");
       }
 
       setOpen(false);
@@ -137,13 +137,13 @@ export const CreateUserModal = ({
       // eslint-disable-next-line @typescript-eslint/no-shadow
     } catch (error) {
       console.error(
-        `Error ${isEditMode ? 'updating' : 'creating'} user:`,
+        `Error ${isEditMode ? "updating" : "creating"} user:`,
         error
       );
       setError(
         error instanceof Error
           ? error.message
-          : `Failed to ${isEditMode ? 'update' : 'create'} user`
+          : `Failed to ${isEditMode ? "update" : "create"} user`
       );
     } finally {
       setIsSubmitting(false);
@@ -167,7 +167,7 @@ export const CreateUserModal = ({
   return (
     <FormProvider {...methods}>
       <Modal
-        title={isEditMode ? 'Edit user' : 'New user'}
+        title={isEditMode ? "Edit user" : "New user"}
         isOpen={isOpen}
         setOpen={setOpen}
         size='normal'
@@ -187,7 +187,7 @@ export const CreateUserModal = ({
               // eslint-disable-next-line @typescript-eslint/no-misused-promises
               onClick={handleSubmit(onSubmit)}
             >
-              {isEditMode ? 'Save changes' : 'Create'}
+              {isEditMode ? "Save changes" : "Create"}
             </Button>
           </div>
         }
@@ -200,9 +200,9 @@ export const CreateUserModal = ({
               <TextInput
                 label='First name'
                 inputValue={firstName}
-                setInputValue={(value) => handleInputChange('firstName', value)}
-                {...register('firstName', {
-                  required: 'First name is required',
+                setInputValue={(value) => handleInputChange("firstName", value)}
+                {...register("firstName", {
+                  required: "First name is required",
                 })}
               />
               {errors.firstName && (
@@ -215,9 +215,9 @@ export const CreateUserModal = ({
               <TextInput
                 label='Last name'
                 inputValue={lastName}
-                setInputValue={(value) => handleInputChange('lastName', value)}
-                {...register('lastName', {
-                  required: 'Last name is required',
+                setInputValue={(value) => handleInputChange("lastName", value)}
+                {...register("lastName", {
+                  required: "Last name is required",
                 })}
               />
               {errors.lastName && (
@@ -230,13 +230,13 @@ export const CreateUserModal = ({
               <TextInput
                 label='Email'
                 inputValue={email}
-                setInputValue={(value) => handleInputChange('email', value)}
+                setInputValue={(value) => handleInputChange("email", value)}
                 disabled={isEditMode}
-                {...register('email', {
-                  required: 'Email is required',
+                {...register("email", {
+                  required: "Email is required",
                   pattern: {
                     value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                    message: 'Invalid email address',
+                    message: "Invalid email address",
                   },
                 })}
               />

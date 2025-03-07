@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-'use client';
+"use client";
 
 import {
   ColumnDef,
@@ -9,13 +9,12 @@ import {
   getSortedRowModel,
   SortingState,
   useReactTable,
-} from '@tanstack/react-table';
-import { useState } from 'react';
+} from "@tanstack/react-table";
+import { useState } from "react";
 
-import styles from './Table.module.scss';
+import styles from "./Table.module.scss";
 
-import { Icon } from '../Icon/Icon';
-
+import { Icon } from "../Icon/Icon";
 
 interface TableProps<T> {
   data: T[];
@@ -30,7 +29,7 @@ export const Table = <T,>({
   columns,
   showPagination = true,
   pageSize = 10,
-  className = '',
+  className = "",
 }: TableProps<T>): JSX.Element => {
   const [sorting, setSorting] = useState<SortingState>([]);
 
@@ -61,7 +60,7 @@ export const Table = <T,>({
                 <th
                   key={header.id}
                   onClick={header.column.getToggleSortingHandler()}
-                  className={header.column.getCanSort() ? styles.sortable : ''}
+                  className={header.column.getCanSort() ? styles.sortable : ""}
                 >
                   <div className={styles.th_content}>
                     {flexRender(
@@ -70,10 +69,10 @@ export const Table = <T,>({
                     )}
                     {header.column.getIsSorted() && (
                       <span className={styles.sort_icon}>
-                        {header.column.getIsSorted() === 'asc' ? (
-                          <Icon name="sort" size="small" color="black" />
+                        {header.column.getIsSorted() === "asc" ? (
+                          <Icon name='sort' size='small' color='black' />
                         ) : (
-                          <Icon name="sort" size="small" color="black" />
+                          <Icon name='sort' size='small' color='black' />
                         )}
                       </span>
                     )}
@@ -96,10 +95,7 @@ export const Table = <T,>({
             ))
           ) : (
             <tr>
-              <td
-                colSpan={columns.length}
-                className={styles.empty_table}
-              >
+              <td colSpan={columns.length} className={styles.empty_table}>
                 No data available
               </td>
             </tr>
@@ -110,7 +106,7 @@ export const Table = <T,>({
       {showPagination && data.length > 0 && (
         <div className={styles.pagination}>
           <div className={styles.pagination_info}>
-            Page {table.getState().pagination.pageIndex + 1} of{' '}
+            Page {table.getState().pagination.pageIndex + 1} of{" "}
             {table.getPageCount()}
           </div>
           <div className={styles.pagination_controls}>
@@ -119,14 +115,14 @@ export const Table = <T,>({
               disabled={!table.getCanPreviousPage()}
               className={styles.pagination_button}
             >
-              <Icon name="chevronLeft" size="small" color="black" />
+              <Icon name='chevronLeft' size='small' color='black' />
             </button>
             <button
               onClick={() => table.nextPage()}
               disabled={!table.getCanNextPage()}
               className={styles.pagination_button}
             >
-              <Icon name="chevronRight" size="small" color="black" />
+              <Icon name='chevronRight' size='small' color='black' />
             </button>
           </div>
         </div>
