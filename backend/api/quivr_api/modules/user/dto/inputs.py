@@ -1,7 +1,7 @@
 from typing import Optional
 from uuid import UUID
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 
 class UserUpdatableProperties(BaseModel):
@@ -26,3 +26,9 @@ class UpdateUserRequest(BaseModel):
     lastName: str
     email: str
     brains: list[str]
+
+
+class ResetPasswordRequest(BaseModel):
+    current_password: str = Field(..., description="Current password")
+    new_password: str = Field(..., description="New password")
+    confirm_password: str = Field(..., description="Confirm new password")

@@ -1,9 +1,9 @@
 from typing import List
 from uuid import UUID, uuid4
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Optional
 from uuid import UUID
 
-from quivr_api.modules.user.dto.inputs import CreateUserRequest, UserUpdatableProperties, UpdateUserRequest
+from quivr_api.modules.user.dto.inputs import CreateUserRequest, UserUpdatableProperties, UpdateUserRequest, ResetPasswordRequest
 from quivr_api.modules.user.entity.user_identity import UserIdentity
 from quivr_api.modules.user.repository.users import Users
 from quivr_api.modules.user.repository.users_interface import UsersInterface
@@ -17,6 +17,10 @@ logger = get_logger(__name__)
 
 def generate_uuid_password() -> str:
     return str(uuid4())
+
+def is_valid_password(password: str) -> bool:
+    """Check if password meets requirements (min 8 chars)"""
+    return len(password) >= 6
 
 class UserService:
     repository: UsersInterface
@@ -98,6 +102,58 @@ class UserService:
             "username": f"{user_data.firstName} {user_data.lastName}"
         }
 
+    def reset_password(self, user_id: UUID, password_data: ResetPasswordRequest) -> Dict[str, Any]:
+        """Reset user password
+        
+        Args:
+            user_id: User ID
+            password_data: Password data containing current and new password
+            
+        Returns:
+            Dict with success message
+            
+        Raises:
+            Exception: If password reset fails
+        """
+        # Validate new password
+        if not is_valid_password(password_data.new_password):
+            raise Exception("Password must be at least 6 characters long")
+            
+        # Validate password confirmation
+        if password_data.new_password != password_data.confirm_password:
+            raise Exception("New password and confirmation do not match")
+            
+        try:
+            # Get user email
+            user_email = self.get_user_email_by_user_id(user_id)
+            if not user_email:
+                raise Exception("User not found")
+                
+            # Sign in with current password to verify it's correct
+            try:
+                self.supabase_client.auth.sign_in_with_password({
+                    "email": user_email,
+                    "password": password_data.current_password
+                })
+            except Exception as e:
+                logger.error(f"Error during password verification: {e}")
+                raise Exception("Current password is incorrect")
+                
+            # Update password
+            auth_response = self.supabase_client.auth.admin.update_user_by_id(
+                user_id,
+                {"password": password_data.new_password}
+            )
+            
+            if not auth_response.user:
+                raise Exception("Failed to update password")
+                
+            return {"message": "Password updated successfully"}
+            
+        except Exception as e:
+            logger.error(f"Error resetting password: {e}")
+            raise Exception(f"Error resetting password: {str(e)}")
+        
     def resend_invitation_email(
         self,
         fullNameUser: str,

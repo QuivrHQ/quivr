@@ -186,3 +186,24 @@ async def get_all_users_endpoint(
     except Exception as e:
         logger.error(f"Error getting all users: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Error getting users: {str(e)}")
+
+
+@user_router.post("/user/reset-password", dependencies=[Depends(AuthBearer())], tags=["User"])
+async def reset_password_endpoint(
+    password_data: ResetPasswordRequest,
+    current_user: UserIdentity = Depends(get_current_user),
+):
+    """
+    Reset user password.
+    
+    - `password_data`: The password data containing current and new password.
+    - `current_user`: The current authenticated user.
+    
+    This endpoint allows a user to reset their own password. It requires authentication.
+    """
+    try:
+        logger.info(f"Resetting password for user: {current_user.id}")
+        return user_service.reset_password(current_user.id, password_data)
+    except Exception as e:
+        logger.error(f"Error resetting password: {str(e)}")
+        raise HTTPException(status_code=400, detail=str(e))
