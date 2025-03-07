@@ -262,12 +262,14 @@ def _define_custom_prompts() -> dict[TemplatePromptName, BasePromptTemplate]:
     custom_prompts[TemplatePromptName.TOOL_ROUTING_PROMPT] = TOOL_ROUTING_PROMPT
 
     system_message_zendesk_template = """
-
     - You are a Zendesk Agent.
     - You are answering a client query.
     - You must provide a response with all the information you have. Do not write areas to be filled like [your name], [your email], etc.
     - Give a the most complete answer to the client query and give relevant links if needed.
     - Based on the following similar client tickets, provide a response to the client query in the exact same format.
+    - When there are multiple similar tickets, prioritize information from the most recent tickets.
+    - If there are contradictions between tickets, use information from the most recent ticket as it represents the most up-to-date information.
+
 
     ------ Output Format ------
     - You shouln't provide the greetings and the signature as those will be added automatically after generation.
@@ -277,6 +279,7 @@ def _define_custom_prompts() -> dict[TemplatePromptName, BasePromptTemplate]:
     - Keep the same lexical field as in the similar tickets agent responses.
     - Always add the most relevant informations to the response, just like in similar tickets response so the user have all the informations needed.
     - Stay as close as similar response as possible.
+    - Maintain consistency in terminology used in recent tickets.
 
     ------ Current User Metadata ------
     {user_metadata}
@@ -294,7 +297,7 @@ def _define_custom_prompts() -> dict[TemplatePromptName, BasePromptTemplate]:
     {system_prompt}
     -------------------------------------
 
-    ------ Client Query ------
+    ------ Client Question ------
     {client_query}
     --------------------------
 
@@ -311,6 +314,6 @@ def _define_custom_prompts() -> dict[TemplatePromptName, BasePromptTemplate]:
     return custom_prompts
 
 
-_templ_registry: dict[TemplatePromptName, BasePromptTemplate] = {}
+_templ_registry: dict[TemplatePromptName, BasePromptTemplate] = _define_custom_prompts()
 
 custom_prompts = types.MappingProxyType(_templ_registry)

@@ -45,6 +45,7 @@ from quivr_core.rag.utils import (
     LangfuseService,
     collect_tools,
     combine_documents,
+    format_dict,
     format_file_list,
     get_chunk_metadata,
     parse_chunk_response,
@@ -914,12 +915,12 @@ class QuivrQARAGLangGraph:
         docs: List[Document] = tasks.docs if tasks else []
         messages = state["messages"]
         user_task = messages[0].content
-        ticket_metadata = state["ticket_metadata"]
-        user_metadata = state["user_metadata"]
+        ticket_metadata = state["ticket_metadata"] or {}
+        user_metadata = state["user_metadata"] or {}
         inputs = {
             "similar_tickets": "\n".join([doc.page_content for doc in docs]),
-            "ticket_metadata": ticket_metadata,
-            "user_metadata": user_metadata,
+            "ticket_metadata": format_dict(ticket_metadata),
+            "user_metadata": format_dict(user_metadata),
             "client_query": user_task,
             "system_prompt": self.retrieval_config.prompt
             if self.retrieval_config.prompt
@@ -929,7 +930,6 @@ class QuivrQARAGLangGraph:
         msg = custom_prompts[TemplatePromptName.ZENDESK_TEMPLATE_PROMPT].format(
             **inputs
         )
-        breakpoint()
         llm = self.bind_tools_to_llm(self.generate_zendesk_rag.__name__)
         response = llm.invoke(msg)
 
