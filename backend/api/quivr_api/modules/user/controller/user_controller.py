@@ -12,6 +12,7 @@ from quivr_api.modules.user.repository.users import Users
 from quivr_api.modules.user.service.user_service import UserService
 from quivr_api.modules.user.service.user_usage import UserUsage
 from quivr_api.logger import get_logger
+from quivr_api.modules.user.dto.inputs import ResetPasswordRequest
 
 logger = get_logger(__name__)
 user_router = APIRouter()
