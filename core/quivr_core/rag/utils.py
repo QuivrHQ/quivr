@@ -1,5 +1,5 @@
 import logging
-from typing import Any, List, Tuple, no_type_check
+from typing import Any, Dict, List, Tuple, no_type_check
 
 from langchain_core.messages import AIMessage, BaseMessage, HumanMessage, SystemMessage
 from langchain_core.messages.ai import AIMessageChunk
@@ -14,7 +14,7 @@ from quivr_core.rag.entities.models import (
     RAGResponseMetadata,
     RawRAGResponse,
 )
-from quivr_core.rag.prompts import custom_prompts
+from quivr_core.rag.prompts import TemplatePromptName, custom_prompts
 
 # TODO(@aminediro): define a types packages where we clearly define IO types
 # This should be used for serialization/deseriallization later
@@ -163,7 +163,7 @@ def parse_response(raw_response: RawRAGResponse, model_name: str) -> ParsedRAGRe
 
 def combine_documents(
     docs,
-    document_prompt=custom_prompts.DEFAULT_DOCUMENT_PROMPT,
+    document_prompt=custom_prompts[TemplatePromptName.DEFAULT_DOCUMENT_PROMPT],
     document_separator="\n\n",
 ):
     # for each docs, add an index in the metadata to be able to cite the sources
@@ -196,6 +196,10 @@ def collect_tools(workflow_config: WorkflowConfig):
         activated_tools += f"Tool {i+1} description: {tool.description}\n\n"
 
     return validated_tools, activated_tools
+
+
+def format_dict(kv: Dict[str, str]) -> str:
+    return "\n".join([f"{k}: {v}" for k, v in kv.items() if v is not None and v != ""])
 
 
 class LangfuseService:

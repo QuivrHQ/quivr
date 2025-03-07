@@ -500,6 +500,7 @@ class Brain:
         rag_pipeline: Type[Union[QuivrQARAG, QuivrQARAGLangGraph]] | None = None,
         list_files: list[QuivrKnowledge] | None = None,
         chat_history: ChatHistory | None = None,
+        **input_kwargs,
     ) -> AsyncGenerator[ParsedRAGChunkResponse, ParsedRAGChunkResponse]:
         """
         Ask a question to the brain and get a streamed generated answer.
@@ -518,6 +519,7 @@ class Brain:
             print(chunk.answer)
         ```
         """
+        assert self.vector_db
         llm = self.llm
 
         # If you passed a different llm model we'll override the brain  one
@@ -547,6 +549,7 @@ class Brain:
             history=chat_history,
             list_files=list_files,
             metadata=metadata,
+            **input_kwargs,
         ):
             # Format output to be correct servicedf;j
             if not response.last_chunk:
@@ -565,6 +568,7 @@ class Brain:
         rag_pipeline: Type[Union[QuivrQARAG, QuivrQARAGLangGraph]] | None = None,
         list_files: list[QuivrKnowledge] | None = None,
         chat_history: ChatHistory | None = None,
+        **input_kwargs,
     ) -> ParsedRAGResponse:
         """
         Synchronous version that asks a question to the brain and gets a generated answer.
@@ -586,6 +590,7 @@ class Brain:
             rag_pipeline=rag_pipeline,
             list_files=list_files,
             chat_history=chat_history,
+            **input_kwargs,
         ):
             full_answer += response.answer
 

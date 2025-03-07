@@ -5,6 +5,7 @@ from enum import Enum
 from typing import Any, Dict, Hashable, List, Optional, Type, Union
 from uuid import UUID
 
+from langchain_core.prompts.base import BasePromptTemplate
 from langchain_core.tools import BaseTool
 from langgraph.graph import END, START
 from pydantic import BaseModel
@@ -14,7 +15,6 @@ from quivr_core.base_config import QuivrBaseConfig
 from quivr_core.config import MegaparseConfig
 from quivr_core.llm_tools.llm_tools import TOOLS_CATEGORIES, TOOLS_LISTS, LLMToolFactory
 from quivr_core.processor.splitter import SplitterConfig
-from quivr_core.rag.prompts import CustomPromptsModel
 
 logger = logging.getLogger("quivr_core")
 
@@ -271,7 +271,7 @@ class LLMEndpointConfig(QuivrBaseConfig):
     max_output_tokens: int = 4096
     temperature: float = 0.3
     streaming: bool = True
-    prompt: CustomPromptsModel | None = None
+    prompt: BasePromptTemplate | None = None
 
     _FALLBACK_TOKENIZER = "cl100k_base"
 
