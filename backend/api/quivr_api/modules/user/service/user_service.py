@@ -139,9 +139,8 @@ class UserService:
                 logger.error(f"Error during password verification: {e}")
                 raise Exception("Current password is incorrect")
                 
-            # Update password
-            auth_response = self.supabase_client.auth.admin.update_user_by_id(
-                user_id,
+            # Update password - use the session from the sign-in to update the password
+            auth_response = self.supabase_client.auth.update_user(
                 {"password": password_data.new_password}
             )
             
