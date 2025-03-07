@@ -68,6 +68,16 @@ export type UpdateUserResponse = {
   username: string;
 };
 
+export type ResetPasswordRequest = {
+  current_password: string;
+  new_password: string;
+  confirm_password: string;
+};
+
+export type ResetPasswordResponse = {
+  message: string;
+};
+
 export const updateUserIdentity = async (
   userUpdatableProperties: UserIdentityUpdatableProperties,
   axiosInstance: AxiosInstance
@@ -123,3 +133,16 @@ export const deleteUserData = async (
 export const getUserCredits = async (
   axiosInstance: AxiosInstance
 ): Promise<number> => (await axiosInstance.get<number>('/user/credits')).data;
+
+export const resetPassword = async (
+  passwordData: ResetPasswordRequest,
+  axiosInstance: AxiosInstance
+): Promise<ResetPasswordResponse> => {
+  const response = await axiosInstance.post(
+    '/user/reset-password',
+    passwordData
+  );
+
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+  return response.data;
+};

@@ -9,6 +9,9 @@ import {
   getUser,
   getUserCredits,
   getUserIdentity,
+  resetPassword,
+  ResetPasswordRequest,
+  ResetPasswordResponse,
   updateUser,
   updateUserIdentity,
   UpdateUserRequest,
@@ -37,5 +40,8 @@ export const useUserApi = () => {
     getUser: async () => getUser(axiosInstance),
     deleteUserData: async () => deleteUserData(axiosInstance),
     getUserCredits: async () => getUserCredits(axiosInstance),
+    resetPassword: async (
+      passwordData: ResetPasswordRequest
+    ): Promise<ResetPasswordResponse> => resetPassword(passwordData, axiosInstance),
   };
 };

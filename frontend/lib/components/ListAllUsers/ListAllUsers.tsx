@@ -1,4 +1,5 @@
 import { ColumnDef } from '@tanstack/react-table';
+import { format } from 'date-fns';
 import { useEffect, useMemo, useState } from 'react';
 
 import { useUserApi } from '@/lib/api/user/useUserApi';
@@ -33,7 +34,11 @@ export const ListAllUsers = (): JSX.Element => {
     try {
       const date = new Date(dateString);
 
-      return date.toLocaleString();
+      if (isNaN(date.getTime())) {
+        return 'Invalid date';
+      }
+
+      return format(date, 'dd MMM yyyy, h:mm:ss a');
     } catch (e) {
       return 'Invalid date';
     }
@@ -71,8 +76,8 @@ export const ListAllUsers = (): JSX.Element => {
                 }}
               >
                 {brains.length > 0
-                  ? `Admin and ${brains.length - 1} other brain${
-                      brains.length > 2 ? 's' : ''
+                  ? `Admin and ${brains.length} other brain${
+                      brains.length > 1 ? 's' : ''
                     }`
                   : 'No brain'}{' '}
                 <Icon name='chevronDown' size='small' color='primary' />
