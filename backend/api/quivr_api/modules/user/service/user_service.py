@@ -1,6 +1,6 @@
 from typing import List
 from uuid import UUID, uuid4
-from typing import List, Dict, Any, Optional
+from typing import List, Dict, Any
 from uuid import UUID
 
 from quivr_api.modules.user.dto.inputs import CreateUserRequest, UserUpdatableProperties, UpdateUserRequest, ResetPasswordRequest
@@ -16,7 +16,7 @@ import os
 logger = get_logger(__name__)
 
 def generate_uuid_password() -> str:
-    return str(uuid4())
+    return str(uuid4().hex[:6])
 
 def is_valid_password(password: str) -> bool:
     """Check if password meets requirements (min 8 chars)"""
@@ -53,7 +53,7 @@ class UserService:
         auth_response = self.supabase_client.auth.admin.create_user({
             "email": user_data.email,
             "password": password,
-            "email_confirm": False,
+            "email_confirm": True,
             "user_metadata": {
                 "first_name": user_data.firstName,
                 "last_name": user_data.lastName,
@@ -255,4 +255,3 @@ class UserService:
             "email": user_data.email,
             "username": f"{user_data.firstName} {user_data.lastName}"
         }
-

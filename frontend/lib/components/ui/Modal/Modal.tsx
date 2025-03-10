@@ -27,9 +27,9 @@ type CommonModalProps = {
 type ModalProps =
   | CommonModalProps
   | (Omit<CommonModalProps, "isOpen" | "setOpen"> & {
-      isOpen: boolean;
-      setOpen: (isOpen: boolean) => void;
-    });
+    isOpen: boolean;
+    setOpen: (isOpen: boolean) => void;
+  });
 
 const handleInteractOutside = (unclosable: boolean, event: Event) => {
   if (unclosable) {
@@ -49,9 +49,8 @@ const handleModalContentAnimation = (
     initial: initialAnimation,
     animate: animateAnimation,
     exit: exitAnimation,
-    className: `${styles.modal_content_wrapper} ${styles[size]} ${
-      unforceWhite ? styles.white : ""
-    }`,
+    className: `${styles.modal_content_wrapper} ${styles[size]} ${unforceWhite ? styles.white : ""
+      }`,
   };
 };
 

@@ -1,6 +1,7 @@
 import { ColumnDef } from '@tanstack/react-table';
 import { format } from 'date-fns';
 import { useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { useUserApi } from '@/lib/api/user/useUserApi';
 import { UserIdentity } from '@/lib/api/user/user';
@@ -13,6 +14,7 @@ import Table from '@/lib/components/ui/Table/Table';
 import styles from './ListAllUsers.module.scss';
 
 export const ListAllUsers = (): JSX.Element => {
+  const { t } = useTranslation(["user"]);
   const [users, setUsers] = useState<UserIdentity[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -48,17 +50,17 @@ export const ListAllUsers = (): JSX.Element => {
     () => [
       {
         accessorKey: 'username',
-        header: 'Name',
+        header: t("name", { ns: "user" }),
         cell: ({ row }) => row.original.username || 'N/A',
       },
       {
         accessorKey: 'email',
-        header: 'Email',
+        header: t("email", { ns: "user" }),
         cell: ({ row }) => row.original.email ?? 'N/A',
       },
       {
         accessorKey: 'brains',
-        header: 'Brains',
+        header: t("brains", { ns: "user" }),
         cell: ({ row }) => {
           const brains = row.original.brains ?? [];
           const brainNames = row.original.brain_names ?? [];
@@ -76,10 +78,9 @@ export const ListAllUsers = (): JSX.Element => {
                 }}
               >
                 {brains.length > 0
-                  ? `Admin and ${brains.length} other brain${
-                      brains.length > 1 ? 's' : ''
-                    }`
-                  : 'No brain'}{' '}
+                  ? `Admin và ${brains.length} brain${brains.length > 1 ? 's' : ''
+                  } khác`
+                  : 'Không có brain'}{' '}
                 <Icon name='chevronDown' size='small' color='primary' />
               </div>
 
@@ -107,12 +108,12 @@ export const ListAllUsers = (): JSX.Element => {
       },
       {
         accessorKey: 'last_sign_in_at',
-        header: 'Last Login',
+        header: t("last_login", { ns: "user" }),
         cell: ({ row }) => formatDate(row.original.last_sign_in_at),
       },
       {
         id: 'actions',
-        header: 'Actions',
+        header: t("actions", { ns: "user" }),
         cell: ({ row }) => {
           const userId = row.original.id;
 
@@ -144,15 +145,15 @@ export const ListAllUsers = (): JSX.Element => {
                     }}
                   >
                     <Icon name='edit' size='small' color='primary' />
-                    <span>Edit user</span>
+                    <span>{t("edit_user", { ns: "user" })}</span>
                   </div>
                   <div className={styles.actions_dropdown_item}>
                     <Icon name='key' size='small' color='primary' />
-                    <span>Reset password</span>
+                    <span>{t("reset_password", { ns: "user" })}</span>
                   </div>
                   <div className={styles.actions_dropdown_item}>
                     <Icon name='delete' size='small' color='dangerous' />
-                    <span>Deactivate user</span>
+                    <span>{t("deactivate_user", { ns: "user" })}</span>
                   </div>
                 </div>
               )}
@@ -229,8 +230,8 @@ export const ListAllUsers = (): JSX.Element => {
     <Card className={styles.users_card}>
       <div className={styles.card_header}>
         <div className={styles.header_left}>
-          <h2>All Users</h2>
-          <p>Total users: {users.length}</p>
+          <h2>{t("all_user", { ns: "user" })}</h2>
+          <p>{`${t("total_users", { ns: "user" })} ${users.length}`}</p>
         </div>
         <button
           className={styles.refresh_button}
@@ -238,7 +239,7 @@ export const ListAllUsers = (): JSX.Element => {
           disabled={isLoading}
         >
           <Icon name='sync' size='small' color='primary' />
-          {isLoading ? 'Loading...' : 'Refresh'}
+          {isLoading ? 'Loading...' : 'Làm mới'}
         </button>
       </div>
       <Table

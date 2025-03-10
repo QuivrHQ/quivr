@@ -106,7 +106,7 @@ export const Table = <T,>({
       {showPagination && data.length > 0 && (
         <div className={styles.pagination}>
           <div className={styles.pagination_info}>
-            Page {table.getState().pagination.pageIndex + 1} of{" "}
+            Trang {table.getState().pagination.pageIndex + 1} of{" "}
             {table.getPageCount()}
           </div>
           <div className={styles.pagination_controls}>

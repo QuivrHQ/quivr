@@ -40,7 +40,7 @@ export const CreateUserModal = ({
   onSuccess,
 }: CreateUserModalProps): JSX.Element => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const { t } = useTranslation(["translation"]);
+  const { t } = useTranslation(["user"]);
   const { allBrains } = useBrainContext();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -167,7 +167,7 @@ export const CreateUserModal = ({
   return (
     <FormProvider {...methods}>
       <Modal
-        title={isEditMode ? "Edit user" : "New user"}
+        title={isEditMode ? t("edit_user", { ns: "user" }) : t("create_user", { ns: "user" })}
         isOpen={isOpen}
         setOpen={setOpen}
         size='normal'
@@ -178,7 +178,7 @@ export const CreateUserModal = ({
               variant='secondary'
               onClick={() => setOpen(false)}
             >
-              Cancel
+              {t("cancel", { ns: "user" })}
             </Button>
             <Button
               type='submit'
@@ -187,7 +187,7 @@ export const CreateUserModal = ({
               // eslint-disable-next-line @typescript-eslint/no-misused-promises
               onClick={handleSubmit(onSubmit)}
             >
-              {isEditMode ? "Save changes" : "Create"}
+              {isEditMode ? t("save_changes", { ns: "user" }) : t("create", { ns: "user" })}
             </Button>
           </div>
         }
@@ -196,13 +196,13 @@ export const CreateUserModal = ({
           {error && <div className={styles.error_message}>{error}</div>}
           <div className={styles.form_fields}>
             <div className={styles.form_field}>
-              <label htmlFor='firstName'>First name</label>
+              <label htmlFor='firstName'>{t("first_name", { ns: "user" })}</label>
               <TextInput
-                label='First name'
+                label={t("first_name", { ns: "user" })}
                 inputValue={firstName}
                 setInputValue={(value) => handleInputChange("firstName", value)}
                 {...register("firstName", {
-                  required: "First name is required",
+                  required: t("first_name_required", { ns: "user" }),
                 })}
               />
               {errors.firstName && (
@@ -211,13 +211,13 @@ export const CreateUserModal = ({
             </div>
 
             <div className={styles.form_field}>
-              <label htmlFor='lastName'>Last name</label>
+              <label htmlFor='lastName'>{t("last_name", { ns: "user" })}</label>
               <TextInput
-                label='Last name'
+                label={t("last_name", { ns: "user" })}
                 inputValue={lastName}
                 setInputValue={(value) => handleInputChange("lastName", value)}
                 {...register("lastName", {
-                  required: "Last name is required",
+                  required: t("last_name_required", { ns: "user" }),
                 })}
               />
               {errors.lastName && (
@@ -226,17 +226,17 @@ export const CreateUserModal = ({
             </div>
 
             <div className={styles.form_field}>
-              <label htmlFor='email'>Email</label>
+              <label htmlFor='email'>{t("email", { ns: "user" })}</label>
               <TextInput
-                label='Email'
+                label={t("email", { ns: "user" })}
                 inputValue={email}
                 setInputValue={(value) => handleInputChange("email", value)}
                 disabled={isEditMode}
                 {...register("email", {
-                  required: "Email is required",
+                  required: t("email_required", { ns: "user" }),
                   pattern: {
                     value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                    message: "Invalid email address",
+                    message: t("email_invalid", { ns: "user" }),
                   },
                 })}
               />
@@ -246,12 +246,12 @@ export const CreateUserModal = ({
             </div>
 
             <div className={styles.form_field}>
-              <label htmlFor='brains'>Groups</label>
+              <label htmlFor='brains'>{t("brains", { ns: "user" })}</label>
               <MultiSelect
                 options={brainOptions}
                 selectedOptions={selectedBrains}
                 onChange={handleBrainsChange}
-                placeholder='Select groups'
+                placeholder={t("select_brains", { ns: "user" })}
                 iconName='brain'
               />
             </div>

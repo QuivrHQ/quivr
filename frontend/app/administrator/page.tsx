@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 
 import { CreateUserModal } from "@/lib/components/CreateUserModal/CreateUserModal";
 import { ListAllUsers } from "@/lib/components/ListAllUsers";
@@ -10,11 +11,12 @@ import { ButtonType } from "@/lib/types/QuivrButton";
 import styles from "./page.module.scss";
 
 const Administrator = (): JSX.Element => {
+  const { t } = useTranslation(["user"]);
   const [isCreateUserModalOpen, setIsCreateUserModalOpen] = useState(false);
 
   const buttons: ButtonType[] = [
     {
-      label: "Create user",
+      label: t("create_user", { ns: "user" }),
       color: "primary",
       onClick: () => {
         setIsCreateUserModalOpen(true);
@@ -28,7 +30,7 @@ const Administrator = (): JSX.Element => {
       <div className={styles.page_header}>
         <PageHeader
           iconName='user'
-          label='User Administration'
+          label={t("user_administration", { ns: "user" })}
           buttons={buttons}
         />
       </div>

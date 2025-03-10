@@ -89,7 +89,7 @@
   color: var(--text-primary);
   
   &:hover {
-    background-color: var(--background-light);
+    background-color: var(--background-1);
   }
 }
 
@@ -158,7 +158,7 @@
   border-radius: 50%;
   
   &:hover {
-    background-color: var(--background-light);
+    background-color: var(--background-1);
   }
 }
 
@@ -167,7 +167,7 @@
   top: 100%;
   right: 0;
   width: 180px;
-  background-color: var(--background-light);
+  background-color: var(--background-1);
   border-radius: 0.5rem;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   z-index: 100;

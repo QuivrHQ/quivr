@@ -50,8 +50,7 @@ const UserPage = (): JSX.Element => {
 
   const buttons: ButtonType[] = [
     {
-      label: "Reset password",
-      // label: t("reset_password", { ns: "translation" }),
+      label: t("reset_password", { ns: "user" }),
       color: "primary",
       onClick: () => {
         setResetPasswordModalOpened(true);

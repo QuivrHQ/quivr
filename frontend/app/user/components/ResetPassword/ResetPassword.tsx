@@ -1,11 +1,11 @@
 "use client";
 
 import { FormEvent, useState } from "react";
+import { useTranslation } from "react-i18next";
 
 import { useUserApi } from "@/lib/api/user/useUserApi";
 import { ResetPasswordRequest } from "@/lib/api/user/user";
 import { QuivrButton } from "@/lib/components/ui/QuivrButton/QuivrButton";
-import { useSupabase } from "@/lib/context/SupabaseProvider";
 
 import styles from "./ResetPassword.module.scss";
 
@@ -14,9 +14,8 @@ interface ResetPasswordProps {
 }
 
 export const ResetPassword = ({ onClose }: ResetPasswordProps): JSX.Element => {
-  // const { t } = useTranslation(["translation", "user", "logout"]);
+  const { t } = useTranslation(["translation", "user", "logout"]);
   const { resetPassword } = useUserApi();
-  const { supabase } = useSupabase();
 
   // Reset password state
   const [currentPassword, setCurrentPassword] = useState("");
@@ -32,13 +31,13 @@ export const ResetPassword = ({ onClose }: ResetPasswordProps): JSX.Element => {
 
     // Validate passwords
     if (newPassword.length < 6) {
-      setPasswordError("New password must be at least 6 characters long");
+      setPasswordError(t("new_pass_least_6", { ns: "user" }));
 
       return;
     }
 
     if (newPassword !== confirmPassword) {
-      setPasswordError("New password and confirmation do not match");
+      setPasswordError(t("new_pass_confirmed", { ns: "user" }));
 
       return;
     }
@@ -54,15 +53,12 @@ export const ResetPassword = ({ onClose }: ResetPasswordProps): JSX.Element => {
 
       await resetPassword(passwordData);
 
-      // Refresh the session after password change
-      await supabase.auth.refreshSession();
-
       setResetSuccess(true);
     } catch (error) {
       if (error instanceof Error) {
         setPasswordError(error.message);
       } else {
-        setPasswordError("An error occurred while resetting your password");
+        setPasswordError(t("an_error_occurred", { ns: "user" }));
       }
     } finally {
       setIsResettingPassword(false);
@@ -71,11 +67,11 @@ export const ResetPassword = ({ onClose }: ResetPasswordProps): JSX.Element => {
 
   return (
     <div className={styles.reset_password_container}>
-      <h2>Reset Your Password</h2>
+      <h2>{t("reset_password", { ns: "user" })}</h2>
 
       {resetSuccess ? (
         <div className={styles.success_message}>
-          <p>Your password has been successfully updated!</p>
+          <p>{t("reset_password_success", { ns: "user" })}</p>
           <QuivrButton
             onClick={() => {
               onClose();
@@ -85,7 +81,7 @@ export const ResetPassword = ({ onClose }: ResetPasswordProps): JSX.Element => {
               setConfirmPassword("");
             }}
             color='primary'
-            label='Close'
+            label={t("close", { ns: "user" })}
             iconName='close'
           />
         </div>
@@ -95,37 +91,37 @@ export const ResetPassword = ({ onClose }: ResetPasswordProps): JSX.Element => {
           className={styles.reset_password_form}
         >
           <div className={styles.form_group}>
-            <label htmlFor='current_password'>Current password</label>
+            <label htmlFor='current_password'>{t("current_password", { ns: "user" })}</label>
             <input
               id='current_password'
               type='password'
               value={currentPassword}
               onChange={(e) => setCurrentPassword(e.target.value)}
-              placeholder='Enter your current password'
+              placeholder={t("current_password_plc", { ns: "user" })}
               required
             />
           </div>
 
           <div className={styles.form_group}>
-            <label htmlFor='new_password'>Create a password</label>
+            <label htmlFor='new_password'>{t("new_password", { ns: "user" })}</label>
             <input
               id='new_password'
               type='password'
               value={newPassword}
               onChange={(e) => setNewPassword(e.target.value)}
-              placeholder='Enter your new password'
+              placeholder={t("new_password_plc", { ns: "user" })}
               required
             />
           </div>
 
           <div className={styles.form_group}>
-            <label htmlFor='confirm_password'>Confirm your password</label>
+            <label htmlFor='confirm_password'>{t("confirm_password", { ns: "user" })}</label>
             <input
               id='confirm_password'
               type='password'
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
-              placeholder='Confirm your new password'
+              placeholder={t("confirm_password_plc", { ns: "user" })}
               required
             />
           </div>
@@ -138,14 +134,14 @@ export const ResetPassword = ({ onClose }: ResetPasswordProps): JSX.Element => {
             <QuivrButton
               onClick={onClose}
               color='primary'
-              label='Cancel'
+              label={t("cancel", { ns: "user" })}
               iconName='close'
             />
             <button type='submit'>
               <QuivrButton
                 isLoading={isResettingPassword}
                 color='primary'
-                label='Save'
+                label={t("save", { ns: "user" })}
                 iconName='check'
               />
             </button>
