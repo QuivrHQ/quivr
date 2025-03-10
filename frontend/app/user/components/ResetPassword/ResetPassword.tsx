@@ -5,6 +5,7 @@ import { FormEvent, useState } from "react";
 import { useUserApi } from "@/lib/api/user/useUserApi";
 import { ResetPasswordRequest } from "@/lib/api/user/user";
 import { QuivrButton } from "@/lib/components/ui/QuivrButton/QuivrButton";
+import { useSupabase } from "@/lib/context/SupabaseProvider";
 
 import styles from "./ResetPassword.module.scss";
 
@@ -15,6 +16,7 @@ interface ResetPasswordProps {
 export const ResetPassword = ({ onClose }: ResetPasswordProps): JSX.Element => {
   // const { t } = useTranslation(["translation", "user", "logout"]);
   const { resetPassword } = useUserApi();
+  const { supabase } = useSupabase();
 
   // Reset password state
   const [currentPassword, setCurrentPassword] = useState("");
@@ -50,9 +52,11 @@ export const ResetPassword = ({ onClose }: ResetPasswordProps): JSX.Element => {
         confirm_password: confirmPassword,
       };
 
-      console.log("passwordData", passwordData);
-
       await resetPassword(passwordData);
+
+      // Refresh the session after password change
+      await supabase.auth.refreshSession();
+
       setResetSuccess(true);
     } catch (error) {
       if (error instanceof Error) {
