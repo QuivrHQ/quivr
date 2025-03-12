@@ -915,8 +915,11 @@ class QuivrQARAGLangGraph:
         docs: List[Document] = tasks.docs if tasks else []
         messages = state["messages"]
         user_task = messages[0].content
+        # TODO(@AmineDiro): Parse template f-strings and match with keys in state
         ticket_metadata = state["ticket_metadata"] or {}
         user_metadata = state["user_metadata"] or {}
+        additional_information = state.get("additional_information", "")
+
         inputs = {
             "similar_tickets": "\n".join([doc.page_content for doc in docs]),
             "ticket_metadata": format_dict(ticket_metadata),
@@ -925,6 +928,7 @@ class QuivrQARAGLangGraph:
             "system_prompt": self.retrieval_config.prompt
             if self.retrieval_config.prompt
             else "",
+            "additional_information": additional_information,
         }
 
         msg = custom_prompts[TemplatePromptName.ZENDESK_TEMPLATE_PROMPT].format(

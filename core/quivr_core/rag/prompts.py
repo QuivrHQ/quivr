@@ -297,6 +297,8 @@ def _define_custom_prompts() -> dict[TemplatePromptName, BasePromptTemplate]:
     {system_prompt}
     -------------------------------------
 
+    {additional_information}
+
     ------ Client Question ------
     {client_query}
     --------------------------
