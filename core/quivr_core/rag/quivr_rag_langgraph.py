@@ -917,19 +917,12 @@ class QuivrQARAGLangGraph:
         docs: List[Document] = tasks.docs if tasks else []
         messages = state["messages"]
         user_task = messages[0].content
-        # TODO(@AmineDiro): Parse template f-strings and match with keys in state
-        # template = custom_prompts[TemplatePromptName.ZENDESK_TEMPLATE_PROMPT]
-        # formatter = string.Formatter()
-        # variables = [name for _, name, _, _ in formatter.parse(str(template)) if name]
-        # logger.info(f"Variables in template: {variables}")
-        # prompt_variables = {}
-        # for var_name in variables:
-        #     prompt_variables[var_name] = state.get(var_name, None)
-        logger.info(f"Zendesk RAG: {state}")
+        prompt_template: BasePromptTemplate = custom_prompts[
+            TemplatePromptName.ZENDESK_TEMPLATE_PROMPT
+        ]
+
         ticket_metadata = state["ticket_metadata"] or {}
         user_metadata = state["user_metadata"] or {}
-        additional_information = state.get("additional_information", "")
-        guidelines = state.get("guidelines", "")
 
         inputs = {
             "similar_tickets": "\n".join([doc.page_content for doc in docs]),
@@ -939,9 +932,11 @@ class QuivrQARAGLangGraph:
             "system_prompt": self.retrieval_config.prompt
             if self.retrieval_config.prompt
             else "",
-            "additional_information": additional_information,
-            "guidelines": guidelines,
         }
+        required_variables = prompt_template.input_variables
+        for variable in required_variables:
+            if variable not in inputs:
+                inputs[variable] = state.get(variable, "")
 
         msg = custom_prompts[TemplatePromptName.ZENDESK_TEMPLATE_PROMPT].format(
             **inputs
