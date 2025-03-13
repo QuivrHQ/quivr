@@ -218,8 +218,6 @@ class UserTasks:
 
 
 class AgentState(TypedDict):
-    # The add_messages function defines how an update should be processed
-    # Default is to replace. add_messages says "append"
     messages: Annotated[Sequence[BaseMessage], add_messages]
     reasoning: List[str]
     chat_history: ChatHistory
@@ -228,6 +226,7 @@ class AgentState(TypedDict):
     instructions: str
     ticket_metadata: Optional[dict[str, str]]
     user_metadata: Optional[dict[str, str]]
+    additional_information: Optional[dict[str, str]]
     tool: str
 
 
