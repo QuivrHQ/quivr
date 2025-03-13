@@ -228,6 +228,8 @@ class AgentState(TypedDict):
     user_metadata: Optional[dict[str, str]]
     additional_information: Optional[dict[str, str]]
     tool: str
+    guidelines: str
+    additional_information: str
 
 
 class IdempotentCompressor(BaseDocumentCompressor):
@@ -914,10 +916,12 @@ class QuivrQARAGLangGraph:
         docs: List[Document] = tasks.docs if tasks else []
         messages = state["messages"]
         user_task = messages[0].content
-        # TODO(@AmineDiro): Parse template f-strings and match with keys in state
+        prompt_template: BasePromptTemplate = custom_prompts[
+            TemplatePromptName.ZENDESK_TEMPLATE_PROMPT
+        ]
+
         ticket_metadata = state["ticket_metadata"] or {}
         user_metadata = state["user_metadata"] or {}
-        additional_information = state.get("additional_information", "")
 
         inputs = {
             "similar_tickets": "\n".join([doc.page_content for doc in docs]),
@@ -927,12 +931,13 @@ class QuivrQARAGLangGraph:
             "system_prompt": self.retrieval_config.prompt
             if self.retrieval_config.prompt
             else "",
-            "additional_information": additional_information,
         }
+        required_variables = prompt_template.input_variables
+        for variable in required_variables:
+            if variable not in inputs:
+                inputs[variable] = state.get(variable, "")
 
-        msg = custom_prompts[TemplatePromptName.ZENDESK_TEMPLATE_PROMPT].format(
-            **inputs
-        )
+        msg = prompt_template.format(**inputs)
         llm = self.bind_tools_to_llm(self.generate_zendesk_rag.__name__)
         response = llm.invoke(msg)
 

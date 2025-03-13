@@ -270,16 +270,14 @@ def _define_custom_prompts() -> dict[TemplatePromptName, BasePromptTemplate]:
     - When there are multiple similar tickets, prioritize information from the most recent tickets.
     - If there are contradictions between tickets, use information from the most recent ticket as it represents the most up-to-date information.
 
-
-    ------ Output Format ------
-    - You shouln't provide the greetings and the signature as those will be added automatically after generation.
-    - Avoid using lists or bullet points, or any other formatting that feels robotic in the response.
+    ------------ Guidelines -----------
+    {guidelines}
     - Use paragraphs and sentences, you can add it even if not present in similar tickets. The text must be readable and have well defined paragraphs (\\n\\n) or line breaks (\\n).
-    - Provide a neutral tone response, and a generalist answer, avoid specific.
     - Keep the same lexical field as in the similar tickets agent responses.
     - Always add the most relevant informations to the response, just like in similar tickets response so the user have all the informations needed.
     - Stay as close as similar response as possible.
     - Maintain consistency in terminology used in recent tickets.
+    -----------------------------------
 
     ------ Current User Metadata ------
     {user_metadata}
