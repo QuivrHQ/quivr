@@ -519,7 +519,6 @@ class Brain:
             print(chunk.answer)
         ```
         """
-        assert self.vector_db
         llm = self.llm
 
         # If you passed a different llm model we'll override the brain  one
@@ -529,10 +528,7 @@ class Brain:
         else:
             retrieval_config = RetrievalConfig(llm_config=self.llm.get_config())
 
-        if rag_pipeline is None:
-            rag_pipeline = QuivrQARAGLangGraph
-
-        rag_instance = rag_pipeline(
+        rag_instance = QuivrQARAGLangGraph(
             retrieval_config=retrieval_config, llm=llm, vector_store=self.vector_db
         )
 
