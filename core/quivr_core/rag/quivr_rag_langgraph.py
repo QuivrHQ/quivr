@@ -229,7 +229,7 @@ class AgentState(TypedDict):
     additional_information: Optional[dict[str, str]]
     tool: str
     guidelines: str
-    additional_information: str
+    enforced_system_prompt: str
 
 
 class IdempotentCompressor(BaseDocumentCompressor):
@@ -978,7 +978,12 @@ class QuivrQARAGLangGraph:
 
         # LLM
         llm = self.llm_endpoint._llm
-        prompt = custom_prompts[TemplatePromptName.CHAT_LLM_PROMPT]
+        if state.get("enforced_system_prompt", None):
+            final_inputs["enforced_system_prompt"] = state["enforced_system_prompt"]
+            prompt = custom_prompts[TemplatePromptName.ZENDESK_LLM_PROMPT]
+
+        else:
+            prompt = custom_prompts[TemplatePromptName.CHAT_LLM_PROMPT]
         state, reduced_inputs = self.reduce_rag_context(state, final_inputs, prompt)
 
         msg = prompt.format(**reduced_inputs)
