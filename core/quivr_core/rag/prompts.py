@@ -22,6 +22,7 @@ class TemplatePromptName(str, Enum):
     USER_INTENT_PROMPT = "USER_INTENT_PROMPT"
     UPDATE_PROMPT = "UPDATE_PROMPT"
     SPLIT_PROMPT = "SPLIT_PROMPT"
+    ZENDESK_LLM_PROMPT = "ZENDESK_LLM_PROMPT"
 
 
 def _define_custom_prompts() -> dict[TemplatePromptName, BasePromptTemplate]:
@@ -310,6 +311,26 @@ def _define_custom_prompts() -> dict[TemplatePromptName, BasePromptTemplate]:
         ]
     )
     custom_prompts[TemplatePromptName.ZENDESK_TEMPLATE_PROMPT] = ZENDESK_TEMPLATE_PROMPT
+
+    system_message_template = "{enforced_system_prompt}"
+
+    template_answer = """
+    <draft answer>
+    {task}
+    <draft answer>
+    Stick closely to this draft answer. Assume that the draft answer informations are correct, and do not try to outsmart him/her.
+    Respond directly with the message to send to the customer, ready to be sent:
+
+    Answer:
+    """
+    ZENDESK_LLM_PROMPT = ChatPromptTemplate.from_messages(
+        [
+            SystemMessagePromptTemplate.from_template(system_message_template),
+            MessagesPlaceholder(variable_name="chat_history"),
+            HumanMessagePromptTemplate.from_template(template_answer),
+        ]
+    )
+    custom_prompts[TemplatePromptName.ZENDESK_LLM_PROMPT] = ZENDESK_LLM_PROMPT
 
     return custom_prompts
 
