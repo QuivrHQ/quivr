@@ -1,5 +1,26 @@
 # Changelog
 
+## [0.0.34](https://github.com/QuivrHQ/quivr/compare/core-0.0.33...core-0.0.34) (2025-03-25)
+
+
+### Features
+
+* add guidelines ([#3613](https://github.com/QuivrHQ/quivr/issues/3613)) ([6f99bd3](https://github.com/QuivrHQ/quivr/commit/6f99bd32e222093051eb9e3ce89050a198262438))
+* add zendesk llm template for reformulate ([#3619](https://github.com/QuivrHQ/quivr/issues/3619)) ([e4140d5](https://github.com/QuivrHQ/quivr/commit/e4140d5c32d18b999543c5307770c3ed23ae4cc1))
+* additional-data ([#3614](https://github.com/QuivrHQ/quivr/issues/3614)) ([f9c05f9](https://github.com/QuivrHQ/quivr/commit/f9c05f98f2c8cb26407a8946d81e02a683abc585))
+* arbitrary additional data for zendesk ([#3612](https://github.com/QuivrHQ/quivr/issues/3612)) ([1a05434](https://github.com/QuivrHQ/quivr/commit/1a05434207e05a8358984af5181194d19c517023))
+* core input metadata zendesk ([#3606](https://github.com/QuivrHQ/quivr/issues/3606)) ([855a791](https://github.com/QuivrHQ/quivr/commit/855a791f0fda8d2d603c79fdbd11e1add81c1a09)), closes [#3602](https://github.com/QuivrHQ/quivr/issues/3602)
+* fix chat with model ([#3615](https://github.com/QuivrHQ/quivr/issues/3615)) ([22c740b](https://github.com/QuivrHQ/quivr/commit/22c740b9a3b299a158120a3d8b6da90f45bed48d))
+* megaparse v54 ([#3594](https://github.com/QuivrHQ/quivr/issues/3594)) ([bc6d75d](https://github.com/QuivrHQ/quivr/commit/bc6d75df7348294bc5cde4409d7c17feb72cf2b2))
+
+
+### Bug Fixes
+
+* add system prompt to zendesk rag ([#3604](https://github.com/QuivrHQ/quivr/issues/3604)) ([501783b](https://github.com/QuivrHQ/quivr/commit/501783b53cf3751c0c9a48f2fcacc933fb4f161d))
+* ENT-673 ([501783b](https://github.com/QuivrHQ/quivr/commit/501783b53cf3751c0c9a48f2fcacc933fb4f161d))
+* ENT-716 ([6f99bd3](https://github.com/QuivrHQ/quivr/commit/6f99bd32e222093051eb9e3ce89050a198262438))
+* Zendesk system prompt ([#3592](https://github.com/QuivrHQ/quivr/issues/3592)) ([699b549](https://github.com/QuivrHQ/quivr/commit/699b5495f5519e79fd2a6d0e362402c3c77d06b8))
+
 ## [0.0.33](https://github.com/QuivrHQ/quivr/compare/core-0.0.32...core-0.0.33) (2025-02-03)
 
 
