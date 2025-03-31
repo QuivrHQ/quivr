@@ -230,6 +230,7 @@ class AgentState(TypedDict):
     tool: str
     guidelines: str
     enforced_system_prompt: str
+    _filter: Optional[Dict[str, Any]]
 
 
 class IdempotentCompressor(BaseDocumentCompressor):
@@ -629,9 +630,12 @@ class QuivrQARAGLangGraph:
         if not tasks.has_tasks():
             return {**state}
 
+        _filter = state.get("_filter", None)
+
         kwargs = {
             "search_kwargs": {
                 "k": self.retrieval_config.k,
+                "filter": _filter,  # Add your desired filter here
             }
         }  # type: ignore
         base_retriever = self.get_retriever(**kwargs)
