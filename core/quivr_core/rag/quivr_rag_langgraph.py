@@ -231,6 +231,7 @@ class AgentState(TypedDict):
     guidelines: str
     enforced_system_prompt: str
     _filter: Optional[Dict[str, Any]]
+    ticket_history: str
 
 
 class IdempotentCompressor(BaseDocumentCompressor):
@@ -926,15 +927,14 @@ class QuivrQARAGLangGraph:
 
         ticket_metadata = state["ticket_metadata"] or {}
         user_metadata = state["user_metadata"] or {}
+        ticket_history = state.get("ticket_history", "")
 
         inputs = {
             "similar_tickets": "\n".join([doc.page_content for doc in docs]),
             "ticket_metadata": format_dict(ticket_metadata),
             "user_metadata": format_dict(user_metadata),
             "client_query": user_task,
-            "system_prompt": self.retrieval_config.prompt
-            if self.retrieval_config.prompt
-            else "",
+            "ticket_history": ticket_history,
         }
         required_variables = prompt_template.input_variables
         for variable in required_variables:

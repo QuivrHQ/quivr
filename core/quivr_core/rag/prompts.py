@@ -293,7 +293,7 @@ def _define_custom_prompts() -> dict[TemplatePromptName, BasePromptTemplate]:
     -------------------------------------
 
     ------ Current Ticket History ------
-    {system_prompt}
+    {ticket_history}
     -------------------------------------
 
     {additional_information}
