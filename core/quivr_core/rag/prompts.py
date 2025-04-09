@@ -304,8 +304,7 @@ def _define_custom_prompts() -> dict[TemplatePromptName, BasePromptTemplate]:
 
     Here is the client question to which you must answer
     {client_query}
-
-    Do not invent information that was not present in previous tickets or in user metadata or ticket metadata. Just say, <!> I don't know how to respond to this ticket <!>. And then propose an answer that could make sense with the information you have by saying: Proposed answer: <proposed answer>. 
+ 
     Answer directly with the message to send to the customer, ready to be sent:
     Answer:
     """
