@@ -812,9 +812,9 @@ class QuivrQARAGLangGraph:
 
         _docs = []
 
-        assert hasattr(
-            self.vector_store, "get_vectors_by_knowledge_id"
-        ), "Vector store must have method 'get_vectors_by_knowledge_id', this is an enterprise only feature"
+        assert hasattr(self.vector_store, "get_vectors_by_knowledge_id"), (
+            "Vector store must have method 'get_vectors_by_knowledge_id', this is an enterprise only feature"
+        )
 
         for knowledge_id in top_knowledge_ids:
             _docs.append(
@@ -970,7 +970,6 @@ class QuivrQARAGLangGraph:
             dict: The updated state with re-phrased question
         """
         messages = state["messages"]
-        print(messages)
 
         # Check if there is a system message in messages
         system_message = None
