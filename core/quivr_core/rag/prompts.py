@@ -323,10 +323,10 @@ def _define_custom_prompts() -> dict[TemplatePromptName, BasePromptTemplate]:
     Based on the informations provided, answer directly with the message to send to the customer, ready to be sent:
     Answer:"""
 
-    ZENDESK_TEMPLATE_PROMPT = ChatPromptTemplate(
+    ZENDESK_TEMPLATE_PROMPT = ChatPromptTemplate.from_messages(
         [
-            ("system", system_message_zendesk_template),
-            ("user", user_prompt_template),
+            SystemMessagePromptTemplate.from_template(system_message_zendesk_template),
+            HumanMessagePromptTemplate.from_template(user_prompt_template),
         ]
     )
     custom_prompts[TemplatePromptName.ZENDESK_TEMPLATE_PROMPT] = ZENDESK_TEMPLATE_PROMPT

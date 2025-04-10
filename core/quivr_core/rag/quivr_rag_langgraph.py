@@ -943,7 +943,7 @@ class QuivrQARAGLangGraph:
             if variable not in inputs:
                 inputs[variable] = state.get(variable, "")
 
-        msg = prompt_template.format(**inputs)
+        msg = prompt_template.format_prompt(**inputs)
         llm = self.bind_tools_to_llm(self.generate_zendesk_rag.__name__)
         response = llm.invoke(msg)
 
