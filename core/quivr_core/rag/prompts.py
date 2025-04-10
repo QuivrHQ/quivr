@@ -270,6 +270,7 @@ def _define_custom_prompts() -> dict[TemplatePromptName, BasePromptTemplate]:
     Do NOT invent information that was not present in previous tickets or in user metabadata or ticket metadata or additional information.
     Always prioritize information from the most recent tickets, espcially if they are contradictory.
     
+    Here is the current time: {current_time} UTC
     
     Here are default instructions that can be ignored if they are contradictory to the <instructions from me> section:
     <default instructions>

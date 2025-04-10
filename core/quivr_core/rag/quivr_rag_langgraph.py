@@ -1,4 +1,5 @@
 import asyncio
+import datetime
 import logging
 from collections import OrderedDict
 from typing import (
@@ -812,9 +813,9 @@ class QuivrQARAGLangGraph:
 
         _docs = []
 
-        assert hasattr(self.vector_store, "get_vectors_by_knowledge_id"), (
-            "Vector store must have method 'get_vectors_by_knowledge_id', this is an enterprise only feature"
-        )
+        assert hasattr(
+            self.vector_store, "get_vectors_by_knowledge_id"
+        ), "Vector store must have method 'get_vectors_by_knowledge_id', this is an enterprise only feature"
 
         for knowledge_id in top_knowledge_ids:
             _docs.append(
@@ -928,13 +929,14 @@ class QuivrQARAGLangGraph:
         ticket_metadata = state["ticket_metadata"] or {}
         user_metadata = state["user_metadata"] or {}
         ticket_history = state.get("ticket_history", "")
-
+        current_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         inputs = {
             "similar_tickets": "\n".join([doc.page_content for doc in docs]),
             "ticket_metadata": format_dict(ticket_metadata),
             "user_metadata": format_dict(user_metadata),
             "client_query": user_task,
             "ticket_history": ticket_history,
+            "current_time": current_time,
         }
         required_variables = prompt_template.input_variables
         for variable in required_variables:
