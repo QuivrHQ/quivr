@@ -812,9 +812,9 @@ class QuivrQARAGLangGraph:
 
         _docs = []
 
-        assert hasattr(self.vector_store, "get_vectors_by_knowledge_id"), (
-            "Vector store must have method 'get_vectors_by_knowledge_id', this is an enterprise only feature"
-        )
+        assert hasattr(
+            self.vector_store, "get_vectors_by_knowledge_id"
+        ), "Vector store must have method 'get_vectors_by_knowledge_id', this is an enterprise only feature"
 
         for knowledge_id in top_knowledge_ids:
             _docs.append(
@@ -941,7 +941,7 @@ class QuivrQARAGLangGraph:
             if variable not in inputs:
                 inputs[variable] = state.get(variable, "")
 
-        msg = prompt_template.format(**inputs)
+        msg = prompt_template.format_prompt(**inputs)
         llm = self.bind_tools_to_llm(self.generate_zendesk_rag.__name__)
         response = llm.invoke(msg)
 
