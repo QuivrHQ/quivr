@@ -21,7 +21,7 @@ from langchain_cohere import CohereRerank
 from langchain_community.document_compressors import JinaRerank
 from langchain_core.callbacks import Callbacks
 from langchain_core.documents import BaseDocumentCompressor, Document
-from langchain_core.messages import BaseMessage
+from langchain_core.messages import BaseMessage, HumanMessage, SystemMessage
 from langchain_core.messages.ai import AIMessageChunk
 from langchain_core.prompts.base import BasePromptTemplate
 from langchain_core.runnables.schema import StreamEvent
@@ -970,7 +970,21 @@ class QuivrQARAGLangGraph:
             dict: The updated state with re-phrased question
         """
         messages = state["messages"]
-        user_task = messages[0].content
+        print(messages)
+
+        # Check if there is a system message in messages
+        system_message = None
+        user_message = None
+
+        for msg in messages:
+            if isinstance(msg, SystemMessage):
+                system_message = str(msg.content)
+            elif isinstance(msg, HumanMessage):
+                user_message = str(msg.content)
+
+        user_task = (
+            user_message if user_message else (messages[0].content if messages else "")
+        )
 
         # Prompt
         prompt = self.retrieval_config.prompt
@@ -982,18 +996,18 @@ class QuivrQARAGLangGraph:
 
         # LLM
         llm = self.llm_endpoint._llm
-        if state.get("enforced_system_prompt", None):
-            final_inputs["enforced_system_prompt"] = state["enforced_system_prompt"]
-            prompt = custom_prompts[TemplatePromptName.ZENDESK_LLM_PROMPT]
 
-        else:
-            prompt = custom_prompts[TemplatePromptName.CHAT_LLM_PROMPT]
-        state, reduced_inputs = self.reduce_rag_context(state, final_inputs, prompt)
-
-        msg = prompt.format(**reduced_inputs)
+        prompt = custom_prompts[TemplatePromptName.CHAT_LLM_PROMPT]
+        state, reduced_inputs = self.reduce_rag_context(
+            state, final_inputs, system_message if system_message else prompt
+        )
+        CHAT_LLM_PROMPT = [
+            SystemMessage(content=str(system_message)),
+            HumanMessage(content=str(user_message)),
+        ]
 
         # Run
-        response = llm.invoke(msg)
+        response = llm.invoke(CHAT_LLM_PROMPT)
         return {**state, "messages": [response]}
 
     def build_chain(self):
@@ -1043,6 +1057,7 @@ class QuivrQARAGLangGraph:
     async def answer_astream(
         self,
         question: str,
+        system_prompt: str | None,
         history: ChatHistory,
         list_files: list[QuivrKnowledge],
         metadata: dict[str, str] = {},
@@ -1059,15 +1074,13 @@ class QuivrQARAGLangGraph:
         rolling_message = AIMessageChunk(content="")
         docs: list[Document] | None = None
         previous_content = ""
+        system_prompt = system_prompt
+        messages = [("system", system_prompt)] if system_prompt else []
+        messages.append(("user", question))
 
         async for event in conversational_qa_chain.astream_events(
             {
-                "messages": [
-                    (
-                        "user",
-                        question,
-                    )
-                ],
+                "messages": messages,
                 "chat_history": history,
                 "files": concat_list_files,
                 **input_kwargs,

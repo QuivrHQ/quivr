@@ -496,6 +496,7 @@ class Brain:
     async def ask_streaming(
         self,
         question: str,
+        system_prompt: str | None = None,
         retrieval_config: RetrievalConfig | None = None,
         rag_pipeline: Type[Union[QuivrQARAG, QuivrQARAGLangGraph]] | None = None,
         list_files: list[QuivrKnowledge] | None = None,
@@ -542,6 +543,7 @@ class Brain:
         }
         async for response in rag_instance.answer_astream(
             question=question,
+            system_prompt=system_prompt or None,
             history=chat_history,
             list_files=list_files,
             metadata=metadata,
@@ -560,6 +562,7 @@ class Brain:
     async def aask(
         self,
         question: str,
+        system_prompt: str | None = None,
         retrieval_config: RetrievalConfig | None = None,
         rag_pipeline: Type[Union[QuivrQARAG, QuivrQARAGLangGraph]] | None = None,
         list_files: list[QuivrKnowledge] | None = None,
@@ -582,6 +585,7 @@ class Brain:
 
         async for response in self.ask_streaming(
             question=question,
+            system_prompt=system_prompt,
             retrieval_config=retrieval_config,
             rag_pipeline=rag_pipeline,
             list_files=list_files,
@@ -595,6 +599,7 @@ class Brain:
     def ask(
         self,
         question: str,
+        system_prompt: str | None = None,
         retrieval_config: RetrievalConfig | None = None,
         rag_pipeline: Type[Union[QuivrQARAG, QuivrQARAGLangGraph]] | None = None,
         list_files: list[QuivrKnowledge] | None = None,
@@ -604,6 +609,7 @@ class Brain:
         Fully synchronous version that asks a question to the brain and gets a generated answer.
         Args:
             question (str): The question to ask.
+            system_prompt (str | None): The system prompt to use.
             retrieval_config (RetrievalConfig | None): The retrieval configuration (see RetrievalConfig docs).
             rag_pipeline (Type[Union[QuivrQARAG, QuivrQARAGLangGraph]] | None): The RAG pipeline to use.
             list_files (list[QuivrKnowledge] | None): The list of files to include in the RAG pipeline.
@@ -615,6 +621,7 @@ class Brain:
         return loop.run_until_complete(
             self.aask(
                 question=question,
+                system_prompt=system_prompt,
                 retrieval_config=retrieval_config,
                 rag_pipeline=rag_pipeline,
                 list_files=list_files,
