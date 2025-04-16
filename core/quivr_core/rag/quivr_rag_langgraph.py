@@ -1057,6 +1057,7 @@ class QuivrQARAGLangGraph:
 
     async def answer_astream(
         self,
+        run_id: UUID,
         question: str,
         system_prompt: str | None,
         history: ChatHistory,
@@ -1087,7 +1088,11 @@ class QuivrQARAGLangGraph:
                 **input_kwargs,
             },
             version="v1",
-            config={"metadata": metadata, "callbacks": [langfuse_handler]},
+            config={
+                "run_id": run_id,
+                "metadata": metadata,
+                "callbacks": [langfuse_handler],
+            },
         ):
             node_name = self._extract_node_name(event)
 
