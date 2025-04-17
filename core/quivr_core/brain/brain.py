@@ -561,6 +561,7 @@ class Brain:
 
     async def aask(
         self,
+        run_id: UUID,
         question: str,
         system_prompt: str | None = None,
         retrieval_config: RetrievalConfig | None = None,
@@ -598,6 +599,7 @@ class Brain:
 
     def ask(
         self,
+        run_id: UUID,
         question: str,
         system_prompt: str | None = None,
         retrieval_config: RetrievalConfig | None = None,
@@ -620,6 +622,7 @@ class Brain:
         loop = asyncio.get_event_loop()
         return loop.run_until_complete(
             self.aask(
+                run_id=run_id,
                 question=question,
                 system_prompt=system_prompt,
                 retrieval_config=retrieval_config,
