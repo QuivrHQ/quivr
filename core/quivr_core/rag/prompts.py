@@ -268,7 +268,7 @@ def _define_custom_prompts() -> dict[TemplatePromptName, BasePromptTemplate]:
     You will also have access to the most relevant similar tickets and additional information sometimes such as API calls.
     Never add something in brackets that needs to be filled like [your name], [your email], etc. 
     Do NOT invent information that was not present in previous tickets or in user metabadata or ticket metadata or additional information.
-    Always prioritize information from the most recent tickets, espcially if they are contradictory.
+    Always prioritize information from the most recent tickets, especially if they are contradictory.
     
     Here is the current time: {current_time} UTC
     
@@ -289,12 +289,12 @@ def _define_custom_prompts() -> dict[TemplatePromptName, BasePromptTemplate]:
     """
 
     user_prompt_template = """
-    Here are informations about the user that can help you to answer:
+    Here is information about the user that can help you to answer:
     <user_metadata>
     {user_metadata}
     </user_metadata>
 
-    Here are metadata on the curent ticket that can help you to answer:
+    Here are metadata on the current ticket that can help you to answer:
     <ticket_metadata>
     {ticket_metadata}
     </ticket_metadata>
