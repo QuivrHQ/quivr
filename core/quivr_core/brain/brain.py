@@ -496,6 +496,7 @@ class Brain:
     async def ask_streaming(
         self,
         question: str,
+        run_id: UUID,
         system_prompt: str | None = None,
         retrieval_config: RetrievalConfig | None = None,
         rag_pipeline: Type[Union[QuivrQARAG, QuivrQARAGLangGraph]] | None = None,
@@ -542,6 +543,7 @@ class Brain:
             "langfuse_session_id": str(self.chat_id),
         }
         async for response in rag_instance.answer_astream(
+            run_id=run_id,
             question=question,
             system_prompt=system_prompt or None,
             history=chat_history,
@@ -585,6 +587,7 @@ class Brain:
         full_answer = ""
 
         async for response in self.ask_streaming(
+            run_id=run_id,
             question=question,
             system_prompt=system_prompt,
             retrieval_config=retrieval_config,
