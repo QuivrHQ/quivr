@@ -286,7 +286,7 @@ class LLMEndpoint:
                 )
 
             else:
-                _llm = ChaxstOpenAI(
+                _llm = ChatOpenAI(
                     model=config.model,
                     api_key=SecretStr(config.llm_api_key)
                     if config.llm_api_key
