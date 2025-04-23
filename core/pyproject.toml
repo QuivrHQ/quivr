@@ -27,6 +27,7 @@ dependencies = [
     "langchain-xai>=0.2.3",
     "fasttext-langdetect>=1.0.5",
     "langfuse>=2.57.0",
+    "langchain-groq>=0.3.2",
 ]
 readme = "README.md"
 requires-python = ">= 3.11"
