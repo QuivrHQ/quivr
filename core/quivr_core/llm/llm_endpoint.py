@@ -8,9 +8,9 @@ import tiktoken
 from langchain_anthropic import ChatAnthropic
 from langchain_core.language_models.chat_models import BaseChatModel
 from langchain_google_genai import ChatGoogleGenerativeAI
+from langchain_groq import ChatGroq
 from langchain_mistralai import ChatMistralAI
 from langchain_openai import AzureChatOpenAI, ChatOpenAI
-from langchain_xai import ChatXAI
 from pydantic import SecretStr
 
 from quivr_core.brain.info import LLMInfo
@@ -214,7 +214,7 @@ class LLMEndpoint:
             ChatAnthropic,
             ChatMistralAI,
             ChatGoogleGenerativeAI,
-            ChatXAI,
+            ChatGroq,
         ]
         try:
             if config.supplier == DefaultModelSuppliers.AZURE:
@@ -275,7 +275,7 @@ class LLMEndpoint:
                     temperature=config.temperature,
                 )
             elif config.supplier == DefaultModelSuppliers.GROQ:
-                _llm = ChatXAI(
+                _llm = ChatGroq(
                     model=config.model,
                     api_key=SecretStr(config.llm_api_key)
                     if config.llm_api_key
