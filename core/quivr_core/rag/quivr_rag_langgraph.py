@@ -945,6 +945,7 @@ class QuivrQARAGLangGraph:
 
         msg = prompt_template.format_prompt(**inputs)
         llm = self.bind_tools_to_llm(self.generate_zendesk_rag.__name__)
+
         response = llm.invoke(msg)
 
         return {**state, "messages": [response]}

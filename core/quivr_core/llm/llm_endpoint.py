@@ -7,8 +7,10 @@ from urllib.parse import parse_qs, urlparse
 import tiktoken
 from langchain_anthropic import ChatAnthropic
 from langchain_core.language_models.chat_models import BaseChatModel
+from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_mistralai import ChatMistralAI
 from langchain_openai import AzureChatOpenAI, ChatOpenAI
+from langchain_xai import ChatXAI
 from pydantic import SecretStr
 
 from quivr_core.brain.info import LLMInfo
@@ -206,7 +208,14 @@ class LLMEndpoint:
 
     @classmethod
     def from_config(cls, config: LLMEndpointConfig = LLMEndpointConfig()):
-        _llm: Union[AzureChatOpenAI, ChatOpenAI, ChatAnthropic, ChatMistralAI]
+        _llm: Union[
+            AzureChatOpenAI,
+            ChatOpenAI,
+            ChatAnthropic,
+            ChatMistralAI,
+            ChatGoogleGenerativeAI,
+            ChatXAI,
+        ]
         try:
             if config.supplier == DefaultModelSuppliers.AZURE:
                 # Parse the URL
@@ -255,6 +264,27 @@ class LLMEndpoint:
                     base_url=config.llm_base_url,
                     temperature=config.temperature,
                 )
+            elif config.supplier == DefaultModelSuppliers.GEMINI:
+                _llm = ChatGoogleGenerativeAI(
+                    model=config.model,
+                    api_key=SecretStr(config.llm_api_key)
+                    if config.llm_api_key
+                    else None,
+                    base_url=config.llm_base_url,
+                    max_tokens=config.max_output_tokens,
+                    temperature=config.temperature,
+                )
+            elif config.supplier == DefaultModelSuppliers.GROQ:
+                _llm = ChatXAI(
+                    model=config.model,
+                    api_key=SecretStr(config.llm_api_key)
+                    if config.llm_api_key
+                    else None,
+                    base_url=config.llm_base_url,
+                    max_tokens=config.max_output_tokens,
+                    temperature=config.temperature,
+                )
+
             else:
                 _llm = ChatOpenAI(
                     model=config.model,
