@@ -72,6 +72,7 @@ class DefaultModelSuppliers(str, Enum):
     META = "meta"
     MISTRAL = "mistral"
     GROQ = "groq"
+    GEMINI = "gemini"
 
 
 class LLMConfig(QuivrBaseConfig):
@@ -94,6 +95,11 @@ class LLMModelConfig:
                 tokenizer_hub="Quivr/gpt-4o",
             ),
             "o3-mini": LLMConfig(
+                max_context_tokens=200000,
+                max_output_tokens=100000,
+                tokenizer_hub="Quivr/gpt-4o",
+            ),
+            "o4-mini": LLMConfig(
                 max_context_tokens=200000,
                 max_output_tokens=100000,
                 tokenizer_hub="Quivr/gpt-4o",
@@ -139,6 +145,11 @@ class LLMModelConfig:
             ),
         },
         DefaultModelSuppliers.ANTHROPIC: {
+            "claude-3-7-sonnet": LLMConfig(
+                max_context_tokens=200000,
+                max_output_tokens=8192,
+                tokenizer_hub="Quivr/claude-tokenizer",
+            ),
             "claude-3-5-sonnet": LLMConfig(
                 max_context_tokens=200000,
                 max_output_tokens=8192,
@@ -209,6 +220,16 @@ class LLMModelConfig:
             "code-llama": LLMConfig(
                 max_context_tokens=16384, tokenizer_hub="Quivr/llama-code-tokenizer"
             ),
+            "deepseek-r1-distill-llama-70b": LLMConfig(
+                max_context_tokens=128000,
+                max_output_tokens=32768,
+                tokenizer_hub="Quivr/Meta-Llama-3.1-Tokenizer",
+            ),
+            "meta-llama/llama-4-maverick-17b-128e-instruct": LLMConfig(
+                max_context_tokens=128000,
+                max_output_tokens=32768,
+                tokenizer_hub="Quivr/Meta-Llama-3.1-Tokenizer",
+            ),
         },
         DefaultModelSuppliers.MISTRAL: {
             "mistral-large": LLMConfig(
@@ -228,6 +249,13 @@ class LLMModelConfig:
             ),
             "codestral": LLMConfig(
                 max_context_tokens=32000, tokenizer_hub="Quivr/mistral-tokenizer-v3"
+            ),
+        },
+        DefaultModelSuppliers.GEMINI: {
+            "gemini-2.5": LLMConfig(
+                max_context_tokens=128000,
+                max_output_tokens=4096,
+                tokenizer_hub="Quivr/gemini-tokenizer",
             ),
         },
     }
