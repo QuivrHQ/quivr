@@ -214,7 +214,7 @@ class LLMEndpoint:
             ChatAnthropic,
             ChatMistralAI,
             ChatGoogleGenerativeAI,
-            ChatXAI,
+            ChatGroq,
         ]
         try:
             if config.supplier == DefaultModelSuppliers.AZURE:
@@ -286,7 +286,7 @@ class LLMEndpoint:
                 )
 
             else:
-                _llm = ChatOpenAI(
+                _llm = ChaxstOpenAI(
                     model=config.model,
                     api_key=SecretStr(config.llm_api_key)
                     if config.llm_api_key
