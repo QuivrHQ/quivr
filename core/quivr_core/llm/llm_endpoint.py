@@ -187,6 +187,8 @@ class LLMTokenizer:
 
 
 class LLMEndpoint:
+    _cache = {}
+
     def __init__(self, llm_config: LLMEndpointConfig, llm: BaseChatModel):
         self._config = llm_config
         self._llm = llm
@@ -208,6 +210,10 @@ class LLMEndpoint:
 
     @classmethod
     def from_config(cls, config: LLMEndpointConfig = LLMEndpointConfig()):
+        hashed_config = hash(config)
+        if hashed_config in cls._cache:
+            return cls._cache[hashed_config]
+
         _llm: Union[
             AzureChatOpenAI,
             ChatOpenAI,
@@ -234,14 +240,15 @@ class LLMEndpoint:
                     temperature=config.temperature,
                 )
             elif config.supplier == DefaultModelSuppliers.ANTHROPIC:
+                assert config.llm_api_key, "Can't load model config"
                 _llm = ChatAnthropic(
                     model_name=config.model,
-                    api_key=SecretStr(config.llm_api_key)
-                    if config.llm_api_key
-                    else None,
+                    api_key=SecretStr(config.llm_api_key),
                     base_url=config.llm_base_url,
-                    max_tokens=config.max_output_tokens,
+                    max_tokens_to_sample=config.max_output_tokens,
                     temperature=config.temperature,
+                    timeout=None,
+                    stop=None,
                 )
             elif config.supplier == DefaultModelSuppliers.OPENAI:
                 _llm = ChatOpenAI(
@@ -250,14 +257,14 @@ class LLMEndpoint:
                     if config.llm_api_key
                     else None,
                     base_url=config.llm_base_url,
-                    max_tokens=config.max_output_tokens,
+                    max_completion_tokens=config.max_output_tokens,
                     temperature=config.temperature
                     if not config.model.startswith("o")
                     else None,
                 )
             elif config.supplier == DefaultModelSuppliers.MISTRAL:
                 _llm = ChatMistralAI(
-                    model=config.model,
+                    model_name=config.model,
                     api_key=SecretStr(config.llm_api_key)
                     if config.llm_api_key
                     else None,
@@ -292,10 +299,12 @@ class LLMEndpoint:
                     if config.llm_api_key
                     else None,
                     base_url=config.llm_base_url,
-                    max_tokens=config.max_output_tokens,
+                    max_completion_tokens=config.max_output_tokens,
                     temperature=config.temperature,
                 )
             instance = cls(llm=_llm, llm_config=config)
+            cls._cache[hashed_config] = instance
+
             return instance
 
         except ImportError as e:
