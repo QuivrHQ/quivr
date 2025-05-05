@@ -303,6 +303,23 @@ class LLMEndpointConfig(QuivrBaseConfig):
 
     _FALLBACK_TOKENIZER = "cl100k_base"
 
+    def __hash__(self):
+        return hash(
+            (
+                self.supplier,
+                self.model,
+                self.tokenizer_hub,
+                self.llm_base_url,
+                self.env_variable_name,
+                self.llm_api_key,
+                self.max_context_tokens,
+                self.max_output_tokens,
+                self.temperature,
+                self.streaming,
+                repr(self.prompt) if self.prompt is not None else None,
+            )
+        )
+
     @property
     def fallback_tokenizer(self) -> str:
         return self._FALLBACK_TOKENIZER
