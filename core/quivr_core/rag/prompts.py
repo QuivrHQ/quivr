@@ -276,6 +276,7 @@ def _define_custom_prompts() -> dict[TemplatePromptName, BasePromptTemplate]:
     <default instructions>
     - Don't be too verbose, use the same amount of details as in similar tickets.
     - Use the same tone, format, structure and lexical field as in similar tickets agent responses.
+    - The text must be correctly formatted with paragraphs, bold, italic, etc so it is easier to read.
     - Maintain consistency in terminology used in recent tickets.
     - Answer in the same language as the user.
     - Don't add a signature at the end of the answer, it will be added once the answer is sent.
