@@ -496,10 +496,13 @@ class Brain:
     async def ask_streaming(
         self,
         question: str,
+        run_id: UUID,
+        system_prompt: str | None = None,
         retrieval_config: RetrievalConfig | None = None,
         rag_pipeline: Type[Union[QuivrQARAG, QuivrQARAGLangGraph]] | None = None,
         list_files: list[QuivrKnowledge] | None = None,
         chat_history: ChatHistory | None = None,
+        **input_kwargs,
     ) -> AsyncGenerator[ParsedRAGChunkResponse, ParsedRAGChunkResponse]:
         """
         Ask a question to the brain and get a streamed generated answer.
@@ -527,10 +530,7 @@ class Brain:
         else:
             retrieval_config = RetrievalConfig(llm_config=self.llm.get_config())
 
-        if rag_pipeline is None:
-            rag_pipeline = QuivrQARAGLangGraph
-
-        rag_instance = rag_pipeline(
+        rag_instance = QuivrQARAGLangGraph(
             retrieval_config=retrieval_config, llm=llm, vector_store=self.vector_db
         )
 
@@ -543,10 +543,13 @@ class Brain:
             "langfuse_session_id": str(self.chat_id),
         }
         async for response in rag_instance.answer_astream(
+            run_id=run_id,
             question=question,
+            system_prompt=system_prompt or None,
             history=chat_history,
             list_files=list_files,
             metadata=metadata,
+            **input_kwargs,
         ):
             # Format output to be correct servicedf;j
             if not response.last_chunk:
@@ -560,11 +563,14 @@ class Brain:
 
     async def aask(
         self,
+        run_id: UUID,
         question: str,
+        system_prompt: str | None = None,
         retrieval_config: RetrievalConfig | None = None,
         rag_pipeline: Type[Union[QuivrQARAG, QuivrQARAGLangGraph]] | None = None,
         list_files: list[QuivrKnowledge] | None = None,
         chat_history: ChatHistory | None = None,
+        **input_kwargs,
     ) -> ParsedRAGResponse:
         """
         Synchronous version that asks a question to the brain and gets a generated answer.
@@ -581,11 +587,14 @@ class Brain:
         full_answer = ""
 
         async for response in self.ask_streaming(
+            run_id=run_id,
             question=question,
+            system_prompt=system_prompt,
             retrieval_config=retrieval_config,
             rag_pipeline=rag_pipeline,
             list_files=list_files,
             chat_history=chat_history,
+            **input_kwargs,
         ):
             full_answer += response.answer
 
@@ -593,7 +602,9 @@ class Brain:
 
     def ask(
         self,
+        run_id: UUID,
         question: str,
+        system_prompt: str | None = None,
         retrieval_config: RetrievalConfig | None = None,
         rag_pipeline: Type[Union[QuivrQARAG, QuivrQARAGLangGraph]] | None = None,
         list_files: list[QuivrKnowledge] | None = None,
@@ -603,6 +614,7 @@ class Brain:
         Fully synchronous version that asks a question to the brain and gets a generated answer.
         Args:
             question (str): The question to ask.
+            system_prompt (str | None): The system prompt to use.
             retrieval_config (RetrievalConfig | None): The retrieval configuration (see RetrievalConfig docs).
             rag_pipeline (Type[Union[QuivrQARAG, QuivrQARAGLangGraph]] | None): The RAG pipeline to use.
             list_files (list[QuivrKnowledge] | None): The list of files to include in the RAG pipeline.
@@ -613,7 +625,9 @@ class Brain:
         loop = asyncio.get_event_loop()
         return loop.run_until_complete(
             self.aask(
+                run_id=run_id,
                 question=question,
+                system_prompt=system_prompt,
                 retrieval_config=retrieval_config,
                 rag_pipeline=rag_pipeline,
                 list_files=list_files,

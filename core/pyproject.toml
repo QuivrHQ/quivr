@@ -1,6 +1,6 @@
 [project]
 name = "quivr-core"
-version = "0.0.32"
+version = "0.0.33"
 description = "Quivr core RAG package"
 authors = [{ name = "Stan Girard", email = "stan@quivr.app" }]
 dependencies = [
@@ -21,10 +21,12 @@ dependencies = [
     "faiss-cpu>=1.8.0.post1",
     "rapidfuzz>=3.10.1",
     "markupsafe>=2.1.5",
-    "megaparse-sdk>=0.1.9",
+    "megaparse-sdk>=0.1.11",
     "langchain-mistralai>=0.2.3",
+    "langchain-google-genai>=2.1.3",
     "fasttext-langdetect>=1.0.5",
     "langfuse>=2.57.0",
+    "langchain-groq>=0.3.2",
 ]
 readme = "README.md"
 requires-python = ">= 3.11"

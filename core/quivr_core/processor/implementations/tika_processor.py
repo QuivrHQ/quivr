@@ -1,14 +1,14 @@
-import tiktoken
 import logging
 import os
 from typing import AsyncIterable
 
 import httpx
+import tiktoken
 from langchain_core.documents import Document
 from langchain_text_splitters import RecursiveCharacterTextSplitter, TextSplitter
 
 from quivr_core.files.file import QuivrFile
-from quivr_core.processor.processor_base import ProcessorBase
+from quivr_core.processor.processor_base import ProcessedDocument, ProcessorBase
 from quivr_core.processor.registry import FileExtension
 from quivr_core.processor.splitter import SplitterConfig
 
@@ -70,7 +70,7 @@ class TikaProcessor(ProcessorBase):
             "chunk_overlap": self.splitter_config.chunk_overlap,
         }
 
-    async def process_file_inner(self, file: QuivrFile) -> list[Document]:
+    async def process_file_inner(self, file: QuivrFile) -> ProcessedDocument[None]:
         async with file.open() as f:
             txt = await self._send_parse_tika(f)
         document = Document(page_content=txt)
@@ -78,4 +78,6 @@ class TikaProcessor(ProcessorBase):
         for doc in docs:
             doc.metadata = {"chunk_size": len(self.enc.encode(doc.page_content))}
 
-        return docs
+        return ProcessedDocument(
+            chunks=docs, processor_cls="TikaProcessor", processor_response=None
+        )

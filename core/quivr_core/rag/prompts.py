@@ -1,4 +1,6 @@
 import datetime
+import types
+from enum import Enum
 
 from langchain_core.prompts import (
     ChatPromptTemplate,
@@ -8,21 +10,23 @@ from langchain_core.prompts import (
     SystemMessagePromptTemplate,
 )
 from langchain_core.prompts.base import BasePromptTemplate
-from pydantic import ConfigDict, create_model
 
 
-class CustomPromptsDict(dict):
-    def __init__(self, type, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self._type = type
+class TemplatePromptName(str, Enum):
+    ZENDESK_TEMPLATE_PROMPT = "ZENDESK_TEMPLATE_PROMPT"
+    TOOL_ROUTING_PROMPT = "TOOL_ROUTING_PROMPT"
+    RAG_ANSWER_PROMPT = "RAG_ANSWER_PROMPT"
+    CONDENSE_TASK_PROMPT = "CONDENSE_TASK_PROMPT"
+    DEFAULT_DOCUMENT_PROMPT = "DEFAULT_DOCUMENT_PROMPT"
+    CHAT_LLM_PROMPT = "CHAT_LLM_PROMPT"
+    USER_INTENT_PROMPT = "USER_INTENT_PROMPT"
+    UPDATE_PROMPT = "UPDATE_PROMPT"
+    SPLIT_PROMPT = "SPLIT_PROMPT"
+    ZENDESK_LLM_PROMPT = "ZENDESK_LLM_PROMPT"
 
-    def __setitem__(self, key, value):
-        # Automatically convert the value into a tuple (my_type, value)
-        super().__setitem__(key, (self._type, value))
 
-
-def _define_custom_prompts() -> CustomPromptsDict:
-    custom_prompts: CustomPromptsDict = CustomPromptsDict(type=BasePromptTemplate)
+def _define_custom_prompts() -> dict[TemplatePromptName, BasePromptTemplate]:
+    custom_prompts: dict[TemplatePromptName, BasePromptTemplate] = {}
 
     today_date = datetime.datetime.now().strftime("%B %d, %Y")
 
@@ -48,7 +52,7 @@ def _define_custom_prompts() -> CustomPromptsDict:
         ]
     )
 
-    custom_prompts["CONDENSE_TASK_PROMPT"] = CONDENSE_TASK_PROMPT
+    custom_prompts[TemplatePromptName.CONDENSE_TASK_PROMPT] = CONDENSE_TASK_PROMPT
 
     # ---------------------------------------------------------------------------
     # Prompt for RAG
@@ -102,7 +106,7 @@ def _define_custom_prompts() -> CustomPromptsDict:
             HumanMessagePromptTemplate.from_template(template_answer),
         ]
     )
-    custom_prompts["RAG_ANSWER_PROMPT"] = RAG_ANSWER_PROMPT
+    custom_prompts[TemplatePromptName.RAG_ANSWER_PROMPT] = RAG_ANSWER_PROMPT
 
     # ---------------------------------------------------------------------------
     # Prompt for formatting documents
@@ -110,7 +114,7 @@ def _define_custom_prompts() -> CustomPromptsDict:
     DEFAULT_DOCUMENT_PROMPT = PromptTemplate.from_template(
         template="Filename: {original_file_name}\nSource: {index} \n {page_content}"
     )
-    custom_prompts["DEFAULT_DOCUMENT_PROMPT"] = DEFAULT_DOCUMENT_PROMPT
+    custom_prompts[TemplatePromptName.DEFAULT_DOCUMENT_PROMPT] = DEFAULT_DOCUMENT_PROMPT
 
     # ---------------------------------------------------------------------------
     # Prompt for chatting directly with LLMs, without any document retrieval stage
@@ -133,7 +137,7 @@ def _define_custom_prompts() -> CustomPromptsDict:
             HumanMessagePromptTemplate.from_template(template_answer),
         ]
     )
-    custom_prompts["CHAT_LLM_PROMPT"] = CHAT_LLM_PROMPT
+    custom_prompts[TemplatePromptName.CHAT_LLM_PROMPT] = CHAT_LLM_PROMPT
 
     # ---------------------------------------------------------------------------
     # Prompt to understand the user intent
@@ -157,7 +161,7 @@ def _define_custom_prompts() -> CustomPromptsDict:
             HumanMessagePromptTemplate.from_template(template_answer),
         ]
     )
-    custom_prompts["USER_INTENT_PROMPT"] = USER_INTENT_PROMPT
+    custom_prompts[TemplatePromptName.USER_INTENT_PROMPT] = USER_INTENT_PROMPT
 
     # ---------------------------------------------------------------------------
     # Prompt to create a system prompt from user instructions
@@ -187,7 +191,7 @@ def _define_custom_prompts() -> CustomPromptsDict:
             HumanMessagePromptTemplate.from_template(template_answer),
         ]
     )
-    custom_prompts["UPDATE_PROMPT"] = UPDATE_PROMPT
+    custom_prompts[TemplatePromptName.UPDATE_PROMPT] = UPDATE_PROMPT
 
     # ---------------------------------------------------------------------------
     # Prompt to split the user input into multiple questions / instructions
@@ -224,7 +228,7 @@ def _define_custom_prompts() -> CustomPromptsDict:
             HumanMessagePromptTemplate.from_template(template_answer),
         ]
     )
-    custom_prompts["SPLIT_PROMPT"] = SPLIT_PROMPT
+    custom_prompts[TemplatePromptName.SPLIT_PROMPT] = SPLIT_PROMPT
 
     # ---------------------------------------------------------------------------
     # Prompt to grade the relevance of an answer and decide whather to perform a web search
@@ -256,40 +260,101 @@ def _define_custom_prompts() -> CustomPromptsDict:
         ]
     )
 
-    custom_prompts["TOOL_ROUTING_PROMPT"] = TOOL_ROUTING_PROMPT
+    custom_prompts[TemplatePromptName.TOOL_ROUTING_PROMPT] = TOOL_ROUTING_PROMPT
 
     system_message_zendesk_template = """
-
-    - You are a Zendesk Agent.
-    - You are answering a client query.
-    - You must provide a response with all the information you have. Do not write areas to be filled like [your name], [your email], etc.
-    - Give a the most complete answer to the client query and give relevant links if needed.
-    - Based on the following similar client tickets, provide a response to the client query in the same format.
-
-    ------ Zendesk Similar Tickets ------
-    {similar_tickets}
-    -------------------------------------
-
-    ------ Client Query ------
-    {client_query}
-    --------------------------
-
-    Agent :
+    You are a Customer Service Agent using Zendesk. You are answering a client query.
+    You will be provided with the users metadata, ticket metadata and ticket history which can be used to answer the query.
+    You will also have access to the most relevant similar tickets and additional information sometimes such as API calls.
+    Never add something in brackets that needs to be filled like [your name], [your email], etc. 
+    Do NOT invent information that was not present in previous tickets or in user metabadata or ticket metadata or additional information.
+    Always prioritize information from the most recent tickets, especially if they are contradictory.
+    
+    Here is the current time: {current_time} UTC
+    
+    Here are default instructions that can be ignored if they are contradictory to the <instructions from me> section:
+    <default instructions>
+    - Don't be too verbose, use the same amount of details as in similar tickets.
+    - Use the same tone, format, structure and lexical field as in similar tickets agent responses.
+    - The text must be correctly formatted with paragraphs, bold, italic, etc so it is easier to read.
+    - Maintain consistency in terminology used in recent tickets.
+    - Answer in the same language as the user.
+    - Don't add a signature at the end of the answer, it will be added once the answer is sent.
+    </default instructions>
+    
+    
+    Here are instructions that you MUST follow and prioritize over the <default instructions> section:
+    <instructions from me>
+    {guidelines}
+    </instructions from me>
     """
+
+    user_prompt_template = """
+    Here is information about the user that can help you to answer:
+    <user_metadata>
+    {user_metadata}
+    </user_metadata>
+
+    Here are metadata on the current ticket that can help you to answer:
+    <ticket_metadata>
+    {ticket_metadata}
+    </ticket_metadata>
+
+
+    Here are the most relevant similar tickets that can help you to answer:
+    <similar_tickets>
+    {similar_tickets}
+    </similar_tickets>
+
+    Here are the current ticket history:
+    <ticket_history>
+    {ticket_history}
+    </ticket_history>
+
+    Here are additional information that can help you to answer:
+    <additional_information>
+    {additional_information}
+    </additional_information>
+
+    Here is the client question to which you must answer:
+    <client_query>
+    {client_query}
+    </client_query>
+ 
+    Based on the informations provided, answer directly with the message to send to the customer, ready to be sent:
+    Answer:"""
 
     ZENDESK_TEMPLATE_PROMPT = ChatPromptTemplate.from_messages(
         [
             SystemMessagePromptTemplate.from_template(system_message_zendesk_template),
+            HumanMessagePromptTemplate.from_template(user_prompt_template),
         ]
     )
-    custom_prompts["ZENDESK_TEMPLATE_PROMPT"] = ZENDESK_TEMPLATE_PROMPT
+    custom_prompts[TemplatePromptName.ZENDESK_TEMPLATE_PROMPT] = ZENDESK_TEMPLATE_PROMPT
+
+    system_message_template = "{enforced_system_prompt}"
+
+    template_answer = """
+    <draft answer>
+    {task}
+    <draft answer>
+    Stick closely to this draft answer. Assume that the draft answer informations are correct, and do not try to outsmart him/her.
+    Respond directly with the message to send to the customer, ready to be sent:
+
+    Answer:
+    """
+    ZENDESK_LLM_PROMPT = ChatPromptTemplate.from_messages(
+        [
+            SystemMessagePromptTemplate.from_template(system_message_template),
+            MessagesPlaceholder(variable_name="chat_history"),
+            HumanMessagePromptTemplate.from_template(template_answer),
+        ]
+    )
+    custom_prompts[TemplatePromptName.ZENDESK_LLM_PROMPT] = ZENDESK_LLM_PROMPT
 
     return custom_prompts
 
 
-_custom_prompts = _define_custom_prompts()
-CustomPromptsModel = create_model(
-    "CustomPromptsModel", **_custom_prompts, __config__=ConfigDict(extra="forbid")
-)
+_templ_registry: dict[TemplatePromptName, BasePromptTemplate] = _define_custom_prompts()
 
-custom_prompts = CustomPromptsModel()
+custom_prompts = types.MappingProxyType(_templ_registry)

@@ -18,11 +18,10 @@ from langchain_community.document_loaders import (
 )
 from langchain_community.document_loaders.base import BaseLoader
 from langchain_community.document_loaders.text import TextLoader
-from langchain_core.documents import Document
 from langchain_text_splitters import RecursiveCharacterTextSplitter, TextSplitter
 
 from quivr_core.files.file import FileExtension, QuivrFile
-from quivr_core.processor.processor_base import ProcessorBase
+from quivr_core.processor.processor_base import ProcessedDocument, ProcessorBase
 from quivr_core.processor.splitter import SplitterConfig
 
 logger = logging.getLogger("quivr_core")
@@ -74,7 +73,7 @@ def _build_processor(
                 "splitter": self.splitter_config.model_dump(),
             }
 
-        async def process_file_inner(self, file: QuivrFile) -> list[Document]:
+        async def process_file_inner(self, file: QuivrFile) -> ProcessedDocument[None]:
             if hasattr(self.loader_cls, "__init__"):
                 # NOTE: mypy can't correctly type this as BaseLoader doesn't have a constructor method
                 loader = self.loader_cls(file_path=str(file.path), **self.loader_kwargs)  # type: ignore
@@ -85,9 +84,12 @@ def _build_processor(
             docs = self.text_splitter.split_documents(documents)
 
             for doc in docs:
+                # TODO: This metadata info should be typed
                 doc.metadata = {"chunk_size": len(enc.encode(doc.page_content))}
 
-            return docs
+            return ProcessedDocument(
+                chunks=docs, processor_cls=cls_name, processor_response=None
+            )
 
     return type(cls_name, (ProcessorInit,), dict(_Processor.__dict__))
 

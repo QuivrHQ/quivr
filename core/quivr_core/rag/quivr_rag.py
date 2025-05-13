@@ -22,7 +22,7 @@ from quivr_core.rag.entities.models import (
     RAGResponseMetadata,
     cited_answer,
 )
-from quivr_core.rag.prompts import custom_prompts
+from quivr_core.rag.prompts import TemplatePromptName, custom_prompts
 from quivr_core.rag.utils import (
     LangfuseService,
     combine_documents,
@@ -122,7 +122,7 @@ class QuivrQARAG:
                 "question": lambda x: x["question"],
                 "chat_history": itemgetter("chat_history"),
             }
-            | custom_prompts.CONDENSE_QUESTION_PROMPT
+            | custom_prompts[TemplatePromptName.DEFAULT_DOCUMENT_PROMPT]
             | self.llm_endpoint._llm
             | StrOutputParser(),
         }
@@ -150,7 +150,9 @@ class QuivrQARAG:
             )
 
         answer = {
-            "answer": final_inputs | custom_prompts.ANSWER_PROMPT | llm,
+            "answer": final_inputs
+            | custom_prompts[TemplatePromptName.RAG_ANSWER_PROMPT]
+            | llm,
             "docs": itemgetter("docs"),
         }
 

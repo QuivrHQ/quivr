@@ -5,6 +5,7 @@ from enum import Enum
 from typing import Any, Dict, Hashable, List, Optional, Type, Union
 from uuid import UUID
 
+from langchain_core.prompts.base import BasePromptTemplate
 from langchain_core.tools import BaseTool
 from langgraph.graph import END, START
 from pydantic import BaseModel
@@ -14,7 +15,6 @@ from quivr_core.base_config import QuivrBaseConfig
 from quivr_core.config import MegaparseConfig
 from quivr_core.llm_tools.llm_tools import TOOLS_CATEGORIES, TOOLS_LISTS, LLMToolFactory
 from quivr_core.processor.splitter import SplitterConfig
-from quivr_core.rag.prompts import CustomPromptsModel
 
 logger = logging.getLogger("quivr_core")
 
@@ -72,6 +72,7 @@ class DefaultModelSuppliers(str, Enum):
     META = "meta"
     MISTRAL = "mistral"
     GROQ = "groq"
+    GEMINI = "gemini"
 
 
 class LLMConfig(QuivrBaseConfig):
@@ -94,6 +95,11 @@ class LLMModelConfig:
                 tokenizer_hub="Quivr/gpt-4o",
             ),
             "o3-mini": LLMConfig(
+                max_context_tokens=200000,
+                max_output_tokens=100000,
+                tokenizer_hub="Quivr/gpt-4o",
+            ),
+            "o4-mini": LLMConfig(
                 max_context_tokens=200000,
                 max_output_tokens=100000,
                 tokenizer_hub="Quivr/gpt-4o",
@@ -139,6 +145,11 @@ class LLMModelConfig:
             ),
         },
         DefaultModelSuppliers.ANTHROPIC: {
+            "claude-3-7-sonnet": LLMConfig(
+                max_context_tokens=200000,
+                max_output_tokens=8192,
+                tokenizer_hub="Quivr/claude-tokenizer",
+            ),
             "claude-3-5-sonnet": LLMConfig(
                 max_context_tokens=200000,
                 max_output_tokens=8192,
@@ -209,6 +220,16 @@ class LLMModelConfig:
             "code-llama": LLMConfig(
                 max_context_tokens=16384, tokenizer_hub="Quivr/llama-code-tokenizer"
             ),
+            "deepseek-r1-distill-llama-70b": LLMConfig(
+                max_context_tokens=128000,
+                max_output_tokens=32768,
+                tokenizer_hub="Quivr/Meta-Llama-3.1-Tokenizer",
+            ),
+            "meta-llama/llama-4-maverick-17b-128e-instruct": LLMConfig(
+                max_context_tokens=128000,
+                max_output_tokens=32768,
+                tokenizer_hub="Quivr/Meta-Llama-3.1-Tokenizer",
+            ),
         },
         DefaultModelSuppliers.MISTRAL: {
             "mistral-large": LLMConfig(
@@ -228,6 +249,13 @@ class LLMModelConfig:
             ),
             "codestral": LLMConfig(
                 max_context_tokens=32000, tokenizer_hub="Quivr/mistral-tokenizer-v3"
+            ),
+        },
+        DefaultModelSuppliers.GEMINI: {
+            "gemini-2.5": LLMConfig(
+                max_context_tokens=128000,
+                max_output_tokens=4096,
+                tokenizer_hub="Quivr/gemini-tokenizer",
             ),
         },
     }
@@ -271,9 +299,26 @@ class LLMEndpointConfig(QuivrBaseConfig):
     max_output_tokens: int = 4096
     temperature: float = 0.3
     streaming: bool = True
-    prompt: CustomPromptsModel | None = None
+    prompt: BasePromptTemplate | None = None
 
     _FALLBACK_TOKENIZER = "cl100k_base"
+
+    def __hash__(self):
+        return hash(
+            (
+                self.supplier,
+                self.model,
+                self.tokenizer_hub,
+                self.llm_base_url,
+                self.env_variable_name,
+                self.llm_api_key,
+                self.max_context_tokens,
+                self.max_output_tokens,
+                self.temperature,
+                self.streaming,
+                repr(self.prompt) if self.prompt is not None else None,
+            )
+        )
 
     @property
     def fallback_tokenizer(self) -> str:

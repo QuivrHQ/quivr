@@ -1,4 +1,5 @@
 import asyncio
+import datetime
 import logging
 from collections import OrderedDict
 from typing import (
@@ -21,9 +22,10 @@ from langchain_cohere import CohereRerank
 from langchain_community.document_compressors import JinaRerank
 from langchain_core.callbacks import Callbacks
 from langchain_core.documents import BaseDocumentCompressor, Document
-from langchain_core.messages import BaseMessage
+from langchain_core.messages import BaseMessage, HumanMessage, SystemMessage
 from langchain_core.messages.ai import AIMessageChunk
 from langchain_core.prompts.base import BasePromptTemplate
+from langchain_core.runnables.schema import StreamEvent
 from langchain_core.vectorstores import VectorStore
 from langgraph.graph import END, START, StateGraph
 from langgraph.graph.message import add_messages
@@ -39,11 +41,12 @@ from quivr_core.rag.entities.models import (
     QuivrKnowledge,
     RAGResponseMetadata,
 )
-from quivr_core.rag.prompts import custom_prompts
+from quivr_core.rag.prompts import TemplatePromptName, custom_prompts
 from quivr_core.rag.utils import (
     LangfuseService,
     collect_tools,
     combine_documents,
+    format_dict,
     format_file_list,
     get_chunk_metadata,
     parse_chunk_response,
@@ -216,15 +219,20 @@ class UserTasks:
 
 
 class AgentState(TypedDict):
-    # The add_messages function defines how an update should be processed
-    # Default is to replace. add_messages says "append"
     messages: Annotated[Sequence[BaseMessage], add_messages]
     reasoning: List[str]
     chat_history: ChatHistory
     files: str
     tasks: UserTasks
     instructions: str
+    ticket_metadata: Optional[dict[str, str]]
+    user_metadata: Optional[dict[str, str]]
+    additional_information: Optional[dict[str, str]]
     tool: str
+    guidelines: str
+    enforced_system_prompt: str
+    _filter: Optional[Dict[str, Any]]
+    ticket_history: str
 
 
 class IdempotentCompressor(BaseDocumentCompressor):
@@ -314,7 +322,7 @@ class QuivrQARAGLangGraph:
             dict: The next state of the agent.
         """
 
-        msg = custom_prompts.SPLIT_PROMPT.format(
+        msg = custom_prompts[TemplatePromptName.SPLIT_PROMPT].format(
             user_input=state["messages"][0].content,
         )
 
@@ -358,7 +366,7 @@ class QuivrQARAGLangGraph:
 
     def routing_split(self, state: AgentState):
         response: SplittedInput = self.invoke_structured_output(
-            custom_prompts.SPLIT_PROMPT.format(
+            custom_prompts[TemplatePromptName.SPLIT_PROMPT].format(
                 chat_history=state["chat_history"].to_list(),
                 user_input=state["messages"][0].content,
             ),
@@ -414,7 +422,7 @@ class QuivrQARAGLangGraph:
             "activated_tools": activated_tools,
         }
 
-        msg = custom_prompts.UPDATE_PROMPT.format(**inputs)
+        msg = custom_prompts[TemplatePromptName.UPDATE_PROMPT].format(**inputs)
 
         response: UpdatedPromptAndTools = self.invoke_structured_output(
             msg, UpdatedPromptAndTools
@@ -465,7 +473,6 @@ class QuivrQARAGLangGraph:
 
         return {**state, "chat_history": _chat_history}
 
-    ### Nodes
     async def rewrite(self, state: AgentState) -> AgentState:
         """
         Transform the query to produce a better question.
@@ -485,7 +492,7 @@ class QuivrQARAGLangGraph:
         # Prepare the async tasks for all user tsks
         async_jobs = []
         for task_id in tasks.ids:
-            msg = custom_prompts.CONDENSE_TASK_PROMPT.format(
+            msg = custom_prompts[TemplatePromptName.CONDENSE_TASK_PROMPT].format(
                 chat_history=state["chat_history"].to_list(),
                 task=tasks(task_id).definition,
             )
@@ -547,7 +554,7 @@ class QuivrQARAGLangGraph:
                 "activated_tools": validated_tools,
             }
 
-            msg = custom_prompts.TOOL_ROUTING_PROMPT.format(**input)
+            msg = custom_prompts[TemplatePromptName.TOOL_ROUTING_PROMPT].format(**input)
             async_jobs.append(
                 (self.ainvoke_structured_output(msg, TasksCompletion), task_id)
             )
@@ -625,9 +632,12 @@ class QuivrQARAGLangGraph:
         if not tasks.has_tasks():
             return {**state}
 
+        _filter = state.get("_filter", None)
+
         kwargs = {
             "search_kwargs": {
                 "k": self.retrieval_config.k,
+                "filter": _filter,  # Add your desired filter here
             }
         }  # type: ignore
         base_retriever = self.get_retriever(**kwargs)
@@ -823,7 +833,9 @@ class QuivrQARAGLangGraph:
 
     def get_rag_context_length(self, state: AgentState, docs: List[Document]) -> int:
         final_inputs = self._build_rag_prompt_inputs(state, docs)
-        msg = custom_prompts.RAG_ANSWER_PROMPT.format(**final_inputs)
+        msg = custom_prompts[TemplatePromptName.RAG_ANSWER_PROMPT].format(
+            **final_inputs
+        )
         return self.llm_endpoint.count_tokens(msg)
 
     def reduce_rag_context(
@@ -907,16 +919,33 @@ class QuivrQARAGLangGraph:
 
     def generate_zendesk_rag(self, state: AgentState) -> AgentState:
         tasks = state["tasks"]
-        docs = tasks.docs if tasks else []
+        docs: List[Document] = tasks.docs if tasks else []
         messages = state["messages"]
         user_task = messages[0].content
-        inputs = {
-            "similar_tickets": docs,
-            "client_query": user_task,
-        }
+        prompt_template: BasePromptTemplate = custom_prompts[
+            TemplatePromptName.ZENDESK_TEMPLATE_PROMPT
+        ]
 
-        msg = custom_prompts.ZENDESK_TEMPLATE_PROMPT.format(**inputs)
+        ticket_metadata = state["ticket_metadata"] or {}
+        user_metadata = state["user_metadata"] or {}
+        ticket_history = state.get("ticket_history", "")
+        current_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        inputs = {
+            "similar_tickets": "\n".join([doc.page_content for doc in docs]),
+            "ticket_metadata": format_dict(ticket_metadata),
+            "user_metadata": format_dict(user_metadata),
+            "client_query": user_task,
+            "ticket_history": ticket_history,
+            "current_time": current_time,
+        }
+        required_variables = prompt_template.input_variables
+        for variable in required_variables:
+            if variable not in inputs:
+                inputs[variable] = state.get(variable, "")
+
+        msg = prompt_template.format_prompt(**inputs)
         llm = self.bind_tools_to_llm(self.generate_zendesk_rag.__name__)
+
         response = llm.invoke(msg)
 
         return {**state, "messages": [response]}
@@ -925,11 +954,9 @@ class QuivrQARAGLangGraph:
         tasks = state["tasks"]
         docs = tasks.docs if tasks else []
         inputs = self._build_rag_prompt_inputs(state, docs)
-        state, inputs = self.reduce_rag_context(
-            state, inputs, custom_prompts.RAG_ANSWER_PROMPT
-        )
-
-        msg = custom_prompts.RAG_ANSWER_PROMPT.format(**inputs)
+        prompt = custom_prompts[TemplatePromptName.RAG_ANSWER_PROMPT]
+        state, inputs = self.reduce_rag_context(state, inputs, prompt)
+        msg = prompt.format(**inputs)
         llm = self.bind_tools_to_llm(self.generate_rag.__name__)
         response = llm.invoke(msg)
 
@@ -946,7 +973,20 @@ class QuivrQARAGLangGraph:
             dict: The updated state with re-phrased question
         """
         messages = state["messages"]
-        user_task = messages[0].content
+
+        # Check if there is a system message in messages
+        system_message = None
+        user_message = None
+
+        for msg in messages:
+            if isinstance(msg, SystemMessage):
+                system_message = str(msg.content)
+            elif isinstance(msg, HumanMessage):
+                user_message = str(msg.content)
+
+        user_task = (
+            user_message if user_message else (messages[0].content if messages else "")
+        )
 
         # Prompt
         prompt = self.retrieval_config.prompt
@@ -959,14 +999,17 @@ class QuivrQARAGLangGraph:
         # LLM
         llm = self.llm_endpoint._llm
 
+        prompt = custom_prompts[TemplatePromptName.CHAT_LLM_PROMPT]
         state, reduced_inputs = self.reduce_rag_context(
-            state, final_inputs, custom_prompts.CHAT_LLM_PROMPT
+            state, final_inputs, system_message if system_message else prompt
         )
-
-        msg = custom_prompts.CHAT_LLM_PROMPT.format(**reduced_inputs)
+        CHAT_LLM_PROMPT = [
+            SystemMessage(content=str(system_message)),
+            HumanMessage(content=str(user_message)),
+        ]
 
         # Run
-        response = llm.invoke(msg)
+        response = llm.invoke(CHAT_LLM_PROMPT)
         return {**state, "messages": [response]}
 
     def build_chain(self):
@@ -1015,10 +1058,13 @@ class QuivrQARAGLangGraph:
 
     async def answer_astream(
         self,
+        run_id: UUID,
         question: str,
+        system_prompt: str | None,
         history: ChatHistory,
         list_files: list[QuivrKnowledge],
         metadata: dict[str, str] = {},
+        **input_kwargs,
     ) -> AsyncGenerator[ParsedRAGChunkResponse, ParsedRAGChunkResponse]:
         """
         Answer a question using the langgraph chain and yield each chunk of the answer separately.
@@ -1031,15 +1077,23 @@ class QuivrQARAGLangGraph:
         rolling_message = AIMessageChunk(content="")
         docs: list[Document] | None = None
         previous_content = ""
+        system_prompt = system_prompt
+        messages = [("system", system_prompt)] if system_prompt else []
+        messages.append(("user", question))
 
         async for event in conversational_qa_chain.astream_events(
             {
-                "messages": [("user", question)],
+                "messages": messages,
                 "chat_history": history,
                 "files": concat_list_files,
+                **input_kwargs,
             },
             version="v1",
-            config={"metadata": metadata, "callbacks": [langfuse_handler]},
+            config={
+                "run_id": run_id,
+                "metadata": metadata,
+                "callbacks": [langfuse_handler],
+            },
         ):
             node_name = self._extract_node_name(event)
 
@@ -1077,7 +1131,7 @@ class QuivrQARAGLangGraph:
             last_chunk=True,
         )
 
-    def _is_final_node_with_docs(self, event: dict) -> bool:
+    def _is_final_node_with_docs(self, event: StreamEvent) -> bool:
         return (
             "output" in event["data"]
             and event["data"]["output"] is not None
@@ -1085,14 +1139,14 @@ class QuivrQARAGLangGraph:
             and event["metadata"]["langgraph_node"] in self.final_nodes
         )
 
-    def _is_final_node_and_chat_model_stream(self, event: dict) -> bool:
+    def _is_final_node_and_chat_model_stream(self, event: StreamEvent) -> bool:
         return (
             event["event"] == "on_chat_model_stream"
             and "langgraph_node" in event["metadata"]
             and event["metadata"]["langgraph_node"] in self.final_nodes
         )
 
-    def _extract_node_name(self, event: dict) -> str:
+    def _extract_node_name(self, event: StreamEvent) -> str:
         if "metadata" in event and "langgraph_node" in event["metadata"]:
             name = event["metadata"]["langgraph_node"]
             for node in self.retrieval_config.workflow_config.nodes:

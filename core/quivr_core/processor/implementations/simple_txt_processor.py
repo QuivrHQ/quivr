@@ -4,7 +4,7 @@ import aiofiles
 from langchain_core.documents import Document
 
 from quivr_core.files.file import QuivrFile
-from quivr_core.processor.processor_base import ProcessorBase
+from quivr_core.processor.processor_base import ProcessedDocument, ProcessorBase
 from quivr_core.processor.registry import FileExtension
 from quivr_core.processor.splitter import SplitterConfig
 
@@ -47,7 +47,7 @@ class SimpleTxtProcessor(ProcessorBase):
             "splitter": self.splitter_config.model_dump(),
         }
 
-    async def process_file_inner(self, file: QuivrFile) -> list[Document]:
+    async def process_file_inner(self, file: QuivrFile) -> ProcessedDocument[str]:
         async with aiofiles.open(file.path, mode="r") as f:
             content = await f.read()
 
@@ -57,4 +57,6 @@ class SimpleTxtProcessor(ProcessorBase):
             doc, self.splitter_config.chunk_size, self.splitter_config.chunk_overlap
         )
 
-        return docs
+        return ProcessedDocument(
+            chunks=docs, processor_cls="SimpleTxtProcessor", processor_response=content
+        )
