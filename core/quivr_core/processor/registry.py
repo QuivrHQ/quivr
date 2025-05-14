@@ -173,7 +173,7 @@ def get_processor_class(file_extension: FileExtension | str) -> Type[ProcessorBa
                 register_processor(file_extension, _import_class(proc_entry.cls_mod))
                 break
             except ImportError:
-                logger.warn(
+                logger.warning(
                     f"{proc_entry.err}. Falling to the next available processor for {file_extension}"
                 )
         if len(entries) == 0 and file_extension not in registry:
