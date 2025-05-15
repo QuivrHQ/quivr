@@ -68,7 +68,7 @@ brain = Brain.from_files(name = "my smart brain",
                         )
 ```
 
-Note : [Embeddings](https://python.langchain.com/docs/integrations/text_embedding/) is a langchain class that lets you chose from a large variety of embedding models. Please check out the following docs to know the panel of models you can try.
+Note : [Embeddings](https://python.langchain.com/docs/integrations/text_embedding/) is a langchain class that lets you choose from a large variety of embedding models. Please check out the following docs to know the panel of models you can try.
 
 ## Launch with Chainlit
 
