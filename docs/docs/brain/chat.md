@@ -1,6 +1,6 @@
 ## ChatHistory
 
-The `ChatHistory` class is where all the conversation between the user and the LLM gets stored. A `ChatHistory` object will transparently be instanciated in the `Brain` every time you create one.
+The `ChatHistory` class is where all the conversation between the user and the LLM gets stored. A `ChatHistory` object will transparently be instantiated in the `Brain` every time you create one.
 
 At each interaction with `Brain.ask_streaming` both your message and the LLM's response are added to this chat history. It's super handy because this history is used in the Retrieval-Augmented Generation (RAG) process to give the LLM more context, working as form of memory between the user and the system and helping it generate better responses by looking at what’s already been said.
 
