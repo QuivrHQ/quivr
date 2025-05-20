@@ -204,7 +204,7 @@ def format_dict(kv: Dict[str, str]) -> str:
 
 class LangfuseService:
     def __init__(self):
-        self.langfuse_handler = CallbackHandler()
+        self.langfuse_handler = CallbackHandler(flush_interval=1)
 
     def get_handler(self):
         return self.langfuse_handler
