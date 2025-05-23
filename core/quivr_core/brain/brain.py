@@ -585,6 +585,7 @@ class Brain:
         """
         # question_language = detect_language(question) -- Commented until we use it
         full_answer = ""
+        metadata = None
 
         async for response in self.ask_streaming(
             run_id=run_id,
@@ -597,8 +598,10 @@ class Brain:
             **input_kwargs,
         ):
             full_answer += response.answer
+            if response.metadata:
+                metadata = response.metadata
 
-        return ParsedRAGResponse(answer=full_answer)
+        return ParsedRAGResponse(answer=full_answer, metadata=metadata)
 
     def ask(
         self,
