@@ -18,6 +18,9 @@ from quivr_core.processor.splitter import SplitterConfig
 
 logger = logging.getLogger("quivr_core")
 
+MIN_CONTEXT_TOKENS = 4096
+MIN_OUTPUT_TOKENS = 4096
+
 
 def normalize_to_env_variable_name(name: str) -> str:
     # Replace any character that is not a letter, digit, or underscore with an underscore
@@ -84,6 +87,11 @@ class LLMConfig(QuivrBaseConfig):
 class LLMModelConfig:
     _model_defaults: Dict[DefaultModelSuppliers, Dict[str, LLMConfig]] = {
         DefaultModelSuppliers.OPENAI: {
+            "gpt-4.1": LLMConfig(
+                max_context_tokens=1047576,
+                max_output_tokens=32768,
+                tokenizer_hub="Quivr/gpt-4o",
+            ),
             "gpt-4o": LLMConfig(
                 max_context_tokens=128000,
                 max_output_tokens=16384,
@@ -366,12 +374,26 @@ class LLMEndpointConfig(QuivrBaseConfig):
                         f"Lowering max_context_tokens from {self.max_context_tokens} to {_max_context_tokens}"
                     )
                     self.max_context_tokens = _max_context_tokens
+                if self.max_context_tokens < MIN_CONTEXT_TOKENS:
+                    logger.error(
+                        f"max_context_tokens is too low: {self.max_context_tokens}. "
+                    )
+                    raise ValueError(
+                        f"max_context_tokens is too low: {self.max_context_tokens}. "
+                    )
             if llm_model_config.max_output_tokens:
                 if self.max_output_tokens > llm_model_config.max_output_tokens:
                     logger.warning(
                         f"Lowering max_output_tokens from {self.max_output_tokens} to {llm_model_config.max_output_tokens}"
                     )
                     self.max_output_tokens = llm_model_config.max_output_tokens
+                if self.max_output_tokens < MIN_OUTPUT_TOKENS:
+                    logger.error(
+                        f"max_output_tokens is too low: {self.max_output_tokens}. "
+                    )
+                    raise ValueError(
+                        f"max_output_tokens is too low: {self.max_output_tokens}. "
+                    )
 
             self.tokenizer_hub = llm_model_config.tokenizer_hub
 
