@@ -462,10 +462,9 @@ class QuivrQARAGLangGraph:
                 human_message.content
             ) + self.llm_endpoint.count_tokens(ai_message.content)
 
-            max_context_tokens = 10000
             if (
                 total_tokens + message_tokens
-                > max_context_tokens  # self.retrieval_config.llm_config.max_context_tokens
+                > self.retrieval_config.llm_config.max_context_tokens
                 or total_pairs >= self.retrieval_config.max_history
             ):
                 break
