@@ -24,6 +24,7 @@ from langchain_core.callbacks import Callbacks
 from langchain_core.documents import BaseDocumentCompressor, Document
 from langchain_core.messages import BaseMessage, HumanMessage, SystemMessage
 from langchain_core.messages.ai import AIMessageChunk
+from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain_core.prompts.base import BasePromptTemplate
 from langchain_core.runnables.schema import StreamEvent
 from langchain_core.vectorstores import VectorStore
@@ -461,6 +462,7 @@ class QuivrQARAGLangGraph:
             message_tokens = self.llm_endpoint.count_tokens(
                 human_message.content
             ) + self.llm_endpoint.count_tokens(ai_message.content)
+
             if (
                 total_tokens + message_tokens
                 > self.retrieval_config.llm_config.max_context_tokens
@@ -1004,13 +1006,18 @@ class QuivrQARAGLangGraph:
         state, reduced_inputs = self.reduce_rag_context(
             state, final_inputs, system_message if system_message else prompt
         )
-        CHAT_LLM_PROMPT = [
-            SystemMessage(content=str(system_message)),
-            HumanMessage(content=str(user_message)),
-        ]
-
+        CHAT_LLM_PROMPT = ChatPromptTemplate.from_messages(
+            [
+                SystemMessage(content=str(system_message)),
+                MessagesPlaceholder(variable_name="chat_history"),
+                HumanMessage(content=str(user_message)),
+            ]
+        )
         # Run
-        response = llm.invoke(CHAT_LLM_PROMPT)
+        chat_llm_prompt = CHAT_LLM_PROMPT.invoke(
+            {"chat_history": final_inputs["chat_history"]}
+        )
+        response = llm.invoke(chat_llm_prompt)
         return {**state, "messages": [response]}
 
     def build_chain(self):
