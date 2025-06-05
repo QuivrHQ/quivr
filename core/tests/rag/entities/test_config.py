@@ -3,12 +3,14 @@ import pytest
 from unittest.mock import patch, Mock
 from uuid import uuid4
 
-from quivr_core.rag.entities.config import (
+from quivr_core.rag.entities.reranker import DefaultRerankers
+from quivr_core.rag.entities.utils import (
     normalize_to_env_variable_name,
+)
+from quivr_core.rag.entities.config import (
     SpecialEdges,
     BrainConfig,
     DefaultWebSearchTool,
-    DefaultRerankers,
     DefaultModelSuppliers,
     LLMConfig,
     LLMModelConfig,

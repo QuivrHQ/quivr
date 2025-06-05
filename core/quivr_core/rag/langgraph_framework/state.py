@@ -1,30 +1,11 @@
 from langchain_core.messages import BaseMessage
-from langchain_core.pydantic_v1 import BaseModel, Field
+from pydantic import BaseModel, Field
 from typing import Any, Dict, List, Optional, Sequence, TypedDict, Annotated
 from langchain_core.callbacks import Callbacks
 from langchain_core.documents import BaseDocumentCompressor, Document
 from quivr_core.rag.entities.chat import ChatHistory
 from langgraph.graph.message import add_messages
-from quivr_core.rag.langgraph.task import UserTasks
-
-
-class SplittedInput(BaseModel):
-    instructions_reasoning: Optional[str] = Field(
-        default=None,
-        description="The reasoning that leads to identifying the user instructions to the system",
-    )
-    instructions: Optional[str] = Field(
-        default=None, description="The instructions to the system"
-    )
-
-    tasks_reasoning: Optional[str] = Field(
-        default=None,
-        description="The reasoning that leads to identifying the explicit or implicit user tasks and questions",
-    )
-    task_list: Optional[List[str]] = Field(
-        default_factory=lambda: ["No explicit or implicit tasks found"],
-        description="The list of standalone, self-contained tasks or questions.",
-    )
+from quivr_core.rag.langgraph_framework.task import UserTasks
 
 
 class TasksCompletion(BaseModel):

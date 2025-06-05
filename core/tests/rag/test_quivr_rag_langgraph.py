@@ -7,11 +7,11 @@ from langchain_core.messages import HumanMessage, AIMessage
 from langgraph.graph import END, START
 
 from quivr_core.rag.entities.chat import ChatHistory
+from quivr_core.rag.entities.reranker import DefaultRerankers
 from quivr_core.rag.entities.config import (
     RetrievalConfig,
     LLMEndpointConfig,
     RerankerConfig,
-    DefaultRerankers,
     WorkflowConfig,
     NodeConfig,
 )

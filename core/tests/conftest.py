@@ -9,7 +9,7 @@ import pytest
 from langchain_core.embeddings import DeterministicFakeEmbedding
 from langchain_core.language_models import FakeListChatModel
 from langchain_core.messages.ai import AIMessageChunk
-from langchain_core.pydantic_v1 import BaseModel
+from pydantic import BaseModel
 from langchain_core.runnables.utils import AddableDict
 from langchain_core.vectorstores import InMemoryVectorStore
 from quivr_core.rag.entities.config import LLMEndpointConfig

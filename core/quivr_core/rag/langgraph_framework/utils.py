@@ -1,5 +1,5 @@
-from typing import List, Dict, Any, Tuple
-from quivr_core.rag.langgraph.state import AgentState, UpdatedPromptAndTools
+from typing import Callable, List, Dict, Any, Tuple, TypedDict
+from quivr_core.rag.langgraph_framework.state import AgentState, UpdatedPromptAndTools
 from langchain_core.prompts import BasePromptTemplate
 from langchain_core.documents import Document
 from quivr_core.rag.prompts import TemplatePromptName, custom_prompts
@@ -66,12 +66,15 @@ def get_rag_context_length(self, state: AgentState, docs: List[Document]) -> int
 
 
 def reduce_rag_context(
-    self,
-    state: AgentState,
+    state: Dict[str, Any],
     inputs: Dict[str, Any],
     prompt: BasePromptTemplate,
-    max_context_tokens: int | None = None,
-) -> Tuple[AgentState, Dict[str, Any]]:
+    count_tokens_fn: Callable[[str], int],
+    max_context_tokens: int,
+) -> Tuple[Dict[str, Any], Dict[str, Any]]:
+    """
+    Reduce the context length of the RAG context by removing the least relevant documents.
+    """
     MAX_ITERATIONS = 20
     SECURITY_FACTOR = 0.85
     iteration = 0
@@ -79,21 +82,18 @@ def reduce_rag_context(
     tasks = state["tasks"] if "tasks" in state else None
     docs = tasks.docs if tasks else []
     msg = prompt.format(**inputs)
-    n = self.llm_endpoint.count_tokens(msg)
+    n = count_tokens_fn(msg)
 
-    max_context_tokens = (
-        max_context_tokens
-        if max_context_tokens
-        else self.retrieval_config.llm_config.max_context_tokens
-    )
+    class TaskTokenCount(TypedDict):
+        docs: List[int]
+        total: int
 
     # Get token counts for each doc in each task
+    task_token_counts: Dict[str, TaskTokenCount] = {}
     if tasks:
-        task_token_counts = {}
         for task_id in tasks.ids:
             doc_tokens = [
-                self.llm_endpoint.count_tokens(doc.page_content)
-                for doc in tasks(task_id).docs
+                count_tokens_fn(doc.page_content) for doc in tasks(task_id).docs
             ]
             task_token_counts[task_id] = {
                 "docs": doc_tokens,
@@ -126,7 +126,7 @@ def reduce_rag_context(
         inputs["context"] = combine_documents(docs)
 
         msg = prompt.format(**inputs)
-        n = self.llm_endpoint.count_tokens(msg)
+        n = count_tokens_fn(msg)
 
         iteration += 1
         if iteration > MAX_ITERATIONS:
