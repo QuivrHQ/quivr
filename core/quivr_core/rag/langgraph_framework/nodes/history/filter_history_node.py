@@ -1,0 +1,71 @@
+from typing import Optional
+
+from quivr_core.rag.langgraph_framework.nodes.base.node import (
+    BaseNode,
+    NodeValidationError,
+)
+from quivr_core.rag.langgraph_framework.services.llm_service import LLMService
+from quivr_core.rag.langgraph_framework.nodes.history.entity import FilterHistoryConfig
+from quivr_core.rag.entities.config import LLMEndpointConfig
+from uuid import uuid4
+from quivr_core.rag.entities.chat import ChatHistory
+from quivr_core.rag.langgraph_framework.nodes.base.extractors import ConfigExtractor
+from quivr_core.rag.langgraph_framework.nodes.base.graph_config import BaseGraphConfig
+
+
+class FilterHistoryNode(BaseNode):
+    """
+    Node for filtering the chat history.
+    """
+
+    NODE_NAME = "filter_history"
+    CONFIG_TYPES = (FilterHistoryConfig, LLMEndpointConfig)
+
+    def __init__(
+        self,
+        llm_service: LLMService,
+        config_extractor: Optional[ConfigExtractor] = None,
+        node_name: Optional[str] = None,
+    ):
+        super().__init__(config_extractor=config_extractor, node_name=node_name)
+        self.llm_service = llm_service
+
+    def validate_input_state(self, state) -> None:
+        """Validate that state has the required attributes and methods."""
+        if "chat_history" not in state:
+            raise NodeValidationError(
+                "FilterHistoryNode requires 'chat_history' key in state"
+            )
+
+    def validate_output_state(self, state) -> None:
+        """Validate that output has the correct attributes and methods."""
+        pass
+
+    async def execute(self, state, config: Optional[BaseGraphConfig] = None):
+        """Filter chat history based on token limits and max history."""
+        # Type-safe config extraction
+        history_config = self.get_config(FilterHistoryConfig, config)
+        llm_config = self.get_config(LLMEndpointConfig, config)
+
+        chat_history = state["chat_history"]
+        total_tokens = 0
+        total_pairs = 0
+        _chat_id = uuid4()
+        _chat_history = ChatHistory(chat_id=_chat_id, brain_id=chat_history.brain_id)
+
+        for human_message, ai_message in reversed(list(chat_history.iter_pairs())):
+            message_tokens = self.llm_service.count_tokens(
+                human_message.content
+            ) + self.llm_service.count_tokens(ai_message.content)
+
+            if (
+                total_tokens + message_tokens > llm_config.max_context_tokens
+                or total_pairs >= history_config.max_history
+            ):
+                break
+            _chat_history.append(human_message)
+            _chat_history.append(ai_message)
+            total_tokens += message_tokens
+            total_pairs += 1
+
+        return {**state, "chat_history": _chat_history}

@@ -36,7 +36,8 @@ from pydantic import BaseModel, Field
 from quivr_core.llm import LLMEndpoint
 from quivr_core.llm_tools.llm_tools import LLMToolFactory
 from quivr_core.rag.entities.chat import ChatHistory
-from quivr_core.rag.entities.config import DefaultRerankers, NodeConfig, RetrievalConfig
+from quivr_core.rag.entities.config import NodeConfig, RetrievalConfig
+from quivr_core.rag.entities.reranker import DefaultRerankers
 from quivr_core.rag.entities.models import (
     LangchainMetadata,
     ParsedRAGChunkResponse,
