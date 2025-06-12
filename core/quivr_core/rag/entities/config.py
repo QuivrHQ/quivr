@@ -470,6 +470,7 @@ class NodeConfig(QuivrBaseConfig):
 
 class DefaultWorkflow(str, Enum):
     RAG = "rag"
+    CHAT_WITH_LLM = "chat_with_llm"
 
     @property
     def nodes(self) -> List[NodeConfig]:
@@ -481,7 +482,12 @@ class DefaultWorkflow(str, Enum):
                 NodeConfig(name="rewrite", edges=["retrieve"]),
                 NodeConfig(name="retrieve", edges=["generate_rag"]),
                 NodeConfig(name="generate_rag", edges=[END]),
-            ]
+            ],
+            self.CHAT_WITH_LLM: [
+                NodeConfig(name=START, edges=["filter_history"]),
+                NodeConfig(name="filter_history", edges=["generate_chat_llm"]),
+                NodeConfig(name="generate_chat_llm", edges=[END]),
+            ],
         }
         return workflows[self]
 

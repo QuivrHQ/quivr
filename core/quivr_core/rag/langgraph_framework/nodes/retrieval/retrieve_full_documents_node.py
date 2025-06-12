@@ -7,12 +7,13 @@ from typing import Optional, Dict, Any
 from collections import OrderedDict
 
 from quivr_core.rag.entities.retriever import RetrieverConfig
-from quivr_core.rag.langgraph_framework.nodes.base.base_node import (
+from quivr_core.rag.langgraph_framework.nodes.base.node import (
     BaseNode,
     NodeValidationError,
 )
 from quivr_core.rag.langgraph_framework.task import UserTasks
 from quivr_core.rag.langgraph_framework.nodes.base.extractors import ConfigExtractor
+from quivr_core.rag.langgraph_framework.nodes.base.graph_config import BaseGraphConfig
 
 logger = logging.getLogger("quivr_core")
 
@@ -36,20 +37,11 @@ class RetrieveFullDocumentsNode(BaseNode):
     def __init__(
         self,
         vector_store,
-        config_extractor: ConfigExtractor,
+        config_extractor: Optional[ConfigExtractor] = None,
         node_name: Optional[str] = None,
     ):
         super().__init__(config_extractor, node_name)
         self.vector_store = vector_store
-
-    def get_config(self, config: Optional[Dict[str, Any]] = None) -> RetrieverConfig:
-        """Extract and validate the filter history and LLM configs."""
-        if config is None or not self.config_extractor:
-            return RetrieverConfig()
-
-        retriever_dict = self.config_extractor(config)
-
-        return RetrieverConfig.model_validate(retriever_dict)
 
     def validate_input_state(self, state) -> None:
         """Validate that state has the required attributes."""
@@ -126,11 +118,11 @@ class RetrieveFullDocumentsNode(BaseNode):
         self.logger.info(f"Top knowledge IDs: {top_knowledge_ids}")
         return top_knowledge_ids
 
-    async def execute(self, state, config: Optional[Dict[str, Any]] = None):
+    async def execute(self, state, config: Optional[BaseGraphConfig] = None):
         """Execute full document context retrieval."""
 
         # Get config using the injected extractor
-        retriever_config = self.get_config(config)
+        retriever_config = self.get_config(RetrieverConfig, config)
 
         # Get or create tasks
         if "tasks" in state and state["tasks"]:

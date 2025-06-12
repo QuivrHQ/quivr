@@ -1,5 +1,5 @@
-from typing import Optional, Dict, Any, List
-from quivr_core.rag.langgraph_framework.nodes.base.base_node import (
+from typing import Optional, List
+from quivr_core.rag.langgraph_framework.nodes.base.node import (
     BaseNode,
     NodeValidationError,
 )
@@ -8,7 +8,7 @@ from langchain_core.documents import Document
 from datetime import datetime
 from quivr_core.rag.utils import format_dict
 from quivr_core.rag.entities.config import WorkflowConfig
-
+from quivr_core.rag.langgraph_framework.nodes.base.graph_config import BaseGraphConfig
 from quivr_core.rag.prompts import TemplatePromptName
 
 
@@ -29,50 +29,43 @@ class GenerateZendeskRagNode(BaseNode):
         self,
         prompt_service: PromptService,
         llm_service: LLMService,
-        config_extractor: ConfigExtractor,
+        config_extractor: Optional[ConfigExtractor] = None,
         node_name: Optional[str] = None,
     ):
         super().__init__(config_extractor, node_name)
         self.prompt_service = prompt_service
         self.llm_service = llm_service
 
-    def get_config(self, config: Optional[Dict[str, Any]] = None) -> WorkflowConfig:
-        """Extract and validate the filter history and LLM configs."""
-        if config is None or not self.config_extractor:
-            return WorkflowConfig()
-
-        workflow_dict = self.config_extractor(config)
-
-        return WorkflowConfig.model_validate(workflow_dict)
-
     def validate_input_state(self, state) -> None:
         """Validate that state has the required attributes and methods."""
-
         if "messages" not in state:
             raise NodeValidationError(
-                "RetrieveNode requires 'messages' attribute in state"
+                "GenerateZendeskRagNode requires 'messages' attribute in state"
             )
 
         if not state["messages"]:
             raise NodeValidationError(
-                "RetrieveNode requires non-empty messages in state"
+                "GenerateZendeskRagNode requires non-empty messages in state"
             )
 
         if "tasks" not in state:
             raise NodeValidationError(
-                "RetrieveNode requires 'tasks' attribute in state"
+                "GenerateZendeskRagNode requires 'tasks' attribute in state"
             )
 
         if not state["tasks"]:
-            raise NodeValidationError("RetrieveNode requires non-empty tasks in state")
+            raise NodeValidationError(
+                "GenerateZendeskRagNode requires non-empty tasks in state"
+            )
 
     def validate_output_state(self, state) -> None:
         """Validate that output has the correct attributes and methods."""
         pass
 
-    async def execute(self, state, config: Optional[Dict[str, Any]] = None):
-        # Get config using the injected extractor
-        workflow_config = self.get_config(config)
+    async def execute(self, state, config: Optional[BaseGraphConfig] = None):
+        """Execute Zendesk RAG generation."""
+        # Type-safe config extraction
+        workflow_config = self.get_config(WorkflowConfig, config)
 
         tasks = state["tasks"]
         docs: List[Document] = tasks.docs if tasks else []

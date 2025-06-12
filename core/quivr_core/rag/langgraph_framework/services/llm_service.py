@@ -11,9 +11,9 @@ logger = logging.getLogger("quivr_core")
 class LLMService:
     """Service for LLM operations including structured output, token counting, and tool binding."""
 
-    def __init__(self, llm_endpoint: LLMEndpoint, llm_config: LLMEndpointConfig):
-        self.llm_endpoint = llm_endpoint
+    def __init__(self, llm_config: LLMEndpointConfig):
         self.config = llm_config
+        self.llm_endpoint = LLMEndpoint.from_config(llm_config)
 
     async def invoke_with_structured_output(
         self, prompt: str, output_class: Type[BaseModel]

@@ -523,7 +523,7 @@ class Brain:
         """
         llm = self.llm
 
-        # If you passed a different llm model we'll override the brain  one
+        # If you passed a different llm model we 'll override the brain  one
         if retrieval_config:
             if retrieval_config.llm_config != self.llm.get_config():
                 llm = LLMEndpoint.from_config(config=retrieval_config.llm_config)

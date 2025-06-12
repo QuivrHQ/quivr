@@ -1,17 +1,14 @@
-from typing import Optional, Dict, Any, Tuple
+from typing import Optional
 from quivr_core.rag.entities.config import LLMEndpointConfig
-from quivr_core.rag.langgraph_framework.nodes.base.base_node import (
+from quivr_core.rag.langgraph_framework.nodes.base.node import (
     BaseNode,
-    NodeValidationError,
 )
+from quivr_core.rag.langgraph_framework.nodes.base.exceptions import NodeValidationError
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
-
 from langchain_core.messages import HumanMessage, SystemMessage
-
+from quivr_core.rag.langgraph_framework.nodes.base.graph_config import BaseGraphConfig
 from quivr_core.rag.prompts import TemplatePromptName
 from quivr_core.rag.entities.prompt import PromptConfig
-
-
 from quivr_core.rag.langgraph_framework.services.prompt_service import PromptService
 from quivr_core.rag.langgraph_framework.services.llm_service import LLMService
 from quivr_core.rag.langgraph_framework.nodes.base.extractors import ConfigExtractor
@@ -30,47 +27,34 @@ class GenerateChatLlmNode(BaseNode):
         self,
         prompt_service: PromptService,
         llm_service: LLMService,
-        config_extractor: ConfigExtractor,
+        config_extractor: Optional[ConfigExtractor] = None,
         node_name: Optional[str] = None,
     ):
         super().__init__(config_extractor, node_name)
         self.prompt_service = prompt_service
         self.llm_service = llm_service
 
-    def get_config(
-        self, config: Optional[Dict[str, Any]] = None
-    ) -> Tuple[PromptConfig, LLMEndpointConfig]:
-        """Extract and validate the filter history and LLM configs."""
-        if config is None or not self.config_extractor:
-            return PromptConfig(), LLMEndpointConfig()
-
-        prompt_dict, llm_dict = self.config_extractor(config)
-
-        return (
-            PromptConfig.model_validate(prompt_dict),
-            LLMEndpointConfig.model_validate(llm_dict),
-        )
-
     def validate_input_state(self, state) -> None:
         """Validate that state has the required attributes and methods."""
-
         if "messages" not in state:
             raise NodeValidationError(
-                "RetrieveNode requires 'messages' attribute in state"
+                "GenerateChatLlmNode requires 'messages' attribute in state"
             )
 
         if not state["messages"]:
             raise NodeValidationError(
-                "RetrieveNode requires non-empty messages in state"
+                "GenerateChatLlmNode requires non-empty messages in state"
             )
 
     def validate_output_state(self, state) -> None:
         """Validate that output has the correct attributes and methods."""
         pass
 
-    async def execute(self, state, config: Optional[Dict[str, Any]] = None):
-        # Get config using the injected extractor
-        prompt_config, llm_config = self.get_config(config)
+    async def execute(self, state, config: Optional[BaseGraphConfig] = None):
+        """Execute the chat LLM generation."""
+
+        prompt_config = self.get_config(PromptConfig, config)
+        llm_config = self.get_config(LLMEndpointConfig, config)
 
         messages = state["messages"]
 
@@ -88,7 +72,7 @@ class GenerateChatLlmNode(BaseNode):
             user_message if user_message else (messages[0].content if messages else "")
         )
 
-        # Prompt
+        # Now prompt_config.prompt works perfectly with full type safety!
         prompt = prompt_config.prompt
 
         final_inputs = {}
@@ -106,7 +90,7 @@ class GenerateChatLlmNode(BaseNode):
             final_inputs,
             system_message if system_message else prompt,
             self.llm_service.count_tokens,
-            llm_config.max_context_tokens,
+            llm_config.max_context_tokens,  # Full type safety here too!
         )
 
         CHAT_LLM_PROMPT = ChatPromptTemplate.from_messages(
@@ -116,6 +100,7 @@ class GenerateChatLlmNode(BaseNode):
                 HumanMessage(content=str(user_message)),
             ]
         )
+
         # Run
         chat_llm_prompt = CHAT_LLM_PROMPT.invoke(
             {"chat_history": final_inputs["chat_history"]}
