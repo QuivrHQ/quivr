@@ -38,6 +38,7 @@ from quivr_core.llm_tools.llm_tools import LLMToolFactory
 from quivr_core.rag.entities.chat import ChatHistory
 from quivr_core.rag.entities.config import DefaultRerankers, NodeConfig, RetrievalConfig
 from quivr_core.rag.entities.models import (
+    LangchainMetadata,
     ParsedRAGChunkResponse,
     QuivrKnowledge,
     RAGResponseMetadata,
@@ -777,7 +778,7 @@ class QuivrQARAGLangGraph:
 
         docs = tasks.docs if tasks else []
 
-        relevant_knowledge = {}
+        relevant_knowledge: Dict[str, Dict[str, Any]] = {}
         for doc in docs:
             knowledge_id = doc.metadata["knowledge_id"]
             similarity_score = doc.metadata.get("similarity", 0)
@@ -1070,7 +1071,7 @@ class QuivrQARAGLangGraph:
         system_prompt: str | None,
         history: ChatHistory,
         list_files: list[QuivrKnowledge],
-        metadata: dict[str, str] = {},
+        metadata: LangchainMetadata | None = None,
         **input_kwargs,
     ) -> AsyncGenerator[ParsedRAGChunkResponse, ParsedRAGChunkResponse]:
         """
@@ -1098,7 +1099,7 @@ class QuivrQARAGLangGraph:
             version="v1",
             config={
                 "run_id": run_id,
-                "metadata": metadata,
+                "metadata": metadata.model_dump() if metadata else {},
                 "callbacks": [langfuse_handler],
             },
         ):
@@ -1132,9 +1133,16 @@ class QuivrQARAGLangGraph:
                     )
 
         # Yield final metadata chunk
+        chunk_metadata = get_chunk_metadata(rolling_message, docs)
+        if metadata:
+            chunk_metadata.langchain_metadata = metadata
+            chunk_metadata.langchain_metadata.langfuse_trace_url = (
+                langfuse_handler.get_trace_url()
+            )
+
         yield ParsedRAGChunkResponse(
             answer="",
-            metadata=get_chunk_metadata(rolling_message, docs),
+            metadata=chunk_metadata,
             last_chunk=True,
         )
 
