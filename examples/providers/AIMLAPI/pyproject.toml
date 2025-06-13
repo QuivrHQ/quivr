@@ -1,0 +1,16 @@
+[tool.poetry]
+name = "aimlapi-integration"
+version = "0.1.0"
+description = "Example of using AI/ML API with quivr"
+authors = ["Dmitry Tumanov <d1m7asis@gmail.com>"]
+dependencies = [
+    "quivr-core @ file:///${PROJECT_ROOT}/../../core",
+    "python-dotenv>=1.0.1",
+]
+readme = "README.md"
+requires-python = ">= 3.11"
+
+[tool.rye]
+managed = true
+virtual = true
+dev-dependencies = []
