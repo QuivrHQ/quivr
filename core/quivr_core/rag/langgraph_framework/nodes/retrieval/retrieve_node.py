@@ -5,6 +5,8 @@ Basic document retrieval node with runtime validation.
 import logging
 from typing import Optional
 import asyncio
+from langchain_core.vectorstores import VectorStore
+
 from quivr_core.rag.langgraph_framework.nodes.base.graph_config import BaseGraphConfig
 from quivr_core.rag.langgraph_framework.nodes.base.node import (
     BaseNode,
@@ -36,12 +38,17 @@ class RetrievalNode(BaseNode):
 
     def __init__(
         self,
-        retrieval_service: RetrievalService,
+        retrieval_service: Optional[RetrievalService] = None,
+        vector_store: Optional[VectorStore] = None,
         config_extractor: Optional[ConfigExtractor] = None,
         node_name: Optional[str] = None,
     ):
         super().__init__(config_extractor, node_name)
+
         self.retrieval_service = retrieval_service
+        self._retrieval_service_user_provided = retrieval_service is not None
+
+        self.vector_store = vector_store
 
     def validate_input_state(self, state) -> None:
         """Validate that state has the required attributes and methods."""
@@ -62,8 +69,17 @@ class RetrievalNode(BaseNode):
     async def execute(self, state, config: Optional[BaseGraphConfig] = None):
         """Execute document retrieval for all user tasks."""
         # Type-safe config extraction
-        retriever_config = self.get_config(RetrieverConfig, config)
-        reranker_config = self.get_config(RerankerConfig, config)
+        retriever_config, _ = self.get_config(RetrieverConfig, config)
+        reranker_config, _ = self.get_config(RerankerConfig, config)
+
+        # Initialize RetrievalService if needed
+        if not self.retrieval_service:
+            self.logger.debug(
+                "Initializing/reinitializing RetrievalService due to config change"
+            )
+            assert self.vector_store, "Vector store is required for RetrievalService"
+            self.retrieval_service = RetrievalService(vector_store=self.vector_store)
+        assert self.retrieval_service
 
         if "tasks" in state:
             tasks = state["tasks"]

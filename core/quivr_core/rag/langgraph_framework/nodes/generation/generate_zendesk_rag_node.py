@@ -7,7 +7,7 @@ from langchain_core.prompts import BasePromptTemplate
 from langchain_core.documents import Document
 from datetime import datetime
 from quivr_core.rag.utils import format_dict
-from quivr_core.rag.entities.config import WorkflowConfig
+from quivr_core.rag.entities.config import LLMEndpointConfig, WorkflowConfig
 from quivr_core.rag.langgraph_framework.nodes.base.graph_config import BaseGraphConfig
 from quivr_core.rag.prompts import TemplatePromptName
 
@@ -23,7 +23,7 @@ class GenerateZendeskRagNode(BaseNode):
     """
 
     NODE_NAME = "generate_zendesk_rag"
-    CONFIG_TYPES = (WorkflowConfig,)
+    CONFIG_TYPES = (WorkflowConfig, LLMEndpointConfig)
 
     def __init__(
         self,
@@ -33,8 +33,12 @@ class GenerateZendeskRagNode(BaseNode):
         node_name: Optional[str] = None,
     ):
         super().__init__(config_extractor, node_name)
+
         self.prompt_service = prompt_service
+        self._prompt_service_user_provided = prompt_service is not None
+
         self.llm_service = llm_service
+        self._llm_service_user_provided = llm_service is not None
 
     def validate_input_state(self, state) -> None:
         """Validate that state has the required attributes and methods."""
@@ -65,7 +69,18 @@ class GenerateZendeskRagNode(BaseNode):
     async def execute(self, state, config: Optional[BaseGraphConfig] = None):
         """Execute Zendesk RAG generation."""
         # Type-safe config extraction
-        workflow_config = self.get_config(WorkflowConfig, config)
+        workflow_config, _ = self.get_config(WorkflowConfig, config)
+
+        # Initialize LLMService if needed
+        llm_config, llm_config_changed = self.get_config(LLMEndpointConfig, config)
+        if not self.llm_service or (
+            not self._llm_service_user_provided and llm_config_changed
+        ):
+            self.logger.debug(
+                "Initializing/reinitializing LLMService due to config change"
+            )
+            self.llm_service = LLMService(llm_config=llm_config)
+        assert self.llm_service
 
         tasks = state["tasks"]
         docs: List[Document] = tasks.docs if tasks else []

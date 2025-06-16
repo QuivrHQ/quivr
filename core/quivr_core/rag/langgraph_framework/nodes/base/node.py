@@ -6,6 +6,7 @@ from pydantic import BaseModel
 from quivr_core.rag.langgraph_framework.nodes.base.extractors import ConfigExtractor
 from quivr_core.rag.langgraph_framework.nodes.base.graph_config import BaseGraphConfig
 from quivr_core.rag.langgraph_framework.nodes.base.exceptions import NodeValidationError
+from quivr_core.rag.langgraph_framework.nodes.base.utils import compute_config_hash
 
 logger = logging.getLogger("quivr_core")
 
@@ -36,6 +37,8 @@ class BaseNode(ABC):
         self.node_name = node_name or self.NODE_NAME
         self.logger = logging.getLogger(f"quivr_core.nodes.{self.node_name}")
         self.config_extractor = config_extractor
+        # Cache for config hashes to detect changes
+        self._config_hashes: Dict[Type[BaseModel], str] = {}
 
     @property
     def name(self):
@@ -43,14 +46,47 @@ class BaseNode(ABC):
 
     def get_config(
         self, config_type: Type[T], config: Optional[BaseGraphConfig] = None
-    ) -> T:
+    ) -> Tuple[T, bool]:
         """
-        Extract a specific configuration type with proper typing.
+        Extract a specific configuration type with change detection.
+
+        Args:
+            config_type: The type of config to extract
+            config: The graph config to extract from
+
+        Returns:
+            Tuple of (config_instance, has_changed)
+            - config_instance: The extracted config
+            - has_changed: True if config changed since last call, False otherwise
         """
         if not self.config_extractor or not config:
-            return config_type()
+            default_config = config_type()
+            current_hash = compute_config_hash(default_config)
 
-        return cast(T, self.config_extractor.extract(config, config_type))
+            # Check if this is a new config or if it has changed
+            has_changed = (
+                config_type not in self._config_hashes
+                or self._config_hashes[config_type] != current_hash
+            )
+
+            # Update the cached hash
+            self._config_hashes[config_type] = current_hash
+
+            return default_config, has_changed
+
+        extracted_config = cast(T, self.config_extractor.extract(config, config_type))
+        current_hash = compute_config_hash(extracted_config)
+
+        # Check if this is a new config or if it has changed
+        has_changed = (
+            config_type not in self._config_hashes
+            or self._config_hashes[config_type] != current_hash
+        )
+
+        # Update the cached hash
+        self._config_hashes[config_type] = current_hash
+
+        return extracted_config, has_changed
 
     @abstractmethod
     def validate_input_state(self, state) -> None:

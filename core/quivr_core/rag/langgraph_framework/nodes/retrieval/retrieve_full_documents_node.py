@@ -122,7 +122,7 @@ class RetrieveFullDocumentsNode(BaseNode):
         """Execute full document context retrieval."""
 
         # Get config using the injected extractor
-        retriever_config = self.get_config(RetrieverConfig, config)
+        retriever_config, _ = self.get_config(RetrieverConfig, config)
 
         # Get or create tasks
         if "tasks" in state and state["tasks"]:

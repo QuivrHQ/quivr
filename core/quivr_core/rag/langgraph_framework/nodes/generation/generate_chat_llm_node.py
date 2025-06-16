@@ -32,7 +32,10 @@ class GenerateChatLlmNode(BaseNode):
     ):
         super().__init__(config_extractor, node_name)
         self.prompt_service = prompt_service
+        self._prompt_service_user_provided = prompt_service is not None
+
         self.llm_service = llm_service
+        self._llm_service_user_provided = llm_service is not None
 
     def validate_input_state(self, state) -> None:
         """Validate that state has the required attributes and methods."""
@@ -53,8 +56,18 @@ class GenerateChatLlmNode(BaseNode):
     async def execute(self, state, config: Optional[BaseGraphConfig] = None):
         """Execute the chat LLM generation."""
 
-        prompt_config = self.get_config(PromptConfig, config)
-        llm_config = self.get_config(LLMEndpointConfig, config)
+        prompt_config, _ = self.get_config(PromptConfig, config)
+
+        llm_config, llm_config_changed = self.get_config(LLMEndpointConfig, config)
+        # Initialize LLMService if needed
+        if not self.llm_service or (
+            not self._llm_service_user_provided and llm_config_changed
+        ):
+            self.logger.debug(
+                "Initializing/reinitializing LLMService due to config change"
+            )
+            self.llm_service = LLMService(llm_config=llm_config)
+        assert self.llm_service
 
         messages = state["messages"]
 
