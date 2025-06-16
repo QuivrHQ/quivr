@@ -1,4 +1,5 @@
 from typing import Callable, List, Dict, Any, Tuple, TypedDict
+from quivr_core.rag.entities.config import WorkflowConfig
 from quivr_core.rag.langgraph_framework.state import AgentState, UpdatedPromptAndTools
 from langchain_core.prompts import BasePromptTemplate
 from langchain_core.documents import Document
@@ -9,22 +10,20 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-def update_active_tools(self, updated_prompt_and_tools: UpdatedPromptAndTools):
+def update_active_tools(
+    workflow_config: WorkflowConfig, updated_prompt_and_tools: UpdatedPromptAndTools
+):
     if updated_prompt_and_tools.tools_to_activate:
         for tool in updated_prompt_and_tools.tools_to_activate:
-            for validated_tool in self.retrieval_config.workflow_config.validated_tools:
+            for validated_tool in workflow_config.validated_tools:
                 if tool == validated_tool.name:
-                    self.retrieval_config.workflow_config.activated_tools.append(
-                        validated_tool
-                    )
+                    workflow_config.activated_tools.append(validated_tool)
 
     if updated_prompt_and_tools.tools_to_deactivate:
         for tool in updated_prompt_and_tools.tools_to_deactivate:
-            for activated_tool in self.retrieval_config.workflow_config.activated_tools:
+            for activated_tool in workflow_config.activated_tools:
                 if tool == activated_tool.name:
-                    self.retrieval_config.workflow_config.activated_tools.remove(
-                        activated_tool
-                    )
+                    workflow_config.activated_tools.remove(activated_tool)
 
 
 def get_rag_context_length(self, state: AgentState, docs: List[Document]) -> int:

@@ -15,6 +15,18 @@ class LLMService:
         self.config = llm_config
         self.llm_endpoint = LLMEndpoint.from_config(llm_config)
 
+    async def invoke(self, prompt: str) -> Any:
+        """
+        Invoke the LLM with the given prompt.
+
+        Args:
+            prompt: The prompt to send to the LLM
+
+        Returns:
+            The response from the LLM
+        """
+        return await self.llm_endpoint._llm.ainvoke(prompt)
+
     async def invoke_with_structured_output(
         self, prompt: str, output_class: Type[BaseModel]
     ) -> Any:
