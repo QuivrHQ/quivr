@@ -2,7 +2,7 @@
 
 ## Your Brain’s File Management System
 
-The `Storage` class is the backbone of how a brain interacts with files in `quivr-core`. Every brain holds a reference to an underlying storage system to manage its files. All storages should implement the `StorageBase` base classe that provides the structure and methods to make that happen seamlessly. Let's walk through how it works:
+The `Storage` class is the backbone of how a brain interacts with files in `quivr-core`. Every brain holds a reference to an underlying storage system to manage its files. All storages should implement the `StorageBase` base class that provides the structure and methods to make that happen seamlessly. Let's walk through how it works:
 
 - **Brain-Storage Connection:** Your brain holds a reference to a storage system. This class is the main way your brain can interact with and manage the files it uses. Adding files to a brain will upload them to the storage. This means that files in the storage are stored **before** processing!
 - **File Management:** the storage holds a set of `QuivrFile` objects, which are the building blocks of your brain’s file system. The storage can store them remotely or locally or hold simple
@@ -25,4 +25,4 @@ StorageBase is the foundation of how your brain organizes, uploads, retrieves, a
 - **TransparentStorage**:  
   The `TransparentStorage` implementation offers a lightweight and flexible approach, mainly managing files in memory without a need for local file paths. This storage system is useful when you don't need persistent storage but rather an easy way to store and retrieve files temporarily during the brain's operation.
 
-Each of these storage systems has its own strengths, catering to different use cases. As `quivr_core` evolves, we will implementat more ande more storage systems allowing for even more advanced and customized ways to manage your files like `S3Storage`, `NFSStorage` ...
+Each of these storage systems has its own strengths, catering to different use cases. As `quivr_core` evolves, we will implement more and more storage systems allowing for even more advanced and customized ways to manage your files like `S3Storage`, `NFSStorage` ...
