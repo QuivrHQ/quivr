@@ -6,22 +6,25 @@ import logging
 from typing import Optional
 import asyncio
 from langchain_core.vectorstores import VectorStore
-from langchain_core.vectorstores import VectorStoreRetriever
+from langchain.retrievers import ContextualCompressionRetriever
 from quivr_core.rag.langgraph_framework.nodes.base.graph_config import BaseGraphConfig
 from quivr_core.rag.langgraph_framework.nodes.base.node import (
     BaseNode,
     NodeValidationError,
 )
-from quivr_core.rag.langgraph_framework.nodes.retrieval.utils import get_retriever
+from quivr_core.rag.langgraph_framework.nodes.retrieval.utils import (
+    get_compression_retriever,
+)
 
 from quivr_core.rag.langgraph_framework.task import UserTasks
 from quivr_core.rag.entities.retriever import RetrieverConfig
+from quivr_core.rag.entities.reranker import RerankerConfig
 from quivr_core.rag.langgraph_framework.nodes.base.extractors import ConfigExtractor
 
 logger = logging.getLogger("quivr_core")
 
 
-class RetrievalNode(BaseNode):
+class CompressionRetrievalNode(BaseNode):
     """
     Node for basic document retrieval with reranking and filtering.
 
@@ -43,7 +46,7 @@ class RetrievalNode(BaseNode):
         super().__init__(config_extractor, node_name)
 
         self.vector_store = vector_store
-        self.retriever: Optional[VectorStoreRetriever] = None
+        self.retriever: Optional[ContextualCompressionRetriever] = None
 
     def validate_input_state(self, state) -> None:
         """Validate that state has the required attributes and methods."""
@@ -68,8 +71,14 @@ class RetrievalNode(BaseNode):
             RetrieverConfig, config
         )
 
-        if not self.retriever or retriever_config_changed:
-            self.retriever = get_retriever(self.vector_store, retriever_config)
+        reranker_config, reranker_config_changed = self.get_config(
+            RerankerConfig, config
+        )
+
+        if not self.retriever or retriever_config_changed or reranker_config_changed:
+            self.retriever = get_compression_retriever(
+                self.vector_store, retriever_config, reranker_config
+            )
 
         if "tasks" in state:
             tasks = state["tasks"]
@@ -83,7 +92,9 @@ class RetrievalNode(BaseNode):
         for task_id in tasks.ids:
             async_jobs.append(
                 (
-                    self.retriever.ainvoke(tasks(task_id).definition),
+                    self.retriever.ainvoke(
+                        tasks(task_id).definition,
+                    ),
                     task_id,
                 )
             )

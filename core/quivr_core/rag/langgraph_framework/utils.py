@@ -27,38 +27,6 @@ def update_active_tools(self, updated_prompt_and_tools: UpdatedPromptAndTools):
                     )
 
 
-def filter_chunks_by_relevance(self, chunks: List[Document], **kwargs):
-    config = self.retrieval_config.reranker_config
-    relevance_score_threshold = kwargs.get(
-        "relevance_score_threshold", config.relevance_score_threshold
-    )
-
-    if relevance_score_threshold is None:
-        return chunks
-
-    filtered_chunks = []
-    for chunk in chunks:
-        if config.relevance_score_key not in chunk.metadata:
-            logger.warning(
-                f"Relevance score key {config.relevance_score_key} not found in metadata, cannot filter chunks by relevance"
-            )
-            filtered_chunks.append(chunk)
-        elif chunk.metadata[config.relevance_score_key] >= relevance_score_threshold:
-            filtered_chunks.append(chunk)
-
-    return filtered_chunks
-
-
-def _sort_docs_by_relevance(self, docs: List[Document]) -> List[Document]:
-    return sorted(
-        docs,
-        key=lambda x: x.metadata[
-            self.retrieval_config.reranker_config.relevance_score_key
-        ],
-        reverse=True,
-    )
-
-
 def get_rag_context_length(self, state: AgentState, docs: List[Document]) -> int:
     final_inputs = self._build_rag_prompt_inputs(state, docs)
     msg = custom_prompts[TemplatePromptName.RAG_ANSWER_PROMPT].format(**final_inputs)
