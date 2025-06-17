@@ -9,10 +9,17 @@ from quivr_core.rag.langgraph_framework.nodes.history.entity import FilterHistor
 from quivr_core.rag.entities.config import LLMEndpointConfig
 from uuid import uuid4
 from quivr_core.rag.entities.chat import ChatHistory
-from quivr_core.rag.langgraph_framework.nodes.base.extractors import ConfigExtractor
 from quivr_core.rag.langgraph_framework.nodes.base.graph_config import BaseGraphConfig
+from quivr_core.rag.langgraph_framework.registry.node_registry import register_node
 
 
+@register_node(
+    name="filter_history",
+    description="Filter chat history based on token limits and relevance",
+    category="history",
+    version="1.0.0",
+    dependencies=["llm_service"],
+)
 class FilterHistoryNode(BaseNode):
     """
     Node for filtering the chat history.
@@ -20,17 +27,6 @@ class FilterHistoryNode(BaseNode):
 
     NODE_NAME = "filter_history"
     CONFIG_TYPES = (FilterHistoryConfig, LLMEndpointConfig)
-
-    def __init__(
-        self,
-        llm_service: LLMService,
-        config_extractor: Optional[ConfigExtractor] = None,
-        node_name: Optional[str] = None,
-    ):
-        super().__init__(config_extractor=config_extractor, node_name=node_name)
-
-        self.llm_service = llm_service
-        self._llm_service_user_provided = llm_service is not None
 
     def validate_input_state(self, state) -> None:
         """Validate that state has the required attributes and methods."""
@@ -45,20 +41,12 @@ class FilterHistoryNode(BaseNode):
 
     async def execute(self, state, config: Optional[BaseGraphConfig] = None):
         """Filter chat history based on token limits and max history."""
-        # Type-safe config extraction
+        # Get configs
         history_config, _ = self.get_config(FilterHistoryConfig, config)
+        llm_config, _ = self.get_config(LLMEndpointConfig, config)
 
-        llm_config, llm_config_changed = self.get_config(LLMEndpointConfig, config)
-
-        # Initialize LLMService if needed
-        if not self.llm_service or (
-            not self._llm_service_user_provided and llm_config_changed
-        ):
-            self.logger.debug(
-                "Initializing/reinitializing LLMService due to config change"
-            )
-            self.llm_service = LLMService(llm_config=llm_config)
-        assert self.llm_service
+        # Get services through dependency injection
+        llm_service = self.get_service(LLMService, llm_config)
 
         chat_history = state["chat_history"]
         total_tokens = 0
@@ -67,9 +55,9 @@ class FilterHistoryNode(BaseNode):
         _chat_history = ChatHistory(chat_id=_chat_id, brain_id=chat_history.brain_id)
 
         for human_message, ai_message in reversed(list(chat_history.iter_pairs())):
-            message_tokens = self.llm_service.count_tokens(
+            message_tokens = llm_service.count_tokens(
                 human_message.content
-            ) + self.llm_service.count_tokens(ai_message.content)
+            ) + llm_service.count_tokens(ai_message.content)
 
             if (
                 total_tokens + message_tokens > llm_config.max_context_tokens

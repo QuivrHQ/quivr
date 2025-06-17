@@ -1,14 +1,20 @@
 from typing import Any, Optional, Dict
 from quivr_core.llm_tools.llm_tools import LLMToolFactory
 import asyncio
-from quivr_core.rag.langgraph_framework.nodes.base.node import (
-    BaseNode,
-)
+from quivr_core.rag.langgraph_framework.nodes.base.node import BaseNode
 from quivr_core.rag.entities.prompt import PromptConfig
 from quivr_core.rag.langgraph_framework.nodes.base.graph_config import BaseGraphConfig
 from quivr_core.rag.langgraph_framework.nodes.base.extractors import ConfigExtractor
+from quivr_core.rag.langgraph_framework.registry.node_registry import register_node
 
 
+@register_node(
+    name="run_tool",
+    description="Execute tools for tasks that require external tool invocation",
+    category="tools",
+    version="1.0.0",
+    dependencies=["llm_tools"],
+)
 class RunToolNode(BaseNode):
     """
     Node for running a tool.
@@ -34,7 +40,6 @@ class RunToolNode(BaseNode):
 
     async def execute(self, state, config: Optional[BaseGraphConfig] = None):
         """Execute routing logic."""
-
         tasks = state["tasks"]
         if not tasks.has_tasks():
             return {**state}

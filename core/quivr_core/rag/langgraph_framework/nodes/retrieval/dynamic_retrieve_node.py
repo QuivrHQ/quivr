@@ -1,13 +1,12 @@
 """
-Basic document retrieval node with runtime validation.
+Dynamic document retrieval node with adaptive search parameters.
 """
 
 import logging
-from typing import Optional
+from typing import Optional, List
 import asyncio
 from langchain_core.vectorstores import VectorStore
 from langchain_core.documents import Document
-from typing import List
 from langchain.retrievers import ContextualCompressionRetriever
 from quivr_core.rag.langgraph_framework.nodes.base.graph_config import BaseGraphConfig
 from quivr_core.rag.langgraph_framework.nodes.base.node import (
@@ -18,36 +17,38 @@ from quivr_core.rag.langgraph_framework.nodes.retrieval.utils import (
     filter_chunks_by_relevance,
     get_compression_retriever,
 )
-
 from quivr_core.rag.langgraph_framework.task import UserTasks
 from quivr_core.rag.entities.retriever import RetrieverConfig
 from quivr_core.rag.entities.reranker import RerankerConfig
 from quivr_core.rag.langgraph_framework.nodes.base.extractors import ConfigExtractor
+from quivr_core.rag.langgraph_framework.registry.node_registry import register_node
 
 logger = logging.getLogger("quivr_core")
 
 
+@register_node(
+    name="dynamic_retrieve",
+    description="Dynamic document retrieval with adaptive search parameters based on relevance",
+    category="retrieval",
+    version="1.0.0",
+    dependencies=["vector_store"],
+)
 class DynamicRetrievalNode(BaseNode):
     """
-    Node for basic document retrieval with reranking and filtering.
-
-    Runtime Requirements: State must have:
-    - tasks: UserTasks (for reading tasks)
-    - with_documents(docs) method (for writing documents)
-    - with_reasoning(reasoning) method (for writing reasoning)
+    Node for dynamic document retrieval with adaptive search parameters.
     """
 
-    NODE_NAME = "retrieve"
-    CONFIG_TYPES = (RetrieverConfig,)
+    NODE_NAME = "dynamic_retrieve"
+    CONFIG_TYPES = (RetrieverConfig, RerankerConfig)
 
     def __init__(
         self,
         vector_store: VectorStore,
         config_extractor: Optional[ConfigExtractor] = None,
         node_name: Optional[str] = None,
+        **kwargs,
     ):
-        super().__init__(config_extractor, node_name)
-
+        super().__init__(config_extractor, node_name, **kwargs)
         self.vector_store = vector_store
         self.retriever: Optional[ContextualCompressionRetriever] = None
 
@@ -55,12 +56,11 @@ class DynamicRetrievalNode(BaseNode):
         """Validate that state has the required attributes and methods."""
         if "messages" not in state:
             raise NodeValidationError(
-                "RetrievalNode requires 'messages' attribute in state"
+                "DynamicRetrievalNode requires 'messages' attribute in state"
             )
-
         if not state["messages"]:
             raise NodeValidationError(
-                "RetrievalNode requires non-empty messages in state"
+                "DynamicRetrievalNode requires non-empty messages in state"
             )
 
     def validate_output_state(self, state) -> None:
@@ -75,15 +75,6 @@ class DynamicRetrievalNode(BaseNode):
     ) -> List[Document]:
         """
         Dynamically retrieve documents, increasing search parameters if needed.
-
-        Args:
-            query: The search query
-            filter_dict: Optional filter to apply to search
-            max_iterations: Maximum number of retrieval attempts
-            **kwargs: Additional arguments for retrieval configuration
-
-        Returns:
-            List of retrieved and filtered documents
         """
         top_n = reranker_config.top_n
         k = retriever_config.k
@@ -124,10 +115,10 @@ class DynamicRetrievalNode(BaseNode):
 
     async def execute(self, state, config: Optional[BaseGraphConfig] = None):
         """Execute document retrieval for all user tasks."""
+        # Get configs
         retriever_config, retriever_config_changed = self.get_config(
             RetrieverConfig, config
         )
-
         reranker_config, reranker_config_changed = self.get_config(
             RerankerConfig, config
         )

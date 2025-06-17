@@ -13,22 +13,24 @@ from quivr_core.rag.langgraph_framework.nodes.base.node import (
     NodeValidationError,
 )
 from quivr_core.rag.langgraph_framework.nodes.retrieval.utils import get_retriever
-
 from quivr_core.rag.langgraph_framework.task import UserTasks
 from quivr_core.rag.entities.retriever import RetrieverConfig
 from quivr_core.rag.langgraph_framework.nodes.base.extractors import ConfigExtractor
+from quivr_core.rag.langgraph_framework.registry.node_registry import register_node
 
 logger = logging.getLogger("quivr_core")
 
 
+@register_node(
+    name="retrieve",
+    description="Basic document retrieval with reranking and filtering",
+    category="retrieval",
+    version="1.0.0",
+    dependencies=["vector_store"],
+)
 class RetrievalNode(BaseNode):
     """
     Node for basic document retrieval with reranking and filtering.
-
-    Runtime Requirements: State must have:
-    - tasks: UserTasks (for reading tasks)
-    - with_documents(docs) method (for writing documents)
-    - with_reasoning(reasoning) method (for writing reasoning)
     """
 
     NODE_NAME = "retrieve"
@@ -39,9 +41,9 @@ class RetrievalNode(BaseNode):
         vector_store: VectorStore,
         config_extractor: Optional[ConfigExtractor] = None,
         node_name: Optional[str] = None,
+        **kwargs,
     ):
-        super().__init__(config_extractor, node_name)
-
+        super().__init__(config_extractor, node_name, **kwargs)
         self.vector_store = vector_store
         self.retriever: Optional[VectorStoreRetriever] = None
 
@@ -51,7 +53,6 @@ class RetrievalNode(BaseNode):
             raise NodeValidationError(
                 "RetrievalNode requires 'messages' attribute in state"
             )
-
         if not state["messages"]:
             raise NodeValidationError(
                 "RetrievalNode requires non-empty messages in state"
@@ -63,7 +64,7 @@ class RetrievalNode(BaseNode):
 
     async def execute(self, state, config: Optional[BaseGraphConfig] = None):
         """Execute document retrieval for all user tasks."""
-        # Type-safe config extraction
+        # Get config
         retriever_config, retriever_config_changed = self.get_config(
             RetrieverConfig, config
         )
@@ -82,10 +83,7 @@ class RetrievalNode(BaseNode):
         async_jobs = []
         for task_id in tasks.ids:
             async_jobs.append(
-                (
-                    self.retriever.ainvoke(tasks(task_id).definition),
-                    task_id,
-                )
+                (self.retriever.ainvoke(tasks(task_id).definition), task_id)
             )
 
         # Gather all the responses asynchronously

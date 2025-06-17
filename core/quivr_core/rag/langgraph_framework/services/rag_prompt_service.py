@@ -6,11 +6,10 @@ from quivr_core.rag.prompts import custom_prompts, TemplatePromptName
 logger = logging.getLogger("quivr_core")
 
 
-class PromptService:
+class RAGPromptService:
     """Service for prompt template management and context building."""
 
-    def __init__(self, retrieval_config=None):
-        self.retrieval_config = retrieval_config
+    def __init__(self):
         self.templates = custom_prompts
 
     def get_template(self, template_name: TemplatePromptName) -> BasePromptTemplate:

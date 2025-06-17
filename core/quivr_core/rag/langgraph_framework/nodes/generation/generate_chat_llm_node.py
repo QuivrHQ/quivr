@@ -1,20 +1,27 @@
 from typing import Optional
 from quivr_core.rag.entities.config import LLMEndpointConfig
-from quivr_core.rag.langgraph_framework.nodes.base.node import (
-    BaseNode,
-)
+from quivr_core.rag.langgraph_framework.nodes.base.node import BaseNode
 from quivr_core.rag.langgraph_framework.nodes.base.exceptions import NodeValidationError
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain_core.messages import HumanMessage, SystemMessage
 from quivr_core.rag.langgraph_framework.nodes.base.graph_config import BaseGraphConfig
 from quivr_core.rag.prompts import TemplatePromptName
 from quivr_core.rag.entities.prompt import PromptConfig
-from quivr_core.rag.langgraph_framework.services.prompt_service import PromptService
+from quivr_core.rag.langgraph_framework.services.rag_prompt_service import (
+    RAGPromptService,
+)
 from quivr_core.rag.langgraph_framework.services.llm_service import LLMService
-from quivr_core.rag.langgraph_framework.nodes.base.extractors import ConfigExtractor
 from quivr_core.rag.langgraph_framework.utils import reduce_rag_context
+from quivr_core.rag.langgraph_framework.registry.node_registry import register_node
 
 
+@register_node(
+    name="generate_chat_llm",
+    description="Generate responses using a Chat LLM model with conversation context",
+    category="generation",
+    version="1.0.0",
+    dependencies=["llm_service", "prompt_service"],
+)
 class GenerateChatLlmNode(BaseNode):
     """
     Node for generating a response using a Chat LLM model.
@@ -23,27 +30,12 @@ class GenerateChatLlmNode(BaseNode):
     NODE_NAME = "generate_chat_llm"
     CONFIG_TYPES = (PromptConfig, LLMEndpointConfig)
 
-    def __init__(
-        self,
-        prompt_service: PromptService,
-        llm_service: LLMService,
-        config_extractor: Optional[ConfigExtractor] = None,
-        node_name: Optional[str] = None,
-    ):
-        super().__init__(config_extractor, node_name)
-        self.prompt_service = prompt_service
-        self._prompt_service_user_provided = prompt_service is not None
-
-        self.llm_service = llm_service
-        self._llm_service_user_provided = llm_service is not None
-
     def validate_input_state(self, state) -> None:
         """Validate that state has the required attributes and methods."""
         if "messages" not in state:
             raise NodeValidationError(
                 "GenerateChatLlmNode requires 'messages' attribute in state"
             )
-
         if not state["messages"]:
             raise NodeValidationError(
                 "GenerateChatLlmNode requires non-empty messages in state"
@@ -55,19 +47,13 @@ class GenerateChatLlmNode(BaseNode):
 
     async def execute(self, state, config: Optional[BaseGraphConfig] = None):
         """Execute the chat LLM generation."""
-
+        # Get configs
         prompt_config, _ = self.get_config(PromptConfig, config)
+        llm_config, _ = self.get_config(LLMEndpointConfig, config)
 
-        llm_config, llm_config_changed = self.get_config(LLMEndpointConfig, config)
-        # Initialize LLMService if needed
-        if not self.llm_service or (
-            not self._llm_service_user_provided and llm_config_changed
-        ):
-            self.logger.debug(
-                "Initializing/reinitializing LLMService due to config change"
-            )
-            self.llm_service = LLMService(llm_config=llm_config)
-        assert self.llm_service
+        # Get services through dependency injection
+        llm_service = self.get_service(LLMService, llm_config)
+        prompt_service = self.get_service(RAGPromptService)  # Uses default config
 
         messages = state["messages"]
 
@@ -85,7 +71,6 @@ class GenerateChatLlmNode(BaseNode):
             user_message if user_message else (messages[0].content if messages else "")
         )
 
-        # Now prompt_config.prompt works perfectly with full type safety!
         prompt = prompt_config.prompt
 
         final_inputs = {}
@@ -94,16 +79,18 @@ class GenerateChatLlmNode(BaseNode):
         final_inputs["chat_history"] = state["chat_history"].to_list()
 
         # LLM
-        llm = self.llm_service.get_base_llm()
+        llm = llm_service.get_base_llm()
 
-        prompt = self.prompt_service.get_template(TemplatePromptName.CHAT_LLM_PROMPT)
+        prompt_template = prompt_service.get_template(
+            TemplatePromptName.CHAT_LLM_PROMPT
+        )
 
         state, reduced_inputs = reduce_rag_context(
             state,
             final_inputs,
-            system_message if system_message else prompt,
-            self.llm_service.count_tokens,
-            llm_config.max_context_tokens,  # Full type safety here too!
+            system_message if system_message else prompt_template,
+            llm_service.count_tokens,
+            llm_config.max_context_tokens,
         )
 
         CHAT_LLM_PROMPT = ChatPromptTemplate.from_messages(

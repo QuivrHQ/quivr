@@ -10,13 +10,20 @@ from quivr_core.rag.utils import format_dict
 from quivr_core.rag.entities.config import LLMEndpointConfig, WorkflowConfig
 from quivr_core.rag.langgraph_framework.nodes.base.graph_config import BaseGraphConfig
 from quivr_core.rag.prompts import TemplatePromptName
-
-
-from quivr_core.rag.langgraph_framework.services.prompt_service import PromptService
+from quivr_core.rag.langgraph_framework.services.rag_prompt_service import (
+    RAGPromptService,
+)
 from quivr_core.rag.langgraph_framework.services.llm_service import LLMService
-from quivr_core.rag.langgraph_framework.nodes.base.extractors import ConfigExtractor
+from quivr_core.rag.langgraph_framework.registry.node_registry import register_node
 
 
+@register_node(
+    name="generate_zendesk_rag",
+    description="Generate Zendesk-specific RAG responses with ticket context and metadata",
+    category="generation",
+    version="1.0.0",
+    dependencies=["llm_service", "prompt_service"],
+)
 class GenerateZendeskRagNode(BaseNode):
     """
     Node for generating a response using a Zendesk RAG model.
@@ -25,38 +32,20 @@ class GenerateZendeskRagNode(BaseNode):
     NODE_NAME = "generate_zendesk_rag"
     CONFIG_TYPES = (WorkflowConfig, LLMEndpointConfig)
 
-    def __init__(
-        self,
-        prompt_service: PromptService,
-        llm_service: LLMService,
-        config_extractor: Optional[ConfigExtractor] = None,
-        node_name: Optional[str] = None,
-    ):
-        super().__init__(config_extractor, node_name)
-
-        self.prompt_service = prompt_service
-        self._prompt_service_user_provided = prompt_service is not None
-
-        self.llm_service = llm_service
-        self._llm_service_user_provided = llm_service is not None
-
     def validate_input_state(self, state) -> None:
         """Validate that state has the required attributes and methods."""
         if "messages" not in state:
             raise NodeValidationError(
                 "GenerateZendeskRagNode requires 'messages' attribute in state"
             )
-
         if not state["messages"]:
             raise NodeValidationError(
                 "GenerateZendeskRagNode requires non-empty messages in state"
             )
-
         if "tasks" not in state:
             raise NodeValidationError(
                 "GenerateZendeskRagNode requires 'tasks' attribute in state"
             )
-
         if not state["tasks"]:
             raise NodeValidationError(
                 "GenerateZendeskRagNode requires non-empty tasks in state"
@@ -68,26 +57,20 @@ class GenerateZendeskRagNode(BaseNode):
 
     async def execute(self, state, config: Optional[BaseGraphConfig] = None):
         """Execute Zendesk RAG generation."""
-        # Type-safe config extraction
+        # Get configs
         workflow_config, _ = self.get_config(WorkflowConfig, config)
+        llm_config, _ = self.get_config(LLMEndpointConfig, config)
 
-        # Initialize LLMService if needed
-        llm_config, llm_config_changed = self.get_config(LLMEndpointConfig, config)
-        if not self.llm_service or (
-            not self._llm_service_user_provided and llm_config_changed
-        ):
-            self.logger.debug(
-                "Initializing/reinitializing LLMService due to config change"
-            )
-            self.llm_service = LLMService(llm_config=llm_config)
-        assert self.llm_service
+        # Get services through dependency injection
+        llm_service = self.get_service(LLMService, llm_config)
+        prompt_service = self.get_service(RAGPromptService, None)  # Uses default config
 
         tasks = state["tasks"]
         docs: List[Document] = tasks.docs if tasks else []
         messages = state["messages"]
         user_task = messages[0].content
 
-        prompt_template: BasePromptTemplate = self.prompt_service.get_template(
+        prompt_template: BasePromptTemplate = prompt_service.get_template(
             TemplatePromptName.ZENDESK_TEMPLATE_PROMPT
         )
 
@@ -111,7 +94,7 @@ class GenerateZendeskRagNode(BaseNode):
                 inputs[variable] = state.get(variable, "")
 
         msg = prompt_template.format_prompt(**inputs)
-        llm = self.llm_service.bind_tools(self.name, workflow_config)
+        llm = llm_service.bind_tools(self.name, workflow_config)
 
         response = llm.invoke(msg)
 

@@ -1,5 +1,5 @@
 """
-Basic document retrieval node with runtime validation.
+System prompt editing node with runtime validation.
 """
 
 import logging
@@ -7,22 +7,28 @@ from typing import Optional
 from quivr_core.rag.entities.config import LLMEndpointConfig, WorkflowConfig
 from quivr_core.rag.entities.prompt import PromptConfig
 from quivr_core.rag.langgraph_framework.nodes.base.graph_config import BaseGraphConfig
-from quivr_core.rag.langgraph_framework.nodes.base.node import (
-    BaseNode,
-)
-
+from quivr_core.rag.langgraph_framework.nodes.base.node import BaseNode
 from quivr_core.rag.langgraph_framework.services.llm_service import LLMService
-from quivr_core.rag.langgraph_framework.services.prompt_service import PromptService
+from quivr_core.rag.langgraph_framework.services.rag_prompt_service import (
+    RAGPromptService,
+)
 from quivr_core.rag.entities.retriever import RetrieverConfig
-from quivr_core.rag.langgraph_framework.nodes.base.extractors import ConfigExtractor
 from quivr_core.rag.langgraph_framework.utils import update_active_tools
 from quivr_core.rag.prompts import TemplatePromptName
 from quivr_core.rag.langgraph_framework.state import UpdatedPromptAndTools
 from quivr_core.rag.utils import collect_tools
+from quivr_core.rag.langgraph_framework.registry.node_registry import register_node
 
 logger = logging.getLogger("quivr_core")
 
 
+@register_node(
+    name="edit_system_prompt",
+    description="Edit system prompts and manage tool activation based on user instructions",
+    category="various",
+    version="1.0.0",
+    dependencies=["llm_service", "prompt_service"],
+)
 class EditSystemPromptNode(BaseNode):
     """
     Node for editing the system prompt.
@@ -35,22 +41,7 @@ class EditSystemPromptNode(BaseNode):
     """
 
     NODE_NAME = "edit_system_prompt"
-    CONFIG_TYPES = (RetrieverConfig,)
-
-    def __init__(
-        self,
-        llm_service: Optional[LLMService] = None,
-        prompt_service: Optional[PromptService] = None,
-        config_extractor: Optional[ConfigExtractor] = None,
-        node_name: Optional[str] = None,
-    ):
-        super().__init__(config_extractor, node_name)
-
-        self.llm_service = llm_service
-        self._llm_service_user_provided = llm_service is not None
-
-        self.prompt_service = prompt_service
-        self._prompt_service_user_provided = prompt_service is not None
+    CONFIG_TYPES = (RetrieverConfig, LLMEndpointConfig, WorkflowConfig, PromptConfig)
 
     def validate_input_state(self, state) -> None:
         """Validate that state has the required attributes and methods."""
@@ -62,34 +53,15 @@ class EditSystemPromptNode(BaseNode):
 
     async def execute(self, state, config: Optional[BaseGraphConfig] = None):
         """Execute document retrieval for all user tasks."""
-
-        retriever_config, retriever_config_changed = self.get_config(
-            RetrieverConfig, config
-        )
-
-        llm_config, llm_config_changed = self.get_config(LLMEndpointConfig, config)
-
+        # Get configs
+        retriever_config, _ = self.get_config(RetrieverConfig, config)
+        llm_config, _ = self.get_config(LLMEndpointConfig, config)
         workflow_config, _ = self.get_config(WorkflowConfig, config)
-
         prompt_config, _ = self.get_config(PromptConfig, config)
 
-        # Initialize LLMService if needed
-        if not self.llm_service or (
-            not self._llm_service_user_provided and llm_config_changed
-        ):
-            self.logger.debug(
-                "Initializing/reinitializing LLMService due to config change"
-            )
-            self.llm_service = LLMService(llm_config=llm_config)
-        assert self.llm_service
-
-        # Initialize PromptService if needed
-        if not self.prompt_service:
-            self.logger.debug(
-                "Initializing/reinitializing PromptService due to config change"
-            )
-            self.prompt_service = PromptService()
-        assert self.prompt_service
+        # Get services through dependency injection
+        llm_service = self.get_service(LLMService, llm_config)
+        prompt_service = self.get_service(RAGPromptService, None)  # Uses default config
 
         user_instruction = state["instructions"]
         prompt = prompt_config.prompt
@@ -101,14 +73,12 @@ class EditSystemPromptNode(BaseNode):
             "activated_tools": activated_tools,
         }
 
-        msg = self.prompt_service.get_template(TemplatePromptName.UPDATE_PROMPT).format(
+        msg = prompt_service.get_template(TemplatePromptName.UPDATE_PROMPT).format(
             **inputs
         )
 
         response: UpdatedPromptAndTools = (
-            await self.llm_service.invoke_with_structured_output(
-                msg, UpdatedPromptAndTools
-            )
+            await llm_service.invoke_with_structured_output(msg, UpdatedPromptAndTools)
         )
 
         update_active_tools(workflow_config, response)

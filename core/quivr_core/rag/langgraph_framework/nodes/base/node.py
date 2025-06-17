@@ -7,10 +7,14 @@ from quivr_core.rag.langgraph_framework.nodes.base.extractors import ConfigExtra
 from quivr_core.rag.langgraph_framework.nodes.base.graph_config import BaseGraphConfig
 from quivr_core.rag.langgraph_framework.nodes.base.exceptions import NodeValidationError
 from quivr_core.rag.langgraph_framework.nodes.base.utils import compute_config_hash
+from quivr_core.rag.langgraph_framework.services.service_container import (
+    ServiceContainer,
+)
 
 logger = logging.getLogger("quivr_core")
 
 T = TypeVar("T", bound=BaseModel)
+S = TypeVar("S")  # For services
 
 
 def extract_config_from_runnable(config: Optional[BaseGraphConfig]) -> Dict[str, Any]:
@@ -22,21 +26,24 @@ def extract_config_from_runnable(config: Optional[BaseGraphConfig]) -> Dict[str,
 
 class BaseNode(ABC):
     """
-    Abstract base class for all LangGraph nodes.
+    Abstract base class for all LangGraph nodes with dependency injection support.
     """
 
     NODE_NAME: str = "base_node"
     CONFIG_TYPES: Tuple[Type[BaseModel], ...] = ()
+    _node_metadata: Optional[Dict[str, Any]] = None
 
     def __init__(
         self,
         config_extractor: Optional[ConfigExtractor] = None,
         node_name: Optional[str] = None,
+        service_container: Optional[ServiceContainer] = None,
     ):
         """Initialize the base node."""
         self.node_name = node_name or self.NODE_NAME
         self.logger = logging.getLogger(f"quivr_core.nodes.{self.node_name}")
         self.config_extractor = config_extractor
+        self.service_container = service_container or ServiceContainer()
         # Cache for config hashes to detect changes
         self._config_hashes: Dict[Type[BaseModel], str] = {}
 
@@ -87,6 +94,10 @@ class BaseNode(ABC):
         self._config_hashes[config_type] = current_hash
 
         return extracted_config, has_changed
+
+    def get_service(self, service_type: Type[S], config: Optional[Any] = None) -> S:
+        """Get a service instance from the container."""
+        return self.service_container.get_service(service_type, config)
 
     @abstractmethod
     def validate_input_state(self, state) -> None:

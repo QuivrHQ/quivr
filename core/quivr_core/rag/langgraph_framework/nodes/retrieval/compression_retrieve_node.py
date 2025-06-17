@@ -1,5 +1,5 @@
 """
-Basic document retrieval node with runtime validation.
+Document retrieval node with compression and reranking.
 """
 
 import logging
@@ -15,36 +15,38 @@ from quivr_core.rag.langgraph_framework.nodes.base.node import (
 from quivr_core.rag.langgraph_framework.nodes.retrieval.utils import (
     get_compression_retriever,
 )
-
 from quivr_core.rag.langgraph_framework.task import UserTasks
 from quivr_core.rag.entities.retriever import RetrieverConfig
 from quivr_core.rag.entities.reranker import RerankerConfig
 from quivr_core.rag.langgraph_framework.nodes.base.extractors import ConfigExtractor
+from quivr_core.rag.langgraph_framework.registry.node_registry import register_node
 
 logger = logging.getLogger("quivr_core")
 
 
+@register_node(
+    name="compression_retrieve",
+    description="Document retrieval with contextual compression and reranking",
+    category="retrieval",
+    version="1.0.0",
+    dependencies=["vector_store"],
+)
 class CompressionRetrievalNode(BaseNode):
     """
-    Node for basic document retrieval with reranking and filtering.
-
-    Runtime Requirements: State must have:
-    - tasks: UserTasks (for reading tasks)
-    - with_documents(docs) method (for writing documents)
-    - with_reasoning(reasoning) method (for writing reasoning)
+    Node for document retrieval with compression, reranking and filtering.
     """
 
-    NODE_NAME = "retrieve"
-    CONFIG_TYPES = (RetrieverConfig,)
+    NODE_NAME = "compression_retrieve"
+    CONFIG_TYPES = (RetrieverConfig, RerankerConfig)
 
     def __init__(
         self,
         vector_store: VectorStore,
         config_extractor: Optional[ConfigExtractor] = None,
         node_name: Optional[str] = None,
+        **kwargs,
     ):
-        super().__init__(config_extractor, node_name)
-
+        super().__init__(config_extractor, node_name, **kwargs)
         self.vector_store = vector_store
         self.retriever: Optional[ContextualCompressionRetriever] = None
 
@@ -52,12 +54,11 @@ class CompressionRetrievalNode(BaseNode):
         """Validate that state has the required attributes and methods."""
         if "messages" not in state:
             raise NodeValidationError(
-                "RetrievalNode requires 'messages' attribute in state"
+                "CompressionRetrievalNode requires 'messages' attribute in state"
             )
-
         if not state["messages"]:
             raise NodeValidationError(
-                "RetrievalNode requires non-empty messages in state"
+                "CompressionRetrievalNode requires non-empty messages in state"
             )
 
     def validate_output_state(self, state) -> None:
@@ -66,11 +67,10 @@ class CompressionRetrievalNode(BaseNode):
 
     async def execute(self, state, config: Optional[BaseGraphConfig] = None):
         """Execute document retrieval for all user tasks."""
-        # Type-safe config extraction
+        # Get configs
         retriever_config, retriever_config_changed = self.get_config(
             RetrieverConfig, config
         )
-
         reranker_config, reranker_config_changed = self.get_config(
             RerankerConfig, config
         )
@@ -91,12 +91,7 @@ class CompressionRetrievalNode(BaseNode):
         async_jobs = []
         for task_id in tasks.ids:
             async_jobs.append(
-                (
-                    self.retriever.ainvoke(
-                        tasks(task_id).definition,
-                    ),
-                    task_id,
-                )
+                (self.retriever.ainvoke(tasks(task_id).definition), task_id)
             )
 
         # Gather all the responses asynchronously
