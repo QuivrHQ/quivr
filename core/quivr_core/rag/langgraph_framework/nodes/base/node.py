@@ -5,7 +5,6 @@ from pydantic import BaseModel
 
 from quivr_core.rag.langgraph_framework.nodes.base.extractors import ConfigExtractor
 from quivr_core.rag.langgraph_framework.nodes.base.graph_config import BaseGraphConfig
-from quivr_core.rag.langgraph_framework.nodes.base.exceptions import NodeValidationError
 from quivr_core.rag.langgraph_framework.nodes.base.utils import compute_config_hash
 from quivr_core.rag.langgraph_framework.services.service_container import (
     ServiceContainer,
@@ -139,11 +138,9 @@ class BaseNode(ABC):
 
             return result
 
-        except NodeValidationError:
-            raise
         except Exception as e:
             self.logger.error(f"Error in {self.node_name}: {str(e)}", exc_info=True)
-            return self.handle_error(e, state)
+            raise
 
     @abstractmethod
     async def execute(self, state, config: Optional[BaseGraphConfig] = None):
