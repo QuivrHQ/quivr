@@ -40,9 +40,13 @@ def create_sample_user_tasks() -> UserTasks:
         task_id = tasks.ids[0]
         docs = [
             Document(
-                page_content="Sample document content", metadata={"source": "test"}
+                page_content="Sample document content",
+                metadata={"source": "test", "original_file_name": "test.txt"},
             ),
-            Document(page_content="Another document", metadata={"source": "test2"}),
+            Document(
+                page_content="Another document",
+                metadata={"source": "test2", "original_file_name": "test2.txt"},
+            ),
         ]
         tasks.set_docs(task_id, docs)
 
@@ -54,15 +58,27 @@ def create_sample_documents() -> List[Document]:
     return [
         Document(
             page_content="This is a sample document for testing.",
-            metadata={"source": "test_doc_1.txt", "page": 1},
+            metadata={
+                "source": "test_doc_1.txt",
+                "page": 1,
+                "original_file_name": "test_doc_1.txt",
+            },
         ),
         Document(
             page_content="This is another sample document with more content for testing purposes.",
-            metadata={"source": "test_doc_2.txt", "page": 1},
+            metadata={
+                "source": "test_doc_2.txt",
+                "page": 1,
+                "original_file_name": "test_doc_2.txt",
+            },
         ),
         Document(
             page_content="A third document to test document handling and processing.",
-            metadata={"source": "test_doc_3.txt", "page": 1},
+            metadata={
+                "source": "test_doc_3.txt",
+                "page": 1,
+                "original_file_name": "test_doc_3.txt",
+            },
         ),
     ]
 
