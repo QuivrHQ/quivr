@@ -52,7 +52,7 @@ def mock_chain_qa_stream(monkeypatch, chunks_stream_answer):
 
 
 @pytest.mark.base
-@pytest.mark.asyncio
+@pytest.mark.asyncio(loop_scope="session")
 async def test_quivrqaraglanggraph(
     mem_vector_store, full_response, mock_chain_qa_stream, openai_api_key
 ):

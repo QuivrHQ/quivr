@@ -822,7 +822,7 @@ class TestDataModels:
         assert update.tools_to_deactivate == []
 
 
-@pytest.mark.asyncio
+@pytest.mark.asyncio(loop_scope="session")
 class TestAsyncMethods:
     """Test asynchronous methods."""
 
@@ -951,7 +951,7 @@ class TestAsyncMethods:
 
 
 # Integration test to ensure all components work together
-@pytest.mark.asyncio
+@pytest.mark.asyncio(loop_scope="session")
 class TestIntegration:
     """Integration tests for the RAG system."""
 
