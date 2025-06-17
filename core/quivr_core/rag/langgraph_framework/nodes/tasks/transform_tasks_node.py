@@ -3,8 +3,8 @@ import asyncio
 from quivr_core.rag.entities.config import LLMEndpointConfig
 from quivr_core.rag.langgraph_framework.nodes.base.node import (
     BaseNode,
-    NodeValidationError,
 )
+from quivr_core.rag.langgraph_framework.nodes.base.exceptions import NodeValidationError
 from quivr_core.rag.entities.prompt import PromptConfig
 from quivr_core.rag.langgraph_framework.nodes.base.graph_config import BaseGraphConfig
 from quivr_core.rag.langgraph_framework.services.rag_prompt_service import (

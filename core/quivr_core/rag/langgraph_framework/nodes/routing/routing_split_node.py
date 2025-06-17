@@ -2,8 +2,8 @@ from typing import Optional
 from quivr_core.rag.entities.config import LLMEndpointConfig, RetrievalConfig
 from quivr_core.rag.langgraph_framework.nodes.base.node import (
     BaseNode,
-    NodeValidationError,
 )
+from quivr_core.rag.langgraph_framework.nodes.base.exceptions import NodeValidationError
 from langgraph.types import Send
 from quivr_core.rag.prompts import TemplatePromptName
 from quivr_core.rag.entities.prompt import PromptConfig

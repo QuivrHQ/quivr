@@ -10,8 +10,8 @@ from langchain.retrievers import ContextualCompressionRetriever
 from quivr_core.rag.langgraph_framework.nodes.base.graph_config import BaseGraphConfig
 from quivr_core.rag.langgraph_framework.nodes.base.node import (
     BaseNode,
-    NodeValidationError,
 )
+from quivr_core.rag.langgraph_framework.nodes.base.exceptions import NodeValidationError
 from quivr_core.rag.langgraph_framework.nodes.retrieval.utils import (
     get_compression_retriever,
 )

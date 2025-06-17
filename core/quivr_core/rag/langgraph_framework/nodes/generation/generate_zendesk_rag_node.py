@@ -1,8 +1,8 @@
 from typing import Optional, List
 from quivr_core.rag.langgraph_framework.nodes.base.node import (
     BaseNode,
-    NodeValidationError,
 )
+from quivr_core.rag.langgraph_framework.nodes.base.exceptions import NodeValidationError
 from langchain_core.prompts import BasePromptTemplate
 from langchain_core.documents import Document
 from datetime import datetime
