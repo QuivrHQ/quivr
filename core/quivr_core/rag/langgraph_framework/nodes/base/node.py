@@ -44,8 +44,8 @@ class BaseNode(ABC):
         self.logger = logging.getLogger(f"quivr_core.nodes.{self.node_name}")
         self.config_extractor = config_extractor
         self.service_container = service_container or ServiceContainer()
-        # Cache for config hashes to detect changes
-        self._config_hashes: Dict[Type[BaseModel], str] = {}
+        # Cache for config hashes to detect changes (keyed by (config_type, node_name))
+        self._config_hashes: Dict[Tuple[Type[BaseModel], str], str] = {}
 
     @property
     def name(self):
@@ -55,7 +55,7 @@ class BaseNode(ABC):
         self, config_type: Type[T], config: Optional[BaseGraphConfig] = None
     ) -> Tuple[T, bool]:
         """
-        Extract a specific configuration type with change detection.
+        Extract a specific configuration type with change detection and node-specific overrides.
 
         Args:
             config_type: The type of config to extract
@@ -63,7 +63,7 @@ class BaseNode(ABC):
 
         Returns:
             Tuple of (config_instance, has_changed)
-            - config_instance: The extracted config
+            - config_instance: The extracted config (with node-specific overrides if any)
             - has_changed: True if config changed since last call, False otherwise
         """
         if not self.config_extractor or not config:
@@ -71,27 +71,32 @@ class BaseNode(ABC):
             current_hash = compute_config_hash(default_config)
 
             # Check if this is a new config or if it has changed
+            cache_key = (config_type, self.node_name)
             has_changed = (
-                config_type not in self._config_hashes
-                or self._config_hashes[config_type] != current_hash
+                cache_key not in self._config_hashes
+                or self._config_hashes[cache_key] != current_hash
             )
 
             # Update the cached hash
-            self._config_hashes[config_type] = current_hash
+            self._config_hashes[cache_key] = current_hash
 
             return default_config, has_changed
 
-        extracted_config = cast(T, self.config_extractor.extract(config, config_type))
+        # Extract config with node-specific overrides
+        extracted_config = cast(
+            T, self.config_extractor.extract(config, config_type, self.node_name)
+        )
         current_hash = compute_config_hash(extracted_config)
 
         # Check if this is a new config or if it has changed
+        cache_key = (config_type, self.node_name)
         has_changed = (
-            config_type not in self._config_hashes
-            or self._config_hashes[config_type] != current_hash
+            cache_key not in self._config_hashes
+            or self._config_hashes[cache_key] != current_hash
         )
 
         # Update the cached hash
-        self._config_hashes[config_type] = current_hash
+        self._config_hashes[cache_key] = current_hash
 
         return extracted_config, has_changed
 

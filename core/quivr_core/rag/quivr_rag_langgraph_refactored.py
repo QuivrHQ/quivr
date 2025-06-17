@@ -1,5 +1,5 @@
 from uuid import UUID
-from typing import AsyncGenerator, Any
+from typing import AsyncGenerator, Any, Type
 
 
 from quivr_core.base_config import QuivrBaseConfig
@@ -27,6 +27,7 @@ from quivr_core.rag.utils import (
     get_chunk_metadata,
     parse_chunk_response,
 )
+from quivr_core.rag.langgraph_framework.nodes.base.extractors import ConfigMapping
 
 import logging
 
@@ -42,13 +43,16 @@ class QuivrQARAGLangGraphRefactored:
         workflow_config: WorkflowConfig,
         graph_state,
         graph_config: dict[str, Any],
-        graph_config_schema: QuivrBaseConfig,
+        graph_config_schema: Type[QuivrBaseConfig],
         llm_service: LLMService,
+        config_extractor: ConfigMapping,
     ):
         self.workflow_config = workflow_config
         self.graph_state = graph_state
+        self.graph_config = graph_config
         self.graph_config_schema = graph_config_schema
         self.llm_service = llm_service
+        self.config_extractor = config_extractor
 
         self.graph = None
         self.final_nodes: list[str] = []
@@ -62,9 +66,7 @@ class QuivrQARAGLangGraphRefactored:
         """Create StateGraph with custom state and config schema."""
         from langgraph.graph import StateGraph
 
-        return StateGraph(
-            self.graph_state, config_schema=type(self.graph_config_schema)
-        )
+        return StateGraph(self.graph_state, config_schema=self.graph_config_schema)
 
     def _build_workflow_with_builder(self):
         """Build workflow using GraphBuilder with registered nodes."""
@@ -84,7 +86,9 @@ class QuivrQARAGLangGraphRefactored:
             if node.name not in [START, END]:
                 # Create node instance using the registry by node name
                 try:
-                    node_instance = node_registry.create_node(node.name)
+                    node_instance = node_registry.create_node(
+                        node.name, config_extractor=self.config_extractor
+                    )
                     self.graph_builder.graph.add_node(node.name, node_instance)
                     self.graph_builder.nodes[node.name] = node_instance
                     logger.info(f"Added node '{node.name}' from registry")
@@ -178,6 +182,7 @@ class QuivrQARAGLangGraphRefactored:
             },
             version="v1",
             config={
+                "configurable": self.graph_config,
                 "run_id": run_id,
                 "metadata": metadata,
                 "callbacks": [langfuse_handler],
