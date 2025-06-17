@@ -337,17 +337,11 @@ class LLMEndpointConfig(QuivrBaseConfig):
         )
         if llm_model_config:
             if llm_model_config.max_context_tokens:
-                _max_context_tokens = (
-                    llm_model_config.max_context_tokens
-                    - llm_model_config.max_output_tokens
-                    if llm_model_config.max_output_tokens
-                    else llm_model_config.max_context_tokens
-                )
-                if self.max_context_tokens > _max_context_tokens:
+                if self.max_context_tokens > llm_model_config.max_context_tokens:
                     logger.warning(
-                        f"Lowering max_context_tokens from {self.max_context_tokens} to {_max_context_tokens}"
+                        f"Lowering max_context_tokens from {self.max_context_tokens} to {llm_model_config.max_context_tokens}"
                     )
-                    self.max_context_tokens = _max_context_tokens
+                    self.max_context_tokens = llm_model_config.max_context_tokens
 
                 if self.max_context_tokens < MIN_CONTEXT_TOKENS:
                     logger.error(
