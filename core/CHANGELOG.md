@@ -1,5 +1,46 @@
 # Changelog
 
+## [0.0.34](https://github.com/QuivrHQ/quivr/compare/core-0.0.33...core-0.0.34) (2025-06-19)
+
+
+### Features
+
+* add default values for GPT-4.1  ([#3641](https://github.com/QuivrHQ/quivr/issues/3641)) ([e48ff2f](https://github.com/QuivrHQ/quivr/commit/e48ff2f723cd44f3970ae385b862dd5dd73de53c))
+* add filters ([#3621](https://github.com/QuivrHQ/quivr/issues/3621)) ([1707f18](https://github.com/QuivrHQ/quivr/commit/1707f18e3923ae7e32ecdbd38380434ee71df7d7))
+* Add Gemini support for language models ([#3632](https://github.com/QuivrHQ/quivr/issues/3632)) ([add322c](https://github.com/QuivrHQ/quivr/commit/add322c8d6c3ee8cd712dface19fa615a4980cac))
+* add guidelines ([#3613](https://github.com/QuivrHQ/quivr/issues/3613)) ([6f99bd3](https://github.com/QuivrHQ/quivr/commit/6f99bd32e222093051eb9e3ce89050a198262438))
+* add langchain-groq dependency and update LLMEndpoint to use ChatGroq ([#3633](https://github.com/QuivrHQ/quivr/issues/3633)) ([3556477](https://github.com/QuivrHQ/quivr/commit/3556477993a8f3bbfab5d4a5e119a447d027bc61))
+* add run-id langfuse ([#3629](https://github.com/QuivrHQ/quivr/issues/3629)) ([f8298c1](https://github.com/QuivrHQ/quivr/commit/f8298c1311685732fc36d4381f1188c239277035))
+* add system_prompt parameter to Brain methods and enhance message handling in RAG pipeline ([#3625](https://github.com/QuivrHQ/quivr/issues/3625)) ([500d793](https://github.com/QuivrHQ/quivr/commit/500d7931582d4329044315b21675d1535ebcdcac))
+* add zendesk llm template for reformulate ([#3619](https://github.com/QuivrHQ/quivr/issues/3619)) ([e4140d5](https://github.com/QuivrHQ/quivr/commit/e4140d5c32d18b999543c5307770c3ed23ae4cc1))
+* additional-data ([#3614](https://github.com/QuivrHQ/quivr/issues/3614)) ([f9c05f9](https://github.com/QuivrHQ/quivr/commit/f9c05f98f2c8cb26407a8946d81e02a683abc585))
+* arbitrary additional data for zendesk ([#3612](https://github.com/QuivrHQ/quivr/issues/3612)) ([1a05434](https://github.com/QuivrHQ/quivr/commit/1a05434207e05a8358984af5181194d19c517023))
+* cache llm endpoint ([#3635](https://github.com/QuivrHQ/quivr/issues/3635)) ([5bc8b56](https://github.com/QuivrHQ/quivr/commit/5bc8b561081474dd44134b34c656f5b4e46bba6b))
+* core input metadata zendesk ([#3606](https://github.com/QuivrHQ/quivr/issues/3606)) ([855a791](https://github.com/QuivrHQ/quivr/commit/855a791f0fda8d2d603c79fdbd11e1add81c1a09)), closes [#3602](https://github.com/QuivrHQ/quivr/issues/3602)
+* enhance zendesk template with clearer guidelines and instructions ([#3624](https://github.com/QuivrHQ/quivr/issues/3624)) ([d378478](https://github.com/QuivrHQ/quivr/commit/d37847807da28a7140281436a13f2d3f53eb1880))
+* fix chat with model ([#3615](https://github.com/QuivrHQ/quivr/issues/3615)) ([22c740b](https://github.com/QuivrHQ/quivr/commit/22c740b9a3b299a158120a3d8b6da90f45bed48d))
+* include current time in prompt context and improve assertion formatting in QuivrQARAGLangGraph ([4532bb6](https://github.com/QuivrHQ/quivr/commit/4532bb6dedfa2161238ffc5afff8981bb8da06ea))
+* megaparse v54 ([#3594](https://github.com/QuivrHQ/quivr/issues/3594)) ([bc6d75d](https://github.com/QuivrHQ/quivr/commit/bc6d75df7348294bc5cde4409d7c17feb72cf2b2))
+* metadata brain core ([ce95a3a](https://github.com/QuivrHQ/quivr/commit/ce95a3a18f472f777e0ba9dbecdb400332815948))
+* refine response instructions in client query prompt ([e391817](https://github.com/QuivrHQ/quivr/commit/e391817f58bf7f4be6bc4a00ac570cdfc34de784))
+* renamed system_prompt to correct naming ([#3622](https://github.com/QuivrHQ/quivr/issues/3622)) ([3db473f](https://github.com/QuivrHQ/quivr/commit/3db473fe913f4d7d8049523ec3f9e0022840b6e6))
+
+
+### Bug Fixes
+
+* 2: Historic is now added ([5dd44d8](https://github.com/QuivrHQ/quivr/commit/5dd44d8eb37b25e9d7c14c14df47f19849cdd031))
+* add Claude 4 support ([#3645](https://github.com/QuivrHQ/quivr/issues/3645)) ([947a785](https://github.com/QuivrHQ/quivr/commit/947a785415c6c35ab2ae8157222b4720b0710b4d))
+* add system prompt to zendesk rag ([#3604](https://github.com/QuivrHQ/quivr/issues/3604)) ([501783b](https://github.com/QuivrHQ/quivr/commit/501783b53cf3751c0c9a48f2fcacc933fb4f161d))
+* **brain:** pass missing run_id ([#3631](https://github.com/QuivrHQ/quivr/issues/3631)) ([4f0fb6f](https://github.com/QuivrHQ/quivr/commit/4f0fb6f4c352585f9621eb8a588b28813eb96232))
+* coquille grok to groq ([3556477](https://github.com/QuivrHQ/quivr/commit/3556477993a8f3bbfab5d4a5e119a447d027bc61))
+* ENT-673 ([501783b](https://github.com/QuivrHQ/quivr/commit/501783b53cf3751c0c9a48f2fcacc933fb4f161d))
+* ENT-716 ([6f99bd3](https://github.com/QuivrHQ/quivr/commit/6f99bd32e222093051eb9e3ce89050a198262438))
+* fix grammar and typo in zendesk prompte template ([#3628](https://github.com/QuivrHQ/quivr/issues/3628)) ([2898a5d](https://github.com/QuivrHQ/quivr/commit/2898a5d511f826cbdca50e49ec0fa26e8cd27122))
+* format prompt for zendesk ([#3627](https://github.com/QuivrHQ/quivr/issues/3627)) ([df2d345](https://github.com/QuivrHQ/quivr/commit/df2d345f550d9e79a6522bdc16bbbf28731fd08a))
+* historic and iterate ([#3642](https://github.com/QuivrHQ/quivr/issues/3642)) ([5dd44d8](https://github.com/QuivrHQ/quivr/commit/5dd44d8eb37b25e9d7c14c14df47f19849cdd031))
+* prompts to ensure correct formatting ([#3636](https://github.com/QuivrHQ/quivr/issues/3636)) ([62a8585](https://github.com/QuivrHQ/quivr/commit/62a8585037680cda809022c3543c690fa98571df))
+* Zendesk system prompt ([#3592](https://github.com/QuivrHQ/quivr/issues/3592)) ([699b549](https://github.com/QuivrHQ/quivr/commit/699b5495f5519e79fd2a6d0e362402c3c77d06b8))
+
 ## [0.0.33](https://github.com/QuivrHQ/quivr/compare/core-0.0.32...core-0.0.33) (2025-02-03)
 
 
