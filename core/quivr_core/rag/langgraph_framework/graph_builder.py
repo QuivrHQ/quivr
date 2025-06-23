@@ -6,7 +6,7 @@ from quivr_core.rag.langgraph_framework.registry.node_registry import (
     node_registry,
     NodeRegistry,
 )
-from quivr_core.rag.langgraph_framework.nodes.base.node import BaseNode
+from quivr_core.rag.langgraph_framework.base.node import BaseNode
 from quivr_core.rag.langgraph_framework.state import AgentState
 
 logger = logging.getLogger("quivr_core")

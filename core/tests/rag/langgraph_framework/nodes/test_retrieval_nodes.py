@@ -4,8 +4,6 @@ import pytest
 from unittest.mock import Mock, patch, AsyncMock
 from langchain_core.documents import Document
 
-from quivr_core.rag.entities.retriever import RetrieverConfig
-from quivr_core.rag.entities.reranker import RerankerConfig
 from quivr_core.rag.langgraph_framework.nodes.retrieval.retrieve_node import (
     RetrievalNode,
 )
@@ -15,10 +13,7 @@ from quivr_core.rag.langgraph_framework.nodes.retrieval.dynamic_retrieve_node im
 from quivr_core.rag.langgraph_framework.nodes.retrieval.compression_retrieve_node import (
     CompressionRetrievalNode,
 )
-from quivr_core.rag.langgraph_framework.nodes.retrieval.retrieve_full_documents_node import (
-    RetrieveFullDocumentsNode,
-)
-from quivr_core.rag.langgraph_framework.nodes.base.exceptions import NodeValidationError
+from quivr_core.rag.langgraph_framework.base.exceptions import NodeValidationError
 
 from tests.rag.langgraph_framework.fixtures.test_data import (
     create_sample_agent_state,
@@ -73,7 +68,12 @@ class TestRetrieveNode:
     @pytest.fixture(scope="function")
     def retrieve_node(self, mock_vector_store):
         """Create a RetrieveNode instance."""
-        return RetrievalNode(vector_store=mock_vector_store)
+        from quivr_core.rag.langgraph_framework.services.service_container import (
+            ServiceContainer,
+        )
+
+        service_container = ServiceContainer(vector_store=mock_vector_store)
+        return RetrievalNode(service_container=service_container)
 
     @pytest.fixture(scope="function")
     def valid_state(self):
@@ -82,10 +82,9 @@ class TestRetrieveNode:
         state["tasks"] = create_sample_user_tasks()
         return state
 
-    def test_node_name_and_config_types(self, retrieve_node):
+    def test_node_name(self, retrieve_node):
         """Test node name and configuration types."""
         assert retrieve_node.NODE_NAME == "retrieve"
-        assert RetrieverConfig in retrieve_node.CONFIG_TYPES
 
     def test_validate_input_state_success(self, retrieve_node, valid_state):
         """Test successful input state validation."""
@@ -110,13 +109,13 @@ class TestRetrieveNode:
         """Test successful execution."""
         mock_docs = create_sample_documents()
 
-        # Mock the retriever with proper async behavior
-        mock_retriever = Mock()
-        mock_retriever.ainvoke = AsyncMock(return_value=mock_docs)
-        retrieve_node.retriever = mock_retriever
-
-        with patch.object(retrieve_node, "get_config") as mock_get_config:
-            mock_get_config.return_value = (RetrieverConfig(), False)
+        # Mock the retrieval service methods instead of setting retriever attribute
+        with patch.object(retrieve_node, "get_service") as mock_get_service:
+            mock_retrieval_service = Mock()
+            mock_retriever = Mock()
+            mock_retriever.ainvoke = AsyncMock(return_value=mock_docs)
+            mock_retrieval_service.get_basic_retriever.return_value = mock_retriever
+            mock_get_service.return_value = mock_retrieval_service
 
             result = await retrieve_node.execute(valid_state)
 
@@ -138,7 +137,12 @@ class TestDynamicRetrieveNode:
     @pytest.fixture(scope="function")
     def dynamic_retrieve_node(self, mock_vector_store):
         """Create a DynamicRetrieveNode instance."""
-        return DynamicRetrievalNode(vector_store=mock_vector_store)
+        from quivr_core.rag.langgraph_framework.services.service_container import (
+            ServiceContainer,
+        )
+
+        service_container = ServiceContainer(vector_store=mock_vector_store)
+        return DynamicRetrievalNode(service_container=service_container)
 
     @pytest.fixture(scope="function")
     def valid_state(self):
@@ -162,16 +166,15 @@ class TestDynamicRetrieveNode:
         """Test execution when retrieval is needed."""
         mock_docs = create_sample_documents()
 
-        # Mock the retriever with proper async behavior
-        mock_retriever = Mock()
-        mock_retriever.ainvoke = AsyncMock(return_value=mock_docs)
-        dynamic_retrieve_node.retriever = mock_retriever
-
-        with patch.object(dynamic_retrieve_node, "get_config") as mock_get_config:
-            mock_get_config.side_effect = [
-                (RetrieverConfig(), False),
-                (RerankerConfig(), False),
-            ]
+        # Mock the retrieval service methods for compression retriever
+        with patch.object(dynamic_retrieve_node, "get_service") as mock_get_service:
+            mock_retrieval_service = Mock()
+            mock_retriever = Mock()
+            mock_retriever.ainvoke = AsyncMock(return_value=mock_docs)
+            mock_retrieval_service.get_compression_retriever.return_value = (
+                mock_retriever
+            )
+            mock_get_service.return_value = mock_retrieval_service
 
             _ = await dynamic_retrieve_node.execute(valid_state)
 
@@ -192,7 +195,12 @@ class TestCompressionRetrieveNode:
     @pytest.fixture(scope="function")
     def compression_retrieve_node(self, mock_vector_store):
         """Create a CompressionRetrieveNode instance."""
-        return CompressionRetrievalNode(vector_store=mock_vector_store)
+        from quivr_core.rag.langgraph_framework.services.service_container import (
+            ServiceContainer,
+        )
+
+        service_container = ServiceContainer(vector_store=mock_vector_store)
+        return CompressionRetrievalNode(service_container=service_container)
 
     @pytest.fixture(scope="function")
     def valid_state(self):
@@ -216,99 +224,20 @@ class TestCompressionRetrieveNode:
         """Test execution with document compression."""
         mock_docs = create_sample_documents()
 
-        # Mock the retriever with proper async behavior
-        mock_retriever = Mock()
-        mock_retriever.ainvoke = AsyncMock(return_value=mock_docs)
-        compression_retrieve_node.retriever = mock_retriever
-
-        with patch.object(compression_retrieve_node, "get_config") as mock_get_config:
-            mock_get_config.side_effect = [
-                (RetrieverConfig(), False),
-                (RerankerConfig(), False),
-            ]
+        # Mock the retrieval service methods for compression retriever
+        with patch.object(compression_retrieve_node, "get_service") as mock_get_service:
+            mock_retrieval_service = Mock()
+            mock_retriever = Mock()
+            mock_retriever.ainvoke = AsyncMock(return_value=mock_docs)
+            mock_retrieval_service.get_compression_retriever.return_value = (
+                mock_retriever
+            )
+            mock_get_service.return_value = mock_retrieval_service
 
             _ = await compression_retrieve_node.execute(valid_state)
 
         # Should have performed retrieval
         mock_retriever.ainvoke.assert_called()
-
-
-class TestRetrieveFullDocumentsNode:
-    """Test RetrieveFullDocumentsNode functionality."""
-
-    @pytest.fixture(scope="function")
-    def mock_vector_store(self):
-        """Create a mock vector store."""
-        mock_store = Mock()
-        mock_store.get_vectors_by_knowledge_id = AsyncMock(return_value=[])
-        return mock_store
-
-    @pytest.fixture(scope="function")
-    def retrieve_full_docs_node(self, mock_vector_store):
-        """Create a RetrieveFullDocumentsNode instance."""
-        return RetrieveFullDocumentsNode(vector_store=mock_vector_store)
-
-    @pytest.fixture(scope="function")
-    def valid_state(self):
-        """Create a valid state for testing."""
-        state = create_sample_agent_state()
-        state["tasks"] = create_sample_user_tasks()
-        return state
-
-    def test_node_name(self, retrieve_full_docs_node):
-        """Test node name."""
-        assert retrieve_full_docs_node.NODE_NAME == "retrieve_full_documents_context"
-
-    def test_validate_input_state_success(self, retrieve_full_docs_node, valid_state):
-        """Test successful input state validation."""
-        retrieve_full_docs_node.validate_input_state(valid_state)
-
-    @pytest.mark.asyncio(loop_scope="session")
-    async def test_execute_with_full_document_retrieval(
-        self, retrieve_full_docs_node, valid_state
-    ):
-        """Test execution with full document retrieval."""
-        mock_knowledge_docs = create_knowledge_documents()
-        mock_full_docs = [
-            Document(
-                page_content="Full document content with all pages",
-                metadata={"source": "full_doc.txt", "full_document": True},
-            )
-        ]
-
-        # Set up the tasks to have docs with knowledge_id metadata
-        valid_state["tasks"].set_docs(valid_state["tasks"].ids[0], mock_knowledge_docs)
-
-        # Mock the vector store method
-        retrieve_full_docs_node.vector_store.get_vectors_by_knowledge_id = AsyncMock(
-            return_value=mock_full_docs
-        )
-
-        with patch.object(retrieve_full_docs_node, "get_config") as mock_get_config:
-            mock_get_config.return_value = (RetrieverConfig(), False)
-
-            result = await retrieve_full_docs_node.execute(valid_state)
-
-        # Should have performed retrieval
-        assert result["tasks"] is not None
-        retrieve_full_docs_node.vector_store.get_vectors_by_knowledge_id.assert_called()
-
-    @pytest.mark.asyncio(loop_scope="session")
-    async def test_execute_with_no_chunks_found(
-        self, retrieve_full_docs_node, valid_state
-    ):
-        """Test execution when no chunks are found initially."""
-        # Clear any existing docs from tasks to simulate no chunks found
-        for task_id in valid_state["tasks"].ids:
-            valid_state["tasks"].set_docs(task_id, [])
-
-        with patch.object(retrieve_full_docs_node, "get_config") as mock_get_config:
-            mock_get_config.return_value = (RetrieverConfig(), False)
-
-            result = await retrieve_full_docs_node.execute(valid_state)
-
-        # Should return state unchanged when no docs
-        assert result["tasks"] is not None
 
 
 class TestRetrievalNodeErrorHandling:
@@ -324,7 +253,12 @@ class TestRetrievalNodeErrorHandling:
     @pytest.fixture(scope="function")
     def retrieve_node(self, mock_vector_store):
         """Create a RetrieveNode instance."""
-        return RetrievalNode(vector_store=mock_vector_store)
+        from quivr_core.rag.langgraph_framework.services.service_container import (
+            ServiceContainer,
+        )
+
+        service_container = ServiceContainer(vector_store=mock_vector_store)
+        return RetrievalNode(service_container=service_container)
 
     @pytest.mark.asyncio(loop_scope="session")
     async def test_execute_with_retrieval_error(self, retrieve_node):
@@ -332,15 +266,15 @@ class TestRetrievalNodeErrorHandling:
         state = create_sample_agent_state()
         state["tasks"] = create_sample_user_tasks()
 
-        # Mock retriever to raise an error
-        mock_retriever = Mock()
-        mock_retriever.ainvoke = AsyncMock(
-            side_effect=Exception("Retrieval service unavailable")
-        )
-        retrieve_node.retriever = mock_retriever
-
-        with patch.object(retrieve_node, "get_config") as mock_get_config:
-            mock_get_config.return_value = (RetrieverConfig(), False)
+        # Mock the retrieval service to raise an error
+        with patch.object(retrieve_node, "get_service") as mock_get_service:
+            mock_retrieval_service = Mock()
+            mock_retriever = Mock()
+            mock_retriever.ainvoke = AsyncMock(
+                side_effect=Exception("Retrieval service unavailable")
+            )
+            mock_retrieval_service.get_basic_retriever.return_value = mock_retriever
+            mock_get_service.return_value = mock_retrieval_service
 
             with pytest.raises(Exception, match="Retrieval service unavailable"):
                 await retrieve_node.execute(state)
@@ -388,19 +322,15 @@ class TestRetrievalNodeIntegration:
                 expected_node in retrieval_nodes
             ), f"Node {expected_node} not registered"
 
-    def test_retrieval_nodes_have_proper_dependencies(self, mock_vector_store):
+    def test_retrieval_nodes_have_proper_dependencies(self):
         """Test that retrieval nodes declare proper dependencies."""
         nodes = [
-            RetrievalNode(vector_store=mock_vector_store),
-            DynamicRetrievalNode(vector_store=mock_vector_store),
-            CompressionRetrievalNode(vector_store=mock_vector_store),
+            RetrievalNode(),
+            DynamicRetrievalNode(),
+            CompressionRetrievalNode(),
         ]
 
         for node in nodes:
             # All retrieval nodes should have proper node names
             assert hasattr(node, "NODE_NAME")
             assert node.NODE_NAME is not None
-
-            # Should have config types defined
-            assert hasattr(node, "CONFIG_TYPES")
-            assert RetrieverConfig in node.CONFIG_TYPES

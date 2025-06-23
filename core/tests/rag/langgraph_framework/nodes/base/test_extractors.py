@@ -4,11 +4,11 @@ import pytest
 from typing import Dict, Any
 from pydantic import BaseModel
 
-from quivr_core.rag.langgraph_framework.nodes.base.extractors import (
+from quivr_core.rag.langgraph_framework.base.extractors import (
     ConfigMapping,
     ConfigExtractor,
 )
-from quivr_core.rag.langgraph_framework.nodes.base.exceptions import (
+from quivr_core.rag.langgraph_framework.base.exceptions import (
     ConfigExtractionError,
 )
 

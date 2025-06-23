@@ -1,10 +1,10 @@
 from typing import Optional
 from quivr_core.rag.entities.config import LLMEndpointConfig
-from quivr_core.rag.langgraph_framework.nodes.base.node import BaseNode
-from quivr_core.rag.langgraph_framework.nodes.base.exceptions import NodeValidationError
+from quivr_core.rag.langgraph_framework.base.node import BaseNode
+from quivr_core.rag.langgraph_framework.base.exceptions import NodeValidationError
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain_core.messages import HumanMessage, SystemMessage
-from quivr_core.rag.langgraph_framework.nodes.base.graph_config import BaseGraphConfig
+from quivr_core.rag.langgraph_framework.base.graph_config import BaseGraphConfig
 from quivr_core.rag.prompts import TemplatePromptName
 from quivr_core.rag.entities.prompt import PromptConfig
 from quivr_core.rag.langgraph_framework.services.rag_prompt_service import (
@@ -28,7 +28,6 @@ class GenerateChatLlmNode(BaseNode):
     """
 
     NODE_NAME = "generate_chat_llm"
-    CONFIG_TYPES = (PromptConfig, LLMEndpointConfig)
 
     def validate_input_state(self, state) -> None:
         """Validate that state has the required attributes and methods."""
@@ -48,8 +47,8 @@ class GenerateChatLlmNode(BaseNode):
     async def execute(self, state, config: Optional[BaseGraphConfig] = None):
         """Execute the chat LLM generation."""
         # Get configs
-        prompt_config, _ = self.get_config(PromptConfig, config)
-        llm_config, _ = self.get_config(LLMEndpointConfig, config)
+        prompt_config = self.get_config(PromptConfig, config)
+        llm_config = self.get_config(LLMEndpointConfig, config)
 
         # Get services through dependency injection
         llm_service = self.get_service(LLMService, llm_config)

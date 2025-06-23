@@ -18,6 +18,8 @@ from quivr_core.rag.entities.config import (
     NodeConfig,
 )
 
+import quivr_core.rag.langgraph_framework.nodes  # noqa: F401
+
 from langgraph.graph import END, START
 from quivr_core.rag.langgraph_framework.graph_builder import GraphBuilder
 from quivr_core.rag.langgraph_framework.registry.node_registry import node_registry
@@ -27,7 +29,7 @@ from quivr_core.rag.utils import (
     get_chunk_metadata,
     parse_chunk_response,
 )
-from quivr_core.rag.langgraph_framework.nodes.base.extractors import ConfigMapping
+from quivr_core.rag.langgraph_framework.base.extractors import ConfigMapping
 
 import logging
 

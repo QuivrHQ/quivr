@@ -1,14 +1,14 @@
 from typing import Optional, List
-from quivr_core.rag.langgraph_framework.nodes.base.node import (
+from quivr_core.rag.langgraph_framework.base.node import (
     BaseNode,
 )
-from quivr_core.rag.langgraph_framework.nodes.base.exceptions import NodeValidationError
+from quivr_core.rag.langgraph_framework.base.exceptions import NodeValidationError
 from langchain_core.prompts import BasePromptTemplate
 from langchain_core.documents import Document
 from datetime import datetime
 from quivr_core.rag.utils import format_dict
 from quivr_core.rag.entities.config import LLMEndpointConfig, WorkflowConfig
-from quivr_core.rag.langgraph_framework.nodes.base.graph_config import BaseGraphConfig
+from quivr_core.rag.langgraph_framework.base.graph_config import BaseGraphConfig
 from quivr_core.rag.prompts import TemplatePromptName
 from quivr_core.rag.langgraph_framework.services.rag_prompt_service import (
     RAGPromptService,
@@ -30,7 +30,6 @@ class GenerateZendeskRagNode(BaseNode):
     """
 
     NODE_NAME = "generate_zendesk_rag"
-    CONFIG_TYPES = (WorkflowConfig, LLMEndpointConfig)
 
     def validate_input_state(self, state) -> None:
         """Validate that state has the required attributes and methods."""
@@ -58,8 +57,8 @@ class GenerateZendeskRagNode(BaseNode):
     async def execute(self, state, config: Optional[BaseGraphConfig] = None):
         """Execute Zendesk RAG generation."""
         # Get configs
-        workflow_config, _ = self.get_config(WorkflowConfig, config)
-        llm_config, _ = self.get_config(LLMEndpointConfig, config)
+        workflow_config = self.get_config(WorkflowConfig, config)
+        llm_config = self.get_config(LLMEndpointConfig, config)
 
         # Get services through dependency injection
         llm_service = self.get_service(LLMService, llm_config)

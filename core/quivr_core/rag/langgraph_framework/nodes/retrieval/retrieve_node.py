@@ -5,17 +5,19 @@ Basic document retrieval node with runtime validation.
 import logging
 from typing import Optional
 import asyncio
-from langchain_core.vectorstores import VectorStore
-from langchain_core.vectorstores import VectorStoreRetriever
-from quivr_core.rag.langgraph_framework.nodes.base.graph_config import BaseGraphConfig
-from quivr_core.rag.langgraph_framework.nodes.base.node import (
+from quivr_core.rag.langgraph_framework.base.graph_config import BaseGraphConfig
+from quivr_core.rag.langgraph_framework.base.node import (
     BaseNode,
 )
-from quivr_core.rag.langgraph_framework.nodes.base.exceptions import NodeValidationError
-from quivr_core.rag.langgraph_framework.nodes.retrieval.utils import get_retriever
+from quivr_core.rag.langgraph_framework.base.exceptions import NodeValidationError
+from quivr_core.rag.langgraph_framework.entities.retrieval_service_config import (
+    RetrievalServiceConfig,
+)
+from quivr_core.rag.langgraph_framework.services.retrieval_service import (
+    RetrievalService,
+)
 from quivr_core.rag.langgraph_framework.task import UserTasks
-from quivr_core.rag.entities.retriever import RetrieverConfig
-from quivr_core.rag.langgraph_framework.nodes.base.extractors import ConfigExtractor
+from quivr_core.rag.langgraph_framework.base.extractors import ConfigExtractor
 from quivr_core.rag.langgraph_framework.registry.node_registry import register_node
 
 logger = logging.getLogger("quivr_core")
@@ -34,18 +36,14 @@ class RetrievalNode(BaseNode):
     """
 
     NODE_NAME = "retrieve"
-    CONFIG_TYPES = (RetrieverConfig,)
 
     def __init__(
         self,
-        vector_store: VectorStore,
         config_extractor: Optional[ConfigExtractor] = None,
         node_name: Optional[str] = None,
         **kwargs,
     ):
         super().__init__(config_extractor, node_name, **kwargs)
-        self.vector_store = vector_store
-        self.retriever: Optional[VectorStoreRetriever] = None
 
     def validate_input_state(self, state) -> None:
         """Validate that state has the required attributes and methods."""
@@ -65,12 +63,11 @@ class RetrievalNode(BaseNode):
     async def execute(self, state, config: Optional[BaseGraphConfig] = None):
         """Execute document retrieval for all user tasks."""
         # Get config
-        retriever_config, retriever_config_changed = self.get_config(
-            RetrieverConfig, config
-        )
+        retrieval_service_config = self.get_config(RetrievalServiceConfig, config)
 
-        if not self.retriever or retriever_config_changed:
-            self.retriever = get_retriever(self.vector_store, retriever_config)
+        # Get retriever service
+        retrieval_service = self.get_service(RetrievalService, retrieval_service_config)
+        retriever = retrieval_service.get_basic_retriever()
 
         if "tasks" in state:
             tasks = state["tasks"]
@@ -82,9 +79,7 @@ class RetrievalNode(BaseNode):
 
         async_jobs = []
         for task_id in tasks.ids:
-            async_jobs.append(
-                (self.retriever.ainvoke(tasks(task_id).definition), task_id)
-            )
+            async_jobs.append((retriever.ainvoke(tasks(task_id).definition), task_id))
 
         # Gather all the responses asynchronously
         responses = (

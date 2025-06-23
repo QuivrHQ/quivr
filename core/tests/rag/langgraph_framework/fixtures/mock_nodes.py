@@ -3,9 +3,9 @@
 from typing import Optional
 from pydantic import BaseModel
 
-from quivr_core.rag.langgraph_framework.nodes.base.node import BaseNode
-from quivr_core.rag.langgraph_framework.nodes.base.graph_config import BaseGraphConfig
-from quivr_core.rag.langgraph_framework.nodes.base.exceptions import NodeValidationError
+from quivr_core.rag.langgraph_framework.base.node import BaseNode
+from quivr_core.rag.langgraph_framework.base.graph_config import BaseGraphConfig
+from quivr_core.rag.langgraph_framework.base.exceptions import NodeValidationError
 
 
 class MockConfig(BaseModel):
@@ -19,7 +19,6 @@ class MockNode(BaseNode):
     """Simple mock node for testing."""
 
     NODE_NAME = "mock_node"
-    CONFIG_TYPES = (MockConfig,)
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)

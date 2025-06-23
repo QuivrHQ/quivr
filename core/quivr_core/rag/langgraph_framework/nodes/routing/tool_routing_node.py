@@ -1,14 +1,13 @@
 from typing import Optional, List
 import asyncio
 from quivr_core.rag.entities.config import LLMEndpointConfig, WorkflowConfig
-from quivr_core.rag.langgraph_framework.nodes.base.node import (
+from quivr_core.rag.langgraph_framework.base.node import (
     BaseNode,
 )
 from langgraph.types import Send
 from quivr_core.rag.langgraph_framework.state import TasksCompletion
 from quivr_core.rag.prompts import TemplatePromptName
-from quivr_core.rag.entities.prompt import PromptConfig
-from quivr_core.rag.langgraph_framework.nodes.base.graph_config import BaseGraphConfig
+from quivr_core.rag.langgraph_framework.base.graph_config import BaseGraphConfig
 from quivr_core.rag.langgraph_framework.services.rag_prompt_service import (
     RAGPromptService,
 )
@@ -30,7 +29,6 @@ class ToolRoutingNode(BaseNode):
     """
 
     NODE_NAME = "tool_routing"
-    CONFIG_TYPES = (PromptConfig, LLMEndpointConfig, WorkflowConfig)
 
     def validate_input_state(self, state) -> None:
         """Validate that state has the required attributes and methods."""
@@ -43,9 +41,8 @@ class ToolRoutingNode(BaseNode):
     async def execute(self, state, config: Optional[BaseGraphConfig] = None):
         """Execute routing split logic."""
         # Get configs
-        prompt_config, _ = self.get_config(PromptConfig, config)
-        llm_config, _ = self.get_config(LLMEndpointConfig, config)
-        workflow_config, _ = self.get_config(WorkflowConfig, config)
+        llm_config = self.get_config(LLMEndpointConfig, config)
+        workflow_config = self.get_config(WorkflowConfig, config)
 
         # Get services through dependency injection
         llm_service = self.get_service(LLMService, llm_config)

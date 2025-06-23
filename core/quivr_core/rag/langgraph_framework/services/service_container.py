@@ -2,10 +2,16 @@ from typing import Dict, Type, TypeVar, Any, Optional
 from abc import ABC, abstractmethod
 import logging
 from quivr_core.rag.entities.config import LLMEndpointConfig, WorkflowConfig
+from quivr_core.rag.langgraph_framework.entities.retrieval_service_config import (
+    RetrievalServiceConfig,
+)
 from quivr_core.rag.langgraph_framework.services.llm_service import LLMService
 from quivr_core.rag.langgraph_framework.services.tool_service import ToolService
 from quivr_core.rag.langgraph_framework.services.rag_prompt_service import (
     RAGPromptService,
+)
+from quivr_core.rag.langgraph_framework.services.retrieval_service import (
+    RetrievalService,
 )
 
 logger = logging.getLogger("quivr_core")
@@ -53,21 +59,47 @@ class PromptServiceFactory(ServiceFactory):
         return None
 
 
+class RetrievalServiceFactory(ServiceFactory):
+    """Factory for creating retrieval services with vector store dependency."""
+
+    def __init__(self, vector_store):
+        self.vector_store = vector_store
+
+    def create(
+        self, config: Optional[RetrievalServiceConfig] = None
+    ) -> RetrievalService:
+        if config is None:
+            config = RetrievalServiceConfig()
+        return RetrievalService(config, self.vector_store)
+
+    def get_config_type(self) -> Optional[Type]:
+        return None
+
+
 class ServiceContainer:
     """Dependency injection container for services."""
 
-    def __init__(self):
+    def __init__(self, vector_store=None):
         self._services: Dict[tuple, Any] = {}  # Changed to support tuple keys
         self._factories: Dict[Type, ServiceFactory] = {
             LLMService: LLMServiceFactory(),
             ToolService: ToolServiceFactory(),
             RAGPromptService: PromptServiceFactory(),
         }
+
+        # Register RetrieverService factory if vector_store is provided
+        if vector_store:
+            self._factories[RetrievalService] = RetrievalServiceFactory(vector_store)
+
         self._config_hashes: Dict[Type, str] = {}
 
     def register_factory(self, service_type: Type[T], factory: ServiceFactory):
         """Register a custom service factory."""
         self._factories[service_type] = factory
+
+    def register_vector_store(self, vector_store):
+        """Register a vector store and enable RetrievalService."""
+        self._factories[RetrievalService] = RetrievalServiceFactory(vector_store)
 
     def get_service(self, service_type: Type[T], config: Optional[Any] = None) -> T:
         """Get or create a service instance with config change detection."""

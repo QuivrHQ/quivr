@@ -4,10 +4,10 @@ Allows nodes to receive config extractors that know how to navigate different co
 """
 
 from typing import Dict, Any, Type, Union, Callable, Optional
-from quivr_core.rag.langgraph_framework.nodes.base.exceptions import (
+from quivr_core.rag.langgraph_framework.base.exceptions import (
     ConfigExtractionError,
 )
-from quivr_core.rag.langgraph_framework.nodes.base.graph_config import BaseGraphConfig
+from quivr_core.rag.langgraph_framework.base.graph_config import BaseGraphConfig
 from pydantic import BaseModel
 import copy
 
@@ -84,20 +84,37 @@ class ConfigMapping:
     def _extract_node_config(
         self, config: BaseGraphConfig, config_type: Type[BaseModel], node_name: str
     ) -> Dict[str, Any]:
-        """Extract node-specific config overrides."""
-        # Convention: nodes.{node_name}.{config_key}
+        """Enhanced to check workflow nodes AND validate configs."""
+        # Standard node config lookup
         nodes_config = config.get("nodes", {})
         node_config = nodes_config.get(node_name, {})
 
-        # Get the config key for this type
+        # Get config key
         extractor = self.mapping.get(config_type)
         if isinstance(extractor, str):
             config_key = extractor
         else:
-            # For callable extractors, use the type name in snake_case
             config_key = self._type_to_snake_case(config_type.__name__)
 
-        return node_config.get(config_key, {})
+        node_level_config = node_config.get(config_key, {})
+
+        # ALSO check workflow_config.nodes for node-specific configs
+        workflow_config = config.get("workflow_config", {})
+        workflow_nodes = workflow_config.get("nodes", [])
+
+        for node_def in workflow_nodes:
+            if node_def.get("name") == node_name:
+                # Check if this node has already been validated during WorkflowConfig creation
+                if hasattr(node_def, "get_node_config"):
+                    validated_config = node_def.get_node_config(config_type, config_key)
+                    if validated_config:
+                        return validated_config.model_dump()
+
+                # Fallback to raw config extraction and merging
+                workflow_node_config = node_def.get(config_key, {})
+                return self._deep_merge(workflow_node_config, node_level_config)
+
+        return node_level_config
 
     def _deep_merge(
         self, base: Dict[str, Any], override: Dict[str, Any]

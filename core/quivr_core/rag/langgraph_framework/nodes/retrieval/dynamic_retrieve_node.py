@@ -5,22 +5,24 @@ Dynamic document retrieval node with adaptive search parameters.
 import logging
 from typing import Optional, List
 import asyncio
-from langchain_core.vectorstores import VectorStore
 from langchain_core.documents import Document
 from langchain.retrievers import ContextualCompressionRetriever
-from quivr_core.rag.langgraph_framework.nodes.base.graph_config import BaseGraphConfig
-from quivr_core.rag.langgraph_framework.nodes.base.node import (
+from quivr_core.rag.langgraph_framework.base.graph_config import BaseGraphConfig
+from quivr_core.rag.langgraph_framework.base.node import (
     BaseNode,
 )
-from quivr_core.rag.langgraph_framework.nodes.base.exceptions import NodeValidationError
-from quivr_core.rag.langgraph_framework.nodes.retrieval.utils import (
+from quivr_core.rag.langgraph_framework.base.exceptions import NodeValidationError
+from quivr_core.rag.langgraph_framework.entities.retrieval_service_config import (
+    RetrievalServiceConfig,
+)
+from quivr_core.rag.langgraph_framework.services.utils import (
     filter_chunks_by_relevance,
-    get_compression_retriever,
+)
+from quivr_core.rag.langgraph_framework.services.retrieval_service import (
+    RetrievalService,
 )
 from quivr_core.rag.langgraph_framework.task import UserTasks
-from quivr_core.rag.entities.retriever import RetrieverConfig
-from quivr_core.rag.entities.reranker import RerankerConfig
-from quivr_core.rag.langgraph_framework.nodes.base.extractors import ConfigExtractor
+from quivr_core.rag.langgraph_framework.base.extractors import ConfigExtractor
 from quivr_core.rag.langgraph_framework.registry.node_registry import register_node
 
 logger = logging.getLogger("quivr_core")
@@ -39,18 +41,14 @@ class DynamicRetrievalNode(BaseNode):
     """
 
     NODE_NAME = "dynamic_retrieve"
-    CONFIG_TYPES = (RetrieverConfig, RerankerConfig)
 
     def __init__(
         self,
-        vector_store: VectorStore,
         config_extractor: Optional[ConfigExtractor] = None,
         node_name: Optional[str] = None,
         **kwargs,
     ):
         super().__init__(config_extractor, node_name, **kwargs)
-        self.vector_store = vector_store
-        self.retriever: Optional[ContextualCompressionRetriever] = None
 
     def validate_input_state(self, state) -> None:
         """Validate that state has the required attributes and methods."""
@@ -70,21 +68,22 @@ class DynamicRetrievalNode(BaseNode):
     async def _dynamic_retrieve(
         self,
         query: str,
-        reranker_config: RerankerConfig,
-        retriever_config: RetrieverConfig,
+        retriever: ContextualCompressionRetriever,
+        retrieval_service_config: RetrievalServiceConfig,
     ) -> List[Document]:
         """
         Dynamically retrieve documents, increasing search parameters if needed.
         """
-        top_n = reranker_config.top_n
-        k = retriever_config.k
+        top_n = retrieval_service_config.reranker_config.top_n
+        k = retrieval_service_config.retriever_config.k
 
         number_of_relevant_chunks = top_n
         iteration = 1
 
         while (
             number_of_relevant_chunks == top_n
-            and iteration <= retriever_config.dynamic_retrieval_max_iterations
+            and iteration
+            <= retrieval_service_config.retriever_config.dynamic_retrieval_max_iterations
         ):
             current_top_n = top_n * iteration
             current_k = max([current_top_n * 2, k])
@@ -95,13 +94,12 @@ class DynamicRetrievalNode(BaseNode):
                     "to retrieve more relevant chunks"
                 )
 
-            assert self.retriever, "Retriever not initialized"
-            docs = await self.retriever.ainvoke(query)
+            docs = await retriever.ainvoke(query)
 
             filtered_docs = filter_chunks_by_relevance(
                 docs,
-                relevance_score_threshold=reranker_config.relevance_score_threshold,
-                relevance_score_key=reranker_config.relevance_score_key,
+                relevance_score_threshold=retrieval_service_config.reranker_config.relevance_score_threshold,
+                relevance_score_key=retrieval_service_config.reranker_config.relevance_score_key,
             )
 
             number_of_relevant_chunks = len(filtered_docs)
@@ -115,18 +113,12 @@ class DynamicRetrievalNode(BaseNode):
 
     async def execute(self, state, config: Optional[BaseGraphConfig] = None):
         """Execute document retrieval for all user tasks."""
-        # Get configs
-        retriever_config, retriever_config_changed = self.get_config(
-            RetrieverConfig, config
-        )
-        reranker_config, reranker_config_changed = self.get_config(
-            RerankerConfig, config
-        )
 
-        if not self.retriever or retriever_config_changed or reranker_config_changed:
-            self.retriever = get_compression_retriever(
-                self.vector_store, retriever_config, reranker_config
-            )
+        retrieval_service_config = self.get_config(RetrievalServiceConfig, config)
+
+        # Get retriever service
+        retrieval_service = self.get_service(RetrievalService, retrieval_service_config)
+        retriever = retrieval_service.get_compression_retriever()
 
         if "tasks" in state:
             tasks = state["tasks"]
@@ -142,8 +134,8 @@ class DynamicRetrievalNode(BaseNode):
                 (
                     self._dynamic_retrieve(
                         query=tasks(task_id).definition,
-                        reranker_config=reranker_config,
-                        retriever_config=retriever_config,
+                        retriever=retriever,
+                        retrieval_service_config=retrieval_service_config,
                     ),
                     task_id,
                 )

@@ -1,18 +1,18 @@
 from typing import Optional, List
 from quivr_core.rag.entities.config import LLMEndpointConfig, RetrievalConfig
-from quivr_core.rag.langgraph_framework.nodes.base.node import (
+from quivr_core.rag.langgraph_framework.base.node import (
     BaseNode,
 )
-from quivr_core.rag.langgraph_framework.nodes.base.exceptions import NodeValidationError
+from quivr_core.rag.langgraph_framework.base.exceptions import NodeValidationError
 from langgraph.types import Send
 from quivr_core.rag.prompts import TemplatePromptName
 from quivr_core.rag.entities.prompt import PromptConfig
-from quivr_core.rag.langgraph_framework.nodes.base.graph_config import BaseGraphConfig
+from quivr_core.rag.langgraph_framework.base.graph_config import BaseGraphConfig
 from quivr_core.rag.langgraph_framework.services.rag_prompt_service import (
     RAGPromptService,
 )
 from quivr_core.rag.langgraph_framework.services.llm_service import LLMService
-from quivr_core.rag.langgraph_framework.nodes.routing.entity import SplittedInput
+from quivr_core.rag.langgraph_framework.entities.routing_entity import SplittedInput
 from quivr_core.rag.langgraph_framework.task import UserTasks
 from quivr_core.rag.langgraph_framework.registry.node_registry import register_node
 
@@ -30,7 +30,6 @@ class RoutingNode(BaseNode):
     """
 
     NODE_NAME = "routing"
-    CONFIG_TYPES = (PromptConfig, LLMEndpointConfig, RetrievalConfig)
 
     def validate_input_state(self, state) -> None:
         """Validate that state has the required attributes and methods."""
@@ -50,9 +49,9 @@ class RoutingNode(BaseNode):
     async def execute(self, state, config: Optional[BaseGraphConfig] = None):
         """Execute routing logic."""
         # Get configs
-        prompt_config, _ = self.get_config(PromptConfig, config)
-        llm_config, _ = self.get_config(LLMEndpointConfig, config)
-        retrieval_config, _ = self.get_config(RetrievalConfig, config)
+        prompt_config = self.get_config(PromptConfig, config)
+        llm_config = self.get_config(LLMEndpointConfig, config)
+        retrieval_config = self.get_config(RetrievalConfig, config)
 
         # Get services through dependency injection
         llm_service = self.get_service(LLMService, llm_config)

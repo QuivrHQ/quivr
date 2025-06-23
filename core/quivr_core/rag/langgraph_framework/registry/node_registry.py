@@ -1,7 +1,7 @@
 from typing import Dict, Type, List, Optional
 import logging
 
-from quivr_core.rag.langgraph_framework.nodes.base.node import BaseNode
+from quivr_core.rag.langgraph_framework.base.node import BaseNode
 
 logger = logging.getLogger("quivr_core")
 

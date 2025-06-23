@@ -9,7 +9,7 @@ from quivr_core.rag.langgraph_framework.registry.node_registry import (
     register_node,
     node_registry,
 )
-from quivr_core.rag.langgraph_framework.nodes.base.node import BaseNode
+from quivr_core.rag.langgraph_framework.base.node import BaseNode
 
 from tests.rag.langgraph_framework.fixtures.mock_nodes import MockNode, AsyncMockNode
 

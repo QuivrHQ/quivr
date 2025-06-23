@@ -1,12 +1,12 @@
 from typing import Optional
 import asyncio
 from quivr_core.rag.entities.config import LLMEndpointConfig
-from quivr_core.rag.langgraph_framework.nodes.base.node import (
+from quivr_core.rag.langgraph_framework.base.node import (
     BaseNode,
 )
-from quivr_core.rag.langgraph_framework.nodes.base.exceptions import NodeValidationError
+from quivr_core.rag.langgraph_framework.base.exceptions import NodeValidationError
 from quivr_core.rag.entities.prompt import PromptConfig
-from quivr_core.rag.langgraph_framework.nodes.base.graph_config import BaseGraphConfig
+from quivr_core.rag.langgraph_framework.base.graph_config import BaseGraphConfig
 from quivr_core.rag.langgraph_framework.services.rag_prompt_service import (
     RAGPromptService,
 )
@@ -28,7 +28,6 @@ class TransformTasksNode(BaseNode):
     """
 
     NODE_NAME = "transform_tasks"
-    CONFIG_TYPES = (LLMEndpointConfig, PromptConfig)
 
     def validate_input_state(self, state) -> None:
         """Validate that state has the required attributes and methods."""
@@ -41,8 +40,8 @@ class TransformTasksNode(BaseNode):
     async def execute(self, state, config: Optional[BaseGraphConfig] = None):
         """Execute routing logic."""
         # Get configs
-        llm_config, _ = self.get_config(LLMEndpointConfig, config)
-        prompt_config, _ = self.get_config(PromptConfig, config)
+        llm_config = self.get_config(LLMEndpointConfig, config)
+        prompt_config = self.get_config(PromptConfig, config)
 
         # Get services through dependency injection
         llm_service = self.get_service(LLMService, llm_config)

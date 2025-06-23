@@ -14,8 +14,8 @@ from quivr_core.rag.langgraph_framework.nodes.routing.routing_node import Routin
 from quivr_core.rag.langgraph_framework.nodes.routing.tool_routing_node import (
     ToolRoutingNode,
 )
-from quivr_core.rag.langgraph_framework.nodes.base.exceptions import NodeValidationError
-from quivr_core.rag.langgraph_framework.nodes.routing.entity import SplittedInput
+from quivr_core.rag.langgraph_framework.base.exceptions import NodeValidationError
+from quivr_core.rag.langgraph_framework.entities.routing_entity import SplittedInput
 from quivr_core.rag.langgraph_framework.state import TasksCompletion
 from quivr_core.rag.langgraph_framework.task import UserTasks
 
@@ -40,14 +40,9 @@ class TestRoutingNode:
         state["tasks"] = create_sample_user_tasks()
         return state
 
-    def test_node_name_and_config_types(self, routing_node):
+    def test_node_name(self, routing_node):
         """Test node name and configuration types."""
         assert routing_node.NODE_NAME == "routing"
-        assert routing_node.CONFIG_TYPES == (
-            PromptConfig,
-            LLMEndpointConfig,
-            RetrievalConfig,
-        )
 
     def test_validate_input_state_success(self, routing_node, valid_state):
         """Test successful input state validation."""
@@ -95,9 +90,9 @@ class TestRoutingNode:
 
             with patch.object(routing_node, "get_config") as mock_get_config:
                 mock_get_config.side_effect = [
-                    (PromptConfig(), False),
-                    (LLMEndpointConfig(), False),
-                    (RetrievalConfig(), False),
+                    PromptConfig(),
+                    LLMEndpointConfig(),
+                    RetrievalConfig(),
                 ]
 
                 result = await routing_node.execute(valid_state)
@@ -133,9 +128,9 @@ class TestRoutingNode:
 
             with patch.object(routing_node, "get_config") as mock_get_config:
                 mock_get_config.side_effect = [
-                    (PromptConfig(), False),
-                    (LLMEndpointConfig(), False),
-                    (RetrievalConfig(), False),
+                    PromptConfig(),
+                    LLMEndpointConfig(),
+                    RetrievalConfig(),
                 ]
 
                 result = await routing_node.execute(valid_state)
@@ -173,9 +168,9 @@ class TestRoutingNode:
 
             with patch.object(routing_node, "get_config") as mock_get_config:
                 mock_get_config.side_effect = [
-                    (mock_prompt_config, False),
-                    (LLMEndpointConfig(), False),
-                    (RetrievalConfig(), False),
+                    mock_prompt_config,
+                    LLMEndpointConfig(),
+                    RetrievalConfig(),
                 ]
 
                 result = await routing_node.execute(valid_state)
@@ -204,14 +199,9 @@ class TestToolRoutingNode:
         state["tasks"] = tasks
         return state
 
-    def test_node_name_and_config_types(self, tool_routing_node):
+    def test_node_name(self, tool_routing_node):
         """Test node name and configuration types."""
         assert tool_routing_node.NODE_NAME == "tool_routing"
-        assert tool_routing_node.CONFIG_TYPES == (
-            PromptConfig,
-            LLMEndpointConfig,
-            WorkflowConfig,
-        )
 
     def test_validate_input_state_success(
         self, tool_routing_node, valid_state_with_tasks
@@ -232,9 +222,9 @@ class TestToolRoutingNode:
 
         with patch.object(tool_routing_node, "get_config") as mock_get_config:
             mock_get_config.side_effect = [
-                (PromptConfig(), False),
-                (LLMEndpointConfig(), False),
-                (WorkflowConfig(), False),
+                PromptConfig(),
+                LLMEndpointConfig(),
+                WorkflowConfig(),
             ]
 
             result = await tool_routing_node.execute(state)
@@ -269,9 +259,9 @@ class TestToolRoutingNode:
 
             with patch.object(tool_routing_node, "get_config") as mock_get_config:
                 mock_get_config.side_effect = [
-                    (PromptConfig(), False),
-                    (LLMEndpointConfig(), False),
-                    (WorkflowConfig(), False),
+                    PromptConfig(),
+                    LLMEndpointConfig(),
+                    WorkflowConfig(),
                 ]
 
                 # Mock collect_tools
@@ -318,9 +308,9 @@ class TestToolRoutingNode:
 
             with patch.object(tool_routing_node, "get_config") as mock_get_config:
                 mock_get_config.side_effect = [
-                    (PromptConfig(), False),
-                    (LLMEndpointConfig(), False),
-                    (WorkflowConfig(), False),
+                    PromptConfig(),
+                    LLMEndpointConfig(),
+                    WorkflowConfig(),
                 ]
 
                 # Mock collect_tools
@@ -373,9 +363,9 @@ class TestToolRoutingNode:
 
             with patch.object(tool_routing_node, "get_config") as mock_get_config:
                 mock_get_config.side_effect = [
-                    (PromptConfig(), False),
-                    (LLMEndpointConfig(), False),
-                    (WorkflowConfig(), False),
+                    PromptConfig(),
+                    LLMEndpointConfig(),
+                    WorkflowConfig(),
                 ]
 
                 # Mock collect_tools
@@ -428,9 +418,9 @@ class TestToolRoutingNode:
 
             with patch.object(tool_routing_node, "get_config") as mock_get_config:
                 mock_get_config.side_effect = [
-                    (PromptConfig(), False),
-                    (LLMEndpointConfig(), False),
-                    (WorkflowConfig(), False),
+                    PromptConfig(),
+                    LLMEndpointConfig(),
+                    WorkflowConfig(),
                 ]
 
                 # Mock collect_tools and combine_documents
@@ -489,9 +479,9 @@ class TestRoutingNodeErrorHandling:
 
             with patch.object(routing_node, "get_config") as mock_get_config:
                 mock_get_config.side_effect = [
-                    (PromptConfig(), False),
-                    (LLMEndpointConfig(), False),
-                    (RetrievalConfig(), False),
+                    PromptConfig(),
+                    LLMEndpointConfig(),
+                    RetrievalConfig(),
                 ]
 
                 with pytest.raises(Exception, match="LLM service unavailable"):
@@ -541,10 +531,6 @@ class TestRoutingNodeIntegration:
             # All routing nodes should have proper node names
             assert hasattr(node, "NODE_NAME")
             assert node.NODE_NAME is not None
-
-            # Should have config types defined
-            assert hasattr(node, "CONFIG_TYPES")
-            assert LLMEndpointConfig in node.CONFIG_TYPES
 
     def test_routing_node_send_structure(self):
         """Test that routing nodes return proper Send structures."""

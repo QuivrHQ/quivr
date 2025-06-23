@@ -6,13 +6,12 @@ import logging
 from typing import Optional
 from quivr_core.rag.entities.config import LLMEndpointConfig, WorkflowConfig
 from quivr_core.rag.entities.prompt import PromptConfig
-from quivr_core.rag.langgraph_framework.nodes.base.graph_config import BaseGraphConfig
-from quivr_core.rag.langgraph_framework.nodes.base.node import BaseNode
+from quivr_core.rag.langgraph_framework.base.graph_config import BaseGraphConfig
+from quivr_core.rag.langgraph_framework.base.node import BaseNode
 from quivr_core.rag.langgraph_framework.services.llm_service import LLMService
 from quivr_core.rag.langgraph_framework.services.rag_prompt_service import (
     RAGPromptService,
 )
-from quivr_core.rag.entities.retriever import RetrieverConfig
 from quivr_core.rag.langgraph_framework.utils import update_active_tools
 from quivr_core.rag.prompts import TemplatePromptName
 from quivr_core.rag.langgraph_framework.state import UpdatedPromptAndTools
@@ -41,7 +40,6 @@ class EditSystemPromptNode(BaseNode):
     """
 
     NODE_NAME = "edit_system_prompt"
-    CONFIG_TYPES = (RetrieverConfig, LLMEndpointConfig, WorkflowConfig, PromptConfig)
 
     def validate_input_state(self, state) -> None:
         """Validate that state has the required attributes and methods."""
@@ -54,10 +52,9 @@ class EditSystemPromptNode(BaseNode):
     async def execute(self, state, config: Optional[BaseGraphConfig] = None):
         """Execute document retrieval for all user tasks."""
         # Get configs
-        retriever_config, _ = self.get_config(RetrieverConfig, config)
-        llm_config, _ = self.get_config(LLMEndpointConfig, config)
-        workflow_config, _ = self.get_config(WorkflowConfig, config)
-        prompt_config, _ = self.get_config(PromptConfig, config)
+        llm_config = self.get_config(LLMEndpointConfig, config)
+        workflow_config = self.get_config(WorkflowConfig, config)
+        prompt_config = self.get_config(PromptConfig, config)
 
         # Get services through dependency injection
         llm_service = self.get_service(LLMService, llm_config)

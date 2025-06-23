@@ -1,13 +1,14 @@
 import logging
 import os
 from enum import Enum
-from typing import Any, Dict, Hashable, List, Optional, Type, Union
+from typing import Any, Dict, Hashable, List, Optional, Type, Union, TypeVar
 from uuid import UUID
 
 from langchain_core.prompts.base import BasePromptTemplate
 from langchain_core.tools import BaseTool
 from langgraph.graph import END, START
 from pydantic import BaseModel
+from quivr_core.rag.entities.prompt import PromptConfig
 from rapidfuzz import fuzz, process
 
 from quivr_core.base_config import QuivrBaseConfig
@@ -17,9 +18,15 @@ from quivr_core.processor.splitter import SplitterConfig
 from quivr_core.rag.entities.retriever import RetrieverConfig
 from quivr_core.rag.entities.reranker import RerankerConfig
 from quivr_core.rag.entities.utils import normalize_to_env_variable_name
+from quivr_core.rag.langgraph_framework.entities.filter_history_config import (
+    FilterHistoryConfig,
+)
 
 
 logger = logging.getLogger("quivr_core")
+
+T = TypeVar("T", bound=QuivrBaseConfig)
+
 MIN_CONTEXT_TOKENS = 4096
 MIN_OUTPUT_TOKENS = 4096
 
@@ -434,10 +441,56 @@ class NodeConfig(QuivrBaseConfig):
     tools: List[Dict[str, Any]] | None = None
     instantiated_tools: List[BaseTool | Type] | None = None
 
+    # Store validated node-specific configs
+    validated_configs: Dict[str, QuivrBaseConfig] = {}
+
+    class Config:
+        extra = "allow"  # Allow additional fields for node-specific configs
+
     def __init__(self, **data):
+        # Extract and validate node-specific configs BEFORE calling super().__init__
+        node_configs = {}
+        validated_configs = {}
+
+        # Find all config fields (ending with '_config')
+        for key, value in list(data.items()):
+            if key.endswith("_config") and key not in ["conditional_edge"]:
+                # Remove from data to avoid Pydantic validation issues
+                config_data = data.pop(key)
+                node_configs[key] = config_data
+
+                # Validate against registered config type
+                if key in NODE_CONFIG_TYPES:
+                    config_type = NODE_CONFIG_TYPES[key]
+                    try:
+                        validated_config = config_type.model_validate(config_data)
+                        validated_configs[key] = validated_config
+                        logger.debug(f"Validated {key} for node config")
+                    except Exception as e:
+                        raise ValueError(
+                            f"Invalid {key} in node '{data.get('name', 'unknown')}': {e}"
+                        )
+                else:
+                    logger.warning(f"Unknown config type '{key}' - storing as raw data")
+                    validated_configs[key] = config_data
+
+        # Store validated configs
+        data["validated_configs"] = validated_configs
+
         super().__init__(**data)
         self._instantiate_tools()
         self.resolve_special_edges_in_name_and_edges()
+
+    def get_node_config(self, config_type: Type[T], config_key: str) -> Optional[T]:
+        """Get a validated config of specific type."""
+        config = self.validated_configs.get(config_key)
+        if config and isinstance(config, config_type):
+            return config
+        return None
+
+    def has_config(self, config_key: str) -> bool:
+        """Check if node has a specific config."""
+        return config_key in self.validated_configs
 
     def resolve_special_edges_in_name_and_edges(self):
         """Replace SpecialEdges enum values in name and edges with corresponding langgraph values."""
@@ -535,8 +588,8 @@ class RetrievalConfig(QuivrBaseConfig):
     reranker_config: RerankerConfig = RerankerConfig()
     retriever_config: RetrieverConfig = RetrieverConfig()
     llm_config: LLMEndpointConfig = LLMEndpointConfig()
-    max_history: int = 10
-    prompt: str | None = None
+    filter_history_config: FilterHistoryConfig = FilterHistoryConfig()
+    prompt_config: PromptConfig = PromptConfig()
     workflow_config: WorkflowConfig = WorkflowConfig(nodes=DefaultWorkflow.RAG.nodes)
 
     def __init__(self, **data):
@@ -556,3 +609,18 @@ class IngestionConfig(QuivrBaseConfig):
 class AssistantConfig(QuivrBaseConfig):
     retrieval_config: RetrievalConfig = RetrievalConfig()
     ingestion_config: IngestionConfig = IngestionConfig()
+
+
+# Registry mapping config field names to their Pydantic types
+NODE_CONFIG_TYPES: Dict[str, Type[QuivrBaseConfig]] = {
+    "llm_config": LLMEndpointConfig,
+    "reranker_config": RerankerConfig,
+    "retriever_config": RetrieverConfig,
+    "prompt_config": PromptConfig,
+    "filter_history_config": FilterHistoryConfig,
+}
+
+
+def register_node_config_type(config_name: str, config_type: Type[QuivrBaseConfig]):
+    """Register a new node config type for validation."""
+    NODE_CONFIG_TYPES[config_name] = config_type

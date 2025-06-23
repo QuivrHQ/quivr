@@ -1,10 +1,9 @@
 from typing import Any, Optional, Dict
 from quivr_core.llm_tools.llm_tools import LLMToolFactory
 import asyncio
-from quivr_core.rag.langgraph_framework.nodes.base.node import BaseNode
-from quivr_core.rag.entities.prompt import PromptConfig
-from quivr_core.rag.langgraph_framework.nodes.base.graph_config import BaseGraphConfig
-from quivr_core.rag.langgraph_framework.nodes.base.extractors import ConfigExtractor
+from quivr_core.rag.langgraph_framework.base.node import BaseNode
+from quivr_core.rag.langgraph_framework.base.graph_config import BaseGraphConfig
+from quivr_core.rag.langgraph_framework.base.extractors import ConfigExtractor
 from quivr_core.rag.langgraph_framework.registry.node_registry import register_node
 
 
@@ -21,7 +20,6 @@ class RunToolNode(BaseNode):
     """
 
     NODE_NAME = "run_tool"
-    CONFIG_TYPES = (PromptConfig,)
 
     def __init__(
         self,

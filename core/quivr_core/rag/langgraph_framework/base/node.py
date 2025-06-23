@@ -3,9 +3,9 @@ from abc import ABC, abstractmethod
 from typing import Optional, Dict, Any, Tuple, Type, TypeVar, cast
 from pydantic import BaseModel
 
-from quivr_core.rag.langgraph_framework.nodes.base.extractors import ConfigExtractor
-from quivr_core.rag.langgraph_framework.nodes.base.graph_config import BaseGraphConfig
-from quivr_core.rag.langgraph_framework.nodes.base.utils import compute_config_hash
+from quivr_core.rag.langgraph_framework.base.extractors import ConfigExtractor
+from quivr_core.rag.langgraph_framework.base.graph_config import BaseGraphConfig
+from quivr_core.rag.langgraph_framework.base.utils import compute_config_hash
 from quivr_core.rag.langgraph_framework.services.service_container import (
     ServiceContainer,
 )
@@ -29,7 +29,6 @@ class BaseNode(ABC):
     """
 
     NODE_NAME: str = "base_node"
-    CONFIG_TYPES: Tuple[Type[BaseModel], ...] = ()
     _node_metadata: Optional[Dict[str, Any]] = None
 
     def __init__(
@@ -52,7 +51,7 @@ class BaseNode(ABC):
 
     def get_config(
         self, config_type: Type[T], config: Optional[BaseGraphConfig] = None
-    ) -> Tuple[T, bool]:
+    ) -> T:
         """
         Extract a specific configuration type with change detection and node-specific overrides.
 
@@ -61,25 +60,18 @@ class BaseNode(ABC):
             config: The graph config to extract from
 
         Returns:
-            Tuple of (config_instance, has_changed)
-            - config_instance: The extracted config (with node-specific overrides if any)
-            - has_changed: True if config changed since last call, False otherwise
+            config_instance: The extracted config (with node-specific overrides if any)
         """
         if not self.config_extractor or not config:
             default_config = config_type()
             current_hash = compute_config_hash(default_config)
 
-            # Check if this is a new config or if it has changed
             cache_key = (config_type, self.node_name)
-            has_changed = (
-                cache_key not in self._config_hashes
-                or self._config_hashes[cache_key] != current_hash
-            )
 
             # Update the cached hash
             self._config_hashes[cache_key] = current_hash
 
-            return default_config, has_changed
+            return default_config
 
         # Extract config with node-specific overrides
         extracted_config = cast(
@@ -89,15 +81,11 @@ class BaseNode(ABC):
 
         # Check if this is a new config or if it has changed
         cache_key = (config_type, self.node_name)
-        has_changed = (
-            cache_key not in self._config_hashes
-            or self._config_hashes[cache_key] != current_hash
-        )
 
         # Update the cached hash
         self._config_hashes[cache_key] = current_hash
 
-        return extracted_config, has_changed
+        return extracted_config
 
     def get_service(self, service_type: Type[S], config: Optional[Any] = None) -> S:
         """Get a service instance from the container."""

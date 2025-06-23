@@ -1,8 +1,8 @@
 from typing import Optional, Dict, Any, List
-from quivr_core.rag.langgraph_framework.nodes.base.node import (
+from quivr_core.rag.langgraph_framework.base.node import (
     BaseNode,
 )
-from quivr_core.rag.langgraph_framework.nodes.base.exceptions import NodeValidationError
+from quivr_core.rag.langgraph_framework.base.exceptions import NodeValidationError
 from quivr_core.rag.entities.config import (
     LLMEndpointConfig,
     WorkflowConfig,
@@ -14,7 +14,7 @@ from langchain_core.documents import Document
 from quivr_core.rag.langgraph_framework.utils import reduce_rag_context
 from quivr_core.rag.prompts import TemplatePromptName
 from quivr_core.rag.utils import combine_documents
-from quivr_core.rag.langgraph_framework.nodes.base.graph_config import BaseGraphConfig
+from quivr_core.rag.langgraph_framework.base.graph_config import BaseGraphConfig
 from quivr_core.rag.langgraph_framework.services.rag_prompt_service import (
     RAGPromptService,
 )
@@ -35,7 +35,6 @@ class GenerateRagNode(BaseNode):
     """
 
     NODE_NAME = "generate_rag"
-    CONFIG_TYPES = (WorkflowConfig, PromptConfig, LLMEndpointConfig, RetrievalConfig)
 
     def validate_input_state(self, state) -> None:
         """Validate that state has the required attributes and methods."""
@@ -83,10 +82,10 @@ class GenerateRagNode(BaseNode):
     async def execute(self, state, config: Optional[BaseGraphConfig] = None):
         """Execute RAG generation with clean service injection."""
         # Get configs
-        workflow_config, _ = self.get_config(WorkflowConfig, config)
-        prompt_config, _ = self.get_config(PromptConfig, config)
-        retrieval_config, _ = self.get_config(RetrievalConfig, config)
-        llm_config, _ = self.get_config(LLMEndpointConfig, config)
+        workflow_config = self.get_config(WorkflowConfig, config)
+        prompt_config = self.get_config(PromptConfig, config)
+        retrieval_config = self.get_config(RetrievalConfig, config)
+        llm_config = self.get_config(LLMEndpointConfig, config)
 
         # Get services through dependency injection - much cleaner!
         prompt_service = self.get_service(RAGPromptService, retrieval_config)

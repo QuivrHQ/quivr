@@ -3,9 +3,9 @@
 import pytest
 from unittest.mock import Mock
 
-from quivr_core.rag.langgraph_framework.nodes.base.node import BaseNode
-from quivr_core.rag.langgraph_framework.nodes.base.exceptions import NodeValidationError
-from quivr_core.rag.langgraph_framework.nodes.base.extractors import ConfigExtractor
+from quivr_core.rag.langgraph_framework.base.node import BaseNode
+from quivr_core.rag.langgraph_framework.base.exceptions import NodeValidationError
+from quivr_core.rag.langgraph_framework.base.extractors import ConfigExtractor
 from quivr_core.rag.langgraph_framework.services.service_container import (
     ServiceContainer,
 )
@@ -68,22 +68,20 @@ class TestBaseNodeConfigExtraction:
         """Test config extraction without extractor returns defaults."""
         node = MockNode()
 
-        config, has_changed = node.get_config(MockConfig)
+        config = node.get_config(MockConfig)
 
         assert isinstance(config, MockConfig)
         assert config.test_param == "default_value"
         assert config.numeric_param == 42
-        assert has_changed is True  # First time always returns changed
 
     def test_get_config_without_extractor_caching(self):
         """Test that default config is cached properly."""
         node = MockNode()
 
-        config1, has_changed1 = node.get_config(MockConfig)
-        config2, has_changed2 = node.get_config(MockConfig)
+        config1 = node.get_config(MockConfig)
+        config2 = node.get_config(MockConfig)
 
-        assert has_changed1 is True  # First call
-        assert has_changed2 is False  # Second call (cached)
+        assert config1 == config2
 
     def test_get_config_with_extractor(self, mock_extractor):
         """Test config extraction with extractor."""
@@ -94,10 +92,9 @@ class TestBaseNodeConfigExtraction:
         node = MockNode(config_extractor=mock_extractor)
         graph_config = {"test": "config"}
 
-        config, has_changed = node.get_config(MockConfig, graph_config)
+        config = node.get_config(MockConfig, graph_config)
 
         assert config == expected_config
-        assert has_changed is True
         mock_extractor.extract.assert_called_once_with(
             graph_config, MockConfig, "mock_node"
         )
@@ -111,20 +108,19 @@ class TestBaseNodeConfigExtraction:
         node = MockNode(config_extractor=mock_extractor)
         graph_config = {"test": "config"}
 
-        extracted1, changed1 = node.get_config(MockConfig, graph_config)
-        assert changed1 is True
+        extracted1 = node.get_config(MockConfig, graph_config)
+        assert extracted1 == config1
 
         # Same config (no change)
-        extracted2, changed2 = node.get_config(MockConfig, graph_config)
-        assert changed2 is False
+        extracted2 = node.get_config(MockConfig, graph_config)
+        assert extracted2 == config1
 
         # Different config (change detected)
         config2 = MockConfig(test_param="value2", numeric_param=2)
         mock_extractor.extract.return_value = config2
 
-        extracted3, changed3 = node.get_config(MockConfig, graph_config)
-        assert changed3 is True
-        assert extracted3.test_param == "value2"
+        extracted3 = node.get_config(MockConfig, graph_config)
+        assert extracted3 == config2
 
     def test_get_config_node_specific_caching(self, mock_extractor):
         """Test that config caching is node-specific."""
@@ -137,11 +133,11 @@ class TestBaseNodeConfigExtraction:
         graph_config = {"test": "config"}
 
         # Both nodes should detect change on first call
-        _, changed1 = node1.get_config(MockConfig, graph_config)
-        _, changed2 = node2.get_config(MockConfig, graph_config)
+        config1 = node1.get_config(MockConfig, graph_config)
+        config2 = node2.get_config(MockConfig, graph_config)
 
-        assert changed1 is True
-        assert changed2 is True
+        assert config1 == config
+        assert config2 == config
 
         # Cache should be separate for each node
         cache_key1 = (MockConfig, "node1")
@@ -326,10 +322,6 @@ class TestBaseNodeMetadata:
     def test_node_metadata_attribute(self):
         """Test that nodes can have metadata attribute."""
         _ = MockNode()
-
-        # MockNode should have CONFIG_TYPES
-        assert hasattr(MockNode, "CONFIG_TYPES")
-        assert MockConfig in MockNode.CONFIG_TYPES
 
         # Should have NODE_NAME
         assert hasattr(MockNode, "NODE_NAME")

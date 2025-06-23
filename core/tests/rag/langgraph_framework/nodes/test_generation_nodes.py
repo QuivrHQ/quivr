@@ -20,7 +20,7 @@ from quivr_core.rag.langgraph_framework.nodes.generation.generate_chat_llm_node 
 from quivr_core.rag.langgraph_framework.nodes.generation.generate_zendesk_rag_node import (
     GenerateZendeskRagNode,
 )
-from quivr_core.rag.langgraph_framework.nodes.base.exceptions import NodeValidationError
+from quivr_core.rag.langgraph_framework.base.exceptions import NodeValidationError
 from quivr_core.rag.langgraph_framework.services.llm_service import LLMService
 from quivr_core.rag.langgraph_framework.services.rag_prompt_service import (
     RAGPromptService,
@@ -66,15 +66,9 @@ class TestGenerateRagNode:
 
         return mock_llm_service, mock_prompt_service, mock_template
 
-    def test_node_name_and_config_types(self, generate_rag_node):
+    def test_node_name(self, generate_rag_node):
         """Test node name and configuration types."""
         assert generate_rag_node.NODE_NAME == "generate_rag"
-        assert generate_rag_node.CONFIG_TYPES == (
-            WorkflowConfig,
-            PromptConfig,
-            LLMEndpointConfig,
-            RetrievalConfig,
-        )
 
     def test_validate_input_state_success(self, generate_rag_node, valid_state):
         """Test successful input state validation."""
@@ -170,10 +164,10 @@ class TestGenerateRagNode:
             # Mock config extraction
             with patch.object(generate_rag_node, "get_config") as mock_get_config:
                 mock_get_config.side_effect = [
-                    (WorkflowConfig(), False),
-                    (PromptConfig(), False),
-                    (RetrievalConfig(), False),
-                    (LLMEndpointConfig(), False),
+                    WorkflowConfig(),
+                    PromptConfig(),
+                    RetrievalConfig(),
+                    LLMEndpointConfig(),
                 ]
 
                 # Mock context reduction
@@ -206,10 +200,10 @@ class TestGenerateRagNode:
 
             with patch.object(generate_rag_node, "get_config") as mock_get_config:
                 mock_get_config.side_effect = [
-                    (WorkflowConfig(), False),
-                    (PromptConfig(), False),
-                    (RetrievalConfig(), False),
-                    (LLMEndpointConfig(), False),
+                    WorkflowConfig(),
+                    PromptConfig(),
+                    RetrievalConfig(),
+                    LLMEndpointConfig(),
                 ]
 
                 with patch(
@@ -244,10 +238,9 @@ class TestGenerateChatLlmNode:
             "chat_history": create_sample_chat_history(),
         }
 
-    def test_node_name_and_config_types(self, generate_chat_llm_node):
+    def test_node_name(self, generate_chat_llm_node):
         """Test node name and configuration types."""
         assert generate_chat_llm_node.NODE_NAME == "generate_chat_llm"
-        assert generate_chat_llm_node.CONFIG_TYPES == (PromptConfig, LLMEndpointConfig)
 
     def test_validate_input_state_success(
         self, generate_chat_llm_node, valid_chat_state
@@ -294,8 +287,8 @@ class TestGenerateChatLlmNode:
 
             with patch.object(generate_chat_llm_node, "get_config") as mock_get_config:
                 mock_get_config.side_effect = [
-                    (PromptConfig(), False),
-                    (LLMEndpointConfig(), False),
+                    PromptConfig(),
+                    LLMEndpointConfig(),
                 ]
 
                 # Mock context reduction
@@ -347,8 +340,8 @@ class TestGenerateChatLlmNode:
 
             with patch.object(generate_chat_llm_node, "get_config") as mock_get_config:
                 mock_get_config.side_effect = [
-                    (PromptConfig(), False),
-                    (LLMEndpointConfig(), False),
+                    PromptConfig(),
+                    LLMEndpointConfig(),
                 ]
 
                 with patch(
@@ -388,13 +381,9 @@ class TestGenerateZendeskRagNode:
         state["ticket_history"] = "Previous ticket interactions..."
         return state
 
-    def test_node_name_and_config_types(self, generate_zendesk_rag_node):
+    def test_node_name(self, generate_zendesk_rag_node):
         """Test node name and configuration types."""
         assert generate_zendesk_rag_node.NODE_NAME == "generate_zendesk_rag"
-        assert generate_zendesk_rag_node.CONFIG_TYPES == (
-            WorkflowConfig,
-            LLMEndpointConfig,
-        )
 
     def test_validate_input_state_success(
         self, generate_zendesk_rag_node, valid_zendesk_state
@@ -468,8 +457,8 @@ class TestGenerateZendeskRagNode:
                 generate_zendesk_rag_node, "get_config"
             ) as mock_get_config:
                 mock_get_config.side_effect = [
-                    (WorkflowConfig(), False),
-                    (LLMEndpointConfig(), False),
+                    WorkflowConfig(),
+                    LLMEndpointConfig(),
                 ]
 
                 # Mock datetime
@@ -533,8 +522,8 @@ class TestGenerateZendeskRagNode:
                 generate_zendesk_rag_node, "get_config"
             ) as mock_get_config:
                 mock_get_config.side_effect = [
-                    (WorkflowConfig(), False),
-                    (LLMEndpointConfig(), False),
+                    WorkflowConfig(),
+                    LLMEndpointConfig(),
                 ]
 
                 with patch(
@@ -589,8 +578,8 @@ class TestGenerateZendeskRagNode:
                 generate_zendesk_rag_node, "get_config"
             ) as mock_get_config:
                 mock_get_config.side_effect = [
-                    (WorkflowConfig(), False),
-                    (LLMEndpointConfig(), False),
+                    WorkflowConfig(),
+                    LLMEndpointConfig(),
                 ]
 
                 with patch(

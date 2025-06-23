@@ -3,7 +3,6 @@
 import pytest
 from unittest.mock import Mock, AsyncMock, patch
 
-from quivr_core.rag.entities.prompt import PromptConfig
 from quivr_core.rag.langgraph_framework.nodes.tools.run_tool_node import RunToolNode
 
 from tests.rag.langgraph_framework.fixtures.test_data import (
@@ -35,10 +34,9 @@ class TestRunToolNode:
         state["tasks"] = tasks
         return state
 
-    def test_node_name_and_config_types(self, run_tool_node):
-        """Test node name and configuration types."""
+    def test_node_name(self, run_tool_node):
+        """Test node name."""
         assert run_tool_node.NODE_NAME == "run_tool"
-        assert PromptConfig in run_tool_node.CONFIG_TYPES
 
     def test_validate_input_state_success(self, run_tool_node, valid_state_with_tools):
         """Test successful input state validation."""
@@ -230,10 +228,6 @@ class TestRunToolNodeIntegration:
         # Should have proper node name
         assert hasattr(node, "NODE_NAME")
         assert node.NODE_NAME == "run_tool"
-
-        # Should have config types defined
-        assert hasattr(node, "CONFIG_TYPES")
-        assert PromptConfig in node.CONFIG_TYPES
 
     @pytest.mark.asyncio(loop_scope="session")
     async def test_run_tool_node_with_real_task_structure(self):

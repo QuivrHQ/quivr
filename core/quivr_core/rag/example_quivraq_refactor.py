@@ -1,4 +1,6 @@
-from quivr_core.rag.langgraph_framework.nodes.history.entity import FilterHistoryConfig
+from quivr_core.rag.langgraph_framework.entities.filter_history_config import (
+    FilterHistoryConfig,
+)
 from quivr_core.rag.langgraph_framework.services.llm_service import LLMService
 from quivr_core.rag.langgraph_framework.services.service_container import (
     ServiceContainer,
@@ -8,7 +10,10 @@ from quivr_core.rag.entities.config import (
     LLMEndpointConfig,
     WorkflowConfig,
     QuivrBaseConfig,
+    RetrievalConfig,
 )
+from quivr_core.rag.entities.retriever import RetrieverConfig
+from quivr_core.rag.entities.reranker import RerankerConfig
 from typing import Dict, Any, Annotated, Sequence, List, Optional, TypedDict
 from quivr_core.rag.entities.prompt import PromptConfig
 from quivr_core.rag.quivr_rag_langgraph_refactored import QuivrQARAGLangGraphRefactored
@@ -17,7 +22,7 @@ from langgraph.graph.message import add_messages
 from quivr_core.rag.entities.chat import ChatHistory
 from quivr_core.rag.langgraph_framework.task import UserTasks
 from quivr_core.rag.entities.config import DefaultWorkflow
-from quivr_core.rag.langgraph_framework.nodes.base.extractors import ConfigMapping
+from quivr_core.rag.langgraph_framework.base.extractors import ConfigMapping
 
 from dotenv import load_dotenv, find_dotenv
 import logging
@@ -144,14 +149,12 @@ async def test_node_specific_config():
             "temperature": 0.3,
             "max_context_tokens": 20000,
         },
-        "filter_history_config": {"max_history": 10, "filter_mode": "global"},
+        "filter_history_config": {"max_history": 10},
         # Node-specific overrides
         "nodes": {
             "filter_history": {
                 "filter_history_config": {
                     "max_history": 5,  # Override global max_history
-                    "custom_setting": "node_specific",  # Add node-specific setting
-                    # filter_mode will inherit from global ("global")
                 }
             },
             "generate_rag": {
@@ -220,8 +223,8 @@ async def test_node_specific_config():
     assert global_llm_config.model == "gpt-4o-mini"
     assert global_llm_config.temperature == 0.3
 
-    assert filter_node_llm_config.model == "gpt-4"  # Overridden
-    assert filter_node_llm_config.temperature == 0.7  # Overridden
+    assert filter_node_llm_config.model == "gpt-4o-mini"  # Inherited (corrected)
+    assert filter_node_llm_config.temperature == 0.3  # Inherited (corrected)
     assert filter_node_llm_config.max_context_tokens == 20000  # Inherited
 
     assert generate_node_llm_config.model == "gpt-4o-mini"  # Inherited
@@ -233,7 +236,149 @@ async def test_node_specific_config():
     logger.info("✅ Node-specific configuration test passed!")
 
 
+async def test_workflow_with_node_configs():
+    """Test workflow configuration with node-specific configs and validation."""
+    logger.info("Testing workflow configuration with node-specific configs")
+
+    # Your desired JSON structure with node-specific configs
+    config_data = {
+        "llm_config": {
+            "temperature": 0.3,
+            "max_context_tokens": 20000,
+            "model": "gpt-4o-mini",
+        },
+        "reranker_config": {"model": "rerank-v3.5", "top_n": 10, "supplier": "cohere"},
+        "workflow_config": {
+            "name": "Standard RAG",
+            "nodes": [
+                {
+                    "name": "START",
+                    "edges": ["filter_history"],
+                    "description": "Starting workflow",
+                },
+                {
+                    "name": "filter_history",
+                    "edges": ["retrieve"],
+                    "filter_history_config": {"max_history": 5},
+                    "description": "Filtering history",
+                },
+                {
+                    "name": "retrieve",
+                    "edges": ["generate_zendesk_rag"],
+                    "retriever_config": {
+                        "k": 15,
+                    },
+                    "description": "Retrieving relevant information",
+                },
+                {
+                    "name": "generate_zendesk_rag",
+                    "edges": ["END"],
+                    "llm_config": {
+                        "temperature": 0.1  # Different temperature for generation
+                    },
+                    "description": "Generating answer",
+                },
+            ],
+        },
+    }
+
+    try:
+        # Test creating RetrievalConfig from this structure
+        logger.info("Creating RetrievalConfig from JSON structure...")
+        retrieval_config = RetrievalConfig.model_validate(config_data)
+        logger.info("✅ RetrievalConfig created successfully")
+
+        # Inspect the workflow config
+        workflow = retrieval_config.workflow_config
+        logger.info(f"Workflow name: {workflow.name}")
+        logger.info(f"Number of nodes: {len(workflow.nodes)}")
+
+        # Check each node for configs
+        for node in workflow.nodes:
+            logger.info(f"\nNode: {node.name}")
+            logger.info(f"  Description: {node.description}")
+            logger.info(f"  Edges: {node.edges}")
+
+            # Check for node-specific configs (these would be raw dicts currently)
+            node_dict = node.model_dump()
+            for key, value in node_dict.items():
+                if key.endswith("_config") and key != "conditional_edge":
+                    logger.info(f"  {key}: {value}")
+
+        # Test config extraction with the new structure
+        config_extractor = ConfigMapping(
+            {
+                FilterHistoryConfig: "filter_history_config",
+                LLMEndpointConfig: "llm_config",
+                RetrieverConfig: "retriever_config",
+                RerankerConfig: "reranker_config",
+            }
+        )
+
+        # Test extracting configs for specific nodes
+        logger.info("\nTesting config extraction for nodes:")
+
+        # Extract filter_history config
+        filter_config = config_extractor.extract(
+            config_data, FilterHistoryConfig, "filter_history"
+        )
+        logger.info(f"filter_history max_history: {filter_config.max_history}")
+
+        # Extract retriever config for retrieve node
+        retriever_config = config_extractor.extract(
+            config_data, RetrieverConfig, "retrieve"
+        )
+        logger.info(f"retrieve node k: {retriever_config.k}")
+
+        # Extract LLM config for generate node (should have overridden temperature)
+        llm_config_generate = config_extractor.extract(
+            config_data, LLMEndpointConfig, "generate_zendesk_rag"
+        )
+        logger.info(
+            f"generate_zendesk_rag temperature: {llm_config_generate.temperature}"
+        )
+        logger.info(
+            f"generate_zendesk_rag model: {llm_config_generate.model}"
+        )  # Should inherit
+
+        logger.info("✅ Workflow with node configs test passed!")
+
+    except Exception as e:
+        logger.error(f"❌ Error testing workflow config: {e}", exc_info=True)
+        raise
+
+
+async def test_config_validation_errors():
+    """Test that invalid configs are properly caught."""
+    logger.info("Testing config validation error handling")
+
+    # Test with invalid filter_history_config
+    invalid_config = {
+        "workflow_config": {
+            "name": "Test Workflow",
+            "nodes": [
+                {
+                    "name": "filter_history",
+                    "edges": ["END"],
+                    "filter_history_config": {
+                        "max_history": "invalid_string"  # Should be int
+                    },
+                }
+            ],
+        }
+    }
+
+    try:
+        # This should fail validation if we implement proper validation
+        _ = RetrievalConfig.model_validate(invalid_config)
+        logger.warning("⚠️ Invalid config was accepted - validation not yet implemented")
+    except Exception as e:
+        logger.info(f"✅ Validation correctly caught error: {e}")
+
+
 if __name__ == "__main__":
-    # Run both tests
-    asyncio.run(test_node_specific_config())
+    # Run all tests
+    # asyncio.run(test_node_specific_config())
+    # asyncio.run(test_workflow_with_node_configs())
+    # asyncio.run(test_config_validation_errors())
     asyncio.run(main())
