@@ -3,11 +3,14 @@ import pytest
 from unittest.mock import patch, Mock
 from uuid import uuid4
 
+from quivr_core.rag.entities.prompt import PromptConfig
 from quivr_core.rag.entities.reranker import DefaultRerankers
+from quivr_core.rag.entities.retriever import RetrieverConfig
 from quivr_core.rag.entities.utils import (
     normalize_to_env_variable_name,
 )
 from quivr_core.rag.entities.config import (
+    CitationConfig,
     SpecialEdges,
     BrainConfig,
     DefaultWebSearchTool,
@@ -26,6 +29,9 @@ from quivr_core.rag.entities.config import (
     AssistantConfig,
 )
 from langgraph.graph import END, START
+from quivr_core.rag.langgraph_framework.entities.filter_history_config import (
+    FilterHistoryConfig,
+)
 
 
 class TestNormalizeToEnvVariableName:
@@ -499,8 +505,8 @@ def test_default_retrievalconfig():
     """Existing test - keeping for compatibility."""
     config = RetrievalConfig()
 
-    assert config.max_files == 20
-    assert config.prompt is None
+    assert config.citation_config.max_files == 20
+    assert config.prompt_config.prompt is None
     print("\n\n", config.llm_config, "\n\n")
     print("\n\n", LLMEndpointConfig(), "\n\n")
     # Remove the equality check as it may fail due to computed fields
@@ -513,13 +519,16 @@ class TestRetrievalConfig:
     def test_creation_with_custom_values(self):
         """Test creating RetrievalConfig with custom values."""
         config = RetrievalConfig(
-            max_history=5, max_files=10, k=20, prompt="Custom prompt"
+            citation_config=CitationConfig(max_files=10),
+            filter_history_config=FilterHistoryConfig(max_history=5),
+            prompt_config=PromptConfig(prompt="Custom prompt"),
+            retriever_config=RetrieverConfig(k=20),
         )
 
-        assert config.max_history == 5
-        assert config.max_files == 10
-        assert config.k == 20
-        assert config.prompt == "Custom prompt"
+        assert config.filter_history_config.max_history == 5
+        assert config.citation_config.max_files == 10
+        assert config.retriever_config.k == 20
+        assert config.prompt_config.prompt == "Custom prompt"
 
     def test_workflow_config_default(self):
         """Test that workflow_config has default RAG nodes."""
@@ -582,7 +591,7 @@ class TestConfigIntegration:
 
         # Modify LLM config
         config.retrieval_config.llm_config.temperature = 0.8
-        config.retrieval_config.max_files = 50
+        config.retrieval_config.citation_config.max_files = 50
 
         assert config.retrieval_config.llm_config.temperature == 0.8
-        assert config.retrieval_config.max_files == 50
+        assert config.retrieval_config.citation_config.max_files == 50

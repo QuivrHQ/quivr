@@ -222,7 +222,6 @@ class TestToolRoutingNode:
 
         with patch.object(tool_routing_node, "get_config") as mock_get_config:
             mock_get_config.side_effect = [
-                PromptConfig(),
                 LLMEndpointConfig(),
                 WorkflowConfig(),
             ]

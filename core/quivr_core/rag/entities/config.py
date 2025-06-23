@@ -584,7 +584,12 @@ class WorkflowConfig(QuivrBaseConfig):
                         )
 
 
+class CitationConfig(QuivrBaseConfig):
+    max_files: int = 20
+
+
 class RetrievalConfig(QuivrBaseConfig):
+    citation_config: CitationConfig = CitationConfig()
     reranker_config: RerankerConfig = RerankerConfig()
     retriever_config: RetrieverConfig = RetrieverConfig()
     llm_config: LLMEndpointConfig = LLMEndpointConfig()
