@@ -3,7 +3,7 @@ import logging
 import os
 from pathlib import Path
 from pprint import PrettyPrinter
-from typing import Any, AsyncGenerator, Callable, Dict, Self, Type, Union
+from typing import Any, AsyncGenerator, Callable, Dict, Self, Union
 from uuid import UUID, uuid4
 
 from langchain_core.documents import Document
@@ -11,6 +11,17 @@ from langchain_core.embeddings import Embeddings
 from langchain_core.messages import AIMessage, HumanMessage
 from langchain_core.vectorstores import VectorStore
 from langchain_openai import OpenAIEmbeddings
+from quivr_core.rag.entities.prompt import PromptConfig
+from quivr_core.rag.example_quivraq_refactor import AgentState
+from quivr_core.rag.langgraph_framework.base.extractors import ConfigMapping
+from quivr_core.rag.langgraph_framework.entities.filter_history_config import (
+    FilterHistoryConfig,
+)
+from quivr_core.rag.langgraph_framework.services.llm_service import LLMService
+from quivr_core.rag.langgraph_framework.services.service_container import (
+    ServiceContainer,
+)
+from quivr_core.rag.quivr_rag_langgraph_refactored import QuivrQARAGLangGraphRefactored
 from rich.console import Console
 from rich.panel import Panel
 
@@ -26,15 +37,17 @@ from quivr_core.files.file import load_qfile
 from quivr_core.llm import LLMEndpoint
 from quivr_core.processor.registry import get_processor_class
 from quivr_core.rag.entities.chat import ChatHistory
-from quivr_core.rag.entities.config import RetrievalConfig
+from quivr_core.rag.entities.config import (
+    LLMEndpointConfig,
+    RetrievalConfig,
+    WorkflowConfig,
+)
 from quivr_core.rag.entities.models import (
     ParsedRAGChunkResponse,
     ParsedRAGResponse,
     QuivrKnowledge,
     SearchResult,
 )
-from quivr_core.rag.quivr_rag import QuivrQARAG
-from quivr_core.rag.quivr_rag_langgraph import QuivrQARAGLangGraph
 from quivr_core.storage.local_storage import LocalStorage, TransparentStorage
 from quivr_core.storage.storage_base import StorageBase
 
@@ -499,7 +512,6 @@ class Brain:
         run_id: UUID,
         system_prompt: str | None = None,
         retrieval_config: RetrievalConfig | None = None,
-        rag_pipeline: Type[Union[QuivrQARAG, QuivrQARAGLangGraph]] | None = None,
         list_files: list[QuivrKnowledge] | None = None,
         chat_history: ChatHistory | None = None,
         **input_kwargs,
@@ -509,7 +521,6 @@ class Brain:
         Args:
             question (str): The question to ask.
             retrieval_config (RetrievalConfig | None): The retrieval configuration (see RetrievalConfig docs).
-            rag_pipeline (Type[Union[QuivrQARAG, QuivrQARAGLangGraph]] | None): The RAG pipeline to use.
         list_files (list[QuivrKnowledge] | None): The list of files to include in the RAG pipeline.
             chat_history (ChatHistory | None): The chat history to use.
         Returns:
@@ -521,17 +532,30 @@ class Brain:
             print(chunk.answer)
         ```
         """
-        llm = self.llm
-
         # If you passed a different llm model we 'll override the brain  one
-        if retrieval_config:
-            if retrieval_config.llm_config != self.llm.get_config():
-                llm = LLMEndpoint.from_config(config=retrieval_config.llm_config)
-        else:
+        if not retrieval_config:
             retrieval_config = RetrievalConfig(llm_config=self.llm.get_config())
 
-        rag_instance = QuivrQARAGLangGraph(
-            retrieval_config=retrieval_config, llm=llm, vector_store=self.vector_db
+        workflow_config = retrieval_config.workflow_config
+        llm_config = retrieval_config.llm_config
+        service_container = ServiceContainer(vector_store=self.vector_db)
+        llm_service = service_container.get_service(LLMService, llm_config)
+        config_extractor = ConfigMapping(
+            {
+                PromptConfig: "prompt_config",
+                LLMEndpointConfig: "llm_config",
+                WorkflowConfig: "workflow_config",
+                FilterHistoryConfig: "filter_history_config",
+            }
+        )
+
+        rag_instance = QuivrQARAGLangGraphRefactored(
+            workflow_config=workflow_config,
+            graph_state=AgentState,
+            graph_config=retrieval_config.model_dump(),
+            graph_config_schema=RetrievalConfig,
+            llm_service=llm_service,
+            config_extractor=config_extractor,
         )
 
         chat_history = self.default_chat if chat_history is None else chat_history
@@ -567,7 +591,6 @@ class Brain:
         question: str,
         system_prompt: str | None = None,
         retrieval_config: RetrievalConfig | None = None,
-        rag_pipeline: Type[Union[QuivrQARAG, QuivrQARAGLangGraph]] | None = None,
         list_files: list[QuivrKnowledge] | None = None,
         chat_history: ChatHistory | None = None,
         **input_kwargs,
@@ -577,7 +600,6 @@ class Brain:
         Args:
             question (str): The question to ask.
             retrieval_config (RetrievalConfig | None): The retrieval configuration (see RetrievalConfig docs).
-            rag_pipeline (Type[Union[QuivrQARAG, QuivrQARAGLangGraph]] | None): The RAG pipeline to use.
             list_files (list[QuivrKnowledge] | None): The list of files to include in the RAG pipeline.
             chat_history (ChatHistory | None): The chat history to use.
         Returns:
@@ -592,7 +614,6 @@ class Brain:
             question=question,
             system_prompt=system_prompt,
             retrieval_config=retrieval_config,
-            rag_pipeline=rag_pipeline,
             list_files=list_files,
             chat_history=chat_history,
             **input_kwargs,
@@ -609,7 +630,6 @@ class Brain:
         question: str,
         system_prompt: str | None = None,
         retrieval_config: RetrievalConfig | None = None,
-        rag_pipeline: Type[Union[QuivrQARAG, QuivrQARAGLangGraph]] | None = None,
         list_files: list[QuivrKnowledge] | None = None,
         chat_history: ChatHistory | None = None,
     ) -> ParsedRAGResponse:
@@ -619,7 +639,6 @@ class Brain:
             question (str): The question to ask.
             system_prompt (str | None): The system prompt to use.
             retrieval_config (RetrievalConfig | None): The retrieval configuration (see RetrievalConfig docs).
-            rag_pipeline (Type[Union[QuivrQARAG, QuivrQARAGLangGraph]] | None): The RAG pipeline to use.
             list_files (list[QuivrKnowledge] | None): The list of files to include in the RAG pipeline.
             chat_history (ChatHistory | None): The chat history to use.
         Returns:
@@ -632,7 +651,6 @@ class Brain:
                 question=question,
                 system_prompt=system_prompt,
                 retrieval_config=retrieval_config,
-                rag_pipeline=rag_pipeline,
                 list_files=list_files,
                 chat_history=chat_history,
             )
