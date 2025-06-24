@@ -300,6 +300,11 @@ def _define_custom_prompts() -> dict[TemplatePromptName, BasePromptTemplate]:
     {ticket_metadata}
     </ticket_metadata>
 
+    Here are relevant extract of internal and external documentation that can help you to answer:
+    <documentation>
+    {ticket_metadata}
+    </documentation>
+
 
     Here are the most relevant similar tickets that can help you to answer:
     <similar_tickets>
