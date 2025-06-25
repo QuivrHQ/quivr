@@ -73,4 +73,6 @@ jobs:
           OPENAI_API_KEY: this-is-a-test-key
         run: |
           cd core
-          rye test -p quivr-core
+          pwd
+          ls -la
+          rye test -p quivr-core -v
