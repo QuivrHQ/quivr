@@ -67,7 +67,7 @@ jobs:
           cd core
           UV_INDEX_STRATEGY=unsafe-first-match rye sync --no-lock
 
-      - name: Run tests
+      - name: 🚀 Run tests
         env:
           TIKA_URL: http://localhost:9998/tika
           OPENAI_API_KEY: this-is-a-test-key
@@ -75,4 +75,5 @@ jobs:
           cd core
           pwd
           ls -la
+          rye list
           rye test -p quivr-core -v
