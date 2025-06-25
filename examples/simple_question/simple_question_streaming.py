@@ -1,10 +1,8 @@
 import asyncio
 import tempfile
-
+from uuid import uuid4
 from dotenv import load_dotenv
 from quivr_core import Brain
-from quivr_core.quivr_rag import QuivrQARAG
-from quivr_core.rag.quivr_rag_langgraph import QuivrQARAGLangGraph
 
 
 async def main():
@@ -20,13 +18,11 @@ async def main():
         await brain.save("~/.local/quivr")
 
         question = "what is gold? answer in french"
-        async for chunk in brain.ask_streaming(question, rag_pipeline=QuivrQARAG):
+        async for chunk in brain.ask_streaming(question=question, run_id=uuid4()):
             print("answer QuivrQARAG:", chunk.answer)
 
-        async for chunk in brain.ask_streaming(
-            question, rag_pipeline=QuivrQARAGLangGraph
-        ):
-            print("answer QuivrQARAGLangGraph:", chunk.answer)
+        async for chunk in brain.ask_streaming(question=question, run_id=uuid4()):
+            print("answer", chunk.answer)
 
 
 if __name__ == "__main__":
