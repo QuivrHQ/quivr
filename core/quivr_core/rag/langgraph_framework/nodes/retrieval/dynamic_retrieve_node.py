@@ -83,7 +83,7 @@ class DynamicRetrievalNode(BaseNode):
         while (
             number_of_relevant_chunks == top_n
             and iteration
-            <= retrieval_service_config.retriever_config.dynamic_retrieval_max_iterations
+            <= retrieval_service_config.retriever_config.extra_config.dynamic_retrieval_max_iterations
         ):
             current_top_n = top_n * iteration
             current_k = max([current_top_n * 2, k])
