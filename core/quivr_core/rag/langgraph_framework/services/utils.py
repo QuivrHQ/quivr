@@ -27,7 +27,7 @@ def get_retriever(
     Raises:
         ValueError: If no vector store is provided
     """
-    config = {"search_kwargs": retriever_config}
+    config = {"search_kwargs": retriever_config.model_dump(exclude={"extra_config"})}
     return vector_store.as_retriever(**config)
 
 
