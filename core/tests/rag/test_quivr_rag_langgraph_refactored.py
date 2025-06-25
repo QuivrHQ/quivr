@@ -252,6 +252,7 @@ class TestQuivrQARAGLangGraphRefactored:
         graph_config,
         mock_llm_service,
         config_extractor,
+        mock_service_container,
     ):
         """Create QuivrQARAGLangGraphRefactored instance for testing."""
         return QuivrQARAGLangGraphRefactored(
@@ -261,6 +262,7 @@ class TestQuivrQARAGLangGraphRefactored:
             graph_config_schema=graph_schema,
             llm_service=mock_llm_service,
             config_extractor=config_extractor,
+            service_container=mock_service_container,
         )
 
     def test_initialization(
@@ -540,7 +542,12 @@ class TestQuivrQARAGLangGraphRefactored:
                 assert text_chunks[0].metadata.workflow_step == "Generating response"
 
     def test_integration_with_existing_fixtures(
-        self, fake_llm, mem_vector_store, workflow_config, config_extractor
+        self,
+        fake_llm,
+        mem_vector_store,
+        workflow_config,
+        config_extractor,
+        mock_service_container,
     ):
         """Test integration with existing test fixtures from conftest.py."""
         # Create instance using existing fixtures
@@ -553,6 +560,7 @@ class TestQuivrQARAGLangGraphRefactored:
                 spec=LLMService
             ),  # Still need to mock this as the fixture is for LLMEndpoint
             config_extractor=config_extractor,
+            service_container=mock_service_container,
         )
 
         # Verify initialization works with existing fixtures
@@ -681,6 +689,7 @@ class TestQuivrQARAGLangGraphRefactoredAdvanced:
             graph_config_schema=FastRAGGraphConfig,
             llm_service=Mock(spec=LLMService),
             config_extractor=config_extractor,
+            service_container=Mock(spec=ServiceContainer),
         )
 
         # Should be able to create even minimal graphs
