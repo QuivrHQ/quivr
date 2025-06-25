@@ -1,8 +1,9 @@
 name: Run Tests with Tika Server
 
 on:
-  pull_request:
-  workflow_dispatch:
+  push:
+#   pull_request:
+#   workflow_dispatch:
 
 env:
   NATS_TOKEN: test
