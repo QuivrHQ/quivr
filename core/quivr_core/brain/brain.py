@@ -131,12 +131,19 @@ class Brain:
         storage: StorageBase | None = None,
         workspace_id: UUID | None = None,
         chat_id: UUID | None = None,
+        service_container: ServiceContainer | None = None,
     ):
         self.id = id
         self.name = name
         self.storage = storage
         self.workspace_id = workspace_id
         self.chat_id = chat_id
+
+        # Service container
+        self.service_container = service_container
+        if not self.service_container:
+            self.service_container = ServiceContainer(vector_store=vector_db)
+
         # Chat history
         self._chats = self._init_chats()
         self.default_chat = list(self._chats.values())[0]
@@ -538,8 +545,8 @@ class Brain:
 
         workflow_config = retrieval_config.workflow_config
         llm_config = retrieval_config.llm_config
-        service_container = ServiceContainer(vector_store=self.vector_db)
-        llm_service = service_container.get_service(LLMService, llm_config)
+        assert self.service_container, "Service container is not set"
+        llm_service = self.service_container.get_service(LLMService, llm_config)
         config_extractor = ConfigMapping(
             {
                 PromptConfig: "prompt_config",
@@ -556,6 +563,7 @@ class Brain:
             graph_config_schema=RetrievalConfig,
             llm_service=llm_service,
             config_extractor=config_extractor,
+            service_container=self.service_container,
         )
 
         chat_history = self.default_chat if chat_history is None else chat_history

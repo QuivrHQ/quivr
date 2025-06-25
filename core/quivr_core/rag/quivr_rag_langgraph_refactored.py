@@ -23,6 +23,9 @@ import quivr_core.rag.langgraph_framework.nodes  # noqa: F401
 from langgraph.graph import END, START
 from quivr_core.rag.langgraph_framework.graph_builder import GraphBuilder
 from quivr_core.rag.langgraph_framework.registry.node_registry import node_registry
+from quivr_core.rag.langgraph_framework.services.service_container import (
+    ServiceContainer,
+)
 from quivr_core.rag.utils import (
     LangfuseService,
     format_file_list,
@@ -48,6 +51,7 @@ class QuivrQARAGLangGraphRefactored:
         graph_config_schema: Type[QuivrBaseConfig],
         llm_service: LLMService,
         config_extractor: ConfigMapping,
+        service_container: ServiceContainer,
     ):
         self.workflow_config = workflow_config
         self.graph_state = graph_state
@@ -55,7 +59,7 @@ class QuivrQARAGLangGraphRefactored:
         self.graph_config_schema = graph_config_schema
         self.llm_service = llm_service
         self.config_extractor = config_extractor
-
+        self.service_container = service_container
         self.graph = None
         self.final_nodes: list[str] = []
 
@@ -89,7 +93,9 @@ class QuivrQARAGLangGraphRefactored:
                 # Create node instance using the registry by node name
                 try:
                     node_instance = node_registry.create_node(
-                        node.name, config_extractor=self.config_extractor
+                        node.name,
+                        config_extractor=self.config_extractor,
+                        service_container=self.service_container,
                     )
                     self.graph_builder.graph.add_node(node.name, node_instance)
                     self.graph_builder.nodes[node.name] = node_instance
