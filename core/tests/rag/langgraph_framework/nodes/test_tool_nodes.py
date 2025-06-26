@@ -4,6 +4,7 @@ import pytest
 from unittest.mock import Mock, AsyncMock, patch
 
 from quivr_core.rag.langgraph_framework.nodes.tools.run_tool_node import RunToolNode
+from quivr_core.rag.langgraph_framework.base.exceptions import NodeValidationError
 
 from tests.rag.langgraph_framework.fixtures.test_data import (
     create_sample_agent_state,
@@ -40,8 +41,56 @@ class TestRunToolNode:
 
     def test_validate_input_state_success(self, run_tool_node, valid_state_with_tools):
         """Test successful input state validation."""
-        # RunToolNode.validate_input_state is currently a no-op
         run_tool_node.validate_input_state(valid_state_with_tools)
+
+    def test_validate_input_state_missing_tasks(self, run_tool_node):
+        """Test input validation with missing tasks."""
+        state = {"messages": []}
+
+        with pytest.raises(NodeValidationError, match="requires 'tasks' attribute"):
+            run_tool_node.validate_input_state(state)
+
+    def test_validate_input_state_empty_tasks(self, run_tool_node):
+        """Test input validation with empty tasks."""
+        state = {"tasks": None}
+
+        with pytest.raises(NodeValidationError, match="requires non-empty tasks"):
+            run_tool_node.validate_input_state(state)
+
+    def test_validate_input_state_invalid_tasks_no_has_tasks(self, run_tool_node):
+        """Test input validation with tasks missing has_tasks method."""
+        invalid_tasks = Mock(spec=[])  # Mock without has_tasks method
+        state = {"tasks": invalid_tasks}
+
+        with pytest.raises(
+            NodeValidationError, match="requires tasks object with 'has_tasks' method"
+        ):
+            run_tool_node.validate_input_state(state)
+
+    def test_validate_input_state_invalid_tasks_no_ids(self, run_tool_node):
+        """Test input validation with tasks missing ids property."""
+        invalid_tasks = Mock()
+        invalid_tasks.has_tasks = Mock()
+        del invalid_tasks.ids  # Remove ids property
+        state = {"tasks": invalid_tasks}
+
+        with pytest.raises(
+            NodeValidationError, match="requires tasks object with 'ids' property"
+        ):
+            run_tool_node.validate_input_state(state)
+
+    def test_validate_input_state_invalid_tasks_no_set_docs(self, run_tool_node):
+        """Test input validation with tasks missing set_docs method."""
+        invalid_tasks = Mock()
+        invalid_tasks.has_tasks = Mock()
+        invalid_tasks.ids = []
+        del invalid_tasks.set_docs  # Remove set_docs method
+        state = {"tasks": invalid_tasks}
+
+        with pytest.raises(
+            NodeValidationError, match="requires tasks object with 'set_docs' method"
+        ):
+            run_tool_node.validate_input_state(state)
 
     def test_validate_output_state(self, run_tool_node):
         """Test output state validation (currently no-op)."""

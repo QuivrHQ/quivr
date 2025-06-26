@@ -62,6 +62,16 @@ class TestRoutingNode:
         with pytest.raises(NodeValidationError, match="requires non-empty messages"):
             routing_node.validate_input_state(state)
 
+    def test_validate_input_state_missing_chat_history(self, routing_node):
+        """Test input validation with missing chat_history."""
+        from langchain_core.messages import HumanMessage
+
+        state = {"messages": [HumanMessage(content="test")]}
+
+        # Note: Current RoutingNode implementation doesn't validate chat_history
+        # but uses it in execute(), which could cause runtime errors
+        routing_node.validate_input_state(state)  # Currently passes but shouldn't
+
     def test_validate_output_state(self, routing_node):
         """Test output state validation (currently no-op)."""
         routing_node.validate_output_state({})
@@ -208,6 +218,70 @@ class TestToolRoutingNode:
     ):
         """Test successful input state validation."""
         tool_routing_node.validate_input_state(valid_state_with_tasks)
+
+    def test_validate_input_state_missing_tasks(self, tool_routing_node):
+        """Test input validation with missing tasks."""
+        state = {"chat_history": Mock()}
+
+        with pytest.raises(NodeValidationError, match="requires 'tasks' attribute"):
+            tool_routing_node.validate_input_state(state)
+
+    def test_validate_input_state_empty_tasks(self, tool_routing_node):
+        """Test input validation with empty tasks."""
+        state = {"tasks": None, "chat_history": Mock()}
+
+        with pytest.raises(NodeValidationError, match="requires non-empty tasks"):
+            tool_routing_node.validate_input_state(state)
+
+    def test_validate_input_state_invalid_tasks_no_has_tasks(self, tool_routing_node):
+        """Test input validation with tasks missing has_tasks method."""
+        invalid_tasks = Mock(spec=[])  # Mock without has_tasks method
+        state = {"tasks": invalid_tasks, "chat_history": Mock()}
+
+        with pytest.raises(
+            NodeValidationError, match="requires tasks object with 'has_tasks' method"
+        ):
+            tool_routing_node.validate_input_state(state)
+
+    def test_validate_input_state_invalid_tasks_no_ids(self, tool_routing_node):
+        """Test input validation with tasks missing ids property."""
+        invalid_tasks = Mock()
+        invalid_tasks.has_tasks = Mock()
+        del invalid_tasks.ids  # Remove ids property
+        state = {"tasks": invalid_tasks, "chat_history": Mock()}
+
+        with pytest.raises(
+            NodeValidationError, match="requires tasks object with 'ids' property"
+        ):
+            tool_routing_node.validate_input_state(state)
+
+    def test_validate_input_state_missing_chat_history(self, tool_routing_node):
+        """Test input validation with missing chat_history."""
+        valid_tasks = Mock()
+        valid_tasks.has_tasks = Mock()
+        valid_tasks.ids = []
+        state = {"tasks": valid_tasks}
+
+        with pytest.raises(
+            NodeValidationError, match="requires 'chat_history' attribute"
+        ):
+            tool_routing_node.validate_input_state(state)
+
+    def test_validate_input_state_invalid_chat_history(self, tool_routing_node):
+        """Test input validation with chat_history missing required methods."""
+        valid_tasks = Mock()
+        valid_tasks.has_tasks = Mock()
+        valid_tasks.ids = []
+        state = {
+            "tasks": valid_tasks,
+            "chat_history": "invalid_chat_history",  # String without to_list method
+        }
+
+        with pytest.raises(
+            NodeValidationError,
+            match="requires chat_history object with 'to_list' method",
+        ):
+            tool_routing_node.validate_input_state(state)
 
     def test_validate_output_state(self, tool_routing_node):
         """Test output state validation (currently no-op)."""

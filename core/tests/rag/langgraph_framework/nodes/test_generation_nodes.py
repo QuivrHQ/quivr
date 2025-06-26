@@ -103,6 +103,44 @@ class TestGenerateRagNode:
         with pytest.raises(NodeValidationError, match="requires non-empty tasks"):
             generate_rag_node.validate_input_state(state)
 
+    def test_validate_input_state_missing_files(self, generate_rag_node):
+        """Test input validation with missing files."""
+        state = {
+            "messages": [HumanMessage(content="test")],
+            "tasks": create_sample_user_tasks(),
+        }
+
+        with pytest.raises(NodeValidationError, match="requires 'files' attribute"):
+            generate_rag_node.validate_input_state(state)
+
+    def test_validate_input_state_missing_chat_history(self, generate_rag_node):
+        """Test input validation with missing chat_history."""
+        state = {
+            "messages": [HumanMessage(content="test")],
+            "tasks": create_sample_user_tasks(),
+            "files": [],
+        }
+
+        with pytest.raises(
+            NodeValidationError, match="requires 'chat_history' attribute"
+        ):
+            generate_rag_node.validate_input_state(state)
+
+    def test_validate_input_state_invalid_chat_history(self, generate_rag_node):
+        """Test input validation with chat_history missing required methods."""
+        state = {
+            "messages": [HumanMessage(content="test")],
+            "tasks": create_sample_user_tasks(),
+            "files": [],
+            "chat_history": "invalid_chat_history",  # String without to_list method
+        }
+
+        with pytest.raises(
+            NodeValidationError,
+            match="requires chat_history object with 'to_list' method",
+        ):
+            generate_rag_node.validate_input_state(state)
+
     def test_validate_output_state(self, generate_rag_node):
         """Test output state validation (currently no-op)."""
         # Should not raise any exception
@@ -260,6 +298,28 @@ class TestGenerateChatLlmNode:
         state = {"messages": []}
 
         with pytest.raises(NodeValidationError, match="requires non-empty messages"):
+            generate_chat_llm_node.validate_input_state(state)
+
+    def test_validate_input_state_missing_chat_history(self, generate_chat_llm_node):
+        """Test input validation with missing chat_history."""
+        state = {"messages": [HumanMessage(content="test")]}
+
+        with pytest.raises(
+            NodeValidationError, match="requires 'chat_history' attribute"
+        ):
+            generate_chat_llm_node.validate_input_state(state)
+
+    def test_validate_input_state_invalid_chat_history(self, generate_chat_llm_node):
+        """Test input validation with chat_history missing required methods."""
+        state = {
+            "messages": [HumanMessage(content="test")],
+            "chat_history": "invalid_chat_history",  # String without to_list method
+        }
+
+        with pytest.raises(
+            NodeValidationError,
+            match="requires chat_history object with 'to_list' method",
+        ):
             generate_chat_llm_node.validate_input_state(state)
 
     def test_validate_output_state(self, generate_chat_llm_node):
