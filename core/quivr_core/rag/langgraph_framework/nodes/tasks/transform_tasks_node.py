@@ -31,7 +31,41 @@ class TransformTasksNode(BaseNode):
 
     def validate_input_state(self, state) -> None:
         """Validate that state has the required attributes and methods."""
-        pass
+        # Validate messages (used for fallback task creation)
+        if "messages" not in state:
+            raise NodeValidationError(
+                "TransformTasksNode requires 'messages' attribute in state"
+            )
+
+        if not state["messages"]:
+            raise NodeValidationError(
+                "TransformTasksNode requires non-empty messages in state"
+            )
+
+        # Validate chat_history
+        if "chat_history" not in state:
+            raise NodeValidationError(
+                "TransformTasksNode requires 'chat_history' attribute in state"
+            )
+
+        # Validate chat_history has required methods
+        chat_history = state["chat_history"]
+        if not hasattr(chat_history, "to_list"):
+            raise NodeValidationError(
+                "TransformTasksNode requires chat_history object with 'to_list' method"
+            )
+
+        # If tasks are provided, validate they have required methods
+        if "tasks" in state and state["tasks"]:
+            tasks = state["tasks"]
+            if not hasattr(tasks, "ids"):
+                raise NodeValidationError(
+                    "TransformTasksNode requires tasks object with 'ids' property"
+                )
+            if not hasattr(tasks, "set_definition"):
+                raise NodeValidationError(
+                    "TransformTasksNode requires tasks object with 'set_definition' method"
+                )
 
     def validate_output_state(self, state) -> None:
         """Validate that output has the correct attributes and methods."""

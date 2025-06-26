@@ -58,6 +58,25 @@ class GenerateRagNode(BaseNode):
                 "GenerateRagNode requires non-empty tasks in state"
             )
 
+        # Validate files
+        if "files" not in state:
+            raise NodeValidationError(
+                "GenerateRagNode requires 'files' attribute in state"
+            )
+
+        # Validate chat_history
+        if "chat_history" not in state:
+            raise NodeValidationError(
+                "GenerateRagNode requires 'chat_history' attribute in state"
+            )
+
+        # Validate chat_history has required methods
+        chat_history = state["chat_history"]
+        if not hasattr(chat_history, "to_list"):
+            raise NodeValidationError(
+                "GenerateRagNode requires chat_history object with 'to_list' method"
+            )
+
     def validate_output_state(self, state) -> None:
         """Validate that output has the correct attributes and methods."""
         pass

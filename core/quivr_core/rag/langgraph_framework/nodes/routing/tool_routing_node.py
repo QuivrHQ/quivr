@@ -4,6 +4,7 @@ from quivr_core.rag.entities.config import LLMEndpointConfig, WorkflowConfig
 from quivr_core.rag.langgraph_framework.base.node import (
     BaseNode,
 )
+from quivr_core.rag.langgraph_framework.base.exceptions import NodeValidationError
 from langgraph.types import Send
 from quivr_core.rag.langgraph_framework.state import TasksCompletion
 from quivr_core.rag.prompts import TemplatePromptName
@@ -32,7 +33,39 @@ class ToolRoutingNode(BaseNode):
 
     def validate_input_state(self, state) -> None:
         """Validate that state has the required attributes and methods."""
-        pass
+        if "tasks" not in state:
+            raise NodeValidationError(
+                "ToolRoutingNode requires 'tasks' attribute in state"
+            )
+
+        if not state["tasks"]:
+            raise NodeValidationError(
+                "ToolRoutingNode requires non-empty tasks in state"
+            )
+
+        # Validate tasks object has required methods
+        tasks = state["tasks"]
+        if not hasattr(tasks, "has_tasks"):
+            raise NodeValidationError(
+                "ToolRoutingNode requires tasks object with 'has_tasks' method"
+            )
+
+        if not hasattr(tasks, "ids"):
+            raise NodeValidationError(
+                "ToolRoutingNode requires tasks object with 'ids' property"
+            )
+
+        if "chat_history" not in state:
+            raise NodeValidationError(
+                "ToolRoutingNode requires 'chat_history' attribute in state"
+            )
+
+        # Validate chat_history has required methods
+        chat_history = state["chat_history"]
+        if not hasattr(chat_history, "to_list"):
+            raise NodeValidationError(
+                "ToolRoutingNode requires chat_history object with 'to_list' method"
+            )
 
     def validate_output_state(self, state) -> None:
         """Validate that output has the correct attributes and methods."""

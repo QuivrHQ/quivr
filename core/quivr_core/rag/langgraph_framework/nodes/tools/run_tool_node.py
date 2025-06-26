@@ -2,6 +2,7 @@ from typing import Any, Optional, Dict
 from quivr_core.llm_tools.llm_tools import LLMToolFactory
 import asyncio
 from quivr_core.rag.langgraph_framework.base.node import BaseNode
+from quivr_core.rag.langgraph_framework.base.exceptions import NodeValidationError
 from quivr_core.rag.langgraph_framework.base.graph_config import BaseGraphConfig
 from quivr_core.rag.langgraph_framework.base.extractors import ConfigExtractor
 from quivr_core.rag.langgraph_framework.registry.node_registry import register_node
@@ -30,7 +31,28 @@ class RunToolNode(BaseNode):
 
     def validate_input_state(self, state) -> None:
         """Validate that state has the required attributes and methods."""
-        pass
+        if "tasks" not in state:
+            raise NodeValidationError("RunToolNode requires 'tasks' attribute in state")
+
+        if not state["tasks"]:
+            raise NodeValidationError("RunToolNode requires non-empty tasks in state")
+
+        # Validate tasks object has required methods
+        tasks = state["tasks"]
+        if not hasattr(tasks, "has_tasks"):
+            raise NodeValidationError(
+                "RunToolNode requires tasks object with 'has_tasks' method"
+            )
+
+        if not hasattr(tasks, "ids"):
+            raise NodeValidationError(
+                "RunToolNode requires tasks object with 'ids' property"
+            )
+
+        if not hasattr(tasks, "set_docs"):
+            raise NodeValidationError(
+                "RunToolNode requires tasks object with 'set_docs' method"
+            )
 
     def validate_output_state(self, state) -> None:
         """Validate that output has the correct attributes and methods."""

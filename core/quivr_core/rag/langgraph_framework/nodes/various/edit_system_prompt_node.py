@@ -8,6 +8,7 @@ from quivr_core.rag.entities.config import LLMEndpointConfig, WorkflowConfig
 from quivr_core.rag.entities.prompt import PromptConfig
 from quivr_core.rag.langgraph_framework.base.graph_config import BaseGraphConfig
 from quivr_core.rag.langgraph_framework.base.node import BaseNode
+from quivr_core.rag.langgraph_framework.base.exceptions import NodeValidationError
 from quivr_core.rag.langgraph_framework.services.llm_service import LLMService
 from quivr_core.rag.langgraph_framework.services.rag_prompt_service import (
     RAGPromptService,
@@ -43,7 +44,15 @@ class EditSystemPromptNode(BaseNode):
 
     def validate_input_state(self, state) -> None:
         """Validate that state has the required attributes and methods."""
-        pass
+        if "instructions" not in state:
+            raise NodeValidationError(
+                "EditSystemPromptNode requires 'instructions' attribute in state"
+            )
+
+        if not state["instructions"]:
+            raise NodeValidationError(
+                "EditSystemPromptNode requires non-empty instructions in state"
+            )
 
     def validate_output_state(self, state) -> None:
         """Validate that output has the correct attributes and methods."""
