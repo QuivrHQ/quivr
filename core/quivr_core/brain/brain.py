@@ -43,6 +43,7 @@ from quivr_core.rag.entities.config import (
     WorkflowConfig,
 )
 from quivr_core.rag.entities.models import (
+    LangchainMetadata,
     ParsedRAGChunkResponse,
     ParsedRAGResponse,
     QuivrKnowledge,
@@ -570,10 +571,13 @@ class Brain:
         list_files = [] if list_files is None else list_files
 
         full_answer = ""
-        metadata = {
-            "langfuse_user_id": str(self.workspace_id),
-            "langfuse_session_id": str(self.chat_id),
-        }
+
+        metadata = LangchainMetadata(
+            langfuse_trace_id=str(run_id),
+            langfuse_user_id=str(self.workspace_id),
+            langfuse_session_id=str(self.chat_id),
+        )
+
         async for response in rag_instance.answer_astream(
             run_id=run_id,
             question=question,

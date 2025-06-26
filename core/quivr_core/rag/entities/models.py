@@ -62,6 +62,13 @@ class RawRAGResponse(TypedDict):
     docs: dict[str, Any]
 
 
+class LangchainMetadata(BaseModel):
+    langfuse_trace_id: str | None = None
+    langfuse_trace_url: str | None = None
+    langfuse_session_id: str | None = None
+    langfuse_user_id: str | None = None
+
+
 class ChatLLMMetadata(BaseModel):
     name: str
     display_name: str | None = None
@@ -77,6 +84,7 @@ class RAGResponseMetadata(BaseModel):
     sources: list[Any] = Field(default_factory=list)
     metadata_model: ChatLLMMetadata | None = None
     workflow_step: str | None = None
+    langchain_metadata: LangchainMetadata | None = None
 
 
 class ParsedRAGResponse(BaseModel):

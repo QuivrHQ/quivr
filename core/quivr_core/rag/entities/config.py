@@ -134,6 +134,16 @@ class LLMModelConfig:
             ),
         },
         DefaultModelSuppliers.ANTHROPIC: {
+            "claude-opus-4": LLMConfig(
+                max_context_tokens=200000,
+                max_output_tokens=8192,
+                tokenizer_hub="Quivr/claude-tokenizer",
+            ),
+            "claude-sonnet-4": LLMConfig(
+                max_context_tokens=200000,
+                max_output_tokens=8192,
+                tokenizer_hub="Quivr/claude-tokenizer",
+            ),
             "claude-3-7-sonnet": LLMConfig(
                 max_context_tokens=200000,
                 max_output_tokens=8192,
