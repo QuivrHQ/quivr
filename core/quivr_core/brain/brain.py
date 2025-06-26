@@ -584,7 +584,7 @@ class Brain:
             system_prompt=system_prompt or None,
             history=chat_history,
             list_files=list_files,
-            metadata=metadata,
+            metadata=metadata.model_dump(),
             **input_kwargs,
         ):
             # Format output to be correct servicedf;j
