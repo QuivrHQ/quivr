@@ -114,6 +114,7 @@ async def main():
         graph_config_schema=graph_schema,
         llm_service=llm_service,
         config_extractor=config_extractor,
+        service_container=service_container,
     )
     logger.info("Quivr RAG LangGraph Refactor instance created successfully")
 
