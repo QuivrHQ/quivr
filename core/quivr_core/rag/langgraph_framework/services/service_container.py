@@ -1,6 +1,7 @@
 from typing import Dict, Type, TypeVar, Any, Optional
 from abc import ABC, abstractmethod
 import logging
+from collections import OrderedDict as OrderedDictImpl
 from quivr_core.rag.entities.config import LLMEndpointConfig, WorkflowConfig
 from quivr_core.rag.langgraph_framework.entities.retrieval_service_config import (
     RetrievalServiceConfig,
@@ -77,15 +78,17 @@ class RetrievalServiceFactory(ServiceFactory):
 
 
 class ServiceContainer:
-    """Dependency injection container for services."""
+    """Dependency injection container for services with LRU cache per service type."""
 
-    def __init__(self, vector_store=None):
-        self._services: Dict[tuple, Any] = {}  # Changed to support tuple keys
+    def __init__(self, vector_store=None, max_cache_per_service: int = 5):
+        # Use OrderedDict for LRU cache behavior per service type
+        self._services: Dict[Type, OrderedDictImpl[str, Any]] = {}
         self._factories: Dict[Type, ServiceFactory] = {
             LLMService: LLMServiceFactory(),
             ToolService: ToolServiceFactory(),
             RAGPromptService: PromptServiceFactory(),
         }
+        self._max_cache_per_service = max_cache_per_service
 
         # Register RetrieverService factory if vector_store is provided
         if vector_store:
@@ -101,49 +104,60 @@ class ServiceContainer:
         """Register a vector store and enable RetrievalService."""
         self._factories[RetrievalService] = RetrievalServiceFactory(vector_store)
 
+    def _get_service_cache(self, service_type: Type) -> OrderedDictImpl[str, Any]:
+        """Get or create the cache for a specific service type."""
+        if service_type not in self._services:
+            self._services[service_type] = OrderedDictImpl()
+        return self._services[service_type]
+
+    def _evict_oldest_if_needed(self, service_cache: OrderedDictImpl[str, Any]) -> None:
+        """Remove the oldest cached service if cache is at capacity."""
+        if len(service_cache) >= self._max_cache_per_service:
+            oldest_key = next(iter(service_cache))
+            removed_service = service_cache.pop(oldest_key)
+            logger.debug(f"Evicted oldest cached service: {oldest_key}")
+            # Clean up the service if it has cleanup methods
+            if hasattr(removed_service, "cleanup"):
+                try:
+                    removed_service.cleanup()
+                except Exception as e:
+                    logger.warning(f"Error cleaning up evicted service: {e}")
+
     def get_service(self, service_type: Type[T], config: Optional[Any] = None) -> T:
-        """Get or create a service instance with config change detection."""
+        """Get or create a service instance with LRU cache per service type."""
         import hashlib
         import json
 
-        # If no config is provided, use singleton pattern
+        if service_type not in self._factories:
+            raise ValueError(f"No factory registered for service type: {service_type}")
+
+        # Get the cache for this service type
+        service_cache = self._get_service_cache(service_type)
+
+        # Determine cache key
         if config is None:
-            cache_key = (service_type, "singleton")
-            if cache_key not in self._services:
-                if service_type not in self._factories:
-                    raise ValueError(
-                        f"No factory registered for service type: {service_type}"
-                    )
+            cache_key = "singleton"
+        else:
+            config_dict = (
+                config.model_dump() if hasattr(config, "model_dump") else str(config)
+            )
+            cache_key = hashlib.md5(
+                json.dumps(config_dict, sort_keys=True).encode()
+            ).hexdigest()
 
-                factory = self._factories[service_type]
-                logger.debug(f"Creating singleton instance of {service_type.__name__}")
-                service = factory.create(None)
-                self._services[cache_key] = service
+        # Check if service exists in cache
+        if cache_key in service_cache:
+            # Move to end (most recently used)
+            service = service_cache.pop(cache_key)
+            service_cache[cache_key] = service
+            logger.debug(f"Retrieved cached {service_type.__name__} instance")
+            return service
 
-            return self._services[cache_key]
+        # Service not in cache, create new instance
+        factory = self._factories[service_type]
 
-        # Create config hash for change detection when config is provided
-        config_dict = (
-            config.model_dump() if hasattr(config, "model_dump") else str(config)
-        )
-        config_hash = hashlib.md5(
-            json.dumps(config_dict, sort_keys=True).encode()
-        ).hexdigest()
-
-        # Check if we need to recreate the service
-        cache_key = (service_type, config_hash)
-        if (
-            cache_key not in self._services
-            or self._config_hashes.get(service_type) != config_hash
-        ):
-            if service_type not in self._factories:
-                raise ValueError(
-                    f"No factory registered for service type: {service_type}"
-                )
-
-            factory = self._factories[service_type]
-
-            # Validate config type (skip validation if factory doesn't specify a config type)
+        # Validate config type (skip validation if factory doesn't specify a config type)
+        if config is not None:
             expected_config_type = factory.get_config_type()
             if expected_config_type is not None and not isinstance(
                 config, expected_config_type
@@ -152,14 +166,52 @@ class ServiceContainer:
                     f"Expected config of type {expected_config_type}, got {type(config)}"
                 )
 
-            logger.debug(f"Creating new instance of {service_type.__name__}")
-            service = factory.create(config)
-            self._services[cache_key] = service
-            self._config_hashes[service_type] = config_hash
+        # Evict oldest if at capacity
+        self._evict_oldest_if_needed(service_cache)
 
-        return self._services[cache_key]
+        # Create new service
+        logger.debug(f"Creating new {service_type.__name__} instance")
+        service = factory.create(config)
+        service_cache[cache_key] = service
 
-    def clear_cache(self):
-        """Clear all cached services."""
-        self._services.clear()
-        self._config_hashes.clear()
+        return service
+
+    def clear_cache(self, service_type: Optional[Type] = None):
+        """Clear cached services. If service_type is None, clear all caches."""
+        if service_type is None:
+            # Clean up all services before clearing
+            for service_cache in self._services.values():
+                for service in service_cache.values():
+                    if hasattr(service, "cleanup"):
+                        try:
+                            service.cleanup()
+                        except Exception as e:
+                            logger.warning(
+                                f"Error cleaning up service during cache clear: {e}"
+                            )
+            self._services.clear()
+            self._config_hashes.clear()
+        else:
+            # Clear cache for specific service type
+            if service_type in self._services:
+                service_cache = self._services[service_type]
+                for service in service_cache.values():
+                    if hasattr(service, "cleanup"):
+                        try:
+                            service.cleanup()
+                        except Exception as e:
+                            logger.warning(
+                                f"Error cleaning up {service_type.__name__} service: {e}"
+                            )
+                service_cache.clear()
+
+    def get_cache_stats(self) -> Dict[str, Dict[str, Any]]:
+        """Get cache statistics for monitoring."""
+        stats = {}
+        for service_type, service_cache in self._services.items():
+            stats[service_type.__name__] = {
+                "cached_instances": len(service_cache),
+                "max_capacity": self._max_cache_per_service,
+                "cache_keys": list(service_cache.keys()),
+            }
+        return stats
