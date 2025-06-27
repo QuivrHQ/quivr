@@ -1,5 +1,5 @@
 from pydantic import BaseModel, Field
-from typing import List, Optional
+from typing import List, Optional, Dict
 from uuid import uuid4, UUID
 from langchain_core.documents import Document
 
@@ -24,7 +24,7 @@ class UserTaskEntity(BaseModel):
 
 class UserTasks:
     def __init__(self, task_definitions: List[str] | None = None):
-        self.user_tasks = {}
+        self.user_tasks: Dict[UUID, UserTaskEntity] = {}
         if task_definitions:
             for definition in task_definitions:
                 id = uuid4()
@@ -34,6 +34,32 @@ class UserTasks:
 
     def __iter__(self):
         return iter(self.user_tasks.values())
+
+    def add_task(self, definition: str) -> UUID:
+        """Add a new task to the existing UserTasks instance.
+
+        Args:
+            definition: The task definition string
+
+        Returns:
+            UUID: The ID of the newly created task
+        """
+        task_id = uuid4()
+        self.user_tasks[task_id] = UserTaskEntity(
+            id=task_id, definition=definition, docs=[]
+        )
+        return task_id
+
+    def add_tasks(self, definitions: List[str]) -> List[UUID]:
+        """Add a new task to the existing UserTasks instance.
+
+        Args:
+            definition: The task definition string
+
+        Returns:
+            UUID: The ID of the newly created task
+        """
+        return [self.add_task(definition) for definition in definitions]
 
     def set_docs(self, id: UUID, docs: List[Document]):
         if self.user_tasks:
@@ -92,3 +118,19 @@ class UserTasks:
     def docs(self) -> List[Document]:
         # Return the concatenation of all docs
         return [doc for task in self.user_tasks.values() for doc in task.docs]
+
+    @property
+    def deduplicated_docs(self) -> List[Document]:
+        deduplicated_docs: List[Document] = []
+        for doc in self.docs:
+            # First, use doc id to deduplicate
+            if doc.metadata.get("id", None):
+                if doc.metadata.get("id") not in [
+                    d.metadata.get("id") for d in deduplicated_docs
+                ]:
+                    deduplicated_docs.append(doc)
+            # Otherwise, use doc content to deduplicate
+            else:
+                if doc.page_content not in [d.page_content for d in deduplicated_docs]:
+                    deduplicated_docs.append(doc)
+        return deduplicated_docs

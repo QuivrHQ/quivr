@@ -65,7 +65,7 @@ class GenerateZendeskRagNode(BaseNode):
         prompt_service = self.get_service(RAGPromptService, None)  # Uses default config
 
         tasks = state["tasks"]
-        docs: List[Document] = tasks.docs if tasks else []
+        docs: List[Document] = tasks.deduplicated_docs if tasks else []
         messages = state["messages"]
         user_task = messages[0].content
 

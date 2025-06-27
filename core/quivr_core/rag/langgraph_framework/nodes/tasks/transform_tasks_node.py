@@ -13,6 +13,9 @@ from quivr_core.rag.langgraph_framework.services.rag_prompt_service import (
 from quivr_core.rag.langgraph_framework.services.llm_service import LLMService
 from quivr_core.rag.langgraph_framework.task import UserTasks
 from quivr_core.rag.langgraph_framework.registry.node_registry import register_node
+import logging
+
+logger = logging.getLogger("quivr_core")
 
 
 @register_node(
@@ -79,7 +82,7 @@ class TransformTasksNode(BaseNode):
 
         # Get services through dependency injection
         llm_service = self.get_service(LLMService, llm_config)
-        prompt_service = self.get_service(RAGPromptService, None)  # Uses default config
+        prompt_service = self.get_service(RAGPromptService)
 
         if not prompt_config.template_name:
             raise NodeValidationError(
@@ -112,7 +115,7 @@ class TransformTasksNode(BaseNode):
         )
         task_ids = [jobs[1] for jobs in async_jobs] if async_jobs else []
 
-        # Replace each question with its condensed version
+        # Replace each question with its transformed version
         for response, task_id in zip(responses, task_ids, strict=False):
             tasks.set_definition(task_id, response.content)
 
