@@ -1,5 +1,5 @@
 import tempfile
-
+from uuid import uuid4
 from quivr_core import Brain
 
 import dotenv
@@ -16,5 +16,5 @@ if __name__ == "__main__":
             file_paths=[temp_file.name],
         )
 
-        answer = brain.ask("what is gold? answer in french")
-        print("answer QuivrQARAGLangGraph :", answer)
+        answer = brain.ask(run_id=uuid4(), question="what is gold? answer in french")
+        print("answer:", answer)
