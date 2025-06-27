@@ -23,6 +23,7 @@ class TemplatePromptName(str, Enum):
     UPDATE_PROMPT = "UPDATE_PROMPT"
     SPLIT_PROMPT = "SPLIT_PROMPT"
     ZENDESK_LLM_PROMPT = "ZENDESK_LLM_PROMPT"
+    SPLIT_ZENDESK_TICKET = "SPLIT_ZENDESK_TICKET"
 
 
 def _define_custom_prompts() -> dict[TemplatePromptName, BasePromptTemplate]:
@@ -231,6 +232,32 @@ def _define_custom_prompts() -> dict[TemplatePromptName, BasePromptTemplate]:
     custom_prompts[TemplatePromptName.SPLIT_PROMPT] = SPLIT_PROMPT
 
     # ---------------------------------------------------------------------------
+    # Prompt to split a Zendesk input ticket into multiple questions/tasks
+    # ---------------------------------------------------------------------------
+    system_message_template = (
+        "Given a chat history and an input customer support ticket, split and rephrase the ticket into multiple questions/tasks.\n"
+        "- Tasks to be understood may require considering the chat history.\n"
+        "- If the user input contains different tasks, you shall split the input into multiple tasks.\n"
+        "- Each splitted task shall be a standalone, self-contained task which can be understood "
+        "without the chat history. You shall rephrase the tasks if needed.\n"
+        "- Do NOT try to solve the tasks or answer the questions, "
+        "just reformulate them if needed and otherwise return them as is.\n"
+        "- Remember, you shall NOT suggest or generate new tasks.\n"
+        "- If no tasks are found, return the user input as is in the task list.\n"
+    )
+
+    template_answer = "Input: {task}"
+
+    SPLIT_ZENDESK_TICKET = ChatPromptTemplate.from_messages(
+        [
+            SystemMessagePromptTemplate.from_template(system_message_template),
+            MessagesPlaceholder(variable_name="chat_history"),
+            HumanMessagePromptTemplate.from_template(template_answer),
+        ]
+    )
+    custom_prompts[TemplatePromptName.SPLIT_ZENDESK_TICKET] = SPLIT_ZENDESK_TICKET
+
+    # ---------------------------------------------------------------------------
     # Prompt to grade the relevance of an answer and decide whather to perform a web search
     # ---------------------------------------------------------------------------
     system_message_template = (
@@ -266,12 +293,12 @@ def _define_custom_prompts() -> dict[TemplatePromptName, BasePromptTemplate]:
     You are a Customer Service Agent using Zendesk. You are answering a client query.
     You will be provided with the users metadata, ticket metadata and ticket history which can be used to answer the query.
     You will also have access to the most relevant similar tickets and additional information sometimes such as API calls.
-    Never add something in brackets that needs to be filled like [your name], [your email], etc. 
+    Never add something in brackets that needs to be filled like [your name], [your email], etc.
     Do NOT invent information that was not present in previous tickets or in user metabadata or ticket metadata or additional information.
     Always prioritize information from the most recent tickets, especially if they are contradictory.
-    
+
     Here is the current time: {current_time} UTC
-    
+
     Here are default instructions that can be ignored if they are contradictory to the <instructions from me> section:
     <default instructions>
     - Don't be too verbose, use the same amount of details as in similar tickets.
@@ -281,8 +308,8 @@ def _define_custom_prompts() -> dict[TemplatePromptName, BasePromptTemplate]:
     - Answer in the same language as the user.
     - Don't add a signature at the end of the answer, it will be added once the answer is sent.
     </default instructions>
-    
-    
+
+
     Here are instructions that you MUST follow and prioritize over the <default instructions> section:
     <instructions from me>
     {guidelines}
@@ -320,7 +347,7 @@ def _define_custom_prompts() -> dict[TemplatePromptName, BasePromptTemplate]:
     <client_query>
     {client_query}
     </client_query>
- 
+
     Based on the informations provided, answer directly with the message to send to the customer, ready to be sent:
     Answer:"""
 
