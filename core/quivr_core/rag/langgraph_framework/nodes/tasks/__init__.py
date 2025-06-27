@@ -1,6 +1,6 @@
 """Tasks-related nodes."""
 
-# Import your generation nodes here
 from .transform_tasks_node import TransformTasksNode
+from .split_tasks_node import SplitTasksNode
 
-__all__ = ["TransformTasksNode"]
+__all__ = ["TransformTasksNode", "SplitTasksNode"]
