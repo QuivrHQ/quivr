@@ -67,7 +67,6 @@ class RetrievalNode(BaseNode):
 
         # Get retriever service
         retrieval_service = self.get_service(RetrievalService, retrieval_service_config)
-        retriever = retrieval_service.get_basic_retriever()
 
         if "tasks" in state:
             tasks = state["tasks"]
@@ -79,7 +78,13 @@ class RetrievalNode(BaseNode):
 
         async_jobs = []
         for task_id in tasks.ids:
-            async_jobs.append((retriever.ainvoke(tasks(task_id).definition), task_id))
+            logger.info(f"Task ID: {task_id}")
+            logger.info(f"Task definition: {tasks(task_id).definition}")
+            # Create a separate retriever for each task to avoid session conflicts
+            task_retriever = retrieval_service.get_basic_retriever()
+            async_jobs.append(
+                (task_retriever.ainvoke(tasks(task_id).definition), task_id)
+            )
 
         # Gather all the responses asynchronously
         responses = (

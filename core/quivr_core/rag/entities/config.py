@@ -7,7 +7,7 @@ from uuid import UUID
 from langchain_core.prompts.base import BasePromptTemplate
 from langchain_core.tools import BaseTool
 from langgraph.graph import END, START
-from pydantic import BaseModel
+from pydantic import BaseModel, field_serializer
 from quivr_core.rag.entities.prompt import PromptConfig
 from rapidfuzz import fuzz, process
 
@@ -456,6 +456,24 @@ class NodeConfig(QuivrBaseConfig):
 
     class Config:
         extra = "allow"  # Allow additional fields for node-specific configs
+
+    @field_serializer("validated_configs")
+    def serialize_validated_configs(
+        self, value: Dict[str, QuivrBaseConfig]
+    ) -> Dict[str, Any]:
+        """Custom serializer for validated_configs field."""
+        if not value:
+            return {}
+
+        serialized_configs = {}
+        for key, config in value.items():
+            if hasattr(config, "model_dump"):
+                # If it's a Pydantic model, use its model_dump method
+                serialized_configs[key] = config.model_dump()
+            else:
+                # If it's raw data, keep as is
+                serialized_configs[key] = config
+        return serialized_configs
 
     def __init__(self, **data):
         # Extract and validate node-specific configs BEFORE calling super().__init__
