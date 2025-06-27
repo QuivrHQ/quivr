@@ -10,6 +10,9 @@ from quivr_core.rag.langgraph_framework.base.exceptions import (
 from quivr_core.rag.langgraph_framework.base.graph_config import BaseGraphConfig
 from pydantic import BaseModel
 import copy
+import logging
+
+logger = logging.getLogger("quivr_core")
 
 
 class ConfigMapping:
@@ -28,7 +31,7 @@ class ConfigMapping:
     def __init__(
         self,
         mapping: Dict[
-            Type[BaseModel], Union[str, Callable[[BaseGraphConfig], Dict[str, Any]]]
+            Type[BaseModel], Union[str, Callable[[Dict[str, Any]], Dict[str, Any]]]
         ],
     ):
         self.mapping = mapping
@@ -42,16 +45,18 @@ class ConfigMapping:
         """Extract and validate a specific config type with optional node-specific overrides."""
 
         try:
+            _config = config.get("configurable", {})
             # 1. Extract global config as base
-            global_config_dict = self._extract_global_config(config, config_type)
+            global_config_dict = self._extract_global_config(_config, config_type)
 
             # 2. If no node name provided, return global config
             if not node_name:
                 return config_type.model_validate(global_config_dict)
 
             # 3. Look for node-specific overrides
-            node_config_dict = self._extract_node_config(config, config_type, node_name)
-
+            node_config_dict = self._extract_node_config(
+                _config, config_type, node_name
+            )
             # 4. Merge node config over global config (deep merge)
             merged_config_dict = self._deep_merge(global_config_dict, node_config_dict)
 
@@ -63,11 +68,10 @@ class ConfigMapping:
             ) from e
 
     def _extract_global_config(
-        self, config: BaseGraphConfig, config_type: Type[BaseModel]
+        self, config: Dict[str, Any], config_type: Type[BaseModel]
     ) -> Dict[str, Any]:
         """Extract global config using the mapping."""
         extractor = self.mapping.get(config_type)
-
         if extractor is None:
             # Return empty dict if not mapped - will create default instance
             return {}
@@ -82,7 +86,7 @@ class ConfigMapping:
             raise ValueError(f"Invalid extractor for {config_type}: {extractor}")
 
     def _extract_node_config(
-        self, config: BaseGraphConfig, config_type: Type[BaseModel], node_name: str
+        self, config: Dict[str, Any], config_type: Type[BaseModel], node_name: str
     ) -> Dict[str, Any]:
         """Enhanced to check workflow nodes AND validate configs."""
         # Standard node config lookup
@@ -104,14 +108,8 @@ class ConfigMapping:
 
         for node_def in workflow_nodes:
             if node_def.get("name") == node_name:
-                # Check if this node has already been validated during WorkflowConfig creation
-                if hasattr(node_def, "get_node_config"):
-                    validated_config = node_def.get_node_config(config_type, config_key)
-                    if validated_config:
-                        return validated_config.model_dump()
-
-                # Fallback to raw config extraction and merging
-                workflow_node_config = node_def.get(config_key, {})
+                validated_config = node_def.get("validated_configs", {})
+                workflow_node_config = validated_config.get(config_key, {})
                 return self._deep_merge(workflow_node_config, node_level_config)
 
         return node_level_config

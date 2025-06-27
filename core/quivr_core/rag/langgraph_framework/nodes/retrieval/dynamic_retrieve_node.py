@@ -118,7 +118,6 @@ class DynamicRetrievalNode(BaseNode):
 
         # Get retriever service
         retrieval_service = self.get_service(RetrievalService, retrieval_service_config)
-        retriever = retrieval_service.get_compression_retriever()
 
         if "tasks" in state:
             tasks = state["tasks"]
@@ -130,11 +129,13 @@ class DynamicRetrievalNode(BaseNode):
 
         async_jobs = []
         for task_id in tasks.ids:
+            # Create a separate retriever for each task to avoid session conflicts
+            task_retriever = retrieval_service.get_compression_retriever()
             async_jobs.append(
                 (
                     self._dynamic_retrieve(
                         query=tasks(task_id).definition,
-                        retriever=retriever,
+                        retriever=task_retriever,
                         retrieval_service_config=retrieval_service_config,
                     ),
                     task_id,
