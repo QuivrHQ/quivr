@@ -12,7 +12,9 @@ from quivr_core.rag.langgraph_framework.services.rag_prompt_service import (
     RAGPromptService,
 )
 from quivr_core.rag.langgraph_framework.services.llm_service import LLMService
-from quivr_core.rag.langgraph_framework.entities.routing_entity import SplittedInput
+from quivr_core.rag.langgraph_framework.entities.routing_entity import (
+    SplittedInputWithInstructions,
+)
 from quivr_core.rag.langgraph_framework.task import UserTasks
 from quivr_core.rag.langgraph_framework.registry.node_registry import register_node
 
@@ -77,8 +79,10 @@ class RoutingSplitNode(BaseNode):
             user_input=state["messages"][0].content,
         )
 
-        response: SplittedInput = await llm_service.invoke_with_structured_output(
-            msg, SplittedInput
+        response: SplittedInputWithInstructions = (
+            await llm_service.invoke_with_structured_output(
+                msg, SplittedInputWithInstructions
+            )
         )
 
         instructions = response.instructions or prompt_config.prompt

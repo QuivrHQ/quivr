@@ -3,6 +3,17 @@ from typing import Optional, List
 
 
 class SplittedInput(BaseModel):
+    tasks_reasoning: Optional[str] = Field(
+        default=None,
+        description="The reasoning that leads to identifying the explicit or implicit tasks and questions",
+    )
+    task_list: Optional[List[str]] = Field(
+        default_factory=lambda: ["No explicit or implicit tasks found"],
+        description="The list of standalone, self-contained tasks or questions.",
+    )
+
+
+class SplittedInputWithInstructions(BaseModel):
     instructions_reasoning: Optional[str] = Field(
         default=None,
         description="The reasoning that leads to identifying the user instructions to the system",
