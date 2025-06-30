@@ -43,7 +43,7 @@ class RetrievalService:
 
         return hashlib.md5(json.dumps(config_data, sort_keys=True).encode()).hexdigest()
 
-    def get_basic_retriever(self) -> VectorStoreRetriever:
+    def get_basic_retriever(self, use_cache: bool = True) -> VectorStoreRetriever:
         """
         Get a basic vector store retriever with caching.
 
@@ -57,6 +57,7 @@ class RetrievalService:
         if (
             self._basic_retriever is None
             or self._basic_retriever_config_hash != current_hash
+            or not use_cache
         ):
             logger.debug("Creating new basic retriever")
             self._basic_retriever = get_retriever(

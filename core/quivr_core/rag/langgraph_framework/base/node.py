@@ -87,9 +87,16 @@ class BaseNode(ABC):
 
         return extracted_config
 
-    def get_service(self, service_type: Type[S], config: Optional[Any] = None) -> S:
+    def get_service(
+        self,
+        service_type: Type[S],
+        config: Optional[Any] = None,
+        use_cache: bool = True,
+    ) -> S:
         """Get a service instance from the container."""
-        return self.service_container.get_service(service_type, config)
+        return self.service_container.get_service(
+            service_type, config, use_cache=use_cache
+        )
 
     @abstractmethod
     def validate_input_state(self, state) -> None:
