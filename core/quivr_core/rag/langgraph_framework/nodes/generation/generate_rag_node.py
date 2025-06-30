@@ -6,18 +6,14 @@ from quivr_core.rag.langgraph_framework.base.exceptions import NodeValidationErr
 from quivr_core.rag.entities.config import (
     LLMEndpointConfig,
     WorkflowConfig,
-    RetrievalConfig,
 )
 from quivr_core.rag.entities.prompt import PromptConfig
 from langchain_core.documents import Document
 
 from quivr_core.rag.langgraph_framework.utils import reduce_rag_context
-from quivr_core.rag.prompts import TemplatePromptName
 from quivr_core.rag.utils import combine_documents
 from quivr_core.rag.langgraph_framework.base.graph_config import BaseGraphConfig
-from quivr_core.rag.langgraph_framework.services.rag_prompt_service import (
-    RAGPromptService,
-)
+from quivr_core.rag.prompt.registry import get_prompt
 from quivr_core.rag.langgraph_framework.services.llm_service import LLMService
 from quivr_core.rag.langgraph_framework.registry.node_registry import register_node
 
@@ -27,7 +23,7 @@ from quivr_core.rag.langgraph_framework.registry.node_registry import register_n
     description="Generate RAG responses using retrieved documents and LLM",
     category="generation",
     version="1.0.0",
-    dependencies=["llm_service", "prompt_service"],
+    dependencies=["llm_service"],
 )
 class GenerateRagNode(BaseNode):
     """
@@ -103,18 +99,17 @@ class GenerateRagNode(BaseNode):
         # Get configs
         workflow_config = self.get_config(WorkflowConfig, config)
         prompt_config = self.get_config(PromptConfig, config)
-        retrieval_config = self.get_config(RetrievalConfig, config)
         llm_config = self.get_config(LLMEndpointConfig, config)
 
         # Get services through dependency injection - much cleaner!
-        prompt_service = self.get_service(RAGPromptService, retrieval_config)
         llm_service = self.get_service(LLMService, llm_config)
 
         custom_prompt = prompt_config.prompt
         tasks = state["tasks"]
         docs = tasks.docs if tasks else []
         inputs = self._build_rag_prompt_inputs(state, custom_prompt, docs)
-        prompt = prompt_service.get_template(TemplatePromptName.RAG_ANSWER_PROMPT)
+
+        prompt = get_prompt("rag_answer")
 
         state, inputs = reduce_rag_context(
             state,

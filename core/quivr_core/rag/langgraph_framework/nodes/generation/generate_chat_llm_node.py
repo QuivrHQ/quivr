@@ -5,11 +5,8 @@ from quivr_core.rag.langgraph_framework.base.exceptions import NodeValidationErr
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain_core.messages import HumanMessage, SystemMessage
 from quivr_core.rag.langgraph_framework.base.graph_config import BaseGraphConfig
-from quivr_core.rag.prompts import TemplatePromptName
 from quivr_core.rag.entities.prompt import PromptConfig
-from quivr_core.rag.langgraph_framework.services.rag_prompt_service import (
-    RAGPromptService,
-)
+from quivr_core.rag.prompt.registry import get_prompt
 from quivr_core.rag.langgraph_framework.services.llm_service import LLMService
 from quivr_core.rag.langgraph_framework.utils import reduce_rag_context
 from quivr_core.rag.langgraph_framework.registry.node_registry import register_node
@@ -20,7 +17,7 @@ from quivr_core.rag.langgraph_framework.registry.node_registry import register_n
     description="Generate responses using a Chat LLM model with conversation context",
     category="generation",
     version="1.0.0",
-    dependencies=["llm_service", "prompt_service"],
+    dependencies=["llm_service"],
 )
 class GenerateChatLlmNode(BaseNode):
     """
@@ -65,7 +62,6 @@ class GenerateChatLlmNode(BaseNode):
 
         # Get services through dependency injection
         llm_service = self.get_service(LLMService, llm_config)
-        prompt_service = self.get_service(RAGPromptService)  # Uses default config
 
         messages = state["messages"]
 
@@ -93,9 +89,7 @@ class GenerateChatLlmNode(BaseNode):
         # LLM
         llm = llm_service.get_base_llm()
 
-        prompt_template = prompt_service.get_template(
-            TemplatePromptName.CHAT_LLM_PROMPT
-        )
+        prompt_template = get_prompt("chat_llm")
 
         state, reduced_inputs = reduce_rag_context(
             state,

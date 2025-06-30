@@ -7,9 +7,7 @@ from quivr_core.rag.langgraph_framework.base.node import (
 from quivr_core.rag.langgraph_framework.base.exceptions import NodeValidationError
 from quivr_core.rag.entities.prompt import PromptConfig
 from quivr_core.rag.langgraph_framework.base.graph_config import BaseGraphConfig
-from quivr_core.rag.langgraph_framework.services.rag_prompt_service import (
-    RAGPromptService,
-)
+from quivr_core.rag.prompt.registry import get_prompt
 from quivr_core.rag.langgraph_framework.services.llm_service import LLMService
 from quivr_core.rag.langgraph_framework.task import UserTasks
 from quivr_core.rag.langgraph_framework.registry.node_registry import register_node
@@ -23,7 +21,7 @@ logger = logging.getLogger("quivr_core")
     description="Transform and refine user tasks using LLM processing",
     category="tasks",
     version="1.0.0",
-    dependencies=["llm_service", "prompt_service"],
+    dependencies=["llm_service"],
 )
 class TransformTasksNode(BaseNode):
     """
@@ -82,14 +80,20 @@ class TransformTasksNode(BaseNode):
 
         # Get services through dependency injection
         llm_service = self.get_service(LLMService, llm_config)
-        prompt_service = self.get_service(RAGPromptService)
 
         if not prompt_config.template_name:
             raise NodeValidationError(
                 "TransformTasksNode requires 'template_name' attribute in config"
             )
 
-        prompt = prompt_service.get_template(prompt_config.template_name)
+        # Use prompt registry directly instead of prompt service
+        # Convert enum to string for registry lookup
+        template_name = (
+            prompt_config.template_name.value
+            if hasattr(prompt_config.template_name, "value")
+            else str(prompt_config.template_name)
+        )
+        prompt = get_prompt(template_name)
 
         if "tasks" in state and state["tasks"]:
             tasks = state["tasks"]

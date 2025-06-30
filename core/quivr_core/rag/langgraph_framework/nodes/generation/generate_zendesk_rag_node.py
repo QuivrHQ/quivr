@@ -9,10 +9,7 @@ from datetime import datetime
 from quivr_core.rag.utils import format_dict
 from quivr_core.rag.entities.config import LLMEndpointConfig, WorkflowConfig
 from quivr_core.rag.langgraph_framework.base.graph_config import BaseGraphConfig
-from quivr_core.rag.prompts import TemplatePromptName
-from quivr_core.rag.langgraph_framework.services.rag_prompt_service import (
-    RAGPromptService,
-)
+from quivr_core.rag.prompt.registry import get_prompt
 from quivr_core.rag.langgraph_framework.services.llm_service import LLMService
 from quivr_core.rag.langgraph_framework.registry.node_registry import register_node
 
@@ -22,7 +19,7 @@ from quivr_core.rag.langgraph_framework.registry.node_registry import register_n
     description="Generate Zendesk-specific RAG responses with ticket context and metadata",
     category="generation",
     version="1.0.0",
-    dependencies=["llm_service", "prompt_service"],
+    dependencies=["llm_service"],
 )
 class GenerateZendeskRagNode(BaseNode):
     """
@@ -62,16 +59,13 @@ class GenerateZendeskRagNode(BaseNode):
 
         # Get services through dependency injection
         llm_service = self.get_service(LLMService, llm_config)
-        prompt_service = self.get_service(RAGPromptService, None)  # Uses default config
 
         tasks = state["tasks"]
         docs: List[Document] = tasks.deduplicated_docs if tasks else []
         messages = state["messages"]
         user_task = messages[0].content
 
-        prompt_template: BasePromptTemplate = prompt_service.get_template(
-            TemplatePromptName.ZENDESK_TEMPLATE_PROMPT
-        )
+        prompt_template: BasePromptTemplate = get_prompt("zendesk_template")
 
         ticket_metadata = state["ticket_metadata"] or {}
         user_metadata = state["user_metadata"] or {}

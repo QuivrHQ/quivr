@@ -10,11 +10,8 @@ from quivr_core.rag.langgraph_framework.base.graph_config import BaseGraphConfig
 from quivr_core.rag.langgraph_framework.base.node import BaseNode
 from quivr_core.rag.langgraph_framework.base.exceptions import NodeValidationError
 from quivr_core.rag.langgraph_framework.services.llm_service import LLMService
-from quivr_core.rag.langgraph_framework.services.rag_prompt_service import (
-    RAGPromptService,
-)
+from quivr_core.rag.prompt.registry import get_prompt
 from quivr_core.rag.langgraph_framework.utils import update_active_tools
-from quivr_core.rag.prompts import TemplatePromptName
 from quivr_core.rag.langgraph_framework.state import UpdatedPromptAndTools
 from quivr_core.rag.utils import collect_tools
 from quivr_core.rag.langgraph_framework.registry.node_registry import register_node
@@ -27,7 +24,7 @@ logger = logging.getLogger("quivr_core")
     description="Edit system prompts and manage tool activation based on user instructions",
     category="various",
     version="1.0.0",
-    dependencies=["llm_service", "prompt_service"],
+    dependencies=["llm_service"],
 )
 class EditSystemPromptNode(BaseNode):
     """
@@ -67,7 +64,6 @@ class EditSystemPromptNode(BaseNode):
 
         # Get services through dependency injection
         llm_service = self.get_service(LLMService, llm_config)
-        prompt_service = self.get_service(RAGPromptService, None)  # Uses default config
 
         user_instruction = state["instructions"]
         prompt = prompt_config.prompt
@@ -79,9 +75,8 @@ class EditSystemPromptNode(BaseNode):
             "activated_tools": activated_tools,
         }
 
-        msg = prompt_service.get_template(TemplatePromptName.UPDATE_PROMPT).format(
-            **inputs
-        )
+        update_prompt_template = get_prompt("update_system_prompt")
+        msg = update_prompt_template.format(**inputs)
 
         response: UpdatedPromptAndTools = (
             await llm_service.invoke_with_structured_output(msg, UpdatedPromptAndTools)

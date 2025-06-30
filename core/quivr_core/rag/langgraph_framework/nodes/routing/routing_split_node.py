@@ -1,16 +1,13 @@
 from typing import Optional
-from quivr_core.rag.entities.config import LLMEndpointConfig, RetrievalConfig
+from quivr_core.rag.entities.config import LLMEndpointConfig
 from quivr_core.rag.langgraph_framework.base.node import (
     BaseNode,
 )
 from quivr_core.rag.langgraph_framework.base.exceptions import NodeValidationError
 from langgraph.types import Send
-from quivr_core.rag.prompts import TemplatePromptName
 from quivr_core.rag.entities.prompt import PromptConfig
 from quivr_core.rag.langgraph_framework.base.graph_config import BaseGraphConfig
-from quivr_core.rag.langgraph_framework.services.rag_prompt_service import (
-    RAGPromptService,
-)
+from quivr_core.rag.prompt.registry import get_prompt
 from quivr_core.rag.langgraph_framework.services.llm_service import LLMService
 from quivr_core.rag.langgraph_framework.entities.routing_entity import (
     SplittedInputWithInstructions,
@@ -24,7 +21,7 @@ from quivr_core.rag.langgraph_framework.registry.node_registry import register_n
     description="Split and route user input into multiple processing paths",
     category="routing",
     version="1.0.0",
-    dependencies=["llm_service", "prompt_service"],
+    dependencies=["llm_service"],
 )
 class RoutingSplitNode(BaseNode):
     """
@@ -66,13 +63,12 @@ class RoutingSplitNode(BaseNode):
         # Get configs
         prompt_config = self.get_config(PromptConfig, config)
         llm_config = self.get_config(LLMEndpointConfig, config)
-        retrieval_config = self.get_config(RetrievalConfig, config)
 
         # Get services through dependency injection
         llm_service = self.get_service(LLMService, llm_config)
-        prompt_service = self.get_service(RAGPromptService, retrieval_config)
 
-        prompt = prompt_service.get_template(TemplatePromptName.SPLIT_PROMPT)
+        # Use prompt registry directly instead of prompt service
+        prompt = get_prompt("split_input")
 
         msg = prompt.format(
             chat_history=state["chat_history"].to_list(),
