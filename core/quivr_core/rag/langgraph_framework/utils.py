@@ -3,7 +3,7 @@ from quivr_core.rag.entities.config import WorkflowConfig
 from quivr_core.rag.langgraph_framework.state import AgentState, UpdatedPromptAndTools
 from langchain_core.prompts import BasePromptTemplate
 from langchain_core.documents import Document
-from quivr_core.rag.prompts import TemplatePromptName, custom_prompts
+from quivr_core.rag.prompt.registry import get_prompt
 from quivr_core.rag.utils import combine_documents
 import logging
 
@@ -28,7 +28,7 @@ def update_active_tools(
 
 def get_rag_context_length(self, state: AgentState, docs: List[Document]) -> int:
     final_inputs = self._build_rag_prompt_inputs(state, docs)
-    msg = custom_prompts[TemplatePromptName.RAG_ANSWER_PROMPT].format(**final_inputs)
+    msg = get_prompt("rag_answer").format(**final_inputs)
     return self.llm_endpoint.count_tokens(msg)
 
 
