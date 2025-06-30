@@ -8,9 +8,7 @@ from quivr_core.rag.langgraph_framework.entities.retrieval_service_config import
 )
 from quivr_core.rag.langgraph_framework.services.llm_service import LLMService
 from quivr_core.rag.langgraph_framework.services.tool_service import ToolService
-from quivr_core.rag.langgraph_framework.services.rag_prompt_service import (
-    RAGPromptService,
-)
+
 from quivr_core.rag.langgraph_framework.services.retrieval_service import (
     RetrievalService,
 )
@@ -52,14 +50,6 @@ class ToolServiceFactory(ServiceFactory):
         return WorkflowConfig
 
 
-class PromptServiceFactory(ServiceFactory):
-    def create(self, config: Optional[Any] = None) -> RAGPromptService:
-        return RAGPromptService()
-
-    def get_config_type(self) -> Optional[Type]:
-        return None
-
-
 class RetrievalServiceFactory(ServiceFactory):
     """Factory for creating retrieval services with vector store dependency."""
 
@@ -86,7 +76,6 @@ class ServiceContainer:
         self._factories: Dict[Type, ServiceFactory] = {
             LLMService: LLMServiceFactory(),
             ToolService: ToolServiceFactory(),
-            RAGPromptService: PromptServiceFactory(),
         }
         self._max_cache_per_service = max_cache_per_service
 
