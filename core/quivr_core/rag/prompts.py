@@ -244,6 +244,7 @@ def _define_custom_prompts() -> dict[TemplatePromptName, BasePromptTemplate]:
         "just reformulate them if needed and otherwise return them as is.\n"
         "- Remember, you shall NOT suggest or generate new tasks.\n"
         "- If no tasks are found, return the user input as is in the task list.\n"
+        "- Use the same language as the input ticket.\n"
     )
 
     template_answer = "Input: {task}"
