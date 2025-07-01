@@ -13,7 +13,6 @@ from quivr_core.rag.langgraph_framework.base.node import BaseNode
 from quivr_core.registry_base import (
     BaseRegistry,
     BaseMetadata,
-    create_registry_decorator,
 )
 
 logger = logging.getLogger("quivr_core")
@@ -120,9 +119,6 @@ class NodeRegistry(BaseRegistry[Type[BaseNode], NodeMetadata]):
 # Global registry instance
 node_registry = NodeRegistry()
 
-# Decorator for easy node registration
-register_node = create_registry_decorator(node_registry)
-
 
 def enhanced_register_node(
     name: Optional[str] = None,
@@ -168,6 +164,10 @@ def enhanced_register_node(
         return cls
 
     return decorator
+
+
+# Use the enhanced decorator as the main decorator since it handles NODE_NAME properly
+register_node = enhanced_register_node
 
 
 # Convenience functions

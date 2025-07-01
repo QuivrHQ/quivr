@@ -41,6 +41,19 @@ class RoutingNode(BaseNode):
                 "RoutingNode requires non-empty messages in state"
             )
 
+        # Validate chat_history since it's used in execution
+        if "chat_history" not in state:
+            raise NodeValidationError(
+                "RoutingNode requires 'chat_history' attribute in state"
+            )
+
+        # Validate chat_history has required methods
+        chat_history = state["chat_history"]
+        if not hasattr(chat_history, "to_list"):
+            raise NodeValidationError(
+                "RoutingNode requires chat_history object with 'to_list' method"
+            )
+
     def validate_output_state(self, state) -> None:
         """Validate that output has the correct attributes and methods."""
         pass
@@ -57,7 +70,16 @@ class RoutingNode(BaseNode):
         # Use prompt registry directly instead of prompt service
         prompt = get_prompt("split_input")
 
-        msg = prompt.format(user_input=state["messages"][0].content)
+        # Get chat history for the prompt (it's accessed later anyway)
+        chat_history = state.get("chat_history")
+        if hasattr(chat_history, "to_list"):
+            chat_history_list = chat_history.to_list()
+        else:
+            chat_history_list = []
+
+        msg = prompt.format(
+            user_input=state["messages"][0].content, chat_history=chat_history_list
+        )
 
         response: SplittedInputWithInstructions = (
             await llm_service.invoke_with_structured_output(

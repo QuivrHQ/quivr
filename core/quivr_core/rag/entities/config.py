@@ -5,15 +5,13 @@ from typing import Any, Dict, Hashable, List, Optional, Type, Union, TypeVar
 from uuid import UUID
 
 from langchain_core.prompts.base import BasePromptTemplate
-from langchain_core.tools import BaseTool
 from langgraph.graph import END, START
 from pydantic import BaseModel, field_serializer
+from quivr_core.llm_tools.registry import tool_registry
 from quivr_core.rag.entities.prompt import PromptConfig
-from rapidfuzz import fuzz, process
 
 from quivr_core.base_config import QuivrBaseConfig
 from quivr_core.config import MegaparseConfig
-from quivr_core.llm_tools.llm_tools import TOOLS_CATEGORIES, TOOLS_LISTS, LLMToolFactory
 from quivr_core.processor.splitter import SplitterConfig
 from quivr_core.rag.entities.retriever import RetrieverConfig
 from quivr_core.rag.entities.reranker import RerankerConfig
@@ -448,8 +446,7 @@ class NodeConfig(QuivrBaseConfig):
     description: str | None = None
     edges: List[str] | None = None
     conditional_edge: ConditionalEdgeConfig | None = None
-    tools: List[Dict[str, Any]] | None = None
-    instantiated_tools: List[BaseTool | Type] | None = None
+    tools_configs: List[Dict[str, Any]] | None = None
 
     # Store validated node-specific configs
     validated_configs: Dict[str, QuivrBaseConfig] = {}
@@ -506,7 +503,7 @@ class NodeConfig(QuivrBaseConfig):
         data["validated_configs"] = validated_configs
 
         super().__init__(**data)
-        self._instantiate_tools()
+        self._validate_tools()
         self.resolve_special_edges_in_name_and_edges()
 
     def get_node_config(self, config_type: Type[T], config_key: str) -> Optional[T]:
@@ -534,13 +531,20 @@ class NodeConfig(QuivrBaseConfig):
                 elif edge == SpecialEdges.end:
                     self.edges[i] = END
 
-    def _instantiate_tools(self):
-        """Instantiate tools based on the configuration."""
-        if self.tools:
-            self.instantiated_tools = [
-                LLMToolFactory.create_tool(tool_config.pop("name"), tool_config)
-                for tool_config in self.tools
-            ]
+    def _validate_tools(self):
+        """Validate tools based on the configuration."""
+        if self.tools_configs:
+            for tool_config in self.tools_configs:
+                # Make a copy to avoid modifying the original
+                tool_name = tool_config.get("name")
+                if not tool_name:
+                    logger.error("Tool config has no 'name'")
+                    raise ValueError("Tool config has no 'name'")
+
+                # Check if tool exists in the registry
+                if not tool_registry.has_item(tool_name):
+                    logger.error(f"Tool '{tool_name}' not found in registry")
+                    raise ValueError(f"Tool '{tool_name}' not found in registry")
 
 
 class DefaultWorkflow(str, Enum):
@@ -570,46 +574,14 @@ class DefaultWorkflow(str, Enum):
 class WorkflowConfig(QuivrBaseConfig):
     name: str | None = None
     nodes: List[NodeConfig] = []
-    available_tools: List[str] | None = None
-    validated_tools: List[BaseTool | Type] = []
-    activated_tools: List[BaseTool | Type] = []
 
     def __init__(self, **data):
         super().__init__(**data)
         self.check_first_node_is_start()
-        self.validate_available_tools()
 
     def check_first_node_is_start(self):
         if self.nodes and self.nodes[0].name != START:
             raise ValueError(f"The first node should be a {SpecialEdges.start} node")
-
-    def get_node_tools(self, node_name: str) -> List[Any]:
-        """Get tools for a specific node."""
-        for node in self.nodes:
-            if node.name == node_name and node.instantiated_tools:
-                return node.instantiated_tools
-        return []
-
-    def validate_available_tools(self):
-        if self.available_tools:
-            valid_tools = list(TOOLS_CATEGORIES.keys()) + list(TOOLS_LISTS.keys())
-            for tool in self.available_tools:
-                if tool.lower() in valid_tools:
-                    self.validated_tools.append(
-                        LLMToolFactory.create_tool(tool, {}).tool
-                    )
-                else:
-                    matches = process.extractOne(
-                        tool.lower(), valid_tools, scorer=fuzz.WRatio
-                    )
-                    if matches:
-                        raise ValueError(
-                            f"Tool {tool} is not a valid ToolsCategory or ToolsList. Did you mean {matches[0]}?"
-                        )
-                    else:
-                        raise ValueError(
-                            f"Tool {tool} is not a valid ToolsCategory or ToolsList"
-                        )
 
 
 class CitationConfig(QuivrBaseConfig):
