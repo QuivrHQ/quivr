@@ -7,7 +7,6 @@ from langgraph.types import Send
 from quivr_core.rag.entities.config import (
     LLMEndpointConfig,
     WorkflowConfig,
-    RetrievalConfig,
 )
 from quivr_core.rag.entities.prompt import PromptConfig
 from quivr_core.rag.langgraph_framework.nodes.routing.routing_node import RoutingNode
@@ -15,7 +14,9 @@ from quivr_core.rag.langgraph_framework.nodes.routing.tool_routing_node import (
     ToolRoutingNode,
 )
 from quivr_core.rag.langgraph_framework.base.exceptions import NodeValidationError
-from quivr_core.rag.langgraph_framework.entities.routing_entity import SplittedInput
+from quivr_core.rag.langgraph_framework.entities.routing_entity import (
+    SplittedInputWithInstructions,
+)
 from quivr_core.rag.langgraph_framework.state import TasksCompletion
 from quivr_core.rag.langgraph_framework.task import UserTasks
 
@@ -68,9 +69,10 @@ class TestRoutingNode:
 
         state = {"messages": [HumanMessage(content="test")]}
 
-        # Note: Current RoutingNode implementation doesn't validate chat_history
-        # but uses it in execute(), which could cause runtime errors
-        routing_node.validate_input_state(state)  # Currently passes but shouldn't
+        with pytest.raises(
+            NodeValidationError, match="requires 'chat_history' attribute"
+        ):
+            routing_node.validate_input_state(state)
 
     def test_validate_output_state(self, routing_node):
         """Test output state validation (currently no-op)."""
@@ -80,31 +82,24 @@ class TestRoutingNode:
     async def test_execute_with_instructions(self, routing_node, valid_state):
         """Test execution when LLM returns instructions."""
         mock_llm_service = Mock()
-        mock_prompt_service = Mock()
 
         # Mock LLM response with instructions
-        mock_response = SplittedInput(
+        mock_response = SplittedInputWithInstructions(
             instructions="Custom instructions for the task", task_list=None
         )
         mock_llm_service.invoke_with_structured_output = AsyncMock(
             return_value=mock_response
         )
 
-        # Mock prompt service
-        mock_template = Mock()
-        mock_template.format.return_value = "Formatted routing prompt"
-        mock_prompt_service.get_template.return_value = mock_template
+        with patch("quivr_core.rag.prompt.registry.get_prompt") as mock_get_prompt:
+            # Mock prompt template
+            mock_template = Mock()
+            mock_template.format.return_value = "Formatted routing prompt"
+            mock_get_prompt.return_value = mock_template
 
-        with patch.object(routing_node, "get_service") as mock_get_service:
-            mock_get_service.side_effect = [mock_llm_service, mock_prompt_service]
-
-            with patch.object(routing_node, "get_config") as mock_get_config:
-                mock_get_config.side_effect = [
-                    PromptConfig(),
-                    LLMEndpointConfig(),
-                    RetrievalConfig(),
-                ]
-
+            with patch.object(
+                routing_node, "get_service", return_value=mock_llm_service
+            ):
                 result = await routing_node.execute(valid_state)
 
         # Should return Send for edit_system_prompt
@@ -118,31 +113,24 @@ class TestRoutingNode:
     async def test_execute_with_task_list(self, routing_node, valid_state):
         """Test execution when LLM returns task list."""
         mock_llm_service = Mock()
-        mock_prompt_service = Mock()
 
         # Mock LLM response with task list
-        mock_response = SplittedInput(
+        mock_response = SplittedInputWithInstructions(
             instructions=None, task_list=["Task 1", "Task 2", "Task 3"]
         )
         mock_llm_service.invoke_with_structured_output = AsyncMock(
             return_value=mock_response
         )
 
-        # Mock prompt service
-        mock_template = Mock()
-        mock_template.format.return_value = "Formatted routing prompt"
-        mock_prompt_service.get_template.return_value = mock_template
+        with patch("quivr_core.rag.prompt.registry.get_prompt") as mock_get_prompt:
+            # Mock prompt template
+            mock_template = Mock()
+            mock_template.format.return_value = "Formatted routing prompt"
+            mock_get_prompt.return_value = mock_template
 
-        with patch.object(routing_node, "get_service") as mock_get_service:
-            mock_get_service.side_effect = [mock_llm_service, mock_prompt_service]
-
-            with patch.object(routing_node, "get_config") as mock_get_config:
-                mock_get_config.side_effect = [
-                    PromptConfig(),
-                    LLMEndpointConfig(),
-                    RetrievalConfig(),
-                ]
-
+            with patch.object(
+                routing_node, "get_service", return_value=mock_llm_service
+            ):
                 result = await routing_node.execute(valid_state)
 
         # Should return Send for filter_history
@@ -157,33 +145,29 @@ class TestRoutingNode:
     async def test_execute_with_prompt_config_fallback(self, routing_node, valid_state):
         """Test execution with prompt config fallback when no instructions."""
         mock_llm_service = Mock()
-        mock_prompt_service = Mock()
 
         # Mock LLM response with no instructions
-        mock_response = SplittedInput(instructions=None, task_list=None)
+        mock_response = SplittedInputWithInstructions(instructions=None, task_list=None)
         mock_llm_service.invoke_with_structured_output = AsyncMock(
             return_value=mock_response
         )
 
-        # Mock prompt service
-        mock_template = Mock()
-        mock_template.format.return_value = "Formatted routing prompt"
-        mock_prompt_service.get_template.return_value = mock_template
-
         # Mock prompt config with fallback prompt
         mock_prompt_config = PromptConfig(prompt="Fallback prompt instructions")
 
-        with patch.object(routing_node, "get_service") as mock_get_service:
-            mock_get_service.side_effect = [mock_llm_service, mock_prompt_service]
+        with patch("quivr_core.rag.prompt.registry.get_prompt") as mock_get_prompt:
+            # Mock prompt template
+            mock_template = Mock()
+            mock_template.format.return_value = "Formatted routing prompt"
+            mock_get_prompt.return_value = mock_template
 
-            with patch.object(routing_node, "get_config") as mock_get_config:
-                mock_get_config.side_effect = [
-                    mock_prompt_config,
-                    LLMEndpointConfig(),
-                    RetrievalConfig(),
-                ]
-
-                result = await routing_node.execute(valid_state)
+            with patch.object(
+                routing_node, "get_service", return_value=mock_llm_service
+            ):
+                with patch.object(
+                    routing_node, "get_config", return_value=mock_prompt_config
+                ):
+                    result = await routing_node.execute(valid_state)
 
         # Should return Send for edit_system_prompt with fallback prompt
         assert isinstance(result, list)
@@ -536,27 +520,21 @@ class TestRoutingNodeErrorHandling:
         state = create_sample_agent_state()
 
         mock_llm_service = Mock()
-        mock_prompt_service = Mock()
 
         # Mock LLM error
         mock_llm_service.invoke_with_structured_output = AsyncMock(
             side_effect=Exception("LLM service unavailable")
         )
 
-        mock_template = Mock()
-        mock_template.format.return_value = "Formatted prompt"
-        mock_prompt_service.get_template.return_value = mock_template
+        with patch("quivr_core.rag.prompt.registry.get_prompt") as mock_get_prompt:
+            # Mock prompt template
+            mock_template = Mock()
+            mock_template.format.return_value = "Formatted prompt"
+            mock_get_prompt.return_value = mock_template
 
-        with patch.object(routing_node, "get_service") as mock_get_service:
-            mock_get_service.side_effect = [mock_llm_service, mock_prompt_service]
-
-            with patch.object(routing_node, "get_config") as mock_get_config:
-                mock_get_config.side_effect = [
-                    PromptConfig(),
-                    LLMEndpointConfig(),
-                    RetrievalConfig(),
-                ]
-
+            with patch.object(
+                routing_node, "get_service", return_value=mock_llm_service
+            ):
                 with pytest.raises(Exception, match="LLM service unavailable"):
                     await routing_node.execute(state)
 

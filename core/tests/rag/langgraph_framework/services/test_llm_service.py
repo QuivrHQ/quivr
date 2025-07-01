@@ -5,7 +5,7 @@ from unittest.mock import Mock, AsyncMock, patch
 import openai
 from pydantic import BaseModel
 
-from quivr_core.rag.entities.config import LLMEndpointConfig, WorkflowConfig
+from quivr_core.rag.entities.config import LLMEndpointConfig
 from quivr_core.rag.langgraph_framework.services.llm_service import LLMService
 from quivr_core.llm import LLMEndpoint
 
@@ -200,79 +200,6 @@ class TestLLMServiceTokenCounting:
         mock_endpoint.count_tokens.assert_called_once_with("This is a test string")
 
 
-class TestLLMServiceToolBinding:
-    """Test tool binding functionality."""
-
-    @pytest.fixture(scope="function")
-    def mock_llm_service_with_tools(self):
-        """Create mock LLM service with tool support."""
-        config = LLMEndpointConfig()
-
-        with patch.object(LLMEndpoint, "from_config") as mock_from_config:
-            mock_endpoint = Mock()
-            mock_llm = Mock()
-            mock_endpoint._llm = mock_llm
-            mock_endpoint.supports_func_calling.return_value = True
-            mock_from_config.return_value = mock_endpoint
-
-            service = LLMService(config)
-            return service, mock_endpoint, mock_llm
-
-    def test_bind_tools_with_function_calling_support(
-        self, mock_llm_service_with_tools
-    ):
-        """Test tool binding when function calling is supported."""
-        service, mock_endpoint, mock_llm = mock_llm_service_with_tools
-
-        # Mock workflow config with tools
-        workflow_config = Mock(spec=WorkflowConfig)
-        workflow_config.get_node_tools.return_value = ["tool1", "tool2"]
-
-        # Mock bound LLM
-        mock_bound_llm = Mock()
-        mock_llm.bind_tools.return_value = mock_bound_llm
-
-        result = service.bind_tools("test_node", workflow_config)
-
-        assert result == mock_bound_llm
-        workflow_config.get_node_tools.assert_called_once_with("test_node")
-        mock_llm.bind_tools.assert_called_once_with(
-            ["tool1", "tool2"], tool_choice="any"
-        )
-
-    def test_bind_tools_no_function_calling_support(self, mock_llm_service_with_tools):
-        """Test tool binding when function calling is not supported."""
-        service, mock_endpoint, mock_llm = mock_llm_service_with_tools
-        mock_endpoint.supports_func_calling.return_value = False
-
-        workflow_config = Mock(spec=WorkflowConfig)
-
-        result = service.bind_tools("test_node", workflow_config)
-
-        assert result == mock_llm
-        mock_llm.bind_tools.assert_not_called()
-
-    def test_bind_tools_no_tools_available(self, mock_llm_service_with_tools):
-        """Test tool binding when no tools are available for the node."""
-        service, mock_endpoint, mock_llm = mock_llm_service_with_tools
-
-        workflow_config = Mock(spec=WorkflowConfig)
-        workflow_config.get_node_tools.return_value = []  # No tools
-
-        result = service.bind_tools("test_node", workflow_config)
-
-        assert result == mock_llm
-        mock_llm.bind_tools.assert_not_called()
-
-    def test_get_base_llm(self, mock_llm_service_with_tools):
-        """Test getting base LLM without tool binding."""
-        service, mock_endpoint, mock_llm = mock_llm_service_with_tools
-
-        result = service.get_base_llm()
-
-        assert result == mock_llm
-
-
 class TestLLMServiceConfiguration:
     """Test configuration-related methods."""
 
@@ -358,26 +285,6 @@ class TestLLMServiceErrorHandling:
 
 class TestLLMServiceEdgeCases:
     """Test edge cases and boundary conditions."""
-
-    def test_bind_tools_with_empty_node_name(self):
-        """Test tool binding with empty node name."""
-        config = LLMEndpointConfig()
-
-        with patch.object(LLMEndpoint, "from_config") as mock_from_config:
-            mock_endpoint = Mock()
-            mock_llm = Mock()
-            mock_endpoint._llm = mock_llm
-            mock_endpoint.supports_func_calling.return_value = True
-            mock_from_config.return_value = mock_endpoint
-
-            service = LLMService(config)
-            workflow_config = Mock(spec=WorkflowConfig)
-            workflow_config.get_node_tools.return_value = []
-
-            result = service.bind_tools("", workflow_config)
-
-            assert result == mock_llm
-            workflow_config.get_node_tools.assert_called_once_with("")
 
     def test_count_tokens_with_empty_string(self):
         """Test token counting with empty string."""

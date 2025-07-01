@@ -57,9 +57,9 @@ class TestNodeRegistry:
         """Test basic node registration."""
         registry.register_node("test_node", MockNode)
 
-        assert "test_node" in registry._nodes
-        assert registry._nodes["test_node"].node_class == MockNode
-        assert registry._nodes["test_node"].name == "test_node"
+        assert "test_node" in registry._items
+        assert registry._items["test_node"].node_class == MockNode
+        assert registry._items["test_node"].name == "test_node"
         assert "general" in registry._categories
         assert "test_node" in registry._categories["general"]
 
@@ -74,7 +74,7 @@ class TestNodeRegistry:
             dependencies=["dep1", "dep2"],
         )
 
-        metadata = registry._nodes["advanced_node"]
+        metadata = registry._items["advanced_node"]
         assert metadata.node_class == AsyncMockNode
         assert metadata.description == "An advanced test node"
         assert metadata.category == "advanced"
@@ -92,11 +92,11 @@ class TestNodeRegistry:
         )
 
         # Should log warning
-        assert "Overriding existing node registration: duplicate" in caplog.text
+        assert "Overriding existing registration: duplicate" in caplog.text
 
         # Should override with new class
-        assert registry._nodes["duplicate"].node_class == AsyncMockNode
-        assert registry._nodes["duplicate"].description == "New description"
+        assert registry._items["duplicate"].node_class == AsyncMockNode
+        assert registry._items["duplicate"].description == "New description"
 
     def test_get_node_class(self, registry):
         """Test retrieving node class."""
@@ -107,7 +107,7 @@ class TestNodeRegistry:
 
     def test_get_node_class_not_found(self, registry):
         """Test error when node class not found."""
-        with pytest.raises(KeyError, match="Node 'nonexistent' not found in registry"):
+        with pytest.raises(KeyError, match="Item 'nonexistent' not found in registry"):
             registry.get_node_class("nonexistent")
 
     def test_get_node_metadata(self, registry):
@@ -121,7 +121,7 @@ class TestNodeRegistry:
 
     def test_get_node_metadata_not_found(self, registry):
         """Test error when node metadata not found."""
-        with pytest.raises(KeyError, match="Node 'nonexistent' not found in registry"):
+        with pytest.raises(KeyError, match="Item 'nonexistent' not found in registry"):
             registry.get_node_metadata("nonexistent")
 
     def test_list_nodes_all(self, registry):
@@ -175,7 +175,7 @@ class TestNodeRegistry:
 
     def test_create_node_not_found(self, registry):
         """Test error when creating non-existent node."""
-        with pytest.raises(KeyError, match="Node 'nonexistent' not found in registry"):
+        with pytest.raises(KeyError, match="Item 'nonexistent' not found in registry"):
             registry.create_node("nonexistent")
 
 
@@ -185,17 +185,17 @@ class TestRegisterDecorator:
     @pytest.fixture(scope="function")
     def clean_registry(self):
         """Create a clean registry and restore after test."""
-        original_nodes = node_registry._nodes.copy()
+        original_items = node_registry._items.copy()
         original_categories = node_registry._categories.copy()
 
         # Clear registry
-        node_registry._nodes.clear()
+        node_registry._items.clear()
         node_registry._categories.clear()
 
         yield node_registry
 
         # Restore original state
-        node_registry._nodes = original_nodes
+        node_registry._items = original_items
         node_registry._categories = original_categories
 
     def test_decorator_basic(self, clean_registry):
@@ -215,8 +215,8 @@ class TestRegisterDecorator:
                 return state
 
         # Should be registered automatically
-        assert "decorated_node" in clean_registry._nodes
-        assert clean_registry._nodes["decorated_node"].node_class == DecoratedNode
+        assert "decorated_node" in clean_registry._items
+        assert clean_registry._items["decorated_node"].node_class == DecoratedNode
 
     def test_decorator_with_name(self, clean_registry):
         """Test decorator with custom name."""
@@ -232,8 +232,8 @@ class TestRegisterDecorator:
             async def execute(self, state, config=None):
                 return state
 
-        assert "custom_name" in clean_registry._nodes
-        assert clean_registry._nodes["custom_name"].node_class == DecoratedNode
+        assert "custom_name" in clean_registry._items
+        assert clean_registry._items["custom_name"].node_class == DecoratedNode
 
     def test_decorator_with_metadata(self, clean_registry):
         """Test decorator with full metadata."""
@@ -255,7 +255,7 @@ class TestRegisterDecorator:
             async def execute(self, state, config=None):
                 return state
 
-        metadata = clean_registry._nodes["full_metadata_node"]
+        metadata = clean_registry._items["full_metadata_node"]
         assert metadata.description == "A fully decorated node"
         assert metadata.category == "decorated"
         assert metadata.version == "2.1.0"
@@ -286,10 +286,8 @@ class TestRegisterDecorator:
     def test_decorator_registration_failure(self, clean_registry, caplog):
         """Test decorator handles registration failures gracefully."""
         # Mock the registry to raise an exception
-        original_register = clean_registry.register_node
-        clean_registry.register_node = Mock(
-            side_effect=Exception("Registration failed")
-        )
+        original_register = clean_registry.register
+        clean_registry.register = Mock(side_effect=Exception("Registration failed"))
 
         try:
 
@@ -312,7 +310,7 @@ class TestRegisterDecorator:
 
         finally:
             # Restore original method
-            clean_registry.register_node = original_register
+            clean_registry.register = original_register
 
 
 class TestGlobalRegistry:

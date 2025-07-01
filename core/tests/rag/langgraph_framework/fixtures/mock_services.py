@@ -45,22 +45,6 @@ class MockToolService:
         return [f"tool_for_{node_name}"]
 
 
-class MockRAGPromptService:
-    """Mock RAG prompt service for testing."""
-
-    def __init__(self):
-        self.template_calls = []
-
-    def get_template(self, template_name: str) -> str:
-        """Mock template retrieval."""
-        self.template_calls.append(template_name)
-        return f"Template for {template_name}"
-
-    def format_prompt(self, template: str, **kwargs) -> str:
-        """Mock prompt formatting."""
-        return f"Formatted: {template} with {kwargs}"
-
-
 class MockServiceFactory:
     """Mock service factory for testing."""
 

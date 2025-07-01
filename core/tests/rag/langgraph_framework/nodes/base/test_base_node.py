@@ -160,7 +160,9 @@ class TestBaseNodeServiceInjection:
         service = node.get_service(MockLLMService)
 
         assert service is mock_service
-        mock_container.get_service.assert_called_once_with(MockLLMService, None)
+        mock_container.get_service.assert_called_once_with(
+            MockLLMService, None, use_cache=True
+        )
 
     def test_get_service_with_config(self):
         """Test service retrieval with config."""
@@ -173,7 +175,9 @@ class TestBaseNodeServiceInjection:
         service = node.get_service(MockLLMService, config)
 
         assert service is mock_service
-        mock_container.get_service.assert_called_once_with(MockLLMService, config)
+        mock_container.get_service.assert_called_once_with(
+            MockLLMService, config, use_cache=True
+        )
 
 
 class TestBaseNodeValidation:

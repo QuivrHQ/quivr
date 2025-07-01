@@ -49,7 +49,9 @@ class TestConfigMapping:
         """Test extracting global config using string key."""
         mapping = ConfigMapping({TestConfig: "test_config"})
 
-        config = {"test_config": {"param1": "test_value", "param2": 100}}
+        config = {
+            "configurable": {"test_config": {"param1": "test_value", "param2": 100}}
+        }
 
         result = mapping.extract(config, TestConfig)
 
@@ -66,7 +68,9 @@ class TestConfigMapping:
 
         mapping = ConfigMapping({TestConfig: custom_extractor})
 
-        config = {"custom": {"param1": "custom_value", "param3": False}}
+        config = {
+            "configurable": {"custom": {"param1": "custom_value", "param3": False}}
+        }
 
         result = mapping.extract(config, TestConfig)
 
@@ -79,7 +83,7 @@ class TestConfigMapping:
         """Test extracting config type that's not in mapping uses defaults."""
         mapping = ConfigMapping({})
 
-        config = {"test_config": {"param1": "snake_case_value"}}
+        config = {"configurable": {"test_config": {"param1": "snake_case_value"}}}
 
         result = mapping.extract(config, TestConfig)
 
@@ -93,8 +97,10 @@ class TestConfigMapping:
         mapping = ConfigMapping({TestConfig: "test_config"})
 
         config = {
-            "test_config": {"param1": "global_value", "param2": 50},
-            "nodes": {"test_node": {"test_config": {"param1": "node_value"}}},
+            "configurable": {
+                "test_config": {"param1": "global_value", "param2": 50},
+                "nodes": {"test_node": {"test_config": {"param1": "node_value"}}},
+            }
         }
 
         result = mapping.extract(config, TestConfig, "test_node")
@@ -113,17 +119,19 @@ class TestConfigMapping:
         mapping = ConfigMapping({NestedConfig: "nested_config"})
 
         config = {
-            "nested_config": {
-                "nested": {"key1": "global1", "key2": "global2", "key3": "global3"},
-                "simple": "global_simple",
-            },
-            "nodes": {
-                "test_node": {
-                    "nested_config": {
-                        "nested": {"key1": "node1"}  # Partial override
+            "configurable": {
+                "nested_config": {
+                    "nested": {"key1": "global1", "key2": "global2", "key3": "global3"},
+                    "simple": "global_simple",
+                },
+                "nodes": {
+                    "test_node": {
+                        "nested_config": {
+                            "nested": {"key1": "node1"}  # Partial override
+                        }
                     }
-                }
-            },
+                },
+            }
         }
 
         result = mapping.extract(config, NestedConfig, "test_node")
@@ -140,8 +148,10 @@ class TestConfigMapping:
         )
 
         config = {
-            "test_config": {"param1": "test_value"},
-            "another_config": {"setting1": "another_value"},
+            "configurable": {
+                "test_config": {"param1": "test_value"},
+                "another_config": {"setting1": "another_value"},
+            }
         }
 
         result = mapping.extract_all(config, (TestConfig, AnotherConfig))
@@ -159,9 +169,11 @@ class TestConfigMapping:
         )
 
         config = {
-            "test_config": {"param1": "global_test"},
-            "another_config": {"setting1": "global_another"},
-            "nodes": {"test_node": {"test_config": {"param1": "node_test"}}},
+            "configurable": {
+                "test_config": {"param1": "global_test"},
+                "another_config": {"setting1": "global_another"},
+                "nodes": {"test_node": {"test_config": {"param1": "node_test"}}},
+            }
         }
 
         result = mapping.extract_all(config, (TestConfig, AnotherConfig), "test_node")
@@ -189,14 +201,16 @@ class TestConfigMapping:
         mapping = ConfigMapping({TestConfig: custom_extractor})
 
         config = {
-            "custom": {"param1": "global_custom"},
-            "nodes": {
-                "test_node": {
-                    "test_config": {
-                        "param1": "node_custom"
-                    }  # Uses snake_case conversion
-                }
-            },
+            "configurable": {
+                "custom": {"param1": "global_custom"},
+                "nodes": {
+                    "test_node": {
+                        "test_config": {
+                            "param1": "node_custom"
+                        }  # Uses snake_case conversion
+                    }
+                },
+            }
         }
 
         result = mapping.extract(config, TestConfig, "test_node")
@@ -230,8 +244,10 @@ class TestConfigMapping:
         mapping = ConfigMapping({TestConfig: "test_config"})
 
         config = {
-            "test_config": {
-                "param2": "not_an_integer"  # Should cause validation error
+            "configurable": {
+                "test_config": {
+                    "param2": "not_an_integer"  # Should cause validation error
+                }
             }
         }
 
@@ -250,7 +266,7 @@ class TestConfigExtractorAlias:
         """Test that ConfigExtractor works the same as ConfigMapping."""
         extractor = ConfigExtractor({TestConfig: "test_config"})
 
-        config = {"test_config": {"param1": "test_value"}}
+        config = {"configurable": {"test_config": {"param1": "test_value"}}}
         result = extractor.extract(config, TestConfig)
 
         assert isinstance(result, TestConfig)
@@ -276,27 +292,29 @@ class TestConfigExtractionIntegration:
         mapping = ConfigMapping({DatabaseConfig: "database", APIConfig: "api"})
 
         config = {
-            "database": {
-                "host": "prod.db.com",
-                "credentials": {"user": "prod_user", "password": "secret"},
-            },
-            "api": {
-                "base_url": "https://api.prod.com",
-                "headers": {"Authorization": "Bearer token"},
-            },
-            "nodes": {
-                "db_node": {
-                    "database": {
-                        "port": 3306,  # Override port for this node
-                        "credentials": {"user": "node_user"},  # Partial override
-                    }
+            "configurable": {
+                "database": {
+                    "host": "prod.db.com",
+                    "credentials": {"user": "prod_user", "password": "secret"},
                 },
-                "api_node": {
-                    "api": {
-                        "timeout": 60  # Override timeout for this node
-                    }
+                "api": {
+                    "base_url": "https://api.prod.com",
+                    "headers": {"Authorization": "Bearer token"},
                 },
-            },
+                "nodes": {
+                    "db_node": {
+                        "database": {
+                            "port": 3306,  # Override port for this node
+                            "credentials": {"user": "node_user"},  # Partial override
+                        }
+                    },
+                    "api_node": {
+                        "api": {
+                            "timeout": 60  # Override timeout for this node
+                        }
+                    },
+                },
+            }
         }
 
         # Test database config for db_node
@@ -324,8 +342,10 @@ class TestConfigExtractionIntegration:
 
         # Config with only one section
         config = {
-            "test_config": {"param1": "test_value"}
-            # another_config section is missing
+            "configurable": {
+                "test_config": {"param1": "test_value"}
+                # another_config section is missing
+            }
         }
 
         # Should work and use defaults for missing sections

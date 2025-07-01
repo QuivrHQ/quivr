@@ -8,13 +8,10 @@ from quivr_core.rag.langgraph_framework.services.service_container import (
     ServiceFactory,
     LLMServiceFactory,
     ToolServiceFactory,
-    PromptServiceFactory,
 )
 from quivr_core.rag.langgraph_framework.services.llm_service import LLMService
 from quivr_core.rag.langgraph_framework.services.tool_service import ToolService
-from quivr_core.rag.langgraph_framework.services.rag_prompt_service import (
-    RAGPromptService,
-)
+
 
 from tests.rag.langgraph_framework.fixtures.mock_services import (
     MockLLMService,
@@ -63,55 +60,6 @@ class TestLLMServiceFactory:
         assert factory.get_config_type() == LLMEndpointConfig
 
 
-class TestToolServiceFactory:
-    """Test ToolServiceFactory."""
-
-    def test_create_with_default_config(self):
-        """Test creating tool service with default config."""
-        factory = ToolServiceFactory()
-        service = factory.create()
-
-        assert isinstance(service, ToolService)
-        assert isinstance(service.workflow_config, WorkflowConfig)
-
-    def test_create_with_custom_config(self):
-        """Test creating tool service with custom config."""
-        factory = ToolServiceFactory()
-        config = WorkflowConfig()  # Use default but ensure it's a proper instance
-        service = factory.create(config)
-
-        assert isinstance(service, ToolService)
-        assert service.workflow_config == config
-
-    def test_get_config_type(self):
-        """Test getting config type."""
-        factory = ToolServiceFactory()
-        assert factory.get_config_type() == WorkflowConfig
-
-
-class TestPromptServiceFactory:
-    """Test PromptServiceFactory."""
-
-    def test_create_service(self):
-        """Test creating prompt service."""
-        factory = PromptServiceFactory()
-        service = factory.create()
-
-        assert isinstance(service, RAGPromptService)
-
-    def test_create_with_config_ignored(self):
-        """Test that config is ignored for prompt service."""
-        factory = PromptServiceFactory()
-        service = factory.create("ignored_config")
-
-        assert isinstance(service, RAGPromptService)
-
-    def test_get_config_type_none(self):
-        """Test that config type is None."""
-        factory = PromptServiceFactory()
-        assert factory.get_config_type() is None
-
-
 class TestServiceContainer:
     """Test ServiceContainer dependency injection."""
 
@@ -126,11 +74,9 @@ class TestServiceContainer:
         """Test container initializes with default factories and cache settings."""
         assert LLMService in container._factories
         assert ToolService in container._factories
-        assert RAGPromptService in container._factories
 
         assert isinstance(container._factories[LLMService], LLMServiceFactory)
         assert isinstance(container._factories[ToolService], ToolServiceFactory)
-        assert isinstance(container._factories[RAGPromptService], PromptServiceFactory)
 
         # Test cache configuration
         assert container._max_cache_per_service == 3
@@ -145,15 +91,6 @@ class TestServiceContainer:
 
         assert MockLLMService in container._factories
         assert container._factories[MockLLMService] == factory
-
-    def test_get_singleton_service(self, container):
-        """Test getting singleton service without config."""
-        service1 = container.get_service(RAGPromptService)
-        service2 = container.get_service(RAGPromptService)
-
-        # Should be the same instance (singleton)
-        assert service1 is service2
-        assert isinstance(service1, RAGPromptService)
 
     def test_get_service_with_config(self, container):
         """Test getting service with configuration."""
@@ -257,15 +194,14 @@ class TestServiceContainer:
     def test_clear_all_cache(self, container):
         """Test clearing all service caches."""
         # Create some cached services
-        service1 = container.get_service(RAGPromptService)
+        service1 = container.get_service(LLMService)
         config = LLMEndpointConfig(
-            model="gpt-4", max_context_tokens=10000, max_output_tokens=5000
+            model="gpt-4", max_context_tokens=15000, max_output_tokens=5000
         )
         service2 = container.get_service(LLMService, config)
 
         # Verify services are cached
-        assert len(container._services) == 2
-        assert RAGPromptService in container._services
+        assert len(container._services) == 1
         assert LLMService in container._services
 
         # Clear all caches
@@ -275,7 +211,7 @@ class TestServiceContainer:
         assert container._services == {}
 
         # Should create new instances
-        service3 = container.get_service(RAGPromptService)
+        service3 = container.get_service(LLMService)
         service4 = container.get_service(LLMService, config)
 
         assert service1 is not service3
@@ -284,7 +220,6 @@ class TestServiceContainer:
     def test_clear_specific_cache(self, container):
         """Test clearing cache for specific service type."""
         # Create cached services for different types
-        prompt_service1 = container.get_service(RAGPromptService)
         config = LLMEndpointConfig(
             model="gpt-4", max_context_tokens=10000, max_output_tokens=5000
         )
@@ -292,10 +227,6 @@ class TestServiceContainer:
 
         # Clear only LLMService cache
         container.clear_cache(LLMService)
-
-        # RAGPromptService should still be cached
-        prompt_service2 = container.get_service(RAGPromptService)
-        assert prompt_service1 is prompt_service2
 
         # LLMService should create new instance
         llm_service2 = container.get_service(LLMService, config)
@@ -317,26 +248,20 @@ class TestServiceContainer:
 
     def test_service_creation_logging(self, container, caplog):
         """Test that service creation is logged."""
-        container.get_service(RAGPromptService)
+        container.get_service(LLMService)
 
-        assert "Creating new RAGPromptService instance" in caplog.text
+        assert "Creating new LLMService instance" in caplog.text
 
     def test_service_cache_hit_logging(self, container, caplog):
         """Test that cache hits are logged."""
         # Create service first
-        container.get_service(RAGPromptService)
+        container.get_service(LLMService)
         caplog.clear()
 
         # Access again (should be cache hit)
-        container.get_service(RAGPromptService)
+        container.get_service(LLMService)
 
-        assert "Retrieved cached RAGPromptService instance" in caplog.text
-
-    def test_factory_config_type_validation_skip(self, container):
-        """Test that config type validation can be skipped for factories without config types."""
-        # RAGPromptService factory has no config type, so any config should be accepted
-        service = container.get_service(RAGPromptService, "any_config")
-        assert isinstance(service, RAGPromptService)
+        assert "Retrieved cached LLMService instance" in caplog.text
 
     def test_lru_cache_eviction(self, container):
         """Test that LRU cache evicts oldest entries when capacity is reached."""
@@ -434,7 +359,7 @@ class TestServiceContainer:
         assert stats == {}
 
         # Add some services
-        container.get_service(RAGPromptService)
+        container.get_service(LLMService)
         config1 = LLMEndpointConfig(
             model="gpt-4", max_context_tokens=10000, max_output_tokens=5000
         )
@@ -447,18 +372,13 @@ class TestServiceContainer:
 
         stats = container.get_cache_stats()
 
-        assert "RAGPromptService" in stats
         assert "LLMService" in stats
 
-        assert stats["RAGPromptService"]["cached_instances"] == 1
-        assert stats["RAGPromptService"]["max_capacity"] == 3
-
-        assert stats["LLMService"]["cached_instances"] == 2
+        assert stats["LLMService"]["cached_instances"] == 3
         assert stats["LLMService"]["max_capacity"] == 3
 
         # Check cache keys are present
-        assert len(stats["RAGPromptService"]["cache_keys"]) == 1
-        assert len(stats["LLMService"]["cache_keys"]) == 2
+        assert len(stats["LLMService"]["cache_keys"]) == 3
 
     def test_service_cleanup_on_eviction(self, container):
         """Test that services with cleanup methods are called during eviction."""
@@ -508,13 +428,6 @@ class TestServiceContainer:
                 max_output_tokens=5000,
             )
             llm_services.append(container.get_service(LLMService, config))
-
-        # Add RAGPromptService - should not affect LLMService cache
-        container.get_service(RAGPromptService)
-
-        # LLMService cache should still have all 3 services
-        assert len(container._services[LLMService]) == 3
-        assert len(container._services[RAGPromptService]) == 1
 
         # All LLM services should still be cached
         for i, llm_service in enumerate(llm_services):
