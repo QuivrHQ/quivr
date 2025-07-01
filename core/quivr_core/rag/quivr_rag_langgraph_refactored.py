@@ -18,7 +18,7 @@ from quivr_core.rag.entities.config import (
     NodeConfig,
 )
 
-import quivr_core.rag.langgraph_framework.nodes  # noqa: F401
+import quivr_core.rag.langgraph_framework.nodes as _  # noqa: F401
 
 from langgraph.graph import END, START
 from quivr_core.rag.langgraph_framework.graph_builder import GraphBuilder
