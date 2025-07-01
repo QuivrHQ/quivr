@@ -1,38 +1,90 @@
-from typing import Dict, Type, List, Optional
+"""
+Enhanced node registry using the unified registry base.
+
+This demonstrates how the existing NodeRegistry can be refactored to use
+the new base registry system while maintaining all functionality and
+adding enhanced discovery capabilities.
+"""
+
+from typing import Type, Optional, List
 import logging
 
 from quivr_core.rag.langgraph_framework.base.node import BaseNode
+from quivr_core.registry_base import (
+    BaseRegistry,
+    BaseMetadata,
+    create_registry_decorator,
+)
 
 logger = logging.getLogger("quivr_core")
 
 
-class NodeMetadata:
+class NodeMetadata(BaseMetadata):
     """Metadata for a registered node."""
 
     def __init__(
         self,
         node_class: Type[BaseNode],
         name: str,
-        description: str = "",
-        category: str = "general",
-        version: str = "1.0.0",
         dependencies: Optional[List[str]] = None,
+        **kwargs,
     ):
+        super().__init__(name=name, **kwargs)
         self.node_class = node_class
-        self.name = name
-        self.description = description
-        self.category = category
-        self.version = version
         self.dependencies = dependencies or []
 
 
-class NodeRegistry:
+class NodeRegistry(BaseRegistry[Type[BaseNode], NodeMetadata]):
     """Registry for discovering and managing node types."""
 
-    def __init__(self):
-        self._nodes: Dict[str, NodeMetadata] = {}
-        self._categories: Dict[str, List[str]] = {}
+    def _create_metadata(
+        self,
+        name: str,
+        item: Type[BaseNode],
+        dependencies: Optional[List[str]] = None,
+        **kwargs,
+    ) -> NodeMetadata:
+        """Create metadata for a node class."""
+        return NodeMetadata(
+            node_class=item, name=name, dependencies=dependencies, **kwargs
+        )
 
+    def _extract_item(self, metadata: NodeMetadata) -> Type[BaseNode]:
+        """Extract the node class from metadata."""
+        return metadata.node_class
+
+    def create_node(self, name: str, **kwargs) -> BaseNode:
+        """Create a node instance by name."""
+        node_class = self.get(name)
+        return node_class(**kwargs)
+
+    def get_node_dependencies(self, name: str) -> List[str]:
+        """Get the dependencies for a node."""
+        metadata = self.get_metadata(name)
+        return metadata.dependencies
+
+    def list_nodes_by_dependencies(self, dependency: str) -> List[str]:
+        """List all nodes that depend on a specific dependency."""
+        return [
+            name
+            for name, metadata in self._items.items()
+            if dependency in metadata.dependencies
+        ]
+
+    def validate_dependencies(self, name: str) -> bool:
+        """Validate that all dependencies for a node are available."""
+        metadata = self.get_metadata(name)
+        for dep in metadata.dependencies:
+            if not self.has_item(dep):
+                logger.warning(f"Node {name} has unmet dependency: {dep}")
+                return False
+        return True
+
+    def get_dependency_graph(self) -> dict[str, List[str]]:
+        """Get the full dependency graph for all nodes."""
+        return {name: metadata.dependencies for name, metadata in self._items.items()}
+
+    # Legacy method names for backward compatibility
     def register_node(
         self,
         name: str,
@@ -42,71 +94,45 @@ class NodeRegistry:
         version: str = "1.0.0",
         dependencies: Optional[List[str]] = None,
     ) -> None:
-        """Register a node type."""
-
-        if name in self._nodes:
-            logger.warning(f"Overriding existing node registration: {name}")
-
-        metadata = NodeMetadata(
-            node_class=node_class,
+        """Legacy method name for node registration."""
+        self.register(
             name=name,
+            item=node_class,
             description=description,
             category=category,
             version=version,
             dependencies=dependencies,
         )
 
-        self._nodes[name] = metadata
-
-        # Update category index
-        if category not in self._categories:
-            self._categories[category] = []
-        if name not in self._categories[category]:
-            self._categories[category].append(name)
-
-        logger.info(f"Registered node: {name} (category: {category})")
-
     def get_node_class(self, name: str) -> Type[BaseNode]:
-        """Get a node class by name."""
-        if name not in self._nodes:
-            raise KeyError(f"Node '{name}' not found in registry")
-        return self._nodes[name].node_class
+        """Legacy method name for getting node classes."""
+        return self.get(name)
 
     def get_node_metadata(self, name: str) -> NodeMetadata:
-        """Get node metadata by name."""
-        if name not in self._nodes:
-            raise KeyError(f"Node '{name}' not found in registry")
-        return self._nodes[name]
+        """Legacy method name for getting node metadata."""
+        return self.get_metadata(name)
 
     def list_nodes(self, category: Optional[str] = None) -> List[str]:
-        """List all registered node names, optionally filtered by category."""
-        if category:
-            return self._categories.get(category, [])
-        return list(self._nodes.keys())
-
-    def list_categories(self) -> List[str]:
-        """List all available categories."""
-        return list(self._categories.keys())
-
-    def create_node(self, name: str, **kwargs) -> BaseNode:
-        """Create a node instance by name."""
-        node_class = self.get_node_class(name)
-        return node_class(**kwargs)
+        """Legacy method name for listing nodes."""
+        return self.list_items(category=category)
 
 
 # Global registry instance
 node_registry = NodeRegistry()
 
-
 # Decorator for easy node registration
-def register_node(
+register_node = create_registry_decorator(node_registry)
+
+
+def enhanced_register_node(
     name: Optional[str] = None,
     description: str = "",
     category: str = "general",
     version: str = "1.0.0",
     dependencies: Optional[List[str]] = None,
+    tags: Optional[List[str]] = None,
 ):
-    """Decorator to register a node class."""
+    """Enhanced decorator with dependency and tag support."""
 
     def decorator(cls: Type[BaseNode]) -> Type[BaseNode]:
         node_name = name or getattr(cls, "NODE_NAME", cls.__name__.lower())
@@ -122,17 +148,19 @@ def register_node(
             "category": category,
             "version": version,
             "dependencies": dependencies or [],
+            "tags": tags or [],
         }
 
         # Register immediately if registry is available
         try:
-            node_registry.register_node(
+            node_registry.register(
                 name=node_name,
-                node_class=cls,
+                item=cls,
                 description=description,
                 category=category,
                 version=version,
                 dependencies=dependencies,
+                tags=tags,
             )
         except Exception as e:
             logger.warning(f"Failed to register node {node_name}: {e}")
@@ -140,3 +168,34 @@ def register_node(
         return cls
 
     return decorator
+
+
+# Convenience functions
+def get_node_class(name: str) -> Type[BaseNode]:
+    """Get a node class by name from the registry."""
+    return node_registry.get(name)
+
+
+def create_node(name: str, **kwargs) -> BaseNode:
+    """Create a node instance by name."""
+    return node_registry.create_node(name, **kwargs)
+
+
+def list_available_nodes(category: Optional[str] = None) -> List[str]:
+    """List all available nodes, optionally filtered by category."""
+    return node_registry.list_items(category=category)
+
+
+def search_nodes(query: str, categories: Optional[List[str]] = None) -> List[str]:
+    """Search for nodes by name or description."""
+    return node_registry.search(query, categories)
+
+
+def validate_node_dependencies(name: str) -> bool:
+    """Validate that all dependencies for a node are available."""
+    return node_registry.validate_dependencies(name)
+
+
+def get_dependency_graph() -> dict[str, List[str]]:
+    """Get the full dependency graph for all nodes."""
+    return node_registry.get_dependency_graph()
