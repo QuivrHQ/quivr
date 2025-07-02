@@ -14,7 +14,7 @@ from quivr_core.rag.entities.models import (
     RAGResponseMetadata,
     RawRAGResponse,
 )
-from quivr_core.rag.prompts import TemplatePromptName, custom_prompts
+from quivr_core.rag.prompt.registry import get_prompt
 
 # TODO(@aminediro): define a types packages where we clearly define IO types
 # This should be used for serialization/deseriallization later
@@ -163,7 +163,7 @@ def parse_response(raw_response: RawRAGResponse, model_name: str) -> ParsedRAGRe
 
 def combine_documents(
     docs,
-    document_prompt=custom_prompts[TemplatePromptName.DEFAULT_DOCUMENT_PROMPT],
+    document_prompt=get_prompt("default_document"),
     document_separator="\n\n",
 ):
     # for each docs, add an index in the metadata to be able to cite the sources

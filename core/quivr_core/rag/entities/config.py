@@ -1,37 +1,32 @@
 import logging
 import os
-import re
 from enum import Enum
-from typing import Any, Dict, Hashable, List, Optional, Type, Union
+from typing import Any, Dict, Hashable, List, Optional, Type, Union, TypeVar
 from uuid import UUID
 
 from langchain_core.prompts.base import BasePromptTemplate
-from langchain_core.tools import BaseTool
 from langgraph.graph import END, START
-from pydantic import BaseModel
-from rapidfuzz import fuzz, process
+from pydantic import BaseModel, field_serializer
+from quivr_core.rag.entities.prompt import PromptConfig
 
 from quivr_core.base_config import QuivrBaseConfig
 from quivr_core.config import MegaparseConfig
-from quivr_core.llm_tools.llm_tools import TOOLS_CATEGORIES, TOOLS_LISTS, LLMToolFactory
 from quivr_core.processor.splitter import SplitterConfig
+from quivr_core.rag.entities.retriever import RetrieverConfig
+from quivr_core.rag.entities.reranker import RerankerConfig
+from quivr_core.rag.entities.tools import ToolsConfig
+from quivr_core.rag.entities.utils import normalize_to_env_variable_name
+from quivr_core.rag.langgraph_framework.entities.filter_history_config import (
+    FilterHistoryConfig,
+)
+
 
 logger = logging.getLogger("quivr_core")
+
+T = TypeVar("T", bound=QuivrBaseConfig)
+
 MIN_CONTEXT_TOKENS = 4096
 MIN_OUTPUT_TOKENS = 4096
-
-
-def normalize_to_env_variable_name(name: str) -> str:
-    # Replace any character that is not a letter, digit, or underscore with an underscore
-    env_variable_name = re.sub(r"[^A-Za-z0-9_]", "_", name).upper()
-
-    # Check if the normalized name starts with a digit
-    if env_variable_name[0].isdigit():
-        raise ValueError(
-            f"Invalid environment variable name '{env_variable_name}': Cannot start with a digit."
-        )
-
-    return env_variable_name
 
 
 class SpecialEdges(str, Enum):
@@ -50,21 +45,6 @@ class BrainConfig(QuivrBaseConfig):
 
 class DefaultWebSearchTool(str, Enum):
     TAVILY = "tavily"
-
-
-class DefaultRerankers(str, Enum):
-    COHERE = "cohere"
-    JINA = "jina"
-    # MIXEDBREAD = "mixedbread-ai"
-
-    @property
-    def default_model(self) -> str:
-        # Mapping of suppliers to their default models
-        return {
-            self.COHERE: "rerank-v3.5",
-            self.JINA: "jina-reranker-v2-base-multilingual",
-            # self.MIXEDBREAD: "rmxbai-rerank-large-v1",
-        }[self]
 
 
 class DefaultModelSuppliers(str, Enum):
@@ -372,17 +352,11 @@ class LLMEndpointConfig(QuivrBaseConfig):
         )
         if llm_model_config:
             if llm_model_config.max_context_tokens:
-                _max_context_tokens = (
-                    llm_model_config.max_context_tokens
-                    - llm_model_config.max_output_tokens
-                    if llm_model_config.max_output_tokens
-                    else llm_model_config.max_context_tokens
-                )
-                if self.max_context_tokens > _max_context_tokens:
+                if self.max_context_tokens > llm_model_config.max_context_tokens:
                     logger.warning(
-                        f"Lowering max_context_tokens from {self.max_context_tokens} to {_max_context_tokens}"
+                        f"Lowering max_context_tokens from {self.max_context_tokens} to {llm_model_config.max_context_tokens}"
                     )
-                    self.max_context_tokens = _max_context_tokens
+                    self.max_context_tokens = llm_model_config.max_context_tokens
 
                 if self.max_context_tokens < MIN_CONTEXT_TOKENS:
                     logger.error(
@@ -438,33 +412,6 @@ class LLMEndpointConfig(QuivrBaseConfig):
 
 
 # Cannot use Pydantic v2 field_validator because of conflicts with pydantic v1 still in use in LangChain
-class RerankerConfig(QuivrBaseConfig):
-    supplier: DefaultRerankers | None = None
-    model: str | None = None
-    top_n: int = 5  # Number of chunks returned by the re-ranker
-    api_key: str | None = None
-    relevance_score_threshold: float | None = None
-    relevance_score_key: str = "relevance_score"
-
-    def __init__(self, **data):
-        super().__init__(**data)  # Call Pydantic's BaseModel init
-        self.validate_model()  # Automatically call external validation
-
-    def validate_model(self):
-        # If model is not provided, get default model based on supplier
-        if self.model is None and self.supplier is not None:
-            self.model = self.supplier.default_model
-
-        # Check if the corresponding API key environment variable is set
-        if self.supplier:
-            api_key_var = f"{normalize_to_env_variable_name(self.supplier)}_API_KEY"
-            self.api_key = os.getenv(api_key_var)
-
-            if self.api_key is None:
-                raise ValueError(
-                    f"The API key for supplier '{self.supplier}' is not set. "
-                    f"Please set the environment variable: {api_key_var}"
-                )
 
 
 class ConditionalEdgeConfig(QuivrBaseConfig):
@@ -499,13 +446,78 @@ class NodeConfig(QuivrBaseConfig):
     description: str | None = None
     edges: List[str] | None = None
     conditional_edge: ConditionalEdgeConfig | None = None
-    tools: List[Dict[str, Any]] | None = None
-    instantiated_tools: List[BaseTool | Type] | None = None
+    tools_config: ToolsConfig | None = None
+
+    # Store validated node-specific configs
+    validated_configs: Dict[str, QuivrBaseConfig] = {}
+
+    class Config:
+        extra = "allow"  # Allow additional fields for node-specific configs
+
+    @field_serializer("validated_configs")
+    def serialize_validated_configs(
+        self, value: Dict[str, QuivrBaseConfig]
+    ) -> Dict[str, Any]:
+        """Custom serializer for validated_configs field."""
+        if not value:
+            return {}
+
+        serialized_configs = {}
+        for key, config in value.items():
+            if hasattr(config, "model_dump"):
+                # If it's a Pydantic model, use its model_dump method
+                serialized_configs[key] = config.model_dump()
+            else:
+                # If it's raw data, keep as is
+                serialized_configs[key] = config
+        return serialized_configs
 
     def __init__(self, **data):
+        # Extract and validate node-specific configs BEFORE calling super().__init__
+        node_configs = {}
+        validated_configs = {}
+
+        # Find all config fields (ending with '_config')
+        for key, value in list(data.items()):
+            if key.endswith("_config") and key not in [
+                "conditional_edge",
+                "tools_config",
+            ]:
+                # Remove from data to avoid Pydantic validation issues
+                config_data = data.pop(key)
+                node_configs[key] = config_data
+
+                # Validate against registered config type
+                if key in NODE_CONFIG_TYPES:
+                    config_type = NODE_CONFIG_TYPES[key]
+                    try:
+                        validated_config = config_type.model_validate(config_data)
+                        validated_configs[key] = validated_config
+                        logger.debug(f"Validated {key} for node config")
+                    except Exception as e:
+                        raise ValueError(
+                            f"Invalid {key} in node '{data.get('name', 'unknown')}': {e}"
+                        )
+                else:
+                    logger.warning(f"Unknown config type '{key}' - storing as raw data")
+                    validated_configs[key] = config_data
+
+        # Store validated configs
+        data["validated_configs"] = validated_configs
+
         super().__init__(**data)
-        self._instantiate_tools()
         self.resolve_special_edges_in_name_and_edges()
+
+    def get_node_config(self, config_type: Type[T], config_key: str) -> Optional[T]:
+        """Get a validated config of specific type."""
+        config = self.validated_configs.get(config_key)
+        if config and isinstance(config, config_type):
+            return config
+        return None
+
+    def has_config(self, config_key: str) -> bool:
+        """Check if node has a specific config."""
+        return config_key in self.validated_configs
 
     def resolve_special_edges_in_name_and_edges(self):
         """Replace SpecialEdges enum values in name and edges with corresponding langgraph values."""
@@ -521,17 +533,10 @@ class NodeConfig(QuivrBaseConfig):
                 elif edge == SpecialEdges.end:
                     self.edges[i] = END
 
-    def _instantiate_tools(self):
-        """Instantiate tools based on the configuration."""
-        if self.tools:
-            self.instantiated_tools = [
-                LLMToolFactory.create_tool(tool_config.pop("name"), tool_config)
-                for tool_config in self.tools
-            ]
-
 
 class DefaultWorkflow(str, Enum):
     RAG = "rag"
+    CHAT_WITH_LLM = "chat_with_llm"
 
     @property
     def nodes(self) -> List[NodeConfig]:
@@ -543,7 +548,12 @@ class DefaultWorkflow(str, Enum):
                 NodeConfig(name="rewrite", edges=["retrieve"]),
                 NodeConfig(name="retrieve", edges=["generate_rag"]),
                 NodeConfig(name="generate_rag", edges=[END]),
-            ]
+            ],
+            self.CHAT_WITH_LLM: [
+                NodeConfig(name=START, edges=["filter_history"]),
+                NodeConfig(name="filter_history", edges=["generate_chat_llm"]),
+                NodeConfig(name="generate_chat_llm", edges=[END]),
+            ],
         }
         return workflows[self]
 
@@ -551,55 +561,33 @@ class DefaultWorkflow(str, Enum):
 class WorkflowConfig(QuivrBaseConfig):
     name: str | None = None
     nodes: List[NodeConfig] = []
-    available_tools: List[str] | None = None
-    validated_tools: List[BaseTool | Type] = []
-    activated_tools: List[BaseTool | Type] = []
 
     def __init__(self, **data):
         super().__init__(**data)
         self.check_first_node_is_start()
-        self.validate_available_tools()
 
     def check_first_node_is_start(self):
         if self.nodes and self.nodes[0].name != START:
             raise ValueError(f"The first node should be a {SpecialEdges.start} node")
 
-    def get_node_tools(self, node_name: str) -> List[Any]:
-        """Get tools for a specific node."""
+    def get_node_config_by_name(self, name: str) -> NodeConfig:
         for node in self.nodes:
-            if node.name == node_name and node.instantiated_tools:
-                return node.instantiated_tools
-        return []
+            if node.name == name:
+                return node
+        raise ValueError(f"Node config with name {name} not found")
 
-    def validate_available_tools(self):
-        if self.available_tools:
-            valid_tools = list(TOOLS_CATEGORIES.keys()) + list(TOOLS_LISTS.keys())
-            for tool in self.available_tools:
-                if tool.lower() in valid_tools:
-                    self.validated_tools.append(
-                        LLMToolFactory.create_tool(tool, {}).tool
-                    )
-                else:
-                    matches = process.extractOne(
-                        tool.lower(), valid_tools, scorer=fuzz.WRatio
-                    )
-                    if matches:
-                        raise ValueError(
-                            f"Tool {tool} is not a valid ToolsCategory or ToolsList. Did you mean {matches[0]}?"
-                        )
-                    else:
-                        raise ValueError(
-                            f"Tool {tool} is not a valid ToolsCategory or ToolsList"
-                        )
+
+class CitationConfig(QuivrBaseConfig):
+    max_files: int = 20
 
 
 class RetrievalConfig(QuivrBaseConfig):
+    citation_config: CitationConfig = CitationConfig()
     reranker_config: RerankerConfig = RerankerConfig()
+    retriever_config: RetrieverConfig = RetrieverConfig()
     llm_config: LLMEndpointConfig = LLMEndpointConfig()
-    max_history: int = 10
-    max_files: int = 20
-    k: int = 40  # Number of chunks returned by the retriever
-    prompt: str | None = None
+    filter_history_config: FilterHistoryConfig = FilterHistoryConfig()
+    prompt_config: PromptConfig = PromptConfig()
     workflow_config: WorkflowConfig = WorkflowConfig(nodes=DefaultWorkflow.RAG.nodes)
 
     def __init__(self, **data):
@@ -619,3 +607,18 @@ class IngestionConfig(QuivrBaseConfig):
 class AssistantConfig(QuivrBaseConfig):
     retrieval_config: RetrievalConfig = RetrievalConfig()
     ingestion_config: IngestionConfig = IngestionConfig()
+
+
+# Registry mapping config field names to their Pydantic types
+NODE_CONFIG_TYPES: Dict[str, Type[QuivrBaseConfig]] = {
+    "llm_config": LLMEndpointConfig,
+    "reranker_config": RerankerConfig,
+    "retriever_config": RetrieverConfig,
+    "prompt_config": PromptConfig,
+    "filter_history_config": FilterHistoryConfig,
+}
+
+
+def register_node_config_type(config_name: str, config_type: Type[QuivrBaseConfig]):
+    """Register a new node config type for validation."""
+    NODE_CONFIG_TYPES[config_name] = config_type
