@@ -1,4 +1,5 @@
 from typing import Optional, List
+from quivr_core.rag.entities.prompt import PromptConfig
 from quivr_core.rag.langgraph_framework.base.node import (
     BaseNode,
 )
@@ -11,7 +12,11 @@ from quivr_core.rag.entities.config import LLMEndpointConfig, WorkflowConfig
 from quivr_core.rag.langgraph_framework.base.graph_config import BaseGraphConfig
 from quivr_core.rag.prompt.registry import get_prompt
 from quivr_core.rag.langgraph_framework.services.llm_service import LLMService
+from quivr_core.rag.langgraph_framework.services.tool_service import ToolService
 from quivr_core.rag.langgraph_framework.registry.node_registry import register_node
+from logging import getLogger
+
+logger = getLogger(__name__)
 
 
 @register_node(
@@ -38,34 +43,48 @@ class GenerateZendeskRagNode(BaseNode):
             raise NodeValidationError(
                 "GenerateZendeskRagNode requires non-empty messages in state"
             )
-        if "tasks" not in state:
-            raise NodeValidationError(
-                "GenerateZendeskRagNode requires 'tasks' attribute in state"
-            )
-        if not state["tasks"]:
-            raise NodeValidationError(
-                "GenerateZendeskRagNode requires non-empty tasks in state"
-            )
 
     def validate_output_state(self, state) -> None:
         """Validate that output has the correct attributes and methods."""
         pass
 
     async def execute(self, state, config: Optional[BaseGraphConfig] = None):
-        """Execute Zendesk RAG generation."""
+        """Execute Zendesk RAG generation using new unified LLMService."""
         # Get configs
         workflow_config = self.get_config(WorkflowConfig, config)
         llm_config = self.get_config(LLMEndpointConfig, config)
 
-        # Get services through dependency injection
+        node_config = workflow_config.get_node_config_by_name(self.name)
+
+        # Extract workspace_id and zendesk_id from state or config
+        workspace_id = state.get("workspace_id")
+
+        if not workspace_id:
+            raise ValueError("workspace_id must be provided in state for Zendesk tools")
+
+        # Get services with runtime context - the ToolService will automatically
+        # extract the right runtime args for each tool based on their schemas
+        tool_service = self.get_service(
+            ToolService,
+            node_config.tools_config,
+            runtime_context={"workspace_id": workspace_id},
+        )
         llm_service = self.get_service(LLMService, llm_config)
 
-        tasks = state["tasks"]
+        # Set the tool service on the LLM service
+        llm_service.set_tool_service(tool_service)
+
+        tasks = state["tasks"] if "tasks" in state else None
         docs: List[Document] = tasks.deduplicated_docs if tasks else []
         messages = state["messages"]
         user_task = messages[0].content
 
-        prompt_template: BasePromptTemplate = get_prompt("zendesk_template")
+        prompt_config = self.get_config(PromptConfig, config)
+        prompt_template: BasePromptTemplate
+        if prompt_config.template_name:
+            prompt_template = get_prompt(prompt_config.template_name)
+        else:
+            prompt_template = get_prompt("zendesk_template")
 
         ticket_metadata = state["ticket_metadata"] or {}
         user_metadata = state["user_metadata"] or {}
@@ -87,8 +106,24 @@ class GenerateZendeskRagNode(BaseNode):
                 inputs[variable] = state.get(variable, "")
 
         msg = prompt_template.format_prompt(**inputs)
-        llm = llm_service.bind_tools(self.name, workflow_config)
 
-        response = llm.invoke(msg)
+        # Use the new unified invoke_for_node method
+        result = await llm_service.invoke_for_node(
+            prompt=str(msg),
+            node_config=node_config,
+        )
 
-        return {**state, "messages": [response]}
+        if not result["success"]:
+            raise RuntimeError(
+                f"LLM execution failed: {result.get('error', 'Unknown error')}"
+            )
+
+        response = result["response"]
+
+        # Add tool call information to state if tools were used
+        updated_state = {**state, "messages": [response]}
+        if result["tool_calls_summary"]:
+            updated_state["tool_calls_summary"] = result["tool_calls_summary"]
+            updated_state["tools_used"] = result["tools_used"]
+
+        return updated_state

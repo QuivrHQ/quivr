@@ -15,6 +15,7 @@ from quivr_core.rag.utils import combine_documents
 from quivr_core.rag.langgraph_framework.base.graph_config import BaseGraphConfig
 from quivr_core.rag.prompt.registry import get_prompt
 from quivr_core.rag.langgraph_framework.services.llm_service import LLMService
+from quivr_core.rag.langgraph_framework.services.tool_service import ToolService
 from quivr_core.rag.langgraph_framework.registry.node_registry import register_node
 
 
@@ -23,7 +24,7 @@ from quivr_core.rag.langgraph_framework.registry.node_registry import register_n
     description="Generate RAG responses using retrieved documents and LLM",
     category="generation",
     version="1.0.0",
-    dependencies=["llm_service"],
+    dependencies=["llm_service", "tool_service"],
 )
 class GenerateRagNode(BaseNode):
     """
@@ -95,14 +96,20 @@ class GenerateRagNode(BaseNode):
         }
 
     async def execute(self, state, config: Optional[BaseGraphConfig] = None):
-        """Execute RAG generation with clean service injection."""
+        """Execute RAG generation with new unified LLMService and tool support."""
         # Get configs
         workflow_config = self.get_config(WorkflowConfig, config)
         prompt_config = self.get_config(PromptConfig, config)
         llm_config = self.get_config(LLMEndpointConfig, config)
 
-        # Get services through dependency injection - much cleaner!
+        node_config = workflow_config.get_node_config_by_name(self.name)
+        assert node_config is not None, "Node config not found"
+
+        # Get services through dependency injection
+        tool_service = self.get_service(ToolService, node_config.tools_config)
+
         llm_service = self.get_service(LLMService, llm_config)
+        llm_service.set_tool_service(tool_service)
 
         custom_prompt = prompt_config.prompt
         tasks = state["tasks"]
@@ -120,7 +127,24 @@ class GenerateRagNode(BaseNode):
         )
 
         msg = prompt.format(**inputs)
-        llm = llm_service.bind_tools(self.name, workflow_config)
-        response = llm.invoke(msg)
 
-        return {**state, "messages": [response]}
+        # Use the new unified invoke_for_node method
+        result = await llm_service.invoke_for_node(
+            prompt=msg,
+            node_config=node_config,
+        )
+
+        if not result["success"]:
+            raise RuntimeError(
+                f"LLM execution failed: {result.get('error', 'Unknown error')}"
+            )
+
+        response = result["response"]
+
+        # Add tool call information to state if tools were used
+        updated_state = {**state, "messages": [response]}
+        if result["tool_calls_summary"]:
+            updated_state["tool_calls_summary"] = result["tool_calls_summary"]
+            updated_state["tools_used"] = result["tools_used"]
+
+        return updated_state

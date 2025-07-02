@@ -29,7 +29,7 @@ import logging
 import sys
 import uuid
 import asyncio
-
+from uuid import UUID
 # Add this import at the top to trigger node registration
 
 load_dotenv(find_dotenv())
@@ -55,6 +55,7 @@ class AgentState(TypedDict):
     messages: Annotated[Sequence[BaseMessage], add_messages]
     reasoning: List[str]
     chat_history: ChatHistory
+    workspace_id: UUID
     files: str
     tasks: UserTasks
     instructions: str

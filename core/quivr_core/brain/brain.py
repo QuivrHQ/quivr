@@ -584,6 +584,7 @@ class Brain:
             system_prompt=system_prompt or None,
             history=chat_history,
             list_files=list_files,
+            workspace_id=self.workspace_id,
             metadata=metadata.model_dump(),
             **input_kwargs,
         ):

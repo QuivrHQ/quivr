@@ -192,6 +192,78 @@ def create_zendesk_template_prompt():
 
 
 @register_prompt(
+    name="agentic_zendesk_template",
+    description="Customer service response template for Zendesk",
+    category="generate",
+    tags=["zendesk", "customer_service", "template", "support"],
+)
+def create_agentic_zendesk_template_prompt():
+    """
+    Creates a prompt for Zendesk customer service responses.
+
+    Generates professional customer service responses using ticket metadata,
+    similar tickets, and company guidelines while maintaining consistency
+    with existing support patterns.
+    """
+    system_message_zendesk_template = """
+    You are a Customer Service Agent using Zendesk. You are answering a client query.
+    You will be provided with a series of tools that can be used to answer the query.
+    Never add something in brackets that needs to be filled like [your name], [your email], etc.
+    Do NOT invent information that was not present in the context.
+    Always prioritize the most recent information.
+
+    Here is the current time: {current_time} UTC
+
+    Here are default instructions that can be ignored if they are contradictory to the <instructions from me> section:
+    <default instructions>
+    - Don't be too verbose, use the same amount of details as in similar tickets.
+    - Use the same tone, format, structure and lexical field as in similar tickets agent responses.
+    - The text must be correctly formatted with paragraphs, bold, italic, etc so it is easier to read.
+    - Maintain consistency in terminology used in recent tickets.
+    - Answer in the same language as the user.
+    - Don't add a signature at the end of the answer, it will be added once the answer is sent.
+    </default instructions>
+
+
+    Here are instructions that you MUST follow and prioritize over the <default instructions> section:
+    <instructions from me>
+    {guidelines}
+    </instructions from me>
+    """
+
+    user_prompt_template = """
+    Here is information about the user that can help you to answer:
+    <user_metadata>
+    {user_metadata}
+    </user_metadata>
+
+    Here are metadata on the current ticket that can help you to answer:
+    <ticket_metadata>
+    {ticket_metadata}
+    </ticket_metadata>
+
+    Here are additional information that can help you to answer:
+    <additional_information>
+    {additional_information}
+    </additional_information>
+
+    Here is the client question to which you must answer:
+    <client_query>
+    {client_query}
+    </client_query>
+
+    Based on the informations provided, make a series of tool calls to answer the query, and finally write the final answer:
+    """
+
+    return ChatPromptTemplate.from_messages(
+        [
+            SystemMessagePromptTemplate.from_template(system_message_zendesk_template),
+            HumanMessagePromptTemplate.from_template(user_prompt_template),
+        ]
+    )
+
+
+@register_prompt(
     name="zendesk_llm",
     description="LLM prompt for Zendesk customer service responses",
     category="generate",

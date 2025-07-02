@@ -80,7 +80,7 @@ class ToolRegistry(BaseRegistry[Union[Type[QuivrBaseTool], Callable], ToolMetada
             def __init__(
                 self, lc_tool: LangChainBaseTool, config: Optional[ToolConfig] = None
             ):
-                super().__init__(config=config, tool_name=tool_name)
+                super().__init__(config=config)
                 self.lc_tool = lc_tool
 
             async def execute(self, input_data: Any, **kwargs) -> Any:
@@ -89,9 +89,7 @@ class ToolRegistry(BaseRegistry[Union[Type[QuivrBaseTool], Callable], ToolMetada
                 else:
                     return self.lc_tool.run(input_data)
 
-        tool_config = ToolConfig(
-            name=tool_name, description=getattr(langchain_tool, "description", "")
-        )
+        tool_config = ToolConfig()
         return LangChainToolWrapper(langchain_tool, tool_config)
 
     def list_tools_by_type(self, tool_type: str) -> List[str]:
@@ -138,7 +136,17 @@ def enhanced_register_tool(
     def decorator(
         tool_class_or_factory: Union[Type[QuivrBaseTool], Callable],
     ) -> Union[Type[QuivrBaseTool], Callable]:
-        tool_name = name or getattr(tool_class_or_factory, "__name__", "unnamed_tool")
+        # Auto-detect tool name from TOOL_NAME attribute, fallback to class name
+        tool_name = (
+            name
+            or getattr(tool_class_or_factory, "TOOL_NAME", None)
+            or getattr(tool_class_or_factory, "__name__", "unnamed_tool")
+        )
+
+        # Auto-detect description from TOOL_DESCRIPTION attribute
+        tool_description = description or getattr(
+            tool_class_or_factory, "TOOL_DESCRIPTION", ""
+        )
 
         # Auto-detect tool type from class if it's a BaseTool subclass
         if isinstance(tool_class_or_factory, type) and issubclass(
@@ -155,7 +163,7 @@ def enhanced_register_tool(
             tool_registry.register(
                 name=tool_name,
                 item=tool_class_or_factory,
-                description=description,
+                description=tool_description,
                 category=category,
                 tool_type=actual_tool_type,
                 config_schema=config_schema,

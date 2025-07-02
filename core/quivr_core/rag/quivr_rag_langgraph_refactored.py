@@ -1,5 +1,5 @@
 from uuid import UUID
-from typing import AsyncGenerator, Any, Type
+from typing import AsyncGenerator, Any, Type, Optional
 
 
 from quivr_core.base_config import QuivrBaseConfig
@@ -162,6 +162,7 @@ class QuivrQARAGLangGraphRefactored:
         system_prompt: str | None,
         history: ChatHistory,
         list_files: list[QuivrKnowledge],
+        workspace_id: Optional[UUID] = None,
         metadata: dict[str, str] = {},
         **input_kwargs,
     ) -> AsyncGenerator[ParsedRAGChunkResponse, ParsedRAGChunkResponse]:
@@ -186,6 +187,7 @@ class QuivrQARAGLangGraphRefactored:
                 "messages": messages,
                 "chat_history": history,
                 "files": concat_list_files,
+                "workspace_id": workspace_id,
                 **input_kwargs,
             },
             version="v1",

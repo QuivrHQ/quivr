@@ -91,11 +91,12 @@ class BaseNode(ABC):
         self,
         service_type: Type[S],
         config: Optional[Any] = None,
+        runtime_context: Optional[Dict[str, Any]] = None,
         use_cache: bool = True,
     ) -> S:
         """Get a service instance from the container."""
         return self.service_container.get_service(
-            service_type, config, use_cache=use_cache
+            service_type, config, runtime_context, use_cache=use_cache
         )
 
     @abstractmethod

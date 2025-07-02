@@ -7,7 +7,6 @@ from uuid import UUID
 from langchain_core.prompts.base import BasePromptTemplate
 from langgraph.graph import END, START
 from pydantic import BaseModel, field_serializer
-from quivr_core.llm_tools.registry import tool_registry
 from quivr_core.rag.entities.prompt import PromptConfig
 
 from quivr_core.base_config import QuivrBaseConfig
@@ -15,6 +14,7 @@ from quivr_core.config import MegaparseConfig
 from quivr_core.processor.splitter import SplitterConfig
 from quivr_core.rag.entities.retriever import RetrieverConfig
 from quivr_core.rag.entities.reranker import RerankerConfig
+from quivr_core.rag.entities.tools import ToolsConfig
 from quivr_core.rag.entities.utils import normalize_to_env_variable_name
 from quivr_core.rag.langgraph_framework.entities.filter_history_config import (
     FilterHistoryConfig,
@@ -446,7 +446,7 @@ class NodeConfig(QuivrBaseConfig):
     description: str | None = None
     edges: List[str] | None = None
     conditional_edge: ConditionalEdgeConfig | None = None
-    tools_configs: List[Dict[str, Any]] | None = None
+    tools_config: ToolsConfig | None = None
 
     # Store validated node-specific configs
     validated_configs: Dict[str, QuivrBaseConfig] = {}
@@ -479,7 +479,10 @@ class NodeConfig(QuivrBaseConfig):
 
         # Find all config fields (ending with '_config')
         for key, value in list(data.items()):
-            if key.endswith("_config") and key not in ["conditional_edge"]:
+            if key.endswith("_config") and key not in [
+                "conditional_edge",
+                "tools_config",
+            ]:
                 # Remove from data to avoid Pydantic validation issues
                 config_data = data.pop(key)
                 node_configs[key] = config_data
@@ -503,7 +506,6 @@ class NodeConfig(QuivrBaseConfig):
         data["validated_configs"] = validated_configs
 
         super().__init__(**data)
-        self._validate_tools()
         self.resolve_special_edges_in_name_and_edges()
 
     def get_node_config(self, config_type: Type[T], config_key: str) -> Optional[T]:
@@ -530,21 +532,6 @@ class NodeConfig(QuivrBaseConfig):
                     self.edges[i] = START
                 elif edge == SpecialEdges.end:
                     self.edges[i] = END
-
-    def _validate_tools(self):
-        """Validate tools based on the configuration."""
-        if self.tools_configs:
-            for tool_config in self.tools_configs:
-                # Make a copy to avoid modifying the original
-                tool_name = tool_config.get("name")
-                if not tool_name:
-                    logger.error("Tool config has no 'name'")
-                    raise ValueError("Tool config has no 'name'")
-
-                # Check if tool exists in the registry
-                if not tool_registry.has_item(tool_name):
-                    logger.error(f"Tool '{tool_name}' not found in registry")
-                    raise ValueError(f"Tool '{tool_name}' not found in registry")
 
 
 class DefaultWorkflow(str, Enum):
@@ -582,6 +569,12 @@ class WorkflowConfig(QuivrBaseConfig):
     def check_first_node_is_start(self):
         if self.nodes and self.nodes[0].name != START:
             raise ValueError(f"The first node should be a {SpecialEdges.start} node")
+
+    def get_node_config_by_name(self, name: str) -> NodeConfig:
+        for node in self.nodes:
+            if node.name == name:
+                return node
+        raise ValueError(f"Node config with name {name} not found")
 
 
 class CitationConfig(QuivrBaseConfig):

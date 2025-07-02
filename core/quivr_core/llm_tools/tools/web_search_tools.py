@@ -13,7 +13,7 @@ from langchain_core.documents import Document
 import os
 from pydantic import SecretStr
 
-from quivr_core.llm_tools.base import SearchTool, ToolConfig
+from quivr_core.llm_tools.base import QuivrBaseTool, ToolConfig
 from quivr_core.llm_tools.registry import tool_registry, enhanced_register_tool
 
 
@@ -34,25 +34,22 @@ class TavilySearchToolConfig(ToolConfig):
 
 
 @enhanced_register_tool(
-    name=WebSearchToolsList.TAVILY,
-    description="Tavily web search with advanced search capabilities",
     category="web_search",
     tags=["search", "web", "tavily", "research"],
-    tool_type="search",
     config_schema=TavilySearchToolConfig,
 )
-class TavilySearchTool(SearchTool[TavilySearchToolConfig]):
+class TavilySearchTool(QuivrBaseTool[TavilySearchToolConfig]):
     """Tavily web search tool implementing the new BaseTool interface."""
 
-    TOOL_NAME = "tavily"
+    TOOL_NAME = WebSearchToolsList.TAVILY
     TOOL_TYPE = "search"
+    TOOL_DESCRIPTION = "Tavily web search with advanced search capabilities"
 
     def __init__(
         self,
         config: Optional[TavilySearchToolConfig] = None,
-        tool_name: Optional[str] = None,
     ):
-        super().__init__(config=config, tool_name=tool_name)
+        super().__init__(config=config)
         self.tavily_tool = None
         self._setup_tavily()
 

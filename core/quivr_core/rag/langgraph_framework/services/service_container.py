@@ -2,7 +2,8 @@ from typing import Dict, Type, TypeVar, Any, Optional
 from abc import ABC, abstractmethod
 import logging
 from collections import OrderedDict as OrderedDictImpl
-from quivr_core.rag.entities.config import LLMEndpointConfig, WorkflowConfig
+from quivr_core.rag.entities.config import LLMEndpointConfig
+from quivr_core.rag.entities.tools import ToolsConfig
 from quivr_core.rag.langgraph_framework.entities.retrieval_service_config import (
     RetrievalServiceConfig,
 )
@@ -22,7 +23,11 @@ class ServiceFactory(ABC):
     """Abstract factory for creating services."""
 
     @abstractmethod
-    def create(self, config: Optional[Any] = None) -> Any:
+    def create(
+        self,
+        config: Optional[Any] = None,
+        runtime_context: Optional[Dict[str, Any]] = None,
+    ) -> Any:
         pass
 
     @abstractmethod
@@ -31,7 +36,11 @@ class ServiceFactory(ABC):
 
 
 class LLMServiceFactory(ServiceFactory):
-    def create(self, config: Optional[LLMEndpointConfig] = None) -> LLMService:
+    def create(
+        self,
+        config: Optional[LLMEndpointConfig] = None,
+        runtime_context: Optional[Dict[str, Any]] = None,
+    ) -> LLMService:
         if config is None:
             config = LLMEndpointConfig()  # Use default config
         return LLMService(llm_config=config)
@@ -41,13 +50,17 @@ class LLMServiceFactory(ServiceFactory):
 
 
 class ToolServiceFactory(ServiceFactory):
-    def create(self, config: Optional[WorkflowConfig] = None) -> ToolService:
+    def create(
+        self,
+        config: Optional[ToolsConfig] = None,
+        runtime_context: Optional[Dict[str, Any]] = None,
+    ) -> ToolService:
         if config is None:
-            config = WorkflowConfig()  # Use default config
-        return ToolService(workflow_config=config)
+            config = ToolsConfig()  # Use default config
+        return ToolService(config=config, runtime_context=runtime_context)
 
-    def get_config_type(self) -> Type[WorkflowConfig]:
-        return WorkflowConfig
+    def get_config_type(self) -> Type[ToolsConfig]:
+        return ToolsConfig
 
 
 class RetrievalServiceFactory(ServiceFactory):
@@ -57,7 +70,9 @@ class RetrievalServiceFactory(ServiceFactory):
         self.vector_store = vector_store
 
     def create(
-        self, config: Optional[RetrievalServiceConfig] = None
+        self,
+        config: Optional[RetrievalServiceConfig] = None,
+        runtime_context: Optional[Dict[str, Any]] = None,
     ) -> RetrievalService:
         if config is None:
             config = RetrievalServiceConfig()
@@ -116,6 +131,7 @@ class ServiceContainer:
         self,
         service_type: Type[T],
         config: Optional[Any] = None,
+        runtime_context: Optional[Dict[str, Any]] = None,
         use_cache: bool = True,
     ) -> T:
         """
@@ -124,6 +140,7 @@ class ServiceContainer:
         Args:
             service_type: The type of service to get.
             config: The configuration for the service.
+            runtime_context: The runtime context for the service.
             use_cache: If False, a new instance is created and not cached.
 
         Returns:
@@ -178,7 +195,7 @@ class ServiceContainer:
 
         # Create new service
         logger.debug(f"Creating new {service_type.__name__} instance")
-        service = factory.create(config)
+        service = factory.create(config, runtime_context)
         service_cache[cache_key] = service
 
         return service

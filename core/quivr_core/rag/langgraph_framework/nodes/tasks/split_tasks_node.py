@@ -1,6 +1,6 @@
 from typing import Optional, List
 import asyncio
-from quivr_core.rag.entities.config import LLMEndpointConfig
+from quivr_core.rag.entities.config import LLMEndpointConfig, WorkflowConfig
 from quivr_core.rag.langgraph_framework.base.node import (
     BaseNode,
 )
@@ -10,6 +10,7 @@ from quivr_core.rag.langgraph_framework.base.graph_config import BaseGraphConfig
 from quivr_core.rag.langgraph_framework.entities.routing_entity import SplittedInput
 from quivr_core.rag.prompt.registry import get_prompt
 from quivr_core.rag.langgraph_framework.services.llm_service import LLMService
+from quivr_core.rag.langgraph_framework.services.tool_service import ToolService
 from quivr_core.rag.langgraph_framework.task import UserTasks
 from quivr_core.rag.langgraph_framework.registry.node_registry import register_node
 import logging
@@ -22,7 +23,7 @@ logger = logging.getLogger("quivr_core")
     description="Split user input into multiple processing paths",
     category="tasks",
     version="1.0.0",
-    dependencies=["llm_service"],
+    dependencies=["llm_service", "tool_service"],
 )
 class SplitTasksNode(BaseNode):
     """
@@ -74,14 +75,19 @@ class SplitTasksNode(BaseNode):
         pass
 
     async def execute(self, state, config: Optional[BaseGraphConfig] = None):
-        """Execute routing logic."""
+        """Execute routing logic with enhanced LLMService."""
         # Get configs
+        workflow_config = self.get_config(WorkflowConfig, config)
         llm_config = self.get_config(LLMEndpointConfig, config)
         prompt_config = self.get_config(PromptConfig, config)
 
-        # Get services through dependency injection
+        node_config = workflow_config.get_node_config_by_name(self.name)
+
+        # Get services through dependency injection (though this node typically doesn't use tools)
+        tool_service = self.get_service(ToolService, node_config.tools_config)
+
         llm_service = self.get_service(LLMService, llm_config)
-        # Remove prompt_service - use registry directly
+        llm_service.set_tool_service(tool_service)
 
         if not prompt_config.template_name:
             raise NodeValidationError(
@@ -111,16 +117,33 @@ class SplitTasksNode(BaseNode):
             )
 
             # Asynchronously invoke the model for each question
+            # Use the new unified method for potential future tool support
             async_jobs.append(
-                (llm_service.invoke_with_structured_output(msg, SplittedInput), task_id)
+                (
+                    llm_service.invoke_for_node(
+                        prompt=msg, node_config=node_config, output_class=SplittedInput
+                    ),
+                    task_id,
+                )
             )
 
         # Gather all the responses asynchronously
-        responses: List[SplittedInput] = (
+        raw_responses = (
             await asyncio.gather(*(jobs[0] for jobs in async_jobs))
             if async_jobs
             else []
         )
+
+        # Extract the actual responses from the result dicts
+        responses: List[SplittedInput] = []
+        for result in raw_responses:
+            if result["success"]:
+                responses.append(result["response"])
+            else:
+                logger.error(
+                    f"Task splitting failed: {result.get('error', 'Unknown error')}"
+                )
+                # Continue with other responses
 
         # Replace each question with its condensed version
         _tasks: UserTasks = UserTasks()
