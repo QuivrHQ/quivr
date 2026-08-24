@@ -1,3 +1,24 @@
+def _lineaje_load_gr_client():
+    import sys as _lineaje_sys, os as _lineaje_os, importlib.util as _lineaje_ilu
+    if "_lineaje_gr_stub_client" in _lineaje_sys.modules:
+        return _lineaje_sys.modules["_lineaje_gr_stub_client"]
+    _here = _lineaje_os.path.dirname(_lineaje_os.path.abspath(__file__))
+    _cur, _path = _here, _lineaje_os.path.join(_here, "gr_stub_client.py")
+    for _ in range(8):
+        _cand = _lineaje_os.path.join(_cur, "gr_stub_client.py")
+        if _lineaje_os.path.isfile(_cand):
+            _path = _cand
+            break
+        _parent = _lineaje_os.path.dirname(_cur)
+        if _parent == _cur:
+            break
+        _cur = _parent
+    _spec = _lineaje_ilu.spec_from_file_location("_lineaje_gr_stub_client", _path)
+    _mod = _lineaje_ilu.module_from_spec(_spec)
+    _lineaje_sys.modules["_lineaje_gr_stub_client"] = _mod
+    _spec.loader.exec_module(_mod)
+    return _mod
+
 import tempfile
 import os
 import chainlit as cl
@@ -21,6 +42,24 @@ async def on_chat_start():
             max_size_mb=20,
             timeout=180,
         ).send()
+        try:
+            _gr_client = _lineaje_load_gr_client()
+            _gr_site = _gr_client.SiteDescriptor(site_id='site:sha256:c7a56fd40d406abdd5b61c6c2c04d05e91174b49fa8129f3d6eecdf36163b972', phase='post_tool', boundary={'source': 'external_endpoint', 'sink': 'agent_message'}, candidate_policies=[], fail_mode='ALLOW_WITH_AUDIT', source_type='api', destination_type='agent')
+            import asyncio as _gr_asyncio
+            _gr_decision = await _gr_asyncio.to_thread(lambda: _gr_client.check(_gr_site, files, content_type='application/json'))
+            if _gr_decision.blocked:
+                raise _gr_decision.as_error()
+            files = _gr_decision.payload
+            _gr_client.persist_runtime_mask_to_source(
+                files, source_file=__file__, variable_name='files', before_line=18
+            )
+        except PermissionError:
+            raise
+        except Exception as _gr_exc:
+            import logging as _lineaje_logging
+            _lineaje_logging.getLogger("lineaje.gr_client").warning(
+                "Lineaje guardrail unavailable at site_id='site:sha256:c7a56fd40d406abdd5b61c6c2c04d05e91174b49fa8129f3d6eecdf36163b972' (%s) — passing data through unchecked", _gr_exc
+            )
 
     file = files[0]
 
