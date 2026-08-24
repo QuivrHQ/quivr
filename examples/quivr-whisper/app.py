@@ -1,3 +1,24 @@
+def _lineaje_load_gr_client():
+    import sys as _lineaje_sys, os as _lineaje_os, importlib.util as _lineaje_ilu
+    if "_lineaje_gr_stub_client" in _lineaje_sys.modules:
+        return _lineaje_sys.modules["_lineaje_gr_stub_client"]
+    _here = _lineaje_os.path.dirname(_lineaje_os.path.abspath(__file__))
+    _cur, _path = _here, _lineaje_os.path.join(_here, "gr_stub_client.py")
+    for _ in range(8):
+        _cand = _lineaje_os.path.join(_cur, "gr_stub_client.py")
+        if _lineaje_os.path.isfile(_cand):
+            _path = _cand
+            break
+        _parent = _lineaje_os.path.dirname(_cur)
+        if _parent == _cur:
+            break
+        _cur = _parent
+    _spec = _lineaje_ilu.spec_from_file_location("_lineaje_gr_stub_client", _path)
+    _mod = _lineaje_ilu.module_from_spec(_spec)
+    _lineaje_sys.modules["_lineaje_gr_stub_client"] = _mod
+    _spec.loader.exec_module(_mod)
+    return _mod
+
 from flask import Flask, render_template, request, jsonify, session
 import openai
 import base64
@@ -137,6 +158,23 @@ def synthesize_speech(text):
     )
     audio_content = speech_response.content
     audio_base64 = base64.b64encode(audio_content).decode("utf-8")
+    try:
+        _gr_client = _lineaje_load_gr_client()
+        _gr_site = _gr_client.SiteDescriptor(site_id='site:sha256:a9c6367d4a467e0baab232b2cad6d3af14b1edb1e01b63fe4f12c646492c79a2', phase='data_egress', boundary={'source': 'agent_message', 'sink': 'user_interface'}, candidate_policies=[{'policy_id': 'AI_DAT_SEC_012', 'guardrail_id': 'Mask PII on UI', 'policy_version': '2026.08.1'}], fail_mode='BLOCK', source_type='agent', destination_type='user_interface')
+        _gr_decision = _gr_client.check(_gr_site, audio_base64, content_type='text/plain')
+        if _gr_decision.blocked:
+            raise _gr_decision.as_error()
+        audio_base64 = _gr_decision.payload
+    except PermissionError:
+        raise
+    except Exception as _gr_exc:
+        import logging as _lineaje_logging
+        _lineaje_logging.getLogger("lineaje.gr_client").warning(
+            "Lineaje guardrail unavailable at site_id='site:sha256:a9c6367d4a467e0baab232b2cad6d3af14b1edb1e01b63fe4f12c646492c79a2' (%s) — blocking (fail_mode=BLOCK)", _gr_exc
+        )
+        raise PermissionError(
+            f"Lineaje guardrail unavailable at site_id='site:sha256:a9c6367d4a467e0baab232b2cad6d3af14b1edb1e01b63fe4f12c646492c79a2' and fail_mode=BLOCK: {_gr_exc}"
+        ) from _gr_exc
     return audio_base64
 
 
