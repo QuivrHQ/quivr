@@ -1,3 +1,24 @@
+def _lineaje_load_gr_client():
+    import sys as _lineaje_sys, os as _lineaje_os, importlib.util as _lineaje_ilu
+    if "_lineaje_gr_stub_client" in _lineaje_sys.modules:
+        return _lineaje_sys.modules["_lineaje_gr_stub_client"]
+    _here = _lineaje_os.path.dirname(_lineaje_os.path.abspath(__file__))
+    _cur, _path = _here, _lineaje_os.path.join(_here, "gr_stub_client.py")
+    for _ in range(8):
+        _cand = _lineaje_os.path.join(_cur, "gr_stub_client.py")
+        if _lineaje_os.path.isfile(_cand):
+            _path = _cand
+            break
+        _parent = _lineaje_os.path.dirname(_cur)
+        if _parent == _cur:
+            break
+        _cur = _parent
+    _spec = _lineaje_ilu.spec_from_file_location("_lineaje_gr_stub_client", _path)
+    _mod = _lineaje_ilu.module_from_spec(_spec)
+    _lineaje_sys.modules["_lineaje_gr_stub_client"] = _mod
+    _spec.loader.exec_module(_mod)
+    return _mod
+
 import logging
 import os
 import time
@@ -305,6 +326,23 @@ class LLMEndpoint:
             instance = cls(llm=_llm, llm_config=config)
             cls._cache[hashed_config] = instance
 
+            try:
+                _gr_client = _lineaje_load_gr_client()
+                _gr_site = _gr_client.SiteDescriptor(site_id='site:sha256:4c0d036e91ceb510563023d246840efd804ab1bbceffcbc39890822c72ae4dc9', phase='data_egress', boundary={'source': 'agent_message', 'sink': 'user_interface'}, candidate_policies=[{'policy_id': 'AI_DAT_SEC_012', 'guardrail_id': 'Mask PII on UI', 'policy_version': '2026.08.1'}], fail_mode='BLOCK', source_type='agent', destination_type='user_interface')
+                _gr_decision = _gr_client.check(_gr_site, instance, content_type='text/plain')
+                if _gr_decision.blocked:
+                    raise _gr_decision.as_error()
+                instance = _gr_decision.payload
+            except PermissionError:
+                raise
+            except Exception as _gr_exc:
+                import logging as _lineaje_logging
+                _lineaje_logging.getLogger("lineaje.gr_client").warning(
+                    "Lineaje guardrail unavailable at site_id='site:sha256:4c0d036e91ceb510563023d246840efd804ab1bbceffcbc39890822c72ae4dc9' (%s) — blocking (fail_mode=BLOCK)", _gr_exc
+                )
+                raise PermissionError(
+                    f"Lineaje guardrail unavailable at site_id='site:sha256:4c0d036e91ceb510563023d246840efd804ab1bbceffcbc39890822c72ae4dc9' and fail_mode=BLOCK: {_gr_exc}"
+                ) from _gr_exc
             return instance
 
         except ImportError as e:
