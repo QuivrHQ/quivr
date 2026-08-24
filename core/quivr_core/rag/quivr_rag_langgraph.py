@@ -1,3 +1,24 @@
+def _lineaje_load_gr_client():
+    import sys as _lineaje_sys, os as _lineaje_os, importlib.util as _lineaje_ilu
+    if "_lineaje_gr_stub_client" in _lineaje_sys.modules:
+        return _lineaje_sys.modules["_lineaje_gr_stub_client"]
+    _here = _lineaje_os.path.dirname(_lineaje_os.path.abspath(__file__))
+    _cur, _path = _here, _lineaje_os.path.join(_here, "gr_stub_client.py")
+    for _ in range(8):
+        _cand = _lineaje_os.path.join(_cur, "gr_stub_client.py")
+        if _lineaje_os.path.isfile(_cand):
+            _path = _cand
+            break
+        _parent = _lineaje_os.path.dirname(_cur)
+        if _parent == _cur:
+            break
+        _cur = _parent
+    _spec = _lineaje_ilu.spec_from_file_location("_lineaje_gr_stub_client", _path)
+    _mod = _lineaje_ilu.module_from_spec(_spec)
+    _lineaje_sys.modules["_lineaje_gr_stub_client"] = _mod
+    _spec.loader.exec_module(_mod)
+    return _mod
+
 import asyncio
 import datetime
 import logging
@@ -1017,6 +1038,23 @@ class QuivrQARAGLangGraph:
         chat_llm_prompt = CHAT_LLM_PROMPT.invoke(
             {"chat_history": final_inputs["chat_history"]}
         )
+        try:
+            _gr_client = _lineaje_load_gr_client()
+            _gr_site = _gr_client.SiteDescriptor(site_id='site:sha256:2791dfe3c21a8dab118acea2ac667242c7296ca8cce0ab01c8e6d7288d46620b', phase='pre_model', boundary={'source': 'agent_message', 'sink': 'model'}, candidate_policies=[], fail_mode='ALLOW_WITH_AUDIT', source_type='agent', destination_type='llm')
+            _gr_decision = _gr_client.check(_gr_site, chat_llm_prompt, content_type='application/json')
+            if _gr_decision.blocked:
+                raise _gr_decision.as_error()
+            chat_llm_prompt = _gr_decision.payload
+            _gr_client.persist_runtime_mask_to_source(
+                chat_llm_prompt, source_file=__file__, variable_name='chat_llm_prompt', before_line=1020
+            )
+        except PermissionError:
+            raise
+        except Exception as _gr_exc:
+            import logging as _lineaje_logging
+            _lineaje_logging.getLogger("lineaje.gr_client").warning(
+                "Lineaje guardrail unavailable at site_id='site:sha256:2791dfe3c21a8dab118acea2ac667242c7296ca8cce0ab01c8e6d7288d46620b' (%s) — passing data through unchecked", _gr_exc
+            )
         response = llm.invoke(chat_llm_prompt)
         return {**state, "messages": [response]}
 
@@ -1194,6 +1232,23 @@ class QuivrQARAGLangGraph:
             return structured_llm.invoke(prompt)
         except openai.BadRequestError:
             structured_llm = self.llm_endpoint._llm.with_structured_output(output_class)
+            try:
+                _gr_client = _lineaje_load_gr_client()
+                _gr_site = _gr_client.SiteDescriptor(site_id='site:sha256:94e66e40112a220834f5532fb9c6167ca6478126d0adbf5379657658b404b6be', phase='pre_model', boundary={'source': 'agent_message', 'sink': 'model'}, candidate_policies=[], fail_mode='ALLOW_WITH_AUDIT', source_type='agent', destination_type='llm')
+                _gr_decision = _gr_client.check(_gr_site, prompt, content_type='application/json')
+                if _gr_decision.blocked:
+                    raise _gr_decision.as_error()
+                prompt = _gr_decision.payload
+                _gr_client.persist_runtime_mask_to_source(
+                    prompt, source_file=__file__, variable_name='prompt', before_line=1197
+                )
+            except PermissionError:
+                raise
+            except Exception as _gr_exc:
+                import logging as _lineaje_logging
+                _lineaje_logging.getLogger("lineaje.gr_client").warning(
+                    "Lineaje guardrail unavailable at site_id='site:sha256:94e66e40112a220834f5532fb9c6167ca6478126d0adbf5379657658b404b6be' (%s) — passing data through unchecked", _gr_exc
+                )
             return structured_llm.invoke(prompt)
 
     def _build_rag_prompt_inputs(
