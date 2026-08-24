@@ -1,3 +1,24 @@
+def _lineaje_load_gr_client():
+    import sys as _lineaje_sys, os as _lineaje_os, importlib.util as _lineaje_ilu
+    if "_lineaje_gr_stub_client" in _lineaje_sys.modules:
+        return _lineaje_sys.modules["_lineaje_gr_stub_client"]
+    _here = _lineaje_os.path.dirname(_lineaje_os.path.abspath(__file__))
+    _cur, _path = _here, _lineaje_os.path.join(_here, "gr_stub_client.py")
+    for _ in range(8):
+        _cand = _lineaje_os.path.join(_cur, "gr_stub_client.py")
+        if _lineaje_os.path.isfile(_cand):
+            _path = _cand
+            break
+        _parent = _lineaje_os.path.dirname(_cur)
+        if _parent == _cur:
+            break
+        _cur = _parent
+    _spec = _lineaje_ilu.spec_from_file_location("_lineaje_gr_stub_client", _path)
+    _mod = _lineaje_ilu.module_from_spec(_spec)
+    _lineaje_sys.modules["_lineaje_gr_stub_client"] = _mod
+    _spec.loader.exec_module(_mod)
+    return _mod
+
 import asyncio
 import logging
 import os
@@ -17,6 +38,26 @@ logger.addHandler(ConsoleOutputHandler)
 
 logger = logging.getLogger("megaparse")
 logger.setLevel(logging.DEBUG)
+try:
+    _gr_client = _lineaje_load_gr_client()
+    _gr_site = _gr_client.SiteDescriptor(site_id='site:sha256:84f9bd695c0d8fd619daf296204a284a4207a6e342bfb4ed7dcee8598adeca61', phase='log_emit', boundary={'source': 'log', 'sink': 'log'}, candidate_policies=[{'policy_id': 'AI_DAT_SEC_010', 'guardrail_id': 'Mask PII in Logs', 'policy_version': '2026.08.1'}], fail_mode='BLOCK', source_type='agent', destination_type='log')
+    _gr_decision = _gr_client.check(_gr_site, ConsoleOutputHandler, content_type='application/json')
+    if _gr_decision.blocked:
+        raise _gr_decision.as_error()
+    ConsoleOutputHandler = _gr_decision.payload
+    _gr_client.persist_runtime_mask_to_source(
+        ConsoleOutputHandler, source_file=__file__, variable_name='ConsoleOutputHandler', before_line=20
+    )
+except PermissionError:
+    raise
+except Exception as _gr_exc:
+    import logging as _lineaje_logging
+    _lineaje_logging.getLogger("lineaje.gr_client").warning(
+        "Lineaje guardrail unavailable at site_id='site:sha256:84f9bd695c0d8fd619daf296204a284a4207a6e342bfb4ed7dcee8598adeca61' (%s) — blocking (fail_mode=BLOCK)", _gr_exc
+    )
+    raise PermissionError(
+        f"Lineaje guardrail unavailable at site_id='site:sha256:84f9bd695c0d8fd619daf296204a284a4207a6e342bfb4ed7dcee8598adeca61' and fail_mode=BLOCK: {_gr_exc}"
+    ) from _gr_exc
 logger.addHandler(ConsoleOutputHandler)
 
 
@@ -132,6 +173,27 @@ async def main():
     retrieval_config = assistant_config.retrieval_config
     for i, (question, truth) in enumerate(zip(questions, answers, strict=False)):
         chunk = brain.ask(question=question, retrieval_config=retrieval_config)
+        try:
+            _gr_client = _lineaje_load_gr_client()
+            _gr_site = _gr_client.SiteDescriptor(site_id='site:sha256:d475d1e22867bfee41f2be2f5cf1116e8eadef2ad2efc1ea7a3071a2208716ec', phase='log_emit', boundary={'source': 'log', 'sink': 'log'}, candidate_policies=[{'policy_id': 'AI_DAT_SEC_010', 'guardrail_id': 'Mask PII in Logs', 'policy_version': '2026.08.1'}], fail_mode='BLOCK', source_type='agent', destination_type='log')
+            import asyncio as _gr_asyncio
+            _gr_decision = await _gr_asyncio.to_thread(lambda: _gr_client.check(_gr_site, question, content_type='application/json'))
+            if _gr_decision.blocked:
+                raise _gr_decision.as_error()
+            question = _gr_decision.payload
+            _gr_client.persist_runtime_mask_to_source(
+                question, source_file=__file__, variable_name='question', before_line=135
+            )
+        except PermissionError:
+            raise
+        except Exception as _gr_exc:
+            import logging as _lineaje_logging
+            _lineaje_logging.getLogger("lineaje.gr_client").warning(
+                "Lineaje guardrail unavailable at site_id='site:sha256:d475d1e22867bfee41f2be2f5cf1116e8eadef2ad2efc1ea7a3071a2208716ec' (%s) — blocking (fail_mode=BLOCK)", _gr_exc
+            )
+            raise PermissionError(
+                f"Lineaje guardrail unavailable at site_id='site:sha256:d475d1e22867bfee41f2be2f5cf1116e8eadef2ad2efc1ea7a3071a2208716ec' and fail_mode=BLOCK: {_gr_exc}"
+            ) from _gr_exc
         print(
             "\n Question: ", question, "\n Answer: ", chunk.answer, "\n Truth: ", truth
         )
