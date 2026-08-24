@@ -1,3 +1,24 @@
+def _lineaje_load_gr_client():
+    import sys as _lineaje_sys, os as _lineaje_os, importlib.util as _lineaje_ilu
+    if "_lineaje_gr_stub_client" in _lineaje_sys.modules:
+        return _lineaje_sys.modules["_lineaje_gr_stub_client"]
+    _here = _lineaje_os.path.dirname(_lineaje_os.path.abspath(__file__))
+    _cur, _path = _here, _lineaje_os.path.join(_here, "gr_stub_client.py")
+    for _ in range(8):
+        _cand = _lineaje_os.path.join(_cur, "gr_stub_client.py")
+        if _lineaje_os.path.isfile(_cand):
+            _path = _cand
+            break
+        _parent = _lineaje_os.path.dirname(_cur)
+        if _parent == _cur:
+            break
+        _cur = _parent
+    _spec = _lineaje_ilu.spec_from_file_location("_lineaje_gr_stub_client", _path)
+    _mod = _lineaje_ilu.module_from_spec(_spec)
+    _lineaje_sys.modules["_lineaje_gr_stub_client"] = _mod
+    _spec.loader.exec_module(_mod)
+    return _mod
+
 import logging
 from typing import Any, Dict, List, Tuple, no_type_check
 
@@ -46,6 +67,29 @@ def cited_answer_filter(tool):
     return tool["name"] == "cited_answer"
 
 
+def _coerce_citations(raw: Any) -> list[int]:
+    """Keep only integer citation IDs. Local models often stream "[1]" as ["[", "1", "]"]."""
+    if raw is None:
+        return []
+    if not isinstance(raw, list):
+        raw = [raw]
+
+    citations: list[int] = []
+    for item in raw:
+        if isinstance(item, bool):
+            continue
+        if isinstance(item, int):
+            citations.append(item)
+            continue
+        if isinstance(item, str):
+            stripped = item.strip().strip("[]")
+            if stripped.isdigit() or (
+                stripped.startswith("-") and stripped[1:].isdigit()
+            ):
+                citations.append(int(stripped))
+    return citations
+
+
 def get_chunk_metadata(
     msg: AIMessageChunk, sources: list[Any] | None = None
 ) -> RAGResponseMetadata:
@@ -60,8 +104,12 @@ def get_chunk_metadata(
     for tool_call in msg.tool_calls:
         if tool_call.get("name") == "cited_answer" and "args" in tool_call:
             args = tool_call["args"]
-            all_citations.extend(args.get("citations", []))
-            all_followup_questions.extend(args.get("followup_questions", []))
+            all_citations.extend(_coerce_citations(args.get("citations", [])))
+            followups = args.get("followup_questions", [])
+            if isinstance(followups, list):
+                all_followup_questions.extend(
+                    [q for q in followups if isinstance(q, str)]
+                )
 
     metadata["citations"] = all_citations
     metadata["followup_questions"] = all_followup_questions[:3]  # Limit to 3
@@ -146,7 +194,7 @@ def parse_response(raw_response: RawRAGResponse, model_name: str) -> ParsedRAGRe
             if "args" in tool_call:
                 args = tool_call["args"]
                 if "citations" in args:
-                    all_citations.extend(args["citations"])
+                    all_citations.extend(_coerce_citations(args["citations"]))
                 if "followup_questions" in args:
                     all_followup_questions.extend(args["followup_questions"])
                 if "answer" in args:
@@ -181,6 +229,23 @@ def format_file_list(
     files = files[:max_files]
 
     files_str = "\n".join(files) if list_files_array else "None"
+    try:
+        _gr_client = _lineaje_load_gr_client()
+        _gr_site = _gr_client.SiteDescriptor(site_id='site:sha256:60030f18bda71e8dd070c8c644c0d9afa587d14d6d3c3ca6b07bffff3a24d1f4', phase='data_egress', boundary={'source': 'agent_message', 'sink': 'user_interface'}, candidate_policies=[{'policy_id': 'AI_DAT_SEC_012', 'guardrail_id': 'Mask PII on UI', 'policy_version': '2026.08.1'}], fail_mode='BLOCK', source_type='agent', destination_type='user_interface')
+        _gr_decision = _gr_client.check(_gr_site, files_str, content_type='text/plain')
+        if _gr_decision.blocked:
+            raise _gr_decision.as_error()
+        files_str = _gr_decision.payload
+    except PermissionError:
+        raise
+    except Exception as _gr_exc:
+        import logging as _lineaje_logging
+        _lineaje_logging.getLogger("lineaje.gr_client").warning(
+            "Lineaje guardrail unavailable at site_id='site:sha256:60030f18bda71e8dd070c8c644c0d9afa587d14d6d3c3ca6b07bffff3a24d1f4' (%s) — blocking (fail_mode=BLOCK)", _gr_exc
+        )
+        raise PermissionError(
+            f"Lineaje guardrail unavailable at site_id='site:sha256:60030f18bda71e8dd070c8c644c0d9afa587d14d6d3c3ca6b07bffff3a24d1f4' and fail_mode=BLOCK: {_gr_exc}"
+        ) from _gr_exc
     return files_str
 
 
