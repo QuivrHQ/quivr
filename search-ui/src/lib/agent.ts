@@ -1,5 +1,6 @@
 import type { SearchResult } from '../types'
 import { normalize } from './corpus'
+import { tokenize } from './search'
 
 /**
  * Rédaction de la réponse du mode agent.
@@ -40,6 +41,7 @@ function sentences(result: SearchResult): string[] {
 export function composeAnswer(query: string, results: SearchResult[]): AgentAnswer | null {
   if (results.length === 0) return null
 
+  const terms = tokenize(query)
   const sources: SearchResult[] = []
   const claims: string[] = []
   const seen = new Set<string>()
@@ -48,7 +50,14 @@ export function composeAnswer(query: string, results: SearchResult[]): AgentAnsw
   // qu’une fois, en se rabattant sur la phrase suivante du même document.
   for (const result of results) {
     if (sources.length >= MAX_SOURCES) break
-    const sentence = sentences(result).find((candidate) => !seen.has(normalize(candidate)))
+    const fresh = sentences(result).filter((candidate) => !seen.has(normalize(candidate)))
+    // Une phrase portant un terme de la requête vaut mieux qu’une phrase de liant ;
+    // à défaut, on garde la première phrase encore inédite du document.
+    const sentence =
+      fresh.find((candidate) => {
+        const normalized = normalize(candidate)
+        return terms.some((term) => normalized.includes(term))
+      }) ?? fresh[0]
     if (!sentence) continue
     seen.add(normalize(sentence))
     sources.push(result)

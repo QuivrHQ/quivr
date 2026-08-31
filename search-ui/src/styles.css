@@ -260,13 +260,14 @@ kbd {
 .topbar-main {
   display: flex;
   flex: 1 1 auto;
-  flex-wrap: wrap;
   align-items: center;
-  gap: 12px;
+  /* Sans min-width, un conteneur flex refuse de passer sous la taille de son contenu. */
+  min-width: 0;
 }
 
 .topbar-main .searchbar {
   flex: 1 1 auto;
+  min-width: 0;
   max-width: var(--measure);
 }
 
@@ -280,8 +281,8 @@ kbd {
   display: flex;
   align-items: center;
   gap: 10px;
-  height: 46px;
-  padding: 0 8px 0 15px;
+  height: 48px;
+  padding: 0 7px 0 16px;
   border: 1px solid var(--border);
   border-radius: 999px;
   background: var(--surface);
@@ -299,12 +300,12 @@ kbd {
 }
 
 [data-view='results'] .searchbar-field {
-  height: 44px;
+  height: 46px;
 }
 
 [data-view='home'] .searchbar-field {
-  height: 56px;
-  padding-left: 19px;
+  height: 58px;
+  padding-left: 20px;
   box-shadow: var(--shadow-raise);
 }
 
@@ -337,6 +338,15 @@ kbd {
 .searchbar-input::-webkit-search-cancel-button,
 .searchbar-input::-webkit-search-decoration {
   appearance: none;
+}
+
+.searchbar-trailing {
+  display: flex;
+  align-items: center;
+  flex: none;
+  margin-left: 2px;
+  padding-left: 8px;
+  border-left: 1px solid var(--border);
 }
 
 .searchbar-clear {
@@ -743,24 +753,22 @@ mark {
 
 .mode-switch {
   display: inline-flex;
-  align-self: flex-start;
   gap: 2px;
-  padding: 3px;
-  border-radius: 11px;
-  background: var(--bg-subtle);
 }
 
 .mode {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 5px 12px;
+  height: 34px;
+  padding: 0 12px;
   border: 0;
-  border-radius: 8px;
+  border-radius: 999px;
   background: transparent;
   color: var(--text-muted);
   font: inherit;
   font-size: 13px;
+  white-space: nowrap;
   cursor: pointer;
   transition: background-color 0.12s ease, color 0.12s ease;
 }
@@ -770,25 +778,21 @@ mark {
 }
 
 .mode[aria-selected='true'] {
-  background: var(--surface-raised);
-  box-shadow: var(--shadow-thumb);
-  color: var(--text);
+  background: color-mix(in srgb, var(--accent) 14%, transparent);
+  color: var(--accent);
   font-weight: 600;
 }
 
-.mode[aria-selected='true'] .mode-icon {
-  color: var(--accent);
+[data-view='home'] .mode {
+  height: 40px;
+  padding: 0 14px;
+  font-size: 13.5px;
 }
 
 .mode-icon {
+  flex: none;
   width: 14px;
   height: 14px;
-}
-
-.home-mode {
-  display: flex;
-  justify-content: center;
-  margin-top: 20px;
 }
 
 /* -------------------------------------------------- Réponse de l’agent */
@@ -1096,30 +1100,29 @@ mark {
     --page-x: 18px;
   }
 
-  /* Deux lignes : marque et bascule d’abord, champ pleine largeur ensuite. */
+  /* Une seule ligne : pastille de marque, puis le champ qui prend le reste. */
   .topbar {
-    flex-wrap: wrap;
-    gap: 10px 12px;
-  }
-
-  .topbar-main {
-    display: contents;
+    gap: 12px;
   }
 
   .brand-compact {
     flex: 0 0 auto;
-    order: 1;
   }
 
-  .mode-switch {
-    order: 2;
-    margin-left: auto;
+  .brand-compact .brand-text {
+    display: none;
   }
 
-  .topbar-main .searchbar {
-    order: 3;
-    flex: 1 1 100%;
-    max-width: none;
+  .mode-label {
+    display: none;
+  }
+
+  .mode {
+    padding: 0 9px;
+  }
+
+  .searchbar-trailing {
+    padding-left: 5px;
   }
 
   .brand-hero {
