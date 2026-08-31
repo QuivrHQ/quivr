@@ -6,8 +6,9 @@ Front de recherche pour un RAG documentaire à grande échelle. Deux modes :
 - **Agent** — une réponse rédigée à partir des documents retrouvés, chaque
   affirmation portant le numéro de sa source.
 
-Un clic sur un résultat, un titre ou un numéro de citation ouvre le **document
-complet**, termes de la requête surlignés.
+Un clic sur un résultat ou sur un numéro de citation ouvre le **document
+complet** dans un panneau latéral, par-dessus les résultats floutés, termes de
+la requête surlignés.
 
 Le backend n’est pas branché : les données viennent d’un corpus factice de
 type agence de presse (dépêches, articles, notes de rédaction, transcriptions),
@@ -32,8 +33,9 @@ Le serveur écoute sur <http://localhost:5182> (port réservé pour ce projet).
 ## Pile technique
 
 Vite + React 19 + TypeScript, et **une seule feuille de style CSS**. Aucune
-librairie d’UI, aucun framework CSS, aucune dépendance runtime en dehors de
-React. Thème clair et sombre automatiques (`prefers-color-scheme`).
+librairie d’UI, aucun framework CSS ; deux dépendances runtime seulement :
+React et [Lucide](https://lucide.dev) pour les icônes. Thème clair et sombre
+automatiques (`prefers-color-scheme`).
 
 ## Structure
 
@@ -51,12 +53,13 @@ src/
     SearchBar.tsx          champ + suggestions (navigation clavier)
     ModeSwitch.tsx         bascule Recherche / Agent
     AnswerCard.tsx         réponse de l’agent, citations cliquables
-    DocumentView.tsx       document complet
+    DocumentPanel.tsx      document complet, en panneau latéral
+    Logo.tsx               lockup de marque
     ResultItem.tsx         un résultat (numéroté en mode agent)
     Pagination.tsx         pagination 10 par 10
     Highlight.tsx          mise en évidence des termes, insensible aux accents
     Skeleton.tsx           état de chargement
-    Icons.tsx              icônes SVG en ligne
+    Icons.tsx              icônes de type de document (Lucide)
 ```
 
 ## Brancher le vrai backend
@@ -145,6 +148,9 @@ qui contient des données fictives.
 - **Pertinence** : le score affiché est relatif au meilleur résultat de la
   requête, pas une probabilité absolue.
 - **Raccourcis** : `/` ou `⌘K` pour le champ, `↑` `↓` pour parcourir les
-  résultats, `Échap` pour sortir du champ ou refermer un document.
+  résultats, `Échap` pour refermer le panneau ou sortir du champ.
+- **Panneau latéral** : dialogue modal (`role="dialog"`), fond figé pendant
+  l’ouverture, fermeture au clic sur le fond, et retour du focus sur le
+  résultat d’origine.
 - **Accessibilité** : combobox ARIA sur les suggestions, `role="status"` sur le
   compteur de résultats, focus visible, `prefers-reduced-motion` respecté.

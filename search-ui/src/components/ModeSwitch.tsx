@@ -1,5 +1,5 @@
 import type { Mode } from '../types'
-import { SearchIcon, SparkIcon } from './Icons'
+import { Search, Sparkles } from 'lucide-react'
 
 const MODES: Array<{ value: Mode; label: string }> = [
   { value: 'search', label: 'Recherche' },
@@ -19,9 +19,9 @@ export function ModeSwitch({ mode, onChange }: { mode: Mode; onChange: (mode: Mo
           onClick={() => onChange(entry.value)}
         >
           {entry.value === 'search' ? (
-            <SearchIcon className="mode-icon" />
+            <Search className="mode-icon" strokeWidth={2} aria-hidden="true" />
           ) : (
-            <SparkIcon className="mode-icon" />
+            <Sparkles className="mode-icon" strokeWidth={2} aria-hidden="true" />
           )}
           {entry.label}
         </button>
