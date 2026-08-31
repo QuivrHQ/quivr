@@ -109,11 +109,6 @@ export function AnswerCard({ answer, thinking, onOpenSource }: AnswerCardProps) 
           <p key={index}>{withCitations(paragraph, answer, onOpenSource)}</p>
         ))}
       </div>
-
-      <p className="answer-note">
-        Rédigée à partir des {answer.sources.length} sources ci-dessous. Chaque numéro ouvre le document
-        d’origine.
-      </p>
     </section>
   )
 }

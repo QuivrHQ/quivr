@@ -868,12 +868,6 @@ mark {
   background: color-mix(in srgb, var(--accent) 32%, transparent);
 }
 
-.answer-note {
-  margin: 15px 0 0;
-  color: var(--text-faint);
-  font-size: 12.5px;
-}
-
 .agent-steps {
   display: flex;
   flex-direction: column;
