@@ -23,7 +23,7 @@ export function ModeSwitch({ mode, onChange }: { mode: Mode; onChange: (mode: Mo
           ) : (
             <Sparkles className="mode-icon" strokeWidth={2} aria-hidden="true" />
           )}
-          {entry.label}
+          <span className="mode-label">{entry.label}</span>
         </button>
       ))}
     </div>

@@ -230,6 +230,7 @@ export default function App() {
       onSubmit={runSearch}
       inputRef={inputRef}
       placeholder="Rechercher"
+      trailing={<ModeSwitch mode={mode} onChange={changeMode} />}
     />
   )
 
@@ -249,11 +250,8 @@ export default function App() {
               inputRef={inputRef}
               autoFocus
               placeholder="Rechercher"
+              trailing={<ModeSwitch mode={mode} onChange={changeMode} />}
             />
-
-            <div className="home-mode">
-              <ModeSwitch mode={mode} onChange={changeMode} />
-            </div>
 
             <div className="examples">
               <span className="examples-label">Essayez</span>
@@ -287,10 +285,7 @@ export default function App() {
       >
         <Brand />
       </a>
-      <div className="topbar-main">
-        {searchBar}
-        <ModeSwitch mode={mode} onChange={changeMode} />
-      </div>
+      <div className="topbar-main">{searchBar}</div>
     </header>
   )
 

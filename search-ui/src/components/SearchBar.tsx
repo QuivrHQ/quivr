@@ -1,4 +1,4 @@
-import { useEffect, useId, useMemo, useRef, useState } from 'react'
+import { useEffect, useId, useMemo, useRef, useState, type ReactNode } from 'react'
 import { suggest } from '../lib/search'
 import { Search, X } from 'lucide-react'
 
@@ -9,6 +9,8 @@ interface SearchBarProps {
   placeholder: string
   autoFocus?: boolean
   inputRef?: React.RefObject<HTMLInputElement | null>
+  /** Contrôle logé dans le champ, à droite du bouton d’effacement. */
+  trailing?: ReactNode
 }
 
 export function SearchBar({
@@ -18,6 +20,7 @@ export function SearchBar({
   placeholder,
   autoFocus,
   inputRef,
+  trailing,
 }: SearchBarProps) {
   const listId = useId()
   const localRef = useRef<HTMLInputElement>(null)
@@ -122,6 +125,7 @@ export function SearchBar({
             <X className="searchbar-clear-icon" strokeWidth={2} aria-hidden="true" />
           </button>
         )}
+        {trailing && <span className="searchbar-trailing">{trailing}</span>}
       </form>
 
       {visible && (
