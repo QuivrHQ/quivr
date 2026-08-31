@@ -1,14 +1,15 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { AnswerCard } from './components/AnswerCard'
-import { DocumentView } from './components/DocumentView'
+import { Brand } from './components/Logo'
+import { DocumentPanel } from './components/DocumentPanel'
 import { ModeSwitch } from './components/ModeSwitch'
 import { Pagination } from './components/Pagination'
 import { ResultItem } from './components/ResultItem'
 import { SearchBar } from './components/SearchBar'
 import { ResultsSkeleton } from './components/Skeleton'
 import { composeAnswer } from './lib/agent'
-import { formatCompact, formatNumber } from './lib/format'
-import { INDEX_SIZE, fetchDocument, search, tokenize } from './lib/search'
+import { formatNumber } from './lib/format'
+import { fetchDocument, search, tokenize } from './lib/search'
 import type { DocumentDetail, Mode, SearchResponse, SearchResult } from './types'
 
 /** Résultats par page en mode recherche. */
@@ -70,6 +71,8 @@ export default function App() {
 
   const inputRef = useRef<HTMLInputElement>(null)
   const itemRefs = useRef<Array<HTMLAnchorElement | null>>([])
+  /** Élément à re-focaliser à la fermeture du panneau. */
+  const openerRef = useRef<HTMLElement | null>(null)
   const terms = useMemo(() => tokenize(query), [query])
   const hasQuery = query.trim().length > 0
 
@@ -158,8 +161,8 @@ export default function App() {
       }
 
       if (event.key === 'Escape') {
-        if (isTyping) inputRef.current?.blur()
-        else if (docId) setDocId(null)
+        if (docId) closeDocument()
+        else if (isTyping) inputRef.current?.blur()
         return
       }
 
@@ -203,8 +206,13 @@ export default function App() {
   }
 
   const openDocument = (id: string) => {
+    openerRef.current = document.activeElement instanceof HTMLElement ? document.activeElement : null
     setDocId(id)
-    window.scrollTo({ top: 0 })
+  }
+
+  const closeDocument = () => {
+    setDocId(null)
+    openerRef.current?.focus()
   }
 
   const goHome = () => {
@@ -221,7 +229,7 @@ export default function App() {
       onChange={setInput}
       onSubmit={runSearch}
       inputRef={inputRef}
-      placeholder="Rechercher une dépêche, un sujet, un document…"
+      placeholder="Rechercher"
     />
   )
 
@@ -231,11 +239,8 @@ export default function App() {
         <main className="home">
           <div className="home-inner">
             <h1 className="brand brand-hero">
-              Quivr <span>Search</span>
+              <Brand />
             </h1>
-            <p className="home-tagline">
-              Recherche sémantique sur {formatCompact(INDEX_SIZE)} de dépêches, articles et documents de rédaction.
-            </p>
 
             <SearchBar
               value={input}
@@ -243,16 +248,11 @@ export default function App() {
               onSubmit={runSearch}
               inputRef={inputRef}
               autoFocus
-              placeholder="Rechercher une dépêche, un sujet, un document…"
+              placeholder="Rechercher"
             />
 
             <div className="home-mode">
               <ModeSwitch mode={mode} onChange={changeMode} />
-              <p className="mode-hint">
-                {mode === 'search'
-                  ? 'Liste de documents classés par pertinence.'
-                  : 'Réponse rédigée à partir des documents, avec ses sources.'}
-              </p>
             </div>
 
             <div className="examples">
@@ -285,7 +285,7 @@ export default function App() {
           goHome()
         }}
       >
-        Quivr <span>Search</span>
+        <Brand />
       </a>
       <div className="topbar-main">
         {searchBar}
@@ -293,15 +293,6 @@ export default function App() {
       </div>
     </header>
   )
-
-  if (docId) {
-    return (
-      <div className="app" data-view="document">
-        {header}
-        <DocumentView document={doc} terms={terms} loading={docLoading} onBack={() => setDocId(null)} />
-      </div>
-    )
-  }
 
   return (
     <div className="app" data-view="results">
@@ -396,6 +387,10 @@ export default function App() {
           </>
         )}
       </main>
+
+      {docId && (
+        <DocumentPanel document={doc} terms={terms} loading={docLoading} onClose={closeDocument} />
+      )}
     </div>
   )
 }

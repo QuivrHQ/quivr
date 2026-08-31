@@ -1,6 +1,6 @@
 import { useEffect, useId, useMemo, useRef, useState } from 'react'
 import { suggest } from '../lib/search'
-import { ClearIcon, SearchIcon } from './Icons'
+import { Search, X } from 'lucide-react'
 
 interface SearchBarProps {
   value: string
@@ -85,7 +85,7 @@ export function SearchBar({
           submit(activeIndex >= 0 ? suggestions[activeIndex] : value)
         }}
       >
-        <SearchIcon className="searchbar-icon" />
+        <Search className="searchbar-icon" strokeWidth={2} aria-hidden="true" />
         <input
           ref={ref}
           className="searchbar-input"
@@ -119,7 +119,7 @@ export function SearchBar({
               ref.current?.focus()
             }}
           >
-            <ClearIcon className="searchbar-clear-icon" />
+            <X className="searchbar-clear-icon" strokeWidth={2} aria-hidden="true" />
           </button>
         )}
       </form>
@@ -140,7 +140,7 @@ export function SearchBar({
                 submit(suggestion)
               }}
             >
-              <SearchIcon className="suggestion-icon" />
+              <Search className="suggestion-icon" strokeWidth={2} aria-hidden="true" />
               <span>{suggestion}</span>
             </li>
           ))}

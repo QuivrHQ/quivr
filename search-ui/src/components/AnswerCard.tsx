@@ -1,6 +1,6 @@
 import { Fragment, useEffect, useMemo, useState } from 'react'
 import { AGENT_STEPS, type AgentAnswer } from '../lib/agent'
-import { SparkIcon } from './Icons'
+import { Sparkles } from 'lucide-react'
 
 interface AnswerCardProps {
   answer: AgentAnswer | null
@@ -78,7 +78,7 @@ export function AnswerCard({ answer, thinking, onOpenSource }: AnswerCardProps) 
     return (
       <section className="answer" aria-busy="true">
         <div className="answer-head">
-          <SparkIcon className="answer-icon" />
+          <Sparkles className="answer-icon" strokeWidth={2} aria-hidden="true" />
           Réponse
         </div>
         <ol className="agent-steps">
@@ -100,7 +100,7 @@ export function AnswerCard({ answer, thinking, onOpenSource }: AnswerCardProps) 
   return (
     <section className="answer">
       <div className="answer-head">
-        <SparkIcon className="answer-icon" />
+        <Sparkles className="answer-icon" strokeWidth={2} aria-hidden="true" />
         Réponse
       </div>
 
