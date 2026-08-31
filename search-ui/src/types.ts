@@ -11,14 +11,16 @@ export type DocFeed =
   | 'Archives'
   | 'Documentation rédaction'
 
-export interface SearchResult {
+/** Mode d’interrogation : liste de résultats, ou réponse rédigée avec ses sources. */
+export type Mode = 'search' | 'agent'
+
+/** Métadonnées communes à un résultat et au document complet. */
+export interface DocumentMeta {
   id: string
   title: string
   /** Fil d’Ariane : fil, rubrique, année. */
   path: string[]
   url: string
-  /** Extrait du passage le plus pertinent. */
-  snippet: string
   feed: DocFeed
   type: DocType
   /** Bureau AFP d’origine. */
@@ -29,8 +31,18 @@ export interface SearchResult {
   publishedAt: string
   /** Longueur du document, en mots. */
   words: number
+}
+
+export interface SearchResult extends DocumentMeta {
+  /** Extrait du passage le plus pertinent. */
+  snippet: string
   /** Pertinence relative au meilleur résultat, entre 0 et 1. */
   score: number
+}
+
+/** Document complet, tel qu’affiché sur la page source. */
+export interface DocumentDetail extends DocumentMeta {
+  paragraphs: string[]
 }
 
 export interface SearchRequest {
