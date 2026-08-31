@@ -250,8 +250,8 @@ kbd {
   z-index: 20;
   display: flex;
   align-items: center;
-  gap: 24px;
-  padding: 13px var(--page-x);
+  gap: 20px;
+  padding: 10px var(--page-x);
   border-bottom: 1px solid var(--border);
   background: color-mix(in srgb, var(--bg) 88%, transparent);
   backdrop-filter: saturate(180%) blur(14px);
@@ -260,8 +260,13 @@ kbd {
 .topbar-main {
   display: flex;
   flex: 1 1 auto;
-  flex-direction: column;
-  gap: 9px;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+}
+
+.topbar-main .searchbar {
+  flex: 1 1 auto;
   max-width: var(--measure);
 }
 
@@ -291,6 +296,10 @@ kbd {
 .searchbar-field:focus-within {
   border-color: var(--accent);
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 13%, transparent), var(--shadow-focus);
+}
+
+[data-view='results'] .searchbar-field {
+  height: 44px;
 }
 
 [data-view='home'] .searchbar-field {
@@ -1087,12 +1096,28 @@ mark {
     --page-x: 18px;
   }
 
+  /* Deux lignes : marque et bascule d’abord, champ pleine largeur ensuite. */
   .topbar {
     flex-wrap: wrap;
-    gap: 12px;
+    gap: 10px 12px;
   }
 
   .topbar-main {
+    display: contents;
+  }
+
+  .brand-compact {
+    flex: 0 0 auto;
+    order: 1;
+  }
+
+  .mode-switch {
+    order: 2;
+    margin-left: auto;
+  }
+
+  .topbar-main .searchbar {
+    order: 3;
     flex: 1 1 100%;
     max-width: none;
   }
