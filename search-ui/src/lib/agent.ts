@@ -73,11 +73,8 @@ export function composeAnswer(query: string, results: SearchResult[]): AgentAnsw
     claims.push(`${sentence} [${sources.length}]`)
   }
 
-  const intro = `Sur « ${query} », voici ce qui ressort des ${sources.length} document${
-    sources.length > 1 ? 's' : ''
-  } les plus pertinents du corpus.`
-
-  const paragraphs = [intro]
+  // Pas de phrase d’introduction : la réponse commence par ce qu’elle a à dire.
+  const paragraphs: string[] = []
   for (let index = 0; index < claims.length; index += 2) {
     paragraphs.push(claims.slice(index, index + 2).join(' '))
   }
