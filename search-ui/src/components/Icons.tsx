@@ -1,15 +1,15 @@
-import { FileText, MessageSquareQuote, Newspaper, NotebookPen } from 'lucide-react'
+import { Article, Newspaper, Notebook, Quotes } from '@phosphor-icons/react'
 import type { DocType } from '../types'
 
-/** Icônes issues de Lucide (ISC) : cf. https://lucide.dev */
+/** Icônes Phosphor (MIT) : cf. https://phosphoricons.com */
 const TYPE_ICONS = {
   depeche: Newspaper,
-  article: FileText,
-  note: NotebookPen,
-  transcription: MessageSquareQuote,
+  article: Article,
+  note: Notebook,
+  transcription: Quotes,
 } as const satisfies Record<DocType, unknown>
 
 export function TypeIcon({ type, className }: { type: DocType; className?: string }) {
   const Icon = TYPE_ICONS[type]
-  return <Icon className={className} strokeWidth={1.75} aria-hidden="true" />
+  return <Icon className={className} weight="bold" aria-hidden="true" />
 }

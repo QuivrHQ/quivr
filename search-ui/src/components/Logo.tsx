@@ -1,4 +1,4 @@
-import { Feather } from 'lucide-react'
+import { Feather } from '@phosphor-icons/react'
 
 /**
  * Lockup de marque : pastille accentuée + nom du produit.
@@ -8,7 +8,7 @@ export function Brand() {
   return (
     <>
       <span className="brand-badge">
-        <Feather className="brand-badge-icon" strokeWidth={2} aria-hidden="true" />
+        <Feather className="brand-badge-icon" weight="fill" aria-hidden="true" />
       </span>
       <span className="brand-text">
         Quivr <span>Search</span>

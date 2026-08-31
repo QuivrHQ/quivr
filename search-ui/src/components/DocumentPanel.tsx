@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react'
-import { X } from 'lucide-react'
+import { X } from '@phosphor-icons/react'
 import { TYPE_LABELS, type DocumentDetail } from '../types'
 import { formatDate, formatNumber } from '../lib/format'
 import { Highlight } from './Highlight'
@@ -41,7 +41,7 @@ export function DocumentPanel({ document: detail, terms, loading, onClose }: Doc
         <header className="drawer-head">
           <span className="drawer-label">Source</span>
           <button type="button" className="drawer-close" onClick={onClose} aria-label="Fermer le document">
-            <X className="drawer-close-icon" strokeWidth={2} aria-hidden="true" />
+            <X className="drawer-close-icon" weight="bold" aria-hidden="true" />
           </button>
         </header>
 

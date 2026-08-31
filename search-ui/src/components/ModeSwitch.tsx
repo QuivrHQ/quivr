@@ -1,5 +1,5 @@
 import type { Mode } from '../types'
-import { Search, Sparkles } from 'lucide-react'
+import { ChatCenteredText, MagnifyingGlass } from '@phosphor-icons/react'
 
 const MODES: Array<{ value: Mode; label: string }> = [
   { value: 'search', label: 'Recherche' },
@@ -19,9 +19,9 @@ export function ModeSwitch({ mode, onChange }: { mode: Mode; onChange: (mode: Mo
           onClick={() => onChange(entry.value)}
         >
           {entry.value === 'search' ? (
-            <Search className="mode-icon" strokeWidth={2} aria-hidden="true" />
+            <MagnifyingGlass className="mode-icon" weight="bold" aria-hidden="true" />
           ) : (
-            <Sparkles className="mode-icon" strokeWidth={2} aria-hidden="true" />
+            <ChatCenteredText className="mode-icon" weight="bold" aria-hidden="true" />
           )}
           <span className="mode-label">{entry.label}</span>
         </button>

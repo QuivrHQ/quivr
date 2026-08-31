@@ -1,6 +1,6 @@
 import { useEffect, useId, useMemo, useRef, useState, type ReactNode } from 'react'
 import { suggest } from '../lib/search'
-import { Search, X } from 'lucide-react'
+import { MagnifyingGlass, X } from '@phosphor-icons/react'
 
 interface SearchBarProps {
   value: string
@@ -88,7 +88,7 @@ export function SearchBar({
           submit(activeIndex >= 0 ? suggestions[activeIndex] : value)
         }}
       >
-        <Search className="searchbar-icon" strokeWidth={2} aria-hidden="true" />
+        <MagnifyingGlass className="searchbar-icon" weight="bold" aria-hidden="true" />
         <input
           ref={ref}
           className="searchbar-input"
@@ -122,7 +122,7 @@ export function SearchBar({
               ref.current?.focus()
             }}
           >
-            <X className="searchbar-clear-icon" strokeWidth={2} aria-hidden="true" />
+            <X className="searchbar-clear-icon" weight="bold" aria-hidden="true" />
           </button>
         )}
         {trailing && <span className="searchbar-trailing">{trailing}</span>}
@@ -144,7 +144,7 @@ export function SearchBar({
                 submit(suggestion)
               }}
             >
-              <Search className="suggestion-icon" strokeWidth={2} aria-hidden="true" />
+              <MagnifyingGlass className="suggestion-icon" weight="bold" aria-hidden="true" />
               <span>{suggestion}</span>
             </li>
           ))}
