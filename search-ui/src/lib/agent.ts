@@ -1,5 +1,5 @@
 import type { SearchResult } from '../types'
-import { normalize } from './corpus'
+import { FILLERS, normalize } from './corpus'
 import { tokenize } from './search'
 
 /**
@@ -29,6 +29,12 @@ export const AGENT_STEPS = [
 
 const MAX_SOURCES = 5
 
+/**
+ * Phrases de liant du corpus factice : elles n’apportent rien à une réponse.
+ * Ce filtre disparaît en même temps que le corpus, une fois le backend branché.
+ */
+const FILLER_KEYS = new Set(FILLERS.map(normalize))
+
 /** Phrases de l’extrait, de la plus pertinente à la moins pertinente. */
 function sentences(result: SearchResult): string[] {
   return result.snippet
@@ -50,7 +56,10 @@ export function composeAnswer(query: string, results: SearchResult[]): AgentAnsw
   // qu’une fois, en se rabattant sur la phrase suivante du même document.
   for (const result of results) {
     if (sources.length >= MAX_SOURCES) break
-    const fresh = sentences(result).filter((candidate) => !seen.has(normalize(candidate)))
+    const fresh = sentences(result).filter((candidate) => {
+      const normalized = normalize(candidate)
+      return !seen.has(normalized) && !FILLER_KEYS.has(normalized)
+    })
     // Une phrase portant un terme de la requête vaut mieux qu’une phrase de liant ;
     // à défaut, on garde la première phrase encore inédite du document.
     const sentence =

@@ -354,7 +354,7 @@ const SUFFIXES = [
 ]
 
 /** Formules de rédaction communes à tous les desks, pour étoffer les documents. */
-const FILLERS = [
+export const FILLERS = [
   'Aucune réaction officielle n’avait été publiée dans l’immédiat.',
   'Plusieurs sources concordantes ont confirmé cette information à l’AFP.',
   'Les acteurs concernés n’ont pas souhaité commenter à ce stade.',

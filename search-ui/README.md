@@ -34,7 +34,7 @@ Le serveur écoute sur <http://localhost:5182> (port réservé pour ce projet).
 
 Vite + React 19 + TypeScript, et **une seule feuille de style CSS**. Aucune
 librairie d’UI, aucun framework CSS ; deux dépendances runtime seulement :
-React et [Lucide](https://lucide.dev) pour les icônes. Thème clair et sombre
+React et [Phosphor](https://phosphoricons.com) pour les icônes. Thème clair et sombre
 automatiques (`prefers-color-scheme`).
 
 ## Structure
@@ -59,7 +59,7 @@ src/
     Pagination.tsx         pagination 10 par 10
     Highlight.tsx          mise en évidence des termes, insensible aux accents
     Skeleton.tsx           état de chargement
-    Icons.tsx              icônes de type de document (Lucide)
+    Icons.tsx              icônes de type de document (Phosphor)
 ```
 
 ## Brancher le vrai backend
