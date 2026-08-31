@@ -1,13 +1,20 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
+import { AnswerCard } from './components/AnswerCard'
+import { DocumentView } from './components/DocumentView'
+import { ModeSwitch } from './components/ModeSwitch'
 import { Pagination } from './components/Pagination'
 import { ResultItem } from './components/ResultItem'
 import { SearchBar } from './components/SearchBar'
 import { ResultsSkeleton } from './components/Skeleton'
+import { composeAnswer } from './lib/agent'
 import { formatCompact, formatNumber } from './lib/format'
-import { INDEX_SIZE, search, tokenize } from './lib/search'
-import type { SearchResponse, SearchResult } from './types'
+import { INDEX_SIZE, fetchDocument, search, tokenize } from './lib/search'
+import type { DocumentDetail, Mode, SearchResponse, SearchResult } from './types'
 
+/** Résultats par page en mode recherche. */
 const PER_PAGE = 10
+/** Documents transmis à l’agent pour rédiger sa réponse. */
+const AGENT_CONTEXT = 8
 
 const EXAMPLES = [
   'inflation',
@@ -22,6 +29,8 @@ type Status = 'idle' | 'loading' | 'ready' | 'error'
 interface UrlState {
   q: string
   page: number
+  mode: Mode
+  doc: string | null
 }
 
 function readUrl(): UrlState {
@@ -30,31 +39,47 @@ function readUrl(): UrlState {
   return {
     q: params.get('q') ?? '',
     page: Number.isFinite(page) && page > 0 ? page : 1,
+    mode: params.get('mode') === 'agent' ? 'agent' : 'search',
+    doc: params.get('doc'),
   }
 }
 
-function writeUrl({ q, page }: UrlState) {
+function buildUrl({ q, page, mode, doc }: UrlState): string {
   const params = new URLSearchParams()
   if (q) params.set('q', q)
-  if (page > 1) params.set('page', String(page))
+  if (mode !== 'search') params.set('mode', mode)
+  if (page > 1 && !doc) params.set('page', String(page))
+  if (doc) params.set('doc', doc)
   const query = params.toString()
-  window.history.replaceState(null, '', query ? `?${query}` : window.location.pathname)
+  return query ? `?${query}` : window.location.pathname
 }
 
 export default function App() {
   const initial = useMemo(readUrl, [])
   const [input, setInput] = useState(initial.q)
   const [query, setQuery] = useState(initial.q)
+  const [mode, setMode] = useState<Mode>(initial.mode)
   const [page, setPage] = useState(initial.page)
   const [results, setResults] = useState<SearchResult[]>([])
   const [response, setResponse] = useState<SearchResponse | null>(null)
   const [status, setStatus] = useState<Status>(initial.q ? 'loading' : 'idle')
   const [activeIndex, setActiveIndex] = useState(-1)
+  const [docId, setDocId] = useState<string | null>(initial.doc)
+  const [doc, setDoc] = useState<DocumentDetail | null>(null)
+  const [docLoading, setDocLoading] = useState(Boolean(initial.doc))
 
   const inputRef = useRef<HTMLInputElement>(null)
   const itemRefs = useRef<Array<HTMLAnchorElement | null>>([])
   const terms = useMemo(() => tokenize(query), [query])
   const hasQuery = query.trim().length > 0
+
+  const answer = useMemo(
+    () => (mode === 'agent' && status === 'ready' ? composeAnswer(query, results) : null),
+    [mode, status, query, results],
+  )
+
+  // La liste affichée : les sources citées en mode agent, la page de résultats sinon.
+  const visibleResults = mode === 'agent' ? (answer?.sources ?? []) : results
 
   useEffect(() => {
     if (!hasQuery) {
@@ -67,12 +92,18 @@ export default function App() {
     const controller = new AbortController()
     setStatus('loading')
 
-    search({ q: query, page, perPage: PER_PAGE }, controller.signal)
+    const request = {
+      q: query,
+      page: mode === 'agent' ? 1 : page,
+      perPage: mode === 'agent' ? AGENT_CONTEXT : PER_PAGE,
+    }
+
+    search(request, controller.signal)
       .then((next) => {
         setResponse(next)
         setResults(next.results)
         setStatus('ready')
-        if (next.page !== page) setPage(next.page)
+        if (mode === 'search' && next.page !== page) setPage(next.page)
       })
       .catch((error: unknown) => {
         if (error instanceof DOMException && error.name === 'AbortError') return
@@ -80,12 +111,36 @@ export default function App() {
       })
 
     return () => controller.abort()
-  }, [query, page, hasQuery])
+  }, [query, page, mode, hasQuery])
 
   useEffect(() => {
-    writeUrl({ q: query, page })
+    if (!docId) {
+      setDoc(null)
+      setDocLoading(false)
+      return
+    }
+
+    const controller = new AbortController()
+    setDocLoading(true)
+
+    fetchDocument(docId, controller.signal)
+      .then((next) => {
+        setDoc(next)
+        setDocLoading(false)
+      })
+      .catch((error: unknown) => {
+        if (error instanceof DOMException && error.name === 'AbortError') return
+        setDoc(null)
+        setDocLoading(false)
+      })
+
+    return () => controller.abort()
+  }, [docId])
+
+  useEffect(() => {
+    window.history.replaceState(null, '', buildUrl({ q: query, page, mode, doc: docId }))
     document.title = query ? `${query} — Quivr Search` : 'Quivr Search'
-  }, [query, page])
+  }, [query, page, mode, docId])
 
   // Raccourcis clavier : « / » ou ⌘K pour la recherche, flèches pour parcourir.
   useEffect(() => {
@@ -102,18 +157,19 @@ export default function App() {
         return
       }
 
-      if (event.key === 'Escape' && isTyping) {
-        inputRef.current?.blur()
+      if (event.key === 'Escape') {
+        if (isTyping) inputRef.current?.blur()
+        else if (docId) setDocId(null)
         return
       }
 
-      if (results.length === 0) return
+      if (docId || visibleResults.length === 0) return
       if (event.key !== 'ArrowDown' && event.key !== 'ArrowUp') return
       if (isTyping && event.key === 'ArrowUp') return
 
       event.preventDefault()
       const step = event.key === 'ArrowDown' ? 1 : -1
-      const next = Math.min(Math.max(activeIndex + step, 0), results.length - 1)
+      const next = Math.min(Math.max(activeIndex + step, 0), visibleResults.length - 1)
       setActiveIndex(next)
       const anchor = itemRefs.current[next]
       anchor?.focus({ preventScroll: true })
@@ -122,14 +178,22 @@ export default function App() {
 
     window.addEventListener('keydown', onKeyDown)
     return () => window.removeEventListener('keydown', onKeyDown)
-  }, [activeIndex, results.length])
+  }, [activeIndex, visibleResults.length, docId])
 
   const runSearch = (value: string) => {
     setInput(value)
     setQuery(value)
     setPage(1)
     setActiveIndex(-1)
+    setDocId(null)
     window.scrollTo({ top: 0 })
+  }
+
+  const changeMode = (next: Mode) => {
+    setMode(next)
+    setPage(1)
+    setActiveIndex(-1)
+    setDocId(null)
   }
 
   const changePage = (value: number) => {
@@ -138,12 +202,28 @@ export default function App() {
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
+  const openDocument = (id: string) => {
+    setDocId(id)
+    window.scrollTo({ top: 0 })
+  }
+
   const goHome = () => {
     setInput('')
     setQuery('')
     setPage(1)
     setActiveIndex(-1)
+    setDocId(null)
   }
+
+  const searchBar = (
+    <SearchBar
+      value={input}
+      onChange={setInput}
+      onSubmit={runSearch}
+      inputRef={inputRef}
+      placeholder="Rechercher une dépêche, un sujet, un document…"
+    />
+  )
 
   if (!hasQuery) {
     return (
@@ -166,6 +246,15 @@ export default function App() {
               placeholder="Rechercher une dépêche, un sujet, un document…"
             />
 
+            <div className="home-mode">
+              <ModeSwitch mode={mode} onChange={changeMode} />
+              <p className="mode-hint">
+                {mode === 'search'
+                  ? 'Liste de documents classés par pertinence.'
+                  : 'Réponse rédigée à partir des documents, avec ses sources.'}
+              </p>
+            </div>
+
             <div className="examples">
               <span className="examples-label">Essayez</span>
               {EXAMPLES.map((example) => (
@@ -186,27 +275,37 @@ export default function App() {
     )
   }
 
+  const header = (
+    <header className="topbar">
+      <a
+        className="brand brand-compact"
+        href="/"
+        onClick={(event) => {
+          event.preventDefault()
+          goHome()
+        }}
+      >
+        Quivr <span>Search</span>
+      </a>
+      <div className="topbar-main">
+        {searchBar}
+        <ModeSwitch mode={mode} onChange={changeMode} />
+      </div>
+    </header>
+  )
+
+  if (docId) {
+    return (
+      <div className="app" data-view="document">
+        {header}
+        <DocumentView document={doc} terms={terms} loading={docLoading} onBack={() => setDocId(null)} />
+      </div>
+    )
+  }
+
   return (
     <div className="app" data-view="results">
-      <header className="topbar">
-        <a
-          className="brand brand-compact"
-          href="/"
-          onClick={(event) => {
-            event.preventDefault()
-            goHome()
-          }}
-        >
-          Quivr <span>Search</span>
-        </a>
-        <SearchBar
-          value={input}
-          onChange={setInput}
-          onSubmit={runSearch}
-          inputRef={inputRef}
-          placeholder="Rechercher une dépêche, un sujet, un document…"
-        />
-      </header>
+      {header}
 
       <main className="results-page">
         <div className="results-head">
@@ -214,12 +313,24 @@ export default function App() {
             {status === 'loading' && !response ? (
               <span className="results-count-placeholder">Recherche en cours…</span>
             ) : response ? (
-              <>
-                <strong>{formatNumber(response.total)}</strong>{' '}
-                {response.total > 1 ? 'résultats' : 'résultat'}
-                <span className="results-count-sep">·</span>
-                {response.tookMs} ms
-              </>
+              mode === 'agent' ? (
+                <>
+                  <strong>{formatNumber(answer?.sources.length ?? 0)}</strong> source
+                  {(answer?.sources.length ?? 0) > 1 ? 's' : ''} citée
+                  {(answer?.sources.length ?? 0) > 1 ? 's' : ''}
+                  <span className="results-count-sep">·</span>
+                  {formatNumber(response.total)} documents trouvés
+                  <span className="results-count-sep">·</span>
+                  {response.tookMs} ms
+                </>
+              ) : (
+                <>
+                  <strong>{formatNumber(response.total)}</strong>{' '}
+                  {response.total > 1 ? 'résultats' : 'résultat'}
+                  <span className="results-count-sep">·</span>
+                  {response.tookMs} ms
+                </>
+              )
             ) : null}
           </p>
         </div>
@@ -233,7 +344,11 @@ export default function App() {
           </div>
         )}
 
-        {status === 'loading' && <ResultsSkeleton />}
+        {mode === 'agent' && status !== 'error' && (results.length > 0 || status === 'loading') && (
+          <AnswerCard answer={answer} thinking={status === 'loading'} onOpenSource={openDocument} />
+        )}
+
+        {status === 'loading' && mode === 'search' && <ResultsSkeleton />}
 
         {status === 'ready' && response && (
           <>
@@ -248,12 +363,17 @@ export default function App() {
               </div>
             ) : (
               <>
+                {mode === 'agent' && <h2 className="sources-title">Sources</h2>}
+
                 <div className="results">
-                  {results.map((result, index) => (
+                  {visibleResults.map((result, index) => (
                     <ResultItem
                       key={result.id}
                       result={result}
                       terms={terms}
+                      rank={mode === 'agent' ? index + 1 : undefined}
+                      href={buildUrl({ q: query, page, mode, doc: result.id })}
+                      onOpen={() => openDocument(result.id)}
                       active={index === activeIndex}
                       onActivate={() => setActiveIndex(index)}
                       ref={(node: HTMLElement | null) => {
@@ -263,11 +383,14 @@ export default function App() {
                   ))}
                 </div>
 
-                <Pagination page={response.page} totalPages={response.totalPages} onPageChange={changePage} />
-
-                <p className="page-status">
-                  Page {formatNumber(response.page)} sur {formatNumber(response.totalPages)}
-                </p>
+                {mode === 'search' && (
+                  <>
+                    <Pagination page={response.page} totalPages={response.totalPages} onPageChange={changePage} />
+                    <p className="page-status">
+                      Page {formatNumber(response.page)} sur {formatNumber(response.totalPages)}
+                    </p>
+                  </>
+                )}
               </>
             )}
           </>

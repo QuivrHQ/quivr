@@ -1,5 +1,5 @@
 import { CORPUS, INDEX_SIZE, normalize, type CorpusDoc } from './corpus'
-import type { SearchRequest, SearchResponse, SearchResult } from '../types'
+import type { DocumentDetail, SearchRequest, SearchResponse, SearchResult } from '../types'
 
 export { INDEX_SIZE }
 
@@ -102,8 +102,8 @@ function buildSnippet(doc: CorpusDoc, terms: string[]): string {
 }
 
 function toResult(doc: CorpusDoc, snippet: string, score: number): SearchResult {
-  const { body: _body, haystack: _haystack, ...rest } = doc
-  return { ...rest, snippet, score }
+  const { body: _body, haystack: _haystack, paragraphs: _paragraphs, ...meta } = doc
+  return { ...meta, snippet, score }
 }
 
 /**
@@ -181,6 +181,34 @@ function runQuery(request: SearchRequest, terms: string[], latency: number): Sea
 
 /** Slug d’agence en tête de titre (URGENT:, PAPIER GÉNÉRAL:…). */
 const SLUG_PREFIX = /^[A-ZÉÈÀÇ]{2,}[A-ZÉÈÀÇ ]*: /
+
+/**
+ * Charge un document complet.
+ *
+ * Second point de branchement du backend : `GET /api/documents/:id`.
+ */
+export function fetchDocument(id: string, signal?: AbortSignal): Promise<DocumentDetail | null> {
+  return new Promise((resolve, reject) => {
+    const timer = setTimeout(() => {
+      if (signal?.aborted) {
+        reject(new DOMException('Chargement annulé', 'AbortError'))
+        return
+      }
+      const doc = CORPUS.find((entry) => entry.id === id)
+      if (!doc) {
+        resolve(null)
+        return
+      }
+      const { body: _body, haystack: _haystack, ...detail } = doc
+      resolve(detail)
+    }, 70 + Math.round(Math.random() * 120))
+
+    signal?.addEventListener('abort', () => {
+      clearTimeout(timer)
+      reject(new DOMException('Chargement annulé', 'AbortError'))
+    })
+  })
+}
 
 /** Complétions proposées sous la barre de recherche. */
 export function suggest(query: string, limit = 6): string[] {

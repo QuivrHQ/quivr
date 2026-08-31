@@ -27,6 +27,29 @@ export function ClearIcon({ className }: IconProps) {
   )
 }
 
+export function SparkIcon({ className }: IconProps) {
+  return (
+    <svg className={className} viewBox="0 0 20 20" aria-hidden="true">
+      <path
+        d="M10 2.5 11.6 7 16 8.6 11.6 10.2 10 14.7 8.4 10.2 4 8.6 8.4 7z"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.4"
+        strokeLinejoin="round"
+      />
+      <path d="M15.2 13.4 15.9 15.4 17.8 16.1 15.9 16.8 15.2 18.8 14.5 16.8 12.6 16.1 14.5 15.4z" fill="currentColor" />
+    </svg>
+  )
+}
+
+export function ArrowLeftIcon({ className }: IconProps) {
+  return (
+    <svg className={className} viewBox="0 0 20 20" aria-hidden="true">
+      <path d="M16 10H4.5M9 4.5 4 10l5 5.5" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  )
+}
+
 const TYPE_PATHS: Record<DocType, ReactNode> = {
   depeche: (
     <>

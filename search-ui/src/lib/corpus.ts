@@ -1,4 +1,4 @@
-import type { DocFeed, DocType, SearchResult } from '../types'
+import type { DocFeed, DocType, DocumentMeta } from '../types'
 
 /**
  * Corpus factice de type agence de presse (dépêches, articles, notes de
@@ -353,6 +353,20 @@ const SUFFIXES = [
   ' — contexte',
 ]
 
+/** Formules de rédaction communes à tous les desks, pour étoffer les documents. */
+const FILLERS = [
+  'Aucune réaction officielle n’avait été publiée dans l’immédiat.',
+  'Plusieurs sources concordantes ont confirmé cette information à l’AFP.',
+  'Les acteurs concernés n’ont pas souhaité commenter à ce stade.',
+  'Un point d’étape est attendu dans les prochaines semaines.',
+  'Les chiffres définitifs seront publiés le mois prochain.',
+  'Des vérifications complémentaires sont en cours auprès des parties prenantes.',
+  'Le dossier doit encore franchir plusieurs étapes avant d’être définitivement clos.',
+  'Cette annonce intervient dans un calendrier déjà chargé.',
+  'L’agence poursuit la couverture de cet événement.',
+  'Une mise à jour de cette dépêche est prévue en fin de journée.',
+]
+
 export function normalize(text: string): string {
   return text
     .toLowerCase()
@@ -361,8 +375,10 @@ export function normalize(text: string): string {
     .replace(/[\u2019']/g, ' ')
 }
 
-export interface CorpusDoc extends Omit<SearchResult, 'snippet' | 'score'> {
-  /** Corps complet du document, utilisé pour le scoring et l’extrait. */
+export interface CorpusDoc extends DocumentMeta {
+  /** Texte complet, découpé en paragraphes. */
+  paragraphs: string[]
+  /** Les paragraphes réunis : sert au scoring et à l’extraction d’extraits. */
   body: string
   /** Titre + corps normalisés, pré-calculés pour la recherche. */
   haystack: string
@@ -395,11 +411,26 @@ function buildCorpus(): CorpusDoc[] {
 
         const pool = [...desk.sentences]
         const sentences: string[] = []
-        const sentenceCount = 3 + Math.floor(random() * 3)
+        const sentenceCount = 5 + Math.floor(random() * 4)
         for (let s = 0; s < sentenceCount && pool.length > 0; s += 1) {
           sentences.push(pool.splice(Math.floor(random() * pool.length), 1)[0])
         }
-        const body = sentences.join(' ')
+
+        const fillerPool = [...FILLERS]
+        const takeFiller = () => fillerPool.splice(Math.floor(random() * fillerPool.length), 1)[0]
+
+        // Un paragraphe = deux phrases, la matière du desk d’abord, le liant ensuite.
+        const paragraphs: string[] = []
+        let cursor = 0
+        while (cursor < sentences.length) {
+          const chunk = sentences.slice(cursor, cursor + 2)
+          if (chunk.length === 1) chunk.push(takeFiller())
+          paragraphs.push(chunk.join(' '))
+          cursor += 2
+        }
+        paragraphs.push([takeFiller(), takeFiller()].join(' '))
+
+        const body = paragraphs.join('\n\n')
         const id = `doc-${deskIndex}-${titleIndex}-${v}`
 
         docs.push({
@@ -412,7 +443,8 @@ function buildCorpus(): CorpusDoc[] {
           bureau,
           author,
           publishedAt,
-          words: 180 + Math.floor(random() * 1100),
+          words: body.trim().split(/\s+/).length,
+          paragraphs,
           body,
           haystack: normalize(`${title} ${desk.rubrique} ${body}`),
         })

@@ -9,21 +9,35 @@ interface ResultItemProps {
   terms: string[]
   active: boolean
   onActivate: () => void
+  /** Numéro de citation, en mode agent uniquement. */
+  rank?: number
+  href: string
+  onOpen: () => void
 }
 
 export const ResultItem = forwardRef<HTMLElement, ResultItemProps>(function ResultItem(
-  { result, terms, active, onActivate },
+  { result, terms, active, onActivate, rank, href, onOpen },
   ref,
 ) {
   return (
     <article className="result" data-active={active || undefined} onMouseEnter={onActivate}>
       <div className="result-path">
-        <TypeIcon type={result.type} className="result-path-icon" />
+        {rank ? <span className="result-rank">{rank}</span> : <TypeIcon type={result.type} className="result-path-icon" />}
         <span className="result-path-text">{result.path.join(' › ')}</span>
       </div>
 
       <h2 className="result-title">
-        <a ref={ref as React.Ref<HTMLAnchorElement>} href={result.url} className="result-link">
+        <a
+          ref={ref as React.Ref<HTMLAnchorElement>}
+          href={href}
+          className="result-link"
+          onClick={(event) => {
+            // Un clic modifié (nouvel onglet) garde le comportement natif du lien.
+            if (event.metaKey || event.ctrlKey || event.shiftKey || event.button !== 0) return
+            event.preventDefault()
+            onOpen()
+          }}
+        >
           <Highlight text={result.title} terms={terms} />
         </a>
       </h2>
