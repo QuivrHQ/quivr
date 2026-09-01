@@ -78,6 +78,8 @@ class LocalStorage(StorageBase):
         if file.file_sha1 in self.hashes and not exists_ok:
             raise FileExistsError(f"file {file.original_filename} already uploaded")
 
+        Path(dst_path).parent.mkdir(parents=True, exist_ok=True)
+
         if self.copy_flag:
             shutil.copy2(file.path, dst_path)
         else:
