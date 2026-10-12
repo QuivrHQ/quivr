@@ -195,6 +195,8 @@ class Workflow(unittest.TestCase):
                 'args = sys.argv[1:]',
                 'if args == ["api", "repos/example/repo/pulls/7"]:',
                 '    print(pathlib.Path(os.environ["FIXTURE_PR"]).read_text())',
+                'elif args == ["api", "repos/example/repo/git/ref/heads/main"]:',
+                '    print(pathlib.Path(os.environ["FIXTURE_BASE"]).read_text())',
                 'elif args == ["api", "repos/example/repo/git/commits/merge-sha"]:',
                 '    print(pathlib.Path(os.environ["FIXTURE_MERGE"]).read_text())',
                 'else:',
@@ -205,17 +207,20 @@ class Workflow(unittest.TestCase):
             ]) + '\n')
             gh.chmod(0o755)
             pr, request, merge = root / 'pr.json', root / 'request.json', root / 'merge-response.json'
+            base = root / 'base-response.json'
+            base.write_text(json.dumps({'object': {'sha': 'base-sha'}}))
             merge.write_text(json.dumps({'parents': [{'sha': 'base-sha'}, {'sha': 'head-sha'}]}))
             def dispatch():
                 return subprocess.run(['bash', '-e', '-o', 'pipefail', '-c', script], capture_output=True, text=True,
                                       env={**os.environ, 'PATH': str(root) + os.pathsep + os.environ['PATH'],
                                            'GITHUB_REPOSITORY': 'example/repo', 'PR_NUMBER': '7',
                                            'RUNNER_TEMP': str(root), 'FIXTURE_PR': str(pr),
+                                           'FIXTURE_BASE': str(base),
                                            'FIXTURE_MERGE': str(merge), 'FIXTURE_REQUEST': str(request)})
             for labels in [[{'name': 'ci-full'}], []]:
                 with self.subTest(labels=labels):
                     pr.write_text(json.dumps({'number': 7, 'state': 'open', 'labels': labels,
-                                              'merge_commit_sha': 'merge-sha', 'base': {'sha': 'base-sha'},
+                                              'merge_commit_sha': 'merge-sha', 'base': {'ref': 'main', 'sha': 'old-base-sha'},
                                               'head': {'ref': 'feature/current-head', 'sha': 'head-sha',
                                                        'repo': {'full_name': 'example/repo'}}}))
                     result = dispatch()
@@ -234,7 +239,7 @@ class Workflow(unittest.TestCase):
                     request.unlink(missing_ok=True)
                     merge.write_text(json.dumps({'parents': [{'sha': 'base-sha'}, {'sha': 'head-sha'}]}))
                     pr.write_text(json.dumps({'number': 7, 'state': state,
-                                              'merge_commit_sha': 'merge-sha', 'base': {'sha': 'base-sha'},
+                                              'merge_commit_sha': 'merge-sha', 'base': {'ref': 'main', 'sha': 'old-base-sha'},
                                               'head': {'ref': 'feature/current-head', 'sha': 'head-sha',
                                                        'repo': {'full_name': repository}}}))
                     result = dispatch()
