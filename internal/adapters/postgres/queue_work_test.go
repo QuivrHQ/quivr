@@ -288,6 +288,17 @@ ANALYZE ingestion_receipts`); err != nil {
 WHERE organization=$1 AND version_id=$2 ORDER BY accepted_at LIMIT 1`, "index-owner", "version").Scan(&queue); err != nil || queue != "live" {
 		t.Fatalf("earliest receipt queue=%q err=%v, want live", queue, err)
 	}
+	// Raw fixture writes bypass transactional observations. Run the independent
+	// startup maintenance before reading the maintained backlog.
+	for {
+		more, err := (QueueSnapshots{Pool: p}).Maintain(ctx)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if !more {
+			break
+		}
+	}
 	rows, err := p.Query(ctx, queueBacklogSQL())
 	if err != nil {
 		t.Fatal(err)
