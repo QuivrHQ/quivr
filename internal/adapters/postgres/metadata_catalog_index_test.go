@@ -60,6 +60,11 @@ func TestMetadataCatalogIndexedPageWork(t *testing.T) {
 	if err := EnsureIndexes(ctx, pool); err != nil {
 		t.Fatal(err)
 	}
+	// Missing scope statistics must not let a selective page scan a whole
+	// metadata generation. Pin that adverse estimate instead of depending on
+	// ANALYZE's random sample to expose the optimizer's uncorrelated subplan.
+	exec(`ALTER TABLE projection_metadata ALTER COLUMN organization SET STATISTICS 0`)
+	exec(`ALTER TABLE projection_metadata ALTER COLUMN generation_id SET STATISTICS 0`)
 	exec("ANALYZE")
 	trace := &metadataPageTrace{}
 	cfg := pool.Config()
@@ -171,6 +176,15 @@ func TestMetadataCatalogIndexedPageWork(t *testing.T) {
 								}
 								if work > 16384 {
 									t.Fatalf("unbounded record walk: %s", raw)
+								}
+							}
+							if n["Relation Name"] == "projection_metadata" {
+								work := n["Actual Rows"].(float64)
+								if removed, ok := n["Rows Removed by Filter"].(float64); ok {
+									work += removed
+								}
+								if work > 1 {
+									t.Fatalf("metadata lookup read beyond its pinned version: %s", raw)
 								}
 							}
 							children, _ := n["Plans"].([]any)
@@ -291,6 +305,12 @@ func TestMetadataCatalogIndexBootstrap(t *testing.T) {
 		t.Fatalf("locked bootstrap source was lost: %v", err)
 	}
 	read("kind", "string", "rare", "r000600")
+	// The locked source has no derived values yet. A date page must still use
+	// its source metadata while publication/backfill has not indexed it.
+	dates.AfterID = "r000599"
+	if got, err := store.Records(ctx, "example", "corpus", dates); err != nil || len(got) != 1 || got[0].ID != "r000600" {
+		t.Fatalf("unindexed date source was omitted: %v, %v", got, err)
+	}
 	if _, err = writer.Exec(ctx, `UPDATE projection_metadata SET data='{"kind":"replacement","tags":["updated","updated"],"rank":2,"urgent":true,"date":"-0001-12-31T23:00:00.000Z"}' WHERE version_id='v600'`); err != nil {
 		t.Fatal(err)
 	}
