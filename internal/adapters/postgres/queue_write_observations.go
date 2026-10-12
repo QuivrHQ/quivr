@@ -17,5 +17,5 @@ func observeQueueIntents(ctx context.Context, tx pgx.Tx, org string, versions []
 	if err != nil {
 		return err
 	}
-	return observeQueueRecords(ctx, tx, keys.organizations, keys.records)
+	return observeQueueStateRecords(ctx, tx, keys.organizations, keys.records)
 }

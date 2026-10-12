@@ -38,7 +38,8 @@ type RebuildStore interface {
 	// BeginRebuild moves a queued Operation to running and returns its target.
 	BeginRebuild(ctx context.Context, org, operationID string) (RebuildTarget, error)
 	// RebuildCandidates lists current eligible Versions of the Corpus missing
-	// target projection or vector coverage, in stable order.
+	// target projection or vector coverage, in stable order. An empty bounded
+	// page still requires ActivateRebuild to advance/check final validation.
 	RebuildCandidates(ctx context.Context, org, operationID string, limit int) ([]RebuildCandidate, error)
 	// RebuildCandidatesAfter lists forward from an explicit exclusive scan cursor.
 	// Unlike RebuildCandidates it never wraps to gaps behind the cursor.
@@ -53,7 +54,8 @@ type RebuildStore interface {
 	// reused artifacts. It returns false when the Version is no longer eligible.
 	CoverRebuild(ctx context.Context, org, operationID string, seg content.Segmentation, artifacts []content.Embedding) (bool, error)
 	// ActivateRebuild atomically validates coverage, installs the Corpus route
-	// and records success. It returns false while coverage gaps remain and
+	// and records success. It yields while bounded validation or coverage work
+	// remains, or the publication fence is busy, and returns
 	// operations.ErrNotRunning when the Operation may no longer take effect.
 	ActivateRebuild(ctx context.Context, org, operationID string) (bool, error)
 	// FailRebuild records a terminal failure for a queued or running Operation.
@@ -160,7 +162,7 @@ func (r Rebuilder) Step(ctx context.Context, org, operationID string) (bool, err
 		}
 		return false, err
 	}
-	target, err := r.Store.BeginRebuild(admission, org, operationID)
+	target, err := r.Store.BeginRebuild(work, org, operationID)
 	if err != nil {
 		return interrupted(err)
 	}
@@ -168,12 +170,17 @@ func (r Rebuilder) Step(ctx context.Context, org, operationID string) (bool, err
 		return r.stop(ctx, org, operationID)
 	}
 	limit := max(rebuildBatch, concurrency)
-	page, err := r.Store.RebuildCandidates(admission, org, operationID, limit)
+	// An admitted completion batch drains beyond admission, under the parent
+	// attempt deadline. Its durable progress must not restart at every cutoff.
+	page, err := r.Store.RebuildCandidates(work, org, operationID, limit)
+	if errors.Is(err, operations.ErrNotRunning) {
+		return r.stop(ctx, org, operationID)
+	}
 	if err != nil {
 		return interrupted(err)
 	}
 	if len(page) == 0 {
-		activated, err := r.Store.ActivateRebuild(admission, org, operationID)
+		activated, err := r.Store.ActivateRebuild(work, org, operationID)
 		if errors.Is(err, operations.ErrNotRunning) {
 			return r.stop(ctx, org, operationID)
 		}
@@ -350,11 +357,18 @@ func (r Rebuilder) Step(ctx context.Context, org, operationID string) (bool, err
 	settle, settleCancel := context.WithTimeout(ctx, 5*time.Second)
 	defer settleCancel()
 	if !yielded {
-		remaining, err := r.Store.RebuildCandidates(settle, org, operationID, limit)
-		if err != nil {
-			return false, err
+		advanced := false
+		for _, candidate := range initial {
+			pending, err := r.Store.RebuildCandidatePending(settle, org, operationID, candidate.VersionID)
+			if err != nil {
+				return false, err
+			}
+			if !pending {
+				advanced = true
+				break
+			}
 		}
-		if slices.Equal(initial, remaining) {
+		if !advanced {
 			return false, errors.New("rebuild coverage did not advance; retry after storage or routing recovers")
 		}
 	}

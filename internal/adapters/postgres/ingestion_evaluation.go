@@ -314,7 +314,7 @@ func (s IngestionEvaluationStore) CompleteIngestionEvaluation(ctx context.Contex
 	if err != nil {
 		return err
 	}
-	if err = observeQueueRecords(ctx, tx, []string{org}, []string{record}); err != nil {
+	if err = observeQueueStateRecords(ctx, tx, []string{org}, []string{record}); err != nil {
 		return err
 	}
 	return tx.Commit(ctx)

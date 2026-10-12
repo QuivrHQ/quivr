@@ -61,7 +61,7 @@ func advanceQueueScopeReconciliation(ctx context.Context, tx pgx.Tx, limit int) 
 		for i := range orgs {
 			orgs[i] = org
 		}
-		err = observeQueueRecords(ctx, tx, orgs, records)
+		err = observeQueueStateRecords(ctx, tx, orgs, records)
 	} else {
 		err = observeQueueMetricKeys(ctx, tx, metrics)
 	}
