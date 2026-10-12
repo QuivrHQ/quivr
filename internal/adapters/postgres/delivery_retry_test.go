@@ -5,6 +5,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/The-Vibe-Company/quivr/internal/adapters/postgres"
 	"github.com/The-Vibe-Company/quivr/internal/monitoring"
 )
 
@@ -18,7 +19,17 @@ var fail503 = monitoring.AttemptOutcome{Outcome: monitoring.AttemptRetryableErro
 func TestDeliveryRetryWindowAndDisableAwareAdmission(t *testing.T) {
 	ctx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
 	defer cancel()
-	f := newDeliveryFixture(t, ctx, adapterPool(t, ctx), "adapter-retry-", 4)
+	pool := adapterPool(t, ctx)
+	queueFixtureReconcile(t, postgres.QueueSnapshots{Pool: pool}, ctx)
+	baseline, err := (postgres.DeliveryStore{Pool: pool}).DeliveryBacklog(ctx)
+	if err != nil {
+		t.Fatal(err)
+	}
+	f := newDeliveryFixture(t, ctx, pool, "adapter-retry-", 4)
+	initial, err := f.ds.DeliveryBacklog(ctx)
+	if err != nil || initial.Pending != baseline.Pending+4 {
+		t.Fatalf("new delivery gauge=%+v baseline=%+v error=%v", initial, baseline, err)
+	}
 	window := time.Minute
 	f.leaseAll()
 
@@ -42,7 +53,7 @@ func TestDeliveryRetryWindowAndDisableAwareAdmission(t *testing.T) {
 	// The edge attempt fails after the window: exhausted, work removed,
 	// history kept, last error visible.
 	f.rewind(d0, window)
-	a, refused, err := f.ds.Admit(ctx, f.claimDue(d0), window, f.configured)
+	a, refused, err = f.ds.Admit(ctx, f.claimDue(d0), window, f.configured)
 	if err != nil || refused != "" || a.Number != 2 {
 		t.Fatalf("edge attempt %+v %q %v", a, refused, err)
 	}
@@ -100,9 +111,17 @@ func TestDeliveryRetryWindowAndDisableAwareAdmission(t *testing.T) {
 	if _, refused = f.admit(d3, window, f.configured); refused != "subscription_disabled" {
 		t.Fatal(refused)
 	}
+	observed, err := f.ds.DeliveryBacklog(ctx)
+	if err != nil || observed.Pending != baseline.Pending+1 {
+		t.Fatalf("terminal/parked deliveries not removed: observed=%+v baseline=%+v error=%v", observed, baseline, err)
+	}
 	f.age(d3, 10*time.Hour)
 	f.unlease(d2)
 	f.age(d2, 30*time.Second)
+	// Rewinding immutable admission times emulates an older writer. Repair that
+	// fixture before checking arrival age; actual state transitions were checked
+	// above without reconciliation, so missing write hooks remain detectable.
+	queueFixtureReconcile(t, postgres.QueueSnapshots{Pool: pool}, ctx)
 	b, err := f.ds.DeliveryBacklog(ctx)
 	if err != nil {
 		t.Fatal(err)
@@ -123,5 +142,43 @@ WHERE o.organization=$1 AND o.available_at<'infinity' AND d.state IN ('pending',
 	}
 	if b.OldestAge.Seconds() >= parkedAge {
 		t.Fatalf("parked work inflated the oldest pending age: %v >= %vs", b.OldestAge, parkedAge)
+	}
+
+	// Re-enable must not synchronously rebuild all parked metric memberships.
+	// The source update can commit while the metric ledger is unavailable.
+	locked, err := pool.Begin(ctx)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer locked.Rollback(ctx)
+	if _, err = locked.Exec(ctx, `LOCK queue_metric_items IN ACCESS EXCLUSIVE MODE`); err != nil {
+		t.Fatal(err)
+	}
+	enableCtx, stop := context.WithTimeout(ctx, time.Second)
+	_, err = f.service.EnableSubscription(enableCtx, f.scope, "enable-s3", f.subs[3].ID)
+	stop()
+	if err != nil {
+		t.Fatalf("re-enable tried to synchronously rebuild metrics: %v", err)
+	}
+	if err = locked.Rollback(ctx); err != nil {
+		t.Fatal(err)
+	}
+
+	if _, err = f.ds.DeliveryBacklog(ctx); err == nil {
+		t.Fatal("partially reconciled delivery scope reported as current")
+	}
+	reader := postgres.QueueSnapshots{Pool: pool}
+	for {
+		more, err := reader.Maintain(ctx)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if !more {
+			break
+		}
+	}
+	b, err = f.ds.DeliveryBacklog(ctx)
+	if err != nil || b.Pending != baseline.Pending+2 {
+		t.Fatalf("re-enabled backlog=%+v baseline=%+v error=%v", b, baseline, err)
 	}
 }

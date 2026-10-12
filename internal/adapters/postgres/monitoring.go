@@ -542,9 +542,13 @@ func (s MonitoringStore) EnableSubscription(ctx context.Context, org, key, id st
 WHERE d.organization=$1 AND d.window_start='infinity' AND (m.organization,m.id)=(d.organization,d.match_id) AND m.subscription_id=$2`, org, id); err != nil {
 			return err
 		}
-		_, err = tx.Exec(ctx, `UPDATE delivery_outbox o SET available_at=now(),lease_until='-infinity'
+		if _, err = tx.Exec(ctx, `UPDATE delivery_outbox o SET available_at=now(),lease_until='-infinity'
 FROM deliveries d JOIN matches m ON (m.organization,m.id)=(d.organization,d.match_id)
-WHERE o.organization=$1 AND o.available_at='infinity' AND (d.organization,d.id)=(o.organization,o.delivery_id) AND m.subscription_id=$2`, org, id)
+WHERE o.organization=$1 AND o.available_at='infinity' AND (d.organization,d.id)=(o.organization,o.delivery_id) AND m.subscription_id=$2`, org, id); err != nil {
+			return err
+		}
+		_, err = tx.Exec(ctx, `INSERT INTO queue_scope_reconciliation(kind,organization,resource_id)
+ VALUES('delivery',$1,$2) ON CONFLICT(kind,organization,resource_id) DO UPDATE SET cursor=''`, org, id)
 		return err
 	})
 	if err != nil {

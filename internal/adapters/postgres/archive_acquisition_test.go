@@ -146,9 +146,9 @@ func TestArchiveAcquisitionWorkBudget(t *testing.T) {
 		name, position string
 		accept         acquisitionWork
 	}{
-		{"new-records", "12", acquisitionWork{15, 5, 1, 1, 0}},
-		{"corrections", "13", acquisitionWork{22, 7, 1, 1, 0}},
-		{"older-position", "3", acquisitionWork{21, 7, 1, 1, 0}},
+		{"new-records", "12", acquisitionWork{21, 5, 1, 1, 0}},
+		{"corrections", "13", acquisitionWork{28, 7, 1, 1, 0}},
+		{"older-position", "3", acquisitionWork{27, 7, 1, 1, 0}},
 	} {
 		t.Run(page.name, func(t *testing.T) {
 			totals := map[string]acquisitionWork{}

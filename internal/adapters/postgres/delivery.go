@@ -38,7 +38,10 @@ func deliveryUpdated(ctx context.Context, tx pgx.Tx, org, corpusID, deliveryID s
 
 func park(ctx context.Context, tx pgx.Tx, org, deliveryID string) error {
 	_, err := tx.Exec(ctx, `UPDATE delivery_outbox SET available_at='infinity',lease_until='-infinity' WHERE organization=$1 AND delivery_id=$2`, org, deliveryID)
-	return err
+	if err != nil {
+		return err
+	}
+	return observeQueueMetricKeys(ctx, tx, []queueMetricKey{{source: "delivery", org: org, id: deliveryID}})
 }
 
 // exhaust ends automatic attempts for a pending Delivery without a new attempt.
@@ -49,7 +52,10 @@ func exhaust(ctx context.Context, tx pgx.Tx, org, corpusID, deliveryID string, n
 	if _, err := tx.Exec(ctx, `DELETE FROM delivery_outbox WHERE organization=$1 AND delivery_id=$2`, org, deliveryID); err != nil {
 		return err
 	}
-	return deliveryUpdated(ctx, tx, org, corpusID, deliveryID, number, "exhausted")
+	if err := deliveryUpdated(ctx, tx, org, corpusID, deliveryID, number, "exhausted"); err != nil {
+		return err
+	}
+	return observeQueueMetricKeys(ctx, tx, []queueMetricKey{{source: "delivery", org: org, id: deliveryID}})
 }
 
 func attemptID(org, deliveryID string, number int) string {
@@ -133,6 +139,9 @@ WHERE d.organization=$1 AND d.id=$2 FOR UPDATE OF d`, org, w.DeliveryID, window.
 		if _, err = tx.Exec(ctx, `DELETE FROM delivery_outbox WHERE organization=$1 AND delivery_id=$2`, org, w.DeliveryID); err != nil {
 			return monitoring.AdmittedAttempt{}, "", err
 		}
+		if err = observeQueueMetricKeys(ctx, tx, []queueMetricKey{{source: "delivery", org: org, id: w.DeliveryID}}); err != nil {
+			return monitoring.AdmittedAttempt{}, "", err
+		}
 		return monitoring.AdmittedAttempt{}, "terminal", tx.Commit(ctx)
 	case "delivering":
 		tag, err := tx.Exec(ctx, `INSERT INTO delivery_attempt_outcomes(organization,attempt_id,outcome,error_code,error_message) VALUES($1,$2,'unknown','webhook_outcome_unknown','attempt outcome unknown after worker interruption') ON CONFLICT DO NOTHING`, org, attemptID(org, w.DeliveryID, count))
@@ -169,6 +178,9 @@ WHERE d.organization=$1 AND d.id=$2 FOR UPDATE OF d`, org, w.DeliveryID, window.
 		return monitoring.AdmittedAttempt{}, "", err
 	}
 	if err = deliveryUpdated(ctx, tx, org, corpusID, a.DeliveryID, a.Number, "delivering"); err != nil {
+		return monitoring.AdmittedAttempt{}, "", err
+	}
+	if err = observeQueueMetricKeys(ctx, tx, []queueMetricKey{{source: "delivery", org: org, id: a.DeliveryID}}); err != nil {
 		return monitoring.AdmittedAttempt{}, "", err
 	}
 	return a, "", tx.Commit(ctx)
@@ -240,6 +252,9 @@ RETURNING m.corpus_id,d.state,LEAST(now()+make_interval(secs => $5::double preci
 	if err != nil {
 		return err
 	}
+	if err = observeQueueMetricKeys(ctx, tx, []queueMetricKey{{source: "delivery", org: org, id: a.DeliveryID}}); err != nil {
+		return err
+	}
 	return tx.Commit(ctx)
 }
 
@@ -250,10 +265,8 @@ RETURNING m.corpus_id,d.state,LEAST(now()+make_interval(secs => $5::double preci
 // started (it is parked on its first claim).
 func (s DeliveryStore) DeliveryBacklog(ctx context.Context) (monitoring.DeliveryBacklog, error) {
 	var b monitoring.DeliveryBacklog
-	var age float64
-	err := s.Pool.QueryRow(ctx, `SELECT count(*),coalesce(extract(epoch FROM now()-min(coalesce(d.window_start,d.created_at))),0)::double precision
-FROM delivery_outbox o JOIN deliveries d ON (d.organization,d.id)=(o.organization,o.delivery_id)
-WHERE o.available_at<'infinity' AND d.state IN ('pending','delivering') AND d.window_start IS DISTINCT FROM 'infinity'`).Scan(&b.Pending, &age)
+	pending, _, age, err := queueMetricBacklog(ctx, s.Pool, "delivery")
+	b.Pending = pending
 	b.OldestAge = time.Duration(age * float64(time.Second))
 	return b, err
 }

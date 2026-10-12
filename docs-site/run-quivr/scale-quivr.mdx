@@ -26,6 +26,8 @@ The scaling rule is `replicas = clamp(ceil(waiting / documents_per_replica), min
 
 The signal `queues.bulk.waiting` includes estimated rebuild, backfill and quarantine work. Overlapping work can count twice. **Example observations:** 247,000 rebuild Versions kept a scaler at its maximum with no acquisition waiting; 87,000 waiting at 20,000 per replica recommended five replicas, despite an eight-replica cap. Read the observed count, not the cap.
 
+Queue observations read running backlog totals and indexed oldest arrivals. Imports update these totals as work changes. Rebuild scope discovery runs in resumable pages outside observation refresh; an unfinished scope contributes estimated bulk work even when no import is running. Connector backpressure reads the ingestion-only part of the same observation. During mixed-version upgrades, counts can lag behind older writers until the next resumable reconciliation reaches their changes; see [queue initialization](../run-quivr/upgrade-quivr.mdx#initialize-queue-observations).
+
 A missing observation or queue endpoint `503` means unknown work, never zero. Use a dedicated all-corpus `queues:read` key. Installation-wide metrics use `max` across replicas, not `sum`.
 
 [Scale workers on backlog](../run-quivr/deploy.mdx#scale-workers-on-backlog) owns the variables, queue fields, KEDA/Prometheus examples, bundled scaler backends and manual scaling procedure. Check platform-injected variables for collisions with your target configuration. When changing a Dockerfile path or service definition, update the platform's build settings too.

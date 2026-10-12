@@ -144,6 +144,15 @@ AND i.lease_until<now() ORDER BY i.sequence,i.subscription_version_id LIMIT $5 F
 	if _, err = tx.Exec(ctx, `INSERT INTO evaluation_retirements(organization,id,request_key,canonical_request,result) VALUES($1,$2,$3,$4,$5)`, org, out.ID, in.Key, canonical, result); err != nil {
 		return out, err
 	}
+	versions := make([]string, len(out.Items))
+	sequences := make([]int64, len(out.Items))
+	for i, it := range out.Items {
+		versions[i] = it.SubscriptionVersionID
+		sequences[i] = it.Sequence
+	}
+	if err = observeQueueIntents(ctx, tx, org, versions, sequences); err != nil {
+		return out, err
+	}
 	return out, tx.Commit(ctx)
 }
 

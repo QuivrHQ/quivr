@@ -142,7 +142,10 @@ func queueServingProjection(ctx context.Context, tx pgx.Tx, org, versionID strin
 		return nil
 	}
 	_, err = tx.Exec(ctx, `INSERT INTO pipeline_plan_work(kind,organization,work_id,plan_id,ingestion_registration_id) VALUES('serving_projection',$1,$2,$3,$4)`, org, job.ID, job.PlanID, job.RegistrationID)
-	return err
+	if err != nil {
+		return err
+	}
+	return observeQueueRecords(ctx, tx, []string{org}, []string{job.RecordID})
 }
 
 func queuePendingServingProjections(ctx context.Context, tx pgx.Tx, previous registry.Plan, next registry.Activation) error {
@@ -299,6 +302,9 @@ func (s ServingProjectionStore) completeServingProjectionAttempt(ctx context.Con
 		if err = queueServingProjection(ctx, tx, j.Organization, j.VersionID, j.ID); err != nil {
 			return err
 		}
+	}
+	if err = observeQueueRecords(ctx, tx, []string{j.Organization}, []string{j.RecordID}); err != nil {
+		return err
 	}
 	return tx.Commit(ctx)
 }

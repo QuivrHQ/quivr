@@ -23,7 +23,16 @@ func operationEvent(ctx context.Context, tx pgx.Tx, org, corpusID, id, state str
 	if err := tx.QueryRow(ctx, `SELECT EXISTS(SELECT 1 FROM change_events WHERE organization=$1 AND event_id=$2)`, org, content.StableID("event", org, "operation.updated", "operation", mutation)).Scan(&emitted); err != nil || emitted {
 		return err
 	}
-	return appendEvent(ctx, tx, eventInput{Organization: org, CorpusID: corpusID, Kind: "operation.updated", Resource: "operation", ResourceID: id, MutationID: mutation})
+	if err := appendEvent(ctx, tx, eventInput{Organization: org, CorpusID: corpusID, Kind: "operation.updated", Resource: "operation", ResourceID: id, MutationID: mutation}); err != nil {
+		return err
+	}
+	// A scope-wide state change records a bounded invalidation. Maintenance
+	// observes its items in keyset pages before publishing another snapshot.
+	_, err := tx.Exec(ctx, `INSERT INTO queue_scope_reconciliation(kind,organization,resource_id)
+ SELECT 'quarantine',organization,id FROM operations
+ WHERE organization=$1 AND id=$2 AND kind='quarantine_reprocess'
+ ON CONFLICT(kind,organization,resource_id) DO UPDATE SET cursor=''`, org, id)
+	return err
 }
 
 const operationColumns = `id,organization,kind,corpus_id,state,coalesce(previous_operation_id,''),target_generation_id,counters,errors,coalesce(result->>'projection_generation_id',''),

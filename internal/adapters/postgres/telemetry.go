@@ -8,12 +8,9 @@ import (
 )
 
 // IngestionBacklog counts Receipts accepted but not yet materialized and the
-// age of the oldest one. It reads only pending Receipts through a partial index.
+// age of the oldest one, from maintained work-item totals and an arrival index.
 func (s MaterializationStore) IngestionBacklog(ctx context.Context) (int64, time.Duration, error) {
-	var pending int64
-	var age float64
-	err := s.Pool.QueryRow(ctx, `SELECT count(*),coalesce(extract(epoch FROM now()-min(accepted_at)),0)::double precision
-FROM ingestion_receipts WHERE state='pending'`).Scan(&pending, &age)
+	pending, _, age, err := queueMetricBacklog(ctx, s.Pool, "ingestion")
 	return pending, time.Duration(age * float64(time.Second)), err
 }
 

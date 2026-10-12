@@ -2,6 +2,7 @@ package postgres
 
 import (
 	"context"
+	"fmt"
 	"testing"
 	"time"
 
@@ -35,6 +36,9 @@ VALUES('example','rebuild','projection_rebuild','corpus','rebuild','','target','
 INSERT INTO backfills(organization,operation_id,registration_id,spaces,estimate)
 VALUES('example','backfill','registration','{}','{"versions":100}'),('example','estimated','registration','{}','{"versions":9}')`)
 	snapshots := QueueSnapshots{Pool: pool}
+	if _, err := snapshots.Maintain(ctx); err != nil {
+		t.Fatal(err)
+	}
 	read := func(waiting, active int64) {
 		t.Helper()
 		exec(`UPDATE queue_backlog_snapshots SET published_at='-infinity'`)
@@ -68,4 +72,52 @@ VALUES('example','operation','rebuild','document',nextval('queue_document_attemp
 	read(9, 0)
 	exec(`UPDATE operations SET counters=counters || '{"versions_done":30}' WHERE id IN ('backfill','estimated')`)
 	read(0, 0)
+	// Discovery must bound raw records before eligibility, persist progress only
+	// on commit, and resume sparse corpora without skipping rejected records.
+	for i := 1; i <= 7; i++ {
+		seedQueueRecord(t, ctx, pool, "example", fmt.Sprintf("record-%d", i), fmt.Sprintf("version-%d", i), "text", "idle", 1, true)
+	}
+	exec(`UPDATE records SET withdrawn=true WHERE id<>'record-7'`)
+	exec(`INSERT INTO operations(organization,id,kind,corpus_id,request_key,canonical_request,target_generation_id) VALUES('example','paged','projection_rebuild','corpus','paged','','target')`)
+	page := func(commit bool) {
+		t.Helper()
+		tx, err := pool.Begin(ctx)
+		if err != nil {
+			t.Fatal(err)
+		}
+		defer tx.Rollback(ctx)
+		if more, err := advanceQueueOperationScopes(ctx, tx, 2); err != nil || !more {
+			t.Fatalf("scope page progress=%v error=%v", more, err)
+		}
+		if commit {
+			if err := tx.Commit(ctx); err != nil {
+				t.Fatal(err)
+			}
+		}
+	}
+	page(false)
+	var cursor string
+	var seen int64
+	var initialized bool
+	progress := func(wantCursor string, wantSeen int64, wantDone bool) {
+		t.Helper()
+		if err := pool.QueryRow(ctx, `SELECT coalesce(p.cursor,''),coalesce(p.seen,0),o.counters ? 'versions_in_scope' FROM operations o LEFT JOIN queue_operation_scope_progress p ON (p.organization,p.operation_id)=(o.organization,o.id) WHERE o.id='paged'`).Scan(&cursor, &seen, &initialized); err != nil {
+			t.Fatal(err)
+		}
+		if cursor != wantCursor || seen != wantSeen || initialized != wantDone {
+			t.Fatalf("scope progress=(%s,%d,%v), want (%s,%d,%v)", cursor, seen, initialized, wantCursor, wantSeen, wantDone)
+		}
+	}
+	progress("", 0, false)
+	for i := 2; i <= 6; i += 2 {
+		page(true)
+		progress(fmt.Sprintf("record-%d", i), 0, false)
+	}
+	page(true)
+	progress("record-7", 1, true)
+	var scope int64
+	if err := pool.QueryRow(ctx, `SELECT (counters->>'versions_in_scope')::bigint FROM operations WHERE id='paged'`).Scan(&scope); err != nil || scope != 1 {
+		t.Fatalf("final scope=%d error=%v", scope, err)
+	}
+
 }
