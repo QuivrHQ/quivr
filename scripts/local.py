@@ -1,5 +1,8 @@
 #!/usr/bin/env python3
 """The local stack (make dev, make verify): host Go processes and isolated real dependencies."""
+import pathlib, sys
+ROOT=pathlib.Path(__file__).resolve().parents[1]
+sys.path.insert(0,str(ROOT))
 from prepare_tokenizer import prepare as prepare_tokenizer, requirements
 from prepare_embeddings import prepare as prepare_embeddings, MODEL
 import verify_report
@@ -17,8 +20,6 @@ import queue_workers
 import ingestion_plugin
 import retrieval_plugin
 import argparse, base64, json, math, os, pathlib, re, secrets, signal, subprocess, sys, time, urllib.request, uuid
-ROOT=pathlib.Path(__file__).resolve().parents[1]
-sys.path.insert(0,str(ROOT))
 from deploy import infrastructure as infrastructure_settings
 GO=os.environ.get('GO','go')
 
@@ -146,7 +147,7 @@ class Stack:
             s['admin']:scope('org_a',['corpora:archive','corpora:rename','audit:read','corpora:read','corpora:write','content:read','content:write','search:query','blobs:read','blobs:write','changes:read','monitoring:read','monitoring:write','projections:rebuild','operations:read','operations:write','observability:read'],['*']),
             s['other']:scope('org_b',['corpora:read','corpora:write','content:read','content:write','search:query','blobs:read','blobs:write','changes:read','monitoring:read','monitoring:write','projections:rebuild','operations:read','operations:write','connectors:read','connectors:write','connectors:admin','connector:push'],['*']),
             # Connector acceptance owns org_c so its scheduled load cannot skew org_a/org_b scenarios.
-            s['connector']:scope('org_c',['corpora:read','corpora:write','content:read','content:write','search:query','changes:read','connectors:read','connectors:write','blobs:read'],['*']),
+            s['connector']:scope('org_c',['corpora:read','corpora:write','corpora:rename','content:read','content:write','search:query','changes:read','connectors:read','connectors:write','blobs:read'],['*']),
             s['connector_scoped']:scope('org_c',['connectors:read','connectors:write'],['corpus_not_granted']),
             # The browser demo (scripts/demo.py) owns org_d: its connectors keep polling without touching acceptance Organizations.
             # Its keyword alerts need the monitoring rights to read Matches through the API;
@@ -566,7 +567,9 @@ def contract_python():
     venv_dir=ROOT/'.scratch/contracts/venv'
     if not (venv_dir/'bin/python').exists():run(['python3','-m','venv',str(venv_dir)])
     # Idempotent and quick when satisfied; recovers a half-installed venv and follows requirement changes.
-    run([str(venv_dir/'bin/pip'),'-q','install','-r','contracts/http/v0/checks/requirements.txt'])
+    requirements = (['--require-hashes', '-r', str(ROOT/'contracts/http/v0/checks/requirements-lock.txt')]
+                    if os.environ.get('GITHUB_ACTIONS') == 'true' else ['-r', 'contracts/http/v0/checks/requirements.txt'])
+    run([sys.executable, str(ROOT/'scripts/ci_fetch.py'), '--', str(venv_dir/'bin/pip'), 'install', '-q', *requirements])
     return str(venv_dir/'bin/python')
 
 def validate_captures(stack):
@@ -576,7 +579,7 @@ def lifecycle_required():
     """Only CI with a known unchanged local.py may omit the expensive lifecycle proof."""
     base=os.environ.get('QUIVR_VERIFY_BASE')
     if not base:return True
-    changed=subprocess.run(['git','diff','--quiet',base,'HEAD','--','scripts/local.py'],cwd=ROOT)
+    changed=subprocess.run(['git','diff','--quiet',base,'HEAD','--','scripts/local.py','scripts/lifecycle.py','deploy/reset.py','deploy/reset_support.py','deploy/reset_storage.py','deploy/compose/reset.py','deploy/railway/reset.py'],cwd=ROOT)
     return changed.returncode!=0  # A missing/invalid base is uncertainty: run the proof.
 
 def parts():
@@ -595,7 +598,6 @@ def parts():
     from connector_x_restart import verify as verify_connector_x_restart
     from connector_x_push import verify as verify_connector_x_push
     from lifecycle import verify as verify_lifecycle
-    from weaviate_upgrade import verify as verify_weaviate_upgrade
     # Every part first restarts PostgreSQL under load and grants the scoped key its Corpus.
     setup=[step('persistence_across_restart',persistence)]
     return {
@@ -604,7 +606,6 @@ def parts():
             acceptance('core_acceptance','TestAuthorization|TestValidation|TestPagination|TestConcurrent|TestInline|TestStructuredManifest|TestManifest|TestWithdrawal|TestCorrection|TestLexical|TestLong|TestSemantic|TestUpload|TestBatch'),
             # A cold query encoder and a fresh api answer the first semantic and hybrid searches (THE-813).
             step('first_search_after_start',verify_first_search),
-            step('weaviate_persistence_upgrade',verify_weaviate_upgrade),
             step('adapter_integration',adapters),
             # Tokenizer-only golden parity and certification; full vectors run in ingest-parity nightly.
             step('core_ingest_plugin',core_ingest_plugin.verify),
@@ -693,8 +694,9 @@ def parts():
             step('x_restart',lambda stack:verify_connector_x_restart(stack,f"http://127.0.0.1:{stack.state['fake_x_port']}")),
             # X webhook deliveries while the x-list plugin is down: 503 to X, then polling catches up.
             step('x_push_outage',lambda stack:verify_connector_x_push(stack,f"http://127.0.0.1:{stack.state['fake_x_port']}")),
-            # Last, since it activates them: pdf-text and the RSS connector registered with their own fixtures (THE-807).
+            # Certify pdf-text and RSS with their own fixtures before apply changes the RSS pin (THE-807).
             acceptance('plugin_own_fixtures','^TestPluginRegistrationWithItsFixtures$'),
+            acceptance('install_apply','^TestInstallApply$'),
             step('validate_captures',validate_captures)],
     }
 
@@ -704,7 +706,9 @@ DEMO='demo'
 def extra_parts():
     """Explicit stack proofs outside the default PR lane."""
     from lifecycle import verify as verify_lifecycle
-    return {'ingest-parity':[step('core_ingest_vector_parity',core_ingest_plugin.parity)],
+    from weaviate_upgrade import verify as verify_weaviate_upgrade
+    return {'weaviate-upgrade':[step('weaviate_persistence_upgrade',verify_weaviate_upgrade)],
+            'ingest-parity':[step('core_ingest_vector_parity',core_ingest_plugin.parity)],
             'lifecycle':[step('lifecycle',verify_lifecycle)]}
 
 def verify(stack,steps,part):

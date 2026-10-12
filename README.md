@@ -87,6 +87,8 @@ For a browser UI over the same API, run `make demo` and open http://127.0.0.1:51
 
 ## What works today
 
+- [Reset and reload an installation](https://docs.quivr.thevibecompany.co/run-quivr/reset-and-reload) from private JSON declarations, with a preview and idempotent public API replay.
+
 - [Choose an embedding model](https://docs.quivr.thevibecompany.co/run-quivr/choose-an-embedding-model) for local inference, your own model server or a hosted API, with rebuild requirements and execution-only tuning. [Run a large import](https://docs.quivr.thevibecompany.co/run-quivr/run-a-large-import) covers bulk workers, provider capacity, database sizing and queue monitoring.
 
 - Searches report query-model outages as retryable `503 model_unavailable`, separately from overload and other search dependency failures. See [Search errors](https://docs.quivr.thevibecompany.co/guides/search#when-a-search-fails).
@@ -136,6 +138,8 @@ For a browser UI over the same API, run `make demo` and open http://127.0.0.1:51
 - **Change feed** through polling and resumable SSE, plus **catalog resync** after
   cursor expiry. List a Corpus's Records newest first by current-Version acceptance
   time, filter by time bounds, and read exact range counts through the API or CLI.
+  Metadata equality and date-range pages use scoped indexes and bounded reads;
+  overly broad filters return a non-retryable narrowing error.
 - **Saved Queries and Subscriptions**, pinned and versioned; enabled Subscriptions turn
   newly searchable Versions into unique **Matches** (`/v0/matches`), each with a
   Delivery when a destination is configured. Omit `destination_id` to read Matches

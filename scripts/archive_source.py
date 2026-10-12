@@ -3,46 +3,17 @@
 Only seeds the source dependency. Acceptance reads ingestion, checkpoints,
 versions and original bytes through the public Quivr API.
 """
-import datetime
-import gzip
 import hashlib
-import hmac
+import gzip
 import io
 import json
 import pathlib
 import tarfile
-import urllib.parse
-import urllib.request
 import zipfile
 import uuid
 
 
-def s3_request(endpoint, access, secret, method, path, body=b''):
-    """Small SigV4 client for fixture PUTs, with no credential logging."""
-    now = datetime.datetime.now(datetime.timezone.utc)
-    stamp, day = now.strftime('%Y%m%dT%H%M%SZ'), now.strftime('%Y%m%d')
-    host = urllib.parse.urlsplit(endpoint).netloc
-    uri = urllib.parse.quote(path, safe='/')
-    digest = hashlib.sha256(body).hexdigest()
-    headers = f'host:{host}\nx-amz-content-sha256:{digest}\nx-amz-date:{stamp}\n'
-    signed = 'host;x-amz-content-sha256;x-amz-date'
-    canonical = '\n'.join((method, uri, '', headers, signed, digest))
-    scope = f'{day}/us-east-1/s3/aws4_request'
-    message = '\n'.join(('AWS4-HMAC-SHA256', stamp, scope, hashlib.sha256(canonical.encode()).hexdigest()))
-    key = ('AWS4' + secret).encode()
-    for value in (day, 'us-east-1', 's3', 'aws4_request'):
-        key = hmac.new(key, value.encode(), hashlib.sha256).digest()
-    signature = hmac.new(key, message.encode(), hashlib.sha256).hexdigest()
-    request = urllib.request.Request(endpoint + uri, data=body, method=method, headers={
-        'x-amz-date': stamp, 'x-amz-content-sha256': digest,
-        'Authorization': f'AWS4-HMAC-SHA256 Credential={access}/{scope}, SignedHeaders={signed}, Signature={signature}'})
-    try:
-        with urllib.request.urlopen(request, timeout=30) as response:
-            return response.read()
-    except Exception:
-        # An HTTP exception's request may include capabilities. Surface only
-        # the dependency action, never the signed request or credential.
-        raise RuntimeError(f'Synthetic S3 source {method} failed') from None
+from deploy.reset_storage import s3_request
 
 
 def archive_bytes(members, kind):
@@ -60,7 +31,28 @@ def archive_bytes(members, kind):
     return gzip.compress(raw.getvalue(), mtime=0)
 
 
-def seed(stack, bucket='synthetic-archive-source', prefix='inbox/', count=10, marker=''):
+def correction_members(count=2000, keys=31, marker=''):
+    """Fixed-size ordered revisions, an exact replay, then a late older item."""
+    if count < 4 or not 1 <= keys <= count - 2:
+        raise ValueError('corrections need at least four members and at most count - 2 keys')
+    members, positions, versions = [], {}, {}
+    for index in range(count - 2):
+        key, position = f'STORY{index % keys}', index + 1
+        name = f'2026/01/01/urn%3Aexample%3A{key}-{position}.xml'
+        line = f'Synthetic archive {marker}: {key} revision {position}. '.encode()
+        body = (line * ((30 << 10) // len(line) + 1))[:30 << 10]
+        members.append((name, body))
+        positions[key] = str(position)
+        versions[key] = versions.get(key, 0) + 1
+    members.append(members[0])
+    members.append(('2026/01/01/urn%3Aexample%3ASTORY0-0.xml',
+                    (f'Synthetic older revision {marker}. '.encode() * (30 << 10))[:30 << 10]))
+    versions['STORY0'] += 1
+    return members, {'unique_commands': count - 1, 'unique_records': keys,
+                     'current_positions': positions, 'versions_per_key': versions}
+
+
+def seed(stack, bucket='synthetic-archive-source', prefix='inbox/', count=10, marker='', fixture='simple'):
     cfg = json.loads((stack.directory / 'config.json').read_text())['s3']
     args = (cfg['endpoint'], cfg['access_key'], cfg['secret_key'])
     # Each isolated verification stack owns its bucket, created exactly once.
@@ -73,16 +65,28 @@ def seed(stack, bucket='synthetic-archive-source', prefix='inbox/', count=10, ma
                f'Harbourlight synthetic bulletin {i}.'.encode() + suffix) for i in range(count)]
     second = [('2026/01/02/11/urn%3Aexample%3AITEM7-3.xml', older),
               ('2026/01/03/12/urn%3Aexample%3AITEM9-1.xml', b'Harbourlight final bulletin.' + suffix)]
-    for name, members, kind in [('2026-01.tar.gz', first, 'tar.gz'), ('2026-02.zip', second, 'zip')]:
-        s3_request(*args, 'PUT', '/' + bucket + '/' + prefix + name, archive_bytes(members, kind))
+    expected = {'unique_commands': count + 3, 'unique_records': count + 2}
+    archives = [('2026-01.tar.gz', first, 'tar.gz'), ('2026-02.zip', second, 'zip')]
+    total = count + 3
+    if fixture == 'corrections':
+        members, expected = correction_members(count, min(31, count - 2), marker)
+        archives, total = [('2026-01.tar.gz', members, 'tar.gz')], count
+    elif fixture != 'simple':
+        raise ValueError('unknown archive fixture')
+    checksums = {}
+    for name, members, kind in archives:
+        body = archive_bytes(members, kind)
+        checksums[name] = hashlib.sha256(body).hexdigest()
+        s3_request(*args, 'PUT', '/' + bucket + '/' + prefix + name, body)
     source = {'bucket': bucket, 'prefix': prefix, 'region': 'us-east-1', 'endpoint': cfg['endpoint'],
               'media_type': 'text/plain', 'member_pattern': '**/*.xml',
               'record_key_pattern': r'urn:example:([A-Z0-9]+)-',
-              'source_position_pattern': r'-([0-9]+)\.xml$', 'members_total': count + 3}
+              'source_position_pattern': r'-([0-9]+)\.xml$', 'members_total': total}
     private = stack.directory / 'archive-source.json'
     private.write_text(json.dumps({'config': source, 'credential': {
         'access_key_id': cfg['access_key'], 'secret_access_key': cfg['secret_key']},
-        'latest_text': newer.decode(), 'members_total': count + 3}) + '\n')
+        'latest_text': newer.decode(), 'members_total': total,
+        'fixture': fixture, 'expected': expected, 'archive_sha256': checksums}) + '\n')
     private.chmod(0o600)
     return private
 
