@@ -20,6 +20,18 @@ func advanceQueueOperationScopes(ctx context.Context, tx pgx.Tx, limit int) (boo
 	if err != nil {
 		return false, err
 	}
+	// Completed corpus totals have the same current-Version eligibility. Reuse
+	// their fixed stripes; initialization has its own operator gate and loop.
+	var complete bool
+	var eligibleTotal int64
+	if err = tx.QueryRow(ctx, `SELECT coalesce((SELECT complete FROM corpus_record_bootstrap WHERE organization=$1 AND corpus_id=$2),false),
+ (SELECT coalesce(sum(eligible),0)::bigint FROM corpus_record_totals WHERE organization=$1 AND corpus_id=$2)`, org, corpus).Scan(&complete, &eligibleTotal); err != nil {
+		return false, err
+	}
+	if complete {
+		_, err = tx.Exec(ctx, `UPDATE operations SET counters=counters || jsonb_build_object('versions_in_scope',$3::bigint) WHERE organization=$1 AND id=$2`, org, id, eligibleTotal)
+		return true, err
+	}
 	if _, err = tx.Exec(ctx, `INSERT INTO queue_operation_scope_progress(organization,operation_id) VALUES($1,$2) ON CONFLICT DO NOTHING`, org, id); err != nil {
 		return false, err
 	}

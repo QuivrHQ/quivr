@@ -120,4 +120,35 @@ VALUES('example','operation','rebuild','document',nextval('queue_document_attemp
 		t.Fatalf("final scope=%d error=%v", scope, err)
 	}
 
+	// Completed document totals supply the scope without visiting Records.
+	if more, err := (CorpusStatsStore{Pool: pool}).Bootstrap(ctx, 1000); err != nil || !more {
+		t.Fatalf("corpus bootstrap=%v error=%v", more, err)
+	}
+	exec(`INSERT INTO operations(organization,id,kind,corpus_id,request_key,canonical_request,target_generation_id) VALUES('example','rollup','projection_rebuild','corpus','rollup','','target')`)
+	locked, err := pool.Begin(ctx)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer locked.Rollback(ctx)
+	if _, err = locked.Exec(ctx, `LOCK records IN ACCESS EXCLUSIVE MODE`); err != nil {
+		t.Fatal(err)
+	}
+	tx, err := pool.Begin(ctx)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer tx.Rollback(ctx)
+	if _, err = tx.Exec(ctx, `SET LOCAL lock_timeout='100ms'`); err != nil {
+		t.Fatal(err)
+	}
+	if more, err := advanceQueueOperationScopes(ctx, tx, 2); err != nil || !more {
+		t.Fatalf("complete rollup scope visited Records: progress=%v error=%v", more, err)
+	}
+	if err = tx.Commit(ctx); err != nil {
+		t.Fatal(err)
+	}
+	if err = pool.QueryRow(ctx, `SELECT (counters->>'versions_in_scope')::bigint FROM operations WHERE id='rollup'`).Scan(&scope); err != nil || scope != 1 {
+		t.Fatalf("rollup scope=%d error=%v", scope, err)
+	}
+
 }
