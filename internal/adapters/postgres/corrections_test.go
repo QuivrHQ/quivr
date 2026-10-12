@@ -158,6 +158,16 @@ func TestCorrectionAndWithdrawalNotices(t *testing.T) {
 		}
 	}
 	superseded, _ := noticeOf(matchOf(0, v1), monitoring.NoticeCreated)
+	allowed := func(ids ...string) {
+		t.Helper()
+		for _, id := range ids {
+			refused, claimed := admitted[id]
+			if !claimed || refused != "" {
+				t.Fatalf("delivery %s: claimed=%t refusal=%q, want claimed and allowed", id, claimed, refused)
+			}
+		}
+	}
+	allowed(corrected.ID, invalidated.ID)
 	if admitted[superseded.ID] != "superseded" || admitted[corrected.ID] != "" || admitted[invalidated.ID] != "" || superseded.AttemptCount != 0 {
 		t.Fatalf("admission %v", admitted)
 	}
@@ -251,6 +261,7 @@ func TestCorrectionAndWithdrawalNotices(t *testing.T) {
 	}
 	created2, _ := noticeOf(matchOf(2, v1), monitoring.NoticeCreated)
 	withdrawn2, _ := noticeOf(matchOf(2, v1), monitoring.NoticeWithdrawn)
+	allowed(withdrawn.ID)
 	if admitted[withdrawn.ID] != "" || admitted[superseded.ID] != "record_withdrawn" || admitted[created2.ID] != "subscription_disabled" || admitted[withdrawn2.ID] != "subscription_disabled" {
 		t.Fatalf("admission after withdrawal %v", admitted)
 	}

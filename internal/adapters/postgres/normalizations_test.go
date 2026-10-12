@@ -21,10 +21,6 @@ import (
 	"github.com/The-Vibe-Company/quivr/internal/plugins"
 )
 
-type routedTypes map[string]bool
-
-func (r routedTypes) Routed(mediaType string) bool { return r[mediaType] }
-
 type verifiedSource struct{ blob content.VerifiedBlob }
 
 func (v verifiedSource) VerifiedBlob(context.Context, string, string) (content.VerifiedBlob, error) {

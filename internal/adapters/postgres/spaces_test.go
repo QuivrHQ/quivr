@@ -287,10 +287,18 @@ func TestIndependentEvaluationProjectionCoverage(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+	found := false
 	for _, covered := range coverage {
-		if covered.OwnerPluginID == "example.evaluation" && (covered.ServingSegments == nil || *covered.ServingSegments != 0 || covered.TotalSegments == nil || *covered.TotalSegments != 2) {
+		if covered.ID != f.space.ID {
+			continue
+		}
+		if found || covered.OwnerPluginID != "example.evaluation" || covered.ServingSegments == nil || *covered.ServingSegments != 0 || covered.TotalSegments == nil || *covered.TotalSegments != 2 {
 			t.Fatalf("evaluation-only owner coverage must expose two independent cuts and zero serving cuts: %+v", covered)
 		}
+		found = true
+	}
+	if !found {
+		t.Fatalf("independent evaluation coverage missing %s: %+v", f.space.ID, coverage)
 	}
 	var eventsBefore int
 	if err = f.pool.QueryRow(ctx, `SELECT count(*) FROM change_events WHERE organization=$1`, f.org).Scan(&eventsBefore); err != nil {
@@ -313,10 +321,18 @@ func TestIndependentEvaluationProjectionCoverage(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
+		found = false
 		for _, row := range coverage {
-			if row.ID == f.space.ID && row.Segments != 2 {
+			if row.ID != f.space.ID {
+				continue
+			}
+			if found || row.OwnerPluginID != "example.evaluation" || row.Segments != 2 {
 				t.Fatalf("altered %s committed coverage: %+v", field, row)
 			}
+			found = true
+		}
+		if !found {
+			t.Fatalf("altered %s lost independent coverage %s: %+v", field, f.space.ID, coverage)
 		}
 		var eventsAfter int
 		if err = f.pool.QueryRow(ctx, `SELECT count(*) FROM change_events WHERE organization=$1`, f.org).Scan(&eventsAfter); err != nil || eventsAfter != eventsBefore {

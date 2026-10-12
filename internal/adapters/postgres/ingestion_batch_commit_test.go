@@ -106,6 +106,7 @@ func TestPreparedPublicationGroupsKeepAtomicOrderedFeed(t *testing.T) {
 	// fenced reads travel with the lock, followed by writes/events and commit.
 	trips.mu.Lock()
 	trips.lockedTrips = 0
+	trips.locksSeen = 0
 	trips.mu.Unlock()
 	// Progress by independent writers under injected insert latency, without
 	// a flaky elapsed-time ratio in CI.
@@ -114,7 +115,11 @@ func TestPreparedPublicationGroupsKeepAtomicOrderedFeed(t *testing.T) {
 	}
 	trips.mu.Lock()
 	lockedTrips := trips.lockedTrips
+	captured := trips.locksSeen
 	trips.mu.Unlock()
+	if captured == 0 {
+		t.Fatal("publication exchange guard captured no journal lock statements")
+	}
 	if lockedTrips > 2 {
 		t.Errorf("publication held journal across %d round trips, want at most 2", lockedTrips)
 	}
@@ -301,13 +306,18 @@ func TestPreparedPublicationGroupsKeepAtomicOrderedFeed(t *testing.T) {
 		}
 		trips.mu.Lock()
 		trips.lockedTrips = 0
+		trips.locksSeen = 0
 		trips.mu.Unlock()
 		if err = errors.Join(stores.CommitIngestion(ctx, commits)...); err != nil {
 			t.Fatal(err)
 		}
 		trips.mu.Lock()
 		lockedTrips := trips.lockedTrips
+		captured := trips.locksSeen
 		trips.mu.Unlock()
+		if captured == 0 {
+			t.Fatal("enrichment exchange guard captured no journal lock statements")
+		}
 		if lockedTrips > 2 {
 			t.Errorf("enrichment held journal across %d round trips, want at most 2", lockedTrips)
 		}
