@@ -24,6 +24,9 @@ ENV = {'QUIVR_API_KEY': 'placeholder-api-key', 'DATABASE_URL': 'postgres://place
 
 
 class CoreEntrypointTest(unittest.TestCase):
+    def test_runtime_allows_workers_ten_minutes_for_api_migrations(self):
+        self.assertEqual(core_entrypoint.build_config(ENV)['migration_wait'], '10m')
+
     def test_local_text_encoder_runs_only_beside_api_without_changing_pins(self):
         env = {**ENV, 'QUIVR_DEMO_EMBEDDING': 'gemma',
                'EMBED_URL': 'https://example--embeddings.modal.run',

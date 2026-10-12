@@ -482,6 +482,19 @@ class Infrastructure(unittest.TestCase):
                                     capture_output=True, text=True, timeout=5, check=True)
             self.assertEqual(infra.observed_resources(result.stdout.splitlines())['storage'], '4194304')
 
+    def test_worker_deployments_allow_api_build_and_migration_time(self):
+        from deploy.railway.provision import deployment_config, load_services
+        services = load_services()
+        for name in ('worker', 'worker-bulk'):
+            for new in (True, False):
+                with self.subTest(service=name, new=new):
+                    config = deployment_config(services[name], new=new)
+                    self.assertEqual(config['healthcheckPath'], '/readyz')
+                    self.assertEqual(config['healthcheckTimeout'], 900)
+        # An omitted timeout keeps the existing budget for other services.
+        default = deployment_config({'healthcheck': '/health'}, new=False)
+        self.assertEqual(default['healthcheckTimeout'], 180)
+
     def test_reprovisioning_preserves_the_autoscalers_replica_count(self):
         from deploy.railway.provision import deployment_config, load_services
         services = load_services('large')
