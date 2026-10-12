@@ -45,7 +45,13 @@ VALUES('example','backfill','registration','{}','{"versions":100}'),('example','
 		if err != nil {
 			t.Fatal(err)
 		}
+		seen := map[string]bool{}
 		for _, status := range statuses {
+			queue := string(status.Queue)
+			if (status.Queue != workqueue.Live && status.Queue != workqueue.Bulk) || seen[queue] {
+				t.Fatalf("queue identities: %+v, want each live and bulk once", statuses)
+			}
+			seen[queue] = true
 			if status.Queue == workqueue.Bulk && (status.Waiting != waiting || status.InProgress != active) {
 				t.Fatalf("bulk=%+v, want waiting=%d active=%d", status, waiting, active)
 			}
@@ -55,6 +61,9 @@ VALUES('example','backfill','registration','{}','{"versions":100}'),('example','
 			if status.Queue == workqueue.Bulk && waiting > 0 && status.OldestAgeSeconds < 25 {
 				t.Fatalf("operation admission age lost: %+v", status)
 			}
+		}
+		if !seen[string(workqueue.Live)] || !seen[string(workqueue.Bulk)] {
+			t.Fatalf("queue identities: %+v, want live and bulk", statuses)
 		}
 	}
 	read(13, 0)

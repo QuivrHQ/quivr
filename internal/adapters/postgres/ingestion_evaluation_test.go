@@ -160,7 +160,13 @@ func TestIngestionEvaluationRunsAfterServedCommit(t *testing.T) {
 			if job.PluginID != "certified.ingestion-valid" || job.PlanID != plan.Plan || len(job.Spaces) != 2 {
 				t.Fatalf("evaluation target %+v", job)
 			}
+			wanted := map[string]bool{"certified.ingestion-valid.small@1": true, "certified.ingestion-valid.large@1": true}
+			claimed := map[string]bool{}
 			for _, key := range job.Spaces {
+				if !wanted[key] || claimed[key] {
+					t.Fatalf("old plan space identities: %q, want each small@1 and large@1 once", job.Spaces)
+				}
+				claimed[key] = true
 				if !(pluginhttp.Ingestor{Pin: evaluationPin}).Descriptor().Owns(key) {
 					t.Fatalf("old plan queued an upgraded space: %+v", job)
 				}
@@ -217,10 +223,18 @@ func TestIngestionEvaluationRunsAfterServedCommit(t *testing.T) {
 				if err != nil {
 					t.Fatal(err)
 				}
+				covered := map[string]bool{}
 				for _, s := range spaces {
-					if s.OwnerPluginID == job.PluginID && (s.Segments != 2 || s.TotalSegments == nil || *s.TotalSegments != 2 || s.VersionsCovered != 1) {
+					if !wanted[s.ID] {
+						continue
+					}
+					if covered[s.ID] || s.OwnerPluginID != "certified.ingestion-valid" || s.Segments != 2 || s.TotalSegments == nil || *s.TotalSegments != 2 || s.VersionsCovered != 1 {
 						t.Fatalf("owner coverage: %+v", s)
 					}
+					covered[s.ID] = true
+				}
+				if len(covered) != len(wanted) {
+					t.Fatalf("old plan coverage identities: %v, want %v", covered, wanted)
 				}
 			}
 		})

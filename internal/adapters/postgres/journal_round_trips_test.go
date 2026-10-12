@@ -45,7 +45,11 @@ func TestJournalEventsCarryQueueObservationsInTheirRoundTrip(t *testing.T) {
 	}
 	trips.mu.Lock()
 	extra := trips.observationOnly
+	captured := trips.locksSeen
 	trips.mu.Unlock()
+	if captured == 0 {
+		t.Fatal("journal exchange guard captured no lock statements")
+	}
 	if len(extra) > 0 {
 		t.Errorf("round trips under the journal lock carried only queue observation work: %q", extra)
 	}
@@ -67,31 +71,40 @@ type lockedRoundTrips struct {
 	locked          map[*pgx.Conn]bool
 	observationOnly []string
 	lockedTrips     int
+	locksSeen       int
 }
 
 func journalLock(sql string) bool {
-	return strings.Contains(sql, "FROM organization_journals WHERE organization=$1 FOR UPDATE")
+	// Observe the stable relation/row-lock operation, independent of predicate
+	// spelling and aliases. Quoted/qualified identifiers and interleaved SQL
+	// comments are outside this bounded tracer's current owner queries.
+	return strings.Contains(sql, "from organization_journals ") && (strings.Contains(sql, "for update") || strings.Contains(sql, "for no key update"))
 }
 
 func (r *lockedRoundTrips) trip(c *pgx.Conn, sqls []string) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
+	normalized := make([]string, len(sqls))
+	for i, sql := range sqls {
+		normalized[i] = strings.ToLower(strings.Join(strings.Fields(sql), " "))
+	}
 	if r.locked[c] {
 		r.lockedTrips++
 		observation, event := false, false
-		for _, sql := range sqls {
+		for _, sql := range normalized {
 			observation = observation || strings.Contains(sql, "queue_enrichment_records")
-			event = event || strings.Contains(sql, "INSERT INTO change_events")
+			event = event || strings.Contains(sql, "insert into change_events")
 		}
 		if observation && !event {
 			r.observationOnly = append(r.observationOnly, strings.Join(strings.Fields(sqls[0]), " "))
 		}
 	}
-	for _, sql := range sqls {
+	for _, sql := range normalized {
 		if journalLock(sql) {
 			r.locked[c] = true
+			r.locksSeen++
 		}
-		if s := strings.TrimSpace(strings.ToLower(sql)); s == "commit" || s == "rollback" {
+		if s := strings.TrimSuffix(sql, ";"); s == "commit" || s == "rollback" {
 			delete(r.locked, c)
 		}
 	}
