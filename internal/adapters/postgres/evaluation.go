@@ -697,5 +697,9 @@ func scanMatch(row pgx.Row) (monitoring.Match, error) {
 	if err := row.Scan(&m.ID, &m.SubscriptionID, &m.SubscriptionVersionID, &m.SavedQueryID, &m.SavedQueryVersionID, &m.RecordID, &m.RecordVersionID, &m.PreviousMatchID, &m.Owner, &evidence, &m.Position); err != nil {
 		return m, err
 	}
+	if string(evidence) == "null" {
+		m.EvidenceExpired = true
+		return m, nil
+	}
 	return m, unmarshalNumbers(evidence, &m.Evidence)
 }

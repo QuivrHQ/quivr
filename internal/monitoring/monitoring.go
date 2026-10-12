@@ -19,6 +19,7 @@ import (
 var (
 	ErrForbidden            = publicerr.Forbidden
 	ErrNotFound             = publicerr.NotFound
+	ErrEvidenceExpired      = publicerr.EvidenceExpired
 	ErrConflict             = publicerr.IdempotencyConflict
 	ErrUnsupportedProfile   = publicerr.UnsupportedProfile
 	ErrUnsupportedEvaluator = publicerr.UnsupportedEvaluator

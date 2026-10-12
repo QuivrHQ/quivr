@@ -1758,5 +1758,14 @@
       "message": "metadata filter exceeds the bounded read budget; narrow the metadata or acceptance-time range",
       "retryable": false
     }
+  },
+  {
+    "name": "expired_match_evidence",
+    "schema": "Error",
+    "value": {
+      "code": "evidence_expired",
+      "message": "evidence expired",
+      "retryable": false
+    }
   }
 ]
