@@ -48,6 +48,7 @@ class VectorHost(unittest.TestCase):
                     self.assertEqual(env['AUTOSCHEMA_ENABLED'], 'false')
                     self.assertNotIn('ports', index)
                     self.assertEqual(index['restart'], 'no')
+                    self.assertEqual(index['hostname'], 'quivr-vector-host')
                     self.assertFalse(index['volumes'][0]['bind']['create_host_path'])
                     for path in (target / 'rendered').iterdir():
                         if path.is_file():

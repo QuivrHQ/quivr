@@ -322,9 +322,11 @@ def main():
             and (spec.get('image') or spec.get('deploy'))}
         adapter = Railway(args.project_id, args.environment_id)
         adapter.select(selectors, include_autoscaler=not args.service, allow_missing_index=not args.service)
-        location = adapter.index_is_local() if args.vector_host is None else False
-        external = args.vector_host if args.vector_host is not None else (None if location is True else '')
-        external_write = args.vector_host is not None or location is False
+        inspect_index = 'weaviate' in selectors or args.vector_host is not None
+        location = adapter.index_is_local() if inspect_index and args.vector_host is None else None
+        external = (args.vector_host if args.vector_host is not None else
+                    None if not inspect_index or location is True else '')
+        external_write = args.vector_host is not None or (inspect_index and location is False)
         if args.command == 'apply':
             if external_write:
                 adapter.targets.pop('weaviate', None)

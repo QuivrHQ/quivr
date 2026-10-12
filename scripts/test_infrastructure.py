@@ -90,6 +90,18 @@ class Infrastructure(unittest.TestCase):
         settings = {row['setting']: row for row in result['observations']}
         self.assertEqual(settings['AUTHENTICATION_ANONYMOUS_ACCESS_ENABLED']['expected'], 'false')
         self.assertEqual(settings['AUTHENTICATION_APIKEY_ENABLED']['expected'], 'true')
+        # Explicit role selection retains its documented scope; omitting the
+        # index must not inject an unrelated unknown observation.
+        transport = RailwayTransport()
+        def provider(args, **kwargs):
+            return subprocess.CompletedProcess(args, 0, transport(args[1:], kwargs.get('input')), '')
+        from deploy.railway import infrastructure as railway_cli
+        output = io.StringIO()
+        with patch.object(sys, 'argv', ['infrastructure.py', 'check', '--project-id', 'project',
+            '--environment-id', 'environment', '--profile', 'large', '--service', 'api=api-service']), \
+            patch.object(railway_cli.subprocess, 'run', side_effect=provider), patch('sys.stdout', output):
+            railway_cli.main()
+        self.assertEqual({row['service'] for row in json.loads(output.getvalue())['observations']}, {'api'})
 
     def test_railway_cap_preflight_reports_limits_and_refuses_before_any_write(self):
         # Owns provider-cap admission at the CLI boundary: a later oversized

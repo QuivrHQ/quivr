@@ -53,7 +53,9 @@ def assets(settings, uuid='UNMOUNTED'):
     def bind(source, destination, readonly=False):
         return {'type': 'bind', 'source': str(source), 'target': destination,
                 'read_only': readonly, 'bind': {'create_host_path': False}}
-    index = {'image': spec['image'], 'environment': spec['environment'],
+    # The pinned server defaults its persisted cluster identity to os.Hostname.
+    # Keep it stable across container recreation as well as machine restarts.
+    index = {'image': spec['image'], 'hostname': 'quivr-vector-host', 'environment': spec['environment'],
              'env_file': [str(CONFIG / 'weaviate.env')], 'restart': 'no',
              'deploy': spec['deploy'], 'logging': logging,
              'volumes': [bind(DATA / 'index', '/var/lib/weaviate')], 'networks': ['index']}
