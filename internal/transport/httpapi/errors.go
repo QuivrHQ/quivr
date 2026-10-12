@@ -42,6 +42,8 @@ func errorResponse(err error, fallback *publicerr.Error, corpusID ...string) (in
 		body.ResyncUrl = &url
 	}
 	switch e {
+	case publicerr.FilterTooBroad:
+		body.Message = "metadata filter exceeds the bounded read budget; narrow the metadata or acceptance-time range"
 	case publicerr.QueryTooLong:
 		if detail := publicerr.Detail(err); detail != "" {
 			body.Message = detail

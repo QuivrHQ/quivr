@@ -1751,6 +1751,15 @@
     }
   },
   {
+    "name": "metadata_filter_too_broad",
+    "schema": "Error",
+    "value": {
+      "code": "filter_too_broad",
+      "message": "metadata filter exceeds the bounded read budget; narrow the metadata or acceptance-time range",
+      "retryable": false
+    }
+  },
+  {
     "name": "expired_match_evidence",
     "schema": "Error",
     "value": {

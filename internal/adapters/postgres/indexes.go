@@ -2,6 +2,7 @@ package postgres
 
 import (
 	"context"
+	_ "embed"
 	"errors"
 	"fmt"
 	"strings"
@@ -21,6 +22,7 @@ type indexDefinition struct {
 }
 
 var concurrentIndexes = []indexDefinition{
+	{Name: "change_events_by_corpus", Table: "change_events", Columns: []string{"organization", "corpus_id", "sequence"}},
 	{Name: "segments_by_segmentation", Table: "segments", Columns: []string{"organization", "segmentation_id"}},
 	{Name: "projection_purges_cleanup_due", Table: "projection_purges", Columns: []string{"noticed_at"}, Predicate: "((purged_at IS NULL) OR (cleanup_stage < 3))"},
 	{Name: "queue_enrichment_pending", Table: "queue_enrichment_records", Columns: []string{"organization", "version_id"}, Predicate: "pending"},
@@ -35,6 +37,10 @@ var concurrentIndexes = []indexDefinition{
 	{Name: "ingestion_receipts_pending_revision", Table: "ingestion_receipts", Columns: []string{"organization", "record_id", "slot"}, Predicate: "(state = 'pending'::text)"},
 	{Name: "evaluation_intents_decided_pair", Table: "evaluation_intents", Columns: []string{"organization", "subscription_version_id", "record_version_id", "sequence"}, Predicate: "((kind = 'evaluation'::text) AND (state = 'done'::text) AND (outcome = ANY (ARRAY['matched'::text, 'duplicate'::text, 'no_match'::text, 'no_longer_matches'::text])))"},
 	{Name: "records_by_current_version", Table: "records", Columns: []string{"organization", "corpus_id", "current_version_id"}},
+	{Name: "projection_metadata_filter_source", Table: "projection_metadata_filter_values", Columns: []string{"organization", "version_id", "generation_id"}},
+	{Name: "projection_metadata_filter_values_lookup", Table: "projection_metadata_filter_values", Columns: []string{"organization", "corpus_id", "generation_id", "field", "value", "version_id"}},
+	{Name: "projection_metadata_filter_dates_lookup", Table: "projection_metadata_filter_values", Columns: []string{"organization", "corpus_id", "generation_id", "field", "date_epoch_ms", "version_id"}, Predicate: "(date_epoch_ms IS NOT NULL)"},
+	{Name: "projection_metadata_filter_pending", Table: "projection_metadata", Columns: []string{"organization", "generation_id", "version_id"}, Predicate: "(NOT filter_indexed)"},
 }
 
 // The partial index predates the full managed lookup above. It is retired only
@@ -62,6 +68,41 @@ var (
 // Reserved independently of schema migrations: a build waiting for an older
 // writer must not prevent another process from applying required migrations.
 const indexAdvisoryLock int64 = 642004
+
+//go:embed metadata_catalog_sync.sql
+var metadataCatalogSync string
+
+// Synchronization is optional performance maintenance, outside the declarative
+// schema expansion. Install it atomically before any source is marked indexed.
+// A canceled attempt leaves all unpopulated sources on the bounded read path.
+func ensureMetadataCatalogSync(ctx context.Context, conn *pgx.Conn) error {
+	var installed bool
+	if err := conn.QueryRow(ctx, `SELECT EXISTS(SELECT FROM pg_trigger
+ WHERE tgrelid='projection_metadata'::regclass AND tgname='projection_metadata_filter_sync'
+ AND tgenabled='O' AND NOT tgisinternal
+ AND tgfoid=to_regprocedure('projection_metadata_filter_sync()'))`).Scan(&installed); err != nil {
+		return err
+	}
+	if installed {
+		return nil
+	}
+	tx, err := conn.Begin(ctx)
+	if err != nil {
+		return err
+	}
+	defer func() {
+		cleanup, cancel := context.WithTimeout(context.WithoutCancel(ctx), 2*time.Second)
+		defer cancel()
+		_ = tx.Rollback(cleanup)
+	}()
+	if _, err = tx.Exec(ctx, `SET LOCAL lock_timeout='2s'; SET LOCAL statement_timeout='5s'`); err != nil {
+		return err
+	}
+	if _, err = tx.Exec(ctx, metadataCatalogSync); err != nil {
+		return err
+	}
+	return tx.Commit(ctx)
+}
 
 // EnsureIndexes runs resumable index work after schema migrations commit. Each
 // build preserves concurrent writes, reuses a matching valid index, and repairs
@@ -96,6 +137,9 @@ func EnsureIndexes(ctx context.Context, pool *pgxpool.Pool) (err error) {
 	}
 	if !locked {
 		return ErrIndexBusy
+	}
+	if err := ensureMetadataCatalogSync(ctx, conn); err != nil {
+		return err
 	}
 	inspect := func(index indexDefinition) (found, valid, matches bool, err error) {
 		err = conn.QueryRow(ctx, `SELECT COALESCE(i.indisvalid, false), COALESCE(
@@ -174,5 +218,31 @@ LEFT JOIN pg_am am ON am.oid=c.relam WHERE c.oid=to_regclass($1)`,
 			return fmt.Errorf("retire index %s: %w", retired.Index.Name, err)
 		}
 	}
-	return nil
+	// Population commits short batches, so cancellation/restart resumes from the
+	// remaining source rows and never holds a write fence across the corpus.
+	for {
+		result, err := conn.Exec(ctx, `WITH pending AS MATERIALIZED (
+ SELECT organization,version_id,generation_id FROM projection_metadata
+ WHERE NOT filter_indexed ORDER BY organization,generation_id,version_id
+ LIMIT 500 FOR UPDATE SKIP LOCKED)
+ UPDATE projection_metadata pm SET data=pm.data FROM pending p
+ WHERE (pm.organization,pm.version_id,pm.generation_id)=(p.organization,p.version_id,p.generation_id)`)
+		if err != nil {
+			return err
+		}
+		if result.RowsAffected() == 0 {
+			break
+		}
+	}
+	var pending bool
+	if err := conn.QueryRow(ctx, `SELECT EXISTS(SELECT FROM projection_metadata WHERE NOT filter_indexed)`).Scan(&pending); err != nil {
+		return err
+	}
+	if pending {
+		return ErrIndexBusy
+	}
+	// All consumers now use point probes or scoped Btree entries. Retiring this
+	// installation-wide GIN avoids paying for two complete metadata indexes.
+	_, err = conn.Exec(ctx, "DROP INDEX CONCURRENTLY IF EXISTS projection_metadata_values")
+	return err
 }
