@@ -1,0 +1,9 @@
+# Managed disk response
+
+Sanitized `az disk show` capture supplied by an operator on 2026-10-12 for
+a Premium SSD v2 disk created by the vector-host provisioner. Subscription,
+resource group and disk identifiers were replaced with neutral examples.
+All other supplied fields and values are preserved, including `diskState`
+being `Attached` alongside a null `managedBy`. Do not reconstruct provider
+field names from the provisioner's expectations; replace this fixture only
+with another sanitized CLI capture.

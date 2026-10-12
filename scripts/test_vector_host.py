@@ -1,7 +1,9 @@
 """Dedicated index contracts at the operator CLI boundary; no cloud calls."""
 import json
 import importlib.util
+import io
 import os
+from contextlib import redirect_stderr, redirect_stdout
 from pathlib import Path
 import subprocess
 import sys
@@ -90,10 +92,19 @@ class VectorHost(unittest.TestCase):
         resources, rules, calls = {}, [], []
         init = None
         drift = None
+        failure = None
+        sentinel = 'private-provider-payload-never-print'
         def transport(command, **kwargs):
             nonlocal init
             calls.append(command)
             if command[0] == 'ssh':
+                phase = 'bootstrap' if kwargs.get('input') is None else 'apply'
+                if failure == phase + '-timeout':
+                    raise subprocess.TimeoutExpired([*command, sentinel], 1800, output=sentinel, stderr=sentinel)
+                if failure == phase + '-request':
+                    return subprocess.CompletedProcess(command, 1, sentinel, sentinel)
+                if failure == 'apply-json' and phase == 'apply':
+                    return subprocess.CompletedProcess(command, 0, sentinel, '')
                 if kwargs.get('input') is None:
                     return subprocess.CompletedProcess(command, 0, '', '')
                 return subprocess.CompletedProcess(command, 0, '{"status":"unchanged"}', '')
@@ -111,6 +122,10 @@ class VectorHost(unittest.TestCase):
             elif args[:2] == ['resource', 'list']:
                 response = list(resources.values())
             elif args[:3] == ['vm', 'run-command', 'invoke']:
+                if failure == 'trust-request':
+                    return subprocess.CompletedProcess(command, 1, sentinel, sentinel)
+                if failure == 'trust-response':
+                    return subprocess.CompletedProcess(command, 0, json.dumps({'value': [{'message': sentinel}]}), '')
                 response = {'value': [{'message': '[stdout]\nssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\n[stderr]\n'}]}
             elif args[:4] == ['network', 'nsg', 'rule', 'list']:
                 response = rules
@@ -152,8 +167,19 @@ class VectorHost(unittest.TestCase):
                     'ipConfigurations': [{'publicIPAddress': {'id': '/subscriptions/example/resourceGroups/example-group/providers/Microsoft.Network/publicIPAddresses/example-index-public-ip'},
                         'subnet': {'id': '/subscriptions/example/resourceGroups/example-group/providers/Microsoft.Network/virtualNetworks/example-index-vnet/subnets/example-index-subnet'}}]}
             elif args[:2] == ['disk', 'show']:
-                response = {'id': '/subscriptions/example/resourceGroups/example-group/providers/Microsoft.Compute/disks/example-index-disk', 'sku': {'name': 'PremiumV2_LRS'},
-                    'zones': ['1'], 'diskSizeGb': 512, 'diskIOPSReadWrite': 12000, 'diskMBpsReadWrite': 250}
+                if failure == 'disk-timeout':
+                    raise subprocess.TimeoutExpired([*command, sentinel], 1800, output=sentinel, stderr=sentinel)
+                if failure == 'disk-request':
+                    return subprocess.CompletedProcess(command, 1, sentinel, sentinel)
+                if failure == 'disk-json':
+                    return subprocess.CompletedProcess(command, 0, sentinel, '')
+                response = json.loads((ROOT / 'scripts/fixtures/example.azure-disk-show/disk.json').read_text())
+                # Simulate Azure attaching the created disk when the VM exists.
+                response['managedBy'] = resources.get('example-index', {}).get('id')
+                if drift in disk_drift:
+                    response.update(disk_drift[drift])
+                if failure and failure.startswith('missing-'):
+                    del response[failure.removeprefix('missing-')]
             elif args[:2] == ['vm', 'show']:
                 response = {'id': '/subscriptions/example/resourceGroups/example-group/providers/Microsoft.Compute/virtualMachines/example-index', 'zones': ['1'],
                     'hardwareProfile': {'vmSize': 'Standard_E8s_v5'},
@@ -166,6 +192,14 @@ class VectorHost(unittest.TestCase):
             else:
                 self.fail('unexpected provider operation: ' + str(args[:3]))
             return subprocess.CompletedProcess(command, 0, json.dumps(response), '')
+        disk_drift = {
+            'disk-size': {'diskSizeGB': 256},
+            'disk-sku': {'sku': {'name': 'Standard_LRS'}},
+            'disk-zone': {'zones': ['2']},
+            'disk-iops': {'diskIOPSReadWrite': 3000},
+            'disk-mbps': {'diskMBpsReadWrite': 125},
+            'disk-owner': {'managedBy': '/subscriptions/example/providers/Microsoft.Compute/virtualMachines/other'},
+        }
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
             public_key, identity, api_key = [root / name for name in ('public', 'identity', 'key')]
@@ -178,17 +212,57 @@ class VectorHost(unittest.TestCase):
                 '--location', 'region', '--zone', '1', '--dns-label', 'example-index', '--admin-user', 'operator',
                 '--operator-cidr', '192.0.2.0/24', '--ssh-public-key', str(public_key),
                 '--ssh-identity', str(identity), '--api-key-file', str(api_key)]
-            with patch.object(azure.subprocess, 'run', side_effect=transport), patch.object(sys, 'argv', argv):
+            with patch.object(azure.subprocess, 'run', side_effect=transport), patch.object(sys, 'argv', argv), redirect_stdout(io.StringIO()):
                 self.assertEqual(azure.main(), 0)
                 first_calls = list(calls)
                 calls.clear()
                 self.assertEqual(azure.main(), 0)
                 repeat_calls = list(calls)
                 calls.clear()
-                for drift in ('nic', 'ip', 'vnet', 'image'):
+                for drift in ('nic', 'ip', 'vnet', 'image', *disk_drift):
+                    with self.subTest(drift=drift), redirect_stderr(io.StringIO()) as error:
+                        calls.clear()
+                        self.assertEqual(azure.main(), 2)
+                        self.assertFalse(any(command[0] == 'ssh' or 'create' in command for command in calls))
+                        if drift in disk_drift:
+                            self.assertIn('resource=example-index-disk', error.getvalue())
+                            self.assertIn('exception=ValueError', error.getvalue())
+                drift = None
+                cases = [
+                    ('disk-request', 'inspect data disk', 'example-index-disk', 'RuntimeError'),
+                    ('disk-timeout', 'inspect data disk', 'example-index-disk', 'TimeoutExpired'),
+                    ('disk-json', 'inspect data disk', 'example-index-disk', 'JSONDecodeError'),
+                    ('trust-request', 'retrieve SSH host key', 'example-index', 'RuntimeError'),
+                    ('trust-response', 'validate SSH host key', 'example-index', 'ValueError'),
+                    ('bootstrap-request', 'verify host bootstrap', 'example-index', 'RuntimeError'),
+                    ('bootstrap-timeout', 'verify host bootstrap', 'example-index', 'TimeoutExpired'),
+                    ('apply-request', 'apply host configuration', 'example-index', 'RuntimeError'),
+                    ('apply-timeout', 'apply host configuration', 'example-index', 'TimeoutExpired'),
+                    ('apply-json', 'apply host configuration', 'example-index', 'JSONDecodeError'),
+                    *[('missing-' + key, 'validate data disk', 'example-index-disk', 'KeyError')
+                      for key in ('diskSizeGB', 'diskIOPSReadWrite', 'diskMBpsReadWrite', 'sku')],
+                ]
+                for failure, step, resource, exception in cases:
+                    with self.subTest(failure=failure), redirect_stderr(io.StringIO()) as error, redirect_stdout(io.StringIO()) as output:
+                        calls.clear()
+                        if failure.startswith('trust-'):
+                            (root / 'example-index.vector-host.known_hosts').unlink(missing_ok=True)
+                        self.assertEqual(azure.main(), 2)
+                        self.assertIn('step=' + step, error.getvalue())
+                        self.assertIn('resource=' + resource, error.getvalue())
+                        self.assertIn('exception=' + exception, error.getvalue())
+                        self.assertEqual(output.getvalue(), '')
+                        for private in (sentinel, 'fixture-api-key-never-in-cloud-init', str(identity), '--only-show-errors', 'sudo python3'):
+                            self.assertNotIn(private, error.getvalue())
+                        self.assertFalse(any('create' in command for command in calls))
+                failure = None
+                with patch.object(sys, 'argv', [*argv, '--disk-size', '0']), redirect_stderr(io.StringIO()) as error:
                     calls.clear()
                     self.assertEqual(azure.main(), 2)
-                    self.assertFalse(any(command[0] == 'ssh' or 'create' in command for command in calls))
+                    self.assertEqual(calls, [])
+                    self.assertIn('step=validate local inputs', error.getvalue())
+                    self.assertIn('resource=local inputs', error.getvalue())
+                    self.assertIn('exception=ValueError', error.getvalue())
             self.assertFalse(any('create' in command or 'update' in command or 'attach' in command for command in repeat_calls))
             disk_command = next(command for command in first_calls if command[1:3] == ['disk', 'create'])
             self.assertIn('PremiumV2_LRS', disk_command)

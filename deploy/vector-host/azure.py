@@ -22,6 +22,18 @@ host = importlib.util.module_from_spec(module_spec)
 module_spec.loader.exec_module(host)
 
 
+class ProvisioningError(RuntimeError):
+    """Only explicit operation context and an exception class may be printed."""
+
+
+class ProvisioningContext:
+    def __init__(self):
+        self.at('validate local inputs', 'local inputs')
+
+    def at(self, step, resource):
+        self.step, self.resource = step, resource
+
+
 def az(args):
     result = subprocess.run(['az', *args, '--only-show-errors', '--output', 'json'],
                             capture_output=True, text=True, timeout=1800)
@@ -50,6 +62,18 @@ def cloud_init(args, hostname, override, fingerprint):
 
 
 def provision(args):
+    context = ProvisioningContext()
+    try:
+        return _provision(args, context)
+    except Exception as error:
+        # Exception messages, commands and provider output can contain secrets.
+        # Context is supplied explicitly; names are used only after validation.
+        raise ProvisioningError(f'Provisioning refused or incomplete: step={context.step}; '
+                                f'resource={context.resource}; exception={type(error).__name__}. '
+                                'Inspect private inputs, resource drift and Azure capacity.') from None
+
+
+def _provision(args, context):
     # Validate all local inputs and credentials before any provider write.
     for value in (args.name, args.resource_group, args.location, args.admin_user,
                   args.disk_name, args.nsg_name, args.public_ip_name, args.vnet_name, args.nic_name, args.subnet_name):
@@ -83,7 +107,9 @@ def provision(args):
     services = host.infra.resolve(args.profile, args.overrides)
     # Ask Azure which capabilities the selected VM actually has. Do not assume
     # every region/zone offers the example SKU or sufficient disk throughput.
+    context.at('inspect VM capabilities', args.name)
     skus = az(['vm', 'list-skus', '--location', args.location, '--size', args.vm_size, '--all'])
+    context.at('validate VM capabilities', args.name)
     matches = [sku for sku in skus if sku['name'] == args.vm_size and sku['resourceType'] == 'virtualMachines']
     if len(matches) != 1:
         raise ValueError('selected VM size is unavailable')
@@ -107,6 +133,7 @@ def provision(args):
         raise ValueError('disk size is below the declared profile storage budget')
     # Names and content fingerprint bind resources to this declaration. A changed
     # declaration needs an explicit migration, never an implicit replacement.
+    context.at('resolve resource declaration', args.name)
     intent = {name: getattr(args, name) for name in ('name', 'location', 'zone', 'vm_size', 'image', 'admin_user',
               'dns_label', 'disk_name', 'nsg_name', 'public_ip_name', 'vnet_name', 'nic_name', 'subnet_name',
               'vnet_cidr', 'subnet_cidr',
@@ -121,11 +148,15 @@ def provision(args):
     tags = {'quivr-vector-host': args.name, 'quivr-vector-intent': fingerprint}
     tag_args = [f'{name}={value}' for name, value in tags.items()]
     group_flags = ['--resource-group', args.resource_group]
+    context.at('inspect resource group', args.resource_group)
     if not az(['group', 'exists', '--name', args.resource_group]):
+        context.at('create resource group', args.resource_group)
         az(['group', 'create', '--name', args.resource_group, '--location', args.location])
     # Enumerate instead of treating permission/transport errors as "not found".
+    context.at('list resources', args.resource_group)
     resources = az(['resource', 'list', *group_flags])
     def existing(kind, name):
+        context.at('validate resource ownership', name)
         found = [resource for resource in resources if resource['type'].lower() == kind.lower() and resource['name'] == name]
         if len(found) > 1 or (found and any(found[0].get('tags', {}).get(key) != value for key, value in tags.items())):
             raise ValueError('resource ownership or declaration drift; no replacement will be made')
@@ -139,15 +170,19 @@ def provision(args):
              'nic': ('Microsoft.Network/networkInterfaces', args.nic_name)}
     present = {role: existing(*value) for role, value in kinds.items()}
     if not present['nsg']:
+        context.at('create network security group', args.nsg_name)
         az(['network', 'nsg', 'create', *group_flags, '--name', args.nsg_name,
             '--location', args.location, '--tags', *tag_args])
+    context.at('inspect network security rules', args.nsg_name)
     rules = az(['network', 'nsg', 'rule', 'list', *group_flags, '--nsg-name', args.nsg_name])
+    context.at('validate network security rules', args.nsg_name)
     expected_rules = [('https', '100', 'Allow', 'Tcp', '443', ['*']),
                       ('operator-ssh', '110', 'Allow', 'Tcp', '22', args.operator_cidr),
                       ('deny-inbound', '120', 'Deny', '*', '*', ['*'])]
     if {rule['name'] for rule in rules} - {rule[0] for rule in expected_rules}:
         raise ValueError('unexpected NSG rules; inspect them before provisioning')
     for name, priority, access, protocol, port, sources in expected_rules:
+        context.at('validate network security rule ' + name, args.nsg_name)
         found = [rule for rule in rules if rule['name'] == name]
         if found:
             rule = found[0]
@@ -156,34 +191,44 @@ def provision(args):
                 sorted(source), rule['direction']) != (priority, access, protocol.lower(), port, sorted(sources), 'Inbound'):
                 raise ValueError('NSG rule drift; refusing to alter existing network rules')
         else:
+            context.at('create network security rule ' + name, args.nsg_name)
             az(['network', 'nsg', 'rule', 'create', *group_flags, '--nsg-name', args.nsg_name, '--name', name,
                 '--priority', priority, '--access', access, '--protocol', protocol, '--direction', 'Inbound',
                 '--source-address-prefixes', *sources, '--source-port-ranges', '*',
                 '--destination-address-prefixes', '*', '--destination-port-ranges', port])
     if not present['vnet']:
+        context.at('create virtual network', args.vnet_name)
         az(['network', 'vnet', 'create', *group_flags, '--name', args.vnet_name, '--location', args.location,
             '--address-prefixes', args.vnet_cidr, '--subnet-name', args.subnet_name, '--subnet-prefixes', args.subnet_cidr,
             '--tags', *tag_args])
+    context.at('inspect virtual network', args.vnet_name)
     network_state = az(['network', 'vnet', 'show', *group_flags, '--name', args.vnet_name])
+    context.at('validate virtual network', args.vnet_name)
     subnets = [subnet for subnet in network_state.get('subnets', []) if subnet['name'] == args.subnet_name]
     if (network_state.get('addressSpace', {}).get('addressPrefixes') != [args.vnet_cidr] or
             len(subnets) != 1 or subnets[0].get('addressPrefix') != args.subnet_cidr):
         raise ValueError('virtual network or subnet address drift')
     if not present['ip']:
+        context.at('create public IP', args.public_ip_name)
         az(['network', 'public-ip', 'create', *group_flags, '--name', args.public_ip_name, '--location', args.location,
             '--sku', 'Standard', '--allocation-method', 'Static', '--zone', args.zone,
             '--dns-name', args.dns_label, '--tags', *tag_args])
+    context.at('inspect public IP', args.public_ip_name)
     public_ip = az(['network', 'public-ip', 'show', *group_flags, '--name', args.public_ip_name])
+    context.at('validate public IP', args.public_ip_name)
     if (public_ip.get('zones') != [args.zone] or public_ip['dnsSettings']['domainNameLabel'] != args.dns_label or
             public_ip.get('sku', {}).get('name') != 'Standard' or
             public_ip.get('publicIPAllocationMethod') != 'Static' or public_ip.get('publicIPAddressVersion') != 'IPv4'):
         raise ValueError('public IP SKU, allocation, address family, zone or DNS label drift')
     hostname = public_ip['dnsSettings']['fqdn']
     if not present['nic']:
+        context.at('create network interface', args.nic_name)
         az(['network', 'nic', 'create', *group_flags, '--name', args.nic_name, '--location', args.location,
             '--vnet-name', args.vnet_name, '--subnet', args.subnet_name, '--network-security-group', args.nsg_name,
             '--public-ip-address', args.public_ip_name, '--accelerated-networking', 'true', '--tags', *tag_args])
+    context.at('inspect network interface', args.nic_name)
     nic = az(['network', 'nic', 'show', *group_flags, '--name', args.nic_name])
+    context.at('validate network interface', args.nic_name)
     prefix, separator, _ = public_ip['id'].partition('/providers/')
     if not separator:
         raise ValueError('cannot establish Azure resource identity')
@@ -200,27 +245,34 @@ def provision(args):
             nic['virtualMachine']['id'].lower() != present['vm']['id'].lower()):
         raise ValueError('NIC belongs to another VM')
     if not present['disk']:
+        context.at('create data disk', args.disk_name)
         az(['disk', 'create', *group_flags, '--name', args.disk_name, '--location', args.location,
             '--zone', args.zone, '--sku', 'PremiumV2_LRS', '--size-gb', str(args.disk_size),
             '--disk-iops-read-write', str(args.disk_iops), '--disk-mbps-read-write', str(args.disk_mbps),
             '--tags', *tag_args])
+    context.at('inspect data disk', args.disk_name)
     disk = az(['disk', 'show', *group_flags, '--name', args.disk_name])
-    if (disk['sku']['name'], disk.get('zones'), disk['diskSizeGb'], disk['diskIOPSReadWrite'], disk['diskMBpsReadWrite']) != (
+    context.at('validate data disk', args.disk_name)
+    if (disk['sku']['name'], disk.get('zones'), disk['diskSizeGB'], disk['diskIOPSReadWrite'], disk['diskMBpsReadWrite']) != (
             'PremiumV2_LRS', [args.zone], args.disk_size, args.disk_iops, args.disk_mbps):
         raise ValueError('data disk performance, size or zone drift')
     if disk.get('managedBy') and not present['vm']:
         raise ValueError('data disk is already attached to another VM')
     if not present['vm']:
+        context.at('prepare VM bootstrap', args.name)
         with tempfile.TemporaryDirectory() as directory:
             init = Path(directory) / 'cloud-init.json'
             init.write_text(cloud_init(args, hostname, override, fingerprint))
+            context.at('create VM', args.name)
             az(['vm', 'create', *group_flags, '--name', args.name, '--location', args.location, '--zone', args.zone,
                 '--size', args.vm_size, '--image', args.image, '--admin-username', args.admin_user,
                 '--ssh-key-values', public_key, '--nics', args.nic_name, '--attach-data-disks', disk['id'],
                 '--data-disk-caching', 'None', '--data-disk-delete-option', 'Detach',
                 '--disk-controller-type', 'SCSI',
                 '--custom-data', str(init), '--tags', *tag_args])
+    context.at('inspect VM', args.name)
     vm = az(['vm', 'show', *group_flags, '--name', args.name])
+    context.at('validate VM', args.name)
     if vm.get('zones') != [args.zone] or vm['hardwareProfile']['vmSize'] != args.vm_size:
         raise ValueError('VM size or zone drift')
     reference = vm['storageProfile'].get('imageReference', {})
@@ -235,6 +287,7 @@ def provision(args):
     if (not image_matches or vm.get('osProfile', {}).get('adminUsername') != args.admin_user or
             len(network_interfaces) != 1 or network_interfaces[0]['id'].lower() != nic['id'].lower()):
         raise ValueError('VM image, admin user or network attachment drift')
+    context.at('validate data disk attachment', args.disk_name)
     attachments = vm['storageProfile']['dataDisks']
     if len(attachments) != 1 or attachments[0]['managedDisk']['id'].lower() != disk['id'].lower() or (
             attachments[0]['lun'], attachments[0]['caching'], attachments[0].get('deleteOption')) != (0, 'None', 'Detach'):
@@ -244,19 +297,24 @@ def provision(args):
     # Authenticate the very first SSH connection through Azure's control plane,
     # before sending credentials. Retain this public host key outside the repo;
     # an unchanged rerun needs no RunCommand invocation or trust change.
+    context.at('validate SSH trust file', args.name)
     trust = args.known_hosts or args.ssh_identity.parent / (args.name + '.vector-host.known_hosts')
     if trust.is_symlink() or (trust.exists() and (not trust.is_file() or trust.stat().st_mode & 0o077)):
         raise ValueError('host trust file must be private and regular')
     if trust.resolve().is_relative_to(ROOT):
         raise ValueError('host trust file must stay outside the repository')
     if not trust.exists():
+        context.at('retrieve SSH host key', args.name)
         response = az(['vm', 'run-command', 'invoke', *group_flags, '--name', args.name,
                        '--command-id', 'RunShellScript', '--scripts', 'cat /etc/ssh/ssh_host_ed25519_key.pub'])
+        context.at('validate SSH host key', args.name)
         output = '\n'.join(item.get('message', '') for item in response.get('value', []))
         keys = re.findall(r'^ssh-ed25519 ([A-Za-z0-9+/=]+)(?: .*)?$', output, re.MULTILINE)
         if len(keys) != 1:
             raise ValueError('Azure did not provide one verifiable SSH host key')
+        context.at('save SSH host key', args.name)
         host.write(trust, hostname + ' ssh-ed25519 ' + keys[0] + '\n')
+    context.at('verify host bootstrap', args.name)
     ssh = ['ssh', '-i', str(args.ssh_identity), '-o', 'BatchMode=yes', '-o', 'StrictHostKeyChecking=yes',
            '-o', 'UserKnownHostsFile=' + str(trust),
            '-o', 'ConnectTimeout=10', '-o', 'ConnectionAttempts=10', args.admin_user + '@' + hostname]
@@ -265,6 +323,7 @@ def provision(args):
         capture_output=True, text=True, timeout=1800)
     if verified.returncode:
         raise RuntimeError('Host trust or bootstrap verification failed; no credential sent')
+    context.at('apply host configuration', args.name)
     result = subprocess.run([*ssh, 'sudo python3 '
         + shlex.quote(str(SOURCE / 'deploy/vector-host/host.py')) + ' apply --key-stdin'],
         input=secret, capture_output=True, text=True, timeout=1800)
@@ -307,8 +366,8 @@ def main():
     try:
         print(json.dumps(provision(args), indent=2))
         return 0
-    except (ValueError, RuntimeError, OSError, KeyError, TypeError, subprocess.TimeoutExpired):
-        print('Provisioning refused or incomplete; check private inputs, resource drift and Azure capacity.', file=sys.stderr)
+    except ProvisioningError as error:
+        print(str(error), file=sys.stderr)
         return 2
 
 
