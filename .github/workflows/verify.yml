@@ -27,6 +27,7 @@ jobs:
     timeout-minutes: 5
     outputs:
       ref: ${{ steps.resolve.outputs.ref }}
+      base: ${{ steps.resolve.outputs.base }}
       groups: ${{ steps.select.outputs.groups }}
       parts: ${{ steps.select.outputs.parts }}
       images: ${{ steps.select.outputs.images }}
@@ -52,6 +53,9 @@ jobs:
         # A rerun keeps the original event but must test the current base of the same head.
         if [ "$EVENT_NAME" = pull_request ] && [ "$RUN_ATTEMPT" -gt 1 ]; then
           test "$(git rev-parse HEAD^2)" = "$PR_HEAD"
+        fi
+        if [ "$EVENT_NAME" = pull_request ]; then
+          echo "base=$(git rev-parse HEAD^1)" >> "$GITHUB_OUTPUT"
         fi
         echo "ref=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
     - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
@@ -293,7 +297,7 @@ jobs:
         key: models-${{ runner.os }}-py${{ steps.python.outputs.python-version }}-${{ hashFiles('third_party/e5/model-lock.json', 'plugins/core-ingest/profile.json',
           'third_party/tokenizer/requirements-linux-x86_64.txt') }}
     - run: sudo rm -rf /usr/share/dotnet /usr/local/.ghcup /usr/share/swift /opt/hostedtoolcache/CodeQL /usr/local/share/powershell /usr/local/julia*
-    - run: make migration-compatibility args='--base ${{ github.event.pull_request.base.sha || github.event.before || 'HEAD^' }}'
+    - run: make migration-compatibility args='--base ${{ needs.paths-filter.outputs.base || github.event.before || 'HEAD^' }}'
     - name: Pack bounded failure evidence
       if: failure()
       run: python3 scripts/ci_artifacts.py .scratch vulnerabilities.json --output "${{ runner.temp }}/failure.tar.gz"

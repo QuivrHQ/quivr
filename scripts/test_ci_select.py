@@ -145,7 +145,7 @@ class Workflow(unittest.TestCase):
                     for key in match.group().split('.'):
                         current = current.get(key, '') if isinstance(current, dict) else ''
                     return repr(current)
-                source = re.sub(r'\b(?:github|inputs)\.[\w.-]+', reference, match.group(1))
+                source = re.sub(r'\b(?:github|inputs|needs)\.[\w.-]+', reference, match.group(1))
                 return eval(source.replace('&&', ' and ').replace('||', ' or '), {'__builtins__': {}, 'format': lambda template, *args: template.format(*args)})
             if condition and not value.strip().startswith('${{'):
                 value = '${{ ' + value + ' }}'
@@ -188,9 +188,21 @@ class Workflow(unittest.TestCase):
                                      'event': {'pull_request': {'number': 42}}}, 'inputs': inputs}
                 self.assertEqual(evaluate(checkout_ref, context), expected)
 
+        migration_command = next(step['run'] for step in workflow['jobs']['migration-compatibility']['steps']
+                                 if step.get('run', '').startswith('make migration-compatibility'))
+        for base, before, expected in [('current-base', 'push-before', 'current-base'),
+                                       ('', 'push-before', 'push-before'), ('', '', 'HEAD^')]:
+            with self.subTest(migration_base=base, before=before):
+                context = {'needs': {'paths-filter': {'outputs': {'base': base}}},
+                           'github': {'event': {'before': before, 'pull_request': {'base': {'sha': 'stale-base'}}}}}
+                self.assertEqual(evaluate(migration_command, context),
+                                 f"make migration-compatibility args='--base {expected}'")
+
     def test_metadata_reruns_only_current_head_pull_request_verification(self):
         metadata = yaml.safe_load((ci_select.ROOT / '.github/workflows/verify-metadata.yml').read_text())
         job = metadata['jobs']['request-verification']
+        # GitHub may spend five minutes forcibly canceling the prior run.
+        self.assertGreater(job['timeout-minutes'], 5)
         self.assertFalse(any('uses' in step for step in job['steps']))
         with tempfile.TemporaryDirectory() as folder:
             root = Path(folder)
@@ -279,7 +291,7 @@ class Workflow(unittest.TestCase):
                                             env={**os.environ, 'PR_HEAD': target, 'EVENT_NAME': 'pull_request',
                                                  'RUN_ATTEMPT': '2', 'GITHUB_OUTPUT': str(output)}, capture_output=True)
                     self.assertEqual(result.returncode, expected)
-                    self.assertEqual(output.read_text(), f'ref={merge}\n' if expected == 0 else '')
+                    self.assertEqual(output.read_text(), f'base={base}\nref={merge}\n' if expected == 0 else '')
             self.assertIn('paths-filter', workflow['jobs']['adapter-postgres']['needs'])
             for name, job in workflow['jobs'].items():
                 if name == 'paths-filter':

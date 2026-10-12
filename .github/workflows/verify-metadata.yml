@@ -14,7 +14,8 @@ jobs:
       ((github.event.action == 'labeled' || github.event.action == 'unlabeled') && github.event.label.name == 'ci-full') ||
       (github.event.action == 'edited' && github.event.changes.base.ref != '')
     runs-on: ubuntu-24.04
-    timeout-minutes: 2
+    # Cancellation can take five minutes; leave time to post the rerun afterward.
+    timeout-minutes: 7
     permissions:
       actions: write
       contents: read
