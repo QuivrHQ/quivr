@@ -11,6 +11,11 @@ name: Text foundation
     - reopened
   workflow_dispatch:
     inputs:
+      ref:
+        description: Immutable PR merge commit to verify
+        type: string
+        required: false
+        default: ''
       pr-number:
         description: Pull request requesting full verification
         type: string
@@ -47,6 +52,11 @@ jobs:
         fetch-depth: 0
         ref: ${{ inputs.ref || github.sha }}
         persist-credentials: false
+    - name: Bind the PR merge commit to the dispatched head
+      if: inputs.pr-number != ''
+      env:
+        PR_HEAD: ${{ github.sha }}
+      run: test "$(git rev-parse HEAD^2)" = "$PR_HEAD"
     - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
       with:
         python-version: 3.12.15
@@ -155,8 +165,14 @@ jobs:
     steps:
     - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
       with:
+        fetch-depth: 2
         ref: ${{ inputs.ref || github.sha }}
         persist-credentials: false
+    - name: Bind the PR merge commit to the dispatched head
+      if: inputs.pr-number != ''
+      env:
+        PR_HEAD: ${{ github.sha }}
+      run: test "$(git rev-parse HEAD^2)" = "$PR_HEAD"
     - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e
       with:
         go-version-file: go.mod

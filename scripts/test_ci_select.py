@@ -174,6 +174,13 @@ class Workflow(unittest.TestCase):
                                      'event': {'pull_request': {'number': pr_number}}}, 'inputs': inputs}
                 self.assertEqual(evaluate(workflow['concurrency']['group'], context), expected)
                 self.assertEqual(evaluate(workflow['concurrency']['cancel-in-progress'], context), cancel)
+        for job_name in ['paths-filter', 'adapter-postgres']:
+            bindings = [step for step in workflow['jobs'][job_name]['steps']
+                        if any(value == '${{ github.sha }}' for value in step.get('env', {}).values())]
+            self.assertEqual(len(bindings), 1)
+            for pr_number, expected in [('42', True), ('', False)]:
+                with self.subTest(binding_job=job_name, pr_number=pr_number):
+                    self.assertEqual(evaluate(bindings[0]['if'], {'inputs': {'pr-number': pr_number}}, True), expected)
 
     def test_metadata_dispatch_targets_current_pr_branch_without_checking_out_code(self):
         metadata = yaml.safe_load((ci_select.ROOT / '.github/workflows/verify-metadata.yml').read_text())
@@ -188,6 +195,8 @@ class Workflow(unittest.TestCase):
                 'args = sys.argv[1:]',
                 'if args == ["api", "repos/example/repo/pulls/7"]:',
                 '    print(pathlib.Path(os.environ["FIXTURE_PR"]).read_text())',
+                'elif args == ["api", "repos/example/repo/git/commits/merge-sha"]:',
+                '    print(pathlib.Path(os.environ["FIXTURE_MERGE"]).read_text())',
                 'else:',
                 '    assert args[:3] == ["api", "--method", "POST"], args',
                 '    assert args[3] == "repos/example/repo/actions/workflows/verify.yml/dispatches", args',
@@ -195,34 +204,80 @@ class Workflow(unittest.TestCase):
                 '    pathlib.Path(os.environ["FIXTURE_REQUEST"]).write_text(payload)',
             ]) + '\n')
             gh.chmod(0o755)
-            pr, request = root / 'pr.json', root / 'request.json'
+            pr, request, merge = root / 'pr.json', root / 'request.json', root / 'merge-response.json'
+            merge.write_text(json.dumps({'parents': [{'sha': 'base-sha'}, {'sha': 'head-sha'}]}))
+            def dispatch():
+                return subprocess.run(['bash', '-e', '-o', 'pipefail', '-c', script], capture_output=True, text=True,
+                                      env={**os.environ, 'PATH': str(root) + os.pathsep + os.environ['PATH'],
+                                           'GITHUB_REPOSITORY': 'example/repo', 'PR_NUMBER': '7',
+                                           'RUNNER_TEMP': str(root), 'FIXTURE_PR': str(pr),
+                                           'FIXTURE_MERGE': str(merge), 'FIXTURE_REQUEST': str(request)})
             for labels in [[{'name': 'ci-full'}], []]:
                 with self.subTest(labels=labels):
                     pr.write_text(json.dumps({'number': 7, 'state': 'open', 'labels': labels,
-                                              'head': {'ref': 'feature/current-head',
+                                              'merge_commit_sha': 'merge-sha', 'base': {'sha': 'base-sha'},
+                                              'head': {'ref': 'feature/current-head', 'sha': 'head-sha',
                                                        'repo': {'full_name': 'example/repo'}}}))
-                    result = subprocess.run(['bash', '-e', '-o', 'pipefail', '-c', script], capture_output=True, text=True,
-                                            env={**os.environ, 'PATH': str(root) + os.pathsep + os.environ['PATH'],
-                                                 'GITHUB_REPOSITORY': 'example/repo', 'PR_NUMBER': '7',
-                                                 'RUNNER_TEMP': str(root), 'FIXTURE_PR': str(pr),
-                                                 'FIXTURE_REQUEST': str(request)})
+                    result = dispatch()
                     self.assertEqual(result.returncode, 0, result.stderr)
                     self.assertEqual(json.loads(request.read_text()),
-                                     {'ref': 'feature/current-head', 'inputs': {'pr-number': '7'}})
+                                     {'ref': 'feature/current-head', 'inputs': {'pr-number': '7', 'ref': 'merge-sha'}})
+            for parents in [['stale-base', 'head-sha'], ['base-sha', 'different-head']]:
+                with self.subTest(parents=parents):
+                    request.unlink(missing_ok=True)
+                    merge.write_text(json.dumps({'parents': [{'sha': sha} for sha in parents]}))
+                    self.assertEqual(dispatch().returncode, 1)
+                    self.assertFalse(request.exists())
             for state, repository, expected_code in [('closed', 'example/repo', 0),
                                                      ('open', 'example/fork', 1)]:
                 with self.subTest(state=state, repository=repository):
                     request.unlink(missing_ok=True)
+                    merge.write_text(json.dumps({'parents': [{'sha': 'base-sha'}, {'sha': 'head-sha'}]}))
                     pr.write_text(json.dumps({'number': 7, 'state': state,
-                                              'head': {'ref': 'feature/current-head',
+                                              'merge_commit_sha': 'merge-sha', 'base': {'sha': 'base-sha'},
+                                              'head': {'ref': 'feature/current-head', 'sha': 'head-sha',
                                                        'repo': {'full_name': repository}}}))
-                    result = subprocess.run(['bash', '-e', '-o', 'pipefail', '-c', script], capture_output=True,
-                                            env={**os.environ, 'PATH': str(root) + os.pathsep + os.environ['PATH'],
-                                                 'GITHUB_REPOSITORY': 'example/repo', 'PR_NUMBER': '7',
-                                                 'RUNNER_TEMP': str(root), 'FIXTURE_PR': str(pr),
-                                                 'FIXTURE_REQUEST': str(request)})
+                    result = dispatch()
                     self.assertEqual(result.returncode, expected_code)
                     self.assertFalse(request.exists())
+
+    def test_dispatched_merge_cannot_pass_checks_for_a_different_head(self):
+        workflow = yaml.safe_load((ci_select.ROOT / '.github/workflows/verify.yml').read_text())
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            def git(*args):
+                return subprocess.check_output(['git', *args], cwd=root, text=True).strip()
+            git('init', '-q', '--initial-branch=base')
+            git('config', 'user.email', 'fixture@example.invalid')
+            git('config', 'user.name', 'Fixture')
+            git('config', 'commit.gpgsign', 'false')
+            (root / 'base.txt').write_text('base\n')
+            git('add', 'base.txt')
+            git('commit', '-qm', 'fixture base')
+            git('switch', '-qc', 'feature')
+            (root / 'head.txt').write_text('head\n')
+            git('add', 'head.txt')
+            git('commit', '-qm', 'fixture head')
+            head = git('rev-parse', 'HEAD')
+            git('switch', '-q', 'base')
+            (root / 'base.txt').write_text('advanced base\n')
+            git('commit', '-qam', 'fixture advanced base')
+            base = git('rev-parse', 'HEAD')
+            git('merge', '--no-edit', 'feature')
+            for job_name in ['paths-filter', 'adapter-postgres']:
+                checkout = root / job_name
+                depth = workflow['jobs'][job_name]['steps'][0]['with'].get('fetch-depth', 1)
+                git('clone', '-q', *(['--depth', str(depth)] if depth else []), root.as_uri(), str(checkout))
+                bindings = [step for step in workflow['jobs'][job_name]['steps']
+                            if any(value == '${{ github.sha }}' for value in step.get('env', {}).values())]
+                self.assertEqual(len(bindings), 1, f'{job_name} must bind the merge checkout to the dispatched head')
+                step = bindings[0]
+                for target, expected in [(head, 0), (base, 1)]:
+                    with self.subTest(job=job_name, target=target):
+                        env = {key: target for key in step['env']}
+                        result = subprocess.run(['bash', '-e', '-c', step['run']], cwd=checkout,
+                                                env={**os.environ, **env}, capture_output=True)
+                        self.assertEqual(result.returncode, expected)
 
 
 if __name__ == '__main__':

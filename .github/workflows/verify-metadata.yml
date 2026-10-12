@@ -31,5 +31,10 @@ jobs:
         fi
         # Dispatch refs belong to this repository; never confuse a fork branch with a local branch.
         jq -e --arg repository "$GITHUB_REPOSITORY" '.head.repo.full_name == $repository' "$RUNNER_TEMP/pull.json" > /dev/null
-        jq '{ref: .head.ref, inputs: {"pr-number": (.number | tostring)}}' "$RUNNER_TEMP/pull.json" > "$RUNNER_TEMP/dispatch.json"
+        merge=$(jq -er '.merge_commit_sha' "$RUNNER_TEMP/pull.json")
+        gh api "repos/$GITHUB_REPOSITORY/git/commits/$merge" > "$RUNNER_TEMP/merge.json"
+        # Reject stale or incomplete merge computation instead of testing a different head/base.
+        jq -e --slurpfile pull "$RUNNER_TEMP/pull.json" \
+          '.parents[0].sha == $pull[0].base.sha and .parents[1].sha == $pull[0].head.sha' "$RUNNER_TEMP/merge.json" > /dev/null
+        jq '{ref: .head.ref, inputs: {"pr-number": (.number | tostring), ref: .merge_commit_sha}}' "$RUNNER_TEMP/pull.json" > "$RUNNER_TEMP/dispatch.json"
         gh api --method POST "repos/$GITHUB_REPOSITORY/actions/workflows/verify.yml/dispatches" --input "$RUNNER_TEMP/dispatch.json"
