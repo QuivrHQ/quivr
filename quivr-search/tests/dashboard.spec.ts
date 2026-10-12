@@ -848,6 +848,12 @@ test("revenir sur Alertes ou Sources les montre aussitôt, le temps de les relir
 test("une relecture qui échoue garde Alertes et Sources à l’écran et le dit", async ({
   page,
 }) => {
+  await page.clock.install();
+  // Keep the immediate change-feed read from refreshing the list. Its timer
+  // fallback is paused below so recovery belongs to the retry click.
+  await page.route("**/v0/changes*", (route) =>
+    route.fulfill({ status: 403, json: { code: "forbidden", message: "forbidden", retryable: false } }),
+  );
   const nav = page.getByRole("navigation", { name: "Sections" });
   const alertsShown = page.getByRole("table", { name: "Alertes" });
   const sourcesShown = page.getByRole("list", { name: "Sources" });
@@ -855,6 +861,9 @@ test("une relecture qui échoue garde Alertes et Sources à l’écran et le dit
   await expect(alertsShown).toBeVisible();
   await nav.getByRole("link", { name: /^Sources/ }).click();
   await expect(sourcesShown).toBeVisible();
+  // Let the lazy views load first, then stop polling: after unroute, an
+  // automatic refresh could clear the notice before Réessayer is clicked.
+  await page.clock.pauseAt(new Date(Date.now() + 1000));
   // The lists now fail to load: coming back, each page keeps its last list.
   const failing = (url: URL) => ["/demo/alerts", "/v0/connectors"].includes(url.pathname);
   await page.route(failing, (route) =>
