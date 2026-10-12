@@ -10,6 +10,7 @@ import sys
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 from deploy import infrastructure as infra
+from deploy.reset_support import vector_endpoint
 
 
 def execute(args, environ=None):
@@ -69,10 +70,26 @@ class Compose:
         except (RuntimeError, subprocess.TimeoutExpired, ValueError, IndexError):
             return {}
 
-    def check(self, services, runtime=True):
+    def index_is_local(self):
+        path = infra.ROOT / '.scratch' / self.project / 'config.json'
+        if not path.exists():
+            return None
+        configured = json.loads(path.read_text()).get('weaviate_url')
+        if not self.configured('weaviate'):
+            return False
+        details = json.loads(self.run(['inspect', self.containers['weaviate']]))[0]
+        bindings = details.get('NetworkSettings', {}).get('Ports', {}).get('8080/tcp') or []
+        local = {vector_endpoint('http://' + item['HostIp'] + ':' + item['HostPort']) for item in bindings
+                 if item.get('HostIp') == '127.0.0.1' and item.get('HostPort', '').isdigit()}
+        return vector_endpoint(configured) in local - {None}
+
+    def check(self, services, runtime=True, external_host=None):
         rows = []
         for name in ('postgres', 'weaviate'):
             spec = services[name]
+            if name == 'weaviate' and external_host is not None:
+                rows.extend(infra.external_vector_report(spec, external_host)['observations'])
+                continue
             state = self.configured(name)
             infra.observation(rows, name, 'configured', 'image', spec['image'], state.get('image'))
             for key, value in spec['environment'].items():
@@ -99,7 +116,7 @@ class Compose:
                 infra.observation(rows, name, 'runtime_resources', key, value, observed.get('limits', {}).get(key))
         return infra.report(rows)
 
-    def apply(self, overlay):
+    def apply(self, overlay, external=False):
         # Reuse the selected local stack's credentials; never create or rotate them.
         directory = infra.ROOT / '.scratch' / self.project
         environment = dict(os.environ)
@@ -115,7 +132,7 @@ class Compose:
         environment.setdefault('QUIVR_MODEL_ROOT', str(infra.ROOT / '.scratch/e5-model'))
         # Only infrastructure services; never scale workers or alter unrelated services.
         self.run(['compose', '--project-name', self.project, '-f', str(infra.ROOT / 'deploy/compose/compose.yaml'),
-                  '-f', str(overlay), 'up', '-d', 'postgres', 'weaviate'], environ=environment)
+                  '-f', str(overlay), 'up', '-d', 'postgres', *([] if external else ['weaviate'])], environ=environment)
 
     def initialize_monitoring(self):
         self.configured('postgres')
@@ -134,21 +151,25 @@ def main():
     parser.add_argument('--project', required=True)
     parser.add_argument('--profile', default='small')
     parser.add_argument('--overrides', type=Path)
+    parser.add_argument('--vector-host', nargs='?', const='', metavar='SSH_TARGET',
+                        help='external index: observe through SSH, or unknown if no target')
     args = parser.parse_args()
     try:
         services = infra.resolve(args.profile, args.overrides, os.environ)
         adapter = Compose(args.project)
+        location = adapter.index_is_local() if args.vector_host is None else False
         if args.command == 'apply':
             overlay = infra.ROOT / '.scratch' / args.project / 'infrastructure.json'
             infra.write_overlay(overlay, args.profile, args.overrides, os.environ)
-            adapter.apply(overlay)
+            adapter.apply(overlay, external=args.vector_host is not None or location is False)
             print(json.dumps({'status': 'applied', 'next': 'initialize-monitoring, then check'}))
             return 0
         if args.command == 'initialize-monitoring':
             adapter.initialize_monitoring()
             print(json.dumps({'status': 'monitoring_initialized'}))
             return 0
-        result = adapter.check(services, runtime=args.command == 'check')
+        external = args.vector_host if args.vector_host is not None else (None if location is True else '')
+        result = adapter.check(services, runtime=args.command == 'check', external_host=external)
         print(json.dumps(result, indent=2))
         return {'match': 0, 'drift': 1, 'unknown': 2}[result['status']]
     except (RuntimeError, ValueError, OSError, KeyError, TypeError, IndexError, subprocess.TimeoutExpired):

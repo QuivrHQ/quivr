@@ -78,7 +78,8 @@ class RailwayIsolation(unittest.TestCase):
         from deploy.railway.infrastructure import Railway
         roles = ('autoscaler', 'web', 'api', 'worker', 'worker-bulk',
                  'postgres', 'temporal', 'seaweed', 'weaviate', 'tei')
-        scenarios = [(failure, ()) for failure in (None, 'preview', 'stop', 'remove', 'quiescence', 'restore')]
+        scenarios = [(failure, ()) for failure in (None, 'preview', 'external-index', 'unknown-index',
+                                                    'stop', 'remove', 'quiescence', 'restore')]
         scenarios += [(None, delays) for delays in ((0,), (4,), (4, 8), (4, 5))]
         scenarios += [(failure, (4, 8)) for failure in ('other-service', 'other-helper', 'late-deployment', 'attach-remove', 'attach-quiescence')]
         for failure, attach_delays in scenarios:
@@ -114,13 +115,23 @@ class RailwayIsolation(unittest.TestCase):
                             del removing[identifier]
                     if args[0] == 'ssh':
                         command = args[-1]
+                        if '/v1/objects?limit=1' in command:
+                            return '0'
+                        if 'weaviate_url' in command and 'json.dumps' in command:
+                            return json.dumps(None if failure == 'unknown-index' else
+                                'https://index.example.invalid' if failure == 'external-index' else
+                                'http://weaviate.railway.internal:8080')
                         if 'print(json.dumps(inventory(' in command:
                             return '{"objects_at_least":0,"truncated":false}'
                         if 'workflow count' in command:
                             workflow_reads[0] += 1
                             return '{"count":"1"}' if workflow_reads[0] <= 2 else '{}'
                         return '0'
+                    if args[:2] == ['variable', 'list']:
+                        return '{"RAILWAY_PRIVATE_DOMAIN":"weaviate.railway.internal"}'
                     query, variables = args[1], json.loads(args[3])
+                    if failure in ('external-index', 'unknown-index') and query.startswith('mutation'):
+                        self.fail('external or unknown index caused a reset mutation')
                     if failure == 'preview' and query.startswith('mutation'):
                         self.fail('preview issued a mutation')
                     if 'project(id:' in query:
@@ -233,6 +244,12 @@ class RailwayIsolation(unittest.TestCase):
                     self.assertEqual(scope['volume_sizes']['postgres'], {'old_sizeMB': 65536, 'replacement_sizeMB': None})
                     self.assertIn('unknown until created', scope['replacement_capacity'])
                     self.assertFalse(Path(str(declaration) + '.reset-state.json').exists())
+                    continue
+                if failure in ('external-index', 'unknown-index'):
+                    self.assertEqual(result, 2, errors.getvalue())
+                    self.assertFalse(Path(str(declaration) + '.reset-state.json').exists())
+                    self.assertFalse(deleted)
+                    self.assertIn('external or unverifiable vector index', errors.getvalue())
                     continue
                 state = json.loads(Path(str(declaration) + '.reset-state.json').read_text())
                 if failure is None:

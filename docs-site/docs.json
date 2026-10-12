@@ -62,6 +62,7 @@
               "run-quivr/deploy",
               "run-quivr/run-a-large-import",
               "run-quivr/scale-quivr",
+              "run-quivr/dedicated-vector-host",
               "run-quivr/upgrade-quivr",
               "run-quivr/security",
               "run-quivr/tls",
