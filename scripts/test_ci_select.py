@@ -1,10 +1,13 @@
 """Owner of changed-path routing and selected-job completion contracts."""
 import json
 import os
+import re
 from pathlib import Path
 import subprocess
 import tempfile
 import unittest
+
+import yaml
 
 import ci_select
 
@@ -114,6 +117,70 @@ class Aggregation(unittest.TestCase):
                                         env={**os.environ, 'CI_NEEDS': json.dumps(needs)}, capture_output=True)
                 self.assertEqual(result.returncode, expected)
 
+
+class Workflow(unittest.TestCase):
+    def test_only_suite_changing_events_run_and_share_pr_concurrency(self):
+        workflow = yaml.safe_load((ci_select.ROOT / '.github/workflows/verify.yml').read_text())
+        self.assertEqual(set(workflow['on']['pull_request']['types']),
+                         {'opened', 'synchronize', 'reopened', 'labeled', 'unlabeled', 'edited'})
+
+        def evaluate(value, context, condition=False):
+            # The workflow uses only comparisons, boolean operators and these two
+            # functions. Evaluate its actual expressions, not a copy of its policy.
+            def expression(match):
+                source = match.group(1)
+                def reference(match):
+                    current = context
+                    for key in match.group().split('.'):
+                        current = current.get(key, '') if isinstance(current, dict) else ''
+                    return repr(current)
+                source = re.sub(r'\b(?:github|inputs|needs)\.[\w.-]+', reference, source)
+                source = source.replace('&&', ' and ').replace('||', ' or ')
+                return str(eval(source, {'__builtins__': {}},
+                                {'always': lambda: True, 'format': lambda pattern, *args: pattern.format(*args)}))
+            if not isinstance(value, str):
+                return value
+            if condition and not value.strip().startswith('${{'):
+                value = '${{ ' + value + ' }}'
+            if value.strip().startswith('${{') and value.strip().endswith('}}'):
+                result = expression(re.fullmatch(r'\s*\$\{\{(.*?)\}\}\s*', value, re.S))
+                return {'True': True, 'False': False}.get(result, result)
+            return re.sub(r'\$\{\{(.*?)\}\}', expression, value, flags=re.S)
+
+        cases = [(action, {}, True) for action in ['opened', 'synchronize', 'reopened']]
+        cases += [(action, {'label': {'name': label}}, label == 'ci-full')
+                  for action in ['labeled', 'unlabeled'] for label in ['ci-full', 'ready-to-merge']]
+        cases += [('edited', {'changes': changes}, relevant) for changes, relevant in [
+            ({'base': {'ref': {'from': 'main'}}}, True),
+            ({'body': {'from': 'old description'}}, False),
+            ({'title': {'from': 'old title'}}, False),
+            ({}, False),
+        ]]
+        cases += [(event, {}, True) for event in ['push', 'workflow_dispatch', 'workflow_call']]
+        for action, fields, relevant in cases:
+            for pr_number, run_id in [(42, 101), (42, 102), (43, 101)]:
+                with self.subTest(action=action, fields=fields, pr_number=pr_number, run_id=run_id):
+                    event_name = action if action in ['push', 'workflow_dispatch', 'workflow_call'] else 'pull_request'
+                    context = {'github': {'event_name': event_name, 'run_id': run_id, 'ref': 'refs/heads/main',
+                               'event': {'action': action, 'pull_request': {'number': pr_number,
+                                         'labels': [{'name': 'ci-full'}] if action != 'unlabeled' else []}, **fields}},
+                               'inputs': {'ref': 'release-ref' if action == 'workflow_call' else ''}}
+                    if event_name != 'pull_request':
+                        context['github']['event'].pop('pull_request')
+                    for job in ['paths-filter', 'adapter-postgres']:
+                        self.assertEqual(evaluate(workflow['jobs'][job].get('if', True), context, condition=True), relevant, job)
+                    group = evaluate(workflow['concurrency']['group'], context)
+                    expected = ('verify-release-ref' if action == 'workflow_call' else 'verify-refs/heads/main') \
+                        if event_name != 'pull_request' else (f'verify-{pr_number}' if relevant else f'verify-ignored-{run_id}')
+                    self.assertEqual(group, expected)
+                    self.assertEqual(evaluate(workflow['concurrency']['cancel-in-progress'], context),
+                                     event_name == 'pull_request' and relevant)
+
+        for result in ['success', 'failure', 'cancelled', 'skipped']:
+            for job in ['check', 'verify']:
+                with self.subTest(selector=result, aggregate=job):
+                    self.assertEqual(evaluate(workflow['jobs'][job]['if'],
+                                              {'needs': {'paths-filter': {'result': result}}}, condition=True), result != 'skipped')
 
 
 if __name__ == '__main__':
