@@ -48,7 +48,11 @@ func (a *API) corpusStats(w http.ResponseWriter, r *http.Request, scope corpus.S
 			return
 		}
 		if len(v) != 1 || v[0] == "" {
-			writeError(w, publicerr.InvalidQuery, nil)
+			err := publicerr.InvalidQuery
+			if len(v) == 1 && (key == "histogram_cursor" || key == "sources_cursor") {
+				err = publicerr.InvalidCursor
+			}
+			writeError(w, err, nil)
 			return
 		}
 	}

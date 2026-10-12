@@ -140,6 +140,8 @@ For a browser UI over the same API, run `make demo` and open http://127.0.0.1:51
   time, filter by time bounds, and read exact range counts through the API or CLI.
   Read running document totals, UTC hour or day histograms and connector totals
   with a single Corpus statistics request.
+  Metadata equality and date-range pages use scoped indexes and bounded reads;
+  overly broad filters return a non-retryable narrowing error.
 - **Saved Queries and Subscriptions**, pinned and versioned; enabled Subscriptions turn
   newly searchable Versions into unique **Matches** (`/v0/matches`), each with a
   Delivery when a destination is configured. Omit `destination_id` to read Matches

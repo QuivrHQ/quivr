@@ -72,6 +72,8 @@ func TestCorpusStatsHTTPContract(t *testing.T) {
 		{root + "?resolution=minute", catalogReader, 422, "invalid_query"},
 		{root + "?include=histogram&accepted_after=2026-10-01T00:30:00Z", catalogReader, 422, "invalid_query"},
 		{root + "?include=histogram&histogram_cursor=broken", catalogReader, 422, "invalid_cursor"},
+		{root + "?include=histogram&histogram_cursor=", catalogReader, 422, "invalid_cursor"},
+		{root + "?include=sources&sources_cursor=", catalogReader, 422, "invalid_cursor"},
 		{root + "?include=histogram,sources&resolution=hour&histogram_cursor=" + cursor, catalogReader, 409, "cursor_scope_changed"},
 		{root + "?include=sources&source_limit=1001", catalogReader, 422, "invalid_query"},
 	} {
