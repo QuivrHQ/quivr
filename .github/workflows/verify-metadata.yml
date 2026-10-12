@@ -1,0 +1,44 @@
+# Metadata events must never emit names used by required verification checks.
+name: Request pull-request verification
+'on':
+  pull_request:
+    types:
+    - labeled
+    - unlabeled
+    - edited
+permissions:
+  contents: read
+jobs:
+  request-verification:
+    if: >-
+      ((github.event.action == 'labeled' || github.event.action == 'unlabeled') && github.event.label.name == 'ci-full') ||
+      (github.event.action == 'edited' && github.event.changes.base.ref != '')
+    runs-on: ubuntu-24.04
+    # Cancellation can take five minutes; leave time to post the rerun afterward.
+    timeout-minutes: 7
+    permissions:
+      actions: write
+      contents: read
+      pull-requests: read
+    steps:
+    - name: Rerun full verification of the current head
+      env:
+        GH_TOKEN: ${{ github.token }}
+        PR_NUMBER: ${{ github.event.pull_request.number }}
+      run: |
+        gh api "repos/$GITHUB_REPOSITORY/pulls/$PR_NUMBER" > "$RUNNER_TEMP/pull.json"
+        if ! jq -e '.state == "open"' "$RUNNER_TEMP/pull.json" > /dev/null; then
+          exit 0
+        fi
+        head=$(jq -er '.head.sha' "$RUNNER_TEMP/pull.json")
+        gh api "repos/$GITHUB_REPOSITORY/actions/workflows/verify.yml/runs?event=pull_request&head_sha=$head&per_page=100" > "$RUNNER_TEMP/runs.json"
+        jq -e --arg head "$head" --argjson number "$PR_NUMBER" \
+          '[.workflow_runs[] | select(.event == "pull_request" and .head_sha == $head and any(.pull_requests[]; .number == $number))] | max_by(.id)' \
+          "$RUNNER_TEMP/runs.json" > "$RUNNER_TEMP/run.json"
+        run=$(jq -er '.id' "$RUNNER_TEMP/run.json")
+        if ! jq -e '.status == "completed"' "$RUNNER_TEMP/run.json" > /dev/null; then
+          gh run cancel "$run" --repo "$GITHUB_REPOSITORY"
+          gh run watch "$run" --interval 1 --repo "$GITHUB_REPOSITORY"
+        fi
+        # Dispatch jobs do not satisfy PR checks; rerun the actual PR event instead.
+        gh api --method POST "repos/$GITHUB_REPOSITORY/actions/runs/$run/rerun"

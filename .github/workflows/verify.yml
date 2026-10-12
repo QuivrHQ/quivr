@@ -9,9 +9,6 @@ name: Text foundation
     - opened
     - synchronize
     - reopened
-    - labeled
-    - unlabeled
-    - edited
   workflow_dispatch: {}
   workflow_call:
     inputs:
@@ -29,6 +26,8 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 5
     outputs:
+      ref: ${{ steps.resolve.outputs.ref }}
+      base: ${{ steps.resolve.outputs.base }}
       groups: ${{ steps.select.outputs.groups }}
       parts: ${{ steps.select.outputs.parts }}
       images: ${{ steps.select.outputs.images }}
@@ -42,8 +41,23 @@ jobs:
     - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
       with:
         fetch-depth: 0
-        ref: ${{ inputs.ref || github.sha }}
+        ref: ${{ github.event_name == 'pull_request' && github.run_attempt > 1 && format('refs/pull/{0}/merge', github.event.pull_request.number) || inputs.ref || github.sha }}
         persist-credentials: false
+    - name: Resolve the immutable commit for every verification job
+      id: resolve
+      env:
+        PR_HEAD: ${{ github.event.pull_request.head.sha }}
+        EVENT_NAME: ${{ github.event_name }}
+        RUN_ATTEMPT: ${{ github.run_attempt }}
+      run: |
+        # A rerun keeps the original event but must test the current base of the same head.
+        if [ "$EVENT_NAME" = pull_request ] && [ "$RUN_ATTEMPT" -gt 1 ]; then
+          test "$(git rev-parse HEAD^2)" = "$PR_HEAD"
+        fi
+        if [ "$EVENT_NAME" = pull_request ]; then
+          echo "base=$(git rev-parse HEAD^1)" >> "$GITHUB_OUTPUT"
+        fi
+        echo "ref=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
     - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
       with:
         python-version: 3.12.15
@@ -80,7 +94,7 @@ jobs:
     - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
       with:
         fetch-depth: 0
-        ref: ${{ inputs.ref || github.sha }}
+        ref: ${{ needs.paths-filter.outputs.ref || inputs.ref || github.sha }}
         persist-credentials: false
     - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e
       with:
@@ -141,18 +155,20 @@ jobs:
     steps:
     - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
       with:
-        ref: ${{ inputs.ref || github.sha }}
+        ref: ${{ needs.paths-filter.outputs.ref || inputs.ref || github.sha }}
         persist-credentials: false
     - run: python3 scripts/ci_select.py --aggregate check
       env:
         CI_NEEDS: ${{ toJSON(needs) }}
   adapter-postgres:
+    needs:
+    - paths-filter
     runs-on: ubuntu-24.04
     timeout-minutes: 10
     steps:
     - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
       with:
-        ref: ${{ inputs.ref || github.sha }}
+        ref: ${{ needs.paths-filter.outputs.ref || inputs.ref || github.sha }}
         persist-credentials: false
     - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e
       with:
@@ -191,7 +207,7 @@ jobs:
     - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
       with:
         fetch-depth: 0
-        ref: ${{ inputs.ref || github.sha }}
+        ref: ${{ needs.paths-filter.outputs.ref || inputs.ref || github.sha }}
         persist-credentials: false
     - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e
       with:
@@ -256,7 +272,7 @@ jobs:
     - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
       with:
         fetch-depth: 0
-        ref: ${{ inputs.ref || github.sha }}
+        ref: ${{ needs.paths-filter.outputs.ref || inputs.ref || github.sha }}
         persist-credentials: false
     - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e
       with:
@@ -281,7 +297,7 @@ jobs:
         key: models-${{ runner.os }}-py${{ steps.python.outputs.python-version }}-${{ hashFiles('third_party/e5/model-lock.json', 'plugins/core-ingest/profile.json',
           'third_party/tokenizer/requirements-linux-x86_64.txt') }}
     - run: sudo rm -rf /usr/share/dotnet /usr/local/.ghcup /usr/share/swift /opt/hostedtoolcache/CodeQL /usr/local/share/powershell /usr/local/julia*
-    - run: make migration-compatibility args='--base ${{ github.event.pull_request.base.sha || github.event.before || 'HEAD^' }}'
+    - run: make migration-compatibility args='--base ${{ needs.paths-filter.outputs.base || github.event.before || 'HEAD^' }}'
     - name: Pack bounded failure evidence
       if: failure()
       run: python3 scripts/ci_artifacts.py .scratch vulnerabilities.json --output "${{ runner.temp }}/failure.tar.gz"
@@ -304,7 +320,7 @@ jobs:
     - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
       with:
         persist-credentials: false
-        ref: ${{ inputs.ref || github.sha }}
+        ref: ${{ needs.paths-filter.outputs.ref || inputs.ref || github.sha }}
     - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e
       with:
         go-version-file: go.mod
@@ -342,7 +358,7 @@ jobs:
     - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
       with:
         persist-credentials: false
-        ref: ${{ inputs.ref || github.sha }}
+        ref: ${{ needs.paths-filter.outputs.ref || inputs.ref || github.sha }}
     - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
       with:
         python-version: 3.12.15
@@ -377,7 +393,7 @@ jobs:
     - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
       with:
         persist-credentials: false
-        ref: ${{ inputs.ref || github.sha }}
+        ref: ${{ needs.paths-filter.outputs.ref || inputs.ref || github.sha }}
     - uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069
     - name: Build the release runtime without publishing
       uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc
@@ -467,7 +483,7 @@ jobs:
     steps:
     - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
       with:
-        ref: ${{ inputs.ref || github.sha }}
+        ref: ${{ needs.paths-filter.outputs.ref || inputs.ref || github.sha }}
         persist-credentials: false
     - run: python3 scripts/ci_select.py --aggregate verify
       env:
@@ -478,7 +494,7 @@ jobs:
     steps:
     - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
       with:
-        ref: ${{ inputs.ref || github.sha }}
+        ref: ${{ needs.paths-filter.outputs.ref || inputs.ref || github.sha }}
         persist-credentials: false
     - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1
       with:

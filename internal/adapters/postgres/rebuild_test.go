@@ -497,7 +497,7 @@ func TestRunningRebuildResumesBoundedValidation(t *testing.T) {
 	if _, err = maintenanceFence.Exec(ctx, `SELECT pg_advisory_xact_lock(642003)`); err != nil {
 		t.Fatal(err)
 	}
-	if err = (postgres.QueueSnapshots{Pool: pool}).Refresh(ctx); err != nil {
+	if _, err = (postgres.QueueSnapshots{Pool: pool}).Maintain(ctx); err != nil {
 		t.Fatal(err)
 	}
 	var bootstrapDirties int

@@ -26,8 +26,8 @@ func (s QueueSnapshots) refreshInterval() time.Duration {
 }
 
 // Refresh publishes both queues atomically, at most once per configured
-// interval. Scans run outside request/scrape deadlines; a failed scan preserves
-// the last good data.
+// interval. Bootstrap, expiry cleanup and scope discovery run independently.
+// Incomplete initialization/due promotion preserves the last valid observation.
 func (s QueueSnapshots) Refresh(ctx context.Context) error {
 	if s.Pool == nil {
 		return errors.New("workqueue: nil postgres pool")
@@ -37,39 +37,19 @@ func (s QueueSnapshots) Refresh(ctx context.Context) error {
 		return err
 	}
 	defer tx.Rollback(ctx)
-	if err = initializeQueueOperationScopes(ctx, tx); err != nil {
-		return err
-	}
-	// Release operation row locks before aggregating the backlog. Re-elect a
-	// refresher afterward: another process may publish in this short gap.
-	if err = tx.Commit(ctx); err != nil {
-		return err
-	}
-	tx, err = s.beginRefresh(ctx)
-	if err != nil || tx == nil {
-		return err
-	}
-	defer tx.Rollback(ctx)
-	if err = advanceQueueObservations(ctx, tx, 1000); err != nil {
-		return err
-	}
-	// Unique fencing tokens allow bounded cleanup even while an old process
-	// still holds an expired token. Ordinary completed attempts are deleted.
-	// Any expired batch suffices; sorting by expiry would require a hot index
-	// or a full sort before applying the limit.
-	if _, err = tx.Exec(ctx, `DELETE FROM queue_document_attempts WHERE (organization,kind,work_id,document_id) IN (
-	 SELECT organization,kind,work_id,document_id FROM queue_document_attempts
-	 WHERE lease_until<clock_timestamp() LIMIT 1000 FOR UPDATE SKIP LOCKED
-	)`); err != nil {
-		return err
-	}
-	_, err = tx.Exec(ctx, `INSERT INTO queue_backlog_snapshots(queue,waiting,in_progress,oldest_waiting_age_seconds,ingestion_waiting,observed_at,ingestion_observed_at)
+	published, err := tx.Exec(ctx, `INSERT INTO queue_backlog_snapshots(queue,waiting,in_progress,oldest_waiting_age_seconds,ingestion_waiting,observed_at,ingestion_observed_at)
 	 SELECT backlog.*,statement_timestamp(),statement_timestamp() FROM (`+queueBacklogSQL()+`) backlog
+ WHERE (SELECT initialized FROM queue_backlog_bootstrap WHERE singleton)
+ AND NOT EXISTS(SELECT FROM queue_scope_reconciliation WHERE kind='quarantine')
+ AND NOT EXISTS(SELECT FROM queue_backlog_documents WHERE NOT ready AND ready_at<=statement_timestamp() LIMIT 1)
 	 ON CONFLICT(queue) DO UPDATE SET waiting=EXCLUDED.waiting,in_progress=EXCLUDED.in_progress,
 	 oldest_waiting_age_seconds=EXCLUDED.oldest_waiting_age_seconds,observed_at=EXCLUDED.observed_at,
 	 ingestion_waiting=EXCLUDED.ingestion_waiting,ingestion_observed_at=EXCLUDED.ingestion_observed_at`)
 	if err != nil {
 		return err
+	}
+	if published.RowsAffected() == 0 {
+		return nil
 	}
 	// Stamp publication after the expensive query, while retaining its original
 	// observation cutoff for oldest-age calculations and stale-data detection.

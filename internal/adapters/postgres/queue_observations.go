@@ -10,7 +10,7 @@ import (
 // Observation locks follow canonical writer locks. The bootstrap locks
 // observations only, then reads canonical state in a fresh statement snapshot.
 // It never waits for canonical row locks, which would invert the writer lock order.
-const queueObservationKeysSQL = `SELECT organization,record_id FROM unnest($1::text[],$2::text[]) k(organization,record_id) ORDER BY organization,record_id OFFSET 0`
+const queueObservationKeysSQL = `SELECT DISTINCT organization,record_id FROM unnest($1::text[],$2::text[]) k(organization,record_id) ORDER BY organization,record_id OFFSET 0`
 
 // recordObservationSQL maintains one Record's queue observation from its
 // canonical state. Each statement takes (organizations, records).
@@ -51,7 +51,7 @@ var recordObservationSQL = append([]string{
  AND q.ctid=ANY(ARRAY(SELECT locked.ctid FROM (` + queueObservationKeysSQL + `) ids
  JOIN LATERAL (SELECT ctid FROM queue_enrichment_records p WHERE (p.organization,p.record_id)=(ids.organization,ids.record_id) LIMIT 1) locked ON true))`,
 	markObservedRecordsSQL,
-}, corpusRecordObservationSQL...)
+}, append(append(queueRecordObservationSQL, queueRecordMetricObservationSQL...), corpusRecordObservationSQL...)...)
 
 func queueRecordObservations(batch *pgx.Batch, organizations, records []string) {
 	for _, sql := range recordObservationSQL {
@@ -74,6 +74,23 @@ func observeQueueRecords(ctx context.Context, tx pgx.Tx, organizations, records 
 	}
 	batch := &pgx.Batch{}
 	queueRecordObservations(batch, organizations, records)
+	return tx.SendBatch(ctx, batch).Close()
+}
+
+// observeQueueStateRecords refreshes queue-only changes and maintenance reads.
+// These callers do not change projection eligibility or coverage and need not
+// hold the publication fence. They must not create rebuild dirty records.
+func observeQueueStateRecords(ctx context.Context, tx pgx.Tx, organizations, records []string) error {
+	if len(records) == 0 {
+		return nil
+	}
+	batch := &pgx.Batch{}
+	for _, sql := range recordObservationSQL {
+		if sql == markObservedRecordsSQL {
+			sql = markRoutingRecordsSQL
+		}
+		batch.Queue(sql, organizations, records)
+	}
 	return tx.SendBatch(ctx, batch).Close()
 }
 
@@ -137,20 +154,8 @@ func advanceQueueObservations(ctx context.Context, tx pgx.Tx, limit int) error {
 	if err = rows.Err(); err != nil {
 		return err
 	}
-	// Snapshot bootstrap reads canonical state without the publication fence.
-	// It changes only derived observations, so it must not create rebuild dirties
-	// after a cutover has removed that rebuild's validation metadata.
-	if len(records) > 0 {
-		batch := &pgx.Batch{}
-		for _, sql := range recordObservationSQL {
-			if sql == markObservedRecordsSQL {
-				sql = markRoutingRecordsSQL
-			}
-			batch.Queue(sql, organizations, records)
-		}
-		if err = tx.SendBatch(ctx, batch).Close(); err != nil {
-			return err
-		}
+	if err = observeQueueStateRecords(ctx, tx, organizations, records); err != nil {
+		return err
 	}
 	if len(records) < limit {
 		initialized = true

@@ -257,7 +257,7 @@ func queueIngestionEvaluations(ctx context.Context, tx pgx.Tx, org, recordID, ve
 			}
 		}
 	}
-	return nil
+	return observeQueueRecords(ctx, tx, []string{org}, []string{recordID})
 }
 
 func (s IngestionEvaluationStore) ClaimIngestionEvaluations(ctx context.Context, limit int) ([]content.IngestionEvaluation, error) {
@@ -301,8 +301,23 @@ func (s IngestionEvaluationStore) CompleteIngestionEvaluation(ctx context.Contex
 			return err
 		}
 	}
-	_, err = s.Pool.Exec(ctx, `UPDATE ingestion_evaluations SET state=$3,diagnostic=$4,completed_at=now() WHERE organization=$1 AND id=$2 AND state='queued'`, org, id, state, raw)
-	return err
+	tx, err := s.Pool.Begin(ctx)
+	if err != nil {
+		return err
+	}
+	defer tx.Rollback(ctx)
+	var record string
+	err = tx.QueryRow(ctx, `UPDATE ingestion_evaluations SET state=$3,diagnostic=$4,completed_at=now() WHERE organization=$1 AND id=$2 AND state='queued' RETURNING record_id`, org, id, state, raw).Scan(&record)
+	if err == pgx.ErrNoRows {
+		return nil
+	}
+	if err != nil {
+		return err
+	}
+	if err = observeQueueStateRecords(ctx, tx, []string{org}, []string{record}); err != nil {
+		return err
+	}
+	return tx.Commit(ctx)
 }
 
 // IngestionEvaluationStore persists evaluation-owner ingestion jobs.

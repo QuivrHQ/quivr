@@ -181,6 +181,9 @@ ORDER BY s.id LIMIT $5`, org, corpusID, sequence, after, s.page(), versionID, ev
 	if _, err = tx.Exec(ctx, `UPDATE monitoring_checkpoints SET position=$2,subscription_after=$3 WHERE organization=$1`, org, next, nextAfter); err != nil {
 		return false, err
 	}
+	if err = observeQueueStateRecords(ctx, tx, []string{org}, []string{recordID}); err != nil {
+		return false, err
+	}
 	return true, tx.Commit(ctx)
 }
 
@@ -318,8 +321,18 @@ WHERE v.organization=$1 AND v.id=$2`, in.Organization, in.SubscriptionVersionID,
 }
 
 func (s EvaluationStore) Complete(ctx context.Context, in monitoring.Intent, outcome string) error {
-	_, err := s.Pool.Exec(ctx, completeIntentSQL, in.Organization, in.SubscriptionVersionID, in.Sequence, outcome)
-	return err
+	tx, err := s.Pool.Begin(ctx)
+	if err != nil {
+		return err
+	}
+	defer tx.Rollback(ctx)
+	if _, err = tx.Exec(ctx, completeIntentSQL, in.Organization, in.SubscriptionVersionID, in.Sequence, outcome); err != nil {
+		return err
+	}
+	if err = observeQueueIntents(ctx, tx, in.Organization, []string{in.SubscriptionVersionID}, []int64{in.Sequence}); err != nil {
+		return err
+	}
+	return tx.Commit(ctx)
 }
 
 // completeIntentSQL completes a pending intent. When it leaves every
@@ -347,13 +360,25 @@ WHERE done.kind='evaluation' AND $4<>'not_ready' AND v.organization=done.organiz
       AND d.record_version_id=n.record_version_id AND d.kind='evaluation' AND d.state='done' AND d.outcome<>'not_ready'))`
 
 func (s EvaluationStore) Retry(ctx context.Context, in monitoring.Intent, code string, delay time.Duration) error {
-	_, err := s.Pool.Exec(ctx, `UPDATE evaluation_intents SET attempts=attempts+1,error_code=$4,available_at=now()+make_interval(secs => $5::double precision),lease_until='-infinity' WHERE organization=$1 AND subscription_version_id=$2 AND sequence=$3 AND state='pending'`, in.Organization, in.SubscriptionVersionID, in.Sequence, code, delay.Seconds())
-	return err
+	tx, err := s.Pool.Begin(ctx)
+	if err != nil {
+		return err
+	}
+	defer tx.Rollback(ctx)
+	_, err = tx.Exec(ctx, `UPDATE evaluation_intents SET attempts=attempts+1,error_code=$4,available_at=now()+make_interval(secs => $5::double precision),lease_until='-infinity' WHERE organization=$1 AND subscription_version_id=$2 AND sequence=$3 AND state='pending'`, in.Organization, in.SubscriptionVersionID, in.Sequence, code, delay.Seconds())
+	if err != nil {
+		return err
+	}
+	if err = observeQueueIntents(ctx, tx, in.Organization, []string{in.SubscriptionVersionID}, []int64{in.Sequence}); err != nil {
+		return err
+	}
+	return tx.Commit(ctx)
 }
 
 func (s EvaluationStore) Backlog(ctx context.Context) (monitoring.Backlog, error) {
 	var b monitoring.Backlog
-	err := s.Pool.QueryRow(ctx, `SELECT count(*),count(*) FILTER (WHERE error_code<>'') FROM evaluation_intents WHERE state='pending'`).Scan(&b.Pending, &b.Erroring)
+	pending, erroring, _, err := queueMetricBacklog(ctx, s.Pool, "evaluation")
+	b.Pending, b.Erroring = int(pending), int(erroring)
 	return b, err
 }
 
@@ -432,6 +457,9 @@ func (s EvaluationStore) commitAttempt(ctx context.Context, in monitoring.Intent
 		return "", err
 	}
 	if _, err = tx.Exec(ctx, completeIntentSQL, in.Organization, in.SubscriptionVersionID, in.Sequence, outcome); err != nil {
+		return "", err
+	}
+	if err = observeQueueIntents(ctx, tx, in.Organization, []string{in.SubscriptionVersionID}, []int64{in.Sequence}); err != nil {
 		return "", err
 	}
 	return outcome, tx.Commit(ctx)
@@ -679,6 +707,11 @@ func commitNotice(ctx context.Context, tx pgx.Tx, org string, n notice, withMatc
 	}
 	if n.Destination != "" {
 		if _, err = tx.Exec(ctx, `INSERT INTO delivery_outbox(organization,delivery_id,trace_context) VALUES($1,$2,$3)`, org, r.DeliveryID, telemetry.Encode(ctx)); err != nil {
+			return false, err
+		}
+	}
+	if n.Destination != "" {
+		if err = observeQueueMetricKeys(ctx, tx, []queueMetricKey{{source: "delivery", org: org, id: r.DeliveryID}}); err != nil {
 			return false, err
 		}
 	}

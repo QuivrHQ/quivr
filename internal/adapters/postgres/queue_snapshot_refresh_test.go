@@ -2,6 +2,14 @@ package postgres
 
 import (
 	"context"
+	"github.com/The-Vibe-Company/quivr/internal/autoscaling"
+	"github.com/The-Vibe-Company/quivr/internal/content"
+	"github.com/The-Vibe-Company/quivr/internal/corpus"
+	"github.com/The-Vibe-Company/quivr/internal/retrieval"
+	"github.com/The-Vibe-Company/quivr/internal/transport/httpapi"
+	"github.com/The-Vibe-Company/quivr/internal/uploads"
+	"net/http"
+	"net/http/httptest"
 	"testing"
 	"time"
 )
@@ -21,6 +29,9 @@ func TestQueueSnapshotRefreshReusesDefaultInterval(t *testing.T) {
 		t.Fatal(err)
 	}
 	snapshots := QueueSnapshots{Pool: pool}
+	if _, err := snapshots.Maintain(ctx); err != nil {
+		t.Fatal(err)
+	}
 	if err := snapshots.Refresh(ctx); err != nil {
 		t.Fatal(err)
 	}
@@ -123,11 +134,9 @@ func TestQueueSnapshotRefreshReusesDefaultInterval(t *testing.T) {
 	if err = tx.Rollback(ctx); err != nil {
 		t.Fatal(err)
 	}
-	// Missing refresh storage produces an immediate SQL failure. Existing
-	// observations and publication timestamps survive its transaction rollback.
-	// Scope assignments commit before aggregation, releasing worker row locks.
-	// A failed snapshot must therefore retain newly captured scopes as well as
-	// the previous publication, even for operations sharing the same corpus.
+	// Bootstrap and operation scope discovery belong to independent maintenance.
+	// Even unavailable bootstrap storage must not prevent publishing a fresh
+	// observation for a queued, as-yet uncounted rebuild.
 	seedQueueCorpus(t, ctx, pool, "example")
 	exec(`INSERT INTO projection_generations(id,collection,profile_version) VALUES('target','target','example');
 INSERT INTO operations(organization,id,kind,corpus_id,request_key,canonical_request,target_generation_id)
@@ -135,16 +144,56 @@ VALUES('example','first','projection_rebuild','corpus','first','','target'),
 ('example','second','retrieval_configuration','corpus','second','','target')`)
 	exec(`ALTER TABLE queue_enrichment_bootstrap RENAME TO queue_refresh_unavailable`)
 	defer exec(`ALTER TABLE queue_refresh_unavailable RENAME TO queue_enrichment_bootstrap`)
-	if err = snapshots.Refresh(ctx); err == nil {
-		t.Fatal("refresh succeeded with missing observation storage")
+	if err = snapshots.Refresh(ctx); err != nil {
+		t.Fatalf("refresh coupled to bootstrap: %v", err)
 	}
-	assertWaiting(9)
-	var captured bool
-	if err = pool.QueryRow(ctx, `SELECT count(*)=2 AND bool_and(counters->>'versions_in_scope'='0') FROM operations WHERE organization='example'`).Scan(&captured); err != nil || !captured {
-		t.Fatalf("failed aggregation rolled back scope assignments: captured=%v error=%v", captured, err)
+	statuses, err = snapshots.QueueBacklog(ctx)
+	if err != nil {
+		t.Fatal(err)
 	}
-	var unpublished bool
-	if err = pool.QueryRow(ctx, `SELECT bool_and(published_at='-infinity') FROM queue_backlog_snapshots`).Scan(&unpublished); err != nil || !unpublished {
-		t.Fatalf("failed refresh changed publication time: unpublished=%v error=%v", unpublished, err)
+	for _, status := range statuses {
+		if status.Queue == "bulk" && status.Waiting == 0 {
+			t.Fatalf("uncounted rebuild hidden from scaling: %+v", status)
+		}
 	}
+	var untouched bool
+	if err = pool.QueryRow(ctx, `SELECT bool_and(NOT counters ? 'versions_in_scope') FROM operations WHERE organization='example'`).Scan(&untouched); err != nil || !untouched {
+		t.Fatalf("refresh enumerated rebuild scope: untouched=%v error=%v", untouched, err)
+	}
+	// Persisted discovery can lag processing. Completion counters must not hide
+	// the still-undiscovered scope from the ordinary production scaling target.
+	exec(`INSERT INTO queue_operation_scope_progress(organization,operation_id,cursor,seen) VALUES('example','first','partial',50000);
+ UPDATE operations SET counters='{"versions_covered":50000}' WHERE id='first';
+ UPDATE queue_backlog_snapshots SET published_at='-infinity'`)
+	if err = snapshots.Refresh(ctx); err != nil {
+		t.Fatal(err)
+	}
+	// A rebuild-only installation reaches the real admin response and the same
+	// QueueSource/policy used by the scaler, without any acquisition backlog.
+	handler, err := httpapi.New(nil, content.Service{}, retrieval.Service{}, uploads.Service{}, map[string]corpus.Scope{"operator": {Organization: "example", Actions: []string{"queues:read"}, Corpora: []string{"*"}}}, []byte("queue-fixture-cursor-key-0123456789"), httpapi.WithQueues(snapshots))
+	if err != nil {
+		t.Fatal(err)
+	}
+	source := autoscaling.QueueSource{URL: "http://example.invalid/v0/admin/queues", Key: "operator", Queue: "bulk", Client: &http.Client{Transport: queueHTTPTransport{handler}}}
+	waiting, err := source.Waiting(ctx)
+	if err != nil || waiting != 50001 {
+		t.Fatalf("rebuild-only scaler signal=%d error=%v", waiting, err)
+	}
+	policy, err := autoscaling.NewPolicy(autoscaling.Config{Min: 1, Max: 8, DocumentsPerReplica: 20000})
+	if err != nil {
+		t.Fatal(err)
+	}
+	target, err := policy.Decide(waiting, 1, time.Now())
+	if err != nil || target != 3 {
+		t.Fatalf("rebuild-only recommendation=%d error=%v", target, err)
+	}
+
+}
+
+type queueHTTPTransport struct{ handler http.Handler }
+
+func (tr queueHTTPTransport) RoundTrip(req *http.Request) (*http.Response, error) {
+	recorder := httptest.NewRecorder()
+	tr.handler.ServeHTTP(recorder, req)
+	return recorder.Result(), nil
 }

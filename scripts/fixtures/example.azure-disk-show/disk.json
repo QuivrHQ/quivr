@@ -1,0 +1,25 @@
+{
+  "diskIOPSReadOnly": 3000,
+  "diskIOPSReadWrite": 12000,
+  "diskMBpsReadOnly": 125,
+  "diskMBpsReadWrite": 250,
+  "diskSizeBytes": 549755813888,
+  "diskSizeGB": 512,
+  "diskState": "Attached",
+  "sku": {
+    "name": "PremiumV2_LRS",
+    "tier": "Premium"
+  },
+  "zones": [
+    "1"
+  ],
+  "provisioningState": "Succeeded",
+  "location": "westeurope",
+  "creationData": {
+    "createOption": "Empty",
+    "logicalSectorSize": 4096
+  },
+  "id": "/subscriptions/example/resourceGroups/example-group/providers/Microsoft.Compute/disks/example-index-disk",
+  "name": "example-index-disk",
+  "managedBy": null
+}
