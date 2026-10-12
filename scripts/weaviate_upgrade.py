@@ -6,8 +6,6 @@ import pathlib
 import sys
 import subprocess
 import time
-import urllib.error
-import urllib.request
 import uuid
 
 import gotest
@@ -15,6 +13,7 @@ import gotest
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from deploy import infrastructure
+from deploy.weaviate_client import WeaviateClient, WeaviateClientError, api_key_from_environment
 OLD_IMAGE = 'cr.weaviate.io/semitechnologies/weaviate:1.37.15@sha256:cede92f9f43f9b4be25a9f453e756173bbe171d2e88210a0e5b7ab72e8b96d96'
 BRIDGE_IMAGE = 'cr.weaviate.io/semitechnologies/weaviate:1.38.20@sha256:d23d7bb6242026106ee1ec5aefdbb6a867e260ff171cedc9c3af55c9688e30f6'
 OWNER = 'TestPersistedProjectionAcrossWeaviateUpgrade'
@@ -31,6 +30,7 @@ def exercise(directory, negative_control=False):
     config_file = directory / 'config.json'
     snapshot = directory / 'snapshot.json'
     target = infrastructure.resolve(environ={})['weaviate']['image']
+    api_key = api_key_from_environment()
     report = {'images': [OLD_IMAGE, BRIDGE_IMAGE, target], 'stages': [], 'result': 'failed', 'negative_control': negative_control}
     started = time.monotonic()
 
@@ -46,37 +46,41 @@ def exercise(directory, negative_control=False):
         compose('up', '-d', stdout=subprocess.DEVNULL)
         address = compose('port', 'weaviate', '8080', capture_output=True, text=True).stdout.strip()
         endpoint = 'http://' + address
-        config_file.write_text(json.dumps({'weaviate_url': endpoint}))
+        config = {'weaviate_url': endpoint}
+        if api_key:
+            config['weaviate_api_key'] = api_key
+        config_file.write_text(json.dumps(config))
+        config_file.chmod(0o600)
         version = image.split(':', 1)[1].split('@', 1)[0]
-        await_server(endpoint, version)
+        await_server(endpoint, version, api_key)
         report['stages'].append({'version': version, 'raft_synchronized': True})
 
-    def await_server(endpoint, version):
+    def await_server(endpoint, version, api_key=''):
         deadline = time.monotonic() + 180
-        last = None
+        last = 'server unavailable'
+        client = WeaviateClient(endpoint, api_key)
         # Condition polling covers provisioning, not an assertion wait or a retry
         # of failed tests. Every minor must report synchronized Raft metadata.
         while time.monotonic() < deadline:
             try:
-                with urllib.request.urlopen(endpoint + '/v1/.well-known/ready', timeout=2):
-                    pass
-                with urllib.request.urlopen(endpoint + '/v1/meta', timeout=2) as response:
-                    meta = json.load(response)
-                if meta['version'] != version:
-                    raise RuntimeError(f'expected server {version}, got {meta["version"]}')
-                with urllib.request.urlopen(endpoint + '/v1/cluster/statistics', timeout=2) as response:
-                    statistics = json.load(response)
-                nodes = statistics.get('statistics', [])
-                if len(nodes) == 1 and statistics.get('synchronized') is True:
+                client.request('/v1/.well-known/ready', timeout=2)
+                meta = client.request_json('/v1/meta', timeout=2)
+                if not isinstance(meta, dict) or meta.get('version') != version:
+                    raise RuntimeError('Weaviate metadata version mismatch')
+                statistics = client.request_json('/v1/cluster/statistics', timeout=2)
+                nodes = statistics.get('statistics', []) if isinstance(statistics, dict) else []
+                synchronized = statistics.get('synchronized') if isinstance(statistics, dict) else None
+                if isinstance(nodes, list) and len(nodes) == 1 and synchronized is True:
                     return
-                last = statistics
-            except (urllib.error.URLError, TimeoutError, ConnectionError) as error:
-                last = str(error)
+                last = 'cluster is not synchronized'
+            except (WeaviateClientError, TimeoutError, ConnectionError):
+                last = 'server is not ready'
             time.sleep(.1)  # Poll the observable readiness/synchronization condition, bounded above.
         raise RuntimeError(f'Weaviate {version} did not become ready and Raft-synchronized: {last}')
 
     def stop(version):
-        await_server(json.loads(config_file.read_text())['weaviate_url'], version)
+        config = json.loads(config_file.read_text())
+        await_server(config['weaviate_url'], version, config.get('weaviate_api_key', ''))
         compose('stop', '--timeout', '30', 'weaviate', stdout=subprocess.DEVNULL)
         container = compose('ps', '--all', '-q', 'weaviate', capture_output=True, text=True).stdout.strip()
         state = json.loads(subprocess.check_output(['docker', 'inspect', '--format', '{{json .State}}', container], text=True))

@@ -5,9 +5,14 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"github.com/The-Vibe-Company/quivr/internal/adapters/weaviate"
+	"github.com/The-Vibe-Company/quivr/internal/outbound"
 	"log/slog"
+	"net/http"
+	"net/http/httptest"
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 	"time"
 
@@ -62,6 +67,9 @@ func TestProcessLogsKeepConfigurationCredentialsOutOfBothSinks(t *testing.T) {
 		DatabaseURL: "postgres://user:sentinel-db-secret@localhost/db", Keys: map[string]corpus.Scope{"sentinel-bearer-secret": {}},
 		Destinations: map[string]monitoring.Destination{"receiver": {SecretEnv: "EXAMPLE_WEBHOOK_SECRET"}},
 		Plugin:       &plugins.PinConfig{Configuration: []byte(`{"settings":{"key":"sentinel-plugin-secret"}}`)}}
+	if err := json.Unmarshal([]byte(`{"weaviate_api_key":"sentinel-index-secret"}`), &cfg); err != nil {
+		t.Fatal(err)
+	}
 	cfg.S3.AccessKey, cfg.S3.SecretKey = "sentinel-access-secret", "sentinel-storage-secret"
 	grace, err := cfg.configureProcess("worker")
 	if err != nil {
@@ -74,6 +82,32 @@ func TestProcessLogsKeepConfigurationCredentialsOutOfBothSinks(t *testing.T) {
 	LogFailure(errors.New("sentinel-db-secret sentinel-env-secret"))
 	LogFailure(&plugins.PinError{Path: "sentinel-storage-secret", Issues: []plugins.Issue{{Code: plugins.CodeInvalidConfiguration, Message: "sentinel-bearer-secret"}}})
 	LogFailure(&plugins.PinError{Path: "sentinel-storage-secret", Issues: []plugins.Issue{{Code: plugins.CodeNamespaceConflict, Message: "sentinel-bearer-secret"}}})
+	slog.Info("index metadata", "detail", "sentinel-index-secret")
+	for _, body := range []string{
+		`{"error":[{"message":"denied sentinel-index-secret"}]}`,
+		`{"results":{"matches":1,"successful":0,"failed":1,"objects":[{"errors":{"error":[{"message":"denied sentinel-index-secret"}]}}]}}`,
+	} {
+		server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			if strings.Contains(body, `"message"`) && !strings.Contains(body, `"results"`) {
+				w.WriteHeader(http.StatusUnauthorized)
+			}
+			w.Write([]byte(body))
+		}))
+		store, constructErr := weaviate.NewWithTLS(server.URL, outbound.TLS{}, cfg.WeaviateAPIKey)
+		if constructErr != nil {
+			t.Fatal(constructErr)
+		}
+		_, requestErr := store.PurgeVersion(context.Background(), "QuivrTextV4", "org", "version")
+		store.Client.CloseIdleConnections()
+		server.Close()
+		if requestErr == nil {
+			t.Fatal("expected index refusal")
+		}
+		if strings.Contains(requestErr.Error(), "sentinel-index-secret") {
+			t.Errorf("index error leaked configured key")
+		}
+		slog.Info("index refusal", "detail", requestErr.Error())
+	}
 	fileLog, err := os.ReadFile(filepath.Join(cfg.LogDirectory, "worker.log"))
 	if err != nil {
 		t.Fatal(err)
@@ -92,7 +126,7 @@ func TestProcessLogsKeepConfigurationCredentialsOutOfBothSinks(t *testing.T) {
 	if start["event"] != "quivr.start" || start["version"] != "2.0.0-alpha.7" || start["revision"] != "0123456789abcdef0123456789abcdef01234567" || start["api_version"] != "v0" || start["plugin_engine_version"] != "0.2.0" {
 		t.Fatalf("startup build identity: %v", start)
 	}
-	for _, secret := range []string{signingSecret, "sentinel-cursor-secret", "sentinel-credential-secret", "sentinel-db-secret", "sentinel-bearer-secret", "sentinel-env-secret", "sentinel-plugin-secret", "sentinel-access-secret", "sentinel-storage-secret"} {
+	for _, secret := range []string{signingSecret, "sentinel-cursor-secret", "sentinel-credential-secret", "sentinel-db-secret", "sentinel-bearer-secret", "sentinel-env-secret", "sentinel-plugin-secret", "sentinel-access-secret", "sentinel-storage-secret", "sentinel-index-secret"} {
 		if bytes.Contains(fileLog, []byte(secret)) {
 			t.Fatalf("process log leaked %q", secret)
 		}

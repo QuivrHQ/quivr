@@ -100,7 +100,7 @@ func (s *Store) purgeGenerationWindow(ctx context.Context, collection, org, corp
 
 func (s *Store) selectPurgeIDs(ctx context.Context, collection string, where map[string]any) (purgeResponse, error) {
 	var response purgeResponse
-	scoped := Store{Endpoint: s.Endpoint, Client: s.purgeClient()}
+	scoped := Store{Endpoint: s.Endpoint, Client: s.purgeClient(), apiKey: s.apiKey}
 	if err := scoped.purgeCall(ctx, "DELETE", "/v1/batch/objects", map[string]any{"match": map[string]any{"class": collection, "where": where}, "dryRun": true, "output": "verbose"}, &response); err != nil {
 		return response, err
 	}
@@ -143,12 +143,12 @@ func (s *Store) purgeCall(ctx context.Context, method, path string, in, out any)
 	}
 	req, err := http.NewRequestWithContext(ctx, method, s.Endpoint+path, bytes.NewReader(body))
 	if err != nil {
-		return err
+		return s.safeError(err)
 	}
 	req.Header.Set("Content-Type", "application/json")
 	res, err := s.Client.Do(req)
 	if err != nil {
-		return fmt.Errorf("projection purge %s: %w", method, err)
+		return fmt.Errorf("projection purge %s: %w", method, s.safeError(err))
 	}
 	defer res.Body.Close()
 	if res.StatusCode < 200 || res.StatusCode >= 300 {
@@ -158,13 +158,13 @@ func (s *Store) purgeCall(ctx context.Context, method, path string, in, out any)
 			} `json:"error"`
 		}
 		if json.NewDecoder(io.LimitReader(res.Body, 4096)).Decode(&response) == nil && len(response.Error) > 0 {
-			return fmt.Errorf("projection purge HTTP %d: %.1024s", res.StatusCode, strings.TrimSpace(response.Error[0].Message))
+			return fmt.Errorf("projection purge HTTP %d: %.1024s", res.StatusCode, s.redact(strings.TrimSpace(response.Error[0].Message)))
 		}
 		return fmt.Errorf("projection purge HTTP %d (%s)", res.StatusCode, http.StatusText(res.StatusCode))
 	}
 	if out != nil {
 		if err = json.NewDecoder(io.LimitReader(res.Body, 2<<20)).Decode(out); err != nil {
-			return fmt.Errorf("projection purge response: %w", err)
+			return fmt.Errorf("projection purge response: %w", s.safeError(err))
 		}
 	}
 	return nil

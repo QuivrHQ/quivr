@@ -190,6 +190,8 @@ class Stack:
             plugins=push_plugin.pins(self)+subscription_plugin.pins(self)+connector_plugin.pins(self)+connector_plugin.first_party_pins(self)+fixture_plugin.pins(self),
             # Counts reach the stats reads within 200 ms; query text is recorded so top queries can be read back.
             observability=OBSERVABILITY_OVERRIDES)
+        if os.environ.get('WEAVIATE_API_KEY'):
+            cfg['weaviate_api_key'] = os.environ['WEAVIATE_API_KEY']
         f=self.directory/'config.json';f.write_text(json.dumps(cfg));f.chmod(0o600)
         (self.directory/'tokenizer-provenance.json').write_text((ROOT/'plugins/core-ingest/profile.json').read_text())
         # A second API over the same database with a short change retention proves public cursor expiry.

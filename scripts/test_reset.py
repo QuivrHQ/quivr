@@ -115,6 +115,8 @@ class RailwayIsolation(unittest.TestCase):
                             del removing[identifier]
                     if args[0] == 'ssh':
                         command = args[-1]
+                        if '/v1/objects?limit=1' in command:
+                            return '0'
                         if 'weaviate_url' in command and 'json.dumps' in command:
                             return json.dumps(None if failure == 'unknown-index' else
                                 'https://index.example.invalid' if failure == 'external-index' else

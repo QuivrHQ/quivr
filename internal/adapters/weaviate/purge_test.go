@@ -23,7 +23,7 @@ func (f *attachFixture) count(collection, where string) int {
 		args = "(where:" + where + ")"
 	}
 	body, _ := json.Marshal(map[string]any{"query": fmt.Sprintf("{Aggregate{%s%s{meta{count}}}}", collection, args)})
-	res, err := http.Post(f.url+"/v1/graphql", "application/json", bytes.NewReader(body))
+	res, err := f.store.Client.Post(f.url+"/v1/graphql", "application/json", bytes.NewReader(body))
 	if err != nil {
 		f.t.Fatal(err)
 	}
@@ -91,8 +91,8 @@ func TestPurgeDeletesOnlyFilteredObjects(t *testing.T) {
 	}
 	// Lose one real delete response, as a process interruption after the
 	// provider committed would. A fresh adapter must drain the survivors.
-	interrupted := weaviate.New(f.url)
-	interrupted.Client = &http.Client{Transport: lostPurgeReply{next: http.DefaultTransport}}
+	interrupted := weaviate.New(f.url, f.apiKey)
+	interrupted.Client.Transport = lostPurgeReply{next: interrupted.Client.Transport}
 	if _, err := interrupted.PurgeGeneration(f.ctx, collection, f.org, f.corpusID, old.ID); err == nil {
 		t.Fatal("lost delete reply must report failure")
 	}
@@ -100,7 +100,7 @@ func TestPurgeDeletesOnlyFilteredObjects(t *testing.T) {
 	if afterInterruption < 347 || afterInterruption >= 603 {
 		t.Fatalf("interrupted batch left %d of 603 objects, want at most 256 deleted", afterInterruption)
 	}
-	f.store = weaviate.New(f.url)
+	f.store = weaviate.New(f.url, f.apiKey)
 	deleted, sweeps := 0, 0
 	var r retrieval.PurgeResult
 	var err error

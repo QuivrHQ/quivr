@@ -4,10 +4,10 @@ import subprocess
 from pathlib import Path
 import shlex
 import sys
-import urllib.request
 
 from deploy.compose.infrastructure import Compose
 from deploy.reset_support import Checkpoint, terminate_workflows, vector_objects, require_local_vector
+from deploy.weaviate_client import WeaviateClient
 
 ROOT = Path(__file__).resolve().parents[2]
 VOLUMES = {'postgres': ('data', '/var/lib/postgresql/data'),
@@ -94,8 +94,7 @@ class ComposeReset:
         # An archive used as a source must live outside the storage being reset.
         from deploy.reset_storage import inventory
         self.storage = inventory(self.config['s3'])
-        with urllib.request.urlopen(self.config['weaviate_url'] + '/v1/objects?limit=1', timeout=10) as response:
-            self.index_count = vector_objects(json.load(response))
+        self.index_count = vector_objects(WeaviateClient.from_config(self.config).request_json('/v1/objects?limit=1'))
         return {'volumes': self.volumes, 'object_store': self.storage,
                 'vector_objects': self.index_count, 'workflows': 'terminate running workflows in default namespace',
                 'writers': 'tracked Stack API and worker processes', 'preserves': 'credentials, infrastructure profile, model cache'}
@@ -136,9 +135,8 @@ class ComposeReset:
             storage = inventory(config['s3'])
             if storage['objects_at_least'] != 0 or storage['truncated']:
                 raise RuntimeError('new object store is not empty')
-            with urllib.request.urlopen(config['weaviate_url'] + '/v1/objects?limit=1', timeout=10) as response:
-                if vector_objects(json.load(response)) != 0:
-                    raise RuntimeError('new vector store is not empty')
+            if vector_objects(WeaviateClient.from_config(config).request_json('/v1/objects?limit=1')) != 0:
+                raise RuntimeError('new vector store is not empty')
             postgres = stack.compose('ps', '-q', 'postgres', capture_output=True, text=True).stdout.strip()
             counts = self.adapter.run(['exec', postgres, 'sh', '-c',
                 'psql -XAt -v ON_ERROR_STOP=1 -U "$POSTGRES_USER" -d "$POSTGRES_DB" -c '
