@@ -8,6 +8,7 @@ import time
 
 from deploy.railway.infrastructure import Railway
 from deploy.reset_support import Checkpoint, ResetFailure, ResetTimeout, terminate_workflows, wait_until
+from deploy import weaviate_client
 
 PROJECT = '''query($id:String!){project(id:$id){id
  environments(first:100){edges{node{id projectId canAccess deletedAt}} pageInfo{hasNextPage}}
@@ -84,10 +85,10 @@ class RailwayReset:
 
     def index_inventory(self):
         from deploy.reset_support import vector_objects
-        code = ('import json, urllib.request\n' + inspect.getsource(vector_objects)
+        code = ('import json\n' + inspect.getsource(vector_objects)
+                + '\n' + inspect.getsource(weaviate_client)
                 + '\nc=json.load(open("/tmp/quivr-runtime.json")); '
-                'r=urllib.request.urlopen(c["weaviate_url"]+"/v1/objects?limit=1",timeout=10); '
-                'print(vector_objects(json.load(r)))')
+                'print(vector_objects(WeaviateClient.from_config(c).request_json("/v1/objects?limit=1")))')
         return int(self.ssh('api', 'python3 -c ' + shlex.quote(code)).strip())
 
     def preview(self):

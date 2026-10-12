@@ -42,8 +42,6 @@ import struct
 import subprocess
 import sys
 import time
-import urllib.error
-import urllib.request
 import uuid
 
 
@@ -51,6 +49,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
 from deploy import infrastructure
+from deploy.weaviate_client import WeaviateClient, WeaviateClientError, api_key_from_environment
 
 
 RESERVED_PORTS = (54397, 54398, 54399, 54400, 54401, 54402)
@@ -133,23 +132,15 @@ def run_docker(deadline: float, *arguments: str, parse_json: bool = False) -> ob
 
 class HttpAPI:
     def __init__(self, base_url: str, deadline: float):
-        self.base_url = base_url.rstrip("/")
         self.deadline = deadline
-        self.opener = urllib.request.build_opener(urllib.request.ProxyHandler({}))
+        self.client = WeaviateClient(base_url, api_key_from_environment(), trust_env=False)
 
     def request(self, method: str, path: str, body: object | None = None) -> object:
-        payload = None if body is None else json.dumps(body, separators=(",", ":")).encode()
-        request = urllib.request.Request(
-            self.base_url + path,
-            data=payload,
-            method=method,
-            headers={"Content-Type": "application/json"},
-        )
         try:
-            with self.opener.open(request, timeout=max(1.0, min(30.0, remaining(self.deadline)))) as response:
-                raw = response.read(8 << 20)
-        except (OSError, urllib.error.URLError, urllib.error.HTTPError) as error:
-            raise MeasurementError("pinned store HTTP operation failed") from error
+            _, raw = self.client.request(method=method, path=path, body=body,
+                                         timeout=max(1.0, min(30.0, remaining(self.deadline))))
+        except WeaviateClientError:
+            raise MeasurementError("pinned store HTTP operation failed") from None
         if not raw:
             return None
         try:
@@ -728,13 +719,14 @@ class GrpcQueryClient:
     def connect(self) -> None:
         try:
             import weaviate
+            from weaviate.classes.init import Auth
             from weaviate.config import AdditionalConfig
             from weaviate.classes.query import MetadataQuery
         except (ImportError, ModuleNotFoundError) as error:
             raise MeasurementError(".context/venv lacks weaviate-client") from error
         self._metadata_query = MetadataQuery
         try:
-            self.client = weaviate.connect_to_custom(
+            options = dict(
                 http_host="127.0.0.1",
                 http_port=self.ports[0],
                 http_secure=False,
@@ -744,9 +736,13 @@ class GrpcQueryClient:
                 additional_config=AdditionalConfig(timeout=(10, 120), trust_env=False),
                 skip_init_checks=True,
             )
+            api_key = api_key_from_environment()
+            if api_key:
+                options['auth_credentials'] = Auth.api_key(api_key)
+            self.client = weaviate.connect_to_custom(**options)
             self.collection = self.client.collections.get(self.collection_name)
-        except Exception as error:
-            raise MeasurementError("supported Weaviate gRPC client could not connect") from error
+        except Exception:
+            raise MeasurementError("supported Weaviate gRPC client could not connect") from None
 
     def close(self) -> None:
         if self.client is not None:
@@ -792,8 +788,8 @@ class GrpcQueryClient:
                 )
             else:
                 raise MeasurementError("unsupported query mode")
-        except Exception as error:
-            raise MeasurementError("pinned store gRPC query failed") from error
+        except Exception:
+            raise MeasurementError("pinned store gRPC query failed") from None
         seconds = time.perf_counter() - started
         objects = list(getattr(result, "objects", []) or [])
         if not objects:

@@ -100,6 +100,8 @@ class LoadStack(Stack):
                              'url': f"http://127.0.0.1:{s['receiver_port']}/capture", 'secret': CAPTURE_SECRET}},
             'delivery': {'allow_private_destinations': True},
         }
+        if os.environ.get('WEAVIATE_API_KEY'):
+            self.cfg['weaviate_api_key'] = os.environ['WEAVIATE_API_KEY']
         self.write_config('config.json', {**self.cfg, 'listen': f"127.0.0.1:{s['api_port']}",
                                          'probe_listen': f"127.0.0.1:{s['probe_port']}"})
 

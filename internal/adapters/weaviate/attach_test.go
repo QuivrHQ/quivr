@@ -28,6 +28,7 @@ type attachFixture struct {
 	t        *testing.T
 	ctx      context.Context
 	url      string
+	apiKey   string
 	store    *weaviate.Store
 	gen      content.Generation
 	org      string
@@ -45,14 +46,15 @@ func newAttachFixture(t *testing.T) *attachFixture {
 		t.Fatal(err)
 	}
 	var cfg struct {
-		WeaviateURL string `json:"weaviate_url"`
+		WeaviateURL    string `json:"weaviate_url"`
+		WeaviateAPIKey string `json:"weaviate_api_key"`
 	}
 	if err = json.Unmarshal(b, &cfg); err != nil {
 		t.Fatal(err)
 	}
 	ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
 	t.Cleanup(cancel)
-	f := &attachFixture{t: t, ctx: ctx, url: strings.TrimRight(cfg.WeaviateURL, "/"), store: weaviate.New(cfg.WeaviateURL), org: "adapter-attach", corpusID: "corpus-attach"}
+	f := &attachFixture{t: t, ctx: ctx, url: strings.TrimRight(cfg.WeaviateURL, "/"), apiKey: cfg.WeaviateAPIKey, store: weaviate.New(cfg.WeaviateURL, cfg.WeaviateAPIKey), org: "adapter-attach", corpusID: "corpus-attach"}
 	collection := "QuivrAttach" + strconv.FormatInt(time.Now().UnixNano(), 36)
 	if err = f.store.Bootstrap(ctx, collection); err != nil {
 		t.Fatal(err)
@@ -106,7 +108,7 @@ func (f *attachFixture) objects(g content.Generation, segmentID string) []stored
 	where := fmt.Sprintf(`{operator:And,operands:[{path:["organization"],operator:Equal,valueText:%q},{path:["generationId"],operator:Equal,valueText:%q},{path:["segmentId"],operator:Equal,valueText:%q}]}`, f.org, g.ID, segmentID)
 	query := fmt.Sprintf("{Get{%s(where:%s,limit:20){segmentId _additional{id lastUpdateTimeUnix vectors{semantic_text_v1}}}}}", g.Collection, where)
 	body, _ := json.Marshal(map[string]any{"query": query})
-	res, err := http.Post(f.url+"/v1/graphql", "application/json", bytes.NewReader(body))
+	res, err := f.store.Client.Post(f.url+"/v1/graphql", "application/json", bytes.NewReader(body))
 	if err != nil {
 		f.t.Fatal(err)
 	}
@@ -262,8 +264,8 @@ func TestEmbeddingAttachmentConvergesAfterInterruptedSwap(t *testing.T) {
 		t.Fatal(err)
 	}
 	data := []content.EmbeddingData{f.embedding(f.gen, id, unitVector(42))}
-	crashing := weaviate.New(f.url)
-	crashing.Client = &http.Client{Timeout: 4 * time.Second, Transport: failingDeletes{next: http.DefaultTransport}}
+	crashing := weaviate.New(f.url, f.apiKey)
+	crashing.Client.Transport = failingDeletes{next: crashing.Client.Transport}
 	if err := crashing.PublishEmbeddings(f.ctx, f.gen, f.org, data); err == nil {
 		t.Fatal("attachment must report the interrupted cleanup")
 	}
@@ -404,7 +406,7 @@ func (f *attachFixture) matchesExcluding(segmentID, id string) bool {
 	f.t.Helper()
 	query := fmt.Sprintf(`{Get{%s(where:{operator:And,operands:[{path:["segmentId"],operator:Equal,valueText:%q},{path:["id"],operator:NotEqual,valueText:%q}]},limit:20){_additional{id}}}}`, f.gen.Collection, segmentID, id)
 	body, _ := json.Marshal(map[string]any{"query": query})
-	res, err := http.Post(f.url+"/v1/graphql", "application/json", bytes.NewReader(body))
+	res, err := f.store.Client.Post(f.url+"/v1/graphql", "application/json", bytes.NewReader(body))
 	if err != nil {
 		f.t.Fatal(err)
 	}
