@@ -40,7 +40,7 @@ func TestCorpusRecordLedgerTransitions(t *testing.T) {
  VALUES('example','receipt','receipt','','{}','corpus','one',1,'first','first','2026-10-01T01:30:00Z');
  UPDATE records SET current_version_id='v1' WHERE id='one'`)
 	observe := func() {
-		if err := observeCorpusRecords(ctx, pool, []string{"example", "example"}, []string{"one", "two"}); err != nil {
+		if err := observeCorpusRecords(ctx, pool, []string{"example", "example", "example"}, []string{"one", "two", "one"}); err != nil {
 			t.Fatal(err)
 		}
 	}

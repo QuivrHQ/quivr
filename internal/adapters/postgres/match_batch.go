@@ -181,6 +181,17 @@ func (s EvaluationStore) commitMatchesAttempt(ctx context.Context, matches []mon
 			return nil, err
 		}
 	}
+	if fallback {
+		versions := make([]string, len(matches))
+		sequences := make([]int64, len(matches))
+		for i, m := range matches {
+			versions[i] = m.Intent.SubscriptionVersionID
+			sequences[i] = m.Intent.Sequence
+		}
+		if err = observeQueueIntents(ctx, tx, first.Organization, versions, sequences); err != nil {
+			return nil, err
+		}
+	}
 	// AfterFunc can lag; check members again at the durable commit boundary.
 	if err = matchGroupError(ctx, matches); err != nil {
 		return nil, err
@@ -273,6 +284,20 @@ WHERE x.delivery_id<>'' ORDER BY x.ordinal`, org, deliveryIDs, traces)
 	if writes.Len() == 0 {
 		return nil
 	}
+	orgs := make([]string, len(matches))
+	allRecords := make([]string, len(matches))
+	for i, m := range matches {
+		orgs[i] = org
+		allRecords[i] = m.Intent.RecordID
+	}
+	queueRecordObservations(writes, orgs, allRecords)
+	metricKeys := make([]queueMetricKey, 0, len(deliveryIDs))
+	for _, id := range deliveryIDs {
+		if id != "" {
+			metricKeys = append(metricKeys, queueMetricKey{source: "delivery", org: org, id: id})
+		}
+	}
+	queueMetricObservations(writes, metricKeys)
 	return tx.SendBatch(ctx, writes).Close()
 }
 

@@ -8,6 +8,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/The-Vibe-Company/quivr/internal/adapters/postgres"
 	"github.com/The-Vibe-Company/quivr/internal/app"
 	"github.com/The-Vibe-Company/quivr/internal/plugins/devhost/fakeplugin"
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -55,8 +56,20 @@ func bootstrap(path string) error {
 	}
 	defer pool.Close()
 	var served int
-	if pool.QueryRow(ctx, `SELECT count(*) FROM vector_spaces WHERE role='served'`).Scan(&served) == nil && served > 0 {
-		return nil
+	if pool.QueryRow(ctx, `SELECT count(*) FROM vector_spaces WHERE role='served'`).Scan(&served) != nil || served == 0 {
+		if err := app.BootstrapDatabase(ctx, pool, app.Config{}.DeploymentSpaces(nil)); err != nil {
+			return err
+		}
 	}
-	return app.BootstrapDatabase(ctx, pool, app.Config{}.DeploymentSpaces(nil))
+	// A bare adapter database has no API/worker maintenance loop. Initialize
+	// its queue observations as startup does before testing real write paths.
+	for {
+		more, err := (postgres.QueueSnapshots{Pool: pool}).Maintain(ctx)
+		if err != nil {
+			return err
+		}
+		if !more {
+			return nil
+		}
+	}
 }

@@ -311,6 +311,7 @@ func preparePublication(ctx context.Context, tx pgx.Tx, w content.Work, publicat
 		}
 		writes.Queue("UPDATE ingestion_receipts SET state='resolved',outcome=$3,version_id=nullif($4,''),processing=$5,error_code=$6 WHERE organization=$1 AND id=$2", w.Organization, w.ReceiptID, outcome, versionID, processing, code)
 		queueEvent(ctx, writes, eventInput{Organization: w.Organization, CorpusID: w.Command.Source.CorpusID, Kind: "receipt.resolved", Resource: "receipt", ResourceID: w.ReceiptID})
+		observeRecordInBatch(ctx, writes, w.Organization, w.RecordID)
 		if err = tx.SendBatch(ctx, writes).Close(); err != nil {
 			return err
 		}

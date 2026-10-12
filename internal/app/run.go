@@ -678,6 +678,27 @@ func Run(command string, args ...string) error {
 	queueSnapshots := postgres.QueueSnapshots{Pool: pool, RefreshInterval: queueRefreshInterval}
 	acquisition.Acquirer.Queues = queueSnapshots
 	loops.Go(func(ctx context.Context) {
+		for {
+			maintenance, cancel := context.WithTimeout(ctx, 10*time.Second)
+			more, err := queueSnapshots.Maintain(maintenance)
+			cancel()
+			if err != nil && ctx.Err() == nil {
+				slog.Warn("queue observation maintenance unavailable")
+			}
+			delay := time.Second
+			if more && err == nil {
+				delay = 0
+			}
+			timer := time.NewTimer(delay)
+			select {
+			case <-ctx.Done():
+				timer.Stop()
+				return
+			case <-timer.C:
+			}
+		}
+	})
+	loops.Go(func(ctx context.Context) {
 		delay := queueRefreshInterval
 		failed := false
 		for {
