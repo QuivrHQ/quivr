@@ -7,7 +7,7 @@ import sys
 import urllib.request
 
 from deploy.compose.infrastructure import Compose
-from deploy.reset_support import Checkpoint, terminate_workflows, vector_objects
+from deploy.reset_support import Checkpoint, terminate_workflows, vector_objects, require_local_vector
 
 ROOT = Path(__file__).resolve().parents[2]
 VOLUMES = {'postgres': ('data', '/var/lib/postgresql/data'),
@@ -63,6 +63,16 @@ class ComposeReset:
         self.state = json.loads(statefile.read_text())
         check_tracked_processes(self.state, self.directory)
         self.config = json.loads((self.directory / 'config.json').read_text())
+        # Prove this runtime points at the selected index before any destructive
+        # work. Merely finding a local container does not establish that link.
+        self.adapter.configured('weaviate')
+        if 'weaviate' not in self.adapter.containers:
+            require_local_vector([], [])
+        details = json.loads(self.adapter.run(['inspect', self.adapter.containers['weaviate']]))[0]
+        bindings = details.get('NetworkSettings', {}).get('Ports', {}).get('8080/tcp') or []
+        local = ['http://' + binding['HostIp'] + ':' + binding['HostPort'] for binding in bindings
+                 if binding.get('HostIp') in ('127.0.0.1', 'localhost') and binding.get('HostPort', '').isdigit()]
+        require_local_vector([self.config.get('weaviate_url')], local)
         for role, (logical, destination) in VOLUMES.items():
             if not self.adapter.configured(role):
                 raise RuntimeError('reset requires the selected Stack dependencies running')

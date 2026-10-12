@@ -1,0 +1,206 @@
+"""Dedicated index contracts at the operator CLI boundary; no cloud calls."""
+import json
+import importlib.util
+import os
+from pathlib import Path
+import subprocess
+import sys
+import tempfile
+import unittest
+from unittest.mock import patch
+
+ROOT = Path(__file__).resolve().parents[1]
+HOST = ROOT / 'deploy/vector-host/host.py'
+
+
+class VectorHost(unittest.TestCase):
+    def test_render_owns_secure_auth_and_inherits_declared_profiles(self):
+        # Owner: a renderer copying defaults or restoring anonymous access would
+        # expose the index. Existing resolver tests cannot see this host overlay.
+        pin = json.loads((ROOT / 'deploy/infrastructure.json').read_text())['services']['weaviate']['image']
+        for profile, memory, asynchronous in [('small', '1700MiB', 'false'), ('large', '16GiB', 'true')]:
+            with self.subTest(profile=profile), tempfile.TemporaryDirectory() as directory:
+                target = Path(directory)
+                flags = [sys.executable, str(HOST), 'render', '--hostname', 'index.example.invalid',
+                         '--operator-cidr', '192.0.2.0/24', '--data-device', '/dev/disk/by-id/example.vector-host',
+                         '--profile', profile, '--output', str(target / 'rendered')]
+                for override in (False, True):
+                    if override:
+                        source = target / 'override.json'
+                        source.write_text('{"services":{"weaviate":{"image":"registry.example/index@sha256:'
+                                          + 'a' * 64 + '","environment":{"GOMEMLIMIT":"3GiB"}}}}')
+                        flags.extend(['--overrides', str(source)])
+                    result = subprocess.run(flags, capture_output=True, text=True, timeout=5,
+                                            env={**os.environ, 'WEAVIATE_API_KEY': 'private-fixture-never-render'})
+                    self.assertEqual(result.returncode, 0, result.stderr)
+                    model = json.loads((target / 'rendered/compose.json').read_text())
+                    index = model['services']['weaviate']
+                    env = index['environment']
+                    self.assertEqual(index['image'], 'registry.example/index@sha256:' + 'a' * 64 if override else pin)
+                    self.assertEqual(env['AUTHENTICATION_ANONYMOUS_ACCESS_ENABLED'], 'false')
+                    self.assertEqual(env['AUTHENTICATION_APIKEY_ENABLED'], 'true')
+                    self.assertEqual(env['AUTHENTICATION_APIKEY_USERS'], 'quivr-engine')
+                    self.assertEqual(env['AUTHORIZATION_ADMINLIST_USERS'], 'quivr-engine')
+                    self.assertEqual(env['AUTHORIZATION_ADMINLIST_ENABLED'], 'true')
+                    self.assertEqual(env['AUTHORIZATION_RBAC_ENABLED'], 'false')
+                    self.assertEqual(env['GOMEMLIMIT'], '3GiB' if override else memory)
+                    self.assertEqual(env['ASYNC_INDEXING'], asynchronous)
+                    self.assertEqual(env['AUTOSCHEMA_ENABLED'], 'false')
+                    self.assertNotIn('ports', index)
+                    self.assertEqual(index['restart'], 'no')
+                    self.assertFalse(index['volumes'][0]['bind']['create_host_path'])
+                    for path in (target / 'rendered').iterdir():
+                        if path.is_file():
+                            self.assertNotIn('private-fixture-never-render', path.read_text())
+
+    def test_startup_refuses_missing_or_wrong_filesystem_before_docker(self):
+        # Disk lifecycle owner: a detached disk must never turn the index bind
+        # into a directory on root. Executes the real generated startup guard.
+        module_spec = importlib.util.spec_from_file_location('vector_host', HOST)
+        host = importlib.util.module_from_spec(module_spec)
+        module_spec.loader.exec_module(host)
+        settings = {'hostname': 'index.example.invalid', 'operator_cidrs': ['192.0.2.0/24'],
+                    'data_device': '/dev/disk/by-id/example.vector-host', 'weaviate': host.infra.resolve()['weaviate']}
+        uuid = '12345678-1234-1234-1234-123456789abc'
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            guard = root / 'run.sh'
+            guard.write_text(host.assets(settings, uuid)['run.sh'])
+            findmnt = root / 'findmnt'
+            docker = root / 'docker'
+            docker.write_text('#!/bin/sh\necho called > "$CALL_FILE"\n')
+            docker.chmod(0o755)
+            for observed in ('', 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', uuid):
+                findmnt.write_text('#!/bin/sh\nprintf "%s" "' + observed + '"\n')
+                findmnt.chmod(0o755)
+                called = root / 'called'
+                called.unlink(missing_ok=True)
+                result = subprocess.run(['sh', str(guard)], env={**os.environ,
+                    'PATH': str(root) + ':/usr/bin:/bin', 'CALL_FILE': str(called)}, capture_output=True, timeout=5)
+                self.assertEqual(called.exists(), observed == uuid)
+                self.assertEqual(result.returncode == 0, observed == uuid)
+
+    def test_azure_cli_provisions_zonal_disk_and_has_no_repeat_writes(self):
+        # Cloud boundary owner: provider replies describe fixed resources. The
+        # real provisioner decides creation and no-op; no real az/SSH runs.
+        module_spec = importlib.util.spec_from_file_location('vector_azure', HOST.with_name('azure.py'))
+        azure = importlib.util.module_from_spec(module_spec)
+        module_spec.loader.exec_module(azure)
+        resources, rules, calls = {}, [], []
+        init = None
+        drift = None
+        def transport(command, **kwargs):
+            nonlocal init
+            calls.append(command)
+            if command[0] == 'ssh':
+                if kwargs.get('input') is None:
+                    return subprocess.CompletedProcess(command, 0, '', '')
+                return subprocess.CompletedProcess(command, 0, '{"status":"unchanged"}', '')
+            args = command[1:]
+            def arg(name):
+                return args[args.index(name) + 1]
+            if args[:2] == ['group', 'exists']:
+                response = True
+            elif args[:2] == ['vm', 'list-skus']:
+                response = [{'name': 'Standard_E8s_v5', 'resourceType': 'virtualMachines',
+                    'locationInfo': [{'zones': ['1']}], 'restrictions': [],
+                    'capabilities': [{'name': key, 'value': value} for key, value in
+                        [('MemoryGB', '64'), ('vCPUs', '8'), ('UncachedDiskIOPS', '12800'),
+                         ('UncachedDiskBytesPerSecond', '290000000')]]}]
+            elif args[:2] == ['resource', 'list']:
+                response = list(resources.values())
+            elif args[:3] == ['vm', 'run-command', 'invoke']:
+                response = {'value': [{'message': '[stdout]\nssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\n[stderr]\n'}]}
+            elif args[:4] == ['network', 'nsg', 'rule', 'list']:
+                response = rules
+            elif args[:4] == ['network', 'nsg', 'rule', 'create']:
+                start = args.index('--source-address-prefixes') + 1
+                end = args.index('--source-port-ranges')
+                rules.append({'name': arg('--name'), 'priority': int(arg('--priority')),
+                    'access': arg('--access'), 'protocol': arg('--protocol'), 'direction': 'Inbound',
+                    'destinationPortRange': arg('--destination-port-ranges'),
+                    'sourceAddressPrefixes': args[start:end]})
+                response = {}
+            elif 'create' in args:
+                name = arg('--name')
+                tags_start = args.index('--tags') + 1
+                tags_end = args.index('--only-show-errors')
+                kind = {('network', 'nsg'): 'Microsoft.Network/networkSecurityGroups',
+                    ('network', 'vnet'): 'Microsoft.Network/virtualNetworks',
+                    ('network', 'public-ip'): 'Microsoft.Network/publicIPAddresses',
+                    ('network', 'nic'): 'Microsoft.Network/networkInterfaces',
+                    ('disk', 'create'): 'Microsoft.Compute/disks',
+                    ('vm', 'create'): 'Microsoft.Compute/virtualMachines'}[tuple(args[:2])]
+                resources[name] = {'name': name, 'type': kind, 'id': '/subscriptions/example/resourceGroups/example-group/providers/' + kind + '/' + name,
+                    'tags': dict(value.split('=', 1) for value in args[tags_start:tags_end])}
+                if args[:2] == ['vm', 'create']:
+                    init = json.loads(Path(arg('--custom-data')).read_text().split('\n', 1)[1])
+                response = {}
+            elif args[:3] == ['network', 'public-ip', 'show']:
+                response = {'id': '/subscriptions/example/resourceGroups/example-group/providers/Microsoft.Network/publicIPAddresses/example-index-public-ip', 'zones': ['1'],
+                            'sku': {'name': 'Standard'}, 'publicIPAllocationMethod': 'Dynamic' if drift == 'ip' else 'Static',
+                            'publicIPAddressVersion': 'IPv4',
+                            'dnsSettings': {'domainNameLabel': 'example-index',
+                            'fqdn': 'example-index.region.cloudapp.azure.com'}}
+            elif args[:3] == ['network', 'vnet', 'show']:
+                response = {'addressSpace': {'addressPrefixes': ['10.80.0.0/16']},
+                    'subnets': [{'name': 'example-index-subnet', 'addressPrefix': '10.81.0.0/24' if drift == 'vnet' else '10.80.0.0/24'}]}
+            elif args[:3] == ['network', 'nic', 'show']:
+                response = {'id': '/subscriptions/example/resourceGroups/example-group/providers/Microsoft.Network/networkInterfaces/example-index-nic', 'enableAcceleratedNetworking': True,
+                    'networkSecurityGroup': {'id': '/subscriptions/example/resourceGroups/example-group/providers/Microsoft.Network/networkSecurityGroups/other-nsg' if drift == 'nic' else '/subscriptions/example/resourceGroups/example-group/providers/Microsoft.Network/networkSecurityGroups/example-index-nsg'},
+                    'ipConfigurations': [{'publicIPAddress': {'id': '/subscriptions/example/resourceGroups/example-group/providers/Microsoft.Network/publicIPAddresses/example-index-public-ip'},
+                        'subnet': {'id': '/subscriptions/example/resourceGroups/example-group/providers/Microsoft.Network/virtualNetworks/example-index-vnet/subnets/example-index-subnet'}}]}
+            elif args[:2] == ['disk', 'show']:
+                response = {'id': '/subscriptions/example/resourceGroups/example-group/providers/Microsoft.Compute/disks/example-index-disk', 'sku': {'name': 'PremiumV2_LRS'},
+                    'zones': ['1'], 'diskSizeGb': 512, 'diskIOPSReadWrite': 12000, 'diskMBpsReadWrite': 250}
+            elif args[:2] == ['vm', 'show']:
+                response = {'id': '/subscriptions/example/resourceGroups/example-group/providers/Microsoft.Compute/virtualMachines/example-index', 'zones': ['1'],
+                    'hardwareProfile': {'vmSize': 'Standard_E8s_v5'},
+                    'networkProfile': {'networkInterfaces': [{'id': '/subscriptions/example/resourceGroups/example-group/providers/Microsoft.Network/networkInterfaces/example-index-nic'}]},
+                    'osProfile': {'adminUsername': 'operator'},
+                    'storageProfile': {'imageReference': {'publisher': 'Other' if drift == 'image' else 'Canonical',
+                        'offer': 'ubuntu-24_04-lts', 'sku': 'server', 'version': 'latest'}, 'dataDisks': [
+                    {'lun': 0, 'caching': 'None', 'deleteOption': 'Detach',
+                     'managedDisk': {'id': '/subscriptions/example/resourceGroups/example-group/providers/Microsoft.Compute/disks/example-index-disk'}}]}}
+            else:
+                self.fail('unexpected provider operation: ' + str(args[:3]))
+            return subprocess.CompletedProcess(command, 0, json.dumps(response), '')
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            public_key, identity, api_key = [root / name for name in ('public', 'identity', 'key')]
+            public_key.write_text('ssh-ed25519 fixture-public-key')
+            identity.write_text('fixture-private-key')
+            api_key.write_text('fixture-api-key-never-in-cloud-init')
+            identity.chmod(0o600)
+            api_key.chmod(0o600)
+            argv = [str(HOST.with_name('azure.py')), '--resource-group', 'example-group', '--name', 'example-index',
+                '--location', 'region', '--zone', '1', '--dns-label', 'example-index', '--admin-user', 'operator',
+                '--operator-cidr', '192.0.2.0/24', '--ssh-public-key', str(public_key),
+                '--ssh-identity', str(identity), '--api-key-file', str(api_key)]
+            with patch.object(azure.subprocess, 'run', side_effect=transport), patch.object(sys, 'argv', argv):
+                self.assertEqual(azure.main(), 0)
+                first_calls = list(calls)
+                calls.clear()
+                self.assertEqual(azure.main(), 0)
+                repeat_calls = list(calls)
+                calls.clear()
+                for drift in ('nic', 'ip', 'vnet', 'image'):
+                    calls.clear()
+                    self.assertEqual(azure.main(), 2)
+                    self.assertFalse(any(command[0] == 'ssh' or 'create' in command for command in calls))
+            self.assertFalse(any('create' in command or 'update' in command or 'attach' in command for command in repeat_calls))
+            disk_command = next(command for command in first_calls if command[1:3] == ['disk', 'create'])
+            self.assertIn('PremiumV2_LRS', disk_command)
+            self.assertEqual(disk_command[disk_command.index('--disk-mbps-read-write') + 1], '250')
+            self.assertNotIn('fixture-api-key-never-in-cloud-init', json.dumps(init))
+            ssh_calls = [command for command in first_calls if command[0] == 'ssh']
+            self.assertTrue(ssh_calls)
+            self.assertTrue(all('StrictHostKeyChecking=yes' in command for command in ssh_calls))
+            self.assertFalse(any(command[1:4] == ['vm', 'run-command', 'invoke'] for command in repeat_calls))
+            self.assertIn('--initialize-empty-disk', init['runcmd'][0])
+            self.assertIn('/dev/disk/azure/scsi1/lun0', init['runcmd'][0])
+            self.assertEqual({rule['destinationPortRange'] for rule in rules if rule['access'] == 'Allow'}, {'443', '22'})
+
+
+if __name__ == '__main__':
+    unittest.main()

@@ -11,6 +11,7 @@ import sys
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 from deploy import infrastructure as infra
+from deploy.reset_support import vector_endpoint, runtime_vector_command
 
 PROJECT = '''query($id:String!){project(id:$id){
   subscriptionPlanLimit
@@ -64,6 +65,7 @@ class Railway:
         self.targets = {}
         self.instances = {}
         self.provider = {}
+        self.available = []
 
     def api(self, query, variables, object_result=False):
         response = json.loads(self.run(['api', query, '--variables', json.dumps(variables)]))
@@ -73,7 +75,7 @@ class Railway:
             raise RuntimeError('Railway API did not acknowledge the infrastructure update')
         return response['data']
 
-    def select(self, selectors, include_autoscaler=False):
+    def select(self, selectors, include_autoscaler=False, allow_missing_index=False):
         project = self.api(PROJECT, {'id': self.project})['project']
         plan = project.get('subscriptionPlanLimit')
         self.provider = plan.get('containers', {}) if isinstance(plan, dict) else {}
@@ -81,6 +83,7 @@ class Railway:
             self.provider = {}
         environments = project['environments']
         services = project['services']
+        self.available = [edge['node'] for edge in services['edges']]
         if environments.get('pageInfo', {}).get('hasNextPage') or services.get('pageInfo', {}).get('hasNextPage'):
             raise RuntimeError('selected project exceeds the bounded selector lookup')
         if self.environment not in {edge['node']['id'] for edge in environments['edges']}:
@@ -93,6 +96,8 @@ class Railway:
                 raise RuntimeError('unsupported managed service')
             matches = [edge['node']['id'] for edge in services['edges']
                        if selector in (edge['node']['id'], edge['node']['name'])]
+            if not matches and logical == 'weaviate' and allow_missing_index:
+                continue
             if len(matches) != 1:
                 raise RuntimeError('managed service selector is missing or ambiguous')
             self.targets[logical] = matches[0]
@@ -236,10 +241,43 @@ class Railway:
                   '-d "${POSTGRES_DB:-postgres}" -c ' + shlex.quote(query))
         self.run(['ssh', *self.flags('postgres'), 'sh -c ' + shlex.quote(script)])
 
-    def check(self, services):
+    def index_is_local(self):
+        if 'weaviate' not in self.targets:
+            return False
+        variables = json.loads(self.run(['variable', 'list', '--json', *self.flags('weaviate')]))
+        domain = variables.get('RAILWAY_PRIVATE_DOMAIN')
+        local = vector_endpoint('http://' + domain + ':8080') if isinstance(domain, str) else None
+        urls = []
+        try:
+            for role in ('api', 'worker', 'worker-bulk'):
+                matches = [service['id'] for service in self.available if service['name'] == role]
+                if len(matches) != 1:
+                    if role != 'worker-bulk':
+                        return None
+                    continue
+                identifier = matches[0]
+                instance = self.api(INSTANCE, {'serviceId': identifier, 'environmentId': self.environment})['serviceInstance']
+                active = [item for item in instance.get('activeDeployments', [])
+                          if item['status'] == 'SUCCESS' and not item.get('deploymentStopped')]
+                if len(active) != 1 or (instance.get('latestDeployment') or {}).get('id') != active[0]['id']:
+                    return None
+                replicas = [item for item in active[0].get('instances', []) if item['status'] == 'RUNNING']
+                if not replicas:
+                    return None
+                for replica in replicas:
+                    output = self.run(['ssh', '--project', self.project, '--environment', self.environment,
+                        '--service', identifier, '--deployment-instance', replica['id'], runtime_vector_command()])
+                    urls.append(vector_endpoint(json.loads(output)))
+        except (RuntimeError, subprocess.TimeoutExpired, ValueError, KeyError, TypeError):
+            return None
+        return bool(local and urls and all(url == local for url in urls))
+
+    def check(self, services, external_host=None):
         rows = []
         for name in self.targets:
             spec = services[name]
+            if name == 'weaviate' and external_host is not None:
+                continue
             rows.extend(self.configured_rows(name, spec, self.configured(name)))
             runtimes = self.runtime(name) or [{}]
             for ordinal, runtime in enumerate(runtimes, 1):
@@ -261,6 +299,8 @@ class Railway:
                 if len(runtimes) > 1:
                     for row in rows[first_row:]:
                         row['replica'] = ordinal
+        if external_host is not None:
+            rows.extend(infra.external_vector_report(services['weaviate'], external_host)['observations'])
         return infra.report(rows)
 
 
@@ -272,6 +312,8 @@ def main():
     parser.add_argument('--profile', default='small')
     parser.add_argument('--overrides', type=Path)
     parser.add_argument('--service', action='append', default=[], metavar='ROLE=NAME_OR_ID')
+    parser.add_argument('--vector-host', nargs='?', const='', metavar='SSH_TARGET',
+                        help='external index: observe through SSH, or unknown if no target')
     args = parser.parse_args()
     try:
         services = infra.resolve(args.profile, args.overrides)
@@ -279,8 +321,13 @@ def main():
             name: name for name, spec in services.items() if name != 'autoscaler'
             and (spec.get('image') or spec.get('deploy'))}
         adapter = Railway(args.project_id, args.environment_id)
-        adapter.select(selectors, include_autoscaler=not args.service)
+        adapter.select(selectors, include_autoscaler=not args.service, allow_missing_index=not args.service)
+        location = adapter.index_is_local() if args.vector_host is None else False
+        external = args.vector_host if args.vector_host is not None else (None if location is True else '')
+        external_write = args.vector_host is not None or location is False
         if args.command == 'apply':
+            if external_write:
+                adapter.targets.pop('weaviate', None)
             adapter.apply(services)
             print(json.dumps({'status': 'configured', 'next': 'Deploy changed services, initialize-monitoring, then check.'}))
             return 0
@@ -288,7 +335,14 @@ def main():
             adapter.initialize_monitoring()
             print(json.dumps({'status': 'monitoring_initialized'}))
             return 0
-        result = adapter.check(services) if args.command == 'check' else adapter.preview(services)
+        if args.command == 'check':
+            result = adapter.check(services, external_host=external)
+        else:
+            if external_write:
+                adapter.targets.pop('weaviate', None)
+            result = adapter.preview(services)
+            if external is not None:
+                result.update(infra.report(result['observations'] + infra.external_vector_report(services['weaviate'])['observations']))
         print(json.dumps(result, indent=2))
         return {'match': 0, 'drift': 1, 'unknown': 2}[result['status']]
     except ProviderCapError as error:

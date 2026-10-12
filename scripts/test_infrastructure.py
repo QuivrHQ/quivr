@@ -67,6 +67,30 @@ spec.loader.exec_module(infra)
 
 
 class Infrastructure(unittest.TestCase):
+    def test_external_index_never_matches_the_unused_local_service(self):
+        # External-host owner: a leftover local index must not certify the host
+        # actually used by the engine. Unknown is an explicit observation.
+        from deploy.compose.infrastructure import Compose
+        from deploy.railway.infrastructure import Railway
+        spec = infra.resolve('large')
+        inspected = []
+        def docker(args):
+            inspected.append(args)
+            return ''
+        compose = Compose('fixture', run=docker)
+        result = compose.check(spec, runtime=False, external_host='')
+        index = [row for row in result['observations'] if row['service'] == 'weaviate']
+        self.assertTrue(index)
+        self.assertTrue(all(row['status'] == 'unknown' for row in index))
+        self.assertFalse(any('label=com.docker.compose.service=weaviate' in args for args in inspected))
+        railway = Railway('project', 'environment', run=lambda args: self.fail('unused local index was inspected'))
+        railway.targets = {'weaviate': 'old-index'}
+        result = railway.check(spec, external_host='')
+        self.assertEqual(result['status'], 'unknown')
+        settings = {row['setting']: row for row in result['observations']}
+        self.assertEqual(settings['AUTHENTICATION_ANONYMOUS_ACCESS_ENABLED']['expected'], 'false')
+        self.assertEqual(settings['AUTHENTICATION_APIKEY_ENABLED']['expected'], 'true')
+
     def test_railway_cap_preflight_reports_limits_and_refuses_before_any_write(self):
         # Owns provider-cap admission at the CLI boundary: a later oversized
         # service must not leave earlier variables or sources partly applied.

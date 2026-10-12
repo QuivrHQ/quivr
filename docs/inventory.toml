@@ -77,6 +77,7 @@ excluded = [
 "deploy/railway/README.md" = { audience = "functional", kind = "guide", summary = "run a hosted single-node evaluation demo" }
 "deploy/railway/hosted-embeddings.md" = { audience = "functional", kind = "guide", summary = "evaluate, fill and switch hosted text embeddings with rollback" }
 "docs-site/run-quivr/scale-quivr.mdx" = { audience = "functional", kind = "concept", summary = "capacity budgets, import lessons and incident checks for operators" }
+"docs-site/run-quivr/dedicated-vector-host.mdx" = { audience = "functional", kind = "guide", summary = "provision an authenticated index VM and rebuild it from stored content" }
 "docs/agents/documentation.md" = { audience = "contributor", kind = "guide", summary = "living and dated documents, the inventory, budgets and when docs may change" }
 "docs/agents/domain.md" = { audience = "contributor", kind = "guide", summary = "how the domain documentation is laid out" }
 "docs/agents/evaluation.md" = { audience = "contributor", kind = "guide", summary = "measure how well search ranks results on public and private evaluation sets" }
@@ -128,6 +129,7 @@ excluded = [
 
 # Maximum number of lines per page, in path order.
 [budgets]
+"docs-site/run-quivr/dedicated-vector-host.mdx" = 115
 "deploy/compose/README.md" = 85
 "deploy/infrastructure.md" = 155
 "deploy/modal/README.md" = 100
