@@ -2,7 +2,8 @@
 
 The coordinator deploys [`embeddinggemma.py`](embeddinggemma.py)
 and opts api and worker into `QUIVR_DEMO_EMBEDDING=gemma`. The service runs the
-text backbone of `google/embeddinggemma-2` on an L4, pinned to
+text backbone of `google/embeddinggemma-2` on an L4 GPU, falling back to A10G then
+L40S when Modal has no L4 capacity, pinned to
 `914f7f89142e33e77833254d9c9b90c3cef7303b`. Its image checks that revision's
 README for Apache-2.0 before downloading weights. Runtime is offline, uses
 bfloat16, suppresses the library's default prompt and returns normalized
@@ -24,7 +25,7 @@ EMBED_MIN_CONTAINERS=1 EMBED_MAX_CONTAINERS=2 modal deploy deploy/modal/embeddin
 
 `EMBED_MIN_CONTAINERS` defaults to **0**, allowing the GPU to scale to zero after
 60 idle seconds. Use **1** for the demo's interactive queries, with a maximum of
-**2** L4 containers initially; each requests 4 CPUs and 8 GiB host memory. These
+**2** GPU containers initially; each requests 4 CPUs and 8 GiB host memory. These
 are deployment settings, so change them by redeploying the app. The CPU gateway
 also scales to zero and holds the bearer secret; GPU containers do not receive
 it. Modal combines concurrent text calls into batches of up to 32, waiting at

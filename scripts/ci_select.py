@@ -160,7 +160,8 @@ def main():
     event_path = os.environ.get('GITHUB_EVENT_PATH')
     event = json.loads(Path(event_path).read_text()) if event_path else {}
     labels = {label['name'] for label in event.get('pull_request', {}).get('labels', [])}
-    full = event_name != 'pull_request' or 'ci-full' in labels
+    full = (event_name != 'pull_request' or 'ci-full' in labels
+            or int(os.environ.get('GITHUB_RUN_ATTEMPT', '1')) > 1)
     base = event.get('pull_request', {}).get('base', {}).get('sha')
     head = event.get('pull_request', {}).get('head', {}).get('sha', 'HEAD')
     selection = select([] if full else changed_paths(base, head), full=full)
