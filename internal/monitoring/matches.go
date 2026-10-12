@@ -24,6 +24,9 @@ type Match struct {
 	// route the Match to one of its users.
 	Owner    string
 	Evidence MatchEvidence
+	// EvidenceExpired is a compact ledger identity whose historical payload
+	// has expired. Authorization still precedes the public expiry response.
+	EvidenceExpired bool
 	// Position is the journal position of the Match commit, used for stable paging.
 	Position int64
 }
@@ -130,20 +133,48 @@ type MatchStore interface {
 
 // Matches lists a visible Subscription's Match history in commit order.
 func (s Service) Matches(ctx context.Context, scope corpus.Scope, subscriptionID string, after int64, limit int, prepare ...func() (string, int64, int, error)) ([]Match, error) {
+	matches, _, err := s.matchHistory(ctx, scope, subscriptionID, after, limit, false, prepare...)
+	return matches, err
+}
+
+// MatchesPage keeps the next-page sentinel separate from requested evidence.
+// The boolean says another row exists; that row is read on the next page.
+func (s Service) MatchesPage(ctx context.Context, scope corpus.Scope, subscriptionID string, after int64, limit int, prepare ...func() (string, int64, int, error)) ([]Match, bool, error) {
+	return s.matchHistory(ctx, scope, subscriptionID, after, limit, true, prepare...)
+}
+
+func (s Service) matchHistory(ctx context.Context, scope corpus.Scope, subscriptionID string, after int64, limit int, page bool, prepare ...func() (string, int64, int, error)) ([]Match, bool, error) {
 	if err := scope.Require(corpus.ActionMonitoringMatches); err != nil {
-		return nil, err
+		return nil, false, err
 	}
 	for _, load := range prepare {
 		var err error
 		subscriptionID, after, limit, err = load()
 		if err != nil {
-			return nil, err
+			return nil, false, err
 		}
 	}
 	if _, err := s.visible(ctx, scope, subscriptionID); err != nil {
-		return nil, err
+		return nil, false, err
 	}
-	return s.MatchStore.Matches(ctx, scope.Organization, subscriptionID, after, limit)
+	fetch := limit
+	if page {
+		fetch++
+	}
+	matches, err := s.MatchStore.Matches(ctx, scope.Organization, subscriptionID, after, fetch)
+	if err != nil {
+		return nil, false, err
+	}
+	more := page && len(matches) > limit
+	if more {
+		matches = matches[:limit]
+	}
+	for _, m := range matches {
+		if m.EvidenceExpired {
+			return nil, false, &MatchHistoryExpired{After: m.Position}
+		}
+	}
+	return matches, more, nil
 }
 
 // Match reads one Match when its Subscription and content scope are visible.
@@ -158,8 +189,18 @@ func (s Service) Match(ctx context.Context, scope corpus.Scope, id string) (Matc
 	if _, err = s.visible(ctx, scope, m.SubscriptionID); err != nil {
 		return Match{}, err
 	}
+	if m.EvidenceExpired {
+		return Match{}, ErrEvidenceExpired
+	}
 	return m, nil
 }
+
+// MatchHistoryExpired lets a client explicitly resume beyond a lost interval.
+// No partial or altered successful page is returned.
+type MatchHistoryExpired struct{ After int64 }
+
+func (e *MatchHistoryExpired) Error() string { return ErrEvidenceExpired.Error() }
+func (e *MatchHistoryExpired) Unwrap() error { return ErrEvidenceExpired }
 
 // Delivery reads a logical Delivery under the same visibility rule as its Match.
 func (s Service) Delivery(ctx context.Context, scope corpus.Scope, id string) (Delivery, error) {
