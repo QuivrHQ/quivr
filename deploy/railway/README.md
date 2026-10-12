@@ -367,18 +367,18 @@ python3 deploy/railway/provision.py --project-id YOUR_PROJECT_ID --environment-i
 python3 deploy/railway/provision.py --project-id YOUR_PROJECT_ID --environment-id YOUR_ENVIRONMENT_ID --apply
 ```
 
-The first command previews the service plan. Applying creates missing services and
-volumes and configures runtime variables through stdin, without deploying code or
-adding public domains. Generated credentials are kept in Railway and an ignored 0600
-file under `.scratch/railway/PROJECT_ID/secrets.json`. Keep this file privately for
-repeated provisioning; do not rotate the database or S3 password by rerunning with a
-new file against an existing deployment. The web password is `demo_password` in that
-file. It is a shared evaluation space, not per-user access.
+Provisioning previews the service plan by default. Applying creates missing services and volumes and configures runtime variables through stdin, without deploying code or adding public domains.
+Generated credentials are kept in Railway and an ignored 0600 file under `.scratch/railway/PROJECT_ID/secrets.json`. Retain this file privately for repeated provisioning; rerunning with a new file against an existing deployment would rotate the database or S3 password.
+The web password is `demo_password` in that file, for shared evaluation access.
 
-For a newly provisioned installation, the deployment helper connects pinned image sources
-or uploads Dockerfile services from the repository root. It starts deployment but does not
-wait for readiness; existing installations can use the environment-scoped `railway up`
-command above without provisioner state:
+Workers keep `/readyz` as their deployment gate, with a 900-second healthcheck timeout declared in `services.json`.
+The generated core configuration sets `migration_wait` to `10m`, allowing the API time to finish building and migrating; the remaining five minutes allow worker startup and readiness.
+Workers start no processing and expose no probe until the schema check passes. Pending migrations after ten minutes still fail startup.
+Before the next rollout of an existing installation, rerun the `provision.py --apply` command above with its retained credentials to apply the longer healthchecks, then deploy the new core image.
+For longer API builds, change `migration_wait` in `core-entrypoint.py` and rebuild the core image; raise both workers' `healthcheck_timeout` in `services.json` and reapply provisioning, leaving startup headroom. Alternatively, run the new migrator before starting workers.
+
+For a new installation, the deployment helper connects pinned image sources or uploads Dockerfile services from the repository root; it starts deployment without waiting for readiness.
+Existing installations can use the environment-scoped `railway up` command above without provisioner state:
 
 ```sh
 python3 deploy/railway/deploy.py --project-id YOUR_PROJECT_ID --environment-id YOUR_ENVIRONMENT_ID postgres temporal seaweed weaviate tei

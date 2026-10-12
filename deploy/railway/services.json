@@ -43,6 +43,7 @@
   "worker": {
     "dockerfile": "core",
     "healthcheck": "/readyz",
+    "healthcheck_timeout": 900,
     "replicas": 1,
     "variables": {
       "PORT": "8081",
@@ -53,6 +54,7 @@
   "worker-bulk": {
     "dockerfile": "core",
     "healthcheck": "/readyz",
+    "healthcheck_timeout": 900,
     "replicas": 1,
     "variables": {
       "PORT": "8081",
