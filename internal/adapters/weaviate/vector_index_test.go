@@ -45,7 +45,7 @@ func TestSpaceAddedLaterGetsItsIndexSetting(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	res, err := http.Get(f.url + "/v1/schema/" + f.gen.Collection)
+	res, err := f.store.Client.Get(f.url + "/v1/schema/" + f.gen.Collection)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -99,7 +99,7 @@ func TestSpaceAddedLaterGetsItsIndexSetting(t *testing.T) {
 	// other settings. A rejected update must fail search and remain retryable.
 	readSchema := func() map[string]any {
 		t.Helper()
-		res, err := http.Get(f.url + "/v1/schema/" + f.gen.Collection)
+		res, err := f.store.Client.Get(f.url + "/v1/schema/" + f.gen.Collection)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -119,7 +119,7 @@ func TestSpaceAddedLaterGetsItsIndexSetting(t *testing.T) {
 	body, _ := json.Marshal(class)
 	req, _ := http.NewRequest("PUT", f.url+"/v1/schema/"+f.gen.Collection, bytes.NewReader(body))
 	req.Header.Set("Content-Type", "application/json")
-	res, err = http.DefaultClient.Do(req)
+	res, err = f.store.Client.Do(req)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -127,7 +127,7 @@ func TestSpaceAddedLaterGetsItsIndexSetting(t *testing.T) {
 	if res.StatusCode != http.StatusOK {
 		t.Fatalf("restore old schema: status %d", res.StatusCode)
 	}
-	reopened := weaviate.New(f.url)
+	reopened := weaviate.New(f.url, f.apiKey)
 	if err := reopened.Bootstrap(f.ctx, f.gen.Collection); err != nil {
 		t.Fatal(err)
 	}
@@ -159,7 +159,7 @@ func TestSpaceAddedLaterGetsItsIndexSetting(t *testing.T) {
 		proxy.ServeHTTP(w, r)
 	}))
 	defer server.Close()
-	f.store = weaviate.New(server.URL)
+	f.store = weaviate.New(server.URL, f.apiKey)
 	scope := corpus.Scope{Organization: f.org, Corpora: []string{"*"}}
 	for attempt := 0; attempt < 2; attempt++ {
 		if _, err := f.store.Search(f.ctx, []retrieval.Route{{CorpusID: f.corpusID, Generation: before}}, scope,

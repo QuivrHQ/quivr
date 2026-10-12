@@ -163,7 +163,7 @@ func TestBootstrapUpgradesCollectionWithoutSourceNamespace(t *testing.T) {
 		properties = append(properties, map[string]any{"name": name, "dataType": []string{"text"}, "tokenization": "word", "indexSearchable": true})
 	}
 	body, _ := json.Marshal(map[string]any{"class": legacy.Collection, "properties": properties, "vectorConfig": map[string]any{"semantic_text_v1": map[string]any{"vectorizer": map[string]any{"none": nil}, "vectorIndexType": "hnsw"}}})
-	res, err := http.Post(f.url+"/v1/schema", "application/json", bytes.NewReader(body))
+	res, err := f.store.Client.Post(f.url+"/v1/schema", "application/json", bytes.NewReader(body))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -181,7 +181,7 @@ func TestBootstrapUpgradesCollectionWithoutSourceNamespace(t *testing.T) {
 			Name string `json:"name"`
 		} `json:"properties"`
 	}
-	res, err = http.Get(f.url + "/v1/schema/" + legacy.Collection)
+	res, err = f.store.Client.Get(f.url + "/v1/schema/" + legacy.Collection)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -215,7 +215,7 @@ func TestBootstrapUpgradesCollectionWithoutSourceNamespace(t *testing.T) {
 	body, _ = json.Marshal(old)
 	req, _ := http.NewRequest(http.MethodPut, f.url+"/v1/objects/"+legacy.Collection+"/"+anchor.ID, bytes.NewReader(body))
 	req.Header.Set("Content-Type", "application/json")
-	if res, err = http.DefaultClient.Do(req); err != nil {
+	if res, err = f.store.Client.Do(req); err != nil {
 		t.Fatal(err)
 	}
 	res.Body.Close()
@@ -252,7 +252,7 @@ func TestPluginAnchorMissingRoutingMetadataRemainsImmutable(t *testing.T) {
 		t.Fatal(err)
 	}
 	req.Header.Set("Content-Type", "application/json")
-	res, err := http.DefaultClient.Do(req)
+	res, err := f.store.Client.Do(req)
 	if err != nil {
 		t.Fatal(err)
 	}

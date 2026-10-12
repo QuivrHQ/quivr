@@ -298,7 +298,7 @@ func TestItemIndexedMetadataAndIdentityFilters(t *testing.T) {
 		}
 	}
 	// Range indexing is a schema contract, not a timing assertion.
-	res, err := http.Get(f.url + "/v1/schema/" + g.Collection)
+	res, err := f.store.Client.Get(f.url + "/v1/schema/" + g.Collection)
 	if err != nil {
 		t.Fatal(err)
 	}
