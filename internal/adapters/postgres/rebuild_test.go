@@ -418,3 +418,170 @@ func TestRebuildCursorResumesAndSweepsNewVersions(t *testing.T) {
 		t.Fatalf("terminal checkpoint=%v", err)
 	}
 }
+
+// Completion has its own durable cursor: an already-running, fully covered
+// Operation must resume after deployment and catch new work behind that cursor.
+func TestRunningRebuildResumesBoundedValidation(t *testing.T) {
+	ctx, cancel := context.WithTimeout(t.Context(), 10*time.Second)
+	defer cancel()
+	pool := scratchDatabase(t, ctx)
+	if err := app.BootstrapDatabase(ctx, pool, app.Config{}.DeploymentSpaces(nil)); err != nil {
+		t.Fatal(err)
+	}
+	f := controlFixture{t: t, ctx: ctx, pool: pool, org: "adapter-rebuild-validation", store: contentStores(pool)}
+	c := f.corpus("validation")
+	scope := corpus.Scope{Organization: f.org, Actions: []string{"content:write"}, Corpora: []string{"*"}}
+	seed := rebuildSegmentation(t, ctx, f.store, scope, c, "seed")
+	prior, err := f.store.Generation(ctx, f.org, c)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err = f.store.Promote(ctx, f.org, seed, prior); err != nil {
+		t.Fatal(err)
+	}
+	op := f.rebuild(c, "already-running")
+	if _, err = f.store.BeginRebuild(ctx, f.org, op.ID); err != nil {
+		t.Fatal(err)
+	}
+	if _, err = f.store.CoverRebuild(ctx, f.org, op.ID, seed, nil); err != nil {
+		t.Fatal(err)
+	}
+	// Clone a valid canonical fixture in SQL to cross a page boundary without
+	// adding hundreds of ingestion round trips to this storage contract owner.
+	for _, sql := range []string{
+		`INSERT INTO records SELECT (jsonb_populate_record(NULL::records,to_jsonb(r)||jsonb_build_object('id','r'||lpad(n::text,6,'0'),'record_key',n::text,'current_version_id','version_zz'||lpad(n::text,6,'0'),'desired_version_id','version_zz'||lpad(n::text,6,'0')))).* FROM records r CROSS JOIN generate_series(1,260) n WHERE r.organization=$1 AND r.current_version_id=$2`,
+		`INSERT INTO record_versions SELECT (jsonb_populate_record(NULL::record_versions,to_jsonb(v)||jsonb_build_object('id','version_zz'||lpad(n::text,6,'0'),'record_id','r'||lpad(n::text,6,'0'),'provenance','{}'::jsonb))).* FROM record_versions v CROSS JOIN generate_series(1,260) n WHERE v.organization=$1 AND v.id=$2`,
+		`INSERT INTO accepted_revisions SELECT (jsonb_populate_record(NULL::accepted_revisions,to_jsonb(a)||jsonb_build_object('record_id','r'||lpad(n::text,6,'0'),'version_id','version_zz'||lpad(n::text,6,'0')))).* FROM accepted_revisions a CROSS JOIN generate_series(1,260) n WHERE a.organization=$1 AND a.version_id=$2`,
+		`INSERT INTO version_parts SELECT (jsonb_populate_record(NULL::version_parts,to_jsonb(p)||jsonb_build_object('version_id','version_zz'||lpad(n::text,6,'0')))).* FROM version_parts p CROSS JOIN generate_series(1,260) n WHERE p.organization=$1 AND p.version_id=$2`,
+		`INSERT INTO segmentations SELECT (jsonb_populate_record(NULL::segmentations,to_jsonb(s)||jsonb_build_object('id','seg'||n,'version_id','version_zz'||lpad(n::text,6,'0')))).* FROM segmentations s CROSS JOIN generate_series(1,260) n WHERE s.organization=$1 AND s.version_id=$2`,
+		`INSERT INTO segments SELECT (jsonb_populate_record(NULL::segments,to_jsonb(s)||jsonb_build_object('id','segment'||n,'segmentation_id','seg'||n,'version_id','version_zz'||lpad(n::text,6,'0')))).* FROM segments s CROSS JOIN generate_series(1,260) n WHERE s.organization=$1 AND s.version_id=$2`,
+		`INSERT INTO projection_coverage SELECT (jsonb_populate_record(NULL::projection_coverage,to_jsonb(p)||jsonb_build_object('version_id','version_zz'||lpad(n::text,6,'0'),'segmentation_id','seg'||n))).* FROM projection_coverage p CROSS JOIN generate_series(1,260) n WHERE p.organization=$1 AND p.version_id=$2`,
+	} {
+		if _, err = pool.Exec(ctx, sql, f.org, seed.VersionID); err != nil {
+			t.Fatal(err)
+		}
+	}
+	if err = f.store.CheckpointRebuild(ctx, f.org, op.ID, "version_zz000260"); err != nil {
+		t.Fatal(err)
+	}
+	resumed := postgres.RebuildStore{Pool: pool}
+	// A previously admitted writer prevents observer registration, but neither
+	// candidate discovery nor activation may queue an exclusive request.
+	writer, err := pool.Begin(ctx)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer writer.Rollback(context.Background())
+	if _, err = writer.Exec(ctx, `SELECT pg_advisory_xact_lock_shared(642003)`); err != nil {
+		t.Fatal(err)
+	}
+	if page, err := resumed.RebuildCandidates(ctx, f.org, op.ID, 25); err != nil || len(page) != 0 {
+		t.Fatalf("registration while writer is active: %v %v", page, err)
+	}
+	if done, err := resumed.ActivateRebuild(ctx, f.org, op.ID); err != nil || done {
+		t.Fatalf("activation while writer is active: %v %v", done, err)
+	}
+	if err = writer.Commit(ctx); err != nil {
+		t.Fatal(err)
+	}
+	if done, err := resumed.ActivateRebuild(ctx, f.org, op.ID); err != nil || done {
+		t.Fatalf("first bounded validation: done=%v err=%v; want incomplete", done, err)
+	}
+	// Queue bootstrap updates derived counts while publication is fenced.
+	// It must neither wait for that fence nor create unfenced rebuild dirties.
+	maintenanceFence, err := pool.Begin(ctx)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer maintenanceFence.Rollback(context.Background())
+	if _, err = maintenanceFence.Exec(ctx, `SELECT pg_advisory_xact_lock(642003)`); err != nil {
+		t.Fatal(err)
+	}
+	if err = (postgres.QueueSnapshots{Pool: pool}).Refresh(ctx); err != nil {
+		t.Fatal(err)
+	}
+	var bootstrapDirties int
+	if err = pool.QueryRow(ctx, `SELECT count(*) FROM projection_rebuild_dirty_records WHERE organization=$1 AND operation_id=$2`, f.org, op.ID).Scan(&bootstrapDirties); err != nil || bootstrapDirties != 0 {
+		t.Fatalf("queue bootstrap wrote unfenced rebuild dirties=%d err=%v", bootstrapDirties, err)
+	}
+	if err = maintenanceFence.Commit(ctx); err != nil {
+		t.Fatal(err)
+	}
+	// An epoch replacement invalidates a clean prefix even if it happens to
+	// retain the same generation settings. A fresh store must rescan that prefix.
+	if _, err = pool.Exec(ctx, `INSERT INTO routing_switch_state(singleton,epoch) VALUES(true,'validation-epoch') ON CONFLICT(singleton) DO UPDATE SET epoch=EXCLUDED.epoch`); err != nil {
+		t.Fatal(err)
+	}
+	resumed = postgres.RebuildStore{Pool: pool}
+	if done, err := resumed.ActivateRebuild(ctx, f.org, op.ID); err != nil || done {
+		t.Fatalf("changed epoch skipped prefix validation: %v %v", done, err)
+	}
+	late := rebuildSegmentation(t, ctx, f.store, scope, c, "late")
+	if err = f.store.Promote(ctx, f.org, late, prior); err != nil {
+		t.Fatal(err)
+	}
+	resumed = postgres.RebuildStore{Pool: pool}
+	fence, err := pool.Begin(ctx)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer fence.Rollback(context.Background())
+	if _, err = fence.Exec(ctx, `SELECT pg_advisory_xact_lock(642003)`); err != nil {
+		t.Fatal(err)
+	}
+	if done, err := resumed.ActivateRebuild(ctx, f.org, op.ID); err != nil || done {
+		t.Fatalf("busy publication fence: %v %v", done, err)
+	}
+	if err = fence.Commit(ctx); err != nil {
+		t.Fatal(err)
+	}
+	if done, err := resumed.ActivateRebuild(ctx, f.org, op.ID); err != nil || done {
+		t.Fatalf("new version behind validation: done=%v err=%v", done, err)
+	}
+	page, err := resumed.RebuildCandidates(ctx, f.org, op.ID, 25)
+	if err != nil || len(page) != 1 || page[0].VersionID != late.VersionID {
+		t.Fatalf("late candidate=%+v err=%v", page, err)
+	}
+	if _, err = resumed.CoverRebuild(ctx, f.org, op.ID, late, nil); err != nil {
+		t.Fatal(err)
+	}
+	activated := false
+	for range 8 {
+		done, err := resumed.ActivateRebuild(ctx, f.org, op.ID)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if done {
+			if f.state(op.ID) != operations.StateSucceeded || f.routed(c) != op.TargetGenerationID {
+				t.Fatal("activation did not publish the original Operation's target")
+			}
+			activated = true
+			break
+		}
+	}
+	if !activated {
+		t.Fatal("running rebuild failed to finish its persisted validation")
+	}
+	// Cancellation stops observation immediately. Scratch rows are reclaimed by
+	// ordinary dispatcher polling, even though this Operation never steps again.
+	stopped := f.rebuild(c, "cancel-validation")
+	if _, err = f.store.BeginRebuild(ctx, f.org, stopped.ID); err != nil {
+		t.Fatal(err)
+	}
+	if _, err = resumed.RebuildCandidates(ctx, f.org, stopped.ID, 25); err != nil {
+		t.Fatal(err)
+	}
+	if _, err = f.store.CancelOperation(ctx, f.org, stopped.ID); err != nil {
+		t.Fatal(err)
+	}
+	if err = f.store.ConfirmCancel(ctx, f.org, stopped.ID); err != nil {
+		t.Fatal(err)
+	}
+	if _, err = f.store.ClaimOperations(ctx, 25); err != nil {
+		t.Fatal(err)
+	}
+	var remaining int
+	if err = pool.QueryRow(ctx, `SELECT (SELECT count(*) FROM projection_rebuild_validation WHERE organization=$1 AND operation_id=$2)+(SELECT count(*) FROM projection_rebuild_dirty_records WHERE organization=$1 AND operation_id=$2)`, f.org, stopped.ID).Scan(&remaining); err != nil || remaining != 0 {
+		t.Fatalf("terminal validation scratch remaining=%d err=%v", remaining, err)
+	}
+}

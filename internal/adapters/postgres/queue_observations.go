@@ -50,7 +50,7 @@ var recordObservationSQL = append([]string{
  AND NOT EXISTS(SELECT FROM tombstones t WHERE (t.organization,t.record_id)=(k.organization,k.record_id)),false))
  AND q.ctid=ANY(ARRAY(SELECT locked.ctid FROM (` + queueObservationKeysSQL + `) ids
  JOIN LATERAL (SELECT ctid FROM queue_enrichment_records p WHERE (p.organization,p.record_id)=(ids.organization,ids.record_id) LIMIT 1) locked ON true))`,
-	markRoutingRecordsSQL,
+	markObservedRecordsSQL,
 }, corpusRecordObservationSQL...)
 
 func queueRecordObservations(batch *pgx.Batch, organizations, records []string) {
@@ -137,8 +137,20 @@ func advanceQueueObservations(ctx context.Context, tx pgx.Tx, limit int) error {
 	if err = rows.Err(); err != nil {
 		return err
 	}
-	if err = observeQueueRecords(ctx, tx, organizations, records); err != nil {
-		return err
+	// Snapshot bootstrap reads canonical state without the publication fence.
+	// It changes only derived observations, so it must not create rebuild dirties
+	// after a cutover has removed that rebuild's validation metadata.
+	if len(records) > 0 {
+		batch := &pgx.Batch{}
+		for _, sql := range recordObservationSQL {
+			if sql == markObservedRecordsSQL {
+				sql = markRoutingRecordsSQL
+			}
+			batch.Queue(sql, organizations, records)
+		}
+		if err = tx.SendBatch(ctx, batch).Close(); err != nil {
+			return err
+		}
 	}
 	if len(records) < limit {
 		initialized = true

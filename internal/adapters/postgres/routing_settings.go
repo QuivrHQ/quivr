@@ -34,8 +34,13 @@ const markRoutingRecordsSQL = `INSERT INTO routing_dirty_records(epoch,organizat
  WHERE o.observing ORDER BY o.id,k.organization,k.record_id
  ON CONFLICT(epoch,organization,record_id) DO UPDATE SET revision=routing_dirty_records.revision+1`
 
+// Canonical publication holds the shared routing fence. Routing's own dirty
+// reconciliation also uses markRoutingRecordsSQL but does not publish content;
+// keep that unfenced caller outside rebuild observation.
+const markObservedRecordsSQL = `WITH rebuild_dirty AS (` + markRebuildRecordsSQL + `) ` + markRoutingRecordsSQL
+
 func markRoutingVersion(ctx context.Context, tx pgx.Tx, org, id string) error {
-	_, err := tx.Exec(ctx, `INSERT INTO routing_dirty_records(epoch,organization,record_id)
+	_, err := tx.Exec(ctx, `WITH rebuild_dirty AS (`+markRebuildVersionSQL+`) `+`INSERT INTO routing_dirty_records(epoch,organization,record_id)
  SELECT o.id,v.organization,v.record_id FROM routing_operations o,record_versions v
  WHERE o.observing AND v.organization=$1 AND v.id=$2
  ON CONFLICT(epoch,organization,record_id) DO UPDATE SET revision=routing_dirty_records.revision+1`, org, id)
