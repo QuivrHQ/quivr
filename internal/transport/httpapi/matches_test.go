@@ -2,7 +2,9 @@ package httpapi_test
 
 import (
 	"context"
+	"encoding/json"
 	"net/url"
+	"os"
 	"reflect"
 	"testing"
 	"time"
@@ -23,6 +25,11 @@ func testMatch(i int64) monitoring.Match {
 }
 
 func (history) Match(_ context.Context, org, id string) (monitoring.Match, error) {
+	if id == "match_expired" {
+		m := testMatch(1)
+		m.ID, m.EvidenceExpired = id, true
+		return m, nil
+	}
 	for i := int64(1); i <= 3; i++ {
 		if m := testMatch(i); m.ID == id {
 			return m, nil
@@ -33,7 +40,14 @@ func (history) Match(_ context.Context, org, id string) (monitoring.Match, error
 func (history) Matches(_ context.Context, org, sub string, after int64, limit int) ([]monitoring.Match, error) {
 	out := []monitoring.Match{}
 	for i := int64(1); i <= 3 && len(out) < limit; i++ {
-		if m := testMatch(i); m.Position > after && m.SubscriptionID == sub {
+		m := testMatch(i)
+		if sub == "subscription_expired" {
+			m.SubscriptionID, m.EvidenceExpired = sub, i == 1
+		}
+		if sub == "subscription_sentinel" {
+			m.SubscriptionID, m.EvidenceExpired = sub, i == 3
+		}
+		if m.Position > after && m.SubscriptionID == sub {
 			out = append(out, m)
 		}
 	}
@@ -163,6 +177,60 @@ func TestMatchHistoryPagesAndDeliveryRead(t *testing.T) {
 	server := monitoringServer(t)
 	call(t, server, "POST", "/v0/saved-queries", monitor, savedQueryBody, 201)
 	call(t, server, "POST", "/v0/subscriptions", monitor, subscriptionBody("s1", "quivr.fixture", "receiver_a"), 201)
+	expired, _ := call(t, server, "GET", "/v0/matches/match_expired", monitorReader, "", 410)
+	var examples []struct {
+		Name  string         `json:"name"`
+		Value map[string]any `json:"value"`
+	}
+	data, err := os.ReadFile("../../../contracts/http/v0/examples.json")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := json.Unmarshal(data, &examples); err != nil {
+		t.Fatal(err)
+	}
+	found := false
+	for _, example := range examples {
+		if example.Name != "expired_match_evidence" {
+			continue
+		}
+		found = true
+		for key, want := range example.Value {
+			if !reflect.DeepEqual(expired[key], want) {
+				t.Fatalf("expiry contract %s=%v; want %v", key, expired[key], want)
+			}
+		}
+	}
+	if !found {
+		t.Fatal("missing expired_match_evidence contract fixture")
+	}
+	call(t, server, "GET", "/v0/matches/match_expired", noMonitoring, "", 403)
+	call(t, server, "POST", "/v0/subscriptions", monitor, subscriptionBody("expired", "quivr.fixture", "receiver_a"), 201)
+	call(t, server, "POST", "/v0/subscriptions", monitor, subscriptionBody("sentinel", "quivr.fixture", "receiver_a"), 201)
+	readable, _ := call(t, server, "GET", "/v0/matches?subscription_id=subscription_sentinel&limit=2", monitorReader, "", 200)
+	sentinelCursor, _ := readable["next_page_cursor"].(string)
+	if len(readable["items"].([]any)) != 2 || sentinelCursor == "" {
+		t.Fatalf("expired lookahead rejected a readable page: %v", readable)
+	}
+	call(t, server, "GET", "/v0/matches?subscription_id=subscription_sentinel&limit=2&page_cursor="+url.QueryEscape(sentinelCursor), monitorReader, "", 410)
+	pageExpired, _ := call(t, server, "GET", "/v0/matches?subscription_id=subscription_expired", monitorReader, "", 410)
+	resume, _ := pageExpired["resync_url"].(string)
+	if pageExpired["code"] != "evidence_expired" || resume == "" || pageExpired["items"] != nil {
+		t.Fatalf("expired history page=%v", pageExpired)
+	}
+	resumed, _ := call(t, server, "GET", resume, monitorReader, "", 200)
+	if len(resumed["items"].([]any)) != 2 || resumed["items"].([]any)[0].(map[string]any)["match_id"] != "match_2" {
+		t.Fatalf("history resume=%v", resumed)
+	}
+	u, err := url.Parse(resume)
+	if err != nil {
+		t.Fatal(err)
+	}
+	q := u.Query()
+	q.Set("subscription_id", "subscription_s1")
+	if wrong, _ := call(t, server, "GET", "/v0/matches?"+q.Encode(), monitorReader, "", 409); wrong["code"] != "cursor_scope_changed" {
+		t.Fatalf("expiry cursor scope=%v", wrong)
+	}
 	list := func(query url.Values, token string, want int) map[string]any {
 		body, _ := call(t, server, "GET", "/v0/matches?"+query.Encode(), token, "", want)
 		return body

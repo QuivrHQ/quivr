@@ -7,7 +7,9 @@ import shlex
 import time
 
 from deploy.railway.infrastructure import Railway
-from deploy.reset_support import Checkpoint, ResetFailure, ResetTimeout, terminate_workflows, wait_until
+from deploy.reset_support import (Checkpoint, ResetFailure, ResetTimeout, terminate_workflows, wait_until,
+                                 require_local_vector, runtime_vector_command)
+from deploy import weaviate_client
 
 PROJECT = '''query($id:String!){project(id:$id){id
  environments(first:100){edges{node{id projectId canAccess deletedAt}} pageInfo{hasNextPage}}
@@ -84,10 +86,10 @@ class RailwayReset:
 
     def index_inventory(self):
         from deploy.reset_support import vector_objects
-        code = ('import json, urllib.request\n' + inspect.getsource(vector_objects)
+        code = ('import json\n' + inspect.getsource(vector_objects)
+                + '\n' + inspect.getsource(weaviate_client)
                 + '\nc=json.load(open("/tmp/quivr-runtime.json")); '
-                'r=urllib.request.urlopen(c["weaviate_url"]+"/v1/objects?limit=1",timeout=10); '
-                'print(vector_objects(json.load(r)))')
+                'print(vector_objects(WeaviateClient.from_config(c).request_json("/v1/objects?limit=1")))')
         return int(self.ssh('api', 'python3 -c ' + shlex.quote(code)).strip())
 
     def preview(self):
@@ -137,6 +139,21 @@ class RailwayReset:
                 raise RuntimeError('service has no running instance for reset preflight')
             self.deployments[role] = active[0]['id']
             self.instance_ids[role] = running[0]
+        # The runtime URL can point elsewhere even while an old local Weaviate
+        # volume remains selected. Refuse that mismatch before writer shutdown.
+        variables = json.loads(self.adapter.run(['variable', 'list', '--json', *self.adapter.flags('weaviate')]))
+        domain = variables.get('RAILWAY_PRIVATE_DOMAIN')
+        local = ['http://' + domain + ':8080'] if isinstance(domain, str) else []
+        urls = []
+        for role in ('api', 'worker', 'worker-bulk'):
+            if role in selectors:
+                instance = self.service(role)
+                for deployment in instance['activeDeployments']:
+                    for replica in deployment['instances']:
+                        if not deployment['deploymentStopped'] and replica['status'] == 'RUNNING':
+                            urls.append(json.loads(self.adapter.run(['ssh', *self.adapter.flags(role),
+                                '--deployment-instance', replica['id'], runtime_vector_command()])))
+        require_local_vector(urls, local)
         self.storage = self.storage_inventory()
         self.index_count = self.index_inventory()
         return {'project': self.spec['project'], 'environment': self.spec['environment'],

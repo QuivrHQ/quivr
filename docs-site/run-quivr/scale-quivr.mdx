@@ -42,9 +42,15 @@ Cancelled or superseded rebuild generations are deleted in resumable windows of 
 
 Adaptive sizing bounds actual deletes; dry-run selection still depends on the server cap and can time out under severe index pressure. Check continuing search, import and rebuild progress while a large purge drains.
 
+PostgreSQL metadata cleanup selects a bounded window within the abandoned generation, checks each candidate's collection, and persists its cursor across transactions. It advances over neighboring collection rows that remain live. Each SQL transaction has a budget below five seconds; a timeout rolls back the batch and leaves it available for another sweep.
+
 On the worker's private `/metrics`, watch `quivr_projection_purge_failures_total`, `quivr_projection_purge_oldest_observed_age_seconds`, and `quivr_projection_purge_remaining_objects_lower_bound`, alongside `quivr_projection_purged_objects_total`. Age and remaining objects describe unfinished items in the last nonempty sweep, not the whole backlog. Remaining objects are a lower bound from a capped window, never an exact generation size. A rising age with failures or flat deletion progress indicates a stuck purge; worker logs include the sanitized provider reason. Check search latency and index IO while cleanup runs.
 
 ## Capacity per dependency
+
+### Operational history
+
+Set [history retention](../reference/configuration.mdx#history-retention) to reclaim old import payloads, alert evidence and pull-only notice bodies. The default minimum age is 30 days; bounded hourly scans may take longer to reach every row. Increase scan frequency when history grows faster than it drains. Delivery records and append-only attempts remain indefinitely; pending work and compact replay identities stay protected, so retention does not cap the total number of rows. Export alert evidence before its retention window if you need a lasting copy.
 
 ### Embedding provider
 
@@ -111,6 +117,8 @@ Compare `usage.phases.index_query_ms` with traces using [Diagnose slow searches 
 Quivr keeps durable vector artifacts in object storage independently of Weaviate. A supported Corpus rebuild can reuse those vectors when text and recipe match, reducing provider work. **Example recovery:** an index rebuild reused all stored vectors with zero provider calls. Preserve durable content, artifacts and metadata; an index wipe is not a routine scaling action.
 
 ### Cold-index search
+
+When shared-host memory reclamation or disk limits dominate cold reads, [run the index on a dedicated host](../run-quivr/dedicated-vector-host.mdx) with a persistent SSD and separate memory budget.
 
 An idle index can have fast warm queries and still exceed search's deadline on its first request. A restart rebuilds in-process vector caches; memory pressure can reclaim the operating system's file cache. A large import also leaves flushes and compaction competing with reads. A zero vector queue does not prove that this maintenance has finished. Search retains its hard deadline and can return `search_unavailable` while these costs exceed its budget.
 

@@ -5,6 +5,31 @@ import os
 from pathlib import Path
 import tempfile
 import time
+from urllib.parse import urlsplit
+
+
+def vector_endpoint(value):
+    """Compare endpoint identities without ever reporting their raw contents."""
+    try:
+        parsed = urlsplit(value)
+        if (parsed.scheme not in ('http', 'https') or not parsed.hostname or parsed.username or parsed.password
+                or parsed.path not in ('', '/') or parsed.query or parsed.fragment):
+            return None
+        return parsed.scheme, parsed.hostname.lower(), parsed.port or (443 if parsed.scheme == 'https' else 80)
+    except (ValueError, TypeError, AttributeError):
+        return None
+
+
+def require_local_vector(urls, local):
+    expected = {vector_endpoint(url) for url in local} - {None}
+    if not expected or not urls or any(vector_endpoint(url) not in expected for url in urls):
+        raise ValueError('reset refuses an external or unverifiable vector index before stopping writers')
+
+
+def runtime_vector_command():
+    import shlex
+    code = 'import json; print(json.dumps(json.load(open("/tmp/quivr-runtime.json")).get("weaviate_url")))'
+    return 'python3 -c ' + shlex.quote(code)
 
 
 def vector_objects(value):

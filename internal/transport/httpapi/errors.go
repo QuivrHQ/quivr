@@ -36,6 +36,11 @@ func errorResponse(err error, fallback *publicerr.Error, corpusID ...string) (in
 	if field := publicerr.Field(err); field != "" {
 		body.Field = &field
 	}
+	var resync interface{ PublicResyncURL() string }
+	if errors.As(err, &resync) {
+		url := resync.PublicResyncURL()
+		body.ResyncUrl = &url
+	}
 	switch e {
 	case publicerr.RecordCountTooBroad:
 		body.Message = "record count exceeded its query budget; use a narrower accepted_after/accepted_before window"

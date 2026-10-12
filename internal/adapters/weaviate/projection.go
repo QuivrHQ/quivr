@@ -19,6 +19,7 @@ import (
 
 	"github.com/The-Vibe-Company/quivr/internal/content"
 	"github.com/The-Vibe-Company/quivr/internal/corpus"
+	"github.com/The-Vibe-Company/quivr/internal/outbound"
 	"github.com/The-Vibe-Company/quivr/internal/retrieval"
 	"github.com/The-Vibe-Company/quivr/internal/telemetry"
 )
@@ -32,6 +33,7 @@ var className = regexp.MustCompile(`^[A-Z][A-Za-z0-9_]*$`)
 type Store struct {
 	Endpoint string
 	Client   *http.Client
+	apiKey   string
 	// PurgeTimeout bounds each purge selection/delete request independently of search.
 	PurgeTimeout time.Duration
 	purgeBatch   atomic.Int64
@@ -216,8 +218,13 @@ func (s *Store) ensureVectors(ctx context.Context, g content.Generation) error {
 	return nil
 }
 
-func New(endpoint string) *Store {
-	return &Store{Endpoint: strings.TrimRight(endpoint, "/"), Client: &http.Client{Timeout: 4 * time.Second, Transport: telemetry.Transport(nil, "weaviate.request")}, vectors: &sync.Map{}}
+func New(endpoint string, apiKey ...string) *Store {
+	store := &Store{Endpoint: strings.TrimRight(endpoint, "/"), vectors: &sync.Map{}}
+	store.Client = &http.Client{Timeout: 4 * time.Second, Transport: telemetry.Transport(store.authenticate(http.DefaultTransport, apiKey), "weaviate.request")}
+	if store.apiKey != "" {
+		store.Client.CheckRedirect = outbound.CheckRedirect
+	}
+	return store
 }
 func (s *Store) call(ctx context.Context, method, path string, in, out any) (int, error) {
 	return s.callLimit(ctx, method, path, in, out, 2<<20)
@@ -236,7 +243,7 @@ func (s *Store) callLimit(ctx context.Context, method, path string, in, out any,
 	}
 	req, err := http.NewRequestWithContext(ctx, method, s.Endpoint+path, bytes.NewReader(body))
 	if err != nil {
-		return 0, err
+		return 0, s.safeError(err)
 	}
 	req.Header.Set("Content-Type", "application/json")
 	res, err := s.Client.Do(req)
@@ -254,7 +261,7 @@ func (s *Store) callLimit(ctx context.Context, method, path string, in, out any,
 			err = errResponseLimit
 		}
 	}
-	return res.StatusCode, err
+	return res.StatusCode, s.safeError(err)
 }
 func (s *Store) Ready(ctx context.Context) error {
 	_, err := s.call(ctx, "GET", "/v1/.well-known/ready", nil, nil)
@@ -971,7 +978,7 @@ func (s *Store) deleteWhere(ctx context.Context, client *http.Client, collection
 	}
 	var response purgeResponse
 
-	scoped := Store{Endpoint: s.Endpoint, Client: client}
+	scoped := Store{Endpoint: s.Endpoint, Client: client, apiKey: s.apiKey}
 	if err := scoped.purgeCall(ctx, "DELETE", "/v1/batch/objects", map[string]any{"match": map[string]any{"class": collection, "where": where}, "output": "verbose"}, &response); err != nil {
 		return retrieval.PurgeResult{}, err
 	}
@@ -993,7 +1000,7 @@ func (s *Store) deleteWhere(ctx context.Context, client *http.Client, collection
 				break
 			}
 		}
-		return result, fmt.Errorf("projection delete: %d failed, %d successful: %.1024s", *r.Failed, *r.Successful, reason)
+		return result, fmt.Errorf("projection delete: %d failed, %d successful: %.1024s", *r.Failed, *r.Successful, s.redact(reason))
 	}
 	// Missing limits or incomplete success counts never prove completion.
 	result.Complete = *r.Successful == *r.Matches && (*r.Matches == 0 || (r.Limit > 0 && *r.Matches < r.Limit))

@@ -2433,7 +2433,7 @@ type ManifestContentKind string
 
 // Match Immutable positive historical determination, not a claim of current eligibility. Unique subscription-version/record-version. Correction/withdrawal notifications reference history; no Match is fabricated for negative decisions. owner is the Subscription's owner, absent when global.
 type Match struct {
-	// Evidence Immutable evidence for a positive result, including evaluator version/configuration. Details are plugin-defined, bounded to 16 KiB and schema-validated by its adapter; core checks referenced Parts. Access is rechecked on reads.
+	// Evidence Immutable evidence for a positive result, including evaluator version/configuration. History retention may expire the entire evidence payload; historical reads then return 410 evidence_expired rather than a successful response with modified evidence. Details are plugin-defined, bounded to 16 KiB and schema-validated by its adapter; core checks referenced Parts. Access is rechecked on reads.
 	Evidence MatchEvidence `json:"evidence"`
 	MatchId  string        `json:"match_id"`
 
@@ -2448,7 +2448,7 @@ type Match struct {
 	SubscriptionVersionId string             `json:"subscription_version_id"`
 }
 
-// MatchEvidence Immutable evidence for a positive result, including evaluator version/configuration. Details are plugin-defined, bounded to 16 KiB and schema-validated by its adapter; core checks referenced Parts. Access is rechecked on reads.
+// MatchEvidence Immutable evidence for a positive result, including evaluator version/configuration. History retention may expire the entire evidence payload; historical reads then return 410 evidence_expired rather than a successful response with modified evidence. Details are plugin-defined, bounded to 16 KiB and schema-validated by its adapter; core checks referenced Parts. Access is rechecked on reads.
 type MatchEvidence struct {
 	Details *map[string]interface{} `json:"details,omitempty"`
 
@@ -3529,7 +3529,7 @@ type SubscriptionPreviewMatch struct {
 	AcceptedAt time.Time `json:"accepted_at"`
 	CorpusId   string    `json:"corpus_id"`
 
-	// Evidence Immutable evidence for a positive result, including evaluator version/configuration. Details are plugin-defined, bounded to 16 KiB and schema-validated by its adapter; core checks referenced Parts. Access is rechecked on reads.
+	// Evidence Immutable evidence for a positive result, including evaluator version/configuration. History retention may expire the entire evidence payload; historical reads then return 410 evidence_expired rather than a successful response with modified evidence. Details are plugin-defined, bounded to 16 KiB and schema-validated by its adapter; core checks referenced Parts. Access is rechecked on reads.
 	Evidence        MatchEvidence `json:"evidence"`
 	RecordId        string        `json:"record_id"`
 	RecordVersionId string        `json:"record_version_id"`
@@ -5113,12 +5113,12 @@ type ClientInterface interface {
 
 	// ListMatches performs a GET /v0/matches (the `ListMatches` operationId) request.
 	//
-	// Authorized historical Matches for a Subscription. Stable keyset page cursor, not a Change Cursor. Absence of a Match does not distinguish an evaluator still working from a negative result.
+	// Authorized historical Matches for a Subscription. Stable keyset page cursor, not a Change Cursor. Absence of a Match does not distinguish an evaluator still working from a negative result. A page containing evidence reclaimed by history_retention.alert_detail returns 410 evidence_expired, retryable=false, with resync_url to explicitly resume after the expired Match. Resuming accepts a lost history interval; export evidence before retention expires if needed. Successful pages retain the original evidence and response shape.
 	ListMatches(ctx context.Context, params *ListMatchesParams, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// GetMatch performs a GET /v0/matches/{match_id} (the `GetMatch` operationId) request.
 	//
-	// Authorized historical positive result, explanation and provenance. Recheck current access to Subscription and content; disabled state alone does not erase history. Historical content retention remains separate from search eligibility.
+	// Authorized historical positive result, explanation and provenance. Recheck current access to Subscription and content; disabled state alone does not erase history. Historical content retention remains separate from search eligibility. After history_retention.alert_detail reclaims evidence, this read returns 410 evidence_expired, retryable=false. Retained identity facts still prevent duplicate alerts and link corrections. Successful reads return the original immutable evidence with the existing response shape.
 	GetMatch(ctx context.Context, matchId string, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// GetOperation performs a GET /v0/operations/{operation_id} (the `GetOperation` operationId) request.
@@ -6756,7 +6756,7 @@ func (c *Client) GetReceipt(ctx context.Context, receiptId string, reqEditors ..
 
 // ListMatches performs a GET /v0/matches (the `ListMatches` operationId) request.
 //
-// Authorized historical Matches for a Subscription. Stable keyset page cursor, not a Change Cursor. Absence of a Match does not distinguish an evaluator still working from a negative result.
+// Authorized historical Matches for a Subscription. Stable keyset page cursor, not a Change Cursor. Absence of a Match does not distinguish an evaluator still working from a negative result. A page containing evidence reclaimed by history_retention.alert_detail returns 410 evidence_expired, retryable=false, with resync_url to explicitly resume after the expired Match. Resuming accepts a lost history interval; export evidence before retention expires if needed. Successful pages retain the original evidence and response shape.
 func (c *Client) ListMatches(ctx context.Context, params *ListMatchesParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewListMatchesRequest(c.Server, params)
 	if err != nil {
@@ -6771,7 +6771,7 @@ func (c *Client) ListMatches(ctx context.Context, params *ListMatchesParams, req
 
 // GetMatch performs a GET /v0/matches/{match_id} (the `GetMatch` operationId) request.
 //
-// Authorized historical positive result, explanation and provenance. Recheck current access to Subscription and content; disabled state alone does not erase history. Historical content retention remains separate from search eligibility.
+// Authorized historical positive result, explanation and provenance. Recheck current access to Subscription and content; disabled state alone does not erase history. Historical content retention remains separate from search eligibility. After history_retention.alert_detail reclaims evidence, this read returns 410 evidence_expired, retryable=false. Retained identity facts still prevent duplicate alerts and link corrections. Successful reads return the original immutable evidence with the existing response shape.
 func (c *Client) GetMatch(ctx context.Context, matchId string, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewGetMatchRequest(c.Server, matchId)
 	if err != nil {
@@ -13136,14 +13136,14 @@ type ClientWithResponsesInterface interface {
 
 	// ListMatchesWithResponse performs a GET /v0/matches (the `ListMatches` operationId) request.
 	//
-	// Authorized historical Matches for a Subscription. Stable keyset page cursor, not a Change Cursor. Absence of a Match does not distinguish an evaluator still working from a negative result.
+	// Authorized historical Matches for a Subscription. Stable keyset page cursor, not a Change Cursor. Absence of a Match does not distinguish an evaluator still working from a negative result. A page containing evidence reclaimed by history_retention.alert_detail returns 410 evidence_expired, retryable=false, with resync_url to explicitly resume after the expired Match. Resuming accepts a lost history interval; export evidence before retention expires if needed. Successful pages retain the original evidence and response shape.
 	//
 	// Returns a wrapper object for the known response body format(s).
 	ListMatchesWithResponse(ctx context.Context, params *ListMatchesParams, reqEditors ...RequestEditorFn) (*ListMatchesResponse, error)
 
 	// GetMatchWithResponse performs a GET /v0/matches/{match_id} (the `GetMatch` operationId) request.
 	//
-	// Authorized historical positive result, explanation and provenance. Recheck current access to Subscription and content; disabled state alone does not erase history. Historical content retention remains separate from search eligibility.
+	// Authorized historical positive result, explanation and provenance. Recheck current access to Subscription and content; disabled state alone does not erase history. Historical content retention remains separate from search eligibility. After history_retention.alert_detail reclaims evidence, this read returns 410 evidence_expired, retryable=false. Retained identity facts still prevent duplicate alerts and link corrections. Successful reads return the original immutable evidence with the existing response shape.
 	//
 	// Returns a wrapper object for the known response body format(s).
 	GetMatchWithResponse(ctx context.Context, matchId string, reqEditors ...RequestEditorFn) (*GetMatchResponse, error)
@@ -19475,7 +19475,7 @@ func (c *ClientWithResponses) GetReceiptWithResponse(ctx context.Context, receip
 
 // ListMatchesWithResponse performs a GET /v0/matches (the `ListMatches` operationId) request.
 //
-// Authorized historical Matches for a Subscription. Stable keyset page cursor, not a Change Cursor. Absence of a Match does not distinguish an evaluator still working from a negative result.
+// Authorized historical Matches for a Subscription. Stable keyset page cursor, not a Change Cursor. Absence of a Match does not distinguish an evaluator still working from a negative result. A page containing evidence reclaimed by history_retention.alert_detail returns 410 evidence_expired, retryable=false, with resync_url to explicitly resume after the expired Match. Resuming accepts a lost history interval; export evidence before retention expires if needed. Successful pages retain the original evidence and response shape.
 //
 // Returns a wrapper object for the known response body format(s).
 func (c *ClientWithResponses) ListMatchesWithResponse(ctx context.Context, params *ListMatchesParams, reqEditors ...RequestEditorFn) (*ListMatchesResponse, error) {
@@ -19488,7 +19488,7 @@ func (c *ClientWithResponses) ListMatchesWithResponse(ctx context.Context, param
 
 // GetMatchWithResponse performs a GET /v0/matches/{match_id} (the `GetMatch` operationId) request.
 //
-// Authorized historical positive result, explanation and provenance. Recheck current access to Subscription and content; disabled state alone does not erase history. Historical content retention remains separate from search eligibility.
+// Authorized historical positive result, explanation and provenance. Recheck current access to Subscription and content; disabled state alone does not erase history. Historical content retention remains separate from search eligibility. After history_retention.alert_detail reclaims evidence, this read returns 410 evidence_expired, retryable=false. Retained identity facts still prevent duplicate alerts and link corrections. Successful reads return the original immutable evidence with the existing response shape.
 //
 // Returns a wrapper object for the known response body format(s).
 func (c *ClientWithResponses) GetMatchWithResponse(ctx context.Context, matchId string, reqEditors ...RequestEditorFn) (*GetMatchResponse, error) {

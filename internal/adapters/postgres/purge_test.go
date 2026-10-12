@@ -15,6 +15,7 @@ import (
 	"github.com/The-Vibe-Company/quivr/internal/corpus"
 	"github.com/The-Vibe-Company/quivr/internal/operations"
 	"github.com/The-Vibe-Company/quivr/internal/retrieval"
+	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
@@ -493,3 +494,271 @@ func TestPurgeRetiresAbandonedCompactCoverage(t *testing.T) {
 		t.Fatalf("old lexical coverage=%d err=%v", oldProjection, err)
 	}
 }
+
+// Generation metadata cleanup owns a generation-selective keyset. It must
+// advance over metadata belonging to a neighboring Corpus, resume from the
+// durable cursor in a fresh store, and preserve the old tuple cursor boundary
+// when the same Version appears in generations on either side of that cursor.
+func TestGenerationPurgeMetadataBatchesAndLegacyCursor(t *testing.T) {
+	ctx, cancel := context.WithTimeout(t.Context(), 20*time.Second)
+	defer cancel()
+	p := scratchDatabase(t, ctx)
+	if err := app.BootstrapDatabase(ctx, p, app.Config{}.DeploymentSpaces(nil)); err != nil {
+		t.Fatal(err)
+	}
+	const org = "purge-metadata"
+	if _, err := p.Exec(ctx, `INSERT INTO corpora(organization,id,request_key,canonical_request,name,retrieval) VALUES
+($1,'target','target','','Target','{}'),($1,'neighbor','neighbor','','Neighbor','{}')`, org); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := p.Exec(ctx, `INSERT INTO content_blobs(organization,blob_id,object_key,sha256,byte_length)
+VALUES($1,'blob','blob','blob',1)`, org); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := p.Exec(ctx, `INSERT INTO records(organization,id,corpus_id,namespace,record_key,current_version_id,desired_version_id)
+SELECT $1,'record-'||i,CASE WHEN i=2 THEN 'neighbor' ELSE 'target' END,'source',i::text,'version-'||i,'version-'||i
+FROM generate_series(1,3) i`, org); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := p.Exec(ctx, `INSERT INTO record_versions(organization,id,record_id,slot,digest,acceptance_order,source_position,text_blob_id,manifest_blob_id,provenance,baseline_ready,processing,enrichment_state)
+SELECT $1,'version-'||i,'record-'||i,'text',i::text,i,i::text,'blob','blob','{}',true,'idle','idle'
+FROM generate_series(1,3) i`, org); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := p.Exec(ctx, `INSERT INTO projection_metadata(organization,version_id,generation_id,data)
+SELECT $1,'version-'||i,'target-generation','{}'::jsonb FROM generate_series(1,3) i`, org); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := p.Exec(ctx, `INSERT INTO projection_metadata(organization,version_id,generation_id,data)
+VALUES($1,'version-1','neighbor-generation','{}')`, org); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := p.Exec(ctx, `INSERT INTO projection_purges(organization,kind,corpus_id,generation_id,version_id)
+VALUES($1,'generation','target','target-generation','')`, org); err != nil {
+		t.Fatal(err)
+	}
+	item := retrieval.PurgeItem{Kind: retrieval.PurgeGeneration, Organization: org, CorpusID: "target", GenerationID: "target-generation"}
+	var done bool
+	var err error
+	for attempt := 0; attempt < 10 && !done; attempt++ {
+		var before, after int
+		if err := p.QueryRow(ctx, `SELECT count(*) FROM projection_metadata WHERE organization=$1 AND generation_id=$2`, org, item.GenerationID).Scan(&before); err != nil {
+			t.Fatal(err)
+		}
+		done, err = (postgres.PurgeStore{Pool: p}).RecordPurge(ctx, item, 0, true, 1)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if err := p.QueryRow(ctx, `SELECT count(*) FROM projection_metadata WHERE organization=$1 AND generation_id=$2`, org, item.GenerationID).Scan(&after); err != nil {
+			t.Fatal(err)
+		}
+		if before-after > 1 {
+			t.Fatalf("metadata batch removed %d rows with limit=1", before-after)
+		}
+	}
+	if !done {
+		t.Fatal("generation metadata purge did not finish its bounded batches")
+	}
+	var targetRows, neighborRows int
+	if err := p.QueryRow(ctx, `SELECT count(*) FILTER (WHERE generation_id='target-generation' AND version_id IN ('version-1','version-3')),
+count(*) FILTER (WHERE generation_id='target-generation' AND version_id='version-2')
+FROM projection_metadata WHERE organization=$1`, org).Scan(&targetRows, &neighborRows); err != nil {
+		t.Fatal(err)
+	}
+	if targetRows != 0 || neighborRows != 1 {
+		t.Fatalf("metadata isolation target rows=%d neighbor rows=%d", targetRows, neighborRows)
+	}
+
+	// A persisted old cursor is a tuple, not only a Version key. A target
+	// generation after the cursor's generation must still process the same
+	// Version; one before it was already traversed and remains untouched.
+	if _, err := p.Exec(ctx, `INSERT INTO records(organization,id,corpus_id,namespace,record_key,current_version_id,desired_version_id)
+VALUES($1,'boundary-record','target','source','boundary','boundary-version','boundary-version')`, org); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := p.Exec(ctx, `INSERT INTO record_versions(organization,id,record_id,slot,digest,acceptance_order,source_position,text_blob_id,manifest_blob_id,provenance,baseline_ready,processing,enrichment_state)
+VALUES($1,'boundary-version','boundary-record','text','boundary',1,'boundary','blob','blob','{}',true,'idle','idle')`, org); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := p.Exec(ctx, `INSERT INTO projection_metadata(organization,version_id,generation_id,data) VALUES
+($1,'boundary-version','generation-b','{}'),($1,'boundary-version','generation-a','{}')`, org); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := p.Exec(ctx, `INSERT INTO projection_purges(organization,kind,corpus_id,generation_id,version_id) VALUES
+($1,'generation','target','generation-b',''),($1,'generation','target','generation-a','')`, org); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := p.Exec(ctx, `UPDATE projection_purges SET cleanup_stage=2,cleanup_cursor='["boundary-version","generation-a"]'::jsonb
+WHERE organization=$1 AND kind='generation' AND generation_id='generation-b'`, org); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := p.Exec(ctx, `UPDATE projection_purges SET cleanup_stage=2,cleanup_cursor='["boundary-version","generation-b"]'::jsonb
+WHERE organization=$1 AND kind='generation' AND generation_id='generation-a'`, org); err != nil {
+		t.Fatal(err)
+	}
+	for _, tc := range []struct {
+		generation string
+		wantRows   int
+	}{
+		{generation: "generation-b", wantRows: 0},
+		{generation: "generation-a", wantRows: 1},
+	} {
+		item := retrieval.PurgeItem{Kind: retrieval.PurgeGeneration, Organization: org, CorpusID: "target", GenerationID: tc.generation}
+		var done bool
+		for attempt := 0; attempt < 3 && !done; attempt++ {
+			var err error
+			done, err = (postgres.PurgeStore{Pool: p}).RecordPurge(ctx, item, 0, true, 1)
+			if err != nil {
+				t.Fatalf("legacy cursor %s: err=%v", tc.generation, err)
+			}
+		}
+		if !done {
+			t.Fatalf("legacy cursor %s did not finish", tc.generation)
+		}
+		var rows int
+		if err := p.QueryRow(ctx, `SELECT count(*) FROM projection_metadata WHERE organization=$1 AND version_id='boundary-version' AND generation_id=$2`, org, tc.generation).Scan(&rows); err != nil {
+			t.Fatal(err)
+		}
+		if rows != tc.wantRows {
+			t.Fatalf("legacy cursor %s left %d metadata rows, want %d", tc.generation, rows, tc.wantRows)
+		}
+	}
+}
+
+// A blocked purge must fail before claiming progress. The holder is acquired
+// synchronously, so this exercises the transaction lock fence without a sleep
+// or a timing assertion, and the persisted cursor remains resumable.
+func TestRecordPurgeLockTimeoutRollsBackProgress(t *testing.T) {
+	ctx, cancel := context.WithTimeout(t.Context(), 20*time.Second)
+	defer cancel()
+	p := scratchDatabase(t, ctx)
+	if err := app.BootstrapDatabase(ctx, p, app.Config{}.DeploymentSpaces(nil)); err != nil {
+		t.Fatal(err)
+	}
+	const org = "purge-lock"
+	if _, err := p.Exec(ctx, `INSERT INTO projection_purges(organization,kind,corpus_id,generation_id,version_id)
+VALUES($1,'generation','corpus','generation','')`, org); err != nil {
+		t.Fatal(err)
+	}
+	holder, err := p.Acquire(ctx)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer holder.Release()
+	holderTx, err := holder.Begin(ctx)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer holderTx.Rollback(context.Background())
+	var heldStage int
+	if err := holderTx.QueryRow(ctx, `SELECT cleanup_stage FROM projection_purges
+WHERE organization=$1 AND kind='generation' AND corpus_id='corpus' AND generation_id='generation' AND version_id='' FOR UPDATE`, org).Scan(&heldStage); err != nil {
+		t.Fatal(err)
+	}
+	item := retrieval.PurgeItem{Kind: retrieval.PurgeGeneration, Organization: org, CorpusID: "corpus", GenerationID: "generation"}
+	if done, err := (postgres.PurgeStore{Pool: p}).RecordPurge(ctx, item, 0, true, 1); err == nil || done {
+		t.Fatalf("blocked purge returned done=%t err=%v", done, err)
+	}
+	var stage int
+	var cursor []byte
+	var unpurged bool
+	if err := p.QueryRow(ctx, `SELECT cleanup_stage,cleanup_cursor,purged_at IS NULL FROM projection_purges
+WHERE organization=$1 AND kind='generation' AND corpus_id='corpus' AND generation_id='generation' AND version_id=''`, org).Scan(&stage, &cursor, &unpurged); err != nil {
+		t.Fatal(err)
+	}
+	if stage != 0 || string(cursor) != "[]" || !unpurged {
+		t.Fatalf("blocked purge claimed progress: stage=%d cursor=%s unpurged=%t", stage, cursor, unpurged)
+	}
+}
+
+// Cancellation while the purge row is locked must abort the transaction before
+// its durable cursor or completion flag changes. The tracer coordinates on the
+// production SELECT rather than sleeping for a lock timeout.
+func TestRecordPurgeCancellationRollsBackProgress(t *testing.T) {
+	ctx, cancel := context.WithTimeout(t.Context(), 20*time.Second)
+	defer cancel()
+	p := scratchDatabase(t, ctx)
+	if err := app.BootstrapDatabase(ctx, p, app.Config{}.DeploymentSpaces(nil)); err != nil {
+		t.Fatal(err)
+	}
+	const org = "purge-cancel"
+	if _, err := p.Exec(ctx, `INSERT INTO projection_purges(organization,kind,corpus_id,generation_id,version_id)
+VALUES($1,'generation','corpus','generation','')`, org); err != nil {
+		t.Fatal(err)
+	}
+	holder, err := p.Acquire(ctx)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer holder.Release()
+	holderTx, err := holder.Begin(ctx)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer holderTx.Rollback(context.Background())
+	var heldStage int
+	if err := holderTx.QueryRow(ctx, `SELECT cleanup_stage FROM projection_purges
+WHERE organization=$1 AND kind='generation' AND corpus_id='corpus' AND generation_id='generation' AND version_id='' FOR UPDATE`, org).Scan(&heldStage); err != nil {
+		t.Fatal(err)
+	}
+	started := make(chan struct{}, 1)
+	config := p.Config()
+	config.ConnConfig.Tracer = &purgeCancelTrace{started: started}
+	observed, err := pgxpool.NewWithConfig(ctx, config)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer observed.Close()
+	item := retrieval.PurgeItem{Kind: retrieval.PurgeGeneration, Organization: org, CorpusID: "corpus", GenerationID: "generation"}
+	callCtx, stop := context.WithCancel(ctx)
+	defer stop()
+	result := make(chan struct {
+		done bool
+		err  error
+	}, 1)
+	go func() {
+		done, err := (postgres.PurgeStore{Pool: observed}).RecordPurge(callCtx, item, 0, true, 1)
+		result <- struct {
+			done bool
+			err  error
+		}{done: done, err: err}
+	}()
+	select {
+	case <-started:
+		stop()
+	case <-ctx.Done():
+		t.Fatal(ctx.Err())
+	}
+	select {
+	case outcome := <-result:
+		if outcome.err == nil || outcome.done {
+			t.Fatalf("canceled purge returned done=%t err=%v", outcome.done, outcome.err)
+		}
+	case <-ctx.Done():
+		t.Fatal(ctx.Err())
+	}
+	var stage int
+	var cursor []byte
+	var unpurged bool
+	if err := p.QueryRow(ctx, `SELECT cleanup_stage,cleanup_cursor,purged_at IS NULL FROM projection_purges
+WHERE organization=$1 AND kind='generation' AND corpus_id='corpus' AND generation_id='generation' AND version_id=''`, org).Scan(&stage, &cursor, &unpurged); err != nil {
+		t.Fatal(err)
+	}
+	if stage != 0 || string(cursor) != "[]" || !unpurged {
+		t.Fatalf("canceled purge claimed progress: stage=%d cursor=%s unpurged=%t", stage, cursor, unpurged)
+	}
+}
+
+type purgeCancelTrace struct{ started chan<- struct{} }
+
+func (t *purgeCancelTrace) TraceQueryStart(ctx context.Context, _ *pgx.Conn, data pgx.TraceQueryStartData) context.Context {
+	if strings.Contains(data.SQL, "SELECT cleanup_stage,cleanup_cursor") {
+		select {
+		case t.started <- struct{}{}:
+		default:
+		}
+	}
+	return ctx
+}
+
+func (*purgeCancelTrace) TraceQueryEnd(context.Context, *pgx.Conn, pgx.TraceQueryEndData) {}

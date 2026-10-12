@@ -5,13 +5,17 @@ import (
 	"crypto/rand"
 	"encoding/hex"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"os"
 	"runtime"
+	"strings"
 	"testing"
 	"time"
 
+	"github.com/The-Vibe-Company/quivr/internal/retrieval"
 	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
@@ -206,6 +210,300 @@ SELECT 'example','segmentation-'||i,'current-'||i,'text',i::text FROM generate_s
 		}
 	}
 }
+
+// The lookup indexes are installation-wide contracts: the replacement
+// accepted-revision lookup must be present before its partial predecessor is
+// retired, and receipt/metadata/notice lookups must be usable by the queue and
+// cleanup owners. The plan owners below are the production backlog query, the
+// VersionActivity query, and the work-queue fallback subquery.
+func TestManagedLookupIndexesAndAcceptedRevisionReplacement(t *testing.T) {
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	defer cancel()
+	p := queueWorkPool(t, ctx)
+	if err := Migrate(ctx, p); err != nil {
+		t.Fatal(err)
+	}
+	if err := EnsureIndexes(ctx, p); err != nil {
+		t.Fatal(err)
+	}
+	want := map[string]string{
+		"projection_metadata_by_generation":   "CREATE INDEX projection_metadata_by_generation ON public.projection_metadata USING btree (organization, generation_id, version_id)",
+		"ingestion_receipts_by_version":       "CREATE INDEX ingestion_receipts_by_version ON public.ingestion_receipts USING btree (organization, version_id, accepted_at)",
+		"ingestion_receipts_pending_revision": "CREATE INDEX ingestion_receipts_pending_revision ON public.ingestion_receipts USING btree (organization, record_id, slot) WHERE (state = 'pending'::text)",
+		"evaluation_intents_decided_pair":     "CREATE INDEX evaluation_intents_decided_pair ON public.evaluation_intents USING btree (organization, subscription_version_id, record_version_id, sequence) WHERE ((kind = 'evaluation'::text) AND (state = 'done'::text) AND (outcome = ANY (ARRAY['matched'::text, 'duplicate'::text, 'no_match'::text, 'no_longer_matches'::text])))",
+		"accepted_revisions_version_lookup":   "CREATE INDEX accepted_revisions_version_lookup ON public.accepted_revisions USING btree (organization, version_id)",
+	}
+	for name, definition := range want {
+		var got string
+		var valid bool
+		if err := p.QueryRow(ctx, `SELECT i.indisvalid,pg_get_indexdef(i.indexrelid)
+FROM pg_index i WHERE i.indexrelid=to_regclass($1)`, name).Scan(&valid, &got); err != nil {
+			t.Fatalf("lookup index %s: %v", name, err)
+		}
+		if !valid || got != definition {
+			t.Fatalf("index %s: valid=%t definition=%q, want %q", name, valid, got, definition)
+		}
+	}
+	var retired bool
+	if err := p.QueryRow(ctx, `SELECT to_regclass('accepted_revisions_by_version') IS NOT NULL`).Scan(&retired); err != nil {
+		t.Fatal(err)
+	}
+	if retired {
+		t.Fatal("partial accepted-revision lookup was retained after its full replacement became valid")
+	}
+
+	// Exercise the real queue owner after the duplicate disappears. A tiny
+	// installation may choose a sequential plan, but the query must still read
+	// the accepted-revision join successfully with the replacement catalog.
+	if _, err := p.Exec(ctx, `INSERT INTO corpora(organization,id,request_key,canonical_request,name,retrieval)
+VALUES('index-owner','corpus','corpus','','Index owner','{}');
+INSERT INTO content_blobs(organization,blob_id,object_key,sha256,byte_length)
+VALUES('index-owner','blob','blob','blob',1);
+INSERT INTO records(organization,id,corpus_id,namespace,record_key,current_version_id,desired_version_id)
+VALUES('index-owner','record','corpus','source','record','version','version');
+INSERT INTO record_versions(organization,id,record_id,slot,digest,acceptance_order,source_position,text_blob_id,manifest_blob_id,provenance,baseline_ready,processing,enrichment_state)
+VALUES('index-owner','version','record','text','digest',1,'1','blob','blob','{}',true,'idle','idle');
+INSERT INTO accepted_revisions(organization,record_id,slot,digest,version_id,acceptance_order,source_position,command,accepted_at)
+VALUES('index-owner','record','text','digest','version',1,'1','{}',now());
+INSERT INTO ingestion_receipts(organization,id,request_key,canonical_request,command,corpus_id,record_id,acceptance_order,slot,digest,version_id,state,outcome,processing,accepted_at,work_queue)
+VALUES
+ ('index-owner','receipt-old','request-old','', '{}','corpus','record',1,'text','digest','version','resolved','created','idle',now()-interval '1 hour','live'),
+ ('index-owner','receipt-new','request-new','', '{}','corpus','record',2,'text','digest','version','resolved','created','idle',now(),'bulk');
+INSERT INTO records(organization,id,corpus_id,namespace,record_key)
+SELECT 'index-owner','bulk-record-'||i,'corpus','source',i::text FROM generate_series(1,10000) i;
+INSERT INTO accepted_revisions(organization,record_id,slot,digest,version_id,acceptance_order,source_position,command,accepted_at)
+SELECT 'index-owner','bulk-record-'||i,'text','bulk-digest-'||i,'bulk-version-'||i,i,i::text,'{}',now()
+FROM generate_series(1,10000) i;
+INSERT INTO ingestion_receipts(organization,id,request_key,canonical_request,command,corpus_id,record_id,acceptance_order,slot,digest,version_id,state,outcome,processing,accepted_at,work_queue)
+SELECT 'index-owner','bulk-receipt-'||i,'bulk-request-'||i,'','{}','corpus','bulk-record-'||i,i,'text','bulk-digest-'||i,'bulk-version-'||i,'resolved','created','idle',now(),'bulk'
+FROM generate_series(1,10000) i;
+INSERT INTO queue_document_attempts(organization,kind,work_id,document_id,token,lease_until)
+VALUES('index-owner','operation','missing-operation','version',1,now()+interval '1 hour');
+ANALYZE accepted_revisions;
+ANALYZE ingestion_receipts`); err != nil {
+		t.Fatal(err)
+	}
+	var queue string
+	if err := p.QueryRow(ctx, `SELECT work_queue FROM ingestion_receipts
+WHERE organization=$1 AND version_id=$2 ORDER BY accepted_at LIMIT 1`, "index-owner", "version").Scan(&queue); err != nil || queue != "live" {
+		t.Fatalf("earliest receipt queue=%q err=%v, want live", queue, err)
+	}
+	rows, err := p.Query(ctx, queueBacklogSQL())
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer rows.Close()
+	var queues int
+	for rows.Next() {
+		queues++
+	}
+	if err := rows.Err(); err != nil {
+		t.Fatal(err)
+	}
+	if queues != 2 {
+		t.Fatalf("backlog owner returned %d queues, want live and bulk", queues)
+	}
+	var backlogPlan []byte
+	if err := p.QueryRow(ctx, "EXPLAIN (ANALYZE, BUFFERS, FORMAT JSON) "+queueBacklogSQL()).Scan(&backlogPlan); err != nil {
+		t.Fatal(err)
+	}
+	if !planContainsRelation(t, backlogPlan, "accepted_revisions") {
+		t.Fatal("queue backlog owner did not execute an accepted-revision join")
+	}
+	var versionPlan []byte
+	// VersionActivity uses this exact activityColumns statement for its first
+	// accepted-revision lookup by Version id.
+	versionActivitySQL := activityColumns + ` WHERE a.organization=$1 AND a.version_id=$2 AND a.accepted_at IS NOT NULL AND NOT EXISTS(SELECT 1 FROM corpora c WHERE c.organization=r.organization AND c.id=r.corpus_id AND c.archived)`
+	if err := p.QueryRow(ctx, "EXPLAIN (ANALYZE, BUFFERS, FORMAT JSON) "+versionActivitySQL, "index-owner", "version").Scan(&versionPlan); err != nil {
+		t.Fatal(err)
+	}
+	if !planContainsIndex(t, versionPlan, "accepted_revisions_version_lookup") {
+		t.Fatal("version activity owner did not use the full accepted-revision lookup")
+	}
+	var fallbackPlan []byte
+	// This is the standalone form of the fallback subquery used by the
+	// evaluation and serving projection INSERT owners.
+	if err := p.QueryRow(ctx, `EXPLAIN (ANALYZE, BUFFERS, FORMAT JSON)
+
+SELECT work_queue FROM ingestion_receipts
+WHERE organization=$1 AND version_id=$2 ORDER BY accepted_at LIMIT 1`, "index-owner", "version").Scan(&fallbackPlan); err != nil {
+		t.Fatal(err)
+	}
+	if !planContainsIndex(t, fallbackPlan, "ingestion_receipts_by_version") {
+		t.Fatal("work-queue fallback did not use the receipt-by-version lookup")
+	}
+	if _, err := p.Exec(ctx, "CREATE INDEX CONCURRENTLY accepted_revisions_by_version ON accepted_revisions(version_id)"); err != nil {
+		t.Fatal(err)
+	}
+	if err := EnsureIndexes(ctx, p); err == nil || !errors.Is(err, ErrIndexConflict) {
+		t.Fatalf("incompatible retired index was not rejected: %v", err)
+	}
+	var conflictingDefinition string
+	if err := p.QueryRow(ctx, "SELECT pg_get_indexdef('accepted_revisions_by_version'::regclass)").Scan(&conflictingDefinition); err != nil {
+		t.Fatal(err)
+	}
+	if conflictingDefinition != "CREATE INDEX accepted_revisions_by_version ON public.accepted_revisions USING btree (version_id)" {
+		t.Fatalf("incompatible retired index changed: %s", conflictingDefinition)
+	}
+}
+
+func planContainsIndex(t *testing.T, raw []byte, name string) bool {
+	t.Helper()
+	var plans any
+	if err := json.Unmarshal(raw, &plans); err != nil {
+		t.Fatal(err)
+	}
+	var visit func(any) bool
+	visit = func(value any) bool {
+		switch node := value.(type) {
+		case map[string]any:
+			if node["Index Name"] == name {
+				return true
+			}
+			for _, child := range node {
+				if visit(child) {
+					return true
+				}
+			}
+		case []any:
+			for _, child := range node {
+				if visit(child) {
+					return true
+				}
+			}
+		}
+		return false
+	}
+	return visit(plans)
+}
+
+func planContainsRelation(t *testing.T, raw []byte, name string) bool {
+	t.Helper()
+	var plans any
+	if err := json.Unmarshal(raw, &plans); err != nil {
+		t.Fatal(err)
+	}
+	var visit func(any) bool
+	visit = func(value any) bool {
+		switch node := value.(type) {
+		case map[string]any:
+			if node["Relation Name"] == name {
+				return true
+			}
+			for _, child := range node {
+				if visit(child) {
+					return true
+				}
+			}
+		case []any:
+			for _, child := range node {
+				if visit(child) {
+					return true
+				}
+			}
+		}
+		return false
+	}
+	return visit(plans)
+}
+
+// Generation metadata discovery is a distinct work owner from compact
+// coverage. The trace is captured from RecordPurge itself, then explained in a
+// rollback transaction, so the assertion cannot drift to a hand-maintained
+// copy of the production statement.
+func TestGenerationMetadataPurgeWorkDoesNotGrowWithOtherGenerations(t *testing.T) {
+	ctx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
+	defer cancel()
+	var first int
+	for _, size := range []int{1000, 10000} {
+		pool := queueWorkPool(t, ctx)
+		if err := Migrate(ctx, pool); err != nil {
+			t.Fatal(err)
+		}
+		if err := EnsureIndexes(ctx, pool); err != nil {
+			t.Fatal(err)
+		}
+		if _, err := pool.Exec(ctx, `INSERT INTO projection_purges(organization,kind,corpus_id,generation_id,version_id)
+VALUES('metadata-work','generation','target','target-generation','')`); err != nil {
+			t.Fatal(err)
+		}
+		if _, err := pool.Exec(ctx, `INSERT INTO projection_metadata(organization,version_id,generation_id,data)
+VALUES('metadata-work','target-version','target-generation','{}')`); err != nil {
+			t.Fatal(err)
+		}
+		if _, err := pool.Exec(ctx, `INSERT INTO projection_metadata(organization,version_id,generation_id,data)
+SELECT 'metadata-work','other-version-'||i,'other-generation','{}' FROM generate_series(1,$1::int) i`, size); err != nil {
+			t.Fatal(err)
+		}
+		if _, err := pool.Exec(ctx, `ANALYZE projection_metadata`); err != nil {
+			t.Fatal(err)
+		}
+		trace := &purgeQueryTrace{}
+		config := pool.Config()
+		config.ConnConfig.Tracer = trace
+		observed, err := pgxpool.NewWithConfig(ctx, config)
+		if err != nil {
+			t.Fatal(err)
+		}
+		defer observed.Close()
+		item := retrieval.PurgeItem{Kind: retrieval.PurgeGeneration, Organization: "metadata-work", CorpusID: "target", GenerationID: "target-generation"}
+		if _, err := (PurgeStore{Pool: observed}).RecordPurge(ctx, item, 0, true, 1); err != nil {
+			t.Fatal(err)
+		}
+		var captured tracedPurgeQuery
+		for _, query := range trace.queries {
+			if strings.Contains(query.sql, "FROM projection_metadata pm") {
+				captured = query
+			}
+		}
+		if captured.sql == "" {
+			t.Fatal("RecordPurge did not issue the generation metadata query")
+		}
+		tx, err := pool.Begin(ctx)
+		if err != nil {
+			t.Fatal(err)
+		}
+		var raw []byte
+		explainArgs := make([]any, len(captured.args))
+		for i, arg := range captured.args {
+			if value, ok := arg.(string); ok {
+				explainArgs[i] = pgtype.Text{String: value, Valid: true}
+			} else {
+				explainArgs[i] = arg
+			}
+		}
+		if err := tx.QueryRow(ctx, "EXPLAIN (ANALYZE, BUFFERS, FORMAT JSON) "+captured.sql, explainArgs...).Scan(&raw); err != nil {
+			_ = tx.Rollback(ctx)
+			t.Fatal(err)
+		}
+		if err := tx.Rollback(ctx); err != nil {
+			t.Fatal(err)
+		}
+		blocks := queueWorkBlocks(t, raw)
+		t.Logf("other generations=%d: generation metadata purge buffers=%d", size, blocks)
+		if size == 1000 {
+			first = blocks
+		} else if blocks > 2*first+100 {
+			t.Fatalf("generation-selective metadata work grew with unrelated rows: buffers %d -> %d (bound %d)", first, blocks, 2*first+100)
+		}
+	}
+}
+
+type tracedPurgeQuery struct {
+	sql  string
+	args []any
+}
+
+type purgeQueryTrace struct {
+	queries []tracedPurgeQuery
+}
+
+func (t *purgeQueryTrace) TraceQueryStart(ctx context.Context, _ *pgx.Conn, data pgx.TraceQueryStartData) context.Context {
+	t.queries = append(t.queries, tracedPurgeQuery{sql: data.SQL, args: append([]any(nil), data.Args...)})
+	return ctx
+}
+
+func (*purgeQueryTrace) TraceQueryEnd(context.Context, *pgx.Conn, pgx.TraceQueryEndData) {}
 
 // queueWorkPool creates an isolated, empty database for queue tests, without
 // touching the adapter database.

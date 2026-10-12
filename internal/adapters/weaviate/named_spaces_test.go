@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"math"
-	"net/http"
 	"sort"
 	"strconv"
 	"testing"
@@ -57,7 +56,7 @@ func TestNamedSpacesLiveBesideAGenerationBuiltBefore(t *testing.T) {
 		properties = append(properties, map[string]any{"name": name, "dataType": []string{"text"}, "tokenization": "word", "indexSearchable": true})
 	}
 	schema, _ := json.Marshal(map[string]any{"class": collection, "properties": properties, "vectorConfig": map[string]any{"semantic_text_v1": map[string]any{"vectorizer": map[string]any{"none": nil}, "vectorIndexType": "hnsw", "vectorIndexConfig": map[string]any{"distance": "cosine"}}}})
-	res, err := http.Post(f.url+"/v1/schema", "application/json", bytes.NewReader(schema))
+	res, err := f.store.Client.Post(f.url+"/v1/schema", "application/json", bytes.NewReader(schema))
 	if err != nil || res.StatusCode != 200 {
 		t.Fatalf("create the legacy collection: %v %v", res, err)
 	}
@@ -130,7 +129,7 @@ func TestNamedSpacesLiveBesideAGenerationBuiltBefore(t *testing.T) {
 		Properties map[string]any `json:"properties"`
 	}
 	where, _ := json.Marshal(map[string]any{"query": `{Get{` + collection + `(where:{path:["segmentId"],operator:Equal,valueText:"both"}){body lexicalText generationId}}}`})
-	res, err = http.Post(f.url+"/v1/graphql", "application/json", bytes.NewReader(where))
+	res, err = f.store.Client.Post(f.url+"/v1/graphql", "application/json", bytes.NewReader(where))
 	if err != nil {
 		t.Fatal(err)
 	}

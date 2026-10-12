@@ -72,13 +72,14 @@ func TestPersistedProjectionAcrossWeaviateUpgrade(t *testing.T) {
 		}
 		read(snapshotPath, &snapshot)
 		var config struct {
-			WeaviateURL string `json:"weaviate_url"`
+			WeaviateURL    string `json:"weaviate_url"`
+			WeaviateAPIKey string `json:"weaviate_api_key"`
 		}
 		read(os.Getenv("QUIVR_ADAPTER_CONFIG"), &config)
 		if snapshot.Generation.Collection == "" || len(snapshot.Objects) != 2 || config.WeaviateURL == "" {
 			t.Fatal("incomplete persisted upgrade fixture")
 		}
-		f = &attachFixture{t: t, ctx: ctx, url: config.WeaviateURL, store: weaviate.New(config.WeaviateURL), gen: snapshot.Generation, org: snapshot.Organization, corpusID: snapshot.CorpusID}
+		f = &attachFixture{t: t, ctx: ctx, url: config.WeaviateURL, apiKey: config.WeaviateAPIKey, store: weaviate.New(config.WeaviateURL, config.WeaviateAPIKey), gen: snapshot.Generation, org: snapshot.Organization, corpusID: snapshot.CorpusID}
 	}
 	for id, want := range snapshot.Objects {
 		if got := f.objects(f.gen, id); !reflect.DeepEqual(got, want) {
