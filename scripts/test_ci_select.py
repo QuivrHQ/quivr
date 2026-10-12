@@ -204,7 +204,7 @@ class Workflow(unittest.TestCase):
                 'elif args == ["api", "repos/example/repo/actions/workflows/verify.yml/runs?event=pull_request&head_sha=head-sha&per_page=100"]:',
                 '    print(pathlib.Path(os.environ["FIXTURE_RUNS"]).read_text())',
                 'else:',
-                '    assert args in [["run", "cancel", "21"], ["run", "watch", "21", "--interval", "1"],',
+                '    assert args in [["run", "cancel", "21", "--repo", "example/repo"], ["run", "watch", "21", "--interval", "1", "--repo", "example/repo"],',
                 '                    ["api", "--method", "POST", "repos/example/repo/actions/runs/21/rerun"]], args',
             ]) + '\n')
             gh.chmod(0o755)
@@ -234,7 +234,7 @@ class Workflow(unittest.TestCase):
                     expected = [['api', 'repos/example/repo/pulls/7'],
                                 ['api', 'repos/example/repo/actions/workflows/verify.yml/runs?event=pull_request&head_sha=head-sha&per_page=100']]
                     if status != 'completed':
-                        expected += [['run', 'cancel', '21'], ['run', 'watch', '21', '--interval', '1']]
+                        expected += [['run', 'cancel', '21', '--repo', 'example/repo'], ['run', 'watch', '21', '--interval', '1', '--repo', 'example/repo']]
                     expected += [['api', '--method', 'POST', 'repos/example/repo/actions/runs/21/rerun']]
                     self.assertEqual(emitted, expected)
             runs.write_text(json.dumps({'workflow_runs': []}))

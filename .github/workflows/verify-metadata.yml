@@ -36,8 +36,8 @@ jobs:
           "$RUNNER_TEMP/runs.json" > "$RUNNER_TEMP/run.json"
         run=$(jq -er '.id' "$RUNNER_TEMP/run.json")
         if ! jq -e '.status == "completed"' "$RUNNER_TEMP/run.json" > /dev/null; then
-          gh run cancel "$run"
-          gh run watch "$run" --interval 1
+          gh run cancel "$run" --repo "$GITHUB_REPOSITORY"
+          gh run watch "$run" --interval 1 --repo "$GITHUB_REPOSITORY"
         fi
         # Dispatch jobs do not satisfy PR checks; rerun the actual PR event instead.
         gh api --method POST "repos/$GITHUB_REPOSITORY/actions/runs/$run/rerun"
