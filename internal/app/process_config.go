@@ -73,7 +73,7 @@ func (cfg *Config) configureProcess(command string) (time.Duration, error) {
 }
 
 func (cfg Config) logSecrets() []string {
-	secrets := []string{cfg.CursorKey, cfg.CredentialKey, cfg.DatabaseURL, cfg.S3.AccessKey, cfg.S3.SecretKey}
+	secrets := []string{cfg.WeaviateAPIKey, cfg.CursorKey, cfg.CredentialKey, cfg.DatabaseURL, cfg.S3.AccessKey, cfg.S3.SecretKey}
 	for _, value := range cfg.Telemetry.Headers {
 		secrets = append(secrets, value)
 	}

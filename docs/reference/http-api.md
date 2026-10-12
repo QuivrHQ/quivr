@@ -1069,7 +1069,7 @@ Dry run of a proposed Subscription. Runs the evaluator on the most recently acce
 
 Operation `listMatches`. Requires `monitoring:read`.
 
-Authorized historical Matches for a Subscription. Stable keyset page cursor, not a Change Cursor. Absence of a Match does not distinguish an evaluator still working from a negative result.
+Authorized historical Matches for a Subscription. Stable keyset page cursor, not a Change Cursor. Absence of a Match does not distinguish an evaluator still working from a negative result. A page containing evidence reclaimed by history_retention.alert_detail returns 410 evidence_expired, retryable=false, with resync_url to explicitly resume after the expired Match. Resuming accepts a lost history interval; export evidence before retention expires if needed. Successful pages retain the original evidence and response shape.
 
 **Parameters**
 
@@ -1090,7 +1090,7 @@ Authorized historical Matches for a Subscription. Stable keyset page cursor, not
 
 Operation `getMatch`. Requires `monitoring:read`.
 
-Authorized historical positive result, explanation and provenance. Recheck current access to Subscription and content; disabled state alone does not erase history. Historical content retention remains separate from search eligibility.
+Authorized historical positive result, explanation and provenance. Recheck current access to Subscription and content; disabled state alone does not erase history. Historical content retention remains separate from search eligibility. After history_retention.alert_detail reclaims evidence, this read returns 410 evidence_expired, retryable=false. Retained identity facts still prevent duplicate alerts and link corrections. Successful reads return the original immutable evidence with the existing response shape.
 
 **Parameters**
 
@@ -2401,6 +2401,16 @@ Example `metadata_filter_too_broad`:
 {
   "code": "filter_too_broad",
   "message": "metadata filter exceeds the bounded read budget; narrow the metadata or acceptance-time range",
+  "retryable": false
+}
+```
+
+Example `expired_match_evidence`:
+
+```json
+{
+  "code": "evidence_expired",
+  "message": "evidence expired",
   "retryable": false
 }
 ```
@@ -9653,7 +9663,7 @@ description: What a proposed Subscription would have matched among recent Record
 
 ### `MatchEvidence`
 
-Immutable evidence for a positive result, including evaluator version/configuration. Details are plugin-defined, bounded to 16 KiB and schema-validated by its adapter; core checks referenced Parts. Access is rechecked on reads.
+Immutable evidence for a positive result, including evaluator version/configuration. History retention may expire the entire evidence payload; historical reads then return 410 evidence_expired rather than a successful response with modified evidence. Details are plugin-defined, bounded to 16 KiB and schema-validated by its adapter; core checks referenced Parts. Access is rechecked on reads.
 
 | Field | Type | Required | Description |
 | --- | --- | --- | --- |
@@ -9686,7 +9696,7 @@ properties:
 required:
   - evaluator
   - explanation
-description: Immutable evidence for a positive result, including evaluator version/configuration. Details are plugin-defined, bounded to 16 KiB and schema-validated by its adapter; core checks referenced Parts. Access is rechecked on reads.
+description: Immutable evidence for a positive result, including evaluator version/configuration. History retention may expire the entire evidence payload; historical reads then return 410 evidence_expired rather than a successful response with modified evidence. Details are plugin-defined, bounded to 16 KiB and schema-validated by its adapter; core checks referenced Parts. Access is rechecked on reads.
 ```
 
 </details>

@@ -87,6 +87,8 @@ For a browser UI over the same API, run `make demo` and open http://127.0.0.1:51
 
 ## What works today
 
+- [Run the vector index on a dedicated host](https://docs.quivr.thevibecompany.co/run-quivr/dedicated-vector-host) with authenticated HTTPS, a persistent data disk, and an idempotent Azure CLI provisioning example.
+
 - [Reset and reload an installation](https://docs.quivr.thevibecompany.co/run-quivr/reset-and-reload) from private JSON declarations, with a preview and idempotent public API replay.
 
 - [Choose an embedding model](https://docs.quivr.thevibecompany.co/run-quivr/choose-an-embedding-model) for local inference, your own model server or a hosted API, with rebuild requirements and execution-only tuning. [Run a large import](https://docs.quivr.thevibecompany.co/run-quivr/run-a-large-import) covers bulk workers, provider capacity, database sizing and queue monitoring.
@@ -105,6 +107,10 @@ For a browser UI over the same API, run `make demo` and open http://127.0.0.1:51
 - **Release images and build identity.** Release-please manages alpha release PRs, versions and changelogs. Publishing a release builds signed engine and first-party plugin images on GHCR, with signed SPDX inventories and vulnerability scans. `quivr --version`, `GET /v0/version`, startup logs and process metrics report the build. See [Deploy and configure Quivr](https://docs.quivr.thevibecompany.co/run-quivr/deploy) and [release security](https://docs.quivr.thevibecompany.co/run-quivr/security).
 - **Declarative conformance cases**: contribute generic requirements and measure them locally with
   `make conformance`; [case format and reports](conformance/README.md). CI never executes cases.
+
+- **Authenticated vector indexes**: optional `weaviate_api_key` sends a bearer key
+  on every index request; use HTTPS for an external index. See
+  [configuration](docs-site/reference/configuration.mdx).
 
 - **Outgoing TLS** for Temporal, Weaviate, PostgreSQL, S3 and plugins, with verified
   certificates and configurable trust. Incoming HTTPS terminates at your platform;

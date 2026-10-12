@@ -9,6 +9,7 @@ from pathlib import Path
 import re
 import sys
 import shlex
+import subprocess
 from decimal import Decimal
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -36,6 +37,10 @@ AUTOSCALER_KEYS = {
 }
 KEYS = {'postgres': POSTGRES_KEYS, 'weaviate': WEAVIATE_KEYS, 'autoscaler': AUTOSCALER_KEYS,
         'api': set(), 'worker': set(), 'worker-bulk': set()}
+VECTOR_HOST_AUTH = {'AUTHENTICATION_ANONYMOUS_ACCESS_ENABLED': 'false',
+    'AUTHENTICATION_APIKEY_ENABLED': 'true', 'AUTHENTICATION_APIKEY_USERS': 'quivr-engine',
+    'AUTHORIZATION_ADMINLIST_ENABLED': 'true', 'AUTHORIZATION_ADMINLIST_USERS': 'quivr-engine',
+    'AUTHORIZATION_RBAC_ENABLED': 'false'}
 
 
 def merge(original, override):
@@ -206,6 +211,55 @@ def report(rows):
     status = 'drift' if any(row['status'] == 'drift' for row in rows) else (
         'unknown' if any(row['status'] == 'unknown' for row in rows) else 'match')
     return {'status': status, 'observations': rows}
+
+
+def external_vector_report(spec, target=''):
+    """External indexes have their own observer; a local replica proves nothing."""
+    expected = dict(spec['environment'])
+    expected.update(VECTOR_HOST_AUTH)
+    expected['image'] = spec['image']
+    expected.update(spec['deploy']['resources']['limits'])
+    budget = spec.get('x-quivr-storage-budget-bytes')
+    if budget:
+        expected['minimum_bytes'] = budget
+    observed = {}
+    disk_uuid = None
+    if target:
+        if not re.fullmatch(r'(?:[A-Za-z0-9_.-]+@)?[A-Za-z0-9][A-Za-z0-9.-]*', target):
+            raise ValueError('invalid SSH target')
+        try:
+            result = subprocess.run(['ssh', '-o', 'BatchMode=yes', '-o', 'ConnectTimeout=10', target,
+                'sudo python3 /opt/quivr-vector-host/deploy/vector-host/host.py check'],
+                capture_output=True, text=True, timeout=45)
+            # Exit 1/2 represent drift/unknown and still carry useful evidence.
+            if result.returncode in (0, 1, 2):
+                response = json.loads(result.stdout)
+                observed = {row['setting']: row['observed'] for row in response['observations']
+                            if row.get('service') == 'weaviate' and row.get('scope') in ('vector_host', 'filesystem_capacity')}
+                disk_uuid = next((row for row in response['observations']
+                                  if row.get('service') == 'weaviate' and row.get('setting') == 'mounted_uuid'), None)
+        except (OSError, subprocess.TimeoutExpired, ValueError, KeyError, TypeError):
+            pass
+    rows = []
+    for name, value in expected.items():
+        actual = observed.get(name)
+        if name == 'image':
+            actual = actual if isinstance(actual, str) and re.fullmatch(r'[a-zA-Z0-9./:_-]+@sha256:[0-9a-f]{64}', actual) else None
+        elif name in ('memory', 'cpus', 'minimum_bytes'):
+            actual = str(actual) if isinstance(actual, (str, int, float)) and re.fullmatch(r'[0-9]+(?:\.[0-9]+)?', str(actual)) else None
+        elif name in VECTOR_HOST_AUTH:
+            actual = actual if actual in ('true', 'false', 'quivr-engine') else None
+        else:
+            actual = safe_environment(name, actual)
+        observation(rows, 'weaviate', 'vector_host', name, value, actual)
+        if name == 'minimum_bytes' and actual is not None:
+            rows[-1]['status'] = 'match' if int(actual) >= int(value) else 'drift'
+    if target:
+        def valid_uuid(value):
+            return value if isinstance(value, str) and re.fullmatch(r'[0-9a-fA-F-]{36}', value) else None
+        observation(rows, 'weaviate', 'vector_host', 'mounted_uuid',
+                    valid_uuid((disk_uuid or {}).get('expected')), valid_uuid((disk_uuid or {}).get('observed')))
+    return report(rows)
 
 
 def observed_resources(lines):

@@ -470,7 +470,8 @@ func TestBackfillScopeCheckpointAndControl(t *testing.T) {
 			t.Fatalf("a Version outside the window is a candidate: %s", c.VersionID)
 		}
 	}
-	if err = store.SkipBackfill(ctx, f.org, op.ID, next[0].VersionID, backfill.SkipSegmentationDiffers); err != nil {
+	skippedVersion := next[0].VersionID
+	if err = store.SkipBackfill(ctx, f.org, op.ID, skippedVersion, backfill.SkipSegmentationDiffers); err != nil {
 		t.Fatal(err)
 	}
 
@@ -540,8 +541,8 @@ func TestBackfillScopeCheckpointAndControl(t *testing.T) {
 		t.Fatal(err)
 	}
 	left, err := store.BackfillCandidates(ctx, f.org, other.ID, promoted, 10)
-	if err != nil || len(left) != 2 || (left[0].VersionID != f.versions[0] && left[1].VersionID != f.versions[0]) {
-		t.Fatalf("candidates after a promotion %+v %v, want %s and the skipped one", left, err, f.versions[0])
+	if err != nil || len(left) != 2 || !((left[0].VersionID == f.versions[0] && left[1].VersionID == skippedVersion) || (left[1].VersionID == f.versions[0] && left[0].VersionID == skippedVersion)) {
+		t.Fatalf("candidates after a promotion %+v %v, want %s and skipped %s exactly once", left, err, f.versions[0], skippedVersion)
 	}
 	if _, err = store.PauseOperation(ctx, f.org, other.ID); err != nil {
 		t.Fatal(err)

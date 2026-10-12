@@ -17,6 +17,7 @@ func (s EvaluationStore) dispatchPrefix(ctx context.Context, org string, limit i
 	defer tx.Rollback(ctx)
 	var position int64
 	var after string
+	var observedRecords []string
 	if err = tx.QueryRow(ctx, `SELECT position,subscription_after FROM monitoring_checkpoints WHERE organization=$1 FOR UPDATE`, org).Scan(&position, &after); err != nil {
 		return 0, false, err
 	}
@@ -74,7 +75,7 @@ func (s EvaluationStore) dispatchPrefix(ctx context.Context, org string, limit i
  INSERT INTO evaluation_intents(organization,subscription_version_id,sequence,subscription_id,corpus_id,record_id,record_version_id,kind,trace_context)
  SELECT $1,t.subscription_version_id,t.sequence,t.subscription_id,t.corpus_id,t.resource_id,t.record_version_id,t.kind,t.trace_context
  FROM targets t JOIN selected s ON s.sequence=t.sequence
- ORDER BY t.sequence,t.subscription_id ON CONFLICT DO NOTHING
+ ORDER BY t.sequence,t.subscription_id ON CONFLICT DO NOTHING RETURNING record_id
 ), progress AS (
  SELECT count(*)::int AS processed,max(sequence) AS last_sequence,(SELECT count(*) FROM events) AS considered,
  (SELECT first_sequence FROM oversized) AS oversized FROM selected
@@ -86,12 +87,19 @@ func (s EvaluationStore) dispatchPrefix(ctx context.Context, org string, limit i
  AND (p.processed>0 OR (p.considered=0 AND $2<h.last_sequence))
 )
 SELECT CASE WHEN p.processed>0 THEN p.processed WHEN p.considered=0 AND $2<h.last_sequence THEN 1 ELSE 0 END,
- p.considered>0 AND p.processed=0 FROM progress p CROSS JOIN head h`, org, position, limit, s.page()).Scan(&processed, &paged)
+ p.considered>0 AND p.processed=0,(SELECT array_agg(DISTINCT record_id) FROM intents) FROM progress p CROSS JOIN head h`, org, position, limit, s.page()).Scan(&processed, &paged, &observedRecords)
 	if err != nil {
 		return 0, false, err
 	}
 	if paged {
 		return 0, true, nil
+	}
+	orgs := make([]string, len(observedRecords))
+	for i := range orgs {
+		orgs[i] = org
+	}
+	if err = observeQueueRecords(ctx, tx, orgs, observedRecords); err != nil {
+		return 0, false, err
 	}
 	if err = tx.Commit(ctx); err != nil {
 		return 0, false, err

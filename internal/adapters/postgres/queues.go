@@ -187,76 +187,10 @@ WHERE organization=$1 AND kind=$2 AND work_id=$3 AND document_id=$4 AND token=$5
 }
 
 func queueBacklogSQL() string {
-	// Operations have no source queue because administrative work is always
-	// bulk. Version class comes from its receipt rather than a Version column.
-	// Rebuild/backfill scope is estimated from durable operation counters; overlap
-	// with other operations/stages is intentionally not deduplicated.
-	return `WITH enrichment_versions AS MATERIALIZED (
- SELECT organization,version_id FROM queue_enrichment_records WHERE pending
-), ingestion_work AS MATERIALIZED (
- SELECT CASE WHEN rc.work_queue='bulk' THEN 'bulk' ELSE 'live' END AS queue,
-        rc.organization,COALESCE(NULLIF(rc.version_id,''),ar.version_id,rc.id) AS document_id,
-        COALESCE(LEAST(rc.accepted_at,ar.accepted_at),rc.accepted_at,ar.accepted_at) AS admitted_at,false AS active
- FROM ingestion_receipts rc
- JOIN records r ON (r.organization,r.id)=(rc.organization,rc.record_id)
- LEFT JOIN accepted_revisions ar ON (ar.organization,ar.record_id,ar.slot)=(rc.organization,rc.record_id,rc.slot)
- WHERE rc.route_family='ingestion' AND rc.state='pending'
-   AND NOT (r.withdrawn OR EXISTS(SELECT 1 FROM tombstones t WHERE t.organization=r.organization AND t.record_id=r.id))
- UNION ALL
- SELECT CASE WHEN rc.work_queue='bulk' THEN 'bulk' ELSE 'live' END,
-        v.organization,v.id,COALESCE(LEAST(rc.accepted_at,ar.accepted_at),rc.accepted_at,ar.accepted_at),false
- FROM record_versions v
- JOIN records r ON (r.organization,r.id)=(v.organization,v.record_id)
- JOIN accepted_revisions ar ON (ar.organization,ar.record_id,ar.slot)=(v.organization,v.record_id,v.slot)
- LEFT JOIN ingestion_receipts rc ON (rc.organization,rc.record_id,rc.acceptance_order)=(v.organization,v.record_id,v.acceptance_order)
- WHERE NOT (r.withdrawn OR EXISTS(SELECT 1 FROM tombstones t WHERE t.organization=r.organization AND t.record_id=r.id))
-   AND NOT v.baseline_ready AND NOT v.quarantined AND v.processing IN ('queued','running','retrying')
-), work AS (
- SELECT * FROM ingestion_work
- UNION ALL
- SELECT CASE WHEN rc.work_queue='bulk' THEN 'bulk' ELSE 'live' END,
-        v.organization,v.id,COALESCE(LEAST(rc.accepted_at,ar.accepted_at),rc.accepted_at,ar.accepted_at),false
- FROM enrichment_versions ev
- JOIN record_versions v ON (v.organization,v.id)=(ev.organization,ev.version_id)
- JOIN records r ON (r.organization,r.id)=(v.organization,v.record_id)
- JOIN accepted_revisions ar ON (ar.organization,ar.record_id,ar.slot)=(v.organization,v.record_id,v.slot)
- LEFT JOIN ingestion_receipts rc ON (rc.organization,rc.record_id,rc.acceptance_order)=(v.organization,v.record_id,v.acceptance_order)
- WHERE v.baseline_ready AND r.current_version_id=v.id AND NOT v.quarantined
-   AND v.enrichment_state IN ('queued','running','retrying')
-   AND NOT (r.withdrawn OR EXISTS(SELECT 1 FROM tombstones t WHERE t.organization=r.organization AND t.record_id=r.id))
- UNION ALL
- SELECT CASE WHEN e.work_queue='bulk' THEN 'bulk' ELSE 'live' END,
-        e.organization,e.version_id,e.created_at,false
- FROM ingestion_evaluations e
- JOIN record_versions v ON (v.organization,v.id)=(e.organization,e.version_id)
- JOIN records r ON (r.organization,r.id)=(v.organization,v.record_id)
- WHERE e.state='queued'
-   AND NOT (r.withdrawn OR EXISTS(SELECT 1 FROM tombstones t WHERE t.organization=r.organization AND t.record_id=r.id))
- UNION ALL
- SELECT CASE WHEN sp.work_queue='bulk' THEN 'bulk' ELSE 'live' END,
-        sp.organization,sp.version_id,sp.created_at,false
- FROM serving_projections sp
- JOIN record_versions v ON (v.organization,v.id)=(sp.organization,sp.version_id)
- JOIN records r ON (r.organization,r.id)=(v.organization,v.record_id)
- WHERE sp.state='queued'
-   AND NOT (r.withdrawn OR EXISTS(SELECT 1 FROM tombstones t WHERE t.organization=r.organization AND t.record_id=r.id))
- UNION ALL
- SELECT 'live',
-        i.organization,i.record_version_id,i.available_at,false
- FROM evaluation_intents i
- JOIN record_versions v ON (v.organization,v.id)=(i.organization,i.record_version_id)
- JOIN records r ON (r.organization,r.id)=(v.organization,v.record_id)
- WHERE i.kind='evaluation' AND i.state='pending' AND i.available_at<=statement_timestamp()
-   AND NOT (r.withdrawn OR EXISTS(SELECT 1 FROM tombstones t WHERE t.organization=r.organization AND t.record_id=r.id))
- UNION ALL
- SELECT 'bulk',o.organization,qi.version_id,o.created_at,false
- FROM operations o
- JOIN quarantine_reprocess_items qi ON (qi.organization,qi.operation_id)=(o.organization,o.id)
- JOIN records r ON (r.organization,r.id)=(qi.organization,qi.record_id)
- WHERE o.kind='quarantine_reprocess' AND o.state IN ('queued','running')
-   AND qi.phase IN ('pending','renormalizing','released')
-   AND NOT (r.withdrawn OR EXISTS(SELECT 1 FROM tombstones t WHERE t.organization=r.organization AND t.record_id=r.id))
-), active_attempts AS (
+	// Publication sees counters, leases and arrivals in one statement snapshot.
+	// Only the execution-sized attempt set is enumerated; waiting documents are
+	// point-read for active exclusions and the oldest indexed admission.
+	return `WITH active_attempts AS MATERIALIZED (
  SELECT CASE
           WHEN a.kind='alert' THEN 'live'
           WHEN a.kind IN ('bulk','rebuild','retrieval_configuration','backfill','quarantine_reprocess','operation')
@@ -264,7 +198,7 @@ func queueBacklogSQL() string {
           WHEN COALESCE(rc.work_queue,ie.work_queue,sp.work_queue)='bulk' THEN 'bulk'
           ELSE 'live'
         END AS queue,
-        a.organization,a.document_id,clock_timestamp() AS admitted_at,true AS active,op.id AS operation_id,
+        a.organization,a.document_id,statement_timestamp() AS admitted_at,true AS active,op.id AS operation_id,
         (a.kind='ingestion' AND op.id IS NULL AND (rc.state='pending' OR (NOT av.baseline_ready AND av.processing IN ('queued','running','retrying')))) AS ingestion_active
  FROM queue_document_attempts a
  LEFT JOIN ingestion_receipts rc ON a.organization=rc.organization AND a.work_id=rc.id
@@ -274,7 +208,7 @@ func queueBacklogSQL() string {
  LEFT JOIN record_versions av ON (av.organization,av.id)=(a.organization,a.document_id)
  LEFT JOIN accepted_revisions aa ON (aa.organization,aa.version_id)=(a.organization,a.document_id)
  LEFT JOIN records dr ON dr.organization=a.organization AND dr.id=COALESCE(av.record_id,aa.record_id,rc.record_id,ie.record_id,sp.record_id)
- WHERE a.lease_until>clock_timestamp()
+ WHERE a.lease_until>statement_timestamp()
    AND (a.kind<>'ingestion' OR rc.id IS NULL OR rc.state='pending'
         OR av.id IS NULL
         OR (NOT av.baseline_ready AND av.processing IN ('queued','running','retrying'))
@@ -284,18 +218,28 @@ func queueBacklogSQL() string {
    AND (a.kind NOT IN ('operation','rebuild','retrieval_configuration','backfill','quarantine_reprocess') OR op.id IS NULL OR op.state IN ('queued','running'))
    AND (a.kind<>'alert' OR EXISTS(SELECT 1 FROM evaluation_intents ai WHERE ai.organization=a.organization AND ai.record_version_id=a.document_id AND ai.kind='evaluation' AND ai.state='pending' AND ai.available_at<=statement_timestamp()))
    AND (dr.id IS NULL OR (NOT dr.withdrawn AND NOT EXISTS(SELECT 1 FROM tombstones dt WHERE dt.organization=dr.organization AND dt.record_id=dr.id)))
-), documents AS (
- SELECT queue,organization,document_id,min(admitted_at) AS admitted_at,bool_or(active) AS active
- FROM (SELECT * FROM work UNION ALL SELECT queue,organization,document_id,admitted_at,active FROM active_attempts) all_work
- WHERE document_id<>''
- GROUP BY queue,organization,document_id
+), active_documents AS MATERIALIZED (
+ SELECT queue,organization,document_id,bool_or(ingestion_active) AS ingestion_active
+ FROM active_attempts WHERE document_id<>'' GROUP BY queue,organization,document_id
+), active_totals AS (
+ SELECT a.queue,count(*) AS active,count(*) FILTER(WHERE d.ready) AS pending,
+ count(*) FILTER(WHERE d.ready AND d.ingestion AND a.ingestion_active) AS ingestion_pending
+ FROM active_documents a LEFT JOIN queue_backlog_documents d
+ ON (d.organization,d.queue,d.document_id)=(a.organization,a.queue,a.document_id)
+ GROUP BY a.queue
+), pending_totals AS (
+ SELECT queue,sum(pending)::bigint AS pending,sum(ingestion_pending)::bigint AS ingestion_pending
+ FROM queue_backlog_totals GROUP BY queue
 ), operation_work AS (
  SELECT o.created_at,
- GREATEST(0,COALESCE((o.counters->>'versions_in_scope')::bigint,(b.estimate->>'versions')::bigint,0)
+ CASE WHEN o.kind IN ('projection_rebuild','retrieval_configuration') AND NOT o.counters ? 'versions_in_scope'
+ THEN GREATEST(1,COALESCE(scope.seen,0)-COALESCE(a.active,0))
+ ELSE GREATEST(0,COALESCE((o.counters->>'versions_in_scope')::bigint,(b.estimate->>'versions')::bigint,0)
    - CASE WHEN o.kind='backfill' THEN COALESCE((o.counters->>'versions_done')::bigint,0)+COALESCE((o.counters->>'versions_skipped')::bigint,0)
           ELSE COALESCE((o.counters->>'versions_covered')::bigint,0)+COALESCE((o.counters->>'versions_quarantined')::bigint,0) END
-   - COALESCE(a.active,0)) AS waiting
+   - COALESCE(a.active,0)) END AS waiting
  FROM operations o
+ LEFT JOIN queue_operation_scope_progress scope ON (scope.organization,scope.operation_id)=(o.organization,o.id)
  LEFT JOIN backfills b ON (b.organization,b.operation_id)=(o.organization,o.id)
  LEFT JOIN (
   SELECT organization,operation_id,count(DISTINCT document_id) AS active FROM active_attempts
@@ -307,22 +251,17 @@ func queueBacklogSQL() string {
  FROM operation_work
 ), queues(queue) AS (VALUES ('live'::text),('bulk'::text))
 SELECT q.queue,
-       (count(d.document_id) FILTER (WHERE NOT COALESCE(d.active,false))
-        + CASE WHEN q.queue='bulk' THEN ot.waiting ELSE 0 END)::bigint,
-       count(d.document_id) FILTER (WHERE COALESCE(d.active,false))::bigint,
-       GREATEST(0,CASE WHEN q.queue='bulk' THEN COALESCE(EXTRACT(EPOCH FROM statement_timestamp()-ot.oldest),0) ELSE 0 END,
-                COALESCE(MAX(EXTRACT(EPOCH FROM statement_timestamp()-d.admitted_at))
-                    FILTER (WHERE NOT COALESCE(d.active,false)),0))::double precision,
-       (SELECT count(*) FROM (
-          SELECT iw.organization,iw.document_id FROM ingestion_work iw
-          WHERE iw.queue=q.queue AND iw.document_id<>''
-            AND NOT EXISTS(SELECT 1 FROM active_attempts a
-              WHERE a.queue=iw.queue AND a.organization=iw.organization
-                AND a.document_id=iw.document_id AND a.ingestion_active)
-          GROUP BY iw.organization,iw.document_id
-        ) pending_ingestion)::bigint
-FROM queues q CROSS JOIN operation_totals ot
-LEFT JOIN documents d ON d.queue=q.queue
-GROUP BY q.queue,ot.waiting,ot.oldest
+       (t.pending-coalesce(a.pending,0)+CASE WHEN q.queue='bulk' THEN ot.waiting ELSE 0 END)::bigint,
+       coalesce(a.active,0)::bigint,
+       greatest(0,coalesce(extract(epoch FROM statement_timestamp()-oldest.admitted_at),0),
+        CASE WHEN q.queue='bulk' THEN coalesce(extract(epoch FROM statement_timestamp()-ot.oldest),0) ELSE 0 END)::double precision,
+       (t.ingestion_pending-coalesce(a.ingestion_pending,0))::bigint
+FROM queues q JOIN pending_totals t ON t.queue=q.queue CROSS JOIN operation_totals ot
+LEFT JOIN active_totals a ON a.queue=q.queue
+LEFT JOIN LATERAL (
+ SELECT d.admitted_at FROM queue_backlog_documents d WHERE d.queue=q.queue AND d.ready
+ AND NOT EXISTS(SELECT FROM active_documents a WHERE (a.queue,a.organization,a.document_id)=(d.queue,d.organization,d.document_id))
+ ORDER BY d.admitted_at,d.organization,d.document_id LIMIT 1
+) oldest ON true
 ORDER BY CASE q.queue WHEN 'live' THEN 0 ELSE 1 END`
 }

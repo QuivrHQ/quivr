@@ -66,6 +66,7 @@ var (
 	DryRunRequired                   = declare("dry_run_required", ConflictClass, false)
 	EntryTooLarge                    = declare("entry_too_large", TooLargeClass, false)
 	EvaluatorError                   = declare("evaluator_error", BadGatewayClass, false)
+	EvidenceExpired                  = declare("evidence_expired", GoneClass, false)
 	EvaluatorUnavailable             = declare("evaluator_unavailable", UnavailableClass, true)
 	ExtensionNamespaceOwned          = declare("extension_namespace_owned", InvalidClass, false)
 	Forbidden                        = declare("forbidden", ForbiddenClass, false)

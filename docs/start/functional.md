@@ -19,6 +19,7 @@ What Quivr does, how to run it, and how to send it content to search and monitor
 - [Railway evaluation demo](../../deploy/railway/README.md): run a hosted single-node evaluation demo
 - [Scale bulk workers on Railway](../../deploy/railway/autoscaler/README.md): scale Railway bulk workers from queue backlog
 - [Switch hosted text embeddings with rollback](../../deploy/railway/hosted-embeddings.md): evaluate, fill and switch hosted text embeddings with rollback
+- [docs-site/run-quivr/dedicated-vector-host.mdx](../../docs-site/run-quivr/dedicated-vector-host.mdx): provision an authenticated index VM and rebuild it from stored content
 - [Quivr Search demo (THE-663)](../../quivr-search/README.md): the demo web app: search, sources, live feed and the admin view
 
 ## Reference

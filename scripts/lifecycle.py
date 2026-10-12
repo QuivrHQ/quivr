@@ -10,6 +10,7 @@ import json, os, subprocess, sys, time, urllib.error, urllib.request
 from pathlib import Path
 
 from deploy.reset_storage import s3_request
+from deploy.weaviate_client import WeaviateClient
 
 
 def _call(stack, method, path, body=None):
@@ -62,10 +63,9 @@ def verify(stack):
         'content': {'kind': 'text', 'text': 'The ferry timetable lists the morning crossing.'}})
     assert status == 202, receipt
     from deploy.reset_support import wait_until
-    index_url = json.loads((stack.directory / 'config.json').read_text())['weaviate_url']
+    index_client = WeaviateClient.from_config(json.loads((stack.directory / 'config.json').read_text()))
     def indexed():
-        with urllib.request.urlopen(index_url + '/v1/objects?limit=1', timeout=5) as response:
-            return len(json.load(response).get('objects') or [])
+        return len(index_client.request_json('/v1/objects?limit=1').get('objects') or [])
     wait_until(indexed, lambda count: count > 0, seconds=30)
     # The command owns this proof: no direct down(True) can bypass its guards.
     source = stack.directory / 'lifecycle-sources.json'

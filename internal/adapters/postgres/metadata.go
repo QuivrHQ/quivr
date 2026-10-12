@@ -57,7 +57,14 @@ func catalogMetadataDates(q content.RecordQuery, args *[]any, indexedDates bool)
 		return ""
 	}
 	conditions := metadataConditions(q, args, indexedDates)
-	return " AND EXISTS(SELECT 1 FROM projection_metadata pm WHERE pm.organization=records.organization AND pm.version_id=records.current_version_id AND (" + conditions + "))"
+	barrier := ""
+	if indexedDates {
+		// Keep catalog checks as point lookups. Without this boundary PostgreSQL
+		// can decorrelate EXISTS and evaluate a whole generation before reading
+		// even one bounded record window or candidate page.
+		barrier = " OFFSET 0"
+	}
+	return " AND EXISTS(SELECT 1 FROM projection_metadata pm WHERE pm.organization=records.organization AND pm.version_id=records.current_version_id AND (" + conditions + ")" + barrier + ")"
 }
 
 // metadataRouteConditions also serves aggregations that already join the
@@ -73,9 +80,20 @@ func metadataConditions(q content.RecordQuery, args *[]any, indexedDates bool) s
 		conditions := []string{"records.corpus_id=" + bind(route.CorpusID), "pm.generation_id=" + bind(route.GenerationID)}
 		for _, f := range route.Filters {
 			value := ""
+			epoch := ""
 			if f.Gte != "" || f.Lte != "" {
 				key := bind(f.Field)
 				value = "(pm.data -> " + key + "::text)"
+				if indexedDates {
+					// Publication already normalized scalar dates. Match the exact
+					// source value so arrays and invalid/missing dates still yield NULL.
+					// Unindexed sources retain the historical bootstrap read path.
+					epoch = `CASE WHEN pm.filter_indexed THEN (SELECT mv.date_epoch_ms
+ FROM projection_metadata_filter_values mv WHERE mv.organization=pm.organization
+ AND mv.version_id=pm.version_id AND mv.generation_id=pm.generation_id
+ AND mv.field=` + key + ` AND mv.value=` + value + `)
+ ELSE projection_metadata_filter_epoch(` + value + ` #>> '{}') END`
+				}
 			}
 			if len(f.AnyOf) > 0 {
 				equalities := []string{}
@@ -91,14 +109,14 @@ func metadataConditions(q content.RecordQuery, args *[]any, indexedDates bool) s
 			}
 			if f.Gte != "" {
 				if indexedDates {
-					conditions = append(conditions, "projection_metadata_filter_epoch("+value+" #>> '{}') >= projection_metadata_filter_epoch("+bind(f.Gte)+")")
+					conditions = append(conditions, epoch+" >= projection_metadata_filter_epoch("+bind(f.Gte)+")")
 				} else {
 					conditions = append(conditions, "("+value+" #>> '{}')::timestamptz >= "+bind(f.Gte)+"::timestamptz")
 				}
 			}
 			if f.Lte != "" {
 				if indexedDates {
-					conditions = append(conditions, "projection_metadata_filter_epoch("+value+" #>> '{}') <= projection_metadata_filter_epoch("+bind(f.Lte)+")")
+					conditions = append(conditions, epoch+" <= projection_metadata_filter_epoch("+bind(f.Lte)+")")
 				} else {
 					conditions = append(conditions, "("+value+" #>> '{}')::timestamptz <= "+bind(f.Lte)+"::timestamptz")
 				}

@@ -328,7 +328,10 @@ func settle(ctx context.Context, tx pgx.Tx, org, id, versionID, phase, code stri
 	if phase == quarantine.PhaseSkipped {
 		counters["skipped_"+code] = 1
 	}
-	return addCounters(ctx, tx, org, id, counters)
+	if err := addCounters(ctx, tx, org, id, counters); err != nil {
+		return err
+	}
+	return observeQueueVersion(ctx, tx, org, versionID)
 }
 
 // release lifts a Version's quarantine so its baseline runs like a new
@@ -339,7 +342,10 @@ func release(ctx context.Context, tx pgx.Tx, org, versionID, receiptID string) e
 		return err
 	}
 	_, err := tx.Exec(ctx, `UPDATE record_versions SET quarantined=false,quarantine=NULL,quarantine_stage=NULL,quarantined_at=NULL,processing='queued',error_code='' WHERE organization=$1 AND id=$2`, org, versionID)
-	return err
+	if err != nil {
+		return err
+	}
+	return observeQueueVersion(ctx, tx, org, versionID)
 }
 
 // StartReprocessItem takes and prepares the next pending item: see

@@ -14,6 +14,8 @@ import (
 	"github.com/The-Vibe-Company/quivr/internal/monitoring"
 	"github.com/The-Vibe-Company/quivr/internal/plugins/devhost/fakeplugin"
 	"github.com/The-Vibe-Company/quivr/internal/workqueue"
+	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgconn"
 )
 
 // This adapter test owns the document-count contract: a pending Receipt and
@@ -34,6 +36,7 @@ func TestQueueBacklogCountsDistinctDocumentsAndActiveAttempts(t *testing.T) {
 	stores := contentStores(pool)
 	service := content.Service{Submissions: stores, Receipts: stores, RecordStore: stores, Versions: stores, Materialization: stores}
 	reader := postgres.QueueSnapshots{Pool: pool}
+	queueFixtureReconcile(t, reader, ctx)
 	before := readQueueStatus(t, reader, ctx)
 
 	live, err := service.Accept(ctx, scope, content.Command{
@@ -53,8 +56,12 @@ func TestQueueBacklogCountsDistinctDocumentsAndActiveAttempts(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+	accepted := readQueueStatus(t, reader, ctx)
+	if accepted[workqueue.Live].Waiting != before[workqueue.Live].Waiting+1 || accepted[workqueue.Bulk].Waiting != before[workqueue.Bulk].Waiting+1 {
+		t.Fatalf("application enqueue totals=%+v over %+v", accepted, before)
+	}
 	// Make the oldest age deterministic without waiting on wall time.
-	if _, err = pool.Exec(ctx, `UPDATE ingestion_receipts SET accepted_at=clock_timestamp()-interval '30 seconds' WHERE organization=$1 AND id=$2`, org, live.ID); err != nil {
+	if _, err = queueFixtureExec(t, ctx, reader, org, `UPDATE ingestion_receipts SET accepted_at=clock_timestamp()-interval '30 seconds' WHERE organization=$1 AND id=$2`, org, live.ID); err != nil {
 		t.Fatal(err)
 	}
 
@@ -74,10 +81,10 @@ func TestQueueBacklogCountsDistinctDocumentsAndActiveAttempts(t *testing.T) {
 	}
 	// A replay window can briefly expose the pending receipt alongside the
 	// Version it already reserved. Both rows must still count once.
-	if _, err = pool.Exec(ctx, `UPDATE ingestion_receipts SET state='pending',outcome=NULL,processing='queued' WHERE organization=$1 AND id=$2`, org, bulk.ID); err != nil {
+	if _, err = queueFixtureExec(t, ctx, reader, org, `UPDATE ingestion_receipts SET state='pending',outcome=NULL,processing='queued' WHERE organization=$1 AND id=$2`, org, bulk.ID); err != nil {
 		t.Fatal(err)
 	}
-	if _, err = pool.Exec(ctx, `UPDATE record_versions SET processing='queued',baseline_ready=false WHERE organization=$1 AND id=$2`, org, versionID); err != nil {
+	if _, err = queueFixtureExec(t, ctx, reader, org, `UPDATE record_versions SET processing='queued',baseline_ready=false WHERE organization=$1 AND id=$2`, org, versionID); err != nil {
 		t.Fatal(err)
 	}
 
@@ -121,7 +128,7 @@ func TestQueueBacklogCountsDistinctDocumentsAndActiveAttempts(t *testing.T) {
 	}
 
 	// Withdrawn documents leave every queue count, including a pending retry.
-	if _, err = pool.Exec(ctx, `UPDATE records SET withdrawn=true WHERE organization=$1 AND id=(SELECT record_id FROM ingestion_receipts WHERE organization=$1 AND id=$2)`, org, live.ID); err != nil {
+	if _, err = queueFixtureExec(t, ctx, reader, org, `UPDATE records SET withdrawn=true WHERE organization=$1 AND id=(SELECT record_id FROM ingestion_receipts WHERE organization=$1 AND id=$2)`, org, live.ID); err != nil {
 		t.Fatal(err)
 	}
 	status = readQueueStatus(t, reader, ctx)
@@ -141,13 +148,19 @@ func TestQueueBacklogCountsDistinctDocumentsAndActiveAttempts(t *testing.T) {
 			t.Fatal(err)
 		}
 	}
-	if _, err = pool.Exec(ctx, `UPDATE ingestion_receipts SET state='resolved',outcome='created' WHERE organization=$1 AND id=$2`, org, bulk.ID); err != nil {
+	if _, err = queueFixtureExec(t, ctx, reader, org, `UPDATE ingestion_receipts SET state='resolved',outcome='created' WHERE organization=$1 AND id=$2`, org, bulk.ID); err != nil {
 		t.Fatal(err)
 	}
-	if _, err = pool.Exec(ctx, `UPDATE record_versions SET baseline_ready=true,processing='idle',enrichment_state='queued' WHERE organization=$1 AND id=$2`, org, versionID); err != nil {
+	if _, err = queueFixtureExec(t, ctx, reader, org, `UPDATE record_versions SET baseline_ready=true,processing='idle',enrichment_state='queued' WHERE organization=$1 AND id=$2`, org, versionID); err != nil {
 		t.Fatal(err)
 	}
-	if _, err = pool.Exec(ctx, `UPDATE records SET current_version_id=$2 WHERE organization=$1 AND id=(SELECT record_id FROM record_versions WHERE organization=$1 AND id=$2)`, org, versionID); err != nil {
+	if _, err = queueFixtureExec(t, ctx, reader, org, `UPDATE records SET current_version_id=$2 WHERE organization=$1 AND id=(SELECT record_id FROM record_versions WHERE organization=$1 AND id=$2)`, org, versionID); err != nil {
+		t.Fatal(err)
+	}
+	// A current pointer can reference a Version owned by another Record in
+	// imported/legacy data. It must not create a second queue membership.
+	if _, err = queueFixtureExec(t, ctx, reader, org, `INSERT INTO records(organization,id,corpus_id,namespace,record_key,current_version_id)
+ VALUES($1,'alias',$2,'tests','alias',$3)`, org, c.ID, versionID); err != nil {
 		t.Fatal(err)
 	}
 	observe(versionID)
@@ -169,10 +182,10 @@ func TestQueueBacklogCountsDistinctDocumentsAndActiveAttempts(t *testing.T) {
 	if err = stores.Publish(ctx, corrected, publication(content.Blob{Key: "queues/corrected", SHA256: "queues-corrected-text", Size: 9}, content.Blob{Key: "queues/corrected-manifest", SHA256: "queues-corrected-manifest", Size: 2})); err != nil {
 		t.Fatal(err)
 	}
-	if _, err = pool.Exec(ctx, `UPDATE record_versions SET baseline_ready=true,processing='idle',enrichment_state='idle' WHERE organization=$1 AND id=$2`, org, corrected.VersionID); err != nil {
+	if _, err = queueFixtureExec(t, ctx, reader, org, `UPDATE record_versions SET baseline_ready=true,processing='idle',enrichment_state='idle' WHERE organization=$1 AND id=$2`, org, corrected.VersionID); err != nil {
 		t.Fatal(err)
 	}
-	if _, err = pool.Exec(ctx, `UPDATE records SET current_version_id=$2 WHERE organization=$1 AND id=(SELECT record_id FROM record_versions WHERE organization=$1 AND id=$2)`, org, corrected.VersionID); err != nil {
+	if _, err = queueFixtureExec(t, ctx, reader, org, `UPDATE records SET current_version_id=$2 WHERE organization=$1 AND id=(SELECT record_id FROM record_versions WHERE organization=$1 AND id=$2)`, org, corrected.VersionID); err != nil {
 		t.Fatal(err)
 	}
 	observe(corrected.VersionID)
@@ -180,7 +193,7 @@ func TestQueueBacklogCountsDistinctDocumentsAndActiveAttempts(t *testing.T) {
 	if status[workqueue.Bulk].Waiting != before[workqueue.Bulk].Waiting || status[workqueue.Bulk].InProgress != before[workqueue.Bulk].InProgress {
 		t.Fatalf("superseded enrichment backlog = %+v, want baseline %+v", status[workqueue.Bulk], before[workqueue.Bulk])
 	}
-	if _, err = pool.Exec(ctx, `UPDATE records SET withdrawn=true WHERE organization=$1 AND id=(SELECT record_id FROM ingestion_receipts WHERE organization=$1 AND id=$2)`, org, bulk.ID); err != nil {
+	if _, err = queueFixtureExec(t, ctx, reader, org, `UPDATE records SET withdrawn=true WHERE organization=$1 AND id=(SELECT record_id FROM ingestion_receipts WHERE organization=$1 AND id=$2)`, org, bulk.ID); err != nil {
 		t.Fatal(err)
 	}
 	status = readQueueStatus(t, reader, ctx)
@@ -323,6 +336,7 @@ func TestQueueBacklogOperationStateAndLeaseTransitions(t *testing.T) {
 	stores := contentStores(pool)
 	service := content.Service{Submissions: stores, Receipts: stores, RecordStore: stores, Versions: stores, Materialization: stores}
 	reader := postgres.QueueSnapshots{Pool: pool}
+	queueFixtureReconcile(t, reader, ctx)
 	before := readQueueStatus(t, reader, ctx)
 	receipt, err := service.Accept(ctx, scope, content.Command{
 		Key:     "operation-document",
@@ -346,10 +360,10 @@ func TestQueueBacklogOperationStateAndLeaseTransitions(t *testing.T) {
 	if err = pool.QueryRow(ctx, `SELECT version_id FROM ingestion_receipts WHERE organization=$1 AND id=$2`, org, receipt.ID).Scan(&versionID); err != nil {
 		t.Fatal(err)
 	}
-	if _, err = pool.Exec(ctx, `UPDATE record_versions SET baseline_ready=true,processing='idle',enrichment_state='idle' WHERE organization=$1 AND id=$2`, org, versionID); err != nil {
+	if _, err = queueFixtureExec(t, ctx, reader, org, `UPDATE record_versions SET baseline_ready=true,processing='idle',enrichment_state='idle' WHERE organization=$1 AND id=$2`, org, versionID); err != nil {
 		t.Fatal(err)
 	}
-	if _, err = pool.Exec(ctx, `UPDATE records SET current_version_id=$3,current_accepted_at=clock_timestamp() WHERE organization=$1 AND id=(SELECT record_id FROM record_versions WHERE organization=$1 AND id=$2)`, org, versionID, versionID); err != nil {
+	if _, err = queueFixtureExec(t, ctx, reader, org, `UPDATE records SET current_version_id=$3,current_accepted_at=clock_timestamp() WHERE organization=$1 AND id=(SELECT record_id FROM record_versions WHERE organization=$1 AND id=$2)`, org, versionID, versionID); err != nil {
 		t.Fatal(err)
 	}
 	op, err := (postgres.OperationStore{Pool: pool}).AcceptRebuild(ctx, org, c.ID, "queue-operation", []byte(`{"idempotency_key":"queue-operation"}`))
@@ -360,14 +374,14 @@ func TestQueueBacklogOperationStateAndLeaseTransitions(t *testing.T) {
 	if status[workqueue.Bulk].Waiting != before[workqueue.Bulk].Waiting+1 || status[workqueue.Bulk].InProgress != before[workqueue.Bulk].InProgress {
 		t.Fatalf("queued rebuild backlog = %+v, want one new waiting document over %+v", status[workqueue.Bulk], before[workqueue.Bulk])
 	}
-	if _, err = pool.Exec(ctx, `UPDATE operations SET state='paused' WHERE organization=$1 AND id=$2`, org, op.ID); err != nil {
+	if _, err = queueFixtureExec(t, ctx, reader, org, `UPDATE operations SET state='paused' WHERE organization=$1 AND id=$2`, org, op.ID); err != nil {
 		t.Fatal(err)
 	}
 	status = readQueueStatus(t, reader, ctx)
 	if status[workqueue.Bulk].Waiting != before[workqueue.Bulk].Waiting || status[workqueue.Bulk].InProgress != before[workqueue.Bulk].InProgress {
 		t.Fatalf("paused rebuild backlog = %+v, want baseline %+v", status[workqueue.Bulk], before[workqueue.Bulk])
 	}
-	if _, err = pool.Exec(ctx, `UPDATE operations SET state='running' WHERE organization=$1 AND id=$2`, org, op.ID); err != nil {
+	if _, err = queueFixtureExec(t, ctx, reader, org, `UPDATE operations SET state='running' WHERE organization=$1 AND id=$2`, org, op.ID); err != nil {
 		t.Fatal(err)
 	}
 	started, release := make(chan struct{}), make(chan struct{})
@@ -388,21 +402,21 @@ func TestQueueBacklogOperationStateAndLeaseTransitions(t *testing.T) {
 	if status[workqueue.Bulk].Waiting != before[workqueue.Bulk].Waiting || status[workqueue.Bulk].InProgress != before[workqueue.Bulk].InProgress+1 {
 		t.Fatalf("active rebuild backlog = %+v, want one new in progress document over %+v", status[workqueue.Bulk], before[workqueue.Bulk])
 	}
-	if _, err = pool.Exec(ctx, `UPDATE operations SET state='paused' WHERE organization=$1 AND id=$2`, org, op.ID); err != nil {
+	if _, err = queueFixtureExec(t, ctx, reader, org, `UPDATE operations SET state='paused' WHERE organization=$1 AND id=$2`, org, op.ID); err != nil {
 		t.Fatal(err)
 	}
 	status = readQueueStatus(t, reader, ctx)
 	if status[workqueue.Bulk].Waiting != before[workqueue.Bulk].Waiting || status[workqueue.Bulk].InProgress != before[workqueue.Bulk].InProgress {
 		t.Fatalf("paused active rebuild backlog = %+v, want baseline %+v", status[workqueue.Bulk], before[workqueue.Bulk])
 	}
-	if _, err = pool.Exec(ctx, `UPDATE operations SET state='running' WHERE organization=$1 AND id=$2`, org, op.ID); err != nil {
+	if _, err = queueFixtureExec(t, ctx, reader, org, `UPDATE operations SET state='running' WHERE organization=$1 AND id=$2`, org, op.ID); err != nil {
 		t.Fatal(err)
 	}
 	status = readQueueStatus(t, reader, ctx)
 	if status[workqueue.Bulk].Waiting != before[workqueue.Bulk].Waiting || status[workqueue.Bulk].InProgress != before[workqueue.Bulk].InProgress+1 {
 		t.Fatalf("resumed active rebuild backlog = %+v, want one new in progress document over %+v", status[workqueue.Bulk], before[workqueue.Bulk])
 	}
-	if _, err = pool.Exec(ctx, `UPDATE queue_document_attempts SET lease_until='-infinity' WHERE organization=$1 AND kind='operation' AND work_id=$2 AND document_id=$3`, org, op.ID, versionID); err != nil {
+	if _, err = queueFixtureExec(t, ctx, reader, org, `UPDATE queue_document_attempts SET lease_until='-infinity' WHERE organization=$1 AND kind='operation' AND work_id=$2 AND document_id=$3`, org, op.ID, versionID); err != nil {
 		t.Fatal(err)
 	}
 	status = readQueueStatus(t, reader, ctx)
@@ -413,7 +427,7 @@ func TestQueueBacklogOperationStateAndLeaseTransitions(t *testing.T) {
 	if err = waitForTrackResult(t, ctx, tracked); err != nil {
 		t.Fatalf("expired attempt error = %v, want the work's own nil result", err)
 	}
-	if _, err = pool.Exec(ctx, `UPDATE operations SET state='paused' WHERE organization=$1 AND id=$2`, org, op.ID); err != nil {
+	if _, err = queueFixtureExec(t, ctx, reader, org, `UPDATE operations SET state='paused' WHERE organization=$1 AND id=$2`, org, op.ID); err != nil {
 		t.Fatal(err)
 	}
 
@@ -429,14 +443,14 @@ func TestQueueBacklogOperationStateAndLeaseTransitions(t *testing.T) {
 		t.Fatal(err)
 	}
 	liveBefore := readQueueStatus(t, reader, ctx)[workqueue.Live]
-	if _, err = pool.Exec(ctx, `INSERT INTO evaluation_intents(organization,subscription_version_id,sequence,subscription_id,corpus_id,record_id,record_version_id,available_at) SELECT $1,$2,1,$3,$4,record_id,id,clock_timestamp()+interval '1 hour' FROM record_versions WHERE organization=$1 AND id=$5`, org, sub.Current.VersionID, sub.ID, c.ID, versionID); err != nil {
+	if _, err = queueFixtureExec(t, ctx, reader, org, `INSERT INTO evaluation_intents(organization,subscription_version_id,sequence,subscription_id,corpus_id,record_id,record_version_id,available_at) SELECT $1,$2,1,$3,$4,record_id,id,clock_timestamp()+interval '1 hour' FROM record_versions WHERE organization=$1 AND id=$5`, org, sub.Current.VersionID, sub.ID, c.ID, versionID); err != nil {
 		t.Fatal(err)
 	}
 	live := readQueueStatus(t, reader, ctx)[workqueue.Live]
 	if live.Waiting != liveBefore.Waiting || live.OldestAgeSeconds < 0 {
 		t.Fatalf("delayed alert backlog = %+v, want unavailable retry excluded from %+v", live, liveBefore)
 	}
-	if _, err = pool.Exec(ctx, `UPDATE evaluation_intents SET available_at=clock_timestamp()-interval '30 seconds' WHERE organization=$1`, org); err != nil {
+	if _, err = queueFixtureExec(t, ctx, reader, org, `UPDATE evaluation_intents SET available_at=clock_timestamp()-interval '30 seconds' WHERE organization=$1`, org); err != nil {
 		t.Fatal(err)
 	}
 	live = readQueueStatus(t, reader, ctx)[workqueue.Live]
@@ -463,7 +477,7 @@ func TestQueueBacklogOperationStateAndLeaseTransitions(t *testing.T) {
 	}
 	// A worker can die after scheduling a delayed retry but before releasing
 	// its observation. The still-valid lease must not count unavailable work.
-	if _, err = pool.Exec(ctx, `UPDATE evaluation_intents SET available_at=clock_timestamp()+interval '1 hour' WHERE organization=$1`, org); err != nil {
+	if _, err = queueFixtureExec(t, ctx, reader, org, `UPDATE evaluation_intents SET available_at=clock_timestamp()+interval '1 hour' WHERE organization=$1`, org); err != nil {
 		t.Fatal(err)
 	}
 	live = readQueueStatus(t, reader, ctx)[workqueue.Live]
@@ -474,7 +488,64 @@ func TestQueueBacklogOperationStateAndLeaseTransitions(t *testing.T) {
 	if live.Waiting != liveBefore.Waiting || live.InProgress != liveBefore.InProgress {
 		t.Fatalf("delayed retry with unreleased attempt = %+v, want baseline %+v", live, liveBefore)
 	}
-	if _, err = pool.Exec(ctx, `UPDATE evaluation_intents SET state='done' WHERE organization=$1`, org); err != nil {
+	if _, err = queueFixtureExec(t, ctx, reader, org, `UPDATE evaluation_intents SET state='done' WHERE organization=$1`, org); err != nil {
+		t.Fatal(err)
+	}
+
+	// Model a clock crossing for a retry cohort larger than one maintenance page.
+	// Canonical intents are due; their stored membership is the preceding,
+	// not-yet-promoted state. No wall-clock wait or test-only production clock.
+	prior := readQueueStatus(t, reader, ctx)[workqueue.Live]
+	exec := func(sql string) {
+		t.Helper()
+		if _, err := queueFixtureExec(t, ctx, reader, org, sql, org, sub.Current.VersionID, sub.ID, c.ID); err != nil {
+			t.Fatal(err)
+		}
+	}
+	exec(`INSERT INTO records(organization,id,corpus_id,namespace,record_key)
+ SELECT $1,'cohort-record-'||i,$4,'cohort',i::text FROM generate_series(1,1001) i WHERE $2::text<>'' AND $3::text<>''`)
+	if _, err := queueFixtureExec(t, ctx, reader, org, `INSERT INTO record_versions(organization,id,record_id,slot,digest,acceptance_order,source_position,text_blob_id,manifest_blob_id,provenance,baseline_ready)
+ SELECT organization,'cohort-version-'||i,'cohort-record-'||i,'text',i::text,1,'',text_blob_id,manifest_blob_id,'{}',true FROM record_versions CROSS JOIN generate_series(1,1001) i WHERE organization=$1 AND id=$2`, org, versionID); err != nil {
+		t.Fatal(err)
+	}
+	exec(`INSERT INTO evaluation_intents(organization,subscription_version_id,sequence,subscription_id,corpus_id,record_id,record_version_id,available_at)
+ SELECT $1,$2,i+1,$3,$4,'cohort-record-'||i,'cohort-version-'||i,statement_timestamp()-interval '30 seconds' FROM generate_series(1,1001) i`)
+	if _, err := pool.Exec(ctx, `WITH changed AS (UPDATE queue_backlog_documents SET ready=false WHERE organization=$1 AND document_id LIKE 'cohort-version-%' RETURNING document_id)
+ UPDATE queue_backlog_totals SET pending=pending-(SELECT count(*) FROM changed) WHERE stripe=(hashtextextended($1,0)&63)::integer AND queue='live'`, org); err != nil {
+		t.Fatal(err)
+	}
+	preserved := func() {
+		t.Helper()
+		if _, err := pool.Exec(ctx, `UPDATE queue_backlog_snapshots SET published_at='-infinity'`); err != nil {
+			t.Fatal(err)
+		}
+		if err := reader.Refresh(ctx); err != nil {
+			t.Fatal(err)
+		}
+		statuses, err := reader.QueueBacklog(ctx)
+		if err != nil {
+			t.Fatal(err)
+		}
+		for _, status := range statuses {
+			if status.Queue == workqueue.Live && status.Waiting != prior.Waiting {
+				t.Fatalf("partial due page published: %+v, prior=%+v", status, prior)
+			}
+		}
+		var unstamped bool
+		if err := pool.QueryRow(ctx, `SELECT bool_and(published_at='-infinity') FROM queue_backlog_snapshots`).Scan(&unstamped); err != nil || !unstamped {
+			t.Fatalf("incomplete publication stamped fresh: unchanged=%v error=%v", unstamped, err)
+		}
+	}
+	preserved()
+	if more, err := reader.Maintain(ctx); err != nil || !more {
+		t.Fatalf("first due page more=%v error=%v", more, err)
+	}
+	preserved()
+	final := readQueueStatus(t, reader, ctx)[workqueue.Live]
+	if final.Waiting != prior.Waiting+1001 {
+		t.Fatalf("complete due cohort=%+v, want %d", final, prior.Waiting+1001)
+	}
+	if _, err := queueFixtureExec(t, ctx, reader, org, `UPDATE records SET withdrawn=true WHERE organization=$1 AND namespace='cohort'`, org); err != nil {
 		t.Fatal(err)
 	}
 
@@ -482,6 +553,16 @@ func TestQueueBacklogOperationStateAndLeaseTransitions(t *testing.T) {
 
 func readQueueStatus(t *testing.T, reader postgres.QueueSnapshots, ctx context.Context) map[string]workqueue.Status {
 	t.Helper()
+	for {
+		more, err := reader.Maintain(ctx)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if !more {
+			break
+		}
+	}
+	assertQueueRecount(t, ctx, reader)
 	// Force a refresh at the persisted state transition without waiting for
 	// the production polling interval. This exercises the production reader.
 	if _, err := reader.Pool.Exec(ctx, `UPDATE queue_backlog_snapshots SET observed_at='-infinity',published_at='-infinity'`); err != nil {
@@ -535,6 +616,9 @@ func TestQueueSnapshotsReadWithoutDocumentScanAndRejectStaleData(t *testing.T) {
 	defer cancel()
 	pool := rebuildAdapterPool(t, ctx)
 	snapshots := postgres.QueueSnapshots{Pool: pool}
+	if _, err := snapshots.Maintain(ctx); err != nil {
+		t.Fatal(err)
+	}
 	if err := snapshots.Refresh(ctx); err != nil {
 		t.Fatal(err)
 	}
@@ -566,5 +650,152 @@ func TestQueueSnapshotsReadWithoutDocumentScanAndRejectStaleData(t *testing.T) {
 	}
 	if _, err = snapshots.QueueBacklog(ctx); err != nil {
 		t.Fatalf("refreshed snapshot unavailable: %v", err)
+	}
+}
+
+// The count owners above exercise mixed enqueue/claim/finish/failure and operation
+// transitions. This independent canonical recount checks the incremental waiting
+// totals after each transition; it deliberately does not read the new ledger.
+func assertQueueRecount(t *testing.T, ctx context.Context, reader postgres.QueueSnapshots) {
+	t.Helper()
+	rows, err := reader.Pool.Query(ctx, `WITH enrichment_versions AS MATERIALIZED (
+ SELECT organization,id AS version_id FROM record_versions
+), ingestion_work AS MATERIALIZED (
+ SELECT CASE WHEN rc.work_queue='bulk' THEN 'bulk' ELSE 'live' END AS queue,
+        rc.organization,COALESCE(NULLIF(rc.version_id,''),ar.version_id,rc.id) AS document_id,
+        COALESCE(LEAST(rc.accepted_at,ar.accepted_at),rc.accepted_at,ar.accepted_at) AS admitted_at,false AS active
+ FROM ingestion_receipts rc
+ JOIN records r ON (r.organization,r.id)=(rc.organization,rc.record_id)
+ LEFT JOIN accepted_revisions ar ON (ar.organization,ar.record_id,ar.slot)=(rc.organization,rc.record_id,rc.slot)
+ WHERE rc.route_family='ingestion' AND rc.state='pending'
+   AND NOT (r.withdrawn OR EXISTS(SELECT 1 FROM tombstones t WHERE t.organization=r.organization AND t.record_id=r.id))
+ UNION ALL
+ SELECT CASE WHEN rc.work_queue='bulk' THEN 'bulk' ELSE 'live' END,
+        v.organization,v.id,COALESCE(LEAST(rc.accepted_at,ar.accepted_at),rc.accepted_at,ar.accepted_at),false
+ FROM record_versions v
+ JOIN records r ON (r.organization,r.id)=(v.organization,v.record_id)
+ JOIN accepted_revisions ar ON (ar.organization,ar.record_id,ar.slot)=(v.organization,v.record_id,v.slot)
+ LEFT JOIN ingestion_receipts rc ON (rc.organization,rc.record_id,rc.acceptance_order)=(v.organization,v.record_id,v.acceptance_order)
+ WHERE NOT (r.withdrawn OR EXISTS(SELECT 1 FROM tombstones t WHERE t.organization=r.organization AND t.record_id=r.id))
+   AND NOT v.baseline_ready AND NOT v.quarantined AND v.processing IN ('queued','running','retrying')
+), work AS (
+ SELECT * FROM ingestion_work
+ UNION ALL
+ SELECT CASE WHEN rc.work_queue='bulk' THEN 'bulk' ELSE 'live' END,
+        v.organization,v.id,COALESCE(LEAST(rc.accepted_at,ar.accepted_at),rc.accepted_at,ar.accepted_at),false
+ FROM enrichment_versions ev
+ JOIN record_versions v ON (v.organization,v.id)=(ev.organization,ev.version_id)
+ JOIN records r ON (r.organization,r.id)=(v.organization,v.record_id)
+ JOIN accepted_revisions ar ON (ar.organization,ar.record_id,ar.slot)=(v.organization,v.record_id,v.slot)
+ LEFT JOIN ingestion_receipts rc ON (rc.organization,rc.record_id,rc.acceptance_order)=(v.organization,v.record_id,v.acceptance_order)
+ WHERE v.baseline_ready AND r.current_version_id=v.id AND NOT v.quarantined
+   AND v.enrichment_state IN ('queued','running','retrying')
+   AND NOT (r.withdrawn OR EXISTS(SELECT 1 FROM tombstones t WHERE t.organization=r.organization AND t.record_id=r.id))
+ UNION ALL
+ SELECT CASE WHEN e.work_queue='bulk' THEN 'bulk' ELSE 'live' END,
+        e.organization,e.version_id,e.created_at,false
+ FROM ingestion_evaluations e
+ JOIN record_versions v ON (v.organization,v.id)=(e.organization,e.version_id)
+ JOIN records r ON (r.organization,r.id)=(v.organization,v.record_id)
+ WHERE e.state='queued'
+   AND NOT (r.withdrawn OR EXISTS(SELECT 1 FROM tombstones t WHERE t.organization=r.organization AND t.record_id=r.id))
+ UNION ALL
+ SELECT CASE WHEN sp.work_queue='bulk' THEN 'bulk' ELSE 'live' END,
+        sp.organization,sp.version_id,sp.created_at,false
+ FROM serving_projections sp
+ JOIN record_versions v ON (v.organization,v.id)=(sp.organization,sp.version_id)
+ JOIN records r ON (r.organization,r.id)=(v.organization,v.record_id)
+ WHERE sp.state='queued'
+   AND NOT (r.withdrawn OR EXISTS(SELECT 1 FROM tombstones t WHERE t.organization=r.organization AND t.record_id=r.id))
+ UNION ALL
+ SELECT 'live',
+        i.organization,i.record_version_id,i.available_at,false
+ FROM evaluation_intents i
+ JOIN record_versions v ON (v.organization,v.id)=(i.organization,i.record_version_id)
+ JOIN records r ON (r.organization,r.id)=(v.organization,v.record_id)
+ WHERE i.kind='evaluation' AND i.state='pending' AND i.available_at<=statement_timestamp()
+   AND NOT (r.withdrawn OR EXISTS(SELECT 1 FROM tombstones t WHERE t.organization=r.organization AND t.record_id=r.id))
+ UNION ALL
+ SELECT 'bulk',o.organization,qi.version_id,o.created_at,false
+ FROM operations o
+ JOIN quarantine_reprocess_items qi ON (qi.organization,qi.operation_id)=(o.organization,o.id)
+ JOIN records r ON (r.organization,r.id)=(qi.organization,qi.record_id)
+ WHERE o.kind='quarantine_reprocess' AND o.state IN ('queued','running')
+   AND qi.phase IN ('pending','renormalizing','released')
+   AND NOT (r.withdrawn OR EXISTS(SELECT 1 FROM tombstones t WHERE t.organization=r.organization AND t.record_id=r.id))
+), queues(queue) AS (VALUES ('live'),('bulk'))
+ SELECT q.queue,
+ (SELECT count(*) FROM (SELECT DISTINCT organization,document_id FROM work WHERE queue=q.queue AND document_id<>'') d),
+ (SELECT count(*) FROM (SELECT DISTINCT organization,document_id FROM ingestion_work WHERE queue=q.queue AND document_id<>'') d),
+ (SELECT sum(pending)::bigint FROM queue_backlog_totals WHERE queue=q.queue),
+ (SELECT sum(ingestion_pending)::bigint FROM queue_backlog_totals WHERE queue=q.queue)
+ FROM queues q`)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer rows.Close()
+	for rows.Next() {
+		var queue string
+		var pending, ingestion, actual, actualIngestion int64
+		if err := rows.Scan(&queue, &pending, &ingestion, &actual, &actualIngestion); err != nil {
+			t.Fatal(err)
+		}
+		if pending != actual || ingestion != actualIngestion {
+			t.Fatalf("%s canonical recount waiting=%d ingestion=%d; maintained=%d ingestion=%d", queue, pending, ingestion, actual, actualIngestion)
+		}
+	}
+	if err := rows.Err(); err != nil {
+		t.Fatal(err)
+	}
+}
+
+// Raw fixture mutations model application observations explicitly. Real service
+// writes are read before this helper, so a missing enqueue hook is still caught.
+func queueFixtureExec(t *testing.T, ctx context.Context, reader postgres.QueueSnapshots, org, query string, args ...any) (pgconn.CommandTag, error) {
+	t.Helper()
+	tx, err := reader.Pool.Begin(ctx)
+	if err != nil {
+		return pgconn.CommandTag{}, err
+	}
+	defer tx.Rollback(ctx)
+	tag, err := tx.Exec(ctx, query, args...)
+	if err != nil {
+		return tag, err
+	}
+	rows, err := tx.Query(ctx, `SELECT id FROM records WHERE organization=$1 ORDER BY id`, org)
+	if err != nil {
+		return tag, err
+	}
+	records, err := pgx.CollectRows(rows, pgx.RowTo[string])
+	if err != nil {
+		return tag, err
+	}
+	// The existing test-only observation bridge uses the production batch. It
+	// cannot share this local transaction, so commit the fixture before observing.
+	if err = tx.Commit(ctx); err != nil {
+		return tag, err
+	}
+	if len(records) > 0 {
+		err = postgres.ObserveQueueRecords(ctx, reader.Pool, org, records...)
+	}
+	return tag, err
+}
+
+// Earlier adapter fixtures may emulate old binaries through direct SQL. Repair
+// that global baseline once; every subsequent service transition is observed
+// without forcing reconciliation, so missing application hooks still fail.
+func queueFixtureReconcile(t *testing.T, reader postgres.QueueSnapshots, ctx context.Context) {
+	t.Helper()
+	if _, err := reader.Pool.Exec(ctx, `UPDATE queue_backlog_bootstrap SET next_run='-infinity'; UPDATE queue_metric_bootstrap SET next_run='-infinity'`); err != nil {
+		t.Fatal(err)
+	}
+	for {
+		more, err := reader.Maintain(ctx)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if !more {
+			break
+		}
 	}
 }

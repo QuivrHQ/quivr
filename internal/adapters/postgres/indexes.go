@@ -12,29 +12,57 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
-// concurrentIndexes contains installation-wide performance indexes. Predicates
+// indexDefinition contains an installation-wide performance index. Predicates
 // use PostgreSQL's canonical pg_get_expr spelling so an existing index can be
 // checked before reuse or recovery. These definitions are trusted engine SQL.
-var concurrentIndexes = []struct {
+type indexDefinition struct {
 	Name, Table string
 	Columns     []string
 	Predicate   string
-}{
+}
+
+var concurrentIndexes = []indexDefinition{
 	{Name: "change_events_by_corpus", Table: "change_events", Columns: []string{"organization", "corpus_id", "sequence"}},
 	{Name: "segments_by_segmentation", Table: "segments", Columns: []string{"organization", "segmentation_id"}},
 	{Name: "projection_purges_cleanup_due", Table: "projection_purges", Columns: []string{"noticed_at"}, Predicate: "((purged_at IS NULL) OR (cleanup_stage < 3))"},
 	{Name: "queue_enrichment_pending", Table: "queue_enrichment_records", Columns: []string{"organization", "version_id"}, Predicate: "pending"},
+	{Name: "queue_versions_by_record", Table: "record_versions", Columns: []string{"organization", "record_id"}, Predicate: "((NOT baseline_ready) AND (NOT quarantined) AND (processing = ANY (ARRAY['queued'::text, 'running'::text, 'retrying'::text])))"},
+	{Name: "queue_metric_receipts_by_record", Table: "ingestion_receipts", Columns: []string{"organization", "record_id"}, Predicate: "(state = 'pending'::text)"},
+	{Name: "queue_receipts_by_record", Table: "ingestion_receipts", Columns: []string{"organization", "record_id"}, Predicate: "((route_family = 'ingestion'::text) AND (state = 'pending'::text))"},
+	{Name: "queue_evaluations_by_record", Table: "ingestion_evaluations", Columns: []string{"organization", "record_id"}, Predicate: "(state = 'queued'::text)"},
+	{Name: "queue_serving_by_record", Table: "serving_projections", Columns: []string{"organization", "record_id"}, Predicate: "(state = 'queued'::text)"},
+	{Name: "queue_alerts_by_record", Table: "evaluation_intents", Columns: []string{"organization", "record_id"}, Predicate: "(state = 'pending'::text)"},
+	{Name: "queue_reprocess_by_record", Table: "quarantine_reprocess_items", Columns: []string{"organization", "record_id"}, Predicate: "(phase = ANY (ARRAY['pending'::text, 'renormalizing'::text, 'released'::text]))"},
 	{Name: "queue_versions_baseline", Table: "record_versions", Columns: []string{"organization", "id"}, Predicate: "((NOT baseline_ready) AND (NOT quarantined) AND (processing = ANY (ARRAY['queued'::text, 'running'::text, 'retrying'::text])))"},
 	{Name: "queue_receipts_pending", Table: "ingestion_receipts", Columns: []string{"organization", "id"}, Predicate: "((route_family = 'ingestion'::text) AND (state = 'pending'::text))"},
 	{Name: "queue_evaluations_pending", Table: "ingestion_evaluations", Columns: []string{"organization", "version_id"}, Predicate: "(state = 'queued'::text)"},
 	{Name: "queue_serving_pending", Table: "serving_projections", Columns: []string{"organization", "version_id"}, Predicate: "(state = 'queued'::text)"},
+	{Name: "queue_scope_records", Table: "records", Columns: []string{"organization", "corpus_id", "id"}},
 	{Name: "queue_operations_active", Table: "operations", Columns: []string{"organization", "corpus_id"}, Predicate: "(state = ANY (ARRAY['queued'::text, 'running'::text]))"},
 	{Name: "accepted_revisions_version_lookup", Table: "accepted_revisions", Columns: []string{"organization", "version_id"}},
+	{Name: "projection_metadata_by_generation", Table: "projection_metadata", Columns: []string{"organization", "generation_id", "version_id"}},
+	{Name: "ingestion_receipts_by_version", Table: "ingestion_receipts", Columns: []string{"organization", "version_id", "accepted_at"}},
+	{Name: "ingestion_receipts_pending_revision", Table: "ingestion_receipts", Columns: []string{"organization", "record_id", "slot"}, Predicate: "(state = 'pending'::text)"},
+	{Name: "evaluation_intents_decided_pair", Table: "evaluation_intents", Columns: []string{"organization", "subscription_version_id", "record_version_id", "sequence"}, Predicate: "((kind = 'evaluation'::text) AND (state = 'done'::text) AND (outcome = ANY (ARRAY['matched'::text, 'duplicate'::text, 'no_match'::text, 'no_longer_matches'::text])))"},
 	{Name: "records_by_current_version", Table: "records", Columns: []string{"organization", "corpus_id", "current_version_id"}},
 	{Name: "projection_metadata_filter_source", Table: "projection_metadata_filter_values", Columns: []string{"organization", "version_id", "generation_id"}},
 	{Name: "projection_metadata_filter_values_lookup", Table: "projection_metadata_filter_values", Columns: []string{"organization", "corpus_id", "generation_id", "field", "value", "version_id"}},
 	{Name: "projection_metadata_filter_dates_lookup", Table: "projection_metadata_filter_values", Columns: []string{"organization", "corpus_id", "generation_id", "field", "date_epoch_ms", "version_id"}, Predicate: "(date_epoch_ms IS NOT NULL)"},
 	{Name: "projection_metadata_filter_pending", Table: "projection_metadata", Columns: []string{"organization", "generation_id", "version_id"}, Predicate: "(NOT filter_indexed)"},
+}
+
+// The partial index predates the full managed lookup above. It is retired only
+// after the replacement has been inspected as valid and compatible. Keeping
+// this separate from concurrentIndexes makes a missing old object a no-op while
+// an operator-created object with the same name still fails closed.
+var retiredIndexes = []struct {
+	Index       indexDefinition
+	Replacement indexDefinition
+}{
+	{
+		Index:       indexDefinition{Name: "accepted_revisions_by_version", Table: "accepted_revisions", Columns: []string{"organization", "version_id"}, Predicate: "(accepted_at IS NOT NULL)"},
+		Replacement: indexDefinition{Name: "accepted_revisions_version_lookup", Table: "accepted_revisions", Columns: []string{"organization", "version_id"}},
+	},
 }
 
 // Index setup errors let the CLI report operator actions without logging raw
@@ -121,9 +149,8 @@ func EnsureIndexes(ctx context.Context, pool *pgxpool.Pool) (err error) {
 	if err := ensureMetadataCatalogSync(ctx, conn); err != nil {
 		return err
 	}
-	for _, index := range concurrentIndexes {
-		state := func() (valid, matches bool, err error) {
-			err = conn.QueryRow(ctx, `SELECT COALESCE(i.indisvalid, false), COALESCE(
+	inspect := func(index indexDefinition) (found, valid, matches bool, err error) {
+		err = conn.QueryRow(ctx, `SELECT COALESCE(i.indisvalid, false), COALESCE(
  i.indrelid=to_regclass($2) AND am.amname='btree' AND NOT i.indisunique
  AND i.indexprs IS NULL AND i.indnatts=i.indnkeyatts
  AND NOT EXISTS(SELECT FROM unnest(i.indkey) WITH ORDINALITY k(attnum, ordinal)
@@ -136,14 +163,21 @@ func EnsureIndexes(ctx context.Context, pool *pgxpool.Pool) (err error) {
  AND COALESCE(pg_get_expr(i.indpred, i.indrelid), '')=$4, false)
 FROM pg_class c LEFT JOIN pg_index i ON i.indexrelid=c.oid
 LEFT JOIN pg_am am ON am.oid=c.relam WHERE c.oid=to_regclass($1)`,
-				index.Name, index.Table, index.Columns, index.Predicate).Scan(&valid, &matches)
-			return
+			index.Name, index.Table, index.Columns, index.Predicate).Scan(&valid, &matches)
+		if errors.Is(err, pgx.ErrNoRows) {
+			return false, false, false, nil
 		}
-		valid, matches, err := state()
-		if err != nil && !errors.Is(err, pgx.ErrNoRows) {
+		if err != nil {
+			return false, false, false, err
+		}
+		return true, valid, matches, nil
+	}
+	for _, index := range concurrentIndexes {
+		found, valid, matches, err := inspect(index)
+		if err != nil {
 			return fmt.Errorf("inspect index %s: %w", index.Name, err)
 		}
-		if err == nil {
+		if found {
 			if !matches {
 				return fmt.Errorf("index %s has an incompatible definition; inspect and rename the conflicting object: %w", index.Name, ErrIndexConflict)
 			}
@@ -166,8 +200,30 @@ LEFT JOIN pg_am am ON am.oid=c.relam WHERE c.oid=to_regclass($1)`,
 		if _, err := conn.Exec(ctx, sql); err != nil {
 			return fmt.Errorf("build index %s: %w", index.Name, err)
 		}
-		if valid, matches, err := state(); err != nil || !valid || !matches {
+		if found, valid, matches, err := inspect(index); err != nil || !found || !valid || !matches {
 			return fmt.Errorf("index %s did not become valid with the expected definition (valid=%t, matches=%t): %v", index.Name, valid, matches, err)
+		}
+	}
+	for _, retired := range retiredIndexes {
+		found, _, matches, err := inspect(retired.Index)
+		if err != nil {
+			return fmt.Errorf("inspect index %s: %w", retired.Index.Name, err)
+		}
+		if !found {
+			continue
+		}
+		if !matches {
+			return fmt.Errorf("index %s has an incompatible definition; refusing retirement: %w", retired.Index.Name, ErrIndexConflict)
+		}
+		replacementFound, replacementValid, replacementMatches, err := inspect(retired.Replacement)
+		if err != nil {
+			return fmt.Errorf("inspect replacement index %s: %w", retired.Replacement.Name, err)
+		}
+		if !replacementFound || !replacementValid || !replacementMatches {
+			return fmt.Errorf("replacement index %s is not valid and compatible; refusing retirement of %s", retired.Replacement.Name, retired.Index.Name)
+		}
+		if _, err := conn.Exec(ctx, "DROP INDEX CONCURRENTLY IF EXISTS "+pgx.Identifier{retired.Index.Name}.Sanitize()); err != nil {
+			return fmt.Errorf("retire index %s: %w", retired.Index.Name, err)
 		}
 	}
 	// Population commits short batches, so cancellation/restart resumes from the

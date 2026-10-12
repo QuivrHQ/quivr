@@ -29,6 +29,7 @@ import (
 	"github.com/The-Vibe-Company/quivr/internal/connectors"
 	"github.com/The-Vibe-Company/quivr/internal/content"
 	"github.com/The-Vibe-Company/quivr/internal/corpus"
+	"github.com/The-Vibe-Company/quivr/internal/history"
 	"github.com/The-Vibe-Company/quivr/internal/lifecycle"
 	"github.com/The-Vibe-Company/quivr/internal/monitoring"
 	"github.com/The-Vibe-Company/quivr/internal/normalization"
@@ -50,6 +51,7 @@ import (
 )
 
 type Config struct {
+	HistoryRetention HistoryRetentionConfig      `json:"history_retention"`
 	Postgres         PostgresConfig              `json:"postgres"`
 	Worker           workqueue.Config            `json:"worker"`
 	QueueObservation workqueue.ObservationConfig `json:"queue_observation"`
@@ -62,6 +64,7 @@ type Config struct {
 	// plugin (THE-777), which serve the legacy E5 space until rebuilt.
 	TEIURL                  string                  `json:"tei_url"`
 	WeaviateURL             string                  `json:"weaviate_url"`
+	WeaviateAPIKey          string                  `json:"weaviate_api_key"`
 	TemporalAddress         string                  `json:"temporal_address"`
 	S3                      s3store.Config          `json:"s3"`
 	LogLevel                string                  `json:"log_level"`
@@ -425,6 +428,10 @@ func Run(command string, args ...string) error {
 	if err != nil {
 		return err
 	}
+	historyPolicy, err := cfg.HistoryRetention.parse()
+	if err != nil {
+		return err
+	}
 	if cfg.Delivery.AllowPrivateDestinations {
 		slog.Warn("delivery.allow_private_destinations is enabled: webhooks may reach internal networks; this increases SSRF exposure")
 	}
@@ -555,7 +562,7 @@ func Run(command string, args ...string) error {
 	contents := content.Service{Submissions: submissions, Receipts: receipts, RecordStore: records, Versions: versions, Materialization: materialization, Catalog: records, Stats: postgres.CorpusStatsStore{Pool: pool}, Facets: records, Blobs: blobs, Baseline: baseline, Embeddings: embeddings, BlobSource: uploadStore, Relations: records, Extensions: live, Normalizations: normalizations, Supersession: normalizations, Routes: live,
 		Received: recorder.Received}
 	uploadService := uploads.Service{Store: uploadStore, Transfer: blobs}
-	projection, err := weaviate.NewWithTLS(cfg.WeaviateURL, cfg.TLS.Weaviate)
+	projection, err := weaviate.NewWithTLS(cfg.WeaviateURL, cfg.TLS.Weaviate, cfg.WeaviateAPIKey)
 	if err != nil {
 		return err
 	}
@@ -670,6 +677,27 @@ func Run(command string, args ...string) error {
 	}
 	queueSnapshots := postgres.QueueSnapshots{Pool: pool, RefreshInterval: queueRefreshInterval}
 	acquisition.Acquirer.Queues = queueSnapshots
+	loops.Go(func(ctx context.Context) {
+		for {
+			maintenance, cancel := context.WithTimeout(ctx, 10*time.Second)
+			more, err := queueSnapshots.Maintain(maintenance)
+			cancel()
+			if err != nil && ctx.Err() == nil {
+				slog.Warn("queue observation maintenance unavailable")
+			}
+			delay := time.Second
+			if more && err == nil {
+				delay = 0
+			}
+			timer := time.NewTimer(delay)
+			select {
+			case <-ctx.Done():
+				timer.Stop()
+				return
+			case <-timer.C:
+			}
+		}
+	})
 	loops.Go(func(ctx context.Context) {
 		delay := queueRefreshInterval
 		failed := false
@@ -938,6 +966,9 @@ func Run(command string, args ...string) error {
 		// evaluation and delivery; its watermark keeps cursor expiry exact.
 		loops.Go(func(ctx context.Context) {
 			changes.Pruner{Audit: auditStore, AuditRetentionMonths: auditMonths, Store: journal, Retention: prune.Retention, Interval: prune.Interval, Organizations: prune.Organizations, Metrics: pruneMetrics}.Run(ctx)
+		})
+		loops.Go(func(ctx context.Context) {
+			history.Run(ctx, postgres.HistoryStore{Pool: pool}, historyPolicy)
 		})
 		loops.Go(func(ctx context.Context) {
 			processing.IngestionPageSweeper{Store: baseline, Content: contents, Batch: 100}.Run(ctx)

@@ -78,7 +78,7 @@ func (f *attachFixture) patchVector(segmentID string, vector []float32) {
 	body, _ := json.Marshal(map[string]any{"class": f.gen.Collection, "vectors": map[string]any{"semantic_text_v1": vector}})
 	req, _ := http.NewRequestWithContext(f.ctx, http.MethodPatch, f.url+"/v1/objects/"+f.gen.Collection+"/"+objects[0].ID, bytes.NewReader(body))
 	req.Header.Set("Content-Type", "application/json")
-	res, err := http.DefaultClient.Do(req)
+	res, err := f.store.Client.Do(req)
 	if err != nil {
 		f.t.Fatal(err)
 	}

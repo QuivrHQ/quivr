@@ -77,6 +77,7 @@ excluded = [
 "deploy/railway/README.md" = { audience = "functional", kind = "guide", summary = "run a hosted single-node evaluation demo" }
 "deploy/railway/hosted-embeddings.md" = { audience = "functional", kind = "guide", summary = "evaluate, fill and switch hosted text embeddings with rollback" }
 "docs-site/run-quivr/scale-quivr.mdx" = { audience = "functional", kind = "concept", summary = "capacity budgets, import lessons and incident checks for operators" }
+"docs-site/run-quivr/dedicated-vector-host.mdx" = { audience = "functional", kind = "guide", summary = "provision an authenticated index VM and rebuild it from stored content" }
 "docs/agents/documentation.md" = { audience = "contributor", kind = "guide", summary = "living and dated documents, the inventory, budgets and when docs may change" }
 "docs/agents/domain.md" = { audience = "contributor", kind = "guide", summary = "how the domain documentation is laid out" }
 "docs/agents/evaluation.md" = { audience = "contributor", kind = "guide", summary = "measure how well search ranks results on public and private evaluation sets" }
@@ -116,6 +117,7 @@ excluded = [
 "plugins/push-source/README.md" = { audience = "plugin-author", kind = "guide", summary = "an offline instance-token push source and its certification" }
 "plugins/rss/README.md" = { audience = "plugin-author", kind = "guide", summary = "the first-party RSS and Atom connector plugin" }
 "plugins/x-list/README.md" = { audience = "plugin-author", kind = "concept", summary = "the first-party X list connector plugin and its parity tests" }
+"internal/adapters/postgres/AGENTS.md" = { audience = "contributor", kind = "guide", summary = "keep PostgreSQL test contracts at their durable owners" }
 "quivr-search/AGENTS.md" = { audience = "contributor", kind = "guide", summary = "keep demo test contracts at their observable owners" }
 "quivr-search/README.md" = { audience = "functional", kind = "guide", summary = "the demo web app: search, sources, live feed and the admin view" }
 "sdks/AGENTS.md" = { audience = "contributor", kind = "guide", summary = "keep each SDK test contract at its owning boundary" }
@@ -129,6 +131,7 @@ excluded = [
 
 # Maximum number of lines per page, in path order.
 [budgets]
+"docs-site/run-quivr/dedicated-vector-host.mdx" = 115
 "deploy/compose/README.md" = 85
 "deploy/infrastructure.md" = 155
 "deploy/modal/README.md" = 100
@@ -163,6 +166,7 @@ excluded = [
 "plugins/push-source/README.md" = 21
 "plugins/rss/README.md" = 60
 "plugins/x-list/README.md" = 60
+"internal/adapters/postgres/AGENTS.md" = 10
 "quivr-search/AGENTS.md" = 10
 "quivr-search/README.md" = 128
 "sdks/AGENTS.md" = 8
