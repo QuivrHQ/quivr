@@ -1,0 +1,35 @@
+# Metadata events must never emit names used by required verification checks.
+name: Request pull-request verification
+'on':
+  pull_request:
+    types:
+    - labeled
+    - unlabeled
+    - edited
+permissions:
+  contents: read
+jobs:
+  request-verification:
+    if: >-
+      ((github.event.action == 'labeled' || github.event.action == 'unlabeled') && github.event.label.name == 'ci-full') ||
+      (github.event.action == 'edited' && github.event.changes.base.ref != '')
+    runs-on: ubuntu-24.04
+    timeout-minutes: 2
+    permissions:
+      actions: write
+      contents: read
+      pull-requests: read
+    steps:
+    - name: Request full verification of the current head
+      env:
+        GH_TOKEN: ${{ github.token }}
+        PR_NUMBER: ${{ github.event.pull_request.number }}
+      run: |
+        gh api "repos/$GITHUB_REPOSITORY/pulls/$PR_NUMBER" > "$RUNNER_TEMP/pull.json"
+        if ! jq -e '.state == "open"' "$RUNNER_TEMP/pull.json" > /dev/null; then
+          exit 0
+        fi
+        # Dispatch refs belong to this repository; never confuse a fork branch with a local branch.
+        jq -e --arg repository "$GITHUB_REPOSITORY" '.head.repo.full_name == $repository' "$RUNNER_TEMP/pull.json" > /dev/null
+        jq '{ref: .head.ref, inputs: {"pr-number": (.number | tostring)}}' "$RUNNER_TEMP/pull.json" > "$RUNNER_TEMP/dispatch.json"
+        gh api --method POST "repos/$GITHUB_REPOSITORY/actions/workflows/verify.yml/dispatches" --input "$RUNNER_TEMP/dispatch.json"

@@ -79,6 +79,7 @@ class Selection(unittest.TestCase):
 
     def test_cli_main_label_and_reusable_release_select_full_and_write_outputs(self):
         for event in [{'event_name': 'push'}, {'event_name': 'workflow_call'},
+                      {'event_name': 'workflow_dispatch', 'inputs': {'pr-number': '7'}},
                       {'event_name': 'pull_request', 'pull_request': {'labels': [{'name': 'ci-full'}]}}]:
             with self.subTest(event=event), tempfile.TemporaryDirectory() as folder:
                 event_file = Path(folder) / 'event.json'
@@ -119,68 +120,109 @@ class Aggregation(unittest.TestCase):
 
 
 class Workflow(unittest.TestCase):
-    def test_only_suite_changing_events_run_and_share_pr_concurrency(self):
+    def test_metadata_events_cannot_emit_verification_check_names(self):
         workflow = yaml.safe_load((ci_select.ROOT / '.github/workflows/verify.yml').read_text())
         self.assertEqual(set(workflow['on']['pull_request']['types']),
-                         {'opened', 'synchronize', 'reopened', 'labeled', 'unlabeled', 'edited'})
+                         {'opened', 'synchronize', 'reopened'})
+        required_names = {job.get('name', name) for name, job in workflow['jobs'].items()}
+        metadata = yaml.safe_load((ci_select.ROOT / '.github/workflows/verify-metadata.yml').read_text())
+        self.assertEqual(set(metadata['on']['pull_request']['types']), {'labeled', 'unlabeled', 'edited'})
+        for name, job in metadata['jobs'].items():
+            emitted = job.get('name', name)
+            self.assertNotIn('${{', emitted, 'metadata check names must be fixed')
+            for required in required_names:
+                pattern = '.*'.join(re.escape(part) for part in re.split(r'\$\{\{.*?\}\}', required))
+                self.assertNotRegex(emitted, '^' + pattern + '$')
+            self.assertNotIn('uses', job, 'metadata must dispatch, not call verification jobs inline')
 
         def evaluate(value, context, condition=False):
-            # The workflow uses only comparisons, boolean operators and these two
-            # functions. Evaluate its actual expressions, not a copy of its policy.
             def expression(match):
-                source = match.group(1)
                 def reference(match):
                     current = context
                     for key in match.group().split('.'):
                         current = current.get(key, '') if isinstance(current, dict) else ''
                     return repr(current)
-                source = re.sub(r'\b(?:github|inputs|needs)\.[\w.-]+', reference, source)
-                source = source.replace('&&', ' and ').replace('||', ' or ')
-                return str(eval(source, {'__builtins__': {}},
-                                {'always': lambda: True, 'format': lambda pattern, *args: pattern.format(*args)}))
-            if not isinstance(value, str):
-                return value
+                source = re.sub(r'\b(?:github|inputs)\.[\w.-]+', reference, match.group(1))
+                return eval(source.replace('&&', ' and ').replace('||', ' or '), {'__builtins__': {}})
             if condition and not value.strip().startswith('${{'):
                 value = '${{ ' + value + ' }}'
             if value.strip().startswith('${{') and value.strip().endswith('}}'):
-                result = expression(re.fullmatch(r'\s*\$\{\{(.*?)\}\}\s*', value, re.S))
-                return {'True': True, 'False': False}.get(result, result)
-            return re.sub(r'\$\{\{(.*?)\}\}', expression, value, flags=re.S)
+                return expression(re.fullmatch(r'\s*\$\{\{(.*?)\}\}\s*', value, re.S))
+            return re.sub(r'\$\{\{(.*?)\}\}', lambda match: str(expression(match)), value, flags=re.S)
 
-        cases = [(action, {}, True) for action in ['opened', 'synchronize', 'reopened']]
-        cases += [(action, {'label': {'name': label}}, label == 'ci-full')
-                  for action in ['labeled', 'unlabeled'] for label in ['ci-full', 'ready-to-merge']]
+        cases = [(action, {'label': {'name': label}}, label == 'ci-full')
+                 for action in ['labeled', 'unlabeled'] for label in ['ci-full', 'ready-to-merge']]
         cases += [('edited', {'changes': changes}, relevant) for changes, relevant in [
             ({'base': {'ref': {'from': 'main'}}}, True),
             ({'body': {'from': 'old description'}}, False),
-            ({'title': {'from': 'old title'}}, False),
-            ({}, False),
+            ({'title': {'from': 'old title'}}, False), ({}, False),
         ]]
-        cases += [(event, {}, True) for event in ['push', 'workflow_dispatch', 'workflow_call']]
         for action, fields, relevant in cases:
-            for pr_number, run_id in [(42, 101), (42, 102), (43, 101)]:
-                with self.subTest(action=action, fields=fields, pr_number=pr_number, run_id=run_id):
-                    event_name = action if action in ['push', 'workflow_dispatch', 'workflow_call'] else 'pull_request'
-                    context = {'github': {'event_name': event_name, 'run_id': run_id, 'ref': 'refs/heads/main',
-                               'event': {'action': action, 'pull_request': {'number': pr_number,
-                                         'labels': [{'name': 'ci-full'}] if action != 'unlabeled' else []}, **fields}},
-                               'inputs': {'ref': 'release-ref' if action == 'workflow_call' else ''}}
-                    if event_name != 'pull_request':
-                        context['github']['event'].pop('pull_request')
-                    for job in ['paths-filter', 'adapter-postgres']:
-                        self.assertEqual(evaluate(workflow['jobs'][job].get('if', True), context, condition=True), relevant, job)
-                    group = evaluate(workflow['concurrency']['group'], context)
-                    expected = ('verify-release-ref' if action == 'workflow_call' else 'verify-refs/heads/main') \
-                        if event_name != 'pull_request' else (f'verify-{pr_number}' if relevant else f'verify-ignored-{run_id}')
-                    self.assertEqual(group, expected)
-                    self.assertEqual(evaluate(workflow['concurrency']['cancel-in-progress'], context),
-                                     event_name == 'pull_request' and relevant)
+            with self.subTest(action=action, fields=fields):
+                context = {'github': {'event': {'action': action, **fields}}}
+                self.assertEqual(evaluate(metadata['jobs']['request-verification']['if'], context, True), relevant)
+        for event, inputs, pr_number, expected, cancel in [
+            ('pull_request', {}, 42, 'verify-42', True),
+            ('pull_request', {}, 43, 'verify-43', True),
+            ('workflow_dispatch', {'pr-number': '42'}, '', 'verify-42', True),
+            ('workflow_dispatch', {}, '', 'verify-refs/heads/main', False),
+            ('push', {}, '', 'verify-refs/heads/main', False),
+            ('release', {'ref': 'release-ref'}, '', 'verify-release-ref', False),
+        ]:
+            with self.subTest(event=event, inputs=inputs):
+                context = {'github': {'event_name': event, 'ref': 'refs/heads/main',
+                                     'event': {'pull_request': {'number': pr_number}}}, 'inputs': inputs}
+                self.assertEqual(evaluate(workflow['concurrency']['group'], context), expected)
+                self.assertEqual(evaluate(workflow['concurrency']['cancel-in-progress'], context), cancel)
 
-        for result in ['success', 'failure', 'cancelled', 'skipped']:
-            for job in ['check', 'verify']:
-                with self.subTest(selector=result, aggregate=job):
-                    self.assertEqual(evaluate(workflow['jobs'][job]['if'],
-                                              {'needs': {'paths-filter': {'result': result}}}, condition=True), result != 'skipped')
+    def test_metadata_dispatch_targets_current_pr_branch_without_checking_out_code(self):
+        metadata = yaml.safe_load((ci_select.ROOT / '.github/workflows/verify-metadata.yml').read_text())
+        job = metadata['jobs']['request-verification']
+        self.assertFalse(any('uses' in step for step in job['steps']))
+        script = job['steps'][0]['run']
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            gh = root / 'gh'
+            gh.write_text('\n'.join([
+                '#!/usr/bin/env python3', 'import json, os, pathlib, sys',
+                'args = sys.argv[1:]',
+                'if args == ["api", "repos/example/repo/pulls/7"]:',
+                '    print(pathlib.Path(os.environ["FIXTURE_PR"]).read_text())',
+                'else:',
+                '    assert args[:3] == ["api", "--method", "POST"], args',
+                '    assert args[3] == "repos/example/repo/actions/workflows/verify.yml/dispatches", args',
+                '    payload = pathlib.Path(args[args.index("--input") + 1]).read_text()',
+                '    pathlib.Path(os.environ["FIXTURE_REQUEST"]).write_text(payload)',
+            ]) + '\n')
+            gh.chmod(0o755)
+            pr, request = root / 'pr.json', root / 'request.json'
+            for labels in [[{'name': 'ci-full'}], []]:
+                with self.subTest(labels=labels):
+                    pr.write_text(json.dumps({'number': 7, 'state': 'open', 'labels': labels,
+                                              'head': {'ref': 'feature/current-head',
+                                                       'repo': {'full_name': 'example/repo'}}}))
+                    result = subprocess.run(['bash', '-e', '-o', 'pipefail', '-c', script], capture_output=True, text=True,
+                                            env={**os.environ, 'PATH': str(root) + os.pathsep + os.environ['PATH'],
+                                                 'GITHUB_REPOSITORY': 'example/repo', 'PR_NUMBER': '7',
+                                                 'RUNNER_TEMP': str(root), 'FIXTURE_PR': str(pr),
+                                                 'FIXTURE_REQUEST': str(request)})
+                    self.assertEqual(result.returncode, 0, result.stderr)
+                    self.assertEqual(json.loads(request.read_text()),
+                                     {'ref': 'feature/current-head', 'inputs': {'pr-number': '7'}})
+            for state, repository, expected_code in [('closed', 'example/repo', 0),
+                                                     ('open', 'example/fork', 1)]:
+                with self.subTest(state=state, repository=repository):
+                    request.unlink(missing_ok=True)
+                    pr.write_text(json.dumps({'number': 7, 'state': state,
+                                              'head': {'ref': 'feature/current-head',
+                                                       'repo': {'full_name': repository}}}))
+                    result = subprocess.run(['bash', '-e', '-o', 'pipefail', '-c', script], capture_output=True,
+                                            env={**os.environ, 'PATH': str(root) + os.pathsep + os.environ['PATH'],
+                                                 'GITHUB_REPOSITORY': 'example/repo', 'PR_NUMBER': '7',
+                                                 'RUNNER_TEMP': str(root), 'FIXTURE_PR': str(pr),
+                                                 'FIXTURE_REQUEST': str(request)})
+                    self.assertEqual(result.returncode, expected_code)
+                    self.assertFalse(request.exists())
 
 
 if __name__ == '__main__':

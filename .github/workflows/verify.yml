@@ -9,10 +9,13 @@ name: Text foundation
     - opened
     - synchronize
     - reopened
-    - labeled
-    - unlabeled
-    - edited
-  workflow_dispatch: {}
+  workflow_dispatch:
+    inputs:
+      pr-number:
+        description: Pull request requesting full verification
+        type: string
+        required: false
+        default: ''
   workflow_call:
     inputs:
       ref:
@@ -20,25 +23,12 @@ name: Text foundation
         required: false
         default: ''
 concurrency:
-  # Metadata-only events must not replace running OR pending verification.
-  group: >-
-    verify-${{ github.event_name == 'pull_request' &&
-    (((github.event.action == 'labeled' || github.event.action == 'unlabeled') && github.event.label.name != 'ci-full') ||
-    (github.event.action == 'edited' && github.event.changes.base.ref == '')) &&
-    format('ignored-{0}', github.run_id) || github.event.pull_request.number || inputs.ref || github.ref }}
-  cancel-in-progress: >-
-    ${{ github.event_name == 'pull_request' &&
-    ((github.event.action != 'labeled' && github.event.action != 'unlabeled') || github.event.label.name == 'ci-full') &&
-    (github.event.action != 'edited' || github.event.changes.base.ref != '') }}
+  group: verify-${{ github.event.pull_request.number || inputs.pr-number || inputs.ref || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' || inputs.pr-number != '' }}
 permissions:
   contents: read
 jobs:
   paths-filter:
-    # The selector depends on the base SHA, so base edits must rerun it.
-    if: >-
-      github.event_name != 'pull_request' ||
-      (((github.event.action != 'labeled' && github.event.action != 'unlabeled') || github.event.label.name == 'ci-full') &&
-      (github.event.action != 'edited' || github.event.changes.base.ref != ''))
     runs-on: ubuntu-24.04
     timeout-minutes: 5
     outputs:
@@ -145,7 +135,7 @@ jobs:
     needs:
     - paths-filter
   check:
-    if: always() && needs.paths-filter.result != 'skipped'
+    if: always()
     needs:
     - paths-filter
     - check-group
@@ -160,10 +150,6 @@ jobs:
       env:
         CI_NEEDS: ${{ toJSON(needs) }}
   adapter-postgres:
-    if: >-
-      github.event_name != 'pull_request' ||
-      (((github.event.action != 'labeled' && github.event.action != 'unlabeled') || github.event.label.name == 'ci-full') &&
-      (github.event.action != 'edited' || github.event.changes.base.ref != ''))
     runs-on: ubuntu-24.04
     timeout-minutes: 10
     steps:
@@ -468,7 +454,7 @@ jobs:
       id: failure-artifact
     if: needs.paths-filter.outputs.has-images == 'true'
   verify:
-    if: always() && needs.paths-filter.result != 'skipped'
+    if: always()
     needs:
     - paths-filter
     - check
