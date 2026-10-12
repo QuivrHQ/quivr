@@ -2348,7 +2348,7 @@ type ManifestContentKind string
 
 // Match Immutable positive historical determination, not a claim of current eligibility. Unique subscription-version/record-version. Correction/withdrawal notifications reference history; no Match is fabricated for negative decisions. owner is the Subscription's owner, absent when global.
 type Match struct {
-	// Evidence Immutable evidence for a positive result, including evaluator version/configuration. Details are plugin-defined, bounded to 16 KiB and schema-validated by its adapter; core checks referenced Parts. Access is rechecked on reads.
+	// Evidence Immutable evidence for a positive result, including evaluator version/configuration. History retention may expire the entire evidence payload; historical reads then return 410 evidence_expired rather than a successful response with modified evidence. Details are plugin-defined, bounded to 16 KiB and schema-validated by its adapter; core checks referenced Parts. Access is rechecked on reads.
 	Evidence MatchEvidence `json:"evidence"`
 	MatchId  string        `json:"match_id"`
 
@@ -2363,7 +2363,7 @@ type Match struct {
 	SubscriptionVersionId string             `json:"subscription_version_id"`
 }
 
-// MatchEvidence Immutable evidence for a positive result, including evaluator version/configuration. Details are plugin-defined, bounded to 16 KiB and schema-validated by its adapter; core checks referenced Parts. Access is rechecked on reads.
+// MatchEvidence Immutable evidence for a positive result, including evaluator version/configuration. History retention may expire the entire evidence payload; historical reads then return 410 evidence_expired rather than a successful response with modified evidence. Details are plugin-defined, bounded to 16 KiB and schema-validated by its adapter; core checks referenced Parts. Access is rechecked on reads.
 type MatchEvidence struct {
 	Details *map[string]interface{} `json:"details,omitempty"`
 
@@ -3441,7 +3441,7 @@ type SubscriptionPreviewMatch struct {
 	AcceptedAt time.Time `json:"accepted_at"`
 	CorpusId   string    `json:"corpus_id"`
 
-	// Evidence Immutable evidence for a positive result, including evaluator version/configuration. Details are plugin-defined, bounded to 16 KiB and schema-validated by its adapter; core checks referenced Parts. Access is rechecked on reads.
+	// Evidence Immutable evidence for a positive result, including evaluator version/configuration. History retention may expire the entire evidence payload; historical reads then return 410 evidence_expired rather than a successful response with modified evidence. Details are plugin-defined, bounded to 16 KiB and schema-validated by its adapter; core checks referenced Parts. Access is rechecked on reads.
 	Evidence        MatchEvidence `json:"evidence"`
 	RecordId        string        `json:"record_id"`
 	RecordVersionId string        `json:"record_version_id"`

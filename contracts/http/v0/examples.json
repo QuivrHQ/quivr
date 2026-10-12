@@ -1749,5 +1749,14 @@
         "previous_plan_id": "plan_outgoing"
       }
     }
+  },
+  {
+    "name": "expired_match_evidence",
+    "schema": "Error",
+    "value": {
+      "code": "evidence_expired",
+      "message": "evidence expired",
+      "retryable": false
+    }
   }
 ]

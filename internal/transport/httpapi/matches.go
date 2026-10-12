@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"net/http"
+	"net/url"
 
 	"github.com/The-Vibe-Company/quivr/internal/corpus"
 	"github.com/The-Vibe-Company/quivr/internal/monitoring"
@@ -84,7 +85,7 @@ func (a *API) listMatches(w http.ResponseWriter, r *http.Request, scope corpus.S
 	var ok bool
 	var subscriptionID string
 	var after int64
-	matches, err := a.Monitoring.Matches(r.Context(), scope, "", 0, 0, func() (string, int64, int, error) {
+	matches, more, err := a.Monitoring.MatchesPage(r.Context(), scope, "", 0, 0, func() (string, int64, int, error) {
 		q := r.URL.Query()
 		for k, v := range q {
 			if (k != "subscription_id" && k != "page_cursor" && k != "limit") || len(v) != 1 {
@@ -116,26 +117,40 @@ func (a *API) listMatches(w http.ResponseWriter, r *http.Request, scope corpus.S
 			}
 		}
 
-		return subscriptionID, after, limit + 1, nil
+		return subscriptionID, after, limit, nil
 	})
 	if errors.Is(err, errResponseWritten) {
 		return
+	}
+	var expired *monitoring.MatchHistoryExpired
+	if errors.As(err, &expired) {
+		cursor := a.encodeMatchPage(matchPage{Version: 1, Subscription: subscriptionID, Scope: scopeDigest(scope), After: expired.After})
+		resync := "/v0/matches?" + url.Values{"subscription_id": {subscriptionID}, "page_cursor": {cursor}}.Encode()
+		err = &matchHistoryResync{err: err, url: resync}
 	}
 	if err != nil {
 		writeError(w, err, publicerr.StorageUnavailable)
 		return
 	}
 	page := transport.MatchPage{Items: make([]transport.Match, 0, min(len(matches), limit))}
-	for i, m := range matches {
-		if i == limit {
-			next := a.encodeMatchPage(matchPage{Version: 1, Subscription: subscriptionID, Scope: scopeDigest(scope), After: matches[limit-1].Position})
-			page.NextPageCursor = &next
-			break
-		}
+	for _, m := range matches {
 		page.Items = append(page.Items, matchToTransport(m))
+	}
+	if more {
+		next := a.encodeMatchPage(matchPage{Version: 1, Subscription: subscriptionID, Scope: scopeDigest(scope), After: matches[len(matches)-1].Position})
+		page.NextPageCursor = &next
 	}
 	send(w, 200, page)
 }
+
+type matchHistoryResync struct {
+	err error
+	url string
+}
+
+func (e *matchHistoryResync) Error() string           { return e.err.Error() }
+func (e *matchHistoryResync) Unwrap() error           { return e.err }
+func (e *matchHistoryResync) PublicResyncURL() string { return e.url }
 
 func matchToTransport(m monitoring.Match) transport.Match {
 	out := transport.Match{MatchId: m.ID, SubscriptionId: m.SubscriptionID, SubscriptionVersionId: m.SubscriptionVersionID, SavedQueryId: m.SavedQueryID, SavedQueryVersionId: m.SavedQueryVersionID,

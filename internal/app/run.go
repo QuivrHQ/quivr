@@ -29,6 +29,7 @@ import (
 	"github.com/The-Vibe-Company/quivr/internal/connectors"
 	"github.com/The-Vibe-Company/quivr/internal/content"
 	"github.com/The-Vibe-Company/quivr/internal/corpus"
+	"github.com/The-Vibe-Company/quivr/internal/history"
 	"github.com/The-Vibe-Company/quivr/internal/lifecycle"
 	"github.com/The-Vibe-Company/quivr/internal/monitoring"
 	"github.com/The-Vibe-Company/quivr/internal/normalization"
@@ -50,6 +51,7 @@ import (
 )
 
 type Config struct {
+	HistoryRetention HistoryRetentionConfig      `json:"history_retention"`
 	Postgres         PostgresConfig              `json:"postgres"`
 	Worker           workqueue.Config            `json:"worker"`
 	QueueObservation workqueue.ObservationConfig `json:"queue_observation"`
@@ -419,6 +421,10 @@ func Run(command string, args ...string) error {
 		}
 	}
 	prune, err := cfg.ChangePrune.parse(retention)
+	if err != nil {
+		return err
+	}
+	historyPolicy, err := cfg.HistoryRetention.parse()
 	if err != nil {
 		return err
 	}
@@ -912,6 +918,9 @@ func Run(command string, args ...string) error {
 		// evaluation and delivery; its watermark keeps cursor expiry exact.
 		loops.Go(func(ctx context.Context) {
 			changes.Pruner{Audit: auditStore, AuditRetentionMonths: auditMonths, Store: journal, Retention: prune.Retention, Interval: prune.Interval, Organizations: prune.Organizations, Metrics: pruneMetrics}.Run(ctx)
+		})
+		loops.Go(func(ctx context.Context) {
+			history.Run(ctx, postgres.HistoryStore{Pool: pool}, historyPolicy)
 		})
 		loops.Go(func(ctx context.Context) {
 			processing.IngestionPageSweeper{Store: baseline, Content: contents, Batch: 100}.Run(ctx)

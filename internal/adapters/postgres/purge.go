@@ -4,10 +4,10 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"github.com/jackc/pgx/v5"
 	"time"
 
 	"github.com/The-Vibe-Company/quivr/internal/retrieval"
+	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
@@ -140,14 +140,27 @@ func (s PurgeStore) RecordPurge(ctx context.Context, it retrieval.PurgeItem, del
 	if limit <= 0 {
 		return false, errors.New("purge batch must be positive")
 	}
-	tx, err := s.Pool.Begin(ctx)
+	// A purge worker must release its row lease and transaction promptly even
+	// when a writer holds a lock or a growing table makes a batch expensive.
+	// The context is deliberately below the five-second worker budget; the
+	// transaction-local statement and lock limits provide a server-side fence.
+	purgeCtx, cancel := context.WithTimeout(ctx, 4*time.Second)
+	defer cancel()
+	tx, err := s.Pool.Begin(purgeCtx)
 	if err != nil {
 		return false, err
 	}
-	defer tx.Rollback(ctx)
+	defer func() {
+		rollbackCtx, rollbackCancel := context.WithTimeout(context.WithoutCancel(purgeCtx), 500*time.Millisecond)
+		defer rollbackCancel()
+		_ = tx.Rollback(rollbackCtx)
+	}()
+	if _, err = tx.Exec(purgeCtx, "SET LOCAL lock_timeout = '500ms'; SET LOCAL statement_timeout = '3500ms'"); err != nil {
+		return false, err
+	}
 	var stage int
 	var cursor json.RawMessage
-	err = tx.QueryRow(ctx, `SELECT cleanup_stage,cleanup_cursor FROM projection_purges WHERE organization=$1 AND kind=$2 AND corpus_id=$3 AND generation_id=$4 AND version_id=$5 AND (purged_at IS NULL OR cleanup_stage<3) FOR UPDATE`, it.Organization, it.Kind, it.CorpusID, it.GenerationID, it.VersionID).Scan(&stage, &cursor)
+	err = tx.QueryRow(purgeCtx, `SELECT cleanup_stage,cleanup_cursor FROM projection_purges WHERE organization=$1 AND kind=$2 AND corpus_id=$3 AND generation_id=$4 AND version_id=$5 AND (purged_at IS NULL OR cleanup_stage<3) FOR UPDATE`, it.Organization, it.Kind, it.CorpusID, it.GenerationID, it.VersionID).Scan(&stage, &cursor)
 	if errors.Is(err, pgx.ErrNoRows) {
 		return false, nil
 	}
@@ -155,18 +168,18 @@ func (s PurgeStore) RecordPurge(ctx context.Context, it retrieval.PurgeItem, del
 		return false, err
 	}
 	if complete {
-		stage, cursor, err = purgeCoverageBatch(ctx, tx, it, stage, cursor, limit)
+		stage, cursor, err = purgeCoverageBatch(purgeCtx, tx, it, stage, cursor, limit)
 		if err != nil {
 			return false, err
 		}
 		complete = stage == 3
 	}
-	_, err = tx.Exec(ctx, `UPDATE projection_purges SET objects_deleted=objects_deleted+$6,lease_until='-infinity',purged_at=CASE WHEN $7 THEN now() END,cleanup_stage=$8,cleanup_cursor=$9
+	_, err = tx.Exec(purgeCtx, `UPDATE projection_purges SET objects_deleted=objects_deleted+$6,lease_until='-infinity',purged_at=CASE WHEN $7 THEN now() END,cleanup_stage=$8,cleanup_cursor=$9
  WHERE organization=$1 AND kind=$2 AND corpus_id=$3 AND generation_id=$4 AND version_id=$5`, it.Organization, it.Kind, it.CorpusID, it.GenerationID, it.VersionID, deleted, complete, stage, cursor)
 	if err != nil {
 		return false, err
 	}
-	return complete, tx.Commit(ctx)
+	return complete, tx.Commit(purgeCtx)
 }
 
 // Each stage scans primary keys before checking corpus/generation ownership.
@@ -186,7 +199,7 @@ func purgeCoverageBatch(ctx context.Context, tx pgx.Tx, it retrieval.PurgeItem, 
     DELETE FROM compact_embedding_coverage cc USING candidates c
     WHERE (cc.organization_id,cc.file_id,cc.generation_id)=(c.organization_id,c.file_id,c.generation_id)
      AND EXISTS(SELECT 1 FROM embedding_files f WHERE f.id=c.file_id AND f.organization_id=c.organization_id
-      AND CASE WHEN $2='generation' THEN c.generation_id=$4 AND f.corpus_id=$3 ELSE f.version_id=$5 END LIMIT 1)
+     AND CASE WHEN $2::text='generation' THEN c.generation_id=$4 AND f.corpus_id=$3 ELSE f.version_id=$5 END LIMIT 1)
    ) SELECT count(*),COALESCE((SELECT jsonb_build_array(file_id,generation_id) FROM candidates ORDER BY file_id DESC,generation_id DESC LIMIT 1),'[]'::jsonb) FROM candidates`
 		} else {
 			table, pluginKey := "projection_coverage", ",pc.plugin_id"
@@ -196,27 +209,44 @@ func purgeCoverageBatch(ctx context.Context, tx pgx.Tx, it retrieval.PurgeItem, 
 				pluginKey = ""
 				cursorKeys = "COALESCE($7::jsonb->>0,''),COALESCE($7::jsonb->>1,'')"
 			}
-			keys := "pc.version_id,pc.generation_id" + pluginKey
-			desc := "version_id DESC,generation_id DESC"
-			if stage == 1 {
-				desc += ",plugin_id DESC"
+			if stage == 2 && it.Kind == retrieval.PurgeGeneration {
+				args = []any{it.Organization, it.GenerationID, it.CorpusID, limit, cursor}
+				query = `WITH candidates AS MATERIALIZED (
+    SELECT pm.organization,pm.version_id,pm.generation_id FROM projection_metadata pm
+    WHERE pm.organization=$1 AND pm.generation_id=$2
+      AND (pm.version_id,pm.generation_id)>(COALESCE($5::jsonb->>0,''),COALESCE($5::jsonb->>1,''))
+    ORDER BY pm.version_id,pm.generation_id LIMIT $4
+   ), removed AS (
+    DELETE FROM projection_metadata pm USING candidates c
+    WHERE (pm.organization,pm.version_id,pm.generation_id)=(c.organization,c.version_id,c.generation_id)
+      AND EXISTS(
+       SELECT 1 FROM record_versions v JOIN records r ON(r.organization,r.id)=(v.organization,v.record_id)
+       WHERE v.organization=c.organization AND v.id=c.version_id AND r.corpus_id=$3 LIMIT 1)
+   ) SELECT count(*),COALESCE((SELECT jsonb_build_array(version_id,generation_id) FROM candidates ORDER BY version_id DESC,generation_id DESC LIMIT 1),'[]'::jsonb) FROM candidates`
 			}
-			candidateKeys := "c.version_id,c.generation_id"
-			jsonKeys := "version_id,generation_id"
-			if stage == 1 {
-				candidateKeys += ",c.plugin_id"
-				jsonKeys += ",plugin_id"
-			}
-			query = `WITH candidates AS MATERIALIZED (
+			if query == "" {
+				keys := "pc.version_id,pc.generation_id" + pluginKey
+				desc := "version_id DESC,generation_id DESC"
+				if stage == 1 {
+					desc += ",plugin_id DESC"
+				}
+				candidateKeys := "c.version_id,c.generation_id"
+				jsonKeys := "version_id,generation_id"
+				if stage == 1 {
+					candidateKeys += ",c.plugin_id"
+					jsonKeys += ",plugin_id"
+				}
+				query = `WITH candidates AS MATERIALIZED (
     SELECT pc.organization,` + keys + ` FROM ` + table + ` pc WHERE pc.organization=$1 AND (` + keys + `)>(` + cursorKeys + `)
     ORDER BY ` + keys + ` LIMIT $6
    ), removed AS (
     DELETE FROM ` + table + ` pc USING candidates c WHERE pc.organization=c.organization AND (` + keys + `)=(` + candidateKeys + `)
-    AND CASE WHEN $2='generation' THEN c.generation_id=$4 AND EXISTS(
+    AND CASE WHEN $2::text='generation' THEN c.generation_id=$4 AND EXISTS(
      SELECT 1 FROM record_versions v JOIN records r ON(r.organization,r.id)=(v.organization,v.record_id)
      WHERE v.organization=c.organization AND v.id=c.version_id AND r.corpus_id=$3 LIMIT 1)
     ELSE c.version_id=$5 END
    ) SELECT count(*),COALESCE((SELECT jsonb_build_array(` + jsonKeys + `) FROM candidates ORDER BY ` + desc + ` LIMIT 1),'[]'::jsonb) FROM candidates`
+			}
 		}
 		var scanned int
 		if err := tx.QueryRow(ctx, query, args...).Scan(&scanned, &cursor); err != nil {
