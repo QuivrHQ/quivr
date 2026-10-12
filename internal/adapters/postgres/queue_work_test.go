@@ -246,6 +246,8 @@ func queueWorkPool(t *testing.T, ctx context.Context) *pgxpool.Pool {
 		t.Fatal(err)
 	}
 	connection.ConnConfig.Database = name
+	// Match the smallest default pool on CI, independent of host CPU count.
+	connection.MaxConns = 4
 	pool, err := pgxpool.NewWithConfig(ctx, connection)
 	if err != nil {
 		_, _ = admin.Exec(context.Background(), "DROP DATABASE "+name+" WITH (FORCE)")
@@ -461,6 +463,12 @@ func TestQueueBootstrapRecomputesAfterObservationWriterCommits(t *testing.T) {
 			if !initialized {
 				t.Fatal("bootstrap did not persist completion after recomputing the committed state")
 			}
+
+			// Return the race participants before the independent lock probe. Keeping
+			// all three checked out starves a four-connection pool on its fifth acquire.
+			writer.Release()
+			bootstrap.Release()
+			observer.Release()
 
 			// A completed bootstrap does not need the records table again, even while
 			// an unrelated writer holds an exclusive lock on it.
