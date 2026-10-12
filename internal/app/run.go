@@ -62,6 +62,7 @@ type Config struct {
 	// plugin (THE-777), which serve the legacy E5 space until rebuilt.
 	TEIURL                  string                  `json:"tei_url"`
 	WeaviateURL             string                  `json:"weaviate_url"`
+	WeaviateAPIKey          string                  `json:"weaviate_api_key"`
 	TemporalAddress         string                  `json:"temporal_address"`
 	S3                      s3store.Config          `json:"s3"`
 	LogLevel                string                  `json:"log_level"`
@@ -555,7 +556,7 @@ func Run(command string, args ...string) error {
 	contents := content.Service{Submissions: submissions, Receipts: receipts, RecordStore: records, Versions: versions, Materialization: materialization, Catalog: records, Stats: postgres.CorpusStatsStore{Pool: pool}, Facets: records, Blobs: blobs, Baseline: baseline, Embeddings: embeddings, BlobSource: uploadStore, Relations: records, Extensions: live, Normalizations: normalizations, Supersession: normalizations, Routes: live,
 		Received: recorder.Received}
 	uploadService := uploads.Service{Store: uploadStore, Transfer: blobs}
-	projection, err := weaviate.NewWithTLS(cfg.WeaviateURL, cfg.TLS.Weaviate)
+	projection, err := weaviate.NewWithTLS(cfg.WeaviateURL, cfg.TLS.Weaviate, cfg.WeaviateAPIKey)
 	if err != nil {
 		return err
 	}

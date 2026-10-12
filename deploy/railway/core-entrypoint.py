@@ -247,6 +247,9 @@ def build_config(env):
         # Its queries are demo traffic; a deployment with private queries leaves this off.
         'observability': {'record_query_text': True},
     }
+    weaviate_key = env.get('WEAVIATE_API_KEY', '')
+    if weaviate_key:
+        config['weaviate_api_key'] = weaviate_key
     # Optional operator key, never given to the web app: rebuilds a Corpus projection
     # (for example after a migration adds a projected field), reads the plugin
     # registry (plugins:admin), the admin views (observability:read) and archives (corpora:archive) or renames (corpora:rename)
@@ -508,7 +511,8 @@ def main():
     plugin_secrets = {name for plugin in PLUGINS + runtime_connectors(os.environ) + [HOSTED_EMBED]
                       for name in plugin.get('secrets', [])}
     plugin_secrets.add('EMBED_API_KEY')
-    core_env = {name: value for name, value in os.environ.items() if name not in plugin_secrets and name != 'QUIVR_PLUGIN_SIGNING_KEYS'}
+    core_env = {name: value for name, value in os.environ.items()
+                if name not in plugin_secrets | {'WEAVIATE_API_KEY'} and name != 'QUIVR_PLUGIN_SIGNING_KEYS'}
     core_env.update(engine_signing_environment(os.environ))
     # Only the API applies startup migrations; failures abort before serving.
     if mode == 'api':

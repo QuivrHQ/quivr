@@ -33,8 +33,9 @@ func TestFR_ENRelevanceByMode(t *testing.T) {
 		t.Fatal(err)
 	}
 	var cfg struct {
-		TEIURL      string `json:"tei_url"`
-		WeaviateURL string `json:"weaviate_url"`
+		TEIURL         string `json:"tei_url"`
+		WeaviateURL    string `json:"weaviate_url"`
+		WeaviateAPIKey string `json:"weaviate_api_key"`
 	}
 	if err = json.Unmarshal(b, &cfg); err != nil {
 		t.Fatal(err)
@@ -44,7 +45,7 @@ func TestFR_ENRelevanceByMode(t *testing.T) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Minute)
 	defer cancel()
 	model := tei.Encoder{Endpoint: cfg.TEIURL}
-	projection := weaviate.New(cfg.WeaviateURL)
+	projection := weaviate.New(cfg.WeaviateURL, cfg.WeaviateAPIKey)
 	g := content.Generation{ID: "relevance-fixture", Collection: "QuivrRelevanceV1", ProfileVersion: retrieval.ProfileVersion, SpaceID: model.Space().ID}
 	if err = projection.Bootstrap(ctx, g.Collection); err != nil {
 		t.Fatal(err)
