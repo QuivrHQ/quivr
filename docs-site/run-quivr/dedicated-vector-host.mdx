@@ -1,0 +1,109 @@
+---
+title: Run the vector index on a dedicated host
+description: Give Weaviate its own memory and persistent disk while keeping the rest of your installation in place.
+keywords: [Weaviate, Azure, persistent disk, memory, HTTPS]
+---
+Run Weaviate, Quivr's search index, on a separate machine with authenticated HTTPS and a persistent data disk.
+
+## Prerequisites
+
+- An operator checkout of the Quivr revision you deploy, Python 3.12+ (`python3 --version`), and SSH (`ssh -V`).
+- For the Azure example, Azure CLI (`az version`), an authenticated subscription (`az account show`), permission to create the resources below and invoke VM Run Command to read its public SSH host key. Your region and zone must offer Premium SSD v2 and the selected VM size.
+- A private SSH identity file outside the repository, its public key, an admin username, and the public CIDRs your operator connections originate from. Before sending the API key, the script verifies the SSH host key through Azure's authenticated control plane. It saves a private trust file beside your SSH identity, or at `--known-hosts FILE`, and uses strict host-key checking thereafter. Keep that trust file for repeat runs.
+- A regular `0600` API-key file containing 16–256 URL-safe characters. Generate and store it outside the repository. The same key becomes `WEAVIATE_API_KEY` in the engine's API and every worker.
+- A running installation with API-key-capable Weaviate clients. For migration, preserve PostgreSQL, canonical content and stored vector artifacts. Your Quivr API key needs `corpora:read`, `projections:rebuild`, `operations:read` and `search:query`.
+
+Use a dedicated host when shared-host memory reclamation or limited disk I/O makes searches slow after idle time. It also separates index compaction from application work. A restart still loses warm caches; isolation alone does not promise a search deadline.
+
+Budget **RAM ≥ index data on disk + compressed vector cache and graph + headroom**. Include runtime allocations, active memtables and simultaneous rebuilds. The shared `large` profile caps Weaviate at 64,000,000,000 bytes with `GOMEMLIMIT=16GiB`; a larger VM needs a corresponding container-memory override. The installer requires at least 2 GiB beyond the container limit for the host and proxy. Increase that margin for your workload.
+
+Provision SSD IOPS and throughput for random reads, imports and compaction. The VM's uncached disk limits can cap a faster disk. Leave room for the OS disk and maintenance. See [cold-index sizing](../run-quivr/scale-quivr.mdx#cold-index-search).
+
+## Steps
+
+### 1. Inspect the portable definition
+
+The files in [`deploy/vector-host/`](https://github.com/The-Vibe-Company/quivr/tree/main/deploy/vector-host) reuse the pinned image and profile environment from `deploy/infrastructure.json`. They force API-key authentication on and anonymous access off. Caddy provides automatic certificates through TCP 443; raw Weaviate ports and HTTP port 80 remain closed. Firewall rules permit SSH only from your operator CIDRs.
+
+This credential-free preview was run locally. The DNS name and device are placeholders; rendering never touches the device:
+
+```sh
+python3 deploy/vector-host/host.py render \
+  --hostname index.example.invalid --operator-cidr 192.0.2.0/24 \
+  --data-device /dev/disk/by-id/example.vector-host \
+  --profile large --output .scratch/vector-host-preview
+```
+
+Inspect `compose.json`, `Caddyfile`, `firewall.nft` and the systemd units in the output directory. No API key appears in rendered files. `--overrides FILE` accepts the [shared override format](https://github.com/The-Vibe-Company/quivr/blob/main/deploy/infrastructure.md).
+
+On another Ubuntu 24.04 x86_64 VM, install Docker with Compose v2, nftables and Python, copy this checkout, and run `host.py apply` as root with those host arguments and `--api-key-file FILE`. Use `--initialize-empty-disk` only for a new blank whole data disk. Existing ext4 filesystems are retained; root disks, partitioned disks, foreign mounts and other filesystem types are refused. The installation mounts by UUID and refuses to start on a missing or wrong disk, including when Docker restarts.
+
+### 2. Provision the Azure host
+
+Set the variables below from your private deployment configuration: resource group and VM names, region, zone, globally available DNS label, admin username, operator CIDR, and paths to your SSH identity/public key and API-key file. All names are configurable; omitted component names derive from the VM name.
+
+Example requiring your Azure account and private files; not run against a cloud provider:
+
+```sh
+python3 deploy/vector-host/azure.py \
+  --resource-group "$VECTOR_RESOURCE_GROUP" --name "$VECTOR_HOST_NAME" \
+  --location "$VECTOR_LOCATION" --zone "$VECTOR_ZONE" \
+  --dns-label "$VECTOR_DNS_LABEL" --admin-user "$VECTOR_ADMIN_USER" \
+  --operator-cidr "$VECTOR_OPERATOR_CIDR" \
+  --ssh-public-key "$VECTOR_SSH_PUBLIC_KEY_FILE" \
+  --ssh-identity "$VECTOR_SSH_IDENTITY_FILE" \
+  --api-key-file "$VECTOR_API_KEY_FILE"
+```
+
+Repeat `--operator-cidr` for additional operator networks. Defaults are `Standard_E8s_v5` (8 vCPU / 64 GiB), Ubuntu 24.04 x86_64, and a separate `PremiumV2_LRS` disk with 512 GiB, 12,000 IOPS and 250 MB/s. Host caching is `None`, required for Premium SSD v2. A new IPv4 virtual network and subnet are created. This example requires a zonal VM for Premium SSD v2; VM and disk use the same zone selected with `--zone`.
+
+Use `--vm-size`, `--image`, `--disk-size`, `--disk-iops`, `--disk-mbps`, `--vnet-cidr` and `--subnet-cidr` to change defaults. Component names use `--disk-name`, `--nsg-name`, `--public-ip-name`, `--vnet-name`, `--subnet-name` and `--nic-name`. The script checks VM RAM and uncached disk limits and caps the resolved container CPU limit to its vCPU count. Preserve that CPU setting in overrides when comparing installation checks. See [Azure disk requirements](https://learn.microsoft.com/en-us/azure/virtual-machines/disks-deploy-premium-v2) and [VM sizing](https://learn.microsoft.com/en-us/azure/virtual-machines/sizes/memory-optimized/esv5-series).
+
+Azure creates a static public IP with your DNS label, a network security group allowing 443 from anywhere and 22 from operator CIDRs, and a retained data disk. Cloud-init installs the portable definition and mounts the disk by UUID. After verifying SSH trust and the expected bootstrap, the API key travels separately over SSH stdin into a root-owned `0600` file at `/etc/quivr-vector-host/weaviate.env`. It stays out of cloud-init, resource tags and command arguments.
+
+The command returns `weaviate_url` and `resolved_weaviate_limits`. Service startup and certificate issuance continue on the host; check them before cutover. Repeating the same declaration creates no resources, reformats no disk and restarts no healthy service. Ownership or incompatible configuration drift is refused. A failed first run can leave owned resources; inspect privately and rerun the same command. Source/configuration changes require deliberate host updates rather than silently replacing the VM or disk.
+
+### 3. Move the installation
+
+Schedule downtime for search while the new index is built. Pause source collection and writes, stop workers that write to the old host, and preserve its disk for recovery. Set `WEAVIATE_URL` to the returned HTTPS URL and `WEAVIATE_API_KEY` to the matching key on the API and every worker. For native configuration, use `weaviate_url` and `weaviate_api_key`; keep TLS verification enabled. See [runtime configuration](../reference/configuration.mdx).
+
+Run the installation's schema bootstrap (`quivr migrate`) against the new host, then start the API and rebuild workers with the new settings. Enumerate every organization's document collections (Corpora) and request a rebuild for each through `POST /v0/corpora/{corpus_id}/rebuilds` (`rebuildCorpusProjection`). Supply a new `idempotency_key` in the action body; list Corpora with `GET /v0/corpora`. See the [HTTP API](../api-reference/overview.mdx). Follow the returned Operation until it completes. A projection is the searchable representation of stored content; rebuilding uses canonical text and retained vector artifacts, without re-importing sources. Compatible stored vectors can avoid new embedding calls. Rebuild failures leave search unavailable for the affected Corpus; inspect and retry through the supported Operation workflow.
+
+Check counts, coverage and real lexical, semantic and hybrid searches before resuming source collection and normal writes. Keep all roles on the same index endpoint. If you return to the old host after accepting new writes, rebuild its projections from current durable content before reopening search.
+
+### 4. Check the host and reset scope
+
+Example requiring access to the provisioned host; not run against a cloud provider:
+
+```sh
+ssh "$VECTOR_ADMIN_USER@$VECTOR_HOST_DNS" \
+  sudo python3 /opt/quivr-vector-host/deploy/vector-host/host.py check
+```
+
+The host check reports actual image, startup settings, container limits, mounted disk UUID and capacity as `match`, `drift` or `unknown`. It never reports the allowed API key. Compose and Railway infrastructure CLIs accept `--vector-host SSH_TARGET`; `--vector-host` without a target explicitly reports unknown. Automatic endpoint detection prevents an unused local Weaviate from proving external settings. Use the same profile and overrides as the host, including its resolved CPU cap. SSH probes use your configured identity and known host key.
+
+`host.py apply` preserves the data and certificate disk. The installation reset helper refuses an external or unverifiable vector endpoint before stopping writers or deleting volumes. It does not erase this host. Follow [reset and reload](../run-quivr/reset-and-reload.mdx) only for a supported installation with its selected local index; migration never requires a reset.
+
+## Check it worked
+
+Verify a protected endpoint such as `/v1/schema`: a request without a key is refused and the matching bearer key succeeds over HTTPS. Readiness alone does not prove authentication. Check that 443 is reachable, raw index ports/80 are closed, and 22 is reachable only from operator networks.
+
+After a VM or Docker restart, the same data UUID mounts before the index starts. A missing disk prevents startup. Reapply the unchanged declaration and check that resources, data and service uptime are preserved. Test engine searches after idle time, restart and import completion; monitor memory refaults and disk latency. These live checks require the provisioned host and were not performed by the worker.
+
+## Troubleshooting
+
+- If provisioning refuses capacity or drift, inspect the selected Azure resources privately. Check region/zone availability, VM limits and the original declaration; retain the disk.
+- If initialization fails, inspect `cloud-init status`, its logs and the host service journal privately, then rerun. Ensure your public IP is in an operator CIDR.
+- If certificates are unavailable, check the DNS label resolves to the static IP and TCP 443 reaches Caddy directly. TLS-ALPN validation needs that port.
+- If checks report unknown, supply a reachable SSH target with sudo observation access, or inspect directly on the host. Unknown does not prove a match.
+- If search slows after quiet time, revisit resident-memory and storage budgets; compare warm/cold searches and maintenance load.
+
+## Clean up
+
+Resources incur ongoing cloud charges. Stop all writers before retiring a host. VM deletion detaches the data disk; the provisioner never deletes it. Back up durable engine storage and the retained disk before explicitly deleting Azure resources. Keep private declarations and keys outside this public repository.
+
+## Next
+
+- [Scale Quivr](../run-quivr/scale-quivr.mdx)
+- [Run a large import](../run-quivr/run-a-large-import.mdx)
+- [Reset and reload](../run-quivr/reset-and-reload.mdx)

@@ -7,6 +7,8 @@ Reset a dedicated installation, then recreate its collections (Corpora) and sour
 
 ## Prerequisites
 
+The reset preflight refuses an external or unverifiable vector index before stopping writers or deleting volumes. A [dedicated vector host](/run-quivr/dedicated-vector-host) retains its data disk; this helper does not reset it. Migration to that host uses projection rebuilds from stored content instead.
+
 - A checkout of the same Quivr revision your installation runs, Python 3.12+ (`python3 --version`), and the built `quivr` binary (`quivr --version`).
 - For Compose, the running `make dev` Stack from this checkout and Docker Compose (`docker compose version`). Use its project name from `.scratch/`. Standalone Compose layouts and externally managed API processes are unsupported.
 - For Railway, the [checked-in deployment layout](/run-quivr/deploy), Railway CLI with `railway api` and `railway ssh`, and an account/workspace `RAILWAY_API_TOKEN` with operator access to every environment. Unset project-scoped `RAILWAY_TOKEN`; it cannot prove project-wide volume isolation. Every service must use one stable, redeployable artifact; stop deployment automation during maintenance.

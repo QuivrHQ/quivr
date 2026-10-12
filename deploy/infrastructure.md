@@ -1,7 +1,7 @@
 # Shared infrastructure settings
 
 `deploy/infrastructure.json` is the source of truth for portable Compose and Railway settings. It contains no credentials or deployment selectors.
-`small` is the conservative default; `large` is an unbenchmarked operational starting point for object-heavy imports, not a capacity promise.
+`small` is the conservative default; `large` is an unbenchmarked operational starting point for object-heavy imports, not a capacity promise. For a separate index VM, follow [Run the vector index on a dedicated host](../docs-site/run-quivr/dedicated-vector-host.mdx). Adapter `check` accepts `--vector-host [SSH_TARGET]`; without a reachable observer, external settings are unknown. Reset refuses external or unverifiable endpoints before mutations.
 
 ## Profiles
 

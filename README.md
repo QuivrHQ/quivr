@@ -87,6 +87,8 @@ For a browser UI over the same API, run `make demo` and open http://127.0.0.1:51
 
 ## What works today
 
+- [Run the vector index on a dedicated host](https://docs.quivr.thevibecompany.co/run-quivr/dedicated-vector-host) with authenticated HTTPS, a persistent data disk, and an idempotent Azure CLI provisioning example.
+
 - [Reset and reload an installation](https://docs.quivr.thevibecompany.co/run-quivr/reset-and-reload) from private JSON declarations, with a preview and idempotent public API replay.
 
 - [Choose an embedding model](https://docs.quivr.thevibecompany.co/run-quivr/choose-an-embedding-model) for local inference, your own model server or a hosted API, with rebuild requirements and execution-only tuning. [Run a large import](https://docs.quivr.thevibecompany.co/run-quivr/run-a-large-import) covers bulk workers, provider capacity, database sizing and queue monitoring.
