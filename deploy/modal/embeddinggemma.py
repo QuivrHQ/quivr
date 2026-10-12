@@ -39,7 +39,8 @@ gpu_image = (modal.Image.debian_slim(python_version='3.12')
              .add_local_file(ROOT / 'embedding_api.py', '/root/embedding_api.py', copy=True))
 
 
-@app.cls(image=gpu_image, gpu='L4', cpu=4, memory=8192, timeout=90,
+# A list lets Modal fall back when one GPU type has no capacity; all fit the model.
+@app.cls(image=gpu_image, gpu=['L4', 'A10G', 'L40S'], cpu=4, memory=8192, timeout=90,
          min_containers=MIN_CONTAINERS, max_containers=MAX_CONTAINERS, scaledown_window=60)
 class Encoder:
     @modal.enter()
