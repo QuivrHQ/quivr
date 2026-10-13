@@ -41,7 +41,8 @@ def deployment_config(spec, new):
         if spec['dockerfile'] == 'postgres':
             config['source'] = {'image': None}
     if 'healthcheck' in spec:
-        config.update(healthcheckPath=spec['healthcheck'], healthcheckTimeout=180)
+        config.update(healthcheckPath=spec['healthcheck'],
+                      healthcheckTimeout=spec.get('healthcheck_timeout', 180))
     return config
 
 

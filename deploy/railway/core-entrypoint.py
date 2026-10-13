@@ -234,6 +234,8 @@ def build_config(env):
         'cursor_key': env['QUIVR_CURSOR_KEY'],
         'listen': '0.0.0.0:8080',
         'probe_listen': '0.0.0.0:' + env.get('PORT', '8081'),
+        # Workers may start before the API builds and applies new migrations.
+        'migration_wait': '10m',
         'temporal_address': env['TEMPORAL_ADDRESS'],
         'weaviate_url': env['WEAVIATE_URL'],
         # Encodes queries for generations built before core.ingest, until each Corpus is rebuilt.

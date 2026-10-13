@@ -394,6 +394,9 @@ func (s OperationStore) ClaimOperations(ctx context.Context, limit int) ([]opera
 	if limit <= 0 {
 		return nil, nil
 	}
+	// Private terminal rebuild ledgers are bounded scratch work; failure to
+	// reclaim this batch must not hold up dispatch of unrelated Operations.
+	_ = s.cleanupRebuildValidation(ctx)
 	adminRows, err := database(ctx, s.Pool).Query(ctx, `WITH claimed AS (
  UPDATE routing_operation_outbox o SET lease_until=now()+interval '5 seconds'
  FROM (SELECT organization,operation_id FROM routing_operation_outbox WHERE NOT dispatched AND lease_until<now() ORDER BY operation_id,organization FOR UPDATE SKIP LOCKED LIMIT $1) pending

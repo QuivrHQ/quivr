@@ -125,7 +125,16 @@ func TestConcurrentActivationsConvergeOnLaterAcceptance(t *testing.T) {
 			wg.Add(1)
 			go func() {
 				defer wg.Done()
-				_, errs[j] = f.store.ActivateRebuild(f.ctx, f.org, op.ID)
+				// A busy publication fence or incomplete validation yields. Drive
+				// the public activation contract until its terminal outcome.
+				for f.ctx.Err() == nil {
+					var done bool
+					done, errs[j] = f.store.ActivateRebuild(f.ctx, f.org, op.ID)
+					if done || errs[j] != nil {
+						return
+					}
+				}
+				errs[j] = f.ctx.Err()
 			}()
 		}
 		wg.Wait()

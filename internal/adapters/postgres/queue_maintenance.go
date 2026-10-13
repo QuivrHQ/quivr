@@ -94,7 +94,7 @@ func advanceDueQueueDocuments(ctx context.Context, tx pgx.Tx) (bool, error) {
 	if err != nil || len(keys.records) == 0 {
 		return false, err
 	}
-	err = observeQueueRecords(ctx, tx, keys.organizations, keys.records)
+	err = observeQueueStateRecords(ctx, tx, keys.organizations, keys.records)
 	return true, err
 }
 
@@ -143,7 +143,7 @@ func advanceQueueBacklogBootstrap(ctx context.Context, tx pgx.Tx, limit int) (bo
 		return false, err
 	}
 	if len(keys.records) > 0 {
-		if err := observeQueueRecords(ctx, tx, keys.organizations, keys.records); err != nil {
+		if err := observeQueueStateRecords(ctx, tx, keys.organizations, keys.records); err != nil {
 			return false, err
 		}
 		last := len(keys.records) - 1

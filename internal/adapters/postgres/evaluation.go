@@ -181,7 +181,7 @@ ORDER BY s.id LIMIT $5`, org, corpusID, sequence, after, s.page(), versionID, ev
 	if _, err = tx.Exec(ctx, `UPDATE monitoring_checkpoints SET position=$2,subscription_after=$3 WHERE organization=$1`, org, next, nextAfter); err != nil {
 		return false, err
 	}
-	if err = observeQueueRecords(ctx, tx, []string{org}, []string{recordID}); err != nil {
+	if err = observeQueueStateRecords(ctx, tx, []string{org}, []string{recordID}); err != nil {
 		return false, err
 	}
 	return true, tx.Commit(ctx)

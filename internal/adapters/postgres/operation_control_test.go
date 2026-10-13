@@ -196,7 +196,9 @@ func TestCompletionRacingCancellationHasOneWinner(t *testing.T) {
 				t.Fatalf("completion won inconsistently: %v %v %+v route %s", activated, activateErr, canceled, f.routed(c))
 			}
 		case final == operations.StateCancelRequested:
-			if !errors.Is(activateErr, operations.ErrNotRunning) || canceled.State != operations.StateCancelRequested || f.routed(c) != prior {
+			// Bounded validation may yield before cancellation commits; either
+			// a yield or the canonical stop error leaves the prior route intact.
+			if activated || (activateErr != nil && !errors.Is(activateErr, operations.ErrNotRunning)) || canceled.State != operations.StateCancelRequested || f.routed(c) != prior {
 				t.Fatalf("cancellation won inconsistently: %v %v %+v route %s", activated, activateErr, canceled, f.routed(c))
 			}
 		default:

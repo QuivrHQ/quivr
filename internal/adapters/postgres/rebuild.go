@@ -1,6 +1,7 @@
 package postgres
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"errors"
@@ -117,17 +118,18 @@ func (s RebuildStore) beginRebuildAttempt(ctx context.Context, org, id string) (
 }
 
 func (s RebuildStore) RebuildCandidates(ctx context.Context, org, id string, limit int) ([]retrieval.RebuildCandidate, error) {
-	var corpusID, generationID, after string
-	if err := s.Pool.QueryRow(ctx, `SELECT corpus_id,target_generation_id,rebuild_cursor FROM operations WHERE organization=$1 AND id=$2`, org, id).Scan(&corpusID, &generationID, &after); err != nil {
+	if err := s.advanceRebuildValidation(ctx, org, id); err != nil {
+		return nil, err
+	}
+	var after string
+	if err := s.Pool.QueryRow(ctx, `SELECT rebuild_cursor FROM operations WHERE organization=$1 AND id=$2`, org, id).Scan(&after); err != nil {
 		return nil, notFound(err)
 	}
-	out, err := s.rebuildCandidatesAfter(ctx, org, corpusID, generationID, after, limit)
+	out, err := s.rebuildValidationCandidates(ctx, org, id, after, limit)
 	if err != nil || len(out) > 0 || after == "" {
 		return out, err
 	}
-	// A final full gap sweep catches promotions and enrichment behind the cursor.
-	// Activation independently checks again under its canonical cutover fence.
-	return s.rebuildCandidatesAfter(ctx, org, corpusID, generationID, "", limit)
+	return s.rebuildValidationCandidates(ctx, org, id, "", limit)
 }
 
 // RebuildCandidatesAfter advances only the dispatch scan. Persisted progress
@@ -152,8 +154,10 @@ func (s RebuildStore) RebuildCandidatePending(ctx context.Context, org, id, vers
 	return pending, err
 }
 
-var rebuildCandidatesSQL = `SELECT r.id,v.id,r.namespace,EXISTS(SELECT 1 FROM segments sg JOIN LATERAL ` + embeddingCoverageForSegmentSQL("sg.organization", "sg.id") + ` ec ON true JOIN ` + effectiveGenerationsSQL + ` rg ON rg.id=ec.generation_id JOIN ` + effectiveGenerationsSQL + ` tg ON tg.id=$3 WHERE sg.organization=v.organization AND sg.version_id=v.id AND ec.space_id=tg.space_id AND rg.space_id=tg.space_id AND ec.generation_id=` + routedGenerationSQL("r.organization", "r.corpus_id") + `)
-FROM ` + currentVersionsSQL + ` WHERE ` + rebuildGapSQL + ` AND r.current_version_id > $5 AND v.id > $5 ORDER BY r.current_version_id LIMIT $4`
+var rebuildVectorsRequiredSQL = `EXISTS(SELECT 1 FROM segments sg JOIN LATERAL ` + embeddingCoverageForSegmentSQL("sg.organization", "sg.id") + ` ec ON true JOIN ` + effectiveGenerationsSQL + ` rg ON rg.id=ec.generation_id JOIN ` + effectiveGenerationsSQL + ` tg ON tg.id=$3 WHERE sg.organization=v.organization AND sg.version_id=v.id AND ec.space_id=tg.space_id AND rg.space_id=tg.space_id AND ec.generation_id=` + routedGenerationSQL("r.organization", "r.corpus_id") + `)`
+
+var rebuildCandidatesSQL = `WITH page AS MATERIALIZED (SELECT * FROM records WHERE organization=$1 AND corpus_id=$2 AND current_version_id>$5 ORDER BY current_version_id LIMIT GREATEST($4,256))
+SELECT r.id,v.id,r.namespace,` + rebuildVectorsRequiredSQL + ` FROM page r JOIN record_versions v ON (v.organization,v.id)=(r.organization,r.current_version_id) WHERE ` + rebuildGapSQL + ` ORDER BY r.current_version_id LIMIT $4`
 
 func (s RebuildStore) rebuildCandidatesAfter(ctx context.Context, org, corpusID, generationID, after string, limit int) ([]retrieval.RebuildCandidate, error) {
 	// The current-version key gives the corpus index both the range and ordering.
@@ -161,7 +165,12 @@ func (s RebuildStore) rebuildCandidatesAfter(ctx context.Context, org, corpusID,
 	if err != nil {
 		return nil, err
 	}
+	return collectRebuildCandidates(rows)
+}
+
+func collectRebuildCandidates(rows pgx.Rows) ([]retrieval.RebuildCandidate, error) {
 	defer rows.Close()
+	var err error
 	out := []retrieval.RebuildCandidate{}
 	for rows.Next() {
 		var c retrieval.RebuildCandidate
@@ -271,6 +280,16 @@ func (s RebuildStore) coverRebuildAttempt(ctx context.Context, org, id string, s
 }
 
 func (s RebuildStore) ActivateRebuild(ctx context.Context, org, id string) (bool, error) {
+	var state string
+	if err := s.Pool.QueryRow(ctx, `SELECT state FROM operations WHERE organization=$1 AND id=$2`, org, id).Scan(&state); err != nil {
+		return false, notFound(err)
+	}
+	if state == operations.StateRunning {
+		if err := s.advanceRebuildValidation(ctx, org, id); err != nil {
+			return false, err
+		}
+	}
+
 	var result0 bool
 	err := retryJournalWrite(ctx, "ActivateRebuild", func(ctx context.Context) error {
 		var err error
@@ -286,8 +305,12 @@ func (s RebuildStore) activateRebuildAttempt(ctx context.Context, org, id string
 		return false, err
 	}
 	defer tx.Rollback(ctx)
-	// Promotion and enrichment commits hold this lock too, so no coverage can
-	// land on the prior generation between validation and the route switch.
+	// The exclusive routing fence drains every canonical coverage writer;
+	// acquire it without queueing behind ongoing preparation.
+	var acquired bool
+	if err = tx.QueryRow(ctx, `SELECT pg_try_advisory_xact_lock($1)`, projectionRoutingLock).Scan(&acquired); err != nil || !acquired {
+		return false, err
+	}
 	if err = lockJournal(ctx, tx, org); err != nil {
 		return false, err
 	}
@@ -323,33 +346,23 @@ func (s RebuildStore) activateRebuildAttempt(ctx context.Context, org, id string
 		}
 		return false, operations.ErrNotRunning
 	}
-	// An owner cutover cannot be undone by an older already-pinned rebuild.
-	// Its target routing and its served projections must still agree with the
-	// authoritative active plan before the new generation becomes visible.
-	// Configuration replacement intentionally retains old Corpus routes until
-	// a fresh rebuild moves them onto the new owner's prepared projections.
-	var activePlan string
-	if err = tx.QueryRow(ctx, `SELECT COALESCE((SELECT plan_id FROM active_pipeline_plan),'')`).Scan(&activePlan); err != nil {
-		return false, err
+	var validated []byte
+	var scanned, ownerGap bool
+	err = tx.QueryRow(ctx, `SELECT fingerprint,scanned,owner_gap FROM projection_rebuild_validation WHERE organization=$1 AND operation_id=$2 FOR UPDATE`, org, id).Scan(&validated, &scanned, &ownerGap)
+	if errors.Is(err, pgx.ErrNoRows) {
+		return false, tx.Commit(ctx)
 	}
-	routing, err := planIngestionRouting(ctx, tx, activePlan)
 	if err != nil {
 		return false, err
 	}
-	expected, err := json.Marshal(routing)
+	fingerprint, err := rebuildFingerprint(ctx, tx, org, id)
 	if err != nil {
 		return false, err
 	}
-	var compatible bool
-	if err = tx.QueryRow(ctx, `SELECT t.ingestion_routing IS NOT NULL AND ($4::jsonb->>'default'='' OR (COALESCE(t.ingestion_routing->>'default','')=COALESCE($4::jsonb->>'default','') AND COALESCE(t.ingestion_routing->'routes','{}'::jsonb)=COALESCE($4::jsonb->'routes','{}'::jsonb)))
- AND NOT EXISTS(SELECT 1 FROM records rec JOIN record_versions v ON (v.organization,v.id)=(rec.organization,rec.current_version_id)
- JOIN accepted_revisions ar ON (ar.organization,ar.record_id,ar.slot)=(v.organization,v.record_id,v.slot)
- JOIN projection_coverage pc ON (pc.organization,pc.version_id,pc.generation_id)=(v.organization,v.id,t.id) AND `+effectiveCoverageSQL("pc")+`
- WHERE rec.organization=$1 AND rec.corpus_id=$2 AND $4::jsonb->>'default'<>'' AND pc.plugin_id<>COALESCE(t.ingestion_routing->'routes'->>COALESCE(NULLIF(ar.source_media_type,''),'text/plain'),t.ingestion_routing->>'default',''))
- FROM `+effectiveGenerationsSQL+` t WHERE t.id=$3`, org, op.CorpusID, op.TargetGenerationID, expected).Scan(&compatible); err != nil {
-		return false, err
+	if !bytes.Equal(validated, fingerprint) {
+		return false, tx.Commit(ctx)
 	}
-	if !compatible {
+	if ownerGap {
 		if err = failOperation(ctx, tx, op, operations.Error{Code: "unsupported_vector_space", Message: "the rebuilt generation no longer matches the serving ingestion routing"}); err != nil {
 			return false, err
 		}
@@ -358,11 +371,29 @@ func (s RebuildStore) activateRebuildAttempt(ctx context.Context, org, id string
 		}
 		return false, operations.ErrNotRunning
 	}
-	var gap bool
-	if err = tx.QueryRow(ctx, `SELECT EXISTS(SELECT 1 FROM `+currentVersionsSQL+` WHERE `+rebuildGapSQL+`)`, org, op.CorpusID, op.TargetGenerationID).Scan(&gap); err != nil {
+	if !scanned {
+		return false, tx.Commit(ctx)
+	}
+	var dirty, unchecked, incompatible bool
+	if err = tx.QueryRow(ctx, `SELECT
+ COALESCE((SELECT true FROM projection_rebuild_dirty_records WHERE organization=$1 AND operation_id=$2 AND NOT checked ORDER BY record_id LIMIT 1),false),
+ COALESCE((SELECT true FROM projection_rebuild_dirty_records WHERE organization=$1 AND operation_id=$2 AND checked AND owner_gap ORDER BY record_id LIMIT 1),false),
+ COALESCE((SELECT true FROM projection_rebuild_dirty_records WHERE organization=$1 AND operation_id=$2 ORDER BY record_id LIMIT 1),false)`, org, id).Scan(&unchecked, &incompatible, &dirty); err != nil {
 		return false, err
 	}
-	if gap {
+	if unchecked {
+		return false, tx.Commit(ctx)
+	}
+	if incompatible {
+		if err = failOperation(ctx, tx, op, operations.Error{Code: "unsupported_vector_space", Message: "the rebuilt generation no longer matches the serving ingestion routing"}); err != nil {
+			return false, err
+		}
+		if err = tx.Commit(ctx); err != nil {
+			return false, err
+		}
+		return false, operations.ErrNotRunning
+	}
+	if dirty {
 		return false, tx.Commit(ctx)
 	}
 	// Compare-and-set on the generation read under the journal lock: a route
@@ -385,6 +416,9 @@ ON CONFLICT(organization,corpus_id) DO UPDATE SET generation_id=EXCLUDED.generat
 		return false, errRouteChanged
 	}
 	if err = succeed(ctx, tx, op, result); err != nil {
+		return false, err
+	}
+	if _, err = tx.Exec(ctx, `DELETE FROM projection_rebuild_validation WHERE organization=$1 AND operation_id=$2`, org, id); err != nil {
 		return false, err
 	}
 	return true, tx.Commit(ctx)

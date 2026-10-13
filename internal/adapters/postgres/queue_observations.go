@@ -50,7 +50,7 @@ var recordObservationSQL = append([]string{
  AND NOT EXISTS(SELECT FROM tombstones t WHERE (t.organization,t.record_id)=(k.organization,k.record_id)),false))
  AND q.ctid=ANY(ARRAY(SELECT locked.ctid FROM (` + queueObservationKeysSQL + `) ids
  JOIN LATERAL (SELECT ctid FROM queue_enrichment_records p WHERE (p.organization,p.record_id)=(ids.organization,ids.record_id) LIMIT 1) locked ON true))`,
-	markRoutingRecordsSQL,
+	markObservedRecordsSQL,
 }, append(append(queueRecordObservationSQL, queueRecordMetricObservationSQL...), corpusRecordObservationSQL...)...)
 
 func queueRecordObservations(batch *pgx.Batch, organizations, records []string) {
@@ -74,6 +74,23 @@ func observeQueueRecords(ctx context.Context, tx pgx.Tx, organizations, records 
 	}
 	batch := &pgx.Batch{}
 	queueRecordObservations(batch, organizations, records)
+	return tx.SendBatch(ctx, batch).Close()
+}
+
+// observeQueueStateRecords refreshes queue-only changes and maintenance reads.
+// These callers do not change projection eligibility or coverage and need not
+// hold the publication fence. They must not create rebuild dirty records.
+func observeQueueStateRecords(ctx context.Context, tx pgx.Tx, organizations, records []string) error {
+	if len(records) == 0 {
+		return nil
+	}
+	batch := &pgx.Batch{}
+	for _, sql := range recordObservationSQL {
+		if sql == markObservedRecordsSQL {
+			sql = markRoutingRecordsSQL
+		}
+		batch.Queue(sql, organizations, records)
+	}
 	return tx.SendBatch(ctx, batch).Close()
 }
 
@@ -137,7 +154,7 @@ func advanceQueueObservations(ctx context.Context, tx pgx.Tx, limit int) error {
 	if err = rows.Err(); err != nil {
 		return err
 	}
-	if err = observeQueueRecords(ctx, tx, organizations, records); err != nil {
+	if err = observeQueueStateRecords(ctx, tx, organizations, records); err != nil {
 		return err
 	}
 	if len(records) < limit {

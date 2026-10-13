@@ -797,6 +797,68 @@ func TestRebuildYieldsWithoutConsumingItemDeadlineBudget(t *testing.T) {
 	}
 }
 
+// Database completion work must drain past admission, just like admitted
+// documents. Otherwise a fully covered Operation repeats validation forever.
+type delayedRebuildCompletion struct {
+	*fakeRebuildStore
+	sweep, activation time.Duration
+}
+
+func rebuildCompletionDelay(ctx context.Context, delay time.Duration) error {
+	timer := time.NewTimer(delay)
+	defer timer.Stop()
+	select {
+	case <-timer.C:
+		return nil
+	case <-ctx.Done():
+		return ctx.Err()
+	}
+}
+
+func (s delayedRebuildCompletion) RebuildCandidates(ctx context.Context, org, id string, limit int) ([]retrieval.RebuildCandidate, error) {
+	if err := rebuildCompletionDelay(ctx, s.sweep); err != nil {
+		return nil, err
+	}
+	return s.fakeRebuildStore.RebuildCandidates(ctx, org, id, limit)
+}
+
+func (s delayedRebuildCompletion) ActivateRebuild(ctx context.Context, org, id string) (bool, error) {
+	if err := rebuildCompletionDelay(ctx, s.activation); err != nil {
+		return false, err
+	}
+	return s.fakeRebuildStore.ActivateRebuild(ctx, org, id)
+}
+
+func TestRebuildCompletionOutlivesAdmission(t *testing.T) {
+	for _, tc := range []struct {
+		name                       string
+		sweep, activation, attempt time.Duration
+	}{
+		{"combined checks", 40 * time.Second, 40 * time.Second, 30 * time.Minute},
+		{"slow final sweep", 80 * time.Second, time.Second, 30 * time.Minute},
+		{"parent cancels sweep", 80 * time.Second, time.Second, 30 * time.Second},
+		{"parent cancels activation", time.Second, 80 * time.Second, 30 * time.Second},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			synctest.Test(t, func(t *testing.T) {
+				ctx, cancel := context.WithTimeout(t.Context(), tc.attempt)
+				defer cancel()
+				store := &fakeRebuildStore{covered: map[string][]content.Embedding{}}
+				r := rebuilder(store, &fakeRebuildContent{}, &fakeRebuildProjection{})
+				r.Store = delayedRebuildCompletion{store, tc.sweep, tc.activation}
+				done, err := r.Step(ctx, "org", "op")
+				if tc.attempt < tc.sweep+tc.activation {
+					if done || store.activated || !errors.Is(err, context.DeadlineExceeded) {
+						t.Fatalf("parent cancellation: done=%v activated=%v err=%v", done, store.activated, err)
+					}
+				} else if !done || !store.activated || err != nil {
+					t.Fatalf("covered rebuild did not activate after final validation: done=%v activated=%v err=%v", done, store.activated, err)
+				}
+			})
+		})
+	}
+}
+
 // A failed candidate cancels its siblings, and Step joins their cleanup before
 // recording failure or retrying. A parent cancellation has the same join rule.
 type interruptedRebuildDeriver struct {

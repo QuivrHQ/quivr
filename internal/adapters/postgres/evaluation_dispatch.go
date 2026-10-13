@@ -98,7 +98,7 @@ SELECT CASE WHEN p.processed>0 THEN p.processed WHEN p.considered=0 AND $2<h.las
 	for i := range orgs {
 		orgs[i] = org
 	}
-	if err = observeQueueRecords(ctx, tx, orgs, observedRecords); err != nil {
+	if err = observeQueueStateRecords(ctx, tx, orgs, observedRecords); err != nil {
 		return 0, false, err
 	}
 	if err = tx.Commit(ctx); err != nil {
