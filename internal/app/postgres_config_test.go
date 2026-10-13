@@ -21,7 +21,7 @@ func TestPostgresPoolConfiguration(t *testing.T) {
 		{`{"postgres":{"max_connections":2147483648}}`, "", "30000", 0, false},
 		{`{"postgres":{"max_connections":2}}`, "pool_min_conns=3", "30000", 0, false},
 		{`{"postgres":{"max_connections":2}}`, "pool_min_idle_conns=3", "30000", 0, false},
-		{`{"postgres":{"transaction_timeout":"2s"}}`, "transaction_timeout=9000", "2000", 8, true},
+		{`{"postgres":{"transaction_timeout":"2s","max_connections":4}}`, "transaction_timeout=9000", "2000", 4, true},
 		{`{"postgres":{"transaction_timeout":"0s"}}`, "", "", 0, false},
 		{`{"postgres":{"transaction_timeout":"invalid"}}`, "", "", 0, false},
 		{`{"postgres":{"transaction_timeout":"0.1ms"}}`, "", "", 0, false},
