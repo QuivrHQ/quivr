@@ -18,6 +18,8 @@ BEGIN
         OR current_setting('min_wal_size') <> '4GB'
         OR current_setting('checkpoint_timeout') <> '15min'
         OR current_setting('wal_compression') <> 'lz4'
+        OR current_setting('commit_delay') <> '100'
+        OR current_setting('commit_siblings') <> '5'
         OR current_setting('synchronous_commit') <> 'on'
         OR current_setting('fsync') <> 'on'
         OR current_setting('full_page_writes') <> 'on' THEN
@@ -26,7 +28,7 @@ BEGIN
     IF EXISTS (SELECT FROM pg_settings WHERE name IN
         ('max_connections','shared_buffers','effective_cache_size','work_mem',
          'maintenance_work_mem','dynamic_shared_memory_type','shared_preload_libraries',
-         'track_io_timing','pg_stat_statements.track','jit','synchronous_commit','fsync','full_page_writes',
+         'track_io_timing','pg_stat_statements.track','jit','commit_delay','commit_siblings','synchronous_commit','fsync','full_page_writes',
          'max_wal_size','min_wal_size','checkpoint_timeout','wal_compression',
          'random_page_cost','effective_io_concurrency')
         AND source <> 'command line') THEN

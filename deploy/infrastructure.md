@@ -41,6 +41,7 @@ Weaviate image overrides require a digest. PostgreSQL and autoscaler image chang
 | `QUIVR_POSTGRES_CHECKPOINT_TIMEOUT` | 15min; reduce checkpoint write pressure at a recovery-time cost. |
 | `QUIVR_POSTGRES_WAL_COMPRESSION` / `QUIVR_POSTGRES_STAT_STATEMENTS_TRACK` | lz4 / all; reduce full-page WAL bytes while retaining complete statement statistics for diagnosis. |
 | `QUIVR_POSTGRES_JIT` / `QUIVR_POSTGRES_SYNCHRONOUS_COMMIT` | on / on; JIT supports planned compilation and may override to off, while only `on` is accepted for durable acknowledgements. |
+| `QUIVR_POSTGRES_COMMIT_DELAY` / `QUIVR_POSTGRES_COMMIT_SIBLINGS` | 100 microseconds / 5 active transactions; allow a small durable WAL group-commit window during concurrent writes. Delay accepts 0–100000 microseconds (0 disables the window); siblings accepts 0–1000. Acknowledgements still wait for WAL flush. Tune against storage and throughput measurements. |
 | Weaviate `DEFAULT_QUANTIZATION` | rq-8; reduce vector memory, retaining explicit per-space configuration. |
 | `ASYNC_INDEXING` | false in small, true in large; decouple large writes from ANN indexing with visibility lag. |
 | `PERSISTENCE_MEMTABLES_MAX_SIZE_MB` | 200 in small, 1024 in large; fewer flushes consume more bucket/shard memory and recovery work. |
@@ -54,8 +55,7 @@ Weaviate image overrides require a digest. PostgreSQL and autoscaler image chang
 | `QUIVR_AUTOSCALER_DOCUMENTS_PER_REPLICA` | 20000; proportional backlog target, combined with the bulk prefetch demand rule below. |
 | `QUIVR_AUTOSCALER_INTERVAL` / `QUIVR_AUTOSCALER_REQUEST_TIMEOUT` | 30s / 10s; bound polling and API waits. |
 | `QUIVR_AUTOSCALER_DOWNSCALE_WINDOW` / `QUIVR_AUTOSCALER_MIN_SCALE_INTERVAL` | 5m / 2m; avoid oscillation and repeated deployment restarts. |
-
-Bulk connectors stop fetching new pages at 1,000 waiting ingestion documents. The built-in autoscaler shares that bound in every profile: at 1,000 total waiting bulk documents, it requests at least one more worker per successful scale action, up to `QUIVR_AUTOSCALER_MAX`, retaining larger proportional recommendations. Total waiting includes ingestion and downstream work; the connector bound still applies at maximum capacity. Action cooldowns and downscale stabilization still apply. More workers may not improve throughput when a dependency is saturated.
+| Bulk connector prefetch / autoscaler demand | Shared 1,000-document bound in every profile. Connectors defer on ingestion waiting; the built-in autoscaler adds at least one worker per successful action on total bulk waiting, retaining larger proportional targets. `QUIVR_AUTOSCALER_MAX` caps workers; connector backpressure still applies there. Cooldowns and downscale stabilization remain. Dependency saturation can limit throughput. |
 
 PostgreSQL keeps mmap dynamic shared memory, preloaded statistics, I/O timing and JIT; `synchronous_commit=on` preserves acknowledged-write durability. Its initialization creates `pg_stat_statements`; monitoring setup for existing volumes uses the same idempotent script. Autoscaler credentials, URLs and target IDs stay external. Declaration `x-quivr.build_images` pins its build/runtime bases and keeps generated artifacts in sync.
 

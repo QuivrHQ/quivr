@@ -210,7 +210,8 @@ class Infrastructure(unittest.TestCase):
                     infra.resolve(overrides=override)
             for key, value in (
                 ('QUIVR_POSTGRES_MEMORY_MB', '64'), ('QUIVR_POSTGRES_VOLUME_MB', '0'),
-                ('QUIVR_POSTGRES_MAX_CONNECTIONS', '262144'), ('QUIVR_POSTGRES_WORK_MEM', '1GiB'),
+                ('QUIVR_POSTGRES_MAX_CONNECTIONS', '262144'),
+                ('QUIVR_POSTGRES_COMMIT_DELAY', '100001'), ('QUIVR_POSTGRES_COMMIT_SIBLINGS', '1001'), ('QUIVR_POSTGRES_WORK_MEM', '1GiB'),
                 ('QUIVR_POSTGRES_WORK_MEM', '0MB'), ('QUIVR_POSTGRES_MAX_WAL_SIZE', '16MB'),
                 ('QUIVR_POSTGRES_MIN_WAL_SIZE', '16MB'), ('QUIVR_POSTGRES_MIN_WAL_SIZE', '64GB'), ('QUIVR_POSTGRES_EFFECTIVE_IO_CONCURRENCY', '1001'),
                 ('QUIVR_POSTGRES_RANDOM_PAGE_COST', '10000000001'),
@@ -360,6 +361,8 @@ class Infrastructure(unittest.TestCase):
     def test_compose_reports_sql_and_inspects_only_the_selected_project(self):
         from deploy.compose.infrastructure import Compose
         settings = infra.resolve('large')
+        settings['postgres']['environment']['QUIVR_POSTGRES_COMMIT_DELAY'] = '00100'
+        settings['postgres']['environment']['QUIVR_POSTGRES_COMMIT_SIBLINGS'] = '0005'
         calls = []
         storage_bytes = 343597383680
         def docker(args):
@@ -374,13 +377,15 @@ class Infrastructure(unittest.TestCase):
                     'Labels': {'com.docker.compose.project': 'fixture', 'com.docker.compose.service': service}},
                     'State': {'Running': True}, 'HostConfig': {'Memory': 1073741824, 'NanoCpus': 1000000000}}])
             if args[0] == 'exec':
-                return ('{"settings":{"random_page_cost":"1.1","effective_io_concurrency":"200"},"pg_stat_statements":true,"statistics_preloaded":true}\n327680\n__memory=1073741824\n__cpus=1\n'
+                return ('{"settings":{"random_page_cost":"1.1","effective_io_concurrency":"200","commit_delay":"100","commit_siblings":"6"},"pg_stat_statements":true,"statistics_preloaded":true}\n327680\n__memory=1073741824\n__cpus=1\n'
                         + '__storage=' + str(storage_bytes) + '\n')
             self.fail('unexpected mutating command')
         adapter = Compose('fixture', run=docker)
         result = adapter.check(settings)
         observed = {(row['service'], row['scope'], row['setting']): row for row in result['observations']}
         self.assertEqual(observed['postgres', 'effective_sql', 'random_page_cost']['status'], 'match')
+        self.assertEqual(observed['postgres', 'effective_sql', 'commit_delay']['status'], 'match')
+        self.assertEqual(observed['postgres', 'effective_sql', 'commit_siblings']['status'], 'drift')
         self.assertEqual(observed['postgres', 'effective_sql', 'pg_stat_statements']['status'], 'match')
         self.assertEqual(observed['postgres', 'runtime_resources', 'memory']['observed'], '1073741824')
         self.assertEqual(observed['weaviate', 'configured', 'image']['status'], 'unknown')

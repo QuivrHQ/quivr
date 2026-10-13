@@ -44,28 +44,49 @@ func (b countedBlob) Read(context.Context, content.Blob) ([]byte, error) {
 	return []byte(b.text), nil
 }
 
+type narrowRechecker struct {
+	*withdrawnDuringRead
+	checks int
+}
+
+func (b *narrowRechecker) RecheckHydration(_ context.Context, _ corpus.Scope, cs []content.Candidate) (map[int]bool, error) {
+	b.checks++
+	out := map[int]bool{}
+	for i, c := range cs {
+		if !b.withdrawn[c.SegmentID] {
+			out[i] = true
+		}
+	}
+	return out, nil
+}
+
 // A batch reads a blob its candidates share once, and a candidate withdrawn
 // while the bytes were read is dropped at the recheck, the others kept at
 // their positions.
 func TestHydrationRechecksTheBatchAfterReadingIt(t *testing.T) {
-	const text = "één dos tri"
-	baseline := &withdrawnDuringRead{text: text, withdrawn: map[string]bool{"b": true}}
-	reads := &atomic.Int64{}
-	s := content.Service{Baseline: baseline, Blobs: countedBlob{text: text, reads: reads}}
-	scope := corpus.Scope{Organization: "org", Actions: []string{"content:read", "search:query"}, Corpora: []string{"*"}}
-	got, err := s.Hydrate(context.Background(), scope, []content.Candidate{{SegmentID: "stale"}, {SegmentID: "a"}, {SegmentID: "b"}, {SegmentID: "c"}})
-	if err != nil {
-		t.Fatal(err)
-	}
-	if len(got) != 2 || got[1].Segment.Text != "één" || got[3].Segment.Text != "tri" {
-		texts := map[int]string{}
-		for i, h := range got {
-			texts[i] = h.Segment.ID + ":" + h.Segment.Text
+	for _, narrow := range []bool{false, true} {
+		const text = "één dos tri"
+		baseline := &withdrawnDuringRead{text: text, withdrawn: map[string]bool{"b": true}}
+		guard := &narrowRechecker{withdrawnDuringRead: baseline}
+		var repository content.BaselineRepository = baseline
+		wantLookups, wantChecks := 2, 0
+		if narrow {
+			repository = guard
+			wantLookups, wantChecks = 1, 1
 		}
-		t.Fatalf("hydrated %v; want a:één at 1 and c:tri at 3, stale and b dropped", texts)
-	}
-	if baseline.lookups != 2 || reads.Load() != 1 {
-		t.Fatalf("%d lookups and %d blob reads; want one lookup, one read of the shared blob, one recheck", baseline.lookups, reads.Load())
+		reads := &atomic.Int64{}
+		s := content.Service{Baseline: repository, Blobs: countedBlob{text: text, reads: reads}}
+		scope := corpus.Scope{Organization: "org", Actions: []string{"content:read", "search:query"}, Corpora: []string{"*"}}
+		got, err := s.Hydrate(context.Background(), scope, []content.Candidate{{SegmentID: "stale"}, {SegmentID: "a"}, {SegmentID: "b"}, {SegmentID: "c"}})
+		if err != nil {
+			t.Fatal(err)
+		}
+		if len(got) != 2 || got[1].Segment.Text != "één" || got[3].Segment.Text != "tri" {
+			t.Fatalf("narrow=%t: hydrated %v; want a:één at 1 and c:tri at 3, stale and b dropped", narrow, got)
+		}
+		if baseline.lookups != wantLookups || guard.checks != wantChecks || reads.Load() != 1 {
+			t.Fatalf("narrow=%t: %d lookups, %d fences, %d blob reads; want %d lookups, %d fences and one shared blob read", narrow, baseline.lookups, guard.checks, reads.Load(), wantLookups, wantChecks)
+		}
 	}
 }
 
