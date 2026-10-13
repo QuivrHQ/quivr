@@ -33,4 +33,5 @@ runs:
   - uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9
     with:
       path: ${{ runner.temp }}/grype-database
-      key: grype-run-${{ github.run_id }}-${{ github.run_attempt }}
+      # Failed-only reruns skip this successful producer; keep its database available.
+      key: grype-run-${{ github.run_id }}

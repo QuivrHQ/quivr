@@ -44,7 +44,8 @@ jobs:
   build:
     needs: prepare
     runs-on: ubuntu-24.04
-    timeout-minutes: 8
+    # Allow the pinned source build; signing retains its separate five-minute cap.
+    timeout-minutes: 20
     permissions:
       contents: read
       packages: write
@@ -124,9 +125,15 @@ jobs:
         if-no-files-found: warn
         retention-days: 3
         compression-level: 0
-    - uses: sigstore/cosign-installer@6f9f17788090df1f26f669e9d70d6ae9567deba6
+    - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e
       with:
-        cosign-release: v3.1.3
+        go-version-file: tools/cosign/go.mod
+        cache-dependency-path: tools/cosign/go.sum
+    - name: Build checksum-verified Cosign with existing-entry recovery
+      timeout-minutes: 10
+      run: |
+        bash scripts/install_cosign.sh "$RUNNER_TEMP/signing-tools"
+        echo "$RUNNER_TEMP/signing-tools" >> "$GITHUB_PATH"
     - name: Sign, attest and verify the immutable image
       timeout-minutes: 5
       env:
