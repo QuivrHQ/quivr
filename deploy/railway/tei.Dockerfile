@@ -1,10 +1,13 @@
-FROM python:3.12-slim-bookworm AS model
+FROM python:3.12-slim-bookworm@sha256:34386ef0cb081344d7ec1c103ba398e6e9f64e9ab3a1509accc92a4e24a07258 AS model
 WORKDIR /app
 COPY third_party/e5/model-lock.json ./third_party/e5/model-lock.json
 COPY scripts/prepare_embeddings.py ./scripts/prepare_embeddings.py
 RUN python scripts/prepare_embeddings.py
+RUN python -c "import json; lock=json.load(open('third_party/e5/model-lock.json')); open('/e5.sha256','w').write(''.join(sha+'  /models/e5/'+name+'\\n' for name,sha in lock['files'].items()))"
 
 FROM ghcr.io/huggingface/text-embeddings-inference@sha256:ad950d30878eceb72aaf32024d26fa2b1d04a75304fa0b4776b49aa1941fea07
 COPY --from=model /app/.scratch/e5-model /model
+COPY --from=model /e5.sha256 /app/e5.sha256
+COPY deploy/single-machine/tei-entrypoint.sh /app/tei-entrypoint.sh
 ENV HF_HUB_OFFLINE=1
 CMD ["--model-id", "/model", "--dtype", "float32", "--pooling", "mean", "--max-client-batch-size", "32", "--max-batch-tokens", "8192", "--auto-truncate", "false", "--tokenization-workers", "2"]

@@ -1,0 +1,76 @@
+---
+title: "Run Quivr on one machine"
+description: "Start a complete CPU evaluation installation from published images with Docker Compose."
+keywords: ["self-host", "Docker Compose", "CPU embeddings", "offline"]
+---
+
+Run the API, background worker, first-party plugins and their dependencies on one Linux machine. A release bundle supplies one Compose file; `--profile demo` adds the web interface.
+
+## Prerequisites
+
+Use Linux amd64, Docker Engine with Compose 2.24 or newer, Python 3.12, and a local SSD. Start with 16 GiB RAM and four vCPUs. This is a single-machine evaluation installation: Temporal uses its persisted development server, without high availability. Keep the API and demo on their default loopback addresses; use an SSH tunnel or your own TLS proxy for remote access.
+
+Download `quivr-compose-VERSION.tar.gz` from a [release](https://github.com/The-Vibe-Company/quivr/releases) that contains that asset. Earlier releases without it cannot run this recipe. The bundle contains the deployment settings, installer and exact image digests from that release; no checkout, compiler, GPU or cloud account is needed. [Verify the image signatures](../run-quivr/security.mdx) before pulling them. All first-party images carry the same source revision; dependency digests are fixed by that release's infrastructure declaration.
+
+## Install and start
+
+Extract the bundle into an installation directory. Run these commands there:
+
+```sh
+python3 setup.py init
+python3 setup.py prepare
+docker compose pull
+docker compose up -d
+```
+
+`init` generates `.env` with mode `0600`, reuses existing secrets, and renders `compose.yaml` with literal digests. `prepare` downloads and checksum-verifies the locked model into a named cache. Startup waits for healthy dependencies and a successful one-shot migration; API and workers retain their schema readiness checks. Automatic migrations only expand the schema.
+
+Configuration lives in `.env`; its documented keys are in `.env.example`. Never commit or print it. To supply an existing secret, use `python3 setup.py init --secret-file QUIVR_API_KEY=/protected/api-key` before initialization. Each input must be a mode-0600 regular file containing 64 hexadecimal characters. Generate one with `openssl rand -hex 32 > /protected/api-key` under `umask 077`. Keep application and operator keys separate; the demo only receives the application key.
+
+The default model is EmbeddingGemma 2 on CPU, with the same locked tokenizer, prompt and 768-dimensional vectors for ingestion and queries. The ingestion batch is one passage and each provider process admits one request at a time. To start a fresh installation with the lighter multilingual-e5-small model, use `python3 setup.py init --embedding e5 --project quivr-e5`, then prepare and start it. E5 uses the pinned CPU TEI runtime.
+
+The model, its locked revision and the project name are fixed for populated installations. Setup refuses to switch them: old documents and pending work retain their original provider. Use a fresh installation and resend the original documents through the [add-content API](../guides/add-content.mdx) when changing models. Keep `COMPOSE_PROJECT_NAME` stable when moving or upgrading the bundle; it names the persistent volumes independently of the directory.
+
+## Check it worked
+
+```sh
+docker compose ps -a
+docker compose --profile demo up -d
+```
+
+The migrator exits with code zero; API, worker and dependencies stay running. The API listens on `http://127.0.0.1:8080`, and the demo on `http://127.0.0.1:3000`. Read `DEMO_PASSWORD` privately from `.env` to sign in. Create a collection, add text, and search it by keyword and meaning. The [ingestion guide](../guides/add-content.mdx) describes the public API; the [search guide](../guides/search.mdx) covers lexical, semantic and hybrid modes. CPU ingestion can take time: wait for documents to become searchable and receive vectors before checking meaning searches.
+
+If migration fails, inspect that container privately, correct the configuration, remove the exited migrator with `docker compose rm -f migrate`, and run `docker compose up -d` again. Do not delete volumes to retry startup.
+
+## Size the machine
+
+These are conservative starting budgets, not measured capacity guarantees. Assume three passages per document, one retained version, one vector space, 768 dimensions, and compressed vectors. Long documents, history and rebuilds increase storage and memory; sample your content before a large import.
+
+| Documents | RAM | vCPUs | Local SSD | Index RAM reserved |
+| --- | --- | --- | --- | --- |
+| Up to 10,000 | 16 GiB | 4 | 64 GiB | 2 GiB |
+| Up to 100,000 | 16 GiB | 8 | 200 GiB | 2 GiB |
+| Around 1 million | 32 GiB | 16 | 1 TiB | 12 GiB |
+
+The small infrastructure profile reserves 1 GiB for PostgreSQL and 2 GiB for the index; embeddings reserve 4 GiB and four CPU cores. Leave RAM for API/worker plugins, Temporal, object storage, filesystem cache and the OS. For the last row, set `QUIVR_POSTGRES_MEMORY_MB=4096` and `QUIVR_WEAVIATE_MEMORY_MB=12288` in `.env`, then rerun `python3 setup.py init` before startup. The installer uses the shared PostgreSQL profile and derives the index's soft Go memory budget from its limit. The `large` profile is intended for much larger machines; inspect its declaration before selecting it.
+
+A local CPU sample measured **0.55 passages/second** for 1,533-token inputs at batch one, using four threads restricted to four cores of a 2.90 GHz Xeon VM. Eight warmed requests took 14.65 seconds. This longer input differs from the default 512-token body budget; it is evidence for CPU scheduling, not an import-rate guarantee. [The measurement record](https://github.com/The-Vibe-Company/quivr/blob/main/docs/dated/2026-10-13/cpu-embedding-throughput.md) gives the model/runtime identity and method. At three passages per document, use `documents × 3 / measured passages per second` as encoding time, then allow time for acquisition, retries and indexing. Remeasure on your hardware. See [capacity planning](../run-quivr/scale-quivr.mdx) for index, history and rebuild headroom.
+
+## Network and offline installation
+
+At installation, allow HTTPS to GitHub release assets and the image registries used by the bundle: GHCR, Docker Hub and the Weaviate registry. Model preparation uses Hugging Face and its redirected asset hosts. An internal mirror can replace Hugging Face: `python3 setup.py prepare --mirror https://mirror.example.org/models`. It must preserve `<model>/resolve/<revision>/<file>` paths and exact checksums. Inline credentials and query strings are refused.
+
+For a local model snapshot, use `python3 setup.py prepare --source /path/to/snapshot`; provide regular files at the locked model paths (materialize Hugging Face cache symlinks first). The installer copies and checksum-verifies them into the cache. Before disconnecting **the target machine**, run preparation and `docker compose --profile demo pull`. Preparation needs the release's `cpu-embeddings` image for either model, including E5; pre-pull that reference from `release.json` if preparing the local snapshot later. Keep those pulled images in the target's Docker store: a `docker save`/`load` transfer alone does not preserve the registry digest references required by this recipe. Air-gap transfers need a registry that preserves the original manifests and digests. Set `QUIVR_OFFLINE=1` in `.env` and rerun `python3 setup.py init` after preparation to make the stack network internal. Serving uses read-only verified model files and offline flags; a missing or corrupt cache prevents readiness.
+
+No outbound connection is required for local ingestion/search after installation. Optional connectors, webhooks or external alert providers need their configured destinations; keep them disabled when offline. Dependency and embedding ports remain private. Image pulls and upgrades are Docker-daemon installation flows, separate from the internal container network.
+
+## Back up and upgrade
+
+The five named volumes hold PostgreSQL, Temporal, SeaweedFS, Weaviate and the model cache. For a consistent evaluation backup, stop the entire stack with `docker compose --profile demo stop`, snapshot all five volumes on the host, and securely copy `.env`, `compose.yaml` and `release.json`. Encrypt secret backups and retain their permissions. Resume with `docker compose --profile demo up -d`. Restore those snapshots under the same project/volume names before starting; keep PostgreSQL state, original objects and Temporal state from the same backup. Test restoration before relying on it. [Dedicated index guidance](../run-quivr/dedicated-vector-host.mdx) explains index storage and rebuilds.
+
+Read the new release's upgrade notes and acquire its bundle and image digests before downtime. Copy the existing protected `.env` when moving directories; preserve its project and model. Run the **new bundle's** `setup.py upgrade --directory /path/to/installation --release /path/to/new-bundle/release.json`. It validates and renders the new pins, then stops API/worker/demo and explicitly recreates the migrator before starting. Start the demo profile again if wanted. Keep the old images and a coordinated backup: expand migrations are automatic, but rolling back code after database changes is not guaranteed. Restore the coordinated backup when the release's rollback instructions require it.
+
+## Next
+
+- [Choose an embedding model](../run-quivr/choose-an-embedding-model.mdx).
+- [Upgrade Quivr](../run-quivr/upgrade-quivr.mdx).

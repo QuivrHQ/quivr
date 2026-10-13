@@ -20,7 +20,7 @@ def image_matrix(text, repository):
     prefix = f'ghcr.io/{repository.split("/")[0].lower()}/'
     images = []
     for line in text.splitlines():
-        if not re.fullmatch(re.escape(prefix) + r'quivr(?:-plugin-[a-z0-9._-]+)?@sha256:[0-9a-f]{64}', line):
+        if not re.fullmatch(re.escape(prefix) + r'quivr(?:-plugin-[a-z0-9._-]+|-(?:core|web|cpu-embeddings|postgres|seaweed|tei))?@sha256:[0-9a-f]{64}', line):
             raise ValueError(f'invalid release image digest: {line!r}')
         images.append({'image': line, 'name': line.split('@')[0].rsplit('/', 1)[1]})
     if not images or len({item['name'] for item in images}) != len(images):

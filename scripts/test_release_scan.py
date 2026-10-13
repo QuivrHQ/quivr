@@ -20,9 +20,11 @@ class ReleaseScanTest(unittest.TestCase):
         digest = 'a' * 64
         engine = f'ghcr.io/the-vibe-company/quivr@sha256:{digest}'
         plugin = f'ghcr.io/the-vibe-company/quivr-plugin-core.ingest@sha256:{digest}'
+        core = f'ghcr.io/the-vibe-company/quivr-core@sha256:{digest}'
         self.assertEqual({'include': [{'image': engine, 'name': 'quivr'},
                                      {'image': plugin, 'name': 'quivr-plugin-core.ingest'}]},
                          image_matrix(engine + '\n' + plugin + '\n', 'The-Vibe-Company/quivr'))
+        self.assertEqual(image_matrix(core, 'The-Vibe-Company/quivr')['include'][0]['name'], 'quivr-core')
         for text in ['', engine + '\n' + engine, engine.replace(digest, 'abc'),
                      engine.replace('the-vibe-company', 'other'), engine.replace('@sha256:' + digest, ':latest-alpha')]:
             with self.subTest(text=text), self.assertRaises(ValueError):

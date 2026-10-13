@@ -24,8 +24,43 @@ ENV = {'QUIVR_API_KEY': 'placeholder-api-key', 'DATABASE_URL': 'postgres://place
 
 
 class CoreEntrypointTest(unittest.TestCase):
+    def test_single_machine_uses_private_cpu_provider_without_query_recording(self):
+        env = {**ENV, 'QUIVR_SINGLE_MACHINE': '1', 'QUIVR_ORGANIZATION': 'example',
+               'QUIVR_DEMO_EMBEDDING': 'gemma', 'QUIVR_DEMO_CORE_INGEST': '0',
+               'EMBED_URL': 'http://embeddings:8080', 'EMBED_API_KEY': 'fixture-local-key',
+               'QUIVR_OPERATOR_KEY': 'fixture-operator'}
+        config = core_entrypoint.build_config(env)
+        self.assertEqual(config['keys'][env['QUIVR_API_KEY']]['organization'], 'example')
+        self.assertEqual(config['keys']['fixture-operator']['organization'], 'example')
+        self.assertFalse(config['observability']['record_query_text'])
+        pins = [p for p in config['plugins'] if p['manifest'] == core_entrypoint.HOSTED_MANIFEST]
+        self.assertEqual(pins[0]['configuration']['base_url'], 'http://embeddings:8080/v1')
+        self.assertEqual(pins[0]['configuration']['batch_size'], 1)
+        self.assertEqual(pins[0]['configuration']['max_concurrent_requests'], 1)
+        self.assertEqual(config['ingestion']['default'], 'hosted.embed')
+        for endpoint in ('http://example.org:8080', 'http://embeddings:8080/path', 'http://user@embeddings:8080'):
+            with self.subTest(endpoint=endpoint), self.assertRaises(ValueError):
+                core_entrypoint.build_config({**env, 'EMBED_URL': endpoint})
+        with self.assertRaises(ValueError):
+            core_entrypoint.build_config({**env, 'QUIVR_SINGLE_MACHINE': '0'})
+        self.assertTrue(core_entrypoint.build_config(ENV)['observability']['record_query_text'])
+
     def test_runtime_allows_workers_ten_minutes_for_api_migrations(self):
         self.assertEqual(core_entrypoint.build_config(ENV)['migration_wait'], '10m')
+
+    def test_compose_api_delegates_migrations_to_the_one_shot_role(self):
+        for external in ('0', '1'):
+            with self.subTest(external=external), tempfile.TemporaryDirectory() as temporary:
+                runtime = pathlib.Path(temporary) / 'runtime.json'
+                real_path = pathlib.Path
+                with patch.dict(os.environ, {**ENV, 'QUIVR_ROLE': 'api', 'QUIVR_SINGLE_MACHINE': external}, clear=True), \
+                        patch.object(core_entrypoint.pathlib, 'Path', side_effect=lambda value: runtime if value == '/tmp/quivr-runtime.json' else real_path(value)), \
+                        patch.object(core_entrypoint.subprocess, 'run') as migrate, \
+                        patch.object(core_entrypoint, 'supervise', return_value=0):
+                    with self.assertRaises(SystemExit):
+                        core_entrypoint.main()
+                    self.assertEqual(migrate.call_count, 0 if external == '1' else 1)
+                    self.assertEqual(json.loads(runtime.read_text())['migration_wait'], '10m')
 
     def test_local_text_encoder_runs_only_beside_api_without_changing_pins(self):
         env = {**ENV, 'QUIVR_DEMO_EMBEDDING': 'gemma',

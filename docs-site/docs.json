@@ -60,6 +60,7 @@
             "pages": [
               "run-quivr/overview",
               "run-quivr/deploy",
+              "run-quivr/single-machine",
               "run-quivr/run-a-large-import",
               "run-quivr/scale-quivr",
               "run-quivr/dedicated-vector-host",

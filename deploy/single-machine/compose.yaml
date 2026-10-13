@@ -1,0 +1,446 @@
+{
+  "name": "quivr",
+  "x-quivr-model": "gemma",
+  "x-quivr-model-revision": "",
+  "x-quivr-initialized": false,
+  "services": {
+    "postgres": {
+      "image": "${QUIVR_POSTGRES_IMAGE:?use a release bundle initialized by setup.py}",
+      "environment": {
+        "QUIVR_POSTGRES_MAX_CONNECTIONS": "256",
+        "QUIVR_POSTGRES_WORK_MEM": "4MB",
+        "QUIVR_POSTGRES_RANDOM_PAGE_COST": "1.1",
+        "QUIVR_POSTGRES_EFFECTIVE_IO_CONCURRENCY": "200",
+        "QUIVR_POSTGRES_CHECKPOINT_TIMEOUT": "15min",
+        "QUIVR_POSTGRES_WAL_COMPRESSION": "lz4",
+        "QUIVR_POSTGRES_STAT_STATEMENTS_TRACK": "all",
+        "QUIVR_POSTGRES_JIT": "on",
+        "QUIVR_POSTGRES_SYNCHRONOUS_COMMIT": "on",
+        "POSTGRES_USER": "quivr",
+        "POSTGRES_DB": "quivr",
+        "POSTGRES_PASSWORD": "${QUIVR_DB_PASSWORD:?}"
+      },
+      "deploy": {
+        "resources": {
+          "limits": {
+            "memory": "1073741824",
+            "cpus": "1"
+          }
+        }
+      },
+      "volumes": [
+        "postgres-data:/var/lib/postgresql/data"
+      ],
+      "healthcheck": {
+        "test": [
+          "CMD",
+          "pg_isready",
+          "-h",
+          "127.0.0.1",
+          "-U",
+          "quivr",
+          "-d",
+          "quivr"
+        ],
+        "interval": "2s",
+        "timeout": "5s",
+        "retries": 60,
+        "start_period": "10s"
+      },
+      "logging": {
+        "driver": "json-file",
+        "options": {
+          "max-size": "10m",
+          "max-file": "3"
+        }
+      },
+      "networks": [
+        "stack"
+      ],
+      "restart": "unless-stopped"
+    },
+    "temporal": {
+      "image": "temporalio/temporal:1.8.3@sha256:cea463d98a8d6def4420f903ea5c3fcd0d85c8d10fbcc2770a50c12fff2eb26d",
+      "command": [
+        "server",
+        "start-dev",
+        "--ip",
+        "0.0.0.0",
+        "--headless",
+        "--db-filename",
+        "/home/temporal/temporal.db"
+      ],
+      "volumes": [
+        "temporal-data:/home/temporal"
+      ],
+      "healthcheck": {
+        "test": [
+          "CMD",
+          "temporal",
+          "operator",
+          "cluster",
+          "health",
+          "--address",
+          "127.0.0.1:7233"
+        ],
+        "interval": "2s",
+        "timeout": "5s",
+        "retries": 60,
+        "start_period": "10s"
+      },
+      "logging": {
+        "driver": "json-file",
+        "options": {
+          "max-size": "10m",
+          "max-file": "3"
+        }
+      },
+      "networks": [
+        "stack"
+      ],
+      "restart": "unless-stopped"
+    },
+    "seaweed": {
+      "image": "${QUIVR_SEAWEED_IMAGE:?use a release bundle initialized by setup.py}",
+      "environment": {
+        "S3_ACCESS_KEY": "${S3_ACCESS_KEY:?}",
+        "S3_SECRET_KEY": "${S3_SECRET_KEY:?}"
+      },
+      "volumes": [
+        "seaweed-data:/data"
+      ],
+      "healthcheck": {
+        "test": [
+          "CMD",
+          "wget",
+          "-q",
+          "-O",
+          "/dev/null",
+          "http://127.0.0.1:9333/cluster/status"
+        ],
+        "interval": "2s",
+        "timeout": "5s",
+        "retries": 60,
+        "start_period": "10s"
+      },
+      "logging": {
+        "driver": "json-file",
+        "options": {
+          "max-size": "10m",
+          "max-file": "3"
+        }
+      },
+      "networks": [
+        "stack"
+      ],
+      "restart": "unless-stopped"
+    },
+    "weaviate": {
+      "image": "cr.weaviate.io/semitechnologies/weaviate:1.39.10@sha256:de371bb2e07604636915581d784ce182303f0046376a3dd23822936fa10acc56",
+      "hostname": "quivr-index",
+      "environment": {
+        "AUTHENTICATION_ANONYMOUS_ACCESS_ENABLED": "true",
+        "AUTOSCHEMA_ENABLED": "false",
+        "DEFAULT_VECTORIZER_MODULE": "none",
+        "PERSISTENCE_DATA_PATH": "/var/lib/weaviate",
+        "DEFAULT_QUANTIZATION": "rq-8",
+        "ASYNC_INDEXING": "false",
+        "PERSISTENCE_MEMTABLES_MAX_SIZE_MB": "200",
+        "RAFT_BOOTSTRAP_TIMEOUT": "600",
+        "GOMEMLIMIT": "1700MiB"
+      },
+      "deploy": {
+        "resources": {
+          "limits": {
+            "memory": "2147483648",
+            "cpus": "2"
+          }
+        }
+      },
+      "volumes": [
+        "weaviate-data:/var/lib/weaviate"
+      ],
+      "healthcheck": {
+        "test": [
+          "CMD",
+          "wget",
+          "-q",
+          "-O",
+          "/dev/null",
+          "http://127.0.0.1:8080/v1/.well-known/ready"
+        ],
+        "interval": "2s",
+        "timeout": "5s",
+        "retries": 180,
+        "start_period": "10s"
+      },
+      "logging": {
+        "driver": "json-file",
+        "options": {
+          "max-size": "10m",
+          "max-file": "3"
+        }
+      },
+      "networks": [
+        "stack"
+      ],
+      "restart": "unless-stopped"
+    },
+    "embeddings": {
+      "image": "${QUIVR_CPU_EMBEDDINGS_IMAGE:?use a release bundle initialized by setup.py}",
+      "environment": {
+        "HF_HUB_OFFLINE": "1",
+        "TRANSFORMERS_OFFLINE": "1",
+        "HF_HUB_DISABLE_TELEMETRY": "1",
+        "EMBED_API_KEY": "${EMBED_API_KEY:?}",
+        "QUIVR_EMBEDDING_THREADS": "${QUIVR_EMBEDDING_THREADS:-4}"
+      },
+      "volumes": [
+        "model-cache:/models:ro"
+      ],
+      "deploy": {
+        "resources": {
+          "limits": {
+            "cpus": "${QUIVR_EMBEDDING_CPUS:-4}",
+            "memory": "${QUIVR_EMBEDDING_MEMORY:-4g}"
+          }
+        }
+      },
+      "logging": {
+        "driver": "json-file",
+        "options": {
+          "max-size": "10m",
+          "max-file": "3"
+        }
+      },
+      "networks": [
+        "stack"
+      ],
+      "restart": "unless-stopped"
+    },
+    "migrate": {
+      "image": "${QUIVR_CORE_IMAGE:?use a release bundle initialized by setup.py}",
+      "environment": {
+        "QUIVR_SINGLE_MACHINE": "1",
+        "QUIVR_ORGANIZATION": "${QUIVR_ORGANIZATION:-quivr}",
+        "DATABASE_URL": "postgres://quivr:${QUIVR_DB_PASSWORD:?}@postgres:5432/quivr?sslmode=disable",
+        "QUIVR_API_KEY": "${QUIVR_API_KEY:?}",
+        "QUIVR_OPERATOR_KEY": "${QUIVR_OPERATOR_KEY:?}",
+        "QUIVR_CURSOR_KEY": "${QUIVR_CURSOR_KEY:?}",
+        "QUIVR_CREDENTIAL_KEY": "${QUIVR_CREDENTIAL_KEY:?}",
+        "TEMPORAL_ADDRESS": "temporal:7233",
+        "WEAVIATE_URL": "http://weaviate:8080",
+        "TEI_URL": "http://embeddings:8080",
+        "S3_ENDPOINT": "http://seaweed:8333",
+        "S3_ACCESS_KEY": "${S3_ACCESS_KEY:?}",
+        "S3_SECRET_KEY": "${S3_SECRET_KEY:?}",
+        "QUIVR_DEMO_PLUGINS": "1",
+        "QUIVR_DEMO_CONNECTORS": "1",
+        "QUIVR_DEMO_ADMIN": "1",
+        "QUIVR_WORKER_LIVE_SLOTS": "${QUIVR_WORKER_LIVE_SLOTS:-1}",
+        "QUIVR_WORKER_BULK_SLOTS": "${QUIVR_WORKER_BULK_SLOTS:-1}",
+        "QUIVR_DEMO_EMBEDDING": "gemma",
+        "QUIVR_DEMO_CORE_INGEST": "0",
+        "EMBED_URL": "http://embeddings:8080",
+        "EMBED_API_KEY": "${EMBED_API_KEY:?}",
+        "QUIVR_ROLE": "migrate"
+      },
+      "depends_on": {
+        "postgres": {
+          "condition": "service_healthy"
+        },
+        "temporal": {
+          "condition": "service_healthy"
+        },
+        "seaweed": {
+          "condition": "service_healthy"
+        },
+        "weaviate": {
+          "condition": "service_healthy"
+        },
+        "embeddings": {
+          "condition": "service_healthy"
+        }
+      },
+      "restart": "no",
+      "tmpfs": [
+        "/tmp:mode=1777,size=128m"
+      ],
+      "logging": {
+        "driver": "json-file",
+        "options": {
+          "max-size": "10m",
+          "max-file": "3"
+        }
+      },
+      "networks": [
+        "stack"
+      ]
+    },
+    "api": {
+      "image": "${QUIVR_CORE_IMAGE:?use a release bundle initialized by setup.py}",
+      "environment": {
+        "QUIVR_SINGLE_MACHINE": "1",
+        "QUIVR_ORGANIZATION": "${QUIVR_ORGANIZATION:-quivr}",
+        "DATABASE_URL": "postgres://quivr:${QUIVR_DB_PASSWORD:?}@postgres:5432/quivr?sslmode=disable",
+        "QUIVR_API_KEY": "${QUIVR_API_KEY:?}",
+        "QUIVR_OPERATOR_KEY": "${QUIVR_OPERATOR_KEY:?}",
+        "QUIVR_CURSOR_KEY": "${QUIVR_CURSOR_KEY:?}",
+        "QUIVR_CREDENTIAL_KEY": "${QUIVR_CREDENTIAL_KEY:?}",
+        "TEMPORAL_ADDRESS": "temporal:7233",
+        "WEAVIATE_URL": "http://weaviate:8080",
+        "TEI_URL": "http://embeddings:8080",
+        "S3_ENDPOINT": "http://seaweed:8333",
+        "S3_ACCESS_KEY": "${S3_ACCESS_KEY:?}",
+        "S3_SECRET_KEY": "${S3_SECRET_KEY:?}",
+        "QUIVR_DEMO_PLUGINS": "1",
+        "QUIVR_DEMO_CONNECTORS": "1",
+        "QUIVR_DEMO_ADMIN": "1",
+        "QUIVR_WORKER_LIVE_SLOTS": "${QUIVR_WORKER_LIVE_SLOTS:-1}",
+        "QUIVR_WORKER_BULK_SLOTS": "${QUIVR_WORKER_BULK_SLOTS:-1}",
+        "QUIVR_DEMO_EMBEDDING": "gemma",
+        "QUIVR_DEMO_CORE_INGEST": "0",
+        "EMBED_URL": "http://embeddings:8080",
+        "EMBED_API_KEY": "${EMBED_API_KEY:?}",
+        "QUIVR_ROLE": "api"
+      },
+      "depends_on": {
+        "migrate": {
+          "condition": "service_completed_successfully"
+        }
+      },
+      "ports": [
+        "127.0.0.1:${QUIVR_API_PORT:-8080}:8080"
+      ],
+      "tmpfs": [
+        "/tmp:mode=1777,size=128m"
+      ],
+      "healthcheck": {
+        "test": [
+          "CMD",
+          "python",
+          "-c",
+          "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8081/readyz',timeout=3)"
+        ],
+        "interval": "2s",
+        "timeout": "5s",
+        "retries": 60,
+        "start_period": "10s"
+      },
+      "logging": {
+        "driver": "json-file",
+        "options": {
+          "max-size": "10m",
+          "max-file": "3"
+        }
+      },
+      "networks": [
+        "stack"
+      ],
+      "restart": "unless-stopped"
+    },
+    "worker": {
+      "image": "${QUIVR_CORE_IMAGE:?use a release bundle initialized by setup.py}",
+      "environment": {
+        "QUIVR_SINGLE_MACHINE": "1",
+        "QUIVR_ORGANIZATION": "${QUIVR_ORGANIZATION:-quivr}",
+        "DATABASE_URL": "postgres://quivr:${QUIVR_DB_PASSWORD:?}@postgres:5432/quivr?sslmode=disable",
+        "QUIVR_API_KEY": "${QUIVR_API_KEY:?}",
+        "QUIVR_OPERATOR_KEY": "${QUIVR_OPERATOR_KEY:?}",
+        "QUIVR_CURSOR_KEY": "${QUIVR_CURSOR_KEY:?}",
+        "QUIVR_CREDENTIAL_KEY": "${QUIVR_CREDENTIAL_KEY:?}",
+        "TEMPORAL_ADDRESS": "temporal:7233",
+        "WEAVIATE_URL": "http://weaviate:8080",
+        "TEI_URL": "http://embeddings:8080",
+        "S3_ENDPOINT": "http://seaweed:8333",
+        "S3_ACCESS_KEY": "${S3_ACCESS_KEY:?}",
+        "S3_SECRET_KEY": "${S3_SECRET_KEY:?}",
+        "QUIVR_DEMO_PLUGINS": "1",
+        "QUIVR_DEMO_CONNECTORS": "1",
+        "QUIVR_DEMO_ADMIN": "1",
+        "QUIVR_WORKER_LIVE_SLOTS": "${QUIVR_WORKER_LIVE_SLOTS:-1}",
+        "QUIVR_WORKER_BULK_SLOTS": "${QUIVR_WORKER_BULK_SLOTS:-1}",
+        "QUIVR_DEMO_EMBEDDING": "gemma",
+        "QUIVR_DEMO_CORE_INGEST": "0",
+        "EMBED_URL": "http://embeddings:8080",
+        "EMBED_API_KEY": "${EMBED_API_KEY:?}",
+        "QUIVR_ROLE": "worker"
+      },
+      "depends_on": {
+        "migrate": {
+          "condition": "service_completed_successfully"
+        }
+      },
+      "tmpfs": [
+        "/tmp:mode=1777,size=128m"
+      ],
+      "stop_grace_period": "60s",
+      "logging": {
+        "driver": "json-file",
+        "options": {
+          "max-size": "10m",
+          "max-file": "3"
+        }
+      },
+      "networks": [
+        "stack"
+      ],
+      "restart": "unless-stopped"
+    },
+    "demo": {
+      "image": "${QUIVR_WEB_IMAGE:?use a release bundle initialized by setup.py}",
+      "profiles": [
+        "demo"
+      ],
+      "environment": {
+        "QUIVR_API_URL": "http://api:8080",
+        "QUIVR_API_KEY": "${QUIVR_API_KEY:?}",
+        "DEMO_PASSWORD": "${DEMO_PASSWORD:?}",
+        "DEMO_SECURE_COOKIE": "false",
+        "HOST": "0.0.0.0",
+        "PORT": "3000"
+      },
+      "ports": [
+        "127.0.0.1:${QUIVR_DEMO_PORT:-3000}:3000"
+      ],
+      "depends_on": {
+        "api": {
+          "condition": "service_healthy"
+        }
+      },
+      "logging": {
+        "driver": "json-file",
+        "options": {
+          "max-size": "10m",
+          "max-file": "3"
+        }
+      },
+      "networks": [
+        "stack"
+      ],
+      "restart": "unless-stopped"
+    }
+  },
+  "networks": {
+    "stack": {
+      "internal": false
+    }
+  },
+  "volumes": {
+    "postgres-data": {
+      "name": "quivr-postgres-data"
+    },
+    "temporal-data": {
+      "name": "quivr-temporal-data"
+    },
+    "seaweed-data": {
+      "name": "quivr-seaweed-data"
+    },
+    "weaviate-data": {
+      "name": "quivr-weaviate-data"
+    },
+    "model-cache": {
+      "name": "quivr-model-cache"
+    }
+  }
+}

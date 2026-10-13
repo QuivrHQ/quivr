@@ -1,5 +1,6 @@
 """Owner-boundary tests for pinned query-encoder assets."""
 import hashlib
+import io
 import json
 import os
 import pathlib
@@ -8,6 +9,7 @@ import tempfile
 import types
 import unittest
 from unittest.mock import patch
+from contextlib import redirect_stdout
 
 from deploy.cpu import text_encoder
 from scripts import prepare_query_encoder
@@ -67,6 +69,72 @@ class QueryEncoderAssetsTest(unittest.TestCase):
             asset = root / 'model' / 'config.json'
             self.assertEqual(asset.stat().st_mode & 0o777, 0o644)
             self.assertEqual(asset.read_bytes(), payload)
+
+    def test_mirror_uses_original_revision_relative_model_path(self):
+        payload = b'mirrored config\n'
+
+        class Response:
+            def __init__(self):
+                self.remaining = payload
+
+            def __enter__(self):
+                return self
+
+            def __exit__(self, *_args):
+                return False
+
+            def read1(self, _size):
+                chunk, self.remaining = self.remaining, b''
+                return chunk
+
+        with tempfile.TemporaryDirectory() as tmp:
+            root = pathlib.Path(tmp)
+            lock = self.lock(root, {'config.json': {
+                'sha256': hashlib.sha256(payload).hexdigest(), 'size': len(payload)}})
+            with patch.object(prepare_query_encoder.urllib.request, 'urlopen',
+                              return_value=Response()) as download:
+                prepare_query_encoder.prepare(
+                    root / 'model', lock_path=lock,
+                    mirror_base_url='https://mirror.example/hf/',
+                )
+            self.assertEqual(
+                download.call_args.args[0],
+                'https://mirror.example/hf/fixture/model/resolve/fixture-revision-full/config.json?download=true',
+            )
+
+    def test_mirror_url_must_be_an_explicit_http_url(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = pathlib.Path(tmp)
+            lock = self.lock(root, {'config.json': {
+                'sha256': hashlib.sha256(b'expected').hexdigest(), 'size': 8}})
+            with patch.object(prepare_query_encoder.urllib.request, 'urlopen',
+                              side_effect=AssertionError('invalid mirror downloaded')):
+                for mirror in ('', 'file:///tmp/model', 'https://mirror.example/a?token=secret',
+                               'https://mirror.example/../escape'):
+                    with self.subTest(mirror=mirror), self.assertRaises(ValueError):
+                        prepare_query_encoder.prepare(
+                            root / 'model', lock_path=lock, mirror_base_url=mirror,
+                        )
+
+    def test_cli_forwards_mirror_without_changing_lock_identity(self):
+        lock = {
+            'model': 'fixture/model',
+            'model_revision': 'fixture-revision',
+            'source_revision': 'fixture-revision-full',
+            'dimensions': 768,
+            'files': {'config.json': {'sha256': 'a' * 64, 'size': 1}},
+        }
+        with tempfile.TemporaryDirectory() as tmp, \
+                patch.object(prepare_query_encoder, 'prepare', return_value=lock) as prepare, \
+                redirect_stdout(io.StringIO()):
+            prepare_query_encoder.main([
+                '--output', str(pathlib.Path(tmp) / 'model'),
+                '--verify-only', '--mirror', 'https://mirror.example/hf/',
+            ])
+        prepare.assert_called_once_with(
+            pathlib.Path(tmp) / 'model', verify_only=True,
+            mirror_base_url='https://mirror.example/hf/',
+        )
 
     def test_missing_asset_fails_before_any_model_loader_can_use_directory(self):
         with tempfile.TemporaryDirectory() as tmp:

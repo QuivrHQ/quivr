@@ -66,3 +66,5 @@ Technology comparisons behind the stack.
 - [Isolated plugin runtime](research/plugin-isolation-runtime.md) (French)
 - [Storage and search stack](research/storage-search-stack.md) (French)
 - [Windmill as ingestion and plugin runtime](research/windmill-for-quivr.md) (French)
+
+- [2026-10-13 CPU embedding throughput](2026-10-13/cpu-embedding-throughput.md): bounded Gemma passage sample on four CPU cores.

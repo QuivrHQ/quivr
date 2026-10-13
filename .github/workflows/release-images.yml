@@ -79,6 +79,10 @@ jobs:
           VERSION=${{ needs.prepare.outputs.version }}
           REVISION=${{ needs.prepare.outputs.revision }}
           PLUGIN=${{ matrix.plugin }}
+        labels: |
+          org.opencontainers.image.source=https://github.com/${{ github.repository }}
+          org.opencontainers.image.version=${{ needs.prepare.outputs.version }}
+          org.opencontainers.image.revision=${{ needs.prepare.outputs.revision }}
     - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
       with:
         python-version: 3.12.15
@@ -90,9 +94,10 @@ jobs:
         IMAGE: ${{ matrix.image }}@${{ steps.image.outputs.digest }}
         PLUGIN: ${{ matrix.plugin }}
         PLUGIN_ID: ${{ matrix.plugin_id }}
+        COMPONENT: ${{ matrix.component }}
         VERSION: ${{ needs.prepare.outputs.version }}
         REVISION: ${{ needs.prepare.outputs.revision }}
-      run: python3 scripts/image_smoke.py "$IMAGE" --plugin "$PLUGIN" --plugin-id "$PLUGIN_ID" --version "$VERSION" --revision "$REVISION"
+      run: python3 scripts/image_smoke.py "$IMAGE" --plugin "$PLUGIN" --plugin-id "$PLUGIN_ID" --component "$COMPONENT" --version "$VERSION" --revision "$REVISION"
     - name: Install checksum-verified inventory and scan tools
       env:
         TOOLS_DIR: ${{ runner.temp }}/security-tools
@@ -103,7 +108,7 @@ jobs:
     - name: Inventory the immutable image
       env:
         IMAGE: ${{ matrix.image }}@${{ steps.image.outputs.digest }}
-        SBOM: sboms/${{ matrix.plugin_id && format('quivr-plugin-{0}', matrix.plugin_id) || 'quivr' }}.spdx.json
+        SBOM: sboms/${{ matrix.component && format('quivr-{0}', matrix.component) || matrix.plugin_id && format('quivr-plugin-{0}', matrix.plugin_id) || 'quivr' }}.spdx.json
         SYFT_CHECK_FOR_APP_UPDATE: false
       run: |
         mkdir -p sboms
@@ -120,7 +125,7 @@ jobs:
     - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
       if: failure()
       with:
-        name: vulnerabilities-${{ matrix.plugin || 'engine' }}
+        name: vulnerabilities-${{ matrix.component || matrix.plugin || 'engine' }}
         path: ${{ runner.temp }}/failure.tar.gz
         if-no-files-found: warn
         retention-days: 3
@@ -139,13 +144,13 @@ jobs:
       env:
         IMAGE: ${{ matrix.image }}@${{ steps.image.outputs.digest }}
         RELEASE_TAG: ${{ github.event.release.tag_name }}
-        SBOM: sboms/${{ matrix.plugin_id && format('quivr-plugin-{0}', matrix.plugin_id) || 'quivr' }}.spdx.json
+        SBOM: sboms/${{ matrix.component && format('quivr-{0}', matrix.component) || matrix.plugin_id && format('quivr-plugin-{0}', matrix.plugin_id) || 'quivr' }}.spdx.json
       run: |
         export COSIGN_CERTIFICATE_IDENTITY="$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/.github/workflows/release-images.yml@refs/tags/$RELEASE_TAG"
         bash scripts/sign_image.sh "$IMAGE" "$SBOM"
     - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
       with:
-        name: sbom-${{ matrix.plugin || 'engine' }}
+        name: sbom-${{ matrix.component || matrix.plugin || 'engine' }}
         path: sboms/
         if-no-files-found: error
     - name: Record the signed image
@@ -157,12 +162,20 @@ jobs:
         printf '%s\n' "$IMAGE" > "signed-images/${image_name##*/}.txt"
     - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
       with:
-        name: image-${{ matrix.plugin || 'engine' }}
+        name: image-${{ matrix.component || matrix.plugin || 'engine' }}
         path: signed-images/
+  deployment-smoke:
+    needs: [prepare, build]
+    uses: ./.github/workflows/verify-single-machine.yml
+    with:
+      ref: ${{ needs.prepare.outputs.revision }}
+      version: ${{ needs.prepare.outputs.version }}
+      mode: published
   publish:
     needs:
     - prepare
     - build
+    - deployment-smoke
     runs-on: ubuntu-24.04
     timeout-minutes: 10
     permissions:
@@ -185,6 +198,10 @@ jobs:
         registry: ghcr.io
         username: ${{ github.actor }}
         password: ${{ secrets.GITHUB_TOKEN }}
+    - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      with:
+        ref: ${{ needs.prepare.outputs.revision }}
+        persist-credentials: false
     - name: Advance latest-alpha only after every image passes and is signed
       env:
         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -192,7 +209,9 @@ jobs:
         VERSION: ${{ needs.prepare.outputs.version }}
         REVISION: ${{ needs.prepare.outputs.revision }}
       run: |
-        cat signed-images/* | sort > images.txt
+        cat signed-images/*.txt | sort > images.txt
+        python3 scripts/single_machine_bundle.py --images signed-images --output .scratch/compose-bundle --version "$VERSION" --revision "$REVISION"
+        gh release upload "$RELEASE_TAG" ".scratch/quivr-compose-$VERSION.tar.gz" --repo "$GITHUB_REPOSITORY" --clobber
         # Rerunning an older release must not move the rolling alias backwards.
         published=$(gh api --paginate "repos/$GITHUB_REPOSITORY/releases" \
           --jq '.[] | select(any(.assets[]; .name == "images.txt")) | .tag_name' \

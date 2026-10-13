@@ -132,7 +132,8 @@ def gemma_configuration(env):
         port = url.port
     except ValueError:
         raise ValueError('EMBED_URL must be a valid HTTPS endpoint origin') from None
-    if (url.scheme != 'https' or not url.hostname
+    private_cpu = env.get('QUIVR_SINGLE_MACHINE') == '1' and endpoint == 'http://embeddings:8080'
+    if ((url.scheme != 'https' and not private_cpu) or not url.hostname
             or any(char.isspace() or ord(char) < 32 for char in endpoint)
             or port == 0 or url.netloc.endswith(':')
             or url.username is not None or url.password is not None
@@ -141,7 +142,7 @@ def gemma_configuration(env):
     key = env.get('EMBED_API_KEY', '')
     if not key or not key.isascii() or any(char.isspace() for char in key):
         raise ValueError('EMBED_API_KEY must be a nonempty ASCII bearer token without whitespace')
-    return {'format': 'openai', 'base_url': endpoint + '/v1', 'auth': 'bearer',
+    configuration = {'format': 'openai', 'base_url': endpoint + '/v1', 'auth': 'bearer',
             'model': 'google/embeddinggemma-2', 'dimensions': 768,
             # The plugin revision field is bounded to 32 bytes; the image pins the full SHA.
             'model_revision': '914f7f89142e33e7',
@@ -157,6 +158,9 @@ def gemma_configuration(env):
             'batch_size': 32, 'max_batch_tokens': 65536, 'max_concurrent_requests': 16,
             'request_timeout_ms': 10000, 'call_budget_ms': 90000,
             'usd_per_million_tokens': 0}
+    if private_cpu:
+        configuration.update(batch_size=1, max_batch_tokens=2048, max_concurrent_requests=1)
+    return configuration
 
 
 def hosted_configuration(env):
@@ -213,6 +217,12 @@ def connector_pins(env):
 def build_config(env):
     """Build the core configuration from Railway runtime variables."""
     key = env['QUIVR_API_KEY']
+    organization = env.get('QUIVR_ORGANIZATION', 'quivr-demo').strip()
+    if not organization:
+        raise ValueError('QUIVR_ORGANIZATION must not be empty')
+    recording = env.get('QUIVR_RECORD_QUERY_TEXT', '0' if env.get('QUIVR_SINGLE_MACHINE') == '1' else '1')
+    if recording not in ('0', '1'):
+        raise ValueError('QUIVR_RECORD_QUERY_TEXT must be 0 or 1')
     # changes:read feeds the web app's live Veille page (read-only, fenced to the demo corpus).
     actions = ['corpora:read', 'corpora:write', 'content:read', 'content:write', 'search:query',
                'changes:read']
@@ -242,12 +252,12 @@ def build_config(env):
         'tei_url': env['TEI_URL'],
         's3': {'endpoint': env['S3_ENDPOINT'], 'access_key': env['S3_ACCESS_KEY'],
                'secret_key': env['S3_SECRET_KEY'], 'bucket': 'quivr-content'},
-        'keys': {key: {'organization': 'quivr-demo',
+        'keys': {key: {'organization': organization,
                        'actions': actions,
                        'corpora': ['*']}},
         # The demo lists its most frequent searches, so it records query text (7 days).
         # Its queries are demo traffic; a deployment with private queries leaves this off.
-        'observability': {'record_query_text': True},
+        'observability': {'record_query_text': recording == '1'},
     }
     weaviate_key = env.get('WEAVIATE_API_KEY', '')
     if weaviate_key:
@@ -258,14 +268,16 @@ def build_config(env):
     # Corpora from inside the deployment.
     operator = env.get('QUIVR_OPERATOR_KEY', '').strip()
     if operator:
-        config['keys'][operator] = {'organization': 'quivr-demo', 'corpora': ['*'],
+        if operator == key:
+            raise ValueError('API and operator keys must differ')
+        config['keys'][operator] = {'organization': organization, 'corpora': ['*'],
                                     'actions': ['corpora:read', 'projections:rebuild', 'operations:read', 'operations:write',
                                                 'plugins:admin', 'observability:read', 'queues:read', 'corpora:archive', 'corpora:rename']}
     queue_key = env.get('QUIVR_QUEUE_KEY', '').strip()
     if queue_key:
         if queue_key in config['keys']:
             raise ValueError('QUIVR_QUEUE_KEY must differ from API and operator keys')
-        config['keys'][queue_key] = {'organization': 'quivr-demo', 'corpora': ['*'],
+        config['keys'][queue_key] = {'organization': organization, 'corpora': ['*'],
                                      'actions': ['queues:read']}
     # Omitted queue variables keep one worker serving both queues.
     worker = {}
@@ -517,7 +529,7 @@ def main():
                 if name not in plugin_secrets | {'WEAVIATE_API_KEY'} and name != 'QUIVR_PLUGIN_SIGNING_KEYS'}
     core_env.update(engine_signing_environment(os.environ))
     # Only the API applies startup migrations; failures abort before serving.
-    if mode == 'api':
+    if mode == 'api' and os.environ.get('QUIVR_SINGLE_MACHINE') != '1':
         subprocess.run(['quivr', 'migrate'], check=True, env=core_env)
     # The worker calls every plugin but the retrieval plugin, and the API the push
     # connector plugins it relays webhook deliveries to, the ingestion plugin it encodes
