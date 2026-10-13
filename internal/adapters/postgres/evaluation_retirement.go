@@ -39,11 +39,11 @@ ORDER BY (v.evaluator->>'plugin_id')||'@'||(v.evaluator->>'version') LIMIT $4`, 
 	return items, err
 }
 
-const unavailableEvaluationsSQL = `FROM evaluation_intents i
+var unavailableEvaluationsSQL = `FROM evaluation_intents i
 JOIN subscription_versions v ON (v.organization,v.id)=(i.organization,i.subscription_version_id)
 WHERE i.organization=$1 AND ($2::text[] IS NULL OR i.corpus_id=ANY($2))
 AND v.evaluator->>'plugin_id'=$3 AND v.evaluator->>'version'=$4
-AND i.kind='evaluation' AND i.state='pending' AND i.error_code='evaluator_unavailable'`
+AND i.kind='evaluation' AND i.state='pending' AND i.error_code='evaluator_unavailable' AND (NOT ` + parallelJournalSQL + ` OR i.sequence<=` + journalHeadSQL("$1") + `)`
 
 type retirementRequest struct {
 	Input   monitoring.EvaluationRetirementInput `json:"input"`
@@ -71,14 +71,8 @@ func (s MonitoringStore) retireEvaluationsAttempt(ctx context.Context, org strin
 		return out, err
 	}
 	defer tx.Rollback(ctx)
-	if in.DryRun {
-		var position int64
-		err = tx.QueryRow(ctx, `SELECT last_sequence FROM organization_journals WHERE organization=$1 FOR UPDATE`, org).Scan(&position)
-		if errors.Is(err, pgx.ErrNoRows) {
-			return out, nil
-		}
-	} else {
-		err = lockJournal(ctx, tx, org)
+	if err = lockJournal(ctx, tx, org); err == nil && !in.DryRun {
+		err = lockJournalRequest(ctx, tx, org, "evaluation_retirement", in.Key)
 	}
 	if err != nil {
 		return out, err

@@ -17,7 +17,8 @@ import (
 const projectionRoutingLock = 642003
 
 func lockProjectionRouting(ctx context.Context, tx pgx.Tx) error {
-	_, err := tx.Exec(ctx, `SELECT pg_advisory_xact_lock_shared($1)`, projectionRoutingLock)
+	_, err := tx.Exec(ctx, `WITH mode AS MATERIALIZED (SELECT pg_advisory_xact_lock_shared($2))
+ SELECT pg_advisory_xact_lock_shared($1) FROM mode`, projectionRoutingLock, journalModeLock)
 	return err
 }
 
@@ -53,7 +54,7 @@ func applyIngestionRouting(ctx context.Context, tx pgx.Tx, previous registry.Pla
 	if err != nil {
 		return false, err
 	}
-	if _, err = tx.Exec(ctx, `SELECT pg_advisory_xact_lock($1)`, projectionRoutingLock); err != nil {
+	if _, err = tx.Exec(ctx, `WITH mode AS MATERIALIZED (SELECT pg_advisory_xact_lock_shared($2)) SELECT pg_advisory_xact_lock($1) FROM mode`, projectionRoutingLock, journalModeLock); err != nil {
 		return false, err
 	}
 	if _, err = tx.Exec(ctx, `SELECT pg_advisory_xact_lock($1)`, spacesLock); err != nil {

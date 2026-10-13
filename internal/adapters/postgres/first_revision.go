@@ -21,7 +21,10 @@ func acceptFirstRevision(ctx context.Context, tx pgx.Tx, org string, c content.C
 	requestCopy, receiptCommand, execution := importRequestStorage(canonical, retainDetail)
 	requestDigest := sha256.Sum256(canonical)
 	batch := &pgx.Batch{}
-	batch.Queue("SELECT pg_advisory_xact_lock_shared($1)", projectionRoutingLock)
+	batch.Queue(`WITH mode AS MATERIALIZED (SELECT pg_advisory_xact_lock_shared($2))
+ SELECT pg_advisory_xact_lock_shared($1) FROM mode`, projectionRoutingLock, journalModeLock)
+	batch.Queue(journalClaimSQL, org, "ingestion", c.Key)
+	batch.Queue(journalClaimSQL, org, "record", recordID)
 	batch.Queue(`WITH record AS (
  INSERT INTO records(organization,id,corpus_id,namespace,record_key,acceptance_order,desired_order,desired_position,desired_version_id)
  SELECT $1,$2,$4,$5,$6,1,1,$7,$8
@@ -62,7 +65,7 @@ func acceptFirstRevision(ctx context.Context, tx pgx.Tx, org string, c content.C
 		return false, nil
 	}
 	// Acquire and append last. The separate statements keep the public cursor
-	// gap-free and ordered by commit, including concurrent acceptance replays.
+	// safe in either mode, including concurrent acceptance replays.
 	events := journalBatch(org)
 	pending.CorpusID, accepted.CorpusID = c.Source.CorpusID, c.Source.CorpusID
 	queueEvent(ctx, events, pending)

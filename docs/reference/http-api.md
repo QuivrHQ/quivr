@@ -699,7 +699,7 @@ Lets a paused backfill continue from its checkpoint, on the Pipeline Plan it is 
 
 Operation `pollChanges`. Requires `changes:read`.
 
-Same durable journal as SSE. Without cursor, return empty items and current committed position as next_cursor (start now). With cursor, return authorized events after it, in commit order; duplicates possible. Cursor binds Organization, Corpus filter and authorization scope. Expiry is 410 cursor_expired with resync_url, never silent reset; changed scope/filter is 409 cursor_scope_changed with resync_url. resync_url is the API-relative Record catalog route for the Corpus (/v0/records?corpus_id=...). next_cursor advances over scanned events even when none are visible. Public events are invalidations; reread current state, do not replay historical content into a current mirror.
+Same durable journal as SSE. Every durable event has one identity and appears exactly once in a forward cursor traversal, in stable order with per-Record order preserved. Concurrent writes to different Records need not appear in exact commit order. Reusing an older cursor can redeliver events. Without cursor, return empty items and an exact start-now cursor, excluding already committed changes while retaining then-in-flight writes. Readers advance only through a safe published prefix; aborted allocations may leave gaps. In healthy parallel mode, publication delay is bounded by the longest configured engine transaction timeout (30 seconds by default) plus two 100 ms publisher polls. Outside long-running or prepared transactions and database unavailability can delay publication; readers fail closed rather than skip late commits. Cursor binds Organization, Corpus filter and authorization scope. Expiry is 410 cursor_expired with resync_url, never silent reset; changed scope/filter is 409 cursor_scope_changed with resync_url. resync_url is the API-relative Record catalog route for the Corpus (/v0/records?corpus_id=...). next_cursor advances over scanned events even when none are visible. Public events are invalidations; reread current state, do not replay historical content into a current mirror.
 
 **Parameters**
 
@@ -720,7 +720,7 @@ Same durable journal as SSE. Without cursor, return empty items and current comm
 
 Operation `streamChanges`. Requires `changes:read`.
 
-SSE over the same journal. Last-Event-ID takes precedence over query cursor on reconnect. id is an opaque Change Cursor; data.event_id is deduplication identity. Named change events carry ChangeEvent JSON. checkpoint events carry a cursor when no visible event is emitted, including initial start-now checkpoint. Resume cursor expires or scope changes: before headers use HTTP 410/409; after headers send stream_error with Error JSON then close, without advancing id. Use authenticated streaming fetch/http client. See contract for checkpoint framing and resync.
+SSE over the same safe published journal with stable per-Record ordering and exact start-now semantics as polling. Cross-Record commit order is not guaranteed; resuming an older cursor can redeliver an event. Last-Event-ID takes precedence over query cursor on reconnect. id is an opaque Change Cursor; data.event_id is deduplication identity. Named change events carry ChangeEvent JSON. checkpoint events carry a cursor when no visible event is emitted, including initial start-now checkpoint. Resume cursor expires or scope changes: before headers use HTTP 410/409; after headers send stream_error with Error JSON then close, without advancing id. Use authenticated streaming fetch/http client. See contract for checkpoint framing and resync.
 
 **Parameters**
 
@@ -891,7 +891,7 @@ Active (enabled, not deleted) Subscriptions of one Subscription Owner, or the gl
 
 Operation `createSubscription`. Requires `monitoring:write`.
 
-Atomically create enabled Subscription/Version and activation boundary in commit-ordered journal. Evaluate future eligible transitions, not existing history. Replay same key/request returns same identity and does not reactivate a disabled Subscription. The evaluator must be installed (422 unsupported_evaluator); the pinned Saved Query Version expression and the evaluator configuration must satisfy the evaluator's declared schemas (422 invalid_expression with field /saved_query_version_id, or invalid_subscription_configuration with field /evaluator/configuration/...; message names the first schema issue).
+Atomically create enabled Subscription/Version and activation boundary in the durable journal. Evaluate future eligible transitions, not existing history. Replay same key/request returns same identity and does not reactivate a disabled Subscription. The evaluator must be installed (422 unsupported_evaluator); the pinned Saved Query Version expression and the evaluator configuration must satisfy the evaluator's declared schemas (422 invalid_expression with field /saved_query_version_id, or invalid_subscription_configuration with field /evaluator/configuration/...; message names the first schema issue).
 
 **Request body** (required): `application/json` [`SubscriptionCreate`](#subscriptioncreate)
 

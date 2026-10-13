@@ -75,6 +75,17 @@ func (s SubmissionStore) acceptAttempt(ctx context.Context, scope corpus.Scope, 
 		return content.Receipt{}, err
 	}
 	defer tx.Rollback(ctx)
+	if db != s.Pool {
+		if err = lockProjectionRouting(ctx, tx); err != nil {
+			return content.Receipt{}, err
+		}
+		claims := &pgx.Batch{}
+		claims.Queue(journalClaimSQL, scope.Organization, "ingestion", c.Key)
+		claims.Queue(journalClaimSQL, scope.Organization, "record", recordID)
+		if err = tx.SendBatch(ctx, claims).Close(); err != nil {
+			return content.Receipt{}, err
+		}
+	}
 	// Audited requests keep their surrounding transaction. Ordinary accepts
 	// try the new-record path inside this same transaction, so corrections
 	// do not pay for a speculative rollback, another BEGIN or another fence.
@@ -214,6 +225,13 @@ func (s SubmissionStore) withdrawAttempt(ctx context.Context, scope corpus.Scope
 	if err = lockProjectionRouting(ctx, tx); err != nil {
 		return content.Receipt{}, err
 	}
+	if err = lockJournalRequest(ctx, tx, scope.Organization, "withdrawal", w.Key); err != nil {
+		return content.Receipt{}, err
+	}
+	recordID := content.StableID("record", scope.Organization, w.Source.CorpusID, w.Source.Namespace, w.Source.RecordKey)
+	if err = lockJournalRecord(ctx, tx, scope.Organization, recordID); err != nil {
+		return content.Receipt{}, err
+	}
 	requestCopy, receiptCommand, _ := importRequestStorage(canonical, s.RetainImportAuditDetail)
 	requestDigest := sha256.Sum256(canonical)
 	if err = lockJournal(ctx, tx, scope.Organization); err != nil {
@@ -241,7 +259,6 @@ func (s SubmissionStore) withdrawAttempt(ctx context.Context, scope corpus.Scope
 	if !exists {
 		return content.Receipt{}, corpus.ErrNotFound
 	}
-	recordID := content.StableID("record", scope.Organization, w.Source.CorpusID, w.Source.Namespace, w.Source.RecordKey)
 	if _, err = tx.Exec(ctx, `INSERT INTO records(organization,id,corpus_id,namespace,record_key) VALUES($1,$2,$3,$4,$5) ON CONFLICT DO NOTHING`, scope.Organization, recordID, w.Source.CorpusID, w.Source.Namespace, w.Source.RecordKey); err != nil {
 		return content.Receipt{}, err
 	}

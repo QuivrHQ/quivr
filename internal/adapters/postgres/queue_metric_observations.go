@@ -30,7 +30,9 @@ const seedQueueMetricStripesSQL = `
   FROM (` + queueMetricKeyArraysSQL + `) k
  )
  INSERT INTO queue_metric_totals(source,stripe)
- SELECT source,stripe FROM touched ORDER BY source,stripe
+ SELECT source,stripe FROM touched
+ WHERE NOT ` + parallelJournalSQL + `
+ ORDER BY source,stripe
  ON CONFLICT(source,stripe) DO NOTHING`
 
 const lockQueueMetricStripesSQL = `
@@ -41,6 +43,7 @@ const lockQueueMetricStripesSQL = `
   FROM (` + queueMetricKeyArraysSQL + `) k
   WHERE (k.source,(hashtextextended(k.org,0)&63)::integer)=(t.source,t.stripe)
  )
+ AND NOT ` + parallelJournalSQL + `
  ORDER BY t.source,t.stripe
  FOR UPDATE`
 
@@ -48,7 +51,8 @@ const lockQueueMetricStripesSQL = `
 // statement after lockQueueMetricStripesSQL, so READ COMMITTED obtains a fresh
 // snapshot after any competing canonical writer releases its stripe.
 const reconcileQueueMetricKeysSQL = `
- WITH keys AS MATERIALIZED (` + queueMetricKeyArraysSQL + `),
+ WITH mode AS MATERIALIZED (SELECT ` + parallelJournalSQL + ` AS parallel),
+ keys AS MATERIALIZED (SELECT k.source,k.org,k.work_id,k.sequence FROM (` + queueMetricKeyArraysSQL + `) k CROSS JOIN mode WHERE NOT mode.parallel),
  desired AS MATERIALIZED (
   SELECT k.source,k.org,k.work_id,k.sequence,r.record_id,r.accepted_at AS admitted_at,false AS erroring
   FROM keys k
@@ -143,23 +147,25 @@ const queueRecordMetricTargetsSQL = `SELECT DISTINCT organization,record_id
 
 var queueRecordMetricObservationSQL = []string{
 	`WITH targets AS MATERIALIZED (` + queueRecordMetricTargetsSQL + `),
- wanted AS (
-  SELECT DISTINCT source,(hashtextextended(t.organization,0)&63)::integer AS stripe
-  FROM targets t CROSS JOIN (VALUES('evaluation'),('ingestion')) sources(source)
- )
+	 wanted AS (
+	  SELECT DISTINCT source,(hashtextextended(t.organization,0)&63)::integer AS stripe
+	  FROM targets t CROSS JOIN (VALUES('evaluation'),('ingestion')) sources(source)
+		 WHERE NOT ` + parallelJournalSQL + `
+	 )
  INSERT INTO queue_metric_totals(source,stripe)
  SELECT source,stripe FROM wanted ORDER BY source,stripe
  ON CONFLICT(source,stripe) DO NOTHING`,
 	`SELECT t.source,t.stripe
  FROM queue_metric_totals t
- WHERE EXISTS (
-  SELECT 1 FROM (` + queueRecordMetricTargetsSQL + `) k
-  WHERE t.source IN ('evaluation','ingestion')
-    AND t.stripe=(hashtextextended(k.organization,0)&63)::integer
- )
- ORDER BY t.source,t.stripe
- FOR UPDATE`,
-	`WITH targets AS MATERIALIZED (` + queueRecordMetricTargetsSQL + `),
+	 WHERE EXISTS (
+	  SELECT 1 FROM (` + queueRecordMetricTargetsSQL + `) k
+	  WHERE t.source IN ('evaluation','ingestion')
+	    AND t.stripe=(hashtextextended(k.organization,0)&63)::integer
+	 )
+		 AND NOT ` + parallelJournalSQL + `
+	 ORDER BY t.source,t.stripe
+	 FOR UPDATE`,
+	`WITH targets AS MATERIALIZED (SELECT k.organization,k.record_id FROM (` + queueRecordMetricTargetsSQL + `) k WHERE NOT ` + parallelJournalSQL + `),
  desired AS MATERIALIZED (
   SELECT 'ingestion'::text AS source,r.organization,r.id AS work_id,0::bigint AS sequence,
     r.record_id,r.accepted_at AS admitted_at,false AS erroring
@@ -241,6 +247,43 @@ var queueRecordMetricObservationSQL = []string{
    IS DISTINCT FROM (EXCLUDED.record_id,EXCLUDED.admitted_at,EXCLUDED.erroring)`,
 }
 
+// A delivery metric key has no Record identity of its own. Resolve it through
+// the canonical delivery/match row, retaining old metric memberships so a
+// terminal or deleted source item still gets reconciled. All source families
+// share this Record-scoped dirty revision table in parallel mode.
+const markParallelQueueMetricKeysSQL = `WITH keys AS MATERIALIZED (` + queueMetricKeyArraysSQL + `),
+ records AS MATERIALIZED (
+  SELECT r.organization,r.record_id
+  FROM keys k JOIN ingestion_receipts r ON k.source='ingestion' AND r.organization=k.org AND r.id=k.work_id
+  UNION ALL
+  SELECT i.organization,i.record_id
+  FROM keys k JOIN evaluation_intents i ON k.source='evaluation' AND i.organization=k.org
+   AND i.subscription_version_id=k.work_id AND i.sequence=k.sequence
+  UNION ALL
+  SELECT m.organization,m.record_id
+  FROM keys k JOIN deliveries d ON k.source='delivery' AND d.organization=k.org AND d.id=k.work_id
+   JOIN matches m ON (m.organization,m.id)=(d.organization,d.match_id)
+  UNION ALL
+  SELECT i.organization,i.record_id
+  FROM keys k JOIN queue_metric_items i ON (i.source,i.organization,i.work_id,i.sequence)=(k.source,k.org,k.work_id,k.sequence)
+ )
+ INSERT INTO parallel_queue_observations(organization,record_id,revision,changed_at,dirty_since)
+ SELECT DISTINCT organization,record_id,1,clock_timestamp(),clock_timestamp() FROM records
+ WHERE record_id<>'' AND ` + parallelJournalSQL + `
+ ON CONFLICT(organization,record_id) DO UPDATE SET
+ revision=parallel_queue_observations.revision+1,changed_at=EXCLUDED.changed_at,
+ dirty_since=CASE WHEN parallel_queue_observations.revision=parallel_queue_observations.applied_revision
+ THEN EXCLUDED.dirty_since ELSE parallel_queue_observations.dirty_since END`
+
+func queueRecordMetricObservations(batch *pgx.Batch, organizations, records []string, force bool) {
+	for _, sql := range queueRecordMetricObservationSQL {
+		if force {
+			sql = forceParallelQueueSQL(sql)
+		}
+		batch.Queue(sql, organizations, records)
+	}
+}
+
 // observeQueueMetricKeys maintains metric membership for one committed batch
 // of canonical source mutations. It is deliberately a batched sequence of
 // separate statements: seed and lock finish before the desired CTE gets its
@@ -251,6 +294,29 @@ func observeQueueMetricKeys(ctx context.Context, tx pgx.Tx, keys []queueMetricKe
 	}
 	batch := &pgx.Batch{}
 	queueMetricObservations(batch, keys)
+	return tx.SendBatch(ctx, batch).Close()
+}
+
+// observeQueueMetricKeysForced is owned by bounded maintenance. It performs a
+// metric-only repair even while the parallel journal is active, so periodic
+// bootstrap cannot keep creating dirty Record revisions for the same source
+// rows. Producers use observeQueueMetricKeys and defer through the dirty table.
+func observeQueueMetricKeysForced(ctx context.Context, tx pgx.Tx, keys []queueMetricKey) error {
+	if len(keys) == 0 {
+		return nil
+	}
+	batch := &pgx.Batch{}
+	sources := make([]string, len(keys))
+	orgs := make([]string, len(keys))
+	ids := make([]string, len(keys))
+	sequences := make([]int64, len(keys))
+	for i, key := range keys {
+		sources[i], orgs[i], ids[i], sequences[i] = key.source, key.org, key.id, key.sequence
+	}
+	args := []any{sources, orgs, ids, sequences}
+	batch.Queue(forceParallelQueueSQL(seedQueueMetricStripesSQL), args...)
+	batch.Queue(forceParallelQueueSQL(lockQueueMetricStripesSQL), args...)
+	batch.Queue(forceParallelQueueSQL(reconcileQueueMetricKeysSQL), args...)
 	return tx.SendBatch(ctx, batch).Close()
 }
 
@@ -276,4 +342,5 @@ func queueMetricObservations(batch *pgx.Batch, keys []queueMetricKey) {
 	batch.Queue(seedQueueMetricStripesSQL, args...)
 	batch.Queue(lockQueueMetricStripesSQL, args...)
 	batch.Queue(reconcileQueueMetricKeysSQL, args...)
+	batch.Queue(markParallelQueueMetricKeysSQL, args...)
 }

@@ -61,7 +61,7 @@ func (s RebuildStore) initializeRebuildValidation(ctx context.Context, org, id s
 	}
 	defer tx.Rollback(ctx)
 	var acquired bool
-	if err = tx.QueryRow(ctx, `SELECT pg_try_advisory_xact_lock($1)`, projectionRoutingLock).Scan(&acquired); err != nil || !acquired {
+	if err = tx.QueryRow(ctx, `WITH mode AS MATERIALIZED (SELECT pg_try_advisory_xact_lock_shared($2) AS acquired) SELECT CASE WHEN acquired THEN pg_try_advisory_xact_lock($1) ELSE false END FROM mode`, projectionRoutingLock, journalModeLock).Scan(&acquired); err != nil || !acquired {
 		return false, err
 	}
 	if err = lockJournal(ctx, tx, org); err != nil {
@@ -282,7 +282,7 @@ func (s OperationStore) cleanupRebuildValidation(parent context.Context) error {
 	// this fence their late UPSERT could recreate a ledger after its state was
 	// removed, leaving an orphan that no dispatcher could discover.
 	var acquired bool
-	if err = tx.QueryRow(ctx, `SELECT pg_try_advisory_xact_lock($1)`, projectionRoutingLock).Scan(&acquired); err != nil || !acquired {
+	if err = tx.QueryRow(ctx, `WITH mode AS MATERIALIZED (SELECT pg_try_advisory_xact_lock_shared($2) AS acquired) SELECT CASE WHEN acquired THEN pg_try_advisory_xact_lock($1) ELSE false END FROM mode`, projectionRoutingLock, journalModeLock).Scan(&acquired); err != nil || !acquired {
 		return err
 	}
 	var org, id string

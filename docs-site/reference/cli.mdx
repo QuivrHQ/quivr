@@ -13,6 +13,7 @@ Every command of the `quivr` binary, from the tables the binary itself dispatche
 | --- | --- | --- |
 | [`quivr api`](#quivr-api) | a configuration file (`QUIVR_CONFIG`) | Serve the public HTTP API until interrupted. |
 | [`quivr worker`](#quivr-worker) | a configuration file (`QUIVR_CONFIG`) | Run the background work that processes content, pulls connectors and delivers events, until interrupted. |
+| [`quivr journal`](#quivr-journal) | a configuration file (`QUIVR_CONFIG`) | Inspect change publication and explicitly switch its deployment-wide mode. |
 | [`quivr storage`](#quivr-storage) | a configuration file (`QUIVR_CONFIG`) | Check PostgreSQL schema readiness and report compact storage. |
 | [`quivr migrate`](#quivr-migrate) | a configuration file (`QUIVR_CONFIG`) | Prepare PostgreSQL, object storage and the search projections, then exit. Rerun it to finish a step whose dependency was not ready. |
 | [`quivr --version`](#quivr---version) | nothing: works offline | Print build identity without configuration or a running server. |
@@ -27,7 +28,7 @@ Every command of the `quivr` binary, from the tables the binary itself dispatche
 
 ## Engine commands {#engine-commands}
 
-Engine commands run Quivr itself and read the JSON configuration file named by `QUIVR_CONFIG`; `api`, `worker` and `migrate` connect to PostgreSQL, Temporal, object storage and Weaviate. `api` and `worker` run until interrupted; `migrate` exits when done. `migrate --contract` also applies deferred contract migrations and closes the application rollback window. `api` and `worker` take no flags. `storage status` connects only to PostgreSQL and checks schema readiness.
+Engine commands run Quivr itself and read the JSON configuration file named by `QUIVR_CONFIG`; `api`, `worker` and `migrate` connect to PostgreSQL, Temporal, object storage and Weaviate. `api` and `worker` run until interrupted; `migrate` exits when done. `migrate --contract` also applies deferred contract migrations and closes the application rollback window. `api` and `worker` take no flags. `storage status` and `journal` connect only to PostgreSQL. `journal status` reads publication progress; mode changes require the documented writer-drain acknowledgement.
 
 | Environment variable | Meaning |
 | --- | --- |
@@ -53,6 +54,17 @@ Run the background work that processes content, pulls connectors and delivers ev
 
 ```text
 quivr worker
+```
+
+### quivr journal {#quivr-journal}
+
+Inspect change publication and explicitly switch its deployment-wide mode.
+
+```text
+quivr journal status
+quivr journal activate --previous-writers-retired
+quivr journal legacy --writers-drained
+quivr journal restored --writers-drained
 ```
 
 ### quivr storage {#quivr-storage}

@@ -257,6 +257,9 @@ func (s BackfillStore) acceptBackfillAttempt(ctx context.Context, org, corpusID,
 	if err = lockJournal(ctx, tx, org); err != nil {
 		return operations.Operation{}, err
 	}
+	if err = lockJournalRequest(ctx, tx, org, "operation", content.StableID("request", operations.KindBackfill, corpusID, key)); err != nil {
+		return operations.Operation{}, err
+	}
 	var id string
 	var previous []byte
 	err = tx.QueryRow(ctx, `SELECT id,canonical_request FROM operations WHERE organization=$1 AND kind=$2 AND corpus_id=$3 AND request_key=$4 AND previous_operation_id IS NULL`, org, operations.KindBackfill, corpusID, key).Scan(&id, &previous)

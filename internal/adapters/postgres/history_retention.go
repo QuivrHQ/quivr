@@ -49,7 +49,8 @@ type historyStage struct {
 }
 
 // Scalar point probes intentionally exclude whole-table hash alternatives.
-const historyWatermark = `COALESCE((SELECT p.pruned_through FROM change_journal_prunes p WHERE p.organization=c.organization),0)`
+var historyWatermark = `LEAST(COALESCE((SELECT p.pruned_through FROM change_journal_prunes p WHERE p.organization=c.organization),0),` + journalHeadSQL("c.organization") + `)`
+
 const historyPendingEvaluation = `COALESCE((SELECT true FROM evaluation_intents i WHERE i.organization=c.organization AND i.record_version_id=c.record_version_id AND i.state='pending' LIMIT 1),false)`
 
 // The earliest decided evaluation per pair is a permanent deduplication fact.
@@ -71,6 +72,7 @@ var historyStages = []historyStage{
 		mutation: `UPDATE accepted_revisions h SET command='{}'::jsonb`},
 	{kind: "evaluations", table: "evaluation_intents", keys: "organization,subscription_version_id,sequence", clock: true,
 		guard: `c.state='done' AND c.retention_started_at<now()-make_interval(secs=>$4::double precision)
+ AND c.sequence<=` + journalHeadSQL("c.organization") + `
  AND c.sequence<=COALESCE((SELECT p.position FROM monitoring_checkpoints p WHERE p.organization=c.organization),0)
  AND (c.kind<>'evaluation' OR c.outcome NOT IN ` + decidedOutcomes + ` OR COALESCE((
   SELECT true FROM evaluation_intents d WHERE d.organization=c.organization

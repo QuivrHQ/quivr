@@ -108,7 +108,7 @@ func (a *API) streamChanges(w http.ResponseWriter, r *http.Request, scope corpus
 	if last := r.Header.Get("Last-Event-ID"); last != "" {
 		cursor = last
 	}
-	position, err := a.Changes.Start(setup, scope, corpusID, cursor)
+	resume, err := a.Changes.Start(setup, scope, corpusID, cursor)
 	if err != nil {
 		writeError(w, err, publicerr.ChangesUnavailable, corpusID)
 		return
@@ -128,7 +128,7 @@ func (a *API) streamChanges(w http.ResponseWriter, r *http.Request, scope corpus
 		return rc.Flush() == nil
 	}
 	if cursor == "" {
-		c := a.Changes.Cursor(scope, corpusID, position)
+		c := a.Changes.CursorResume(scope, corpusID, resume)
 		if !write("id: %s\nevent: checkpoint\ndata: {\"cursor\":%q}\n\n", c, c) {
 			return
 		}
@@ -146,7 +146,7 @@ func (a *API) streamChanges(w http.ResponseWriter, r *http.Request, scope corpus
 	lastWrite := time.Now()
 	for {
 		read, cancel := context.WithTimeout(r.Context(), 5*time.Second)
-		page, err := a.Changes.Read(read, scope, corpusID, position, streamPageSize)
+		page, err := a.Changes.Read(read, scope, corpusID, resume, streamPageSize)
 		cancel()
 		if r.Context().Err() != nil {
 			return
@@ -165,13 +165,13 @@ func (a *API) streamChanges(w http.ResponseWriter, r *http.Request, scope corpus
 			}
 			lastWrite = time.Now()
 		}
-		if len(page.Items) == 0 && page.Position != position {
+		if len(page.Items) == 0 && page.Position != resume.Position {
 			if !write("id: %s\nevent: checkpoint\ndata: {\"cursor\":%q}\n\n", page.Next, page.Next) {
 				return
 			}
 			lastWrite = time.Now()
 		}
-		position = page.Position
+		resume = page.Resume
 		if page.HasMore && len(page.Items) > 0 {
 			continue
 		}

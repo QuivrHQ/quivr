@@ -31,7 +31,7 @@ WHERE a.organization=$1 AND a.delivery_id=$2 AND a.number>$3 ORDER BY a.number L
 }
 
 func (s MatchStore) Match(ctx context.Context, org, id string) (monitoring.Match, error) {
-	m, err := scanMatch(s.Pool.QueryRow(ctx, `SELECT `+matchColumns+matchFrom+`WHERE m.organization=$1 AND m.id=$2`, org, id))
+	m, err := scanMatch(s.Pool.QueryRow(ctx, `SELECT `+matchColumns+matchFrom+`WHERE m.organization=$1 AND m.id=$2 AND m.position<=`+journalHeadSQL("$1"), org, id))
 	if errors.Is(err, pgx.ErrNoRows) {
 		return m, monitoring.ErrNotFound
 	}
@@ -39,7 +39,7 @@ func (s MatchStore) Match(ctx context.Context, org, id string) (monitoring.Match
 }
 
 func (s MatchStore) Matches(ctx context.Context, org, subscriptionID string, after int64, limit int) ([]monitoring.Match, error) {
-	rows, err := s.Pool.Query(ctx, `SELECT `+matchColumns+matchFrom+`WHERE m.organization=$1 AND m.subscription_id=$2 AND m.position>$3 ORDER BY m.position LIMIT $4`, org, subscriptionID, after, limit)
+	rows, err := s.Pool.Query(ctx, `SELECT `+matchColumns+matchFrom+`WHERE m.organization=$1 AND m.subscription_id=$2 AND m.position>$3 AND m.position<=`+journalHeadSQL("$1")+` ORDER BY m.position LIMIT $4`, org, subscriptionID, after, limit)
 	if err != nil {
 		return nil, err
 	}
@@ -75,7 +75,7 @@ JOIN matches m ON (m.organization,m.id)=(d.organization,d.match_id)
 JOIN monitoring_notices n ON (n.organization,n.event_id)=(d.organization,d.event_id)
 JOIN subscriptions s ON (s.organization,s.id)=(m.organization,m.subscription_id)
 JOIN records r ON (r.organization,r.id)=(m.organization,m.record_id)
-WHERE d.organization=$1 AND d.id=$2`, org, id).Scan(&d.ID, &d.MatchID, &d.SubscriptionID, &d.DestinationID, &d.State, &d.AttemptCount, &d.Event, &kind, &enabled, &deleted, &withdrawn, &later.Corrected, &later.NoLongerMatches,
+WHERE d.organization=$1 AND d.id=$2 AND m.position<=`+journalHeadSQL("d.organization")+` AND n.position<=`+journalHeadSQL("d.organization")+``, org, id).Scan(&d.ID, &d.MatchID, &d.SubscriptionID, &d.DestinationID, &d.State, &d.AttemptCount, &d.Event, &kind, &enabled, &deleted, &withdrawn, &later.Corrected, &later.NoLongerMatches,
 		&d.LastOutcome, &d.LastErrorCode, &d.LastErrorMessage, &next)
 	if errors.Is(err, pgx.ErrNoRows) {
 		return d, monitoring.ErrNotFound

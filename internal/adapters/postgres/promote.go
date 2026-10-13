@@ -41,7 +41,7 @@ func (s BackfillStore) PromoteSpace(ctx context.Context, space string, force boo
 	defer tx.Rollback(ctx)
 	// Serialize coverage preflight and model selection with serving publication.
 	// Take routing before spaces, as owner activation does; plugin calls hold neither.
-	if _, err = tx.Exec(ctx, `SELECT pg_advisory_xact_lock($1)`, projectionRoutingLock); err != nil {
+	if _, err = tx.Exec(ctx, `WITH mode AS MATERIALIZED (SELECT pg_advisory_xact_lock_shared($2)) SELECT pg_advisory_xact_lock($1) FROM mode`, projectionRoutingLock, journalModeLock); err != nil {
 		return out, err
 	}
 	// Space registrations at startup, activation and rollback wait for it.

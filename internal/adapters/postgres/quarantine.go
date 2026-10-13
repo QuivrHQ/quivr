@@ -147,6 +147,9 @@ func (s QuarantineStore) acceptReprocessAttempt(ctx context.Context, org, key st
 	if err = lockJournal(ctx, tx, org); err != nil {
 		return operations.Operation{}, err
 	}
+	if err = lockJournalRequest(ctx, tx, org, "operation", content.StableID("request", operations.KindQuarantineReprocess, f.CorpusID, key)); err != nil {
+		return operations.Operation{}, err
+	}
 	var id string
 	var previous []byte
 	err = tx.QueryRow(ctx, `SELECT id,canonical_request FROM operations WHERE organization=$1 AND kind=$2 AND corpus_id=$3 AND request_key=$4 AND previous_operation_id IS NULL`, org, operations.KindQuarantineReprocess, f.CorpusID, key).Scan(&id, &previous)
@@ -481,6 +484,9 @@ func (s QuarantineStore) republishAttempt(ctx context.Context, org, id string, i
 	}
 	defer tx.Rollback(ctx)
 	if err = lockProjectionRouting(ctx, tx); err != nil {
+		return err
+	}
+	if err = lockJournalRecord(ctx, tx, org, item.RecordID); err != nil {
 		return err
 	}
 	var hint bool

@@ -180,6 +180,14 @@ func insertSegmentation(ctx context.Context, tx pgx.Tx, org string, result conte
 }
 
 func prepareSegmentation(ctx context.Context, tx pgx.Tx, org string, result content.Segmentation) (journalFinish, error) {
+	if journalGroupOf(ctx) == nil {
+		if err := lockProjectionRouting(ctx, tx); err != nil {
+			return nil, err
+		}
+		if err := lockJournalVersion(ctx, tx, org, result.VersionID); err != nil {
+			return nil, err
+		}
+	}
 	digest := content.SegmentationDigest(result)
 	var existing string
 	err := tx.QueryRow(ctx, `SELECT digest FROM segmentations WHERE organization=$1 AND id=$2`, org, result.ID).Scan(&existing)
@@ -352,6 +360,12 @@ func (s ProjectionStore) promoteAttempt(ctx context.Context, org string, seg con
 }
 
 func promoteCanonical(ctx context.Context, tx pgx.Tx, org string, seg content.Segmentation, g content.Generation) error {
+	if err := lockProjectionRouting(ctx, tx); err != nil {
+		return err
+	}
+	if err := lockJournalVersion(ctx, tx, org, seg.VersionID); err != nil {
+		return err
+	}
 	var recordID, corpusID, desired string
 	var withdrawn, quarantined, ready, active bool
 	var digest, sourceMediaType *string

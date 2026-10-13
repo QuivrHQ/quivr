@@ -112,6 +112,12 @@ func (s EvaluationStore) commitMatchesAttempt(ctx context.Context, matches []mon
 		return nil, err
 	}
 	defer tx.Rollback(context.WithoutCancel(ctx))
+	if err = lockEvaluationResources(ctx, tx, first.Organization, records, ids); err != nil {
+		return nil, err
+	}
+	if err = requirePublishedResources(ctx, tx, first.Organization, records, ids, sequences); err != nil {
+		return nil, err
+	}
 	guards := journalBatch(first.Organization)
 	guards.Queue(matchCandidatesSQL, first.Organization, records, recordVersions, ids, versions, sequences, matchIDs)
 	results := tx.SendBatch(ctx, guards)
@@ -214,18 +220,10 @@ func matchGroupError(ctx context.Context, matches []monitoring.MatchCommit) erro
 func writeNewMatches(ctx context.Context, tx pgx.Tx, matches []monitoring.MatchCommit, candidates []matchCandidate, matchIDs, outcomes []string, count int) error {
 	org := matches[0].Intent.Organization
 	writes := &pgx.Batch{}
-	if count > 0 {
-		// The journal head and every allocated event are visible together only
-		// after commit. Later statements in this packet read the allocated head
-		// and add the input ordinal to its base; no allocation result round trip
-		// is needed. A failed packet rolls the allocation back as well.
-		writes.Queue(`UPDATE organization_journals SET last_sequence=last_sequence+$2 WHERE organization=$1`, org, count)
-	}
+
 	var ids, subscriptionIDs, subscriptionVersions, queryIDs, queryVersions, corpusIDs, deliveryIDs, destinations, eventIDs, evidenceJSON []string
 	var bodies [][]byte
 	var records, recordVersions, traces []string
-	var ordinals []int64
-	var ordinal int64
 	var completeVersions, completeOutcomes []string
 	var completeSequences []int64
 	for i, match := range matches {
@@ -248,32 +246,37 @@ func writeNewMatches(ctx context.Context, tx pgx.Tx, matches []monitoring.MatchC
 			if err != nil {
 				return err
 			}
-			ordinal++
 			records, recordVersions = append(records, in.RecordID), append(recordVersions, in.VersionID)
 			traces = append(traces, telemetry.Encode(matchContext(ctx, match)))
 			ids, subscriptionIDs, subscriptionVersions = append(ids, r.MatchID), append(subscriptionIDs, in.SubscriptionID), append(subscriptionVersions, in.SubscriptionVersionID)
 			queryIDs, queryVersions, corpusIDs = append(queryIDs, c.pinned.queryID), append(queryVersions, c.pinned.queryVersionID), append(corpusIDs, c.corpusID)
 			deliveryIDs, destinations, eventIDs = append(deliveryIDs, r.DeliveryID), append(destinations, c.pinned.destination), append(eventIDs, eventID(event))
-			evidenceJSON, bodies, ordinals = append(evidenceJSON, string(evidence)), append(bodies, body), append(ordinals, ordinal)
+			evidenceJSON, bodies = append(evidenceJSON, string(evidence)), append(bodies, body)
 		}
 		completeVersions, completeSequences, completeOutcomes = append(completeVersions, in.SubscriptionVersionID), append(completeSequences, in.Sequence), append(completeOutcomes, outcomes[i])
 	}
 	if len(ids) > 0 {
-		writes.Queue(`INSERT INTO change_events(organization,sequence,event_id,corpus_id,event_type,resource_type,resource_id,record_version_id,trace_context)
-SELECT $1,(SELECT last_sequence FROM organization_journals WHERE organization=$1)-$6::bigint+x.position,x.event_id,x.corpus_id,'match.created','match',x.match_id,NULL,x.trace
-FROM unnest($2::bigint[],$3::text[],$4::text[],$5::text[],$7::text[]) WITH ORDINALITY AS x(position,event_id,corpus_id,match_id,trace,ordinal) ORDER BY x.ordinal`, org, ordinals, eventIDs, corpusIDs, ids, count, traces)
+		writes.Queue(`WITH inputs AS MATERIALIZED (
+ SELECT * FROM unnest($2::text[],$3::text[],$4::text[],$5::text[]) WITH ORDINALITY AS x(event_id,corpus_id,match_id,trace,ordinal) ORDER BY ordinal),
+ `+batchPositionsSQL("cardinality($2::text[])")+`
+ INSERT INTO change_events(organization,sequence,event_id,corpus_id,event_type,resource_type,resource_id,record_version_id,trace_context,writer_xid)
+ SELECT $1,CASE WHEN p.parallel THEN nextval('change_event_positions') ELSE p.base+x.ordinal END,
+ x.event_id,x.corpus_id,'match.created','match',x.match_id,NULL,x.trace,p.xid
+ FROM inputs x CROSS JOIN positions p ORDER BY x.ordinal`, org, eventIDs, corpusIDs, ids, traces)
 		writes.Queue(`INSERT INTO matches(organization,id,subscription_id,subscription_version_id,saved_query_id,saved_query_version_id,corpus_id,record_id,record_version_id,previous_match_id,evidence,position)
-SELECT $1,x.match_id,x.subscription_id,x.subscription_version_id,x.query_id,x.query_version_id,x.corpus_id,x.record_id,x.version_id,NULL,x.evidence,(SELECT last_sequence FROM organization_journals WHERE organization=$1)-$12::bigint+x.position
-FROM unnest($2::text[],$3::text[],$4::text[],$5::text[],$6::text[],$7::text[],$8::text[],$9::text[],$10::jsonb[],$11::bigint[])
-  WITH ORDINALITY AS x(record_id,version_id,match_id,subscription_id,subscription_version_id,query_id,query_version_id,corpus_id,evidence,position,ordinal) ORDER BY x.ordinal`, org, records, recordVersions, ids, subscriptionIDs, subscriptionVersions, queryIDs, queryVersions, corpusIDs, evidenceJSON, ordinals, count)
+ SELECT $1,x.match_id,x.subscription_id,x.subscription_version_id,x.query_id,x.query_version_id,x.corpus_id,x.record_id,x.version_id,NULL,x.evidence,e.sequence
+ FROM unnest($2::text[],$3::text[],$4::text[],$5::text[],$6::text[],$7::text[],$8::text[],$9::text[],$10::jsonb[],$11::text[])
+ WITH ORDINALITY AS x(record_id,version_id,match_id,subscription_id,subscription_version_id,query_id,query_version_id,corpus_id,evidence,event_id,ordinal)
+ JOIN change_events e ON e.organization=$1 AND e.event_id=x.event_id ORDER BY x.ordinal`, org, records, recordVersions, ids, subscriptionIDs, subscriptionVersions, queryIDs, queryVersions, corpusIDs, evidenceJSON, eventIDs)
 		writes.Queue(`INSERT INTO deliveries(organization,id,match_id,destination_id,event_kind,event_id,window_start)
 SELECT $1,x.delivery_id,x.match_id,x.destination_id,'match.created',x.event_id,NULL
 FROM unnest($2::text[],$3::text[],$4::text[],$5::text[]) WITH ORDINALITY AS x(delivery_id,match_id,destination_id,event_id,ordinal)
 WHERE x.destination_id<>'' ORDER BY x.ordinal`, org, deliveryIDs, ids, destinations, eventIDs)
 		writes.Queue(`INSERT INTO monitoring_notices(organization,event_id,kind,match_id,record_id,record_version_id,subscription_id,subscription_version_id,delivery_id,previous_match_id,body,position)
-SELECT $1,x.event_id,'match.created',x.match_id,x.record_id,x.version_id,x.subscription_id,x.subscription_version_id,NULLIF(x.delivery_id,''),NULL,x.body,(SELECT last_sequence FROM organization_journals WHERE organization=$1)-$11::bigint+x.position
-FROM unnest($2::text[],$3::text[],$4::text[],$5::text[],$6::text[],$7::text[],$8::text[],$9::bytea[],$10::bigint[])
-  WITH ORDINALITY AS x(record_id,version_id,event_id,match_id,subscription_id,subscription_version_id,delivery_id,body,position,ordinal) ORDER BY x.ordinal`, org, records, recordVersions, eventIDs, ids, subscriptionIDs, subscriptionVersions, deliveryIDs, bodies, ordinals, count)
+ SELECT $1,x.event_id,'match.created',x.match_id,x.record_id,x.version_id,x.subscription_id,x.subscription_version_id,NULLIF(x.delivery_id,''),NULL,x.body,e.sequence
+ FROM unnest($2::text[],$3::text[],$4::text[],$5::text[],$6::text[],$7::text[],$8::text[],$9::bytea[])
+ WITH ORDINALITY AS x(record_id,version_id,event_id,match_id,subscription_id,subscription_version_id,delivery_id,body,ordinal)
+ JOIN change_events e ON e.organization=$1 AND e.event_id=x.event_id ORDER BY x.ordinal`, org, records, recordVersions, eventIDs, ids, subscriptionIDs, subscriptionVersions, deliveryIDs, bodies)
 		writes.Queue(`INSERT INTO delivery_outbox(organization,delivery_id,trace_context)
 SELECT $1,x.delivery_id,x.trace FROM unnest($2::text[],$3::text[]) WITH ORDINALITY AS x(delivery_id,trace,ordinal)
 WHERE x.delivery_id<>'' ORDER BY x.ordinal`, org, deliveryIDs, traces)

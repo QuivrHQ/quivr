@@ -39,9 +39,10 @@ func (s QueueSnapshots) Refresh(ctx context.Context) error {
 	defer tx.Rollback(ctx)
 	published, err := tx.Exec(ctx, `INSERT INTO queue_backlog_snapshots(queue,waiting,in_progress,oldest_waiting_age_seconds,ingestion_waiting,observed_at,ingestion_observed_at)
 	 SELECT backlog.*,statement_timestamp(),statement_timestamp() FROM (`+queueBacklogSQL()+`) backlog
- WHERE (SELECT initialized FROM queue_backlog_bootstrap WHERE singleton)
- AND NOT EXISTS(SELECT FROM queue_scope_reconciliation WHERE kind='quarantine')
- AND NOT EXISTS(SELECT FROM queue_backlog_documents WHERE NOT ready AND ready_at<=statement_timestamp() LIMIT 1)
+	 WHERE (SELECT initialized FROM queue_backlog_bootstrap WHERE singleton)
+	 AND NOT EXISTS(SELECT FROM queue_scope_reconciliation WHERE kind='quarantine')
+	 AND NOT EXISTS(SELECT FROM queue_backlog_documents WHERE NOT ready AND ready_at<=statement_timestamp() LIMIT 1)
+	 AND NOT EXISTS(SELECT FROM parallel_queue_observations WHERE revision<>applied_revision)
 	 ON CONFLICT(queue) DO UPDATE SET waiting=EXCLUDED.waiting,in_progress=EXCLUDED.in_progress,
 	 oldest_waiting_age_seconds=EXCLUDED.oldest_waiting_age_seconds,observed_at=EXCLUDED.observed_at,
 	 ingestion_waiting=EXCLUDED.ingestion_waiting,ingestion_observed_at=EXCLUDED.ingestion_observed_at`)
@@ -72,9 +73,9 @@ func (s QueueSnapshots) beginRefresh(ctx context.Context) (pgx.Tx, error) {
 	}
 	var fresh bool
 	if err = tx.QueryRow(ctx, `SELECT count(*)=2 AND min(published_at)>clock_timestamp()-make_interval(secs => $1::double precision)
-      AND count(ingestion_waiting)=2 AND count(ingestion_observed_at)=2
-      AND min(ingestion_observed_at)>clock_timestamp()-make_interval(secs => $2::double precision)
-      FROM queue_backlog_snapshots WHERE queue IN ('live','bulk')`, s.refreshInterval().Seconds(), max(time.Minute, 2*s.refreshInterval()).Seconds()).Scan(&fresh); err != nil || fresh {
+	      AND count(ingestion_waiting)=2 AND count(ingestion_observed_at)=2
+	      AND min(ingestion_observed_at)>clock_timestamp()-make_interval(secs => $2::double precision)
+	      FROM queue_backlog_snapshots WHERE queue IN ('live','bulk')`, s.refreshInterval().Seconds(), max(time.Minute, 2*s.refreshInterval()).Seconds()).Scan(&fresh); err != nil || fresh {
 		tx.Rollback(ctx)
 		return nil, err
 	}
@@ -90,9 +91,9 @@ func (s QueueSnapshots) QueueBacklog(ctx context.Context) ([]workqueue.Status, e
 	}
 	rows, err := s.Pool.Query(ctx, `SELECT queue,waiting,in_progress,
 	 CASE WHEN waiting=0 THEN 0 ELSE oldest_waiting_age_seconds+GREATEST(0,EXTRACT(EPOCH FROM clock_timestamp()-observed_at)) END::double precision,
-     CASE WHEN ingestion_observed_at>clock_timestamp()-make_interval(secs => $1::double precision)
-       THEN ingestion_waiting END
-     FROM queue_backlog_snapshots WHERE queue IN ('live','bulk') AND observed_at>clock_timestamp()-make_interval(secs => $1::double precision)
+	     CASE WHEN ingestion_observed_at>clock_timestamp()-make_interval(secs => $1::double precision)
+	       THEN ingestion_waiting END
+	     FROM queue_backlog_snapshots WHERE queue IN ('live','bulk') AND observed_at>clock_timestamp()-make_interval(secs => $1::double precision)
 	 ORDER BY queue`, max(time.Minute, 2*s.refreshInterval()).Seconds())
 	if err != nil {
 		return nil, err

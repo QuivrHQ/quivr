@@ -27,6 +27,9 @@ func BootstrapDatabase(ctx context.Context, pool *pgxpool.Pool, spaces []content
 	if err != nil {
 		return fmt.Errorf("migrate: %w", err)
 	}
+	if err := (postgres.JournalStore{Pool: pool}).Initialize(ctx); err != nil {
+		return fmt.Errorf("journal bridge: %w", err)
+	}
 	// Optional performance indexes are maintained by the API and worker after
 	// startup. Required registry/default-generation work keeps its own budget.
 	ctx, cancel = context.WithTimeout(ctx, 30*time.Second)

@@ -42,13 +42,13 @@ func (s EvaluationStore) FanOut(ctx context.Context) (int, error) {
 	// A checkpoint starts at the first activation boundary, so dispatch never
 	// scans history that no Subscription can evaluate.
 	if _, err := s.Pool.Exec(ctx, `INSERT INTO monitoring_checkpoints(organization,position)
-SELECT v.organization, min(v.activation_position) FROM subscription_versions v
+SELECT v.organization, LEAST(min(v.activation_position),`+journalHeadSQL("v.organization")+`) FROM subscription_versions v
 WHERE NOT EXISTS(SELECT 1 FROM monitoring_checkpoints c WHERE c.organization=v.organization)
 GROUP BY v.organization
 ON CONFLICT DO NOTHING`); err != nil {
 		return 0, err
 	}
-	rows, err := s.Pool.Query(ctx, `SELECT c.organization FROM monitoring_checkpoints c JOIN organization_journals j USING(organization) WHERE c.position < j.last_sequence OR c.subscription_after <> '' ORDER BY c.organization`)
+	rows, err := s.Pool.Query(ctx, `SELECT c.organization FROM monitoring_checkpoints c WHERE c.position < `+journalHeadSQL("c.organization")+` OR c.subscription_after <> '' ORDER BY c.organization`)
 	if err != nil {
 		return 0, err
 	}
@@ -85,7 +85,7 @@ ON CONFLICT DO NOTHING`); err != nil {
 // dispatchStep turns one trigger event (or one page of its Subscriptions)
 // into intents and advances the checkpoint in the same transaction.
 func (s EvaluationStore) dispatchStep(ctx context.Context, org string) (bool, error) {
-	tx, err := s.Pool.Begin(ctx)
+	tx, err := s.Pool.BeginTx(ctx, pgx.TxOptions{IsoLevel: pgx.RepeatableRead})
 	if err != nil {
 		return false, err
 	}
@@ -98,8 +98,11 @@ func (s EvaluationStore) dispatchStep(ctx context.Context, org string) (bool, er
 	// Every position at or below the committed head is committed: writers
 	// allocate positions under the journal lock held until commit.
 	var head int64
-	if err = tx.QueryRow(ctx, `SELECT last_sequence FROM organization_journals WHERE organization=$1`, org).Scan(&head); err != nil {
+	if err = tx.QueryRow(ctx, `SELECT `+dispatchHeadSQL("$1", "$2::bigint"), org, position).Scan(&head); err != nil {
 		return false, err
+	}
+	if head <= position {
+		return false, nil
 	}
 	var sequence int64
 	var corpusID, recordID, versionID, eventType, traceContext string
@@ -443,6 +446,12 @@ func (s EvaluationStore) commitAttempt(ctx context.Context, in monitoring.Intent
 	}
 	defer tx.Rollback(ctx)
 	if err = lockJournal(ctx, tx, in.Organization); err != nil {
+		return "", err
+	}
+	if err = lockEvaluationResources(ctx, tx, in.Organization, []string{in.RecordID}, []string{in.SubscriptionID}); err != nil {
+		return "", err
+	}
+	if err = requirePublishedResources(ctx, tx, in.Organization, []string{in.RecordID}, []string{in.SubscriptionID}, []int64{in.Sequence}); err != nil {
 		return "", err
 	}
 	var state, previous string

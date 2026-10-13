@@ -21,7 +21,7 @@ func cliSource() (commands.Source, error) {
 	engine := commands.Group{
 		Title: "Engine commands",
 		Needs: "a configuration file (`" + app.ConfigEnv + "`)",
-		Intro: "Engine commands run Quivr itself and read the JSON configuration file named by `" + app.ConfigEnv + "`; `api`, `worker` and `migrate` connect to PostgreSQL, Temporal, object storage and Weaviate. `api` and `worker` run until interrupted; `migrate` exits when done. `migrate --contract` also applies deferred contract migrations and closes the application rollback window. `api` and `worker` take no flags. `storage status` connects only to PostgreSQL and checks schema readiness.",
+		Intro: "Engine commands run Quivr itself and read the JSON configuration file named by `" + app.ConfigEnv + "`; `api`, `worker` and `migrate` connect to PostgreSQL, Temporal, object storage and Weaviate. `api` and `worker` run until interrupted; `migrate` exits when done. `migrate --contract` also applies deferred contract migrations and closes the application rollback window. `api` and `worker` take no flags. `storage status` and `journal` connect only to PostgreSQL. `journal status` reads publication progress; mode changes require the documented writer-drain acknowledgement.",
 		Env:   []commands.EnvVar{{Name: app.ConfigEnv, Meaning: "path of the JSON configuration file"}},
 		ExitCodes: []commands.ExitCode{
 			{Code: 0, Meaning: "stopped cleanly, or migrate finished"},
@@ -36,6 +36,9 @@ func cliSource() (commands.Source, error) {
 		}
 		if c.Name == "storage" {
 			usage += " status"
+		}
+		if c.Name == "journal" {
+			usage += " status\nquivr journal activate --previous-writers-retired\nquivr journal legacy --writers-drained\nquivr journal restored --writers-drained"
 		}
 		engine.Commands = append(engine.Commands, commands.Command{Name: "quivr " + c.Name, Usage: usage, Summary: c.Summary})
 	}

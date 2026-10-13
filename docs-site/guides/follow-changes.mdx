@@ -99,7 +99,9 @@ curl -s "$QUIVR_API_URL/v0/changes?corpus_id=$CORPUS_ID" \
 export START_CURSOR=<the next_cursor above>
 ```
 
-Save this cursor before anything else. Starting now skips the documents already in the collection: to follow an existing collection, take this cursor first, build your initial copy from the catalog as in [Build or rebuild your copy](#build-or-rebuild-your-copy), then follow changes from this cursor. A cursor belongs to one collection, so an app that follows several keeps one cursor for each.
+Save this cursor before anything else. It excludes changes already committed when you started, even when publication is lagging, and keeps writes that were still in flight. Starting now skips the documents already in the collection: to follow an existing collection, take this cursor first, build your initial copy from the catalog as in [Build or rebuild your copy](#build-or-rebuild-your-copy), then follow changes from this cursor. A cursor belongs to one collection, so an app that follows several keeps one cursor for each.
+
+Parallel imports publish a complete safe prefix. On a healthy database, publication takes at most the longest configured database transaction limit (30 seconds by default) plus two 100 ms publisher polls. Outside long-running or prepared transactions, or database unavailability, can delay it. A reader waits at its cursor until publication is safe; it never skips a late lower position. Operators can inspect [publication status](/run-quivr/upgrade-quivr#enable-parallel-imports).
 
 ## Read what changed
 
@@ -262,7 +264,7 @@ While a correction is still processing, or on hold (quarantined), the earlier Ve
 
 ## Save your place and handle repeats
 
-As long as you resume from a cursor within the retention window, the feed delivers each notice at least once, in the order Quivr committed the changes. To lose nothing:
+Each journal notice has one durable `event_id` and appears exactly once while moving forward through cursors within retention. Its order stays stable, and notices for the same document keep their order. Concurrent writes to different documents can appear in a different order from their commits. Reconnecting from an older cursor can deliver a notice again. To lose nothing:
 
 1. Read a page of notices.
 2. Update your copy.

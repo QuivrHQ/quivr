@@ -116,6 +116,37 @@ During a rolling upgrade, previous binaries keep reading and writing but do not 
 
 Hot queue and journal tables disable vacuum truncation to keep vacuum from blocking writers. Autovacuum reuses their dead space; files may retain that space. Queue attempt renewals do not update a timestamp index. If the attempt primary key bloats, run `REINDEX INDEX CONCURRENTLY queue_document_attempts_pkey;` in an operator database session outside a transaction. This rebuild allows concurrent writes and needs temporary disk space for a second index.
 
+## Enable parallel imports
+
+This release is a compatibility bridge: its default journal mode is legacy. Apply its expansion and run the bridge on every API and worker before activation. Pre-bridge binaries have no `quivr journal` command. Retire all pre-bridge API and worker processes and let their transactions finish. At activation, both binaries in your rollback window must understand parallel mode; rolling back to a pre-bridge binary after activation is unsafe. Keep at least one API or worker running until queue initialization finishes.
+
+With `QUIVR_CONFIG` naming your operator configuration, inspect and switch the durable deployment-wide mode:
+
+```bash
+quivr journal status
+quivr journal activate --previous-writers-retired
+```
+
+The result reports `parallel`, `published_through`, `allocated_through`, `unpublished_positions` and `pending_age_seconds`. Positions include unused allocation gaps, so the backlog is a position span, not an event count. Independent document writes then use Record/request arbitration. Queue totals reconcile outside acceptance; an incomplete aggregate is not advertised as a fresh snapshot. Old event IDs and numeric cursors stay valid.
+
+Publication polls every 100 ms. The default engine transaction timeout is 30 seconds. Healthy publication is bounded by the longest [engine transaction timeout](/reference/configuration#postgresql-connections) across replicas plus two poll intervals. If pending age exceeds that bound, check external long-running or prepared transactions and database connectivity. XIDs are cluster-wide: another database's transaction can hold the horizon. Publication stops advancing rather than skip a late event.
+
+Rollback to this bridge honors the current mode. To deliberately return to legacy numbering, retire pre-bridge binaries first and run:
+
+```bash
+quivr journal legacy --writers-drained
+```
+
+The command drains transactions from bridge API and worker processes and queue contributions, establishes the completed prefix and raises legacy heads above allocated positions. Run `quivr journal status` afterward and confirm `parallel` is `false`. Retrying a completed switch leaves its mode unchanged. A timeout leaves the previous mode active; finish queue initialization or drain the conflicting writer and retry. Do not change publication rows or call `setval` by hand beside live writers.
+
+After a logical backup is restored onto a new PostgreSQL cluster, keep every API/worker stopped and run:
+
+```bash
+quivr journal restored --writers-drained
+```
+
+Run this before restart: stored transaction snapshots belong to the old cluster. It expires snapshot start cursors and discards pending XID observations, using the offline writer drain to establish a complete prefix. Clients with those expired cursors rebuild from the catalog; numeric cursors and event IDs survive. Physical restore within the same cluster identity retains its snapshots. Back up the sequence, mode, publication state and events together.
+
 ## Next
 
 - [Deploy Quivr](/run-quivr/deploy)

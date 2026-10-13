@@ -63,7 +63,7 @@ func advanceQueueScopeReconciliation(ctx context.Context, tx pgx.Tx, limit int) 
 		}
 		err = observeQueueStateRecords(ctx, tx, orgs, records)
 	} else {
-		err = observeQueueMetricKeys(ctx, tx, metrics)
+		err = observeQueueMetricKeysForced(ctx, tx, metrics)
 	}
 	if err != nil {
 		return false, err
