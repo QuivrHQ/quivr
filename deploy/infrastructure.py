@@ -23,6 +23,7 @@ POSTGRES_KEYS = {
     'QUIVR_POSTGRES_EFFECTIVE_IO_CONCURRENCY', 'QUIVR_POSTGRES_CHECKPOINT_TIMEOUT',
     'QUIVR_POSTGRES_WAL_COMPRESSION', 'QUIVR_POSTGRES_STAT_STATEMENTS_TRACK',
     'QUIVR_POSTGRES_JIT', 'QUIVR_POSTGRES_SYNCHRONOUS_COMMIT',
+    'QUIVR_POSTGRES_COMMIT_DELAY', 'QUIVR_POSTGRES_COMMIT_SIBLINGS',
 }
 WEAVIATE_KEYS = {
     'AUTHENTICATION_ANONYMOUS_ACCESS_ENABLED', 'AUTOSCHEMA_ENABLED',
@@ -155,6 +156,8 @@ def postgres_expected(service, volume_mb=None):
         'dynamic_shared_memory_type': 'mmap', 'shared_preload_libraries': 'pg_stat_statements',
         'track_io_timing': 'on', 'jit': env['QUIVR_POSTGRES_JIT'],
         'synchronous_commit': env['QUIVR_POSTGRES_SYNCHRONOUS_COMMIT'],
+        'commit_delay': env['QUIVR_POSTGRES_COMMIT_DELAY'],
+        'commit_siblings': env['QUIVR_POSTGRES_COMMIT_SIBLINGS'],
         'fsync': 'on', 'full_page_writes': 'on',
         'pg_stat_statements.track': env['QUIVR_POSTGRES_STAT_STATEMENTS_TRACK'],
     }
@@ -182,7 +185,8 @@ def equivalent(key, expected, actual):
             return memory_bytes(expected) == memory_bytes(actual)
         except ValueError:
             return False
-    if key in ('cpus', 'random_page_cost', 'effective_io_concurrency', 'max_connections'):
+    if key in ('cpus', 'random_page_cost', 'effective_io_concurrency', 'max_connections',
+               'commit_delay', 'commit_siblings'):
         try:
             return Decimal(str(expected)) == Decimal(str(actual))
         except Exception:
@@ -284,11 +288,14 @@ def safe_environment(name, value):
         return None
     value = str(value)
     if name in ('QUIVR_POSTGRES_MEMORY_MB', 'QUIVR_POSTGRES_VOLUME_MB',
-                'QUIVR_POSTGRES_MAX_CONNECTIONS', 'QUIVR_POSTGRES_EFFECTIVE_IO_CONCURRENCY'):
+                'QUIVR_POSTGRES_MAX_CONNECTIONS', 'QUIVR_POSTGRES_EFFECTIVE_IO_CONCURRENCY',
+                'QUIVR_POSTGRES_COMMIT_DELAY', 'QUIVR_POSTGRES_COMMIT_SIBLINGS'):
         bounds = {'QUIVR_POSTGRES_MEMORY_MB': (128, 999999999999),
                   'QUIVR_POSTGRES_VOLUME_MB': (1, 999999999999),
                   'QUIVR_POSTGRES_MAX_CONNECTIONS': (1, 262143),
-                  'QUIVR_POSTGRES_EFFECTIVE_IO_CONCURRENCY': (0, 1000)}
+                  'QUIVR_POSTGRES_EFFECTIVE_IO_CONCURRENCY': (0, 1000),
+                  'QUIVR_POSTGRES_COMMIT_DELAY': (0, 100000),
+                  'QUIVR_POSTGRES_COMMIT_SIBLINGS': (0, 1000)}
         low, high = bounds[name]
         valid = bool(re.fullmatch(r'[0-9]{1,12}', value)) and low <= int(value) <= high
     elif name in ('QUIVR_POSTGRES_SHARED_BUFFERS', 'QUIVR_POSTGRES_EFFECTIVE_CACHE_SIZE',

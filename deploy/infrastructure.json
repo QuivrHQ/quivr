@@ -11,7 +11,9 @@
         "QUIVR_POSTGRES_WAL_COMPRESSION": "lz4",
         "QUIVR_POSTGRES_STAT_STATEMENTS_TRACK": "all",
         "QUIVR_POSTGRES_JIT": "on",
-        "QUIVR_POSTGRES_SYNCHRONOUS_COMMIT": "on"
+        "QUIVR_POSTGRES_SYNCHRONOUS_COMMIT": "on",
+        "QUIVR_POSTGRES_COMMIT_DELAY": "100",
+        "QUIVR_POSTGRES_COMMIT_SIBLINGS": "5"
       },
       "deploy": {
         "resources": {

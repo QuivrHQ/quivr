@@ -45,7 +45,8 @@ class PostgresStart(unittest.TestCase):
                                 'shared_preload_libraries=pg_stat_statements', 'track_io_timing=on',
                                 'pg_stat_statements.track=all', 'jit=on',
                                 'random_page_cost=1.1', 'effective_io_concurrency=200',
-                                'synchronous_commit=on', 'fsync=on', 'full_page_writes=on']:
+                                'synchronous_commit=on', 'fsync=on', 'full_page_writes=on',
+                                'commit_delay=100', 'commit_siblings=5']:
                     self.assertIn(setting, argv)
                 self.assertEqual(argv[-2:], ['-c', 'port=54342'])
         result = self.run_start({'QUIVR_POSTGRES_MEMORY_MB': '1024',
@@ -56,12 +57,15 @@ class PostgresStart(unittest.TestCase):
                                  'QUIVR_POSTGRES_CHECKPOINT_TIMEOUT': '10min',
                                  'QUIVR_POSTGRES_WAL_COMPRESSION': 'off',
                                  'QUIVR_POSTGRES_JIT': 'off',
-                                 'QUIVR_POSTGRES_WORK_MEM': '2MB'})
+                                 'QUIVR_POSTGRES_WORK_MEM': '2MB',
+                                 'QUIVR_POSTGRES_COMMIT_DELAY': '0000',
+                                 'QUIVR_POSTGRES_COMMIT_SIBLINGS': '0000'})
         self.assertEqual(result.returncode, 0, result.stderr)
         argv = json.loads(result.stdout)
         for setting in ['max_connections=80', 'shared_buffers=128MB', 'work_mem=2MB',
                         'random_page_cost=2.5', 'effective_io_concurrency=0',
-                        'checkpoint_timeout=10min', 'wal_compression=off']:
+                        'checkpoint_timeout=10min', 'wal_compression=off',
+                        'commit_delay=0', 'commit_siblings=0']:
             self.assertIn(setting, argv)
         self.assertIn('jit=off', argv)
         from deploy import infrastructure
@@ -71,7 +75,7 @@ class PostgresStart(unittest.TestCase):
         for setting in ('max_connections=500', 'shared_buffers=10GB', 'effective_cache_size=25GB',
                         'maintenance_work_mem=1GB', 'work_mem=16MB', 'max_wal_size=32GB',
                         'min_wal_size=4GB', 'synchronous_commit=on', 'jit=on',
-                        'pg_stat_statements.track=all'):
+                        'pg_stat_statements.track=all', 'commit_delay=100', 'commit_siblings=5'):
             self.assertIn(setting, argv)
 
     def test_volume_budget_and_wal_overrides_reach_postgres(self):
@@ -106,6 +110,12 @@ class PostgresStart(unittest.TestCase):
                       ({'QUIVR_POSTGRES_MAX_CONNECTIONS': '0'}, 'QUIVR_POSTGRES_MAX_CONNECTIONS'),
                       ({'QUIVR_POSTGRES_WORK_MEM': 'bad'}, 'memory-settings'),
                       ({'QUIVR_POSTGRES_RANDOM_PAGE_COST': 'bad'}, 'QUIVR_POSTGRES_RANDOM_PAGE_COST'),
+                      ({'QUIVR_POSTGRES_COMMIT_DELAY': '-1'}, 'QUIVR_POSTGRES_COMMIT_DELAY'),
+                      ({'QUIVR_POSTGRES_COMMIT_DELAY': '100001'}, 'QUIVR_POSTGRES_COMMIT_DELAY'),
+                      ({'QUIVR_POSTGRES_COMMIT_DELAY': 'bad'}, 'QUIVR_POSTGRES_COMMIT_DELAY'),
+                      ({'QUIVR_POSTGRES_COMMIT_SIBLINGS': '-1'}, 'QUIVR_POSTGRES_COMMIT_SIBLINGS'),
+                      ({'QUIVR_POSTGRES_COMMIT_SIBLINGS': '1001'}, 'QUIVR_POSTGRES_COMMIT_SIBLINGS'),
+                      ({'QUIVR_POSTGRES_COMMIT_SIBLINGS': '1.5'}, 'QUIVR_POSTGRES_COMMIT_SIBLINGS'),
                       ({'QUIVR_POSTGRES_EFFECTIVE_IO_CONCURRENCY': '-1'}, 'QUIVR_POSTGRES_EFFECTIVE_IO_CONCURRENCY'),
                       ({'QUIVR_POSTGRES_EFFECTIVE_IO_CONCURRENCY': '1001'}, 'QUIVR_POSTGRES_EFFECTIVE_IO_CONCURRENCY'),
                       ({'QUIVR_POSTGRES_CHECKPOINT_TIMEOUT': '2s'}, 'QUIVR_POSTGRES_CHECKPOINT_TIMEOUT'),
