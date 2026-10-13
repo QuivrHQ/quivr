@@ -91,5 +91,5 @@ COPY --from=connectors /out/plugins/ /app/plugins/
 COPY deploy/railway/core-entrypoint.py /app/core-entrypoint.py
 COPY third_party/french-light /usr/share/quivr/notices/french-light
 USER 10001:10001
-VOLUME ["/tmp"]
+# Railway rejects a Dockerfile VOLUME; Compose mounts /tmp as tmpfs instead.
 ENTRYPOINT ["python", "/app/core-entrypoint.py"]
