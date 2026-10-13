@@ -103,6 +103,15 @@ case "$QUIVR_POSTGRES_JIT" in
     on|off) ;; *) fail QUIVR_POSTGRES_JIT ;;
 esac
 [ "$QUIVR_POSTGRES_SYNCHRONOUS_COMMIT" = on ] || fail QUIVR_POSTGRES_SYNCHRONOUS_COMMIT
+# Group commit keeps durable acknowledgements; normalize decimal overrides.
+commit_delay=$(awk -v value="$QUIVR_POSTGRES_COMMIT_DELAY" 'BEGIN {
+    if (value !~ /^[0-9]+$/ || value < 0 || value > 100000) exit 1
+    printf "%.0f", value
+}') || fail QUIVR_POSTGRES_COMMIT_DELAY
+commit_siblings=$(awk -v value="$QUIVR_POSTGRES_COMMIT_SIBLINGS" 'BEGIN {
+    if (value !~ /^[0-9]+$/ || value < 0 || value > 1000) exit 1
+    printf "%.0f", value
+}') || fail QUIVR_POSTGRES_COMMIT_SIBLINGS
 case "$QUIVR_POSTGRES_STAT_STATEMENTS_TRACK" in
     none|top|all) ;; *) fail QUIVR_POSTGRES_STAT_STATEMENTS_TRACK ;;
 esac
@@ -127,6 +136,7 @@ set -- postgres \
     -c "checkpoint_timeout=$QUIVR_POSTGRES_CHECKPOINT_TIMEOUT" \
     -c "wal_compression=$QUIVR_POSTGRES_WAL_COMPRESSION" \
     -c "jit=$QUIVR_POSTGRES_JIT" \
+    -c "commit_delay=$commit_delay" -c "commit_siblings=$commit_siblings" \
     -c "synchronous_commit=$QUIVR_POSTGRES_SYNCHRONOUS_COMMIT" -c fsync=on -c full_page_writes=on \
     "$@"
 exec docker-entrypoint.sh "$@"

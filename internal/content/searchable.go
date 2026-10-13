@@ -267,6 +267,12 @@ type BaselineRepository interface {
 	Hydrate(context.Context, corpus.Scope, []Candidate) (map[int]Located, error)
 }
 
+// HydrationRechecker is an optional narrow serving fence. Repositories that
+// provide it avoid loading immutable metadata again after blob reads.
+type HydrationRechecker interface {
+	RecheckHydration(context.Context, corpus.Scope, []Candidate) (map[int]bool, error)
+}
+
 // Located is a candidate's segment as canonical storage records it, with the
 // immutable blob holding its Part text.
 type Located struct {
@@ -401,12 +407,21 @@ func (s Service) Hydrate(ctx context.Context, scope corpus.Scope, cs []Candidate
 	for j, i := range found {
 		recheck[j] = cs[i]
 	}
-	still, err := s.Baseline.Hydrate(ctx, scope, recheck)
+	still := map[int]bool{}
+	if guard, ok := s.Baseline.(HydrationRechecker); ok {
+		still, err = guard.RecheckHydration(ctx, scope, recheck)
+	} else {
+		var hydrated map[int]Located
+		hydrated, err = s.Baseline.Hydrate(ctx, scope, recheck)
+		for j := range hydrated {
+			still[j] = true
+		}
+	}
 	if err != nil {
 		return nil, err
 	}
 	for j, i := range found {
-		if _, ok := still[j]; !ok {
+		if !still[j] {
 			delete(out, i)
 		}
 	}

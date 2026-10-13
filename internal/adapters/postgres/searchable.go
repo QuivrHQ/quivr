@@ -440,46 +440,85 @@ func promoteCanonical(ctx context.Context, tx pgx.Tx, org string, seg content.Se
 	return tx.SendBatch(ctx, writes).Close()
 }
 
-// hydrateSQL looks up a batch of candidates, given as parallel arrays of
-// segment and generation ids with the Organization repeated for each, in one
-// query: a candidate is returned, with its position in the batch, only while
-// its segment belongs to the current eligible Version of its Record and to the
-// generation the Corpus routes to. Its embedding in the generation's served
-// space, if any, comes with it.
-//
-// Each row is reached by its primary key from the candidate's, in a LATERAL
-// subquery that OFFSET 0 keeps the planner from flattening, so a batch costs a
-// few index lookups per candidate whatever the Organization's size (THE-875).
-// Until the statistics count an Organization's new rows, the planner takes it
-// for one row: as plain joins, it then scanned every Record of the Organization
-// for each of its Versions, and with the Organization as a constant it picked
-// any index that starts with it. The Organization therefore comes from the
-// candidate row, a value the planner cannot see.
-var hydrateSQL = `SELECT c.n,r.id,v.id,r.corpus_id,sg.segmentation_id,sg.id,sg.part_key,sg.start_offset,sg.end_offset,sg.text_sha256,b.object_key,b.sha256,b.byte_length,coalesce(e.id,''),coalesce(e.space_id,''),sg.derivation
+// Hydration reaches each requested segment, Version and Record by a bounded
+// composite-key seek. Empty statistics otherwise let the planner choose an
+// Organization-only prefix of an unrelated index and filter every row for
+// every candidate. OFFSET 0 on an equality lookup alone does not prevent it.
+// Ordering and LIMIT preserve the full key seek; outer equality rejects the
+// next row when the key is absent. The same serving predicates fence the
+// initial metadata lookup and the post-blob-read recheck.
+var hydrationCandidatesSQL = `
 FROM unnest($1::text[],$2::text[],$3::text[],$4::text[],$5::text[]) WITH ORDINALITY AS c(organization,segment_id,generation_id,evaluation_plugin,evaluation_space,n)
-CROSS JOIN LATERAL (SELECT sg.* FROM segments sg WHERE sg.organization=c.organization AND sg.id=c.segment_id OFFSET 0) sg
-CROSS JOIN LATERAL (SELECT v.* FROM record_versions v WHERE v.organization=c.organization AND v.id=sg.version_id OFFSET 0) v
-CROSS JOIN LATERAL (SELECT r.* FROM records r WHERE r.organization=c.organization AND r.id=v.record_id OFFSET 0) r
-CROSS JOIN LATERAL (SELECT p.blob_id FROM version_parts p WHERE p.organization=c.organization AND p.version_id=sg.version_id AND p.part_key=sg.part_key OFFSET 0) p
-CROSS JOIN LATERAL (SELECT b.object_key,b.sha256,b.byte_length FROM content_blobs b WHERE b.organization=c.organization AND b.blob_id=p.blob_id OFFSET 0) b
+JOIN LATERAL (SELECT sg.organization,sg.id,sg.version_id,sg.segmentation_id,sg.part_key,sg.start_offset,sg.end_offset,sg.text_sha256,sg.derivation
+ FROM segments sg WHERE (sg.organization,sg.id)>=(c.organization,c.segment_id)
+ ORDER BY sg.organization,sg.id LIMIT 1) sg ON (sg.organization,sg.id)=(c.organization,c.segment_id)
+JOIN LATERAL (SELECT v.organization,v.id,v.record_id,v.baseline_ready,v.quarantined FROM record_versions v
+ WHERE (v.organization,v.id)>=(c.organization,sg.version_id)
+ ORDER BY v.organization,v.id LIMIT 1) v ON (v.organization,v.id)=(c.organization,sg.version_id)
+JOIN LATERAL (SELECT r.organization,r.id,r.corpus_id,r.current_version_id,r.withdrawn FROM records r
+ WHERE (r.organization,r.id)>=(c.organization,v.record_id)
+ ORDER BY r.organization,r.id LIMIT 1) r ON (r.organization,r.id)=(c.organization,v.record_id)
 CROSS JOIN LATERAL (SELECT pc.organization,pc.version_id,pc.plugin_id FROM projection_coverage pc WHERE pc.organization=c.organization AND pc.version_id=sg.version_id AND pc.generation_id=c.generation_id AND pc.segmentation_id=sg.segmentation_id AND ((c.evaluation_plugin='' AND ` + effectiveCoverageSQL("pc") + `) OR (c.evaluation_plugin<>'' AND pc.plugin_id=c.evaluation_plugin)) OFFSET 0) pc
-LEFT JOIN LATERAL (SELECT ec.artifact_id AS id,ec.space_id FROM ` + embeddingCoverageForSegmentSQL("c.organization", "c.segment_id") + ` ec JOIN ` + effectiveGenerationsSQL + ` g ON g.id=ec.generation_id AND ((c.evaluation_plugin='' AND ` + selectedVectorSpaceSQL("pc", "g") + `=ec.space_id) OR (c.evaluation_plugin<>'' AND ec.space_id=c.evaluation_space))
-  WHERE ec.organization=c.organization AND ec.segment_id=c.segment_id AND ec.generation_id=c.generation_id ORDER BY ec.artifact_id LIMIT 1) e ON true
+`
+
+var hydrationFenceSQL = `
 WHERE c.generation_id=` + routedGenerationSQL("r.organization", "r.corpus_id") + ` AND r.current_version_id=v.id AND ` + eligibleVersionSQL + ` AND NOT EXISTS(SELECT 1 FROM corpora cp WHERE cp.organization=r.organization AND cp.id=r.corpus_id AND cp.archived)`
 
-// Hydrate looks a batch of candidates up in one query (hydrateSQL). A
+var hydrateSQL = `SELECT c.n,r.id,v.id,r.corpus_id,sg.segmentation_id,sg.id,sg.part_key,sg.start_offset,sg.end_offset,sg.text_sha256,b.object_key,b.sha256,b.byte_length,coalesce(e.id,''),coalesce(e.space_id,''),
+ jsonb_build_object('source_ranges',sg.derivation->'source_ranges','source_separator',sg.derivation->'source_separator')
+` + hydrationCandidatesSQL + `
+JOIN LATERAL (SELECT p.organization,p.version_id,p.part_key,p.blob_id FROM version_parts p
+ WHERE (p.organization,p.version_id,p.part_key)>=(c.organization,sg.version_id,sg.part_key)
+ ORDER BY p.organization,p.version_id,p.part_key LIMIT 1) p ON (p.organization,p.version_id,p.part_key)=(c.organization,sg.version_id,sg.part_key)
+JOIN LATERAL (SELECT b.organization,b.blob_id,b.object_key,b.sha256,b.byte_length FROM content_blobs b
+ WHERE (b.organization,b.blob_id)>=(c.organization,p.blob_id)
+ ORDER BY b.organization,b.blob_id LIMIT 1) b ON (b.organization,b.blob_id)=(c.organization,p.blob_id)
+LEFT JOIN LATERAL (SELECT ec.artifact_id AS id,ec.space_id FROM ` + embeddingCoverageForSegmentSQL("c.organization", "c.segment_id") + ` ec JOIN ` + effectiveGenerationsSQL + ` g ON g.id=ec.generation_id AND ((c.evaluation_plugin='' AND ` + selectedVectorSpaceSQL("pc", "g") + `=ec.space_id) OR (c.evaluation_plugin<>'' AND ec.space_id=c.evaluation_space))
+  WHERE ec.organization=c.organization AND ec.segment_id=c.segment_id AND ec.generation_id=c.generation_id ORDER BY ec.artifact_id LIMIT 1) e ON true
+` + hydrationFenceSQL
+
+func hydrationArgs(scope corpus.Scope, cs []content.Candidate) []any {
+	orgs, segments, generations, evaluations, spaces := make([]string, len(cs)), make([]string, len(cs)), make([]string, len(cs)), make([]string, len(cs)), make([]string, len(cs))
+	for i, c := range cs {
+		orgs[i], segments[i], generations[i], evaluations[i], spaces[i] = scope.Organization, c.SegmentID, c.GenerationID, c.EvaluationPlugin, c.EvaluationSpace
+	}
+	return []any{orgs, segments, generations, evaluations, spaces}
+}
+
+// RecheckHydration checks only mutable serving fences after canonical bytes
+// have been read. Immutable Part/blob/embedding metadata stays in the initial
+// hydration; both paths use the same authorization and currentness predicates.
+func (s ProjectionStore) RecheckHydration(ctx context.Context, scope corpus.Scope, cs []content.Candidate) (map[int]bool, error) {
+	out := map[int]bool{}
+	if len(cs) == 0 {
+		return out, nil
+	}
+	rows, err := database(ctx, s.Pool).Query(ctx, `SELECT c.n,r.corpus_id `+hydrationCandidatesSQL+hydrationFenceSQL, hydrationArgs(scope, cs)...)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	for rows.Next() {
+		var n int
+		var corpusID string
+		if err = rows.Scan(&n, &corpusID); err != nil {
+			return nil, err
+		}
+		if scope.Contains(corpusID) {
+			out[n-1] = true
+		}
+	}
+	return out, rows.Err()
+}
+
+// Hydrate looks a batch of candidates up with only response/source fields. A
 // candidate outside the caller's Corpora is absent, as if it did not exist.
 func (s ProjectionStore) Hydrate(ctx context.Context, scope corpus.Scope, cs []content.Candidate) (map[int]content.Located, error) {
 	out := map[int]content.Located{}
 	if len(cs) == 0 {
 		return out, nil
 	}
-	orgs, segments, generations, evaluations, spaces := make([]string, len(cs)), make([]string, len(cs)), make([]string, len(cs)), make([]string, len(cs)), make([]string, len(cs))
-	for i, c := range cs {
-		orgs[i], segments[i], generations[i], evaluations[i] = scope.Organization, c.SegmentID, c.GenerationID, c.EvaluationPlugin
-		spaces[i] = c.EvaluationSpace
-	}
-	rows, err := database(ctx, s.Pool).Query(ctx, hydrateSQL, orgs, segments, generations, evaluations, spaces)
+	rows, err := database(ctx, s.Pool).Query(ctx, hydrateSQL, hydrationArgs(scope, cs)...)
 	if err != nil {
 		return nil, err
 	}

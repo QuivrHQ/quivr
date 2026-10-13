@@ -271,6 +271,13 @@ func hydrateOne(ctx context.Context, store fixtureContentStores, scope corpus.Sc
 	if err != nil {
 		return content.Hydrated{}, err
 	}
+	still, err := store.RecheckHydration(ctx, scope, []content.Candidate{c})
+	if err != nil {
+		return content.Hydrated{}, err
+	}
+	if still[0] != (len(found) == 1) {
+		return content.Hydrated{}, errors.New("hydration and its serving fence disagree")
+	}
 	l, ok := found[0]
 	if !ok {
 		return content.Hydrated{}, corpus.ErrNotFound
@@ -279,7 +286,8 @@ func hydrateOne(ctx context.Context, store fixtureContentStores, scope corpus.Sc
 }
 
 // TestHydrationCostFollowsTheBatch owns hydration's cost (THE-875): a batch
-// reads a few index pages per candidate, whatever its Organization's size,
+// uses two statements and bounded page work for 50 hits, regardless of
+// Organization size,
 // even while the planner's statistics do not count the Organization yet, as
 // on a new deployment or while a backfill grows it. PostgreSQL reports the
 // pages each lookup reads through auto_explain on the store's own connection.
@@ -293,12 +301,8 @@ func TestHydrationCostFollowsTheBatch(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	// Statistics taken now know nothing of the Records below.
-	if _, err = pool.Exec(ctx, `ANALYZE segments, record_versions, records, version_parts, content_blobs, projection_coverage`); err != nil {
-		t.Fatal(err)
-	}
 	store := contentStores(pool)
-	service := content.Service{Submissions: store, Receipts: store, RecordStore: store, Versions: store, Materialization: store, Baseline: store}
+	service := content.Service{Submissions: store, Receipts: store, RecordStore: store, Versions: store, Materialization: store, Baseline: store, Blobs: store.objects}
 	g, err := store.Generation(ctx, org, c.ID)
 	if err != nil {
 		t.Fatal(err)
@@ -315,7 +319,11 @@ func TestHydrationCostFollowsTheBatch(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		if err = store.Publish(ctx, work, publication(content.Blob{Key: "fixture/" + key, SHA256: "text-" + key, Size: 15}, content.Blob{Key: "fixture/manifest-" + key, SHA256: "manifest-" + key, Size: 2})); err != nil {
+		blob, err := store.objects.Put(ctx, org, []byte(cmd.Content.Text))
+		if err != nil {
+			t.Fatal(err)
+		}
+		if err = store.Publish(ctx, work, publication(blob, content.Blob{Key: "fixture/manifest-" + key, SHA256: "manifest-" + key, Size: 2})); err != nil {
 			t.Fatal(err)
 		}
 		v := content.Version{ID: work.VersionID, RecordID: work.RecordID, Manifest: content.ManifestFor(cmd)}
@@ -329,7 +337,7 @@ func TestHydrationCostFollowsTheBatch(t *testing.T) {
 		if err = service.Promote(ctx, org, seg, g); err != nil {
 			t.Fatal(err)
 		}
-		if i%30 == 0 {
+		if i%3 == 0 {
 			batch = append(batch, content.Candidate{SegmentID: seg.Segments[0].ID, GenerationID: g.ID})
 		}
 	}
@@ -338,6 +346,17 @@ func TestHydrationCostFollowsTheBatch(t *testing.T) {
 	var plans []string
 	cfg.ConnConfig.OnNotice = func(_ *pgconn.PgConn, n *pgconn.Notice) { plans = append(plans, n.Message) }
 	cfg.AfterConnect = func(ctx context.Context, conn *pgx.Conn) error {
+		// A private copy of the hot tables gives every run genuinely empty
+		// statistics, independent of test order and autovacuum on public tables.
+		// LIKE retains the real indexes; no production hook or global tuning.
+		for _, table := range []string{"segments", "record_versions", "records", "version_parts", "content_blobs", "projection_coverage"} {
+			if _, err := conn.Exec(ctx, "CREATE TEMP TABLE "+table+" (LIKE public."+table+" INCLUDING ALL); ANALYZE "+table); err != nil {
+				return err
+			}
+			if _, err := conn.Exec(ctx, "INSERT INTO pg_temp."+table+" SELECT * FROM public."+table+" WHERE organization=$1", org); err != nil {
+				return err
+			}
+		}
 		_, err := conn.Exec(ctx, `LOAD 'auto_explain'; SET auto_explain.log_min_duration=0; SET auto_explain.log_analyze=on; SET auto_explain.log_buffers=on; SET auto_explain.log_format=json; SET auto_explain.log_level=notice`)
 		return err
 	}
@@ -346,30 +365,50 @@ func TestHydrationCostFollowsTheBatch(t *testing.T) {
 		t.Fatal(err)
 	}
 	defer explained.Close()
-	// pgx prepares the query: after five runs PostgreSQL may switch to a
-	// generic plan, which must be as cheap.
-	for run := range 7 {
-		plans = nil
-		found, err := (contentStores(explained)).Hydrate(ctx, scope, batch)
-		if err != nil || len(found) != len(batch) {
-			t.Fatalf("run %d: hydrated %d of %d candidates, %v", run, len(found), len(batch), err)
+	// Cover the automatic custom-to-generic decision, then explicitly force
+	// both choices. Repeat with current statistics so ANALYZE cannot regress it.
+	for _, statistics := range []string{"empty", "analyzed"} {
+		if statistics == "analyzed" {
+			if _, err = explained.Exec(ctx, `ANALYZE segments, record_versions, records, version_parts, content_blobs, projection_coverage`); err != nil {
+				t.Fatal(err)
+			}
 		}
-		if len(plans) != 1 {
-			t.Fatalf("run %d: %d plans reported, want the one of the batch query", run, len(plans))
-		}
-		var plan struct {
-			Plan struct {
-				SharedHitBlocks  int `json:"Shared Hit Blocks"`
-				SharedReadBlocks int `json:"Shared Read Blocks"`
-			} `json:"Plan"`
-		}
-		if err = json.Unmarshal([]byte(plans[0][strings.Index(plans[0], "{"):]), &plan); err != nil {
-			t.Fatal(err)
-		}
-		// A lookup by primary key reads about four pages; the batch reads
-		// each of its tables once per candidate.
-		if pages := plan.Plan.SharedHitBlocks + plan.Plan.SharedReadBlocks; pages > 50*len(batch) {
-			t.Fatalf("run %d: hydrating %d candidates of an Organization of 150 Records read %d pages, want at most %d; plan: %s", run, len(batch), pages, 50*len(batch), plans[0])
+		for _, mode := range []string{"auto", "force_custom_plan", "force_generic_plan"} {
+			if _, err = explained.Exec(ctx, "SET plan_cache_mode="+mode); err != nil {
+				t.Fatal(err)
+			}
+			for run := range 7 {
+				plans = nil
+				reader := content.Service{Baseline: postgres.ProjectionStore{Pool: explained}, Blobs: store.objects}
+				found, err := reader.Hydrate(ctx, scope, batch)
+				if err != nil || len(found) != len(batch) {
+					t.Fatalf("%s/%s run %d: hydrated %d of %d candidates, %v", statistics, mode, run, len(found), len(batch), err)
+				}
+				if len(plans) != 2 {
+					t.Fatalf("%s/%s run %d: %d statements reported, want one metadata lookup and one serving fence", statistics, mode, run, len(plans))
+				}
+				pages := 0
+				for _, raw := range plans {
+					var plan struct {
+						Plan struct {
+							SharedHitBlocks  int `json:"Shared Hit Blocks"`
+							SharedReadBlocks int `json:"Shared Read Blocks"`
+							LocalHitBlocks   int `json:"Local Hit Blocks"`
+							LocalReadBlocks  int `json:"Local Read Blocks"`
+						} `json:"Plan"`
+					}
+					if err = json.Unmarshal([]byte(raw[strings.Index(raw, "{"):]), &plan); err != nil {
+						t.Fatal(err)
+					}
+					pages += plan.Plan.SharedHitBlocks + plan.Plan.SharedReadBlocks + plan.Plan.LocalHitBlocks + plan.Plan.LocalReadBlocks
+				}
+				if run == 0 || run == 6 {
+					t.Logf("%s/%s run %d: %d statements, %d pages for %d hits", statistics, mode, run, len(plans), pages, len(found))
+				}
+				if pages > 50*len(batch) {
+					t.Fatalf("%s/%s run %d: hydrating %d candidates touched %d pages, want at most %d; plans: %v", statistics, mode, run, len(batch), pages, 50*len(batch), plans)
+				}
+			}
 		}
 	}
 }
