@@ -72,8 +72,9 @@ type archiveBlobRoutes struct{}
 func (archiveBlobRoutes) Routed(context.Context, string) bool { return true }
 
 // Owns deterministic acquisition work budgets at the real upload/accept stores.
-// The only fake is the remote object store: actual S3 verification hashes the
-// uploaded bytes. SQL executes on PostgreSQL, with no time threshold or delay.
+// The remote object store deliberately omits checksums: actual S3 verification
+// must HEAD then hash the uploaded bytes through the legacy GET fallback. SQL
+// executes on PostgreSQL, with no time threshold or delay.
 // A regression to per-write database exchanges or repeated acceptance
 // transactions fails this test even on a fast machine.
 func TestArchiveAcquisitionWorkBudget(t *testing.T) {
@@ -233,8 +234,8 @@ func TestArchiveAcquisitionWorkBudget(t *testing.T) {
 	}
 	mu.Lock()
 	defer mu.Unlock()
-	if gets != 93 || puts != 93 || heads != 0 {
-		t.Fatalf("storage work PUT=%d verification GET=%d HEAD=%d; want 93/93/0", puts, gets, heads)
+	if gets != 93 || puts != 93 || heads != 93 {
+		t.Fatalf("storage work PUT=%d verification GET=%d HEAD=%d; want 93/93/93 (checksum-less fallback)", puts, gets, heads)
 	}
 	var n, events int
 	if err := pool.QueryRow(ctx, "SELECT count(*) FROM ingestion_receipts WHERE organization=$1", org).Scan(&n); err != nil {

@@ -231,6 +231,16 @@ Unreadable or malformed certificate files, incomplete or mismatched client ident
 | `access_key`, `secret_key` | Its credentials |
 | `bucket` | The bucket Quivr writes to; `quivr migrate` creates it when missing |
 
+Upload grants sign the expected SHA-256 into the presigned PUT. Confirmation checks the stored size and SHA-256 with `HeadObject` and `ChecksumMode=ENABLED`. A matching full-object checksum (SHA-256 of all stored bytes) verifies the upload without downloading its bytes. This applies to connector imports and direct `/v0/uploads` confirmation.
+
+| Store | Upload integrity and confirmation |
+| --- | --- |
+| Amazon S3 | PUT validates `x-amz-checksum-sha256`; checksum-enabled HEAD returns it. Encrypted objects may also require AWS Key Management Service (KMS) permissions to read the checksum. |
+| Bundled SeaweedFS 4.45 | Presigned PUT validates SHA-256 and rejects altered bytes with `BadDigest`; checksum-enabled HEAD returns the stored checksum. |
+| Other S3-compatible stores, or existing objects without SHA-256 | Confirmation streams the object and checks its length and SHA-256 when HEAD returns no usable full-object checksum, or rejects HEAD with HTTP 400, 405 or 501. |
+
+Composite multipart checksums, assembled from individual part checksums, also use streaming verification. Quivr never trusts client-supplied object metadata or an ETag as SHA-256 proof. A size or checksum mismatch rejects the upload; unavailable storage leaves confirmation retryable. Canonical and vector-file reads retain their byte-level integrity checks.
+
 ## Plugin pins
 
 Each item of `plugins` pins one plugin. [Pin a plugin](/run-quivr/pin) explains how to use them.

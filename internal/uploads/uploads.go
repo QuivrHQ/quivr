@@ -144,8 +144,8 @@ func (s Service) Create(ctx context.Context, org string, req Request) (Session, 
 // identity (SHA-256 and media type) already exists, it answers that Blob as a
 // verified session and issues no upload. Otherwise it issues an upload
 // session whose presigned PUT storage accepts only the declared length,
-// checksum and media type; only Confirm, which reads the stored bytes back,
-// turns it into a Blob.
+// checksum and media type; only Confirm, which verifies the stored checksum
+// and size, turns it into a Blob.
 func (s Service) Grant(ctx context.Context, org string, req Request) (Session, error) {
 	if !valid(req) {
 		return Session{}, ErrInvalid
