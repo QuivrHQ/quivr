@@ -119,7 +119,7 @@ func (s RoutingStore) observeRouting(ctx context.Context, tx pgx.Tx, w *routingW
 	// Observation begins only when prior shared writers have committed. Never
 	// queue an exclusive request that would make new imports wait behind it.
 	var acquired bool
-	if err := tx.QueryRow(ctx, `SELECT pg_try_advisory_xact_lock($1) AND pg_try_advisory_xact_lock($2)`, projectionRoutingLock, pluginPlanLock).Scan(&acquired); err != nil {
+	if err := tx.QueryRow(ctx, `WITH mode AS MATERIALIZED (SELECT pg_try_advisory_xact_lock_shared($3) AS acquired) SELECT CASE WHEN acquired THEN pg_try_advisory_xact_lock($1) AND pg_try_advisory_xact_lock($2) ELSE false END FROM mode`, projectionRoutingLock, pluginPlanLock, journalModeLock).Scan(&acquired); err != nil {
 		return false, err
 	}
 	if !acquired {

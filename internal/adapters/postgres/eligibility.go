@@ -35,5 +35,5 @@ func routedGenerationSQL(org, corpusID string) string {
 // (by journal position) for the same Subscription and Record. It only reports
 // facts: monitoring.AdmissionReason decides which notice kinds they
 // supersede. Delivery admission and Delivery reads share it.
-const laterNoticesSQL = `EXISTS(SELECT 1 FROM monitoring_notices later WHERE later.organization=n.organization AND later.subscription_id=n.subscription_id AND later.record_id=n.record_id AND later.kind='match.corrected' AND later.position>n.position),
-  EXISTS(SELECT 1 FROM monitoring_notices later WHERE later.organization=n.organization AND later.subscription_id=n.subscription_id AND later.record_id=n.record_id AND later.kind='match.no_longer_matches' AND later.position>n.position)`
+var laterNoticesSQL = `EXISTS(SELECT 1 FROM monitoring_notices later WHERE later.organization=n.organization AND later.subscription_id=n.subscription_id AND later.record_id=n.record_id AND later.kind='match.corrected' AND later.position>n.position AND later.position<=` + journalHeadSQL("n.organization") + `),
+  EXISTS(SELECT 1 FROM monitoring_notices later WHERE later.organization=n.organization AND later.subscription_id=n.subscription_id AND later.record_id=n.record_id AND later.kind='match.no_longer_matches' AND later.position>n.position AND later.position<=` + journalHeadSQL("n.organization") + `)`

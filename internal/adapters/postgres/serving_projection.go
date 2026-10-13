@@ -270,6 +270,9 @@ func (s ServingProjectionStore) completeServingProjectionAttempt(ctx context.Con
 	if err = lockJournal(ctx, tx, j.Organization); err != nil {
 		return err
 	}
+	if err = lockJournalRecord(ctx, tx, j.Organization, j.RecordID); err != nil {
+		return err
+	}
 	eligible, err := servingProjectionEligible(ctx, tx, j)
 	if err != nil {
 		return err
@@ -325,6 +328,9 @@ func (s ServingProjectionStore) coverServingProjectionAttempt(ctx context.Contex
 	}
 	defer tx.Rollback(ctx)
 	if err = lockProjectionRouting(ctx, tx); err != nil {
+		return err
+	}
+	if err = lockJournalRecord(ctx, tx, j.Organization, j.RecordID); err != nil {
 		return err
 	}
 	hint, err := servingProjectionEligible(ctx, tx, j)

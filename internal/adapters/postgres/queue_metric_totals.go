@@ -12,10 +12,11 @@ import (
 // never scans source work; the arrival index visits at most one pending item.
 func queueMetricBacklog(ctx context.Context, pool *pgxpool.Pool, source string) (pending, erroring int64, age float64, err error) {
 	err = pool.QueryRow(ctx, `SELECT coalesce(sum(t.pending),0)::bigint,coalesce(sum(t.erroring),0)::bigint,
- coalesce(extract(epoch FROM statement_timestamp()-(SELECT admitted_at FROM queue_metric_items WHERE source=$1 ORDER BY admitted_at LIMIT 1)),0)::double precision
- FROM queue_metric_bootstrap b LEFT JOIN queue_metric_totals t ON t.source=b.source
- WHERE b.source=$1 AND b.initialized
- AND ($1<>'delivery' OR NOT EXISTS(SELECT FROM queue_scope_reconciliation WHERE kind='delivery')) GROUP BY b.source`, source).Scan(&pending, &erroring, &age)
+	coalesce(extract(epoch FROM statement_timestamp()-(SELECT admitted_at FROM queue_metric_items WHERE source=$1 ORDER BY admitted_at LIMIT 1)),0)::double precision
+	 FROM queue_metric_bootstrap b LEFT JOIN queue_metric_totals t ON t.source=b.source
+	 WHERE b.source=$1 AND b.initialized
+	 AND NOT EXISTS(SELECT FROM parallel_queue_observations WHERE revision<>applied_revision AND dirty_since<=statement_timestamp()-interval '1 minute')
+	 AND ($1<>'delivery' OR NOT EXISTS(SELECT FROM queue_scope_reconciliation WHERE kind='delivery')) GROUP BY b.source`, source).Scan(&pending, &erroring, &age)
 	return
 }
 
@@ -150,7 +151,7 @@ func advanceQueueMetricBootstrap(ctx context.Context, tx pgx.Tx, limit int) (mor
 	// stripe. Thus the transaction never holds a stripe while reaching for the
 	// next source's bootstrap lock.
 	if len(observed) > 0 {
-		if err = observeQueueMetricKeys(ctx, tx, observed); err != nil {
+		if err = observeQueueMetricKeysForced(ctx, tx, observed); err != nil {
 			return false, err
 		}
 	}

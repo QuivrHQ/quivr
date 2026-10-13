@@ -1,0 +1,12 @@
+# scripts/measure_parallel_journal.py owns this fixed-count SQL-boundary fixture.
+# It compares modes of the candidate bridge, not external provider throughput.
+version: 1
+name: parallel-journal-acceptance
+boundary: SubmissionStore.Accept
+modes: [legacy, parallel]
+concurrency: [1, 8, 32]
+items_per_trial: 512
+synchronous_commit: on
+transaction_timeout: 30s
+maximum_seconds: 300
+providers: none

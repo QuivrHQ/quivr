@@ -10,7 +10,7 @@ import (
 // A partial event or a first oversized event returns paged=true so dispatchStep
 // retains its existing Subscription pagination and checkpoint semantics.
 func (s EvaluationStore) dispatchPrefix(ctx context.Context, org string, limit int) (processed int, paged bool, err error) {
-	tx, err := s.Pool.BeginTx(ctx, pgx.TxOptions{IsoLevel: pgx.ReadCommitted})
+	tx, err := s.Pool.BeginTx(ctx, pgx.TxOptions{IsoLevel: pgx.RepeatableRead})
 	if err != nil {
 		return 0, false, err
 	}
@@ -28,7 +28,7 @@ func (s EvaluationStore) dispatchPrefix(ctx context.Context, org string, limit i
 	// lock. Both materialized inputs are bounded before any writes: at most
 	// limit events and page+1 targets per event, including the oversize sentinel.
 	err = tx.QueryRow(ctx, `WITH head AS MATERIALIZED (
- SELECT last_sequence FROM organization_journals WHERE organization=$1
+ SELECT `+dispatchHeadSQL("$1", "$2::bigint")+` AS last_sequence
 ), events AS MATERIALIZED (
  SELECT e.sequence,e.corpus_id,e.resource_id,coalesce(e.record_version_id,'') AS version_id,e.event_type,e.trace_context
  FROM change_events e CROSS JOIN head h

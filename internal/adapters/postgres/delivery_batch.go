@@ -67,6 +67,7 @@ func deliveryGroup(orgs, ids []string) bool {
 // using a separate statement snapshot after the journal lock is acquired.
 func deliveryGuardRows[T any](ctx context.Context, tx pgx.Tx, org, query string, args []any, collect func(pgx.CollectableRow) (T, error)) ([]T, error) {
 	batch := journalBatch(org)
+	queueDeliveryResourceLocks(batch, org, args[1].([]string))
 	batch.Queue(query, args...)
 	results := tx.SendBatch(ctx, batch)
 	defer results.Close()
@@ -171,6 +172,9 @@ func (s DeliveryStore) admitDeliveryGroupAttempt(ctx context.Context, works []mo
 	if err != nil {
 		return false, nil, err
 	}
+	if err = requirePublishedDeliveries(ctx, tx, org, ids); err != nil {
+		return false, nil, err
+	}
 	if len(guards) != len(works) {
 		return false, nil, nil
 	}
@@ -215,18 +219,16 @@ func deliveryStateEvent(org, corpusID, deliveryID string, number int, state stri
 	return eventInput{Organization: org, CorpusID: corpusID, Kind: "delivery.updated", Resource: "delivery", ResourceID: deliveryID, MutationID: fmt.Sprint(deliveryID, ":", number, ":", state)}
 }
 
-// deliveryEventsBatchSQL allocates one contiguous range under the already held
-// journal lock. Ordinality assigns each event its original input position;
-// the committed head is visible only with the whole range and its other facts.
-const deliveryEventsBatchSQL = `WITH inputs AS (
-  SELECT * FROM unnest($2::text[],$3::text[],$4::text[],$5::text[])
-    WITH ORDINALITY AS x(event_id,corpus_id,delivery_id,trace_context,ordinal)),
-position AS (
-  UPDATE organization_journals SET last_sequence=last_sequence+cardinality($2::text[])
-  WHERE organization=$1 RETURNING last_sequence-cardinality($2::text[]) AS base)
-INSERT INTO change_events(organization,sequence,event_id,corpus_id,event_type,resource_type,resource_id,record_version_id,trace_context)
-SELECT $1,position.base+inputs.ordinal,inputs.event_id,inputs.corpus_id,'delivery.updated','delivery',inputs.delivery_id,NULL,inputs.trace_context
-FROM inputs CROSS JOIN position ORDER BY inputs.ordinal`
+// deliveryEventsBatchSQL allocates ordered positions with the mode-aware
+// allocator. Parallel positions can have gaps and wait for safe publication.
+var deliveryEventsBatchSQL = `WITH inputs AS MATERIALIZED (
+ SELECT * FROM unnest($2::text[],$3::text[],$4::text[],$5::text[])
+ WITH ORDINALITY AS x(event_id,corpus_id,delivery_id,trace_context,ordinal) ORDER BY ordinal),
+ ` + batchPositionsSQL("cardinality($2::text[])") + `
+ INSERT INTO change_events(organization,sequence,event_id,corpus_id,event_type,resource_type,resource_id,record_version_id,trace_context,writer_xid)
+ SELECT $1,CASE WHEN p.parallel THEN nextval('change_event_positions') ELSE p.base+x.ordinal END,
+ x.event_id,x.corpus_id,'delivery.updated','delivery',x.delivery_id,NULL,x.trace_context,p.xid
+ FROM inputs x CROSS JOIN positions p ORDER BY x.ordinal`
 
 type deliveryRecordGuard struct {
 	ordinal    int

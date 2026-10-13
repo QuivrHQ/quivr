@@ -167,6 +167,13 @@ func commitJournalGroup(ctx context.Context, pool *pgxpool.Pool, org string, pre
 		if err = lockProjectionRouting(ctx, tx); err != nil {
 			return err
 		}
+		keys := make([]string, len(entries))
+		for i, entry := range entries {
+			keys[i] = entry.RecordID
+		}
+		if err = lockJournalRecords(ctx, tx, org, keys); err != nil {
+			return err
+		}
 		group := &journalGroup{organization: org, records: map[string]bool{}, entries: entries, preparedVectors: map[string]bool{}, segmented: map[string]bool{}}
 		ctx = context.WithValue(ctx, journalGroupKey{}, group)
 		finishes := make([]journalFinish, 0, len(preparations))
@@ -214,7 +221,7 @@ func commitJournalGroup(ctx context.Context, pool *pgxpool.Pool, org string, pre
 	})
 }
 
-// Allocate a contiguous range and observe final canonical state once per
+// Allocate stable positions and observe final canonical state once per
 // Record. Every event retains its member's trace.
 func (group *journalGroup) append(ctx context.Context, tx pgx.Tx) error {
 	writes := &pgx.Batch{}
@@ -234,12 +241,14 @@ func (group *journalGroup) queueAppend(writes *pgx.Batch) {
 			versions = append(versions, e.VersionID)
 			traces = append(traces, e.trace)
 		}
-		writes.Queue(`WITH positions AS (
- UPDATE organization_journals SET last_sequence=last_sequence+$2 WHERE organization=$1 RETURNING last_sequence-$2 AS start
-) INSERT INTO change_events(organization,sequence,event_id,corpus_id,event_type,resource_type,resource_id,record_version_id,trace_context)
- SELECT $1,positions.start+e.n,e.id,e.corpus,e.kind,e.resource,e.record,NULLIF(e.version,''),e.trace
- FROM positions CROSS JOIN unnest($3::text[],$4::text[],$5::text[],$6::text[],$7::text[],$8::text[],$9::text[])
- WITH ORDINALITY e(id,corpus,kind,resource,record,version,trace,n) ORDER BY e.n`, group.organization, len(group.events), ids, corpora, kinds, resources, records, versions, traces)
+		writes.Queue(`WITH inputs AS MATERIALIZED (
+ SELECT * FROM unnest($3::text[],$4::text[],$5::text[],$6::text[],$7::text[],$8::text[],$9::text[])
+ WITH ORDINALITY e(id,corpus,kind,resource,record,version,trace,n) ORDER BY e.n),
+ `+batchPositionsSQL("$2")+`
+ INSERT INTO change_events(organization,sequence,event_id,corpus_id,event_type,resource_type,resource_id,record_version_id,trace_context,writer_xid)
+ SELECT $1,CASE WHEN p.parallel THEN nextval('change_event_positions') ELSE p.base+e.n END,
+ e.id,e.corpus,e.kind,e.resource,e.record,NULLIF(e.version,''),e.trace,p.xid
+ FROM inputs e CROSS JOIN positions p ORDER BY e.n`, group.organization, len(group.events), ids, corpora, kinds, resources, records, versions, traces)
 	}
 	orgs, records := []string{}, []string{}
 	for record := range group.records {

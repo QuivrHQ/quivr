@@ -2,6 +2,8 @@ package postgres
 
 import (
 	"context"
+	"strings"
+
 	"github.com/The-Vibe-Company/quivr/internal/content"
 
 	"github.com/jackc/pgx/v5"
@@ -12,9 +14,11 @@ import (
 // It never waits for canonical row locks, which would invert the writer lock order.
 const queueObservationKeysSQL = `SELECT DISTINCT organization,record_id FROM unnest($1::text[],$2::text[]) k(organization,record_id) ORDER BY organization,record_id OFFSET 0`
 
-// recordObservationSQL maintains one Record's queue observation from its
-// canonical state. Each statement takes (organizations, records).
-var recordObservationSQL = append([]string{
+// queueRecordCanonicalObservationSQL maintains one Record's canonical and
+// derived observations. Aggregate queue counters are deliberately kept out of
+// this prefix so parallel writers can commit without waiting on organization
+// stripes; the bounded reconciler runs the aggregate suffix separately.
+var queueRecordCanonicalObservationSQL = []string{
 	`INSERT INTO queue_enrichment_records(organization,record_id)
  SELECT DISTINCT organization,record_id FROM (` + queueObservationKeysSQL + `) k ORDER BY organization,record_id
  ON CONFLICT DO NOTHING`,
@@ -51,12 +55,74 @@ var recordObservationSQL = append([]string{
  AND q.ctid=ANY(ARRAY(SELECT locked.ctid FROM (` + queueObservationKeysSQL + `) ids
  JOIN LATERAL (SELECT ctid FROM queue_enrichment_records p WHERE (p.organization,p.record_id)=(ids.organization,ids.record_id) LIMIT 1) locked ON true))`,
 	markObservedRecordsSQL,
-}, append(append(queueRecordObservationSQL, queueRecordMetricObservationSQL...), corpusRecordObservationSQL...)...)
+}
+
+// markParallelQueueRecordsSQL records a durable, Record-scoped revision. The
+// table is only active after the deployment-wide parallel journal cutover;
+// legacy writers retain their synchronous aggregate observations.
+const markParallelQueueRecordsSQL = `INSERT INTO parallel_queue_observations(organization,record_id,revision,changed_at,dirty_since)
+ SELECT DISTINCT organization,record_id,1,clock_timestamp(),clock_timestamp()
+ FROM unnest($1::text[],$2::text[]) keys(organization,record_id)
+ WHERE ` + parallelJournalSQL + `
+ ON CONFLICT(organization,record_id) DO UPDATE SET
+	revision=parallel_queue_observations.revision+1,changed_at=EXCLUDED.changed_at,
+ dirty_since=CASE WHEN parallel_queue_observations.revision=parallel_queue_observations.applied_revision
+ THEN EXCLUDED.dirty_since ELSE parallel_queue_observations.dirty_since END`
+
+// The normal producer suffix keeps the legacy routing/rebuild capture and the
+// parallel dirty revision in one statement. This preserves the existing batch
+// de-duplication boundary used by queueEvent while making the dirty write part
+// of the same acceptance transaction.
+const markObservedAndParallelQueueRecordsSQL = `WITH rebuild_dirty AS (` + markRebuildRecordsSQL + ` RETURNING 1),
+ routing AS (` + markRoutingRecordsSQL + ` RETURNING 1),
+ parallel AS (` + markParallelQueueRecordsSQL + ` RETURNING 1)
+ SELECT 1`
+
+// recordObservationSQL is retained as the complete two-argument observation
+// suffix for queueEvent's trailing-observation coalescing. Parallel aggregate
+// statements become no-ops through their mode predicates; the reconciler uses
+// forceParallelQueueSQL when it owns the aggregate stripes.
+var recordObservationSQL = func() []string {
+	observations := make([]string, len(queueRecordCanonicalObservationSQL))
+	copy(observations, queueRecordCanonicalObservationSQL)
+	for i, sql := range observations {
+		if sql == markObservedRecordsSQL {
+			observations[i] = markObservedAndParallelQueueRecordsSQL
+		}
+	}
+	observations = append(observations, queueRecordObservationSQL...)
+	observations = append(observations, queueRecordMetricObservationSQL...)
+	observations = append(observations, corpusRecordObservationSQL...)
+	return observations
+}()
+
+func forceParallelQueueSQL(sql string) string {
+	sql = strings.ReplaceAll(sql, "NOT "+parallelJournalSQL, "TRUE")
+	return strings.ReplaceAll(sql, "NOT mode.parallel", "TRUE")
+}
 
 func queueRecordObservations(batch *pgx.Batch, organizations, records []string) {
 	for _, sql := range recordObservationSQL {
 		batch.Queue(sql, organizations, records)
 	}
+}
+
+func queueRecordCanonicalObservations(batch *pgx.Batch, organizations, records []string, routingOnly bool) {
+	for _, sql := range queueRecordCanonicalObservationSQL {
+		if routingOnly && sql == markObservedRecordsSQL {
+			sql = markRoutingRecordsSQL
+		} else if !routingOnly && sql == markObservedRecordsSQL {
+			sql = markObservedAndParallelQueueRecordsSQL
+		}
+		batch.Queue(sql, organizations, records)
+	}
+}
+
+func queueRecordStateObservations(batch *pgx.Batch, organizations, records []string) {
+	queueRecordCanonicalObservations(batch, organizations, records, true)
+	queueRecordAggregateObservations(batch, organizations, records, false)
+	queueRecordMetricObservations(batch, organizations, records, false)
+	queueCorpusRecordObservations(batch, organizations, records)
 }
 
 func observeQueueRecords(ctx context.Context, tx pgx.Tx, organizations, records []string) error {
@@ -84,13 +150,15 @@ func observeQueueStateRecords(ctx context.Context, tx pgx.Tx, organizations, rec
 	if len(records) == 0 {
 		return nil
 	}
-	batch := &pgx.Batch{}
-	for _, sql := range recordObservationSQL {
-		if sql == markObservedRecordsSQL {
-			sql = markRoutingRecordsSQL
-		}
-		batch.Queue(sql, organizations, records)
+	var parallel bool
+	if err := tx.QueryRow(ctx, `SELECT `+parallelJournalSQL).Scan(&parallel); err != nil {
+		return err
 	}
+	if parallel {
+		return reconcileParallelQueueKeys(ctx, tx, organizations, records)
+	}
+	batch := &pgx.Batch{}
+	queueRecordStateObservations(batch, organizations, records)
 	return tx.SendBatch(ctx, batch).Close()
 }
 

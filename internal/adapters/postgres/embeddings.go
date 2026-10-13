@@ -246,6 +246,9 @@ func prepareEnrichment(ctx context.Context, tx pgx.Tx, org string, seg content.S
 	if err = lockProjectionRouting(ctx, tx); err != nil {
 		return nil, err
 	}
+	if err = lockJournalVersion(ctx, tx, org, seg.VersionID); err != nil {
+		return nil, err
+	}
 	if err = read(false); err != nil {
 		return nil, err
 	}

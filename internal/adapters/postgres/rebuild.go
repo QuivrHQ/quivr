@@ -308,7 +308,7 @@ func (s RebuildStore) activateRebuildAttempt(ctx context.Context, org, id string
 	// The exclusive routing fence drains every canonical coverage writer;
 	// acquire it without queueing behind ongoing preparation.
 	var acquired bool
-	if err = tx.QueryRow(ctx, `SELECT pg_try_advisory_xact_lock($1)`, projectionRoutingLock).Scan(&acquired); err != nil || !acquired {
+	if err = tx.QueryRow(ctx, `WITH mode AS MATERIALIZED (SELECT pg_try_advisory_xact_lock_shared($2) AS acquired) SELECT CASE WHEN acquired THEN pg_try_advisory_xact_lock($1) ELSE false END FROM mode`, projectionRoutingLock, journalModeLock).Scan(&acquired); err != nil || !acquired {
 		return false, err
 	}
 	if err = lockJournal(ctx, tx, org); err != nil {

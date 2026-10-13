@@ -16,7 +16,7 @@ In the [release image](/run-quivr/deploy#run-the-image), mount the file read-onl
 | `queue_observation` | no | Shared backlog refresh pacing. `queue_observation.refresh_interval` is a Go duration from `1s` to `60s`, default `15s`. Use the same value in every API and worker process. |
 | `corpus_stats` | no | `bootstrap_enabled` (`corpus_stats.bootstrap_enabled`) is a boolean, default `false`. Enable resumable initialization of historical document totals only after every previous API and worker has stopped; see [Initialize document totals](/run-quivr/upgrade-quivr#initialize-document-totals). |
 | `database_url` | yes | PostgreSQL connection URL, such as `postgres://quivr:…@db:5432/quivr?sslmode=verify-full` |
-| `postgres` | no | Connection pool sizing per process. See [PostgreSQL connections](#postgresql-connections). |
+| `postgres` | no | Connection pool sizing and transaction lifetime per process. See [PostgreSQL connections](#postgresql-connections). |
 | `cursor_key` | yes | A secret of at least 32 bytes that signs change-feed cursors. Keep it stable. |
 | `keys` | yes | The API keys, by bearer token. See [API keys](#api-keys). |
 | `temporal_address` | yes | Temporal's frontend address, such as `temporal:7233` |
@@ -78,6 +78,16 @@ For example, a configuration fragment with a pool of 16 connections:
 ```json
 {"postgres": {"max_connections": 16}}
 ```
+
+`postgres.transaction_timeout` bounds every engine database transaction from `BEGIN`.
+The default is `30s`; a positive Go duration of at least `1ms` is required, up to
+PostgreSQL's signed 32-bit millisecond limit. It overrides the URL setting and
+applies to API, worker, migration, journal and storage commands on PostgreSQL 17
+or later. Restart processes after changing it. A timeout closes the database
+session; retry an ambiguous command with its original idempotency key. Parallel
+change publication normally waits at most the longest limit across replicas plus
+two 100 ms publisher polls. Other clients and prepared transactions can hold its
+horizon longer; inspect [journal status](/run-quivr/upgrade-quivr#enable-parallel-imports).
 
 Set PostgreSQL's server `max_connections` so usable connections cover the sum of
 pool sizes across **all replicas**, other clients and deployment headroom.

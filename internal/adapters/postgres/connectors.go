@@ -172,6 +172,9 @@ func (s ConnectorStore) createConnectorAttempt(ctx context.Context, n connectors
 	if err = lockJournal(ctx, tx, n.Organization); err != nil {
 		return connectors.Instance{}, err
 	}
+	if err = lockJournalRequest(ctx, tx, n.Organization, "connector", n.RequestKey); err != nil {
+		return connectors.Instance{}, err
+	}
 	var existing string
 	var digest []byte
 	err = tx.QueryRow(ctx, "SELECT id,request_digest FROM connector_instances WHERE organization=$1 AND request_key=$2", n.Organization, n.RequestKey).Scan(&existing, &digest)

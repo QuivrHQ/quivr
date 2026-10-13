@@ -101,6 +101,14 @@ func (s DeliveryStore) admitAttempt(ctx context.Context, w monitoring.DeliveryWo
 	if err = lockJournal(ctx, tx, org); err != nil {
 		return monitoring.AdmittedAttempt{}, "", err
 	}
+	locks := &pgx.Batch{}
+	queueDeliveryResourceLocks(locks, org, []string{w.DeliveryID})
+	if err = tx.SendBatch(ctx, locks).Close(); err != nil {
+		return monitoring.AdmittedAttempt{}, "", err
+	}
+	if err = requirePublishedDeliveries(ctx, tx, org, []string{w.DeliveryID}); err != nil {
+		return monitoring.AdmittedAttempt{}, "", err
+	}
 	// Fence stale claims: a step that outlived its lease must not admit work
 	// another worker now holds or that an outcome already parked.
 	var held bool
@@ -210,6 +218,12 @@ func (s DeliveryStore) recordAttempt(ctx context.Context, a monitoring.AdmittedA
 	}
 	defer tx.Rollback(ctx)
 	if err = lockJournal(ctx, tx, org); err != nil {
+		return err
+	}
+	if _, err = tx.Exec(ctx, `SELECT delivery_id FROM delivery_outbox WHERE organization=$1 AND delivery_id=$2 FOR UPDATE`, org, a.DeliveryID); err != nil {
+		return err
+	}
+	if _, err = tx.Exec(ctx, `SELECT id FROM deliveries WHERE organization=$1 AND id=$2 FOR UPDATE`, org, a.DeliveryID); err != nil {
 		return err
 	}
 	var status any

@@ -1,4 +1,4 @@
-// Package changes exposes the Organization commit-ordered journal as a
+// Package changes exposes the durable journal with stable per-Record order as a
 // resumable public change feed with opaque, scope-bound Change Cursors.
 package changes
 
@@ -59,7 +59,7 @@ type References struct {
 
 // Window is one consistent scan of the journal.
 type Window struct {
-	// Events are the visible events in (after, Through], in commit order.
+	// Events are the visible events in (after, Through], in stable publication order.
 	Events []Event
 	// Through is the last committed position that was fully scanned.
 	Through int64
@@ -68,12 +68,37 @@ type Window struct {
 	// Expired is true when the cursor precedes the pruned watermark, or when
 	// the first position after it is older than retention.
 	Expired bool
+	// Resume is the state to carry to the next read when the journal supports
+	// snapshot-aware starts. Legacy journals leave ResumeSet false.
+	Resume    Resume
+	ResumeSet bool
+	// StartCeiling is the sequence ceiling captured with Resume.StartID. It is
+	// used only to omit the snapshot reference from event cursors after the
+	// start has been fully crossed.
+	StartCeiling int64
+}
+
+// Resume is the state needed to continue a change-feed traversal. Position
+// remains the public numeric position used by v1 cursors; StartID identifies a
+// short-lived, scope-bound snapshot exclusion state when present.
+type Resume struct {
+	Position int64
+	StartID  string
 }
 
 // Journal reads committed positions in one snapshot. It returns at most
 // limit visible events; when more exist, Through is the last returned one.
 type Journal interface {
 	ReadChanges(ctx context.Context, organization, corpusID string, after int64, limit int, retention time.Duration) (Window, error)
+}
+
+// SnapshotJournal adds exact start-now and resume support without changing the
+// legacy Journal contract. In-memory and other lightweight Journal fakes can
+// continue to implement only ReadChanges.
+type SnapshotJournal interface {
+	Journal
+	StartChanges(ctx context.Context, organization, corpusID string, retention time.Duration) (Resume, error)
+	ReadChangesResume(ctx context.Context, organization, corpusID string, resume Resume, limit int, retention time.Duration) (Window, error)
 }
 
 // Change is an Event paired with the cursor that resumes after it.
@@ -88,6 +113,7 @@ type Page struct {
 	Next     string
 	Position int64
 	HasMore  bool
+	Resume   Resume
 }
 
 // Service reads the journal for one authorized Corpus.
@@ -101,41 +127,49 @@ type Service struct {
 // Start resolves an optional cursor to a position. An empty cursor means start
 // now at the committed head. Expiry of a supplied cursor is detected here, so
 // transports can reject it before a stream begins.
-func (s Service) Start(ctx context.Context, scope corpus.Scope, corpusID, token string) (int64, error) {
+func (s Service) Start(ctx context.Context, scope corpus.Scope, corpusID, token string) (Resume, error) {
 
 	if err := scope.Require(corpus.ActionChangesStart); err != nil {
-		return 0, err
+		return Resume{}, err
 	}
 	if err := s.authorize(ctx, scope, corpusID); err != nil {
-		return 0, err
+		return Resume{}, err
 	}
 	return s.start(ctx, scope, corpusID, token)
 }
 
-func (s Service) start(ctx context.Context, scope corpus.Scope, corpusID, token string) (int64, error) {
+func (s Service) start(ctx context.Context, scope corpus.Scope, corpusID, token string) (Resume, error) {
 	if token == "" {
+		if snapshot, ok := s.Journal.(SnapshotJournal); ok {
+			return snapshot.StartChanges(ctx, scope.Organization, corpusID, s.retention())
+		}
 		w, err := s.Journal.ReadChanges(ctx, scope.Organization, corpusID, 0, 0, s.retention())
-		return w.Head, err
+		return Resume{Position: w.Head}, err
 	}
-	position, err := s.decode(scope, corpusID, token)
+	resume, err := s.decode(scope, corpusID, token)
 	if err != nil {
-		return 0, err
+		return Resume{}, err
 	}
-	w, err := s.Journal.ReadChanges(ctx, scope.Organization, corpusID, position, 0, s.retention())
+	w, err := s.readWindow(ctx, scope, corpusID, resume, 0)
 	if err != nil {
-		return 0, err
-	}
-	if position > w.Head {
-		return 0, ErrCursorInvalid
+		return Resume{}, err
 	}
 	if w.Expired {
-		return 0, ErrCursorExpired
+		return Resume{}, ErrCursorExpired
 	}
-	return position, nil
+	if resume.Position > w.Head {
+		return Resume{}, ErrCursorInvalid
+	}
+	if w.ResumeSet {
+		resume = w.Resume
+		resume.Position = w.Through
+	}
+	return resume, nil
 }
 
-// Read returns up to limit visible changes after position.
-func (s Service) Read(ctx context.Context, scope corpus.Scope, corpusID string, position int64, limit int) (Page, error) {
+// Read returns up to limit visible changes after a resume state. An int64 is
+// also accepted for callers that still hold a v1 numeric position.
+func (s Service) Read(ctx context.Context, scope corpus.Scope, corpusID string, position any, limit int) (Page, error) {
 
 	if err := scope.Require(corpus.ActionChangesRead); err != nil {
 		return Page{}, err
@@ -143,30 +177,53 @@ func (s Service) Read(ctx context.Context, scope corpus.Scope, corpusID string, 
 	if err := s.authorize(ctx, scope, corpusID); err != nil {
 		return Page{}, err
 	}
-	return s.read(ctx, scope, corpusID, position, limit)
-}
-
-func (s Service) read(ctx context.Context, scope corpus.Scope, corpusID string, position int64, limit int) (Page, error) {
-	w, err := s.Journal.ReadChanges(ctx, scope.Organization, corpusID, position, limit, s.retention())
+	resume, err := asResume(position)
 	if err != nil {
 		return Page{}, err
 	}
-	if position > w.Head {
-		return Page{}, ErrCursorInvalid
+	return s.read(ctx, scope, corpusID, resume, limit)
+}
+
+func (s Service) readWindow(ctx context.Context, scope corpus.Scope, corpusID string, resume Resume, limit int) (Window, error) {
+	if snapshot, ok := s.Journal.(SnapshotJournal); ok {
+		return snapshot.ReadChangesResume(ctx, scope.Organization, corpusID, resume, limit, s.retention())
+	}
+	return s.Journal.ReadChanges(ctx, scope.Organization, corpusID, resume.Position, limit, s.retention())
+}
+
+func (s Service) read(ctx context.Context, scope corpus.Scope, corpusID string, resume Resume, limit int) (Page, error) {
+	w, err := s.readWindow(ctx, scope, corpusID, resume, limit)
+	if err != nil {
+		return Page{}, err
 	}
 	if w.Expired {
 		return Page{}, ErrCursorExpired
 	}
-	page := Page{Items: make([]Change, 0, len(w.Events)), Position: w.Through, HasMore: w.Through < w.Head}
-	for _, e := range w.Events {
-		page.Items = append(page.Items, Change{Event: e, Cursor: s.Cursor(scope, corpusID, e.Position)})
+	if resume.Position > w.Head {
+		return Page{}, ErrCursorInvalid
 	}
-	page.Next = s.Cursor(scope, corpusID, w.Through)
+	next := Resume{Position: w.Through, StartID: resume.StartID}
+	if w.ResumeSet {
+		next = w.Resume
+		next.Position = w.Through
+	}
+	page := Page{Items: make([]Change, 0, len(w.Events)), Position: w.Through, HasMore: w.Through < w.Head, Resume: next}
+	for _, e := range w.Events {
+		eventResume := Resume{Position: e.Position, StartID: resume.StartID}
+		if w.ResumeSet {
+			eventResume.StartID = w.Resume.StartID
+			if resume.StartID != "" && w.StartCeiling > 0 && e.Position < w.StartCeiling {
+				eventResume.StartID = resume.StartID
+			}
+		}
+		page.Items = append(page.Items, Change{Event: e, Cursor: s.CursorResume(scope, corpusID, eventResume)})
+	}
+	page.Next = s.CursorResume(scope, corpusID, next)
 	return page, nil
 }
 
 // Poll implements start-now polling: without a cursor it returns no events
-// and the committed head as the next cursor.
+// and the exact start-now boundary as the next cursor.
 func (s Service) Poll(ctx context.Context, scope corpus.Scope, corpusID, token string, limit int, prepare ...func() (int, error)) (Page, error) {
 
 	if err := scope.Require(corpus.ActionChangesPoll); err != nil {
@@ -187,17 +244,17 @@ func (s Service) Poll(ctx context.Context, scope corpus.Scope, corpusID, token s
 
 func (s Service) poll(ctx context.Context, scope corpus.Scope, corpusID, token string, limit int) (Page, error) {
 	if token == "" {
-		position, err := s.start(ctx, scope, corpusID, "")
+		resume, err := s.start(ctx, scope, corpusID, "")
 		if err != nil {
 			return Page{}, err
 		}
-		return Page{Items: []Change{}, Next: s.Cursor(scope, corpusID, position), Position: position}, nil
+		return Page{Items: []Change{}, Next: s.CursorResume(scope, corpusID, resume), Position: resume.Position, Resume: resume}, nil
 	}
-	position, err := s.decode(scope, corpusID, token)
+	resume, err := s.decode(scope, corpusID, token)
 	if err != nil {
 		return Page{}, err
 	}
-	return s.read(ctx, scope, corpusID, position, limit)
+	return s.read(ctx, scope, corpusID, resume, limit)
 }
 
 type cursorPayload struct {
@@ -205,29 +262,67 @@ type cursorPayload struct {
 	Corpus   string `json:"c"`
 	Scope    string `json:"s"`
 	Position int64  `json:"p"`
+	StartID  string `json:"r,omitempty"`
 }
 
 // Cursor encodes an opaque Change Cursor bound to scope and Corpus.
 func (s Service) Cursor(scope corpus.Scope, corpusID string, position int64) string {
-	b, _ := json.Marshal(cursorPayload{1, corpusID, digest(scope), position})
+	return s.CursorResume(scope, corpusID, Resume{Position: position})
+}
+
+// CursorResume encodes a cursor with optional snapshot-aware start state. A
+// resume without StartID keeps the original v1 payload shape and signature.
+func (s Service) CursorResume(scope corpus.Scope, corpusID string, resume Resume) string {
+	version := 1
+	if resume.StartID != "" {
+		version = 2
+	}
+	b, _ := json.Marshal(cursorPayload{Version: version, Corpus: corpusID, Scope: digest(scope), Position: resume.Position, StartID: resume.StartID})
 	return base64.RawURLEncoding.EncodeToString(b) + "." + base64.RawURLEncoding.EncodeToString(s.sign(b))
 }
 
-func (s Service) decode(scope corpus.Scope, corpusID, token string) (int64, error) {
+func (s Service) decode(scope corpus.Scope, corpusID, token string) (Resume, error) {
 	parts := strings.Split(token, ".")
 	if len(parts) != 2 {
-		return 0, ErrCursorInvalid
+		return Resume{}, ErrCursorInvalid
 	}
 	b, e1 := base64.RawURLEncoding.DecodeString(parts[0])
 	sig, e2 := base64.RawURLEncoding.DecodeString(parts[1])
 	var c cursorPayload
-	if e1 != nil || e2 != nil || !hmac.Equal(sig, s.sign(b)) || json.Unmarshal(b, &c) != nil || c.Version != 1 || c.Position < 0 {
-		return 0, ErrCursorInvalid
+	if e1 != nil || e2 != nil || !hmac.Equal(sig, s.sign(b)) || json.Unmarshal(b, &c) != nil || (c.Version != 1 && c.Version != 2) || (c.Version == 1 && c.StartID != "") || c.Position < 0 {
+		return Resume{}, ErrCursorInvalid
 	}
 	if c.Corpus != corpusID || c.Scope != digest(scope) {
-		return 0, ErrCursorScope
+		return Resume{}, ErrCursorScope
 	}
-	return c.Position, nil
+	return Resume{Position: c.Position, StartID: c.StartID}, nil
+}
+
+func asResume(value any) (Resume, error) {
+	switch v := value.(type) {
+	case Resume:
+		if v.Position < 0 {
+			return Resume{}, ErrCursorInvalid
+		}
+		return v, nil
+	case *Resume:
+		if v == nil || v.Position < 0 {
+			return Resume{}, ErrCursorInvalid
+		}
+		return *v, nil
+	case int64:
+		if v < 0 {
+			return Resume{}, ErrCursorInvalid
+		}
+		return Resume{Position: v}, nil
+	case int:
+		if v < 0 {
+			return Resume{}, ErrCursorInvalid
+		}
+		return Resume{Position: int64(v)}, nil
+	default:
+		return Resume{}, ErrCursorInvalid
+	}
 }
 
 func (s Service) sign(b []byte) []byte {

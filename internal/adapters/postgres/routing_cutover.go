@@ -105,7 +105,7 @@ func (s RoutingStore) cutoverRouting(ctx context.Context, tx pgx.Tx, w *routingW
 	w.publishCtx, w.publishCancel = context.WithTimeout(ctx, 50*time.Millisecond)
 	ctx = w.publishCtx
 	var acquired bool
-	if err := tx.QueryRow(ctx, `SELECT pg_try_advisory_xact_lock($1)`, projectionRoutingLock).Scan(&acquired); err != nil {
+	if err := tx.QueryRow(ctx, `WITH mode AS MATERIALIZED (SELECT pg_try_advisory_xact_lock_shared($2) AS acquired) SELECT CASE WHEN acquired THEN pg_try_advisory_xact_lock($1) ELSE false END FROM mode`, projectionRoutingLock, journalModeLock).Scan(&acquired); err != nil {
 		return false, err
 	}
 	if !acquired {

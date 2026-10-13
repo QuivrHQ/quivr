@@ -98,6 +98,9 @@ func (s OperationStore) acceptCommandAttempt(ctx context.Context, org, kind, cor
 	if !exists {
 		return operations.Operation{}, corpus.ErrNotFound
 	}
+	if err = lockJournalRequest(ctx, tx, org, "operation", content.StableID("request", kind, corpusID, key)); err != nil {
+		return operations.Operation{}, err
+	}
 	var id string
 	var previous []byte
 	err = tx.QueryRow(ctx, `SELECT id,canonical_request FROM operations WHERE organization=$1 AND kind=$2 AND corpus_id=$3 AND request_key=$4 AND previous_operation_id IS NULL`, org, kind, corpusID, key).Scan(&id, &previous)

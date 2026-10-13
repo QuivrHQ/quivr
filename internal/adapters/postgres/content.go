@@ -24,9 +24,10 @@ func lockJournal(ctx context.Context, tx pgx.Tx, org string) error {
 
 func journalBatch(org string) *pgx.Batch {
 	batch := &pgx.Batch{}
-	batch.Queue("SELECT pg_advisory_xact_lock_shared($1)", projectionRoutingLock)
-	batch.Queue("INSERT INTO organization_journals(organization) VALUES($1) ON CONFLICT DO NOTHING", org)
-	batch.Queue("SELECT last_sequence FROM organization_journals WHERE organization=$1 FOR UPDATE", org)
+	batch.Queue(`WITH mode AS MATERIALIZED (SELECT pg_advisory_xact_lock_shared($2))
+ SELECT pg_advisory_xact_lock_shared($1) FROM mode`, projectionRoutingLock, journalModeLock)
+	batch.Queue(`INSERT INTO organization_journals(organization) SELECT $1 WHERE NOT `+parallelJournalSQL+` ON CONFLICT DO NOTHING`, org)
+	batch.Queue(`SELECT last_sequence FROM organization_journals WHERE organization=$1 AND NOT `+parallelJournalSQL+` FOR UPDATE`, org)
 	return batch
 }
 
@@ -74,11 +75,17 @@ func appendEvent(ctx context.Context, tx pgx.Tx, event eventInput) error {
 }
 
 // appendEventAt appends one event and returns its journal position. Callers
-// hold the Organization journal lock, so positions commit in order.
-const appendEventSQL = `WITH position AS (
-UPDATE organization_journals SET last_sequence=last_sequence+1 WHERE organization=$1 RETURNING last_sequence
-) INSERT INTO change_events(organization,sequence,event_id,corpus_id,event_type,resource_type,resource_id,record_version_id,trace_context)
-SELECT $1,last_sequence,$2,$3,$4,$5,$6,NULLIF($7,''),$8 FROM position RETURNING sequence`
+// hold the scoped canonical fence; parallel positions become visible only
+// through the publisher's complete prefix.
+const appendEventSQL = `WITH mode AS MATERIALIZED (SELECT ` + parallelJournalSQL + ` AS parallel),
+ writer AS MATERIALIZED (SELECT pg_current_xact_id() AS xid FROM mode WHERE parallel),
+ legacy AS (UPDATE organization_journals SET last_sequence=last_sequence+1
+ WHERE organization=$1 AND NOT (SELECT parallel FROM mode) RETURNING last_sequence),
+ position AS (
+ SELECT last_sequence AS sequence,NULL::xid8 AS xid FROM legacy
+ UNION ALL SELECT nextval('change_event_positions'),xid FROM writer
+ ) INSERT INTO change_events(organization,sequence,event_id,corpus_id,event_type,resource_type,resource_id,record_version_id,trace_context,writer_xid)
+ SELECT $1,sequence,$2,$3,$4,$5,$6,NULLIF($7,''),$8,xid FROM position RETURNING sequence`
 
 func eventArguments(ctx context.Context, event eventInput) []any {
 	return []any{event.Organization, eventID(event), event.CorpusID, event.Kind, event.Resource, event.ResourceID, event.VersionID, telemetry.Encode(ctx)}
@@ -229,6 +236,9 @@ func preparePublication(ctx context.Context, tx pgx.Tx, w content.Work, publicat
 		return tx.QueryRow(ctx, guard, args...).Scan(&state, &reserved, &withdrawn, &exists)
 	}
 	if err = lockProjectionRouting(ctx, tx); err != nil {
+		return nil, err
+	}
+	if err = lockJournalRecord(ctx, tx, w.Organization, w.RecordID); err != nil {
 		return nil, err
 	}
 	if err = read(false); err != nil {

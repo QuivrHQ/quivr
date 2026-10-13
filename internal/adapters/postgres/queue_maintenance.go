@@ -29,6 +29,9 @@ func (s QueueSnapshots) Maintain(ctx context.Context) (more bool, err error) {
 			return false, err
 		},
 		func(ctx context.Context, tx pgx.Tx) (bool, error) {
+			return advanceParallelQueueObservations(ctx, tx, queueMaintenancePage)
+		},
+		func(ctx context.Context, tx pgx.Tx) (bool, error) {
 			if err := advanceQueueObservations(ctx, tx, queueMaintenancePage); err != nil {
 				return false, err
 			}

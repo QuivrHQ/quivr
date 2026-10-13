@@ -211,6 +211,7 @@ type Command struct {
 var Commands = []Command{
 	{Name: "api", Summary: "Serve the public HTTP API until interrupted."},
 	{Name: "worker", Summary: "Run the background work that processes content, pulls connectors and delivers events, until interrupted."},
+	{Name: "journal", Summary: "Inspect change publication and explicitly switch its deployment-wide mode."},
 	{Name: "storage", Summary: "Check PostgreSQL schema readiness and report compact storage."},
 	{Name: "migrate", Summary: "Prepare PostgreSQL, object storage and the search projections, then exit. Rerun it to finish a step whose dependency was not ready."},
 }
@@ -235,7 +236,7 @@ func isCommand(name string) bool {
 
 func Run(command string, args ...string) error {
 	contract := command == "migrate" && len(args) == 1 && args[0] == "--contract"
-	if len(args) != 0 && !contract && command != "storage" {
+	if len(args) != 0 && !contract && command != "storage" && command != "journal" {
 		return errors.New(engineUsage())
 	}
 	if !isCommand(command) {
@@ -263,6 +264,9 @@ func Run(command string, args ...string) error {
 	}
 	if err = decoder.Decode(new(any)); err != io.EOF {
 		return badConfig(configInvalid, ConfigEnv, "invalid configuration JSON: expected a single object")
+	}
+	if command == "journal" {
+		return runJournal(cfg, args, os.Stdout)
 	}
 	if command == "storage" {
 		return runStorage(cfg, args, os.Stdout)
@@ -652,6 +656,11 @@ func Run(command string, args ...string) error {
 	}
 	indexes := &IndexMaintenance{Pool: pool}
 	loops.Go(indexes.Run)
+	publication := postgres.JournalStore{Pool: pool}
+	if err := publication.Initialize(ctx); err != nil {
+		return fmt.Errorf("journal bridge: %w", err)
+	}
+	loops.Go(publication.Run)
 	if cfg.CorpusStats.BootstrapEnabled {
 		loops.Go(func(ctx context.Context) {
 			stats := postgres.CorpusStatsStore{Pool: pool}

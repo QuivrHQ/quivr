@@ -1,17 +1,21 @@
 package postgres
 
+import "github.com/jackc/pgx/v5"
+
 // Queue memberships are derived from the affected Records after their canonical
 // writes. Separate statements take a fresh snapshot after observation/counter
 // locks; the existing journal batch supplies both arguments and deduplicates work.
 var queueRecordObservationSQL = []string{
 	`INSERT INTO queue_backlog_totals(stripe,queue)
- SELECT DISTINCT (hashtextextended(o,0)&63)::integer AS stripe,q
- FROM unnest($1::text[],$2::text[]) orgs(o,r) CROSS JOIN (VALUES('live'),('bulk')) queues(q)
- ORDER BY stripe,q ON CONFLICT DO NOTHING`,
+	 SELECT DISTINCT (hashtextextended(o,0)&63)::integer AS stripe,q
+	 FROM unnest($1::text[],$2::text[]) orgs(o,r) CROSS JOIN (VALUES('live'),('bulk')) queues(q)
+	 WHERE NOT ` + parallelJournalSQL + `
+	 ORDER BY stripe,q ON CONFLICT DO NOTHING`,
 	`SELECT stripe FROM queue_backlog_totals
- WHERE stripe IN (SELECT DISTINCT (hashtextextended(o,0)&63)::integer FROM unnest($1::text[],$2::text[]) orgs(o,r))
- ORDER BY stripe,queue FOR UPDATE`,
-	`WITH keys AS MATERIALIZED (SELECT DISTINCT o AS organization,r AS record_id FROM unnest($1::text[],$2::text[]) k(o,r)),
+	 WHERE stripe IN (SELECT DISTINCT (hashtextextended(o,0)&63)::integer FROM unnest($1::text[],$2::text[]) orgs(o,r))
+	 AND NOT ` + parallelJournalSQL + `
+	 ORDER BY stripe,queue FOR UPDATE`,
+	`WITH keys AS MATERIALIZED (SELECT DISTINCT o AS organization,r AS record_id FROM unnest($1::text[],$2::text[]) k(o,r) WHERE NOT ` + parallelJournalSQL + `),
  eligible AS MATERIALIZED (
   SELECT k.* FROM keys k JOIN LATERAL (
    SELECT withdrawn FROM records WHERE (organization,id)=(k.organization,k.record_id) OFFSET 0
@@ -98,4 +102,13 @@ old_counts AS (
   ready_at=EXCLUDED.ready_at,ready=EXCLUDED.ready
  WHERE (queue_backlog_documents.record_id,queue_backlog_documents.admitted_at,queue_backlog_documents.ingestion,queue_backlog_documents.ready_at,queue_backlog_documents.ready)
  IS DISTINCT FROM (EXCLUDED.record_id,EXCLUDED.admitted_at,EXCLUDED.ingestion,EXCLUDED.ready_at,EXCLUDED.ready) RETURNING document_id) SELECT 1`,
+}
+
+func queueRecordAggregateObservations(batch *pgx.Batch, organizations, records []string, force bool) {
+	for _, sql := range queueRecordObservationSQL {
+		if force {
+			sql = forceParallelQueueSQL(sql)
+		}
+		batch.Queue(sql, organizations, records)
+	}
 }

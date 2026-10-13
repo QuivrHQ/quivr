@@ -18,6 +18,9 @@ import (
 // returns the resource of an identical earlier command, or "" when this
 // command is new. Callers hold the Organization journal lock.
 func claimRequest(ctx context.Context, tx pgx.Tx, org, family, key string, canonical []byte, resourceID string) (string, error) {
+	if err := lockJournalRequest(ctx, tx, org, family, key); err != nil {
+		return "", err
+	}
 	var previous []byte
 	var existing string
 	err := tx.QueryRow(ctx, "SELECT canonical_request,resource_id FROM monitoring_requests WHERE organization=$1 AND route_family=$2 AND request_key=$3", org, family, key).Scan(&previous, &existing)
@@ -126,7 +129,7 @@ func (s MonitoringStore) CreateSavedQuery(ctx context.Context, org string, in mo
 func (s MonitoringStore) SavedQuery(ctx context.Context, org, id string) (monitoring.SavedQuery, error) {
 	q := monitoring.SavedQuery{}
 	var definition, vectors []byte
-	err := database(ctx, s.Pool).QueryRow(ctx, `SELECT q.id,q.name,q.deleted,v.id,v.definition,v.query_vectors FROM saved_queries q JOIN saved_query_versions v ON v.organization=q.organization AND v.id=q.current_version_id WHERE q.organization=$1 AND q.id=$2`, org, id).Scan(&q.ID, &q.Name, &q.Deleted, &q.Current.VersionID, &definition, &vectors)
+	err := database(ctx, s.Pool).QueryRow(ctx, `SELECT q.id,q.name,q.deleted,v.id,v.definition,v.query_vectors FROM saved_queries q JOIN saved_query_versions v ON v.organization=q.organization AND v.id=q.current_version_id WHERE q.organization=$1 AND q.id=$2 FOR UPDATE OF q`, org, id).Scan(&q.ID, &q.Name, &q.Deleted, &q.Current.VersionID, &definition, &vectors)
 	if errors.Is(err, pgx.ErrNoRows) {
 		return q, monitoring.ErrNotFound
 	}
@@ -177,7 +180,7 @@ func (s MonitoringStore) CreateSavedQueryVersion(ctx context.Context, org, id st
 	existing, err := s.monitoringCommand(ctx, org, "saved_query_versions", in.Key, canonical, versionID, func(tx pgx.Tx) error {
 		var deleted bool
 		var previous []string
-		err := tx.QueryRow(ctx, `SELECT q.deleted,v.corpus_ids FROM saved_queries q JOIN saved_query_versions v ON (v.organization,v.id)=(q.organization,q.current_version_id) WHERE q.organization=$1 AND q.id=$2`, org, id).Scan(&deleted, &previous)
+		err := tx.QueryRow(ctx, `SELECT q.deleted,v.corpus_ids FROM saved_queries q JOIN saved_query_versions v ON (v.organization,v.id)=(q.organization,q.current_version_id) WHERE q.organization=$1 AND q.id=$2 FOR UPDATE OF q`, org, id).Scan(&deleted, &previous)
 		if errors.Is(err, pgx.ErrNoRows) {
 			return monitoring.ErrNotFound
 		}
@@ -239,7 +242,7 @@ func (s MonitoringStore) DeleteSavedQuery(ctx context.Context, org, key, id stri
 		var corpora []string
 		err := tx.QueryRow(ctx, `SELECT q.deleted,v.corpus_ids,
   EXISTS(SELECT 1 FROM subscriptions s JOIN subscription_versions sv ON (sv.organization,sv.id)=(s.organization,s.current_version_id) WHERE s.organization=q.organization AND sv.saved_query_id=q.id AND NOT s.deleted)
-FROM saved_queries q JOIN saved_query_versions v ON (v.organization,v.id)=(q.organization,q.current_version_id) WHERE q.organization=$1 AND q.id=$2`, org, id).Scan(&deleted, &corpora, &used)
+FROM saved_queries q JOIN saved_query_versions v ON (v.organization,v.id)=(q.organization,q.current_version_id) WHERE q.organization=$1 AND q.id=$2 FOR UPDATE OF q`, org, id).Scan(&deleted, &corpora, &used)
 		if errors.Is(err, pgx.ErrNoRows) {
 			return monitoring.ErrNotFound
 		}
@@ -269,7 +272,7 @@ func (s MonitoringStore) RenameSavedQuery(ctx context.Context, org, key, id, nam
 		var deleted bool
 		var current string
 		var corpora []string
-		err := tx.QueryRow(ctx, `SELECT q.deleted,q.name,v.corpus_ids FROM saved_queries q JOIN saved_query_versions v ON (v.organization,v.id)=(q.organization,q.current_version_id) WHERE q.organization=$1 AND q.id=$2`, org, id).Scan(&deleted, &current, &corpora)
+		err := tx.QueryRow(ctx, `SELECT q.deleted,q.name,v.corpus_ids FROM saved_queries q JOIN saved_query_versions v ON (v.organization,v.id)=(q.organization,q.current_version_id) WHERE q.organization=$1 AND q.id=$2 FOR UPDATE OF q`, org, id).Scan(&deleted, &current, &corpora)
 		if errors.Is(err, pgx.ErrNoRows) {
 			return monitoring.ErrNotFound
 		}
@@ -297,6 +300,9 @@ func (s MonitoringStore) RenameSavedQuery(ctx context.Context, org, key, id, nam
 // pinnableQuery checks, under the journal lock, that a new Subscription
 // Version may pin query: its Saved Query is not deleted and query is current.
 func pinnableQuery(ctx context.Context, tx pgx.Tx, org string, query monitoring.SavedQueryVersion) error {
+	if _, err := tx.Exec(ctx, `SELECT id FROM saved_queries WHERE organization=$1 AND id=$2 FOR SHARE`, org, query.SavedQueryID); err != nil {
+		return err
+	}
 	var deleted bool
 	var current string
 	err := tx.QueryRow(ctx, `SELECT deleted,current_version_id FROM saved_queries WHERE organization=$1 AND id=$2`, org, query.SavedQueryID).Scan(&deleted, &current)
