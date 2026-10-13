@@ -14,6 +14,8 @@ import (
 	"github.com/The-Vibe-Company/quivr/internal/uploads"
 	"github.com/aws/aws-sdk-go-v2/aws"
 	awss3 "github.com/aws/aws-sdk-go-v2/service/s3"
+	"github.com/aws/aws-sdk-go-v2/service/s3/types"
+	smithyhttp "github.com/aws/smithy-go/transport/http"
 )
 
 // PresignPut issues a single presigned PUT capability and the exact headers the
@@ -50,11 +52,37 @@ func (s *Store) PresignPut(ctx context.Context, objectKey string, size int64, sh
 	return request.URL, headers, nil
 }
 
-// Verify proves read-after-write: the stored bytes match the expected length and
-// digest. A mismatch is terminal; an unavailable object is retryable.
+// Verify proves the stored length and digest. A store-validated full-object
+// checksum avoids downloading the payload; legacy objects and stores without
+// checksum HEAD support retain bounded streaming verification. A mismatch is
+// terminal; an unavailable object is retryable.
 func (s *Store) Verify(ctx context.Context, objectKey string, size int64, sha256hex string) error {
 	if size < 1 || size > uploads.MaxUploadBytes {
 		return errors.New("unsupported transfer size")
+	}
+	head, err := s.client.HeadObject(ctx, &awss3.HeadObjectInput{
+		Bucket: aws.String(s.bucket), Key: aws.String(objectKey), ChecksumMode: types.ChecksumModeEnabled,
+	})
+	if err != nil {
+		// Some compatible stores reject checksum mode or do not implement HEAD.
+		// Other failures (missing objects, access denial, outages) stay retryable.
+		var response *smithyhttp.ResponseError
+		if !errors.As(err, &response) || (response.HTTPStatusCode() != 400 && response.HTTPStatusCode() != 405 && response.HTTPStatusCode() != 501) {
+			return errors.New("transferred object unavailable")
+		}
+	} else {
+		if head.ContentLength != nil && *head.ContentLength != size {
+			return fmt.Errorf("transferred size does not match expectation: %w", uploads.ErrVerificationMismatch)
+		}
+		checksum := aws.ToString(head.ChecksumSHA256)
+		// Multipart SHA-256 is composite, not a digest of the complete byte stream.
+		if head.ContentLength != nil && checksum != "" && head.ChecksumType != types.ChecksumTypeComposite && !strings.Contains(checksum, "-") {
+			digest, decodeErr := base64.StdEncoding.DecodeString(checksum)
+			if decodeErr != nil || len(digest) != sha256.Size || hex.EncodeToString(digest) != sha256hex {
+				return fmt.Errorf("transferred checksum does not match expectation: %w", uploads.ErrVerificationMismatch)
+			}
+			return nil
+		}
 	}
 	object, err := s.client.GetObject(ctx, &awss3.GetObjectInput{Bucket: aws.String(s.bucket), Key: aws.String(objectKey)})
 	if err != nil {
