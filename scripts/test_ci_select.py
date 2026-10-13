@@ -13,6 +13,25 @@ import ci_select
 
 
 class Selection(unittest.TestCase):
+    def test_scan_database_survives_failed_only_rerun_and_isolates_runs(self):
+        producer = yaml.safe_load((ci_select.ROOT / '.github/actions/grype-database/action.yml').read_text())
+        consumer = yaml.safe_load((ci_select.ROOT / '.github/actions/grype-database-restore/action.yml').read_text())
+        save = next(step['with'] for step in producer['runs']['steps'] if step.get('uses', '').startswith('actions/cache/save@'))
+        restore = next(step['with'] for step in consumer['runs']['steps'] if step.get('uses', '').startswith('actions/cache/restore@'))
+
+        def key(template, run, attempt):
+            values = {'github.run_id': str(run), 'github.run_attempt': str(attempt)}
+            return re.sub(r'\$\{\{\s*(.*?)\s*\}\}', lambda match: values[match.group(1)], template)
+
+        # The successful database producer is skipped during a failed-only rerun.
+        saved = {key(save['key'], 41, 1): 'verified database'}
+        for attempt in [1, 2, 3]:
+            with self.subTest(attempt=attempt):
+                self.assertEqual(saved.get(key(restore['key'], 41, attempt)), 'verified database')
+        self.assertNotIn(key(restore['key'], 42, 1), saved)
+        self.assertTrue(restore['fail-on-cache-miss'])
+        self.assertNotIn('restore-keys', restore)
+
     def test_docs_front_eval_and_plugin_select_only_affected_expensive_lanes(self):
         cases = [
             (['docs-site/guides/search.mdx'], [], [], True),
