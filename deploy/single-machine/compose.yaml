@@ -335,7 +335,8 @@
         }
       },
       "networks": [
-        "stack"
+        "stack",
+        "access"
       ],
       "restart": "unless-stopped"
     },
@@ -416,7 +417,8 @@
         }
       },
       "networks": [
-        "stack"
+        "stack",
+        "access"
       ],
       "restart": "unless-stopped"
     }
@@ -424,7 +426,8 @@
   "networks": {
     "stack": {
       "internal": false
-    }
+    },
+    "access": {}
   },
   "volumes": {
     "postgres-data": {

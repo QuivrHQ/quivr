@@ -146,9 +146,13 @@ def stack(images, settings, values, initialized=False):
         service.update(logging=log, networks=['stack'])
         if name != 'migrate':
             service.setdefault('restart', 'unless-stopped')
+    # Docker does not publish host ports for an exclusively internal bridge.
+    # Only API/demo join access; dependencies and inference stay on stack.
+    for name in ('api', 'demo'):
+        services[name]['networks'].append('access')
     return {'name': project, 'x-quivr-model': model, 'x-quivr-model-revision': values.get('QUIVR_MODEL_REVISION', ''),
             'x-quivr-initialized': initialized, 'services': services,
-            'networks': {'stack': {'internal': values.get('QUIVR_OFFLINE', '0') == '1'}},
+            'networks': {'stack': {'internal': values.get('QUIVR_OFFLINE', '0') == '1'}, 'access': {}},
             'volumes': {name: {'name': project + '-' + name} for name in
                 ('postgres-data', 'temporal-data', 'seaweed-data', 'weaviate-data', 'model-cache')}}
 
