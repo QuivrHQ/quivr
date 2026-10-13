@@ -50,7 +50,9 @@ class Selection(unittest.TestCase):
                 self.assertEqual(selected['groups'], ['guards', 'go', 'python', *extra_groups])
                 self.assertEqual(selected['site'], site)
                 if paths[0].startswith('plugins/'):
-                    self.assertEqual([i['plugin'] for i in selected['images']], ['rss'])
+                    self.assertEqual([i.get('component', i['plugin']) for i in selected['images']], ['rss', 'core'])
+                elif paths[0].startswith('quivr-search/'):
+                    self.assertEqual([i['component'] for i in selected['images']], ['web'])
                 else:
                     self.assertEqual(selected['images'], [])
 
@@ -60,8 +62,8 @@ class Selection(unittest.TestCase):
                      'migrations/expansion.sql', 'internal/retrieval/retrieval.go']:
             with self.subTest(path=path):
                 self.assertTrue({'eval-1', 'eval-2', 'eval-3'} <= set(ci_select.select([path])['groups']))
-        self.assertEqual([i['plugin'] for i in ci_select.select(['plugins/rss/quivr-plugin.yaml'])['images']], ['', 'rss'])
-        self.assertEqual([i['plugin'] for i in ci_select.select(['plugins/rss/connector.go'])['images']], ['rss'])
+        self.assertEqual([i.get('component', i['plugin']) for i in ci_select.select(['plugins/rss/quivr-plugin.yaml'])['images']], ['', 'rss', 'core'])
+        self.assertEqual([i.get('component', i['plugin']) for i in ci_select.select(['plugins/rss/connector.go'])['images']], ['rss', 'core'])
         self.assertTrue(ci_select.select(['tests/fixtures/runtime.md'])['full'])
 
     def test_engine_shared_inputs_and_unknown_paths_fail_closed(self):
@@ -132,13 +134,20 @@ class Aggregation(unittest.TestCase):
         needs = {'paths-filter': {'result': 'success', 'outputs': {key: 'false' for key in flags}},
                  'check': {'result': 'success'}, 'adapter-postgres': {'result': 'success'},
                  **{key: {'result': 'skipped'} for key in ['part', 'site', 'migration-compatibility',
-                                                         'vulnerabilities', 'image-inventory', 'image-vulnerabilities']}}
+                                                         'vulnerabilities', 'image-inventory', 'image-vulnerabilities', 'single-machine']}}
         for value, expected in [('false', 0), ('true', 1), ('invalid', 1), (None, 1)]:
             with self.subTest(output=value):
                 needs['paths-filter']['outputs']['has-images'] = value
                 result = subprocess.run(['python3', str(ci_select.ROOT / 'scripts/ci_select.py'), '--aggregate', 'verify'],
                                         env={**os.environ, 'CI_NEEDS': json.dumps(needs)}, capture_output=True)
                 self.assertEqual(result.returncode, expected)
+        needs['paths-filter']['outputs']['has-images'] = 'false'
+        needs['paths-filter']['outputs']['full'] = 'true'
+        for state, expected in [('skipped', 1), ('failure', 1), ('success', 0)]:
+            needs['single-machine']['result'] = state
+            result = subprocess.run(['python3', str(ci_select.ROOT / 'scripts/ci_select.py'), '--aggregate', 'verify'],
+                                    env={**os.environ, 'CI_NEEDS': json.dumps(needs)}, capture_output=True)
+            self.assertEqual(result.returncode, expected)
 
 
 class Workflow(unittest.TestCase):
@@ -314,6 +323,14 @@ class Workflow(unittest.TestCase):
             self.assertIn('paths-filter', workflow['jobs']['adapter-postgres']['needs'])
             for name, job in workflow['jobs'].items():
                 if name == 'paths-filter':
+                    continue
+                if job.get('uses'):
+                    self.assertEqual(job['with']['ref'], '${{ needs.paths-filter.outputs.ref || inputs.ref || github.sha }}')
+                    child = yaml.safe_load((ci_select.ROOT / job['uses'].removeprefix('./')).read_text())
+                    for child_job in child['jobs'].values():
+                        for step in child_job['steps']:
+                            if step.get('uses', '').startswith('actions/checkout@'):
+                                self.assertEqual(step['with']['ref'], '${{ inputs.ref }}')
                     continue
                 for step in job['steps']:
                     if step.get('uses', '').startswith('actions/checkout@'):

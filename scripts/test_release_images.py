@@ -8,6 +8,15 @@ import release_images
 
 
 class ReleaseImagesTests(unittest.TestCase):
+    def test_release_includes_complete_deployment_runtimes(self):
+        result = release_images.inventory(release_images.ROOT, 'example/quivr')['include']
+        components = {entry['component']: entry['image'] for entry in result if entry.get('component')}
+        self.assertEqual(components, {
+            'core': 'ghcr.io/example/quivr-core', 'web': 'ghcr.io/example/quivr-web',
+            'cpu-embeddings': 'ghcr.io/example/quivr-cpu-embeddings',
+            'postgres': 'ghcr.io/example/quivr-postgres', 'seaweed': 'ghcr.io/example/quivr-seaweed',
+            'tei': 'ghcr.io/example/quivr-tei'})
+
     def test_accepts_only_the_alpha_release_line(self):
         self.assertEqual(release_images.version('v2.0.0-alpha.12'), '2.0.0-alpha.12')
         for tag in ['v1.0.0', 'v2.0.0', 'v2.0.0-alpha.01', 'v2.0.0-alpha.1-extra', '../main']:

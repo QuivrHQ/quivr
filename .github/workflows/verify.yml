@@ -409,8 +409,11 @@ jobs:
           VERSION=dev
           REVISION=${{ github.sha }}
           PLUGIN=${{ matrix.plugin }}
-        cache-from: type=gha,scope=scan-${{ matrix.plugin || 'engine' }}
-        cache-to: type=gha,mode=max,scope=scan-${{ matrix.plugin || 'engine' }}
+        labels: |
+          org.opencontainers.image.version=dev
+          org.opencontainers.image.revision=${{ github.sha }}
+        cache-from: type=gha,scope=scan-${{ matrix.component || matrix.plugin || 'engine' }}
+        cache-to: type=gha,mode=max,scope=scan-${{ matrix.component || matrix.plugin || 'engine' }}
     - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
       if: matrix.plugin == 'hosted-embed'
       with:
@@ -466,13 +469,20 @@ jobs:
     - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
       if: failure()
       with:
-        name: failure-image-${{ matrix.plugin || 'engine' }}
+        name: failure-image-${{ matrix.component || matrix.plugin || 'engine' }}
         path: ${{ runner.temp }}/failure.tar.gz
         if-no-files-found: ignore
         retention-days: 3
         compression-level: 0
       id: failure-artifact
     if: needs.paths-filter.outputs.has-images == 'true'
+  single-machine:
+    needs: paths-filter
+    if: needs.paths-filter.outputs.full == 'true'
+    uses: ./.github/workflows/verify-single-machine.yml
+    with:
+      ref: ${{ needs.paths-filter.outputs.ref || inputs.ref || github.sha }}
+      mode: candidate
   verify:
     if: always()
     needs:
@@ -484,6 +494,7 @@ jobs:
     - vulnerabilities
     - image-inventory
     - image-vulnerabilities
+    - single-machine
     - site
     runs-on: ubuntu-24.04
     timeout-minutes: 2

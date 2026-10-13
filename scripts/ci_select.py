@@ -118,11 +118,15 @@ def select(paths, full=False):
         else:
             # Includes workflow/action, Go dependency, deployment, test and shared harness changes.
             full, reason = True, 'shared or unclassified input'
+    if images:
+        images.add('core')
+    if any(path.startswith('quivr-search/') for path in paths or []):
+        images.add('web')
     if full:
         return {'groups': all_groups, 'parts': all_parts, 'images': all_images, 'site': True,
                 'migration-compatibility': True, 'vulnerabilities': True, 'full': True, 'reason': reason}
     return {'groups': [g for g in all_groups if g in groups], 'parts': [p for p in all_parts if p in parts],
-            'images': [i for i in all_images if i['plugin'] in images], 'site': site,
+            'images': [i for i in all_images if i.get('component', i['plugin']) in images], 'site': site,
             'migration-compatibility': migration, 'vulnerabilities': vulnerabilities,
             'full': False, 'reason': reason}
 
@@ -152,6 +156,7 @@ def main():
             'vulnerabilities': outputs.get('vulnerabilities') == 'true',
             'image-inventory': outputs.get('has-images') == 'true',
             'image-vulnerabilities': outputs.get('has-images') == 'true',
+            'single-machine': outputs.get('full') == 'true',
         }
         results = {job: info['result'] for job, info in needs.items()}
         print(json.dumps({'selected': selected, 'results': results}, indent=2))

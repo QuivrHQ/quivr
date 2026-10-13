@@ -44,7 +44,8 @@ from the checked-out manifest and `version.txt`. It:
    Plugin discovery uses an ephemeral signing key injected only at runtime.
 4. Generates a Syft SPDX SBOM and rejects Grype critical findings with an available fix.
 5. Signs and verifies each digest and its SBOM attestation with cosign/GitHub OIDC.
-6. Attaches per-image `*.spdx.json` SBOMs, `images.txt` (signed digests) and release-please's `CHANGELOG.md` to
+6. Runs the anonymous, image-only Compose smoke for both CPU models, then attaches the
+   `quivr-compose-VERSION.tar.gz` bundle, per-image `*.spdx.json` SBOMs, `images.txt` (signed digests) and release-please's `CHANGELOG.md` to
    the existing release. Its release notes already contain the changelog.
 7. Creates version/full `sha-<commit>` tags and advances `latest-alpha` without
    changing the signed digests. Older reruns do not move that alias backwards.
@@ -57,7 +58,11 @@ GHCR package names use manifest ids: `quivr` for the engine and
 `quivr-plugin-<id>` for each plugin. For example, `quivr-plugin-core.ingest`
 and `quivr-plugin-connector.rss`. Set each new GHCR package's visibility to
 public in its package settings after the first publication; GHCR initially
-creates private packages. The image source label links them to this repository.
+creates private packages. The Compose release also creates `quivr-core`, `quivr-web`,
+`quivr-cpu-embeddings`, `quivr-postgres`, `quivr-seaweed` and `quivr-tei`.
+On their first release, make all six public before rerunning the failed
+`deployment-smoke` job and its publish dependency. Its anonymous pull is the
+operator-access gate; authenticating that smoke would conceal a private package. The image source label links them to this repository.
 
 The engine uses `quivr.Dockerfile`; plugin targets are `go-plugin`,
 `python-plugin`, `core-ingest` and `hosted-embed` in `plugin.Dockerfile`.

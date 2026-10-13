@@ -39,6 +39,13 @@ def inventory(root, repository):
         images.append({'plugin': folder.name, 'plugin_id': plugin_id,
                        'image': f'ghcr.io/{owner}/quivr-plugin-{plugin_id}',
                        'file': 'deploy/images/plugin.Dockerfile', 'target': target})
+    for component, dockerfile in (
+            ('core', 'deploy/railway/core.Dockerfile'), ('web', 'deploy/railway/web.Dockerfile'),
+            ('cpu-embeddings', 'deploy/cpu/embeddings.Dockerfile'),
+            ('postgres', 'deploy/railway/postgres.Dockerfile'),
+            ('seaweed', 'deploy/railway/seaweed.Dockerfile'), ('tei', 'deploy/railway/tei.Dockerfile')):
+        images.append({'plugin': '', 'component': component, 'image': f'ghcr.io/{owner}/quivr-{component}',
+                       'file': dockerfile, 'target': ''})
     return {'include': images}
 
 

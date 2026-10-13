@@ -62,6 +62,32 @@ def _asset_path(directory, name):
     return path
 
 
+def _mirror_base_url(value):
+    """Validate an explicit mirror root before constructing revision-relative paths."""
+    if value is None:
+        return None
+    if (not isinstance(value, str) or not value
+            or any(character.isspace() or ord(character) < 32 for character in value)):
+        raise ValueError('model mirror must be a nonempty HTTP(S) URL')
+    parsed = urllib.parse.urlsplit(value)
+    if (parsed.scheme not in ('http', 'https') or not parsed.netloc
+            or parsed.username is not None or parsed.password is not None
+            or parsed.query or parsed.fragment):
+        raise ValueError('model mirror must be an HTTP(S) URL without credentials or query')
+    if '..' in pathlib.PurePosixPath(parsed.path).parts:
+        raise ValueError('model mirror path must not contain parent traversal')
+    return value.rstrip('/')
+
+
+def _asset_url(lock, name, mirror_base_url=None):
+    mirror = _mirror_base_url(mirror_base_url)
+    if mirror is None:
+        mirror = 'https://huggingface.co'
+    return (mirror + '/' + urllib.parse.quote(lock['model'], safe='/')
+            + '/resolve/' + urllib.parse.quote(lock['source_revision'], safe='') + '/'
+            + urllib.parse.quote(name, safe='/') + '?download=true')
+
+
 def _digest(path):
     digest = hashlib.sha256()
     size = 0
@@ -94,7 +120,7 @@ def verify_model(directory, *, lock_path=LOCK_PATH):
     return lock
 
 
-def _download_asset(directory, name, expected, lock):
+def _download_asset(directory, name, expected, lock, *, mirror_base_url=None):
     path = _asset_path(directory, name)
     path.parent.mkdir(parents=True, exist_ok=True)
     # A sibling temporary file keeps a failed stream from becoming a plausible asset.
@@ -103,9 +129,7 @@ def _download_asset(directory, name, expected, lock):
     temporary = pathlib.Path(temporary_name)
     digest = hashlib.sha256()
     size = 0
-    url = ('https://huggingface.co/' + urllib.parse.quote(lock['model'], safe='/')
-           + '/resolve/' + urllib.parse.quote(lock['source_revision'], safe='') + '/'
-           + urllib.parse.quote(name, safe='/') + '?download=true')
+    url = _asset_url(lock, name, mirror_base_url)
     try:
         deadline = time.monotonic() + DOWNLOAD_TOTAL_SECONDS
         with os.fdopen(fd, 'wb') as output:
@@ -137,10 +161,15 @@ def _download_asset(directory, name, expected, lock):
         raise
 
 
-def prepare(output, *, verify_only=False, lock_path=LOCK_PATH):
+def prepare(output, *, verify_only=False, lock_path=LOCK_PATH, mirror_base_url=None, mirror=None):
     """Verify an existing snapshot or download missing/corrupt assets atomically."""
     output = pathlib.Path(output)
     lock = _read_lock(lock_path)
+    if mirror is not None and mirror_base_url is not None and mirror != mirror_base_url:
+        raise ValueError('mirror and mirror_base_url disagree')
+    if mirror is not None:
+        mirror_base_url = mirror
+    mirror_base_url = _mirror_base_url(mirror_base_url)
     if verify_only:
         verify_model(output, lock_path=lock_path)
         return lock
@@ -150,7 +179,7 @@ def prepare(output, *, verify_only=False, lock_path=LOCK_PATH):
         try:
             _verify_asset(path, expected, name)
         except RuntimeError:
-            _download_asset(output, name, expected, lock)
+            _download_asset(output, name, expected, lock, mirror_base_url=mirror_base_url)
             _verify_asset(path, expected, name)
         else:
             _normalize_mode(path)
@@ -161,12 +190,14 @@ def _parser():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--output', required=True, type=pathlib.Path)
     parser.add_argument('--verify-only', action='store_true')
+    parser.add_argument('--mirror-base-url', '--mirror', dest='mirror_base_url')
     return parser
 
 
 def main(argv=None):
     args = _parser().parse_args(argv)
-    lock = prepare(args.output, verify_only=args.verify_only)
+    lock = prepare(args.output, verify_only=args.verify_only,
+                   mirror_base_url=args.mirror_base_url)
     print(json.dumps({
         'model': lock['model'],
         'model_revision': lock['model_revision'],

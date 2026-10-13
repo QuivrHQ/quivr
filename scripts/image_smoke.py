@@ -54,6 +54,17 @@ def check(args):
         raise ValueError('plugin smoke checks require the manifest plugin id')
     docker('pull', args.image) if '@sha256:' in args.image else None
     config = json.loads(docker('image', 'inspect', args.image))[0]['Config']
+    if args.component:
+        labels = config.get('Labels') or {}
+        if labels.get('org.opencontainers.image.version') != args.version or labels.get('org.opencontainers.image.revision') != args.revision:
+            raise RuntimeError('deployment component release identity mismatch')
+        if args.component == 'core':
+            output = docker('run', '--rm', '--read-only', '--tmpfs', '/tmp', '--network', 'none',
+                            '--entrypoint', '/usr/local/bin/quivr', args.image, '--version')
+            if output != f'quivr {args.version} (revision {args.revision}; API v0; plugin engine 0.2.0)':
+                raise RuntimeError('bundled core build identity mismatch')
+        print(args.component + ': deployment release identity checked; startup is owned by the Compose smoke')
+        return
     if config['User'] != '10001:10001' or '/tmp' not in config.get('Volumes', {}):
         raise RuntimeError('image must default to UID/GID 10001 and declare /tmp')
     environment = os.environ.copy()
@@ -143,6 +154,7 @@ if __name__ == '__main__':
     parser.add_argument('image')
     parser.add_argument('--plugin', default='')
     parser.add_argument('--plugin-id', default='')
+    parser.add_argument('--component', default='')
     parser.add_argument('--version', required=True)
     parser.add_argument('--revision', required=True)
     check(parser.parse_args())

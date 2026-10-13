@@ -76,6 +76,7 @@ excluded = [
 "deploy/railway/autoscaler/README.md" = { audience = "functional", kind = "guide", summary = "scale Railway bulk workers from queue backlog" }
 "deploy/railway/README.md" = { audience = "functional", kind = "guide", summary = "run a hosted single-node evaluation demo" }
 "deploy/railway/hosted-embeddings.md" = { audience = "functional", kind = "guide", summary = "evaluate, fill and switch hosted text embeddings with rollback" }
+"docs-site/run-quivr/single-machine.mdx" = { audience = "functional", kind = "guide", summary = "run a complete CPU evaluation stack from one Compose release bundle" }
 "docs-site/run-quivr/scale-quivr.mdx" = { audience = "functional", kind = "concept", summary = "capacity budgets, import lessons and incident checks for operators" }
 "docs-site/run-quivr/dedicated-vector-host.mdx" = { audience = "functional", kind = "guide", summary = "provision an authenticated index VM and rebuild it from stored content" }
 "docs/agents/documentation.md" = { audience = "contributor", kind = "guide", summary = "living and dated documents, the inventory, budgets and when docs may change" }
@@ -146,7 +147,7 @@ excluded = [
 "docs/eval-modal.md" = 195
 "AGENTS.md" = 45
 "CONTEXT.md" = 327
-"deploy/images/README.md" = 76
+"deploy/images/README.md" = 85
 "deploy/railway/autoscaler/README.md" = 75
 "deploy/railway/README.md" = 450
 "deploy/railway/hosted-embeddings.md" = 107
@@ -178,3 +179,5 @@ excluded = [
 "docs/agents/oss-embeddings.md" = 85
 
 "docs/agents/migrations.md" = 78
+
+"docs-site/run-quivr/single-machine.mdx" = 81

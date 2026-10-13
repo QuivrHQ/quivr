@@ -1,0 +1,90 @@
+name: Single machine installation
+'on':
+  workflow_call:
+    inputs:
+      ref:
+        type: string
+        required: true
+      mode:
+        type: string
+        default: candidate
+      version:
+        type: string
+        default: ''
+permissions:
+  contents: read
+jobs:
+  compose:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    services:
+      registry:
+        image: registry:3.0.0@sha256:6c5666b861f3505b116bb9aa9b25175e71210414bd010d92035ff64018f9457e
+        ports: ['5000:5000']
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          ref: ${{ inputs.ref }}
+          persist-credentials: false
+      - uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
+        with:
+          python-version: 3.12.15
+      - run: python3 scripts/ci_fetch.py -- pip install --require-hashes -r scripts/ci-requirements-base.txt
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
+        if: inputs.mode == 'published'
+        with:
+          pattern: image-*
+          merge-multiple: true
+          path: .scratch/compose-images
+      - name: Reserve disk for the six image builds
+        if: inputs.mode == 'candidate'
+        run: sudo rm -rf /usr/share/dotnet /usr/local/.ghcup /usr/share/swift /opt/hostedtoolcache/CodeQL /usr/local/share/powershell /usr/local/julia*
+      - name: Build immutable release candidates into the isolated registry
+        if: inputs.mode == 'candidate'
+        env:
+          REF: ${{ inputs.ref }}
+        run: |
+          python3 - <<'PY'
+          import pathlib, subprocess, sys
+          sys.path.insert(0, 'scripts')
+          import release_images
+          version = pathlib.Path('version.txt').read_text().strip()
+          revision = subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip()
+          output = pathlib.Path('.scratch/compose-images')
+          output.mkdir(parents=True, exist_ok=True)
+          for entry in release_images.inventory(pathlib.Path('.'), 'example/quivr')['include']:
+              component = entry.get('component')
+              if not component:
+                  continue
+              image = 'localhost:5000/quivr-' + component
+              subprocess.run(['docker','build','--file',entry['file'],'--tag',image + ':candidate',
+                  '--build-arg','VERSION=' + version,'--build-arg','REVISION=' + revision,
+                  '--label','org.opencontainers.image.version=' + version,
+                  '--label','org.opencontainers.image.revision=' + revision,'.'],check=True)
+              subprocess.run(['docker','push',image + ':candidate'],check=True)
+              digest = subprocess.check_output(['docker','inspect','--format','{{index .RepoDigests 0}}',image + ':candidate'],text=True).strip()
+              (output / ('quivr-' + component + '.txt')).write_text(digest + '\n')
+              subprocess.run(['python3','scripts/image_smoke.py',digest,'--component',component,
+                  '--version',version,'--revision',revision],check=True)
+          PY
+      - name: Prepare the identical operator bundle and prove both model selections
+        env:
+          RELEASE_VERSION: ${{ inputs.version }}
+          MODE: ${{ inputs.mode }}
+        run: |
+          test "$MODE" = candidate || test "$MODE" = published
+          version="${RELEASE_VERSION:-$(cat version.txt)}"
+          revision=$(git rev-parse HEAD)
+          python3 scripts/single_machine_bundle.py --images .scratch/compose-images --output .scratch/gemma-bundle --version "$version" --revision "$revision"
+          python3 scripts/single_machine_bundle.py --images .scratch/compose-images --output .scratch/e5-bundle --version "$version" --revision "$revision"
+          python3 scripts/single_machine_smoke.py --directory .scratch/gemma-bundle --model gemma
+          python3 scripts/single_machine_smoke.py --directory .scratch/e5-bundle --model e5
+      - name: Clean only isolated test projects after failures
+        if: always()
+        run: |
+          for directory in .scratch/gemma-bundle .scratch/e5-bundle; do
+            if test -f "$directory/.env"; then
+              docker compose --project-directory "$directory" --profile demo down -v --remove-orphans
+            fi
+          done
