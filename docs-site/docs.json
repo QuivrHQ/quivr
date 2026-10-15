@@ -24,6 +24,13 @@
       "vscode"
     ]
   },
+  "integrations": {
+    "posthog": {
+      "apiKey": "phc_pSFWFc94275asrYSX5PQffv7wE6vUsGDdUnBaDobgtMN",
+      "apiHost": "https://us.i.posthog.com",
+      "sessionRecording": false
+    }
+  },
   "navigation": {
     "tabs": [
       {
