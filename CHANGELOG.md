@@ -10,6 +10,13 @@
 
 - Prepare deployment routing changes in checkpointed batches while imports continue. Publish the final switch through one routing pointer. Rollback accepts missing coverage and retains outgoing searchable projections while recovery completes. Backfill scope counting runs outside the routing lock.
 
+## [2.0.0-alpha.8](https://github.com/The-Vibe-Company/quivr/compare/v2.0.0-alpha.7...v2.0.0-alpha.8) (2026-10-15)
+
+
+### Features
+
+* **docs-site:** add PostHog analytics to the documentation site ([#3954](https://github.com/The-Vibe-Company/quivr/issues/3954)) ([1f72133](https://github.com/The-Vibe-Company/quivr/commit/1f72133e27e1cc0a7a05fb35a93df0f9e33136c4))
+
 ## [2.0.0-alpha.7](https://github.com/The-Vibe-Company/quivr/compare/v2.0.0-alpha.6...v2.0.0-alpha.7) (2026-10-13)
 
 
