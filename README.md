@@ -9,6 +9,8 @@ the background and lets you follow a topic over time. The core stays generic: fo
 AI models and business rules belong in plugins, so you can adapt Quivr to your domain
 without forking the platform.
 
+Quivr is developed by [The Vibe Company](https://www.thevibecompany.co), the AI agency created by the Quivr team.
+
 > **Status: evaluation stage.** The API is `v0` and may change without notice. Do not
 > run it in production yet.
 
