@@ -1,0 +1,7 @@
+{
+  "format": "openai",
+  "base_url": "https://api.orcarouter.ai/v1",
+  "auth": "bearer",
+  "model": "openai/text-embedding-3-large",
+  "dimensions": 3072
+}

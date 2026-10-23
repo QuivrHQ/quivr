@@ -40,6 +40,20 @@ OpenAI (`examples/openai.json`):
  "auth":"bearer","model":"text-embedding-3-large","dimensions":3072}
 ```
 
+OrcaRouter (`examples/orcarouter.json`), a multi-provider gateway at
+[OrcaRouter](https://www.orcarouter.ai):
+
+```json
+{"format":"openai","base_url":"https://api.orcarouter.ai/v1",
+ "auth":"bearer","model":"openai/text-embedding-3-large","dimensions":3072}
+```
+
+OrcaRouter serves an OpenAI-compatible `/embeddings` endpoint, so keep the
+`vendor/model` id it lists for embeddings and send its key as `EMBED_API_KEY`
+like any other bearer configuration. Generating the manifest makes no request;
+the first certification or ingestion call establishes that the key, model and
+declared dimensions agree.
+
 Local TEI (`examples/tei.json`):
 
 ```json
